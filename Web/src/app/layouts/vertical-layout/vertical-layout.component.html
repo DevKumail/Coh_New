@@ -5,8 +5,15 @@
   <!-- <app-topbar/> -->
   <app-topbar (patientBannerToggle)="togglePatientBanner($event)"></app-topbar>
 
-  <div class="content-page">
+  <!-- <div class="content-page"> -->
  
+  <!-- <div class="content-page scroll-wrapper"> -->
+    <!-- <div class="content-page scroll-wrapper" [ngClass]="{ 'with-pinned': isPinned }"> -->
+
+      <!-- add by waleed -->
+      <div class="content-page scroll-wrapper" [style.marginTop.px]="isPinned ? 160 : 60">
+
+
 
 <app-patient-header-panel
 
@@ -14,6 +21,7 @@
     [state]="showPatientBanner || isPinned ? 'visible' : 'hidden'"
   [pinned]="isPinned"
   (pinnedChange)="isPinned = $event"
+  [ngClass]="{ 'sticky': isPinned }"    
 ></app-patient-header-panel>
 
     

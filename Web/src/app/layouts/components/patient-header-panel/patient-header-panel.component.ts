@@ -83,6 +83,7 @@ import { IconsModule } from '@/app/shared/icons.module';
   ]
 })
 export class PatientHeaderPanelComponent {
+  
 
   @Input() state: 'visible' | 'hidden' = 'hidden';
   @Input() patient: any = null;

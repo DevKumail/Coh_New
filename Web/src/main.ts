@@ -1,6 +1,6 @@
   import { appConfig } from './app/app.config';
 
-  import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
+  import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors } from '@angular/common/http';
   import { provideRouter } from '@angular/router';
   import { routes } from './app/app.routes';
   import { bootstrapApplication } from '@angular/platform-browser';
@@ -15,14 +15,10 @@
    import { User, Hospital, HeartPulse, ClipboardEdit  } from 'lucide-angular';
 import { AuthInterceptor } from '@core/interceptors/auth.interceptor';
 
-  // bootstrapApplication(AppComponent, appConfig)
-  //   .catch((err) => console.error(err));
-
     bootstrapApplication(AppComponent, {
     providers: [
-      provideHttpClient(),       // ✅ <-- Register HttpClient
-      provideRouter(routes),     // ✅ <-- Register routes if using routing
-      // other global providers
+      provideHttpClient(),
+      provideRouter(routes),
       provideAnimations(), 
        importProvidersFrom(
       LucideAngularModule.pick({
@@ -31,10 +27,8 @@ import { AuthInterceptor } from '@core/interceptors/auth.interceptor';
         HeartPulse,
         ClipboardEdit 
       })),
-     {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    }
+          provideHttpClient(
+      withInterceptors([AuthInterceptor])
+    ),
     ]
   }).catch((err) => console.error(err));
