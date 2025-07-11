@@ -122,7 +122,9 @@ export const menuItems: ExtendedMenuItemType[] = [
     isCollapsed: true,
     children: [
 
-      { label: 'Alerts', url: '/registartion/alerts' },
+      { label: 'Alerts', url: '/registration/alerts' },
+      { label: 'Coverages', url: '/registration/coverage-list' },
+      { label: 'Coverage Create', url: '/registration/covrage-create' },
 
     ]
   },

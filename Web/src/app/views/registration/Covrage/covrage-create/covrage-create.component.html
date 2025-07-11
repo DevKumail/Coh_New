@@ -1,0 +1,150 @@
+<div class="container-fluid mt-3">
+  <div class="card shadow-lg p-4 rounded">
+
+    <!-- 🔷 Optional Breadcrumb -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold mb-0">Add Subscriber</h4>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a routerLink="/registration">Registration</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Add Subscriber</li>
+        </ol>
+      </nav>
+    </div>
+
+    <!-- 📝 Reactive Form Starts -->
+    <form [formGroup]="subscriberForm" (ngSubmit)="insertsubscriber()">
+      <div class="row">
+        <!-- Type -->
+        <div class="col-lg-3">
+          <label class="form-label">Type</label>
+          <select class="form-select" formControlName="CompanyOrIndividual" (change)="showRelation()">
+            <option *ngFor="let t of type" [ngValue]="t">{{ t.label }}</option>
+          </select>
+        </div>
+
+        <!-- Relation -->
+        <div class="col-lg-3" *ngIf="isRelation">
+          <label class="form-label">Relation</label>
+          <select class="form-select" formControlName="InsuranceRel">
+            <option *ngFor="let rel of InsuranceRelation" [ngValue]="rel">{{ rel.name }}</option>
+          </select>
+        </div>
+
+        <!-- Title -->
+        <div class="col-lg-3">
+          <label class="form-label">Title</label>
+          <select class="form-select" formControlName="Suffix">
+            <option *ngFor="let title of titles" [ngValue]="title">{{ title.name }}</option>
+          </select>
+        </div>
+
+        <!-- First Name -->
+        <div class="col-lg-3">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-control" formControlName="FirstName" placeholder="Enter First Name" />
+        </div>
+
+        <!-- Middle Name -->
+        <div class="col-lg-3">
+          <label class="form-label">Middle Name</label>
+          <input type="text" class="form-control" formControlName="MiddleName" placeholder="Enter Middle Name" />
+        </div>
+
+        <!-- Last Name -->
+        <div class="col-lg-3">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-control" formControlName="LastName" placeholder="Enter Last Name" />
+        </div>
+
+        <!-- Phone -->
+        <div class="col-lg-3">
+          <label class="form-label">Phone</label>
+          <input type="text" class="form-control" formControlName="InsuredPhone" placeholder="03XXXXXXXXX" />
+        </div>
+
+        <!-- DOB -->
+        <div class="col-lg-3">
+          <label class="form-label">Date of Birth</label>
+          <input type="date" class="form-control" formControlName="BirthDate" />
+        </div>
+
+        <!-- Gender -->
+        <div class="col-lg-3">
+          <label class="form-label">Gender</label>
+          <select class="form-select" formControlName="Sex">
+            <option *ngFor="let g of genders" [ngValue]="g">{{ g.name }}</option>
+          </select>
+        </div>
+
+        <!-- Insured ID No -->
+        <div class="col-lg-3">
+          <label class="form-label">Insured ID No</label>
+          <input type="text" class="form-control" formControlName="InsuredIdNo" placeholder="ID Number" />
+        </div>
+
+        <!-- Country -->
+        <div class="col-lg-3">
+          <label class="form-label">Country</label>
+          <!-- <select class="form-select" formControlName="CountryId" (change)="onCountryChange($event)">
+            <option *ngFor="let c of Country" [ngValue]="c">{{ c.name }}</option>
+          </select> -->
+          <select class="form-select" formControlName="CountryId">
+  <option *ngFor="let c of Country" [ngValue]="c">{{ c.name }}</option>
+</select>
+        </div>
+
+        <!-- State -->
+        <div class="col-lg-3">
+          <label class="form-label">State</label>
+         <select class="form-select" formControlName="StateId">
+  <option *ngFor="let s of states" [ngValue]="s">{{ s.name }}</option>
+</select>
+        </div>
+
+        <!-- City -->
+        <div class="col-lg-3">
+          <label class="form-label">City</label>
+          <select class="form-select" formControlName="CityId">
+  <option *ngFor="let city of city" [ngValue]="city">{{ city.name }}</option>
+</select>
+        </div>
+
+        <!-- Zip -->
+        <div class="col-lg-3">
+          <label class="form-label">Zip Code</label>
+          <input type="text" class="form-control" formControlName="ZipCode" />
+        </div>
+
+        <!-- Policy Plan -->
+        <div class="col-lg-3">
+          <label class="form-label">Policy Plan</label>
+          <select class="form-select" formControlName="selectedBLPayerPlan">
+            <option *ngFor="let plan of BLPayerPlan" [ngValue]="plan">{{ plan.name }}</option>
+          </select>
+        </div>
+
+        <!-- Package -->
+        <div class="col-lg-3">
+          <label class="form-label">Package</label>
+          <select class="form-select" formControlName="selectedBLPayerPackage">
+            <option *ngFor="let pack of BLPayerPackage" [ngValue]="pack">{{ pack.name }}</option>
+          </select>
+        </div>
+
+        <!-- Active -->
+        <div class="col-lg-3 d-flex align-items-center mt-4">
+          <input type="checkbox" class="form-check-input" formControlName="Inactive" />
+          <label class="form-check-label ms-2">Active</label>
+        </div>
+      </div>
+
+      <!-- Save / Cancel Buttons -->
+      <div class="d-flex justify-content-end mt-4">
+        <button type="submit" class="btn btn-success">Save</button>
+        <button type="button" class="btn btn-secondary ms-2" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+
+  </div>
+</div>

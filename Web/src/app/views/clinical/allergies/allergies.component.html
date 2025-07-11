@@ -6,8 +6,8 @@
     <div class="row">
       <!-- Provider ID -->
       <div class="col-lg-3 mb-3">
-        <label class="form-label">Provider ID</label>
-        <input type="text" class="form-control" formControlName="providerId" placeholder="Enter Provider ID" />
+        <label class="form-label">Provider</label>
+        <input type="text" class="form-control" formControlName="providerName" placeholder="Enter Provider Name" />
       </div>
 
       <!-- Allergy Type Dropdown -->
@@ -66,7 +66,8 @@
 
     <div class="d-flex justify-content-end">
       <button type="button" class="btn btn-secondary" (click)="resetForm()">Clear</button>
-      <button type="button" class="btn btn-danger ms-2" (click)="submitAllergyForm()">Submit</button>
+      <button type="button" class="btn btn-success ms-2" (click)="submitAllergyForm1()">Submit</button>
+
     </div>
   </div>
 </form>
@@ -78,7 +79,7 @@
       <table class="table table-bordered table-striped mb-0">
         <thead>
           <tr>
-            <th class="text-center">Provider ID</th>
+            <th class="text-center">Provider Name</th>
             <th class="text-center">Allergy Type</th>
             <th class="text-center">Allergen</th>
             <th class="text-center">Severity</th>
@@ -91,7 +92,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let allergy of allergyData; let i = index">
-            <td class="text-center">{{ allergy.providerId }}</td>
+            <td class="text-center">{{ allergy.providerName }}</td>
             <td class="text-center">{{ allergy.allergyType }}</td>
             <td class="text-center">{{ allergy.allergen }}</td>
             <td class="text-center">{{ allergy.severity }}</td>

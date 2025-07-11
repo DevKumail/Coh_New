@@ -5,13 +5,15 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NgIconComponent } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
+import { ClinicalApiService } from '../clinical.api.service';
+
 
 
 @Component({
   selector: 'app-allergies',
   imports: [ CommonModule,
-    ReactiveFormsModule
-    ,FormsModule,],
+    ReactiveFormsModule,
+    FormsModule,],
   templateUrl: './allergies.component.html',
   styleUrl: './allergies.component.scss'
 })
@@ -34,7 +36,12 @@ export class AllergiesComponent implements OnInit {
   start = 0;
   end = this.pageSize;
 
-  constructor(private fb: FormBuilder, private router: Router) {}
+  constructor(
+
+    private clinicalApi: ClinicalApiService,
+    private fb: FormBuilder,
+    private router: Router
+    ) {}
 
   ngOnInit() {
     this.initForm();
@@ -44,7 +51,7 @@ export class AllergiesComponent implements OnInit {
 
   initForm() {
     this.allergyForm = this.fb.group({
-      providerId: [''],
+      providerName: [''],
       allergyType: [''],
       allergen: [''],
       severity: [''],
@@ -55,10 +62,12 @@ export class AllergiesComponent implements OnInit {
     });
   }
 
+
+
   loadDummyData() {
     this.allergyData = [
       {
-        providerId: 'PRV001',
+        providerName: 'Dr. Smith',
         allergyType: 'Food',
         allergen: 'Peanuts',
         severity: 'High',
@@ -68,7 +77,7 @@ export class AllergiesComponent implements OnInit {
         status: 'Active'
       },
       {
-        providerId: 'PRV002',
+        providerName: 'Dr. Johnson',
         allergyType: 'Drug',
         allergen: 'Penicillin',
         severity: 'Moderate',
@@ -78,7 +87,7 @@ export class AllergiesComponent implements OnInit {
         status: 'Resolved'
       },
       {
-        providerId: 'PRV003',
+        providerName: 'Dr. Brown',
         allergyType: 'Environmental',
         allergen: 'Dust',
         severity: 'Low',
@@ -159,6 +168,40 @@ export class AllergiesComponent implements OnInit {
   resetForm() {
     this.allergyForm.reset();
   }
-}
 
+
+//   submitAllergyForm() {
+//   if (this.allergyForm.valid) {
+//     const formData = this.allergyForm.value;
+
+//     this.clinicalApi.submitPatientAllergy(formData).subscribe({
+//       next: (response) => {
+//         console.log('Allergy submitted successfully:', response);
+//         this.allergyData.push(formData);
+//         this.allergyForm.reset();
+//         this.updatePagination();
+//       },
+//       error: (error) => {
+//         console.error('Error submitting allergy:', error);
+//       }
+//     });
+//   }
+// }
+
+submitAllergyForm1() {
+  if (this.allergyForm.valid) {
+    const formData = this.allergyForm.value;
+    this.clinicalApi.submitPatientAllergy(formData).subscribe({
+      next: (response) => {
+        console.log('Submitted', response);
+        this.allergyData.push(formData);
+        this.allergyForm.reset();
+        this.updatePagination();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+}
+}
 
