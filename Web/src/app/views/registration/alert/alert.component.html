@@ -17,6 +17,7 @@
   <div class="card p-3 shadow rounded">
     <h5 class="card-title mb-3 fw-bold">Alerts</h5>
     <input type="hidden" formControlName="mrno" />
+
     <div class="row">
       <div class="col-lg-3">
         <div class="mb-3">
@@ -110,14 +111,16 @@
             </thead>
             <tbody>
               <tr *ngFor="let item of MyAlertsData.slice(start, end)">
-                <td class="text-center">{{ getAlertTypeName(item.alertType) }}</td>
-                <td class="text-center">{{ item.startDate }}</td>
-                <td class="text-center">{{ item.repeatDate }}</td>
-                <td class="text-center">{{ item.message }}</td>
-                <td class="text-center">{{ item.status }}</td>
+                <!-- <td class="text-center">{{ getAlertTypeName(item.alertType) }}</td> -->
+                 <td class="text-center">{{ getAlertTypeName(item.alertTypeId) }}</td>
+
+                <td class="text-center">{{ item.startDate|date:'yyyy-MM-dd' }}</td>
+                <td class="text-center">{{ item.repeatDate|date:'yyyy-MM-dd' }}</td>
+                <td class="text-center">{{ item.alertMessage }}</td>
+                <td class="text-center">{{ item.active ? 'Active' : 'Inactive' }}</td>
                 <td class="text-center">{{ item.updatedBy }}</td>
                 <td class="text-center">{{ item.enteredBy }}</td>
-                <td class="text-center">{{ item.enteredDate }}</td>
+                <td class="text-center">{{ item.enteredDate|date:'yyyy-MM-dd' }}</td>
               </tr>
             </tbody>
           </table>

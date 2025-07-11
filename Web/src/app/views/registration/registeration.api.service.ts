@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '@/app/core/services/api.service';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class RegistrationApiService {
-    constructor(private api: ApiService) { }
+    constructor(private api: ApiService, private http: HttpClient) { }
 
     getAllPatients(): Observable<any> {
         return this.api.get('/api/patients');
@@ -29,13 +30,15 @@ export class RegistrationApiService {
         debugger
         return this.api.post(`Alert/SubmitAlertType`, data);
     }
-    GetPatientAlertsData(mrno: string): Promise<any> {
-        debugger
-        return this.api.get(`Alert/GetPatientAlertsData?mrno=${mrno}`).toPromise();
+ 
 
-    }
     GetAlertType(): Promise<any> {
-        return this.api.get('AllDropdowns/GetAlertType').toPromise(); // ✅ No /api
+        return this.api.get('AllDropdowns/GetAlertType').toPromise();
+    }
+    
+    GetAlertDetailsDb(mrno: string): Promise<any> {
+        const url = `Alert/GetAlertDeatilsDB?mrno=${mrno}`;
+        return this.api.get(url).toPromise();
     }
 
 

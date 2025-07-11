@@ -57,6 +57,8 @@ export class AlertComponent implements OnInit {
   ) { }
   Active = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
 
+  
+
   ngOnInit(): void {
     this.alertForm = this.fb.group({
       alertType: [null, Validators.required],
@@ -68,10 +70,8 @@ export class AlertComponent implements OnInit {
       enteredBy: [''],
       enteredDate: [null],
     });
-
+this.  GetPatientAlertsData() ;
     this.GetAlertType();
-    this.registrationApiService.GetPatientAlertsData(this.mrno)
-
 
     this.alertForm = this.fb.group({
       alertType: [0, Validators.required],
@@ -105,10 +105,11 @@ export class AlertComponent implements OnInit {
     }
     return false;
   }
+  
   mrno: any
   GetPatientAlertsData() {
     debugger
-    this.registrationApiService.GetPatientAlertsData(this.mrno).then((res: any) => {
+    this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
       debugger;
 
       const alertsTable = [] = res?.alert?.table1;
@@ -167,7 +168,7 @@ export class AlertComponent implements OnInit {
     this.registrationApiService.SubmitAlertType(alert).subscribe({
       next: (res) => {
         Swal.fire({
-          position: "top-end",
+          position: "center",
           icon: "success",
           title: "Your work has been saved",
           showConfirmButton: false,
@@ -185,12 +186,24 @@ export class AlertComponent implements OnInit {
       }
     });
   }
+  
 
 
+  // getAlertTypeName(typeId: number): string {
+  //   const match = this.getAlert.find((a: any) => a.typeId === typeId);
+  //   return match ? match.name : typeId.toString();
+  // }
+  //add waleed
   getAlertTypeName(typeId: number): string {
-    const match = this.getAlert.find((a: any) => a.typeId === typeId);
-    return match ? match.name : typeId.toString();
+  if (typeof typeId !== 'number') {
+    console.warn('⚠️ Invalid typeId:', typeId);
+    return 'Unknown';
   }
+
+  const match = this.getAlert?.find((a: any) => a.typeId === typeId);
+  return match?.name || typeId?.toString?.() || 'Unknown';
+}
+
 
   get start(): number {
     return (this.currentPage - 1) * this.pageSize;
