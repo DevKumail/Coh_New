@@ -33,7 +33,13 @@ export const routes: Routes = [
         canActivate: [authGuard, modulePermissionGuard],
         data: { module: 'Control Panel' },
         loadChildren: () => import('./views/control-panel/control-panel.module').then((m) => m.ControlPanelModule)
-      }
+      },
+      {
+          path: 'billing',
+          canActivate: [authGuard, modulePermissionGuard],
+          data: { module: 'Billing' },
+          loadChildren: () => import('./views/billing/billing.module').then((m) => m.BillingModule)
+        }
 
 
     ],

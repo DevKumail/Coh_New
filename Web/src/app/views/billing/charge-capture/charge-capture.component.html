@@ -1,0 +1,203 @@
+<!-- 🔹 Breadcrumb OUTSIDE card -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
+      <li class="breadcrumb-item">
+        <a href="javascript:void(0);">
+          <ng-icon name="tablerSmartHome"></ng-icon>
+          Clinical
+        </a>
+      </li>
+      <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
+        <ng-icon name="tablerChevronRight"></ng-icon>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Medical History</li>
+    </ol>
+  </nav>
+
+  <!-- hide Diagnosis gride -->
+  <div class="card shadow rounded">
+    <div class="card-body">
+     <div class="col-lg-3">
+        <div class="mb-3">
+          <label class="form-label">Provider / Nurse Name:</label>
+          <select class="form-select" [(ngModel)]="ProviderId" name="ProviderId" (change)="provider($event)">
+            <option value="">Select Provider</option>
+            <option *ngFor="let item of Provider" [value]="item.code">
+              {{ item.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <ul ngbNav #nav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs mb-3">
+        <!-- My Diagnosis Code -->
+        <li [ngbNavItem]="1">
+          <a ngbNavLink href="javascript:void(0)">My Diagnosis Code</a>
+          <ng-template ngbNavContent>
+
+              <div class="row">
+                  <div class="col-md-2 col-sm-4 col-12">
+                    <label  for="">Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      (input)="filter($event)"
+                      placeholder="Code"
+                      />
+                  </div>
+
+                  <div class="col-md-2 col-sm-4 col-12">
+                    <label for="">ICD Version</label>
+                    <select class="form-select" [(ngModel)]="ICDVersionId" name="ICDVersionId" (change)="filteVersion($event)">
+                      <option value="">Select ICD Version</option>
+                      <option *ngFor="let item of ICDVersions" [value]="item.code">
+                        {{ item.name }}
+                      </option>
+                    </select>
+                  </div>
+
+
+                  <div class="col-md-2 col-sm-4 col-12">
+                  <label for="">Description</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="description"
+                    (input)="filter($event)"
+                    placeholder="Description"
+                  />
+                </div>
+
+
+                <div class="col-md-2 col-sm-4 col-12">
+                  <label for="">Group Name</label>
+                  <select class="form-select" [(ngModel)]="ICT9GroupId" name="ICT9GroupId" (change)="filteVersion($event)">
+                    <option value="">Select Group</option>
+                    <option *ngFor="let item of ICT9Group" [value]="item.code">
+                      {{ item.name }}
+                    </option>
+                  </select>
+                </div>
+            </div>
+            <br />
+
+<!-- *ngxPermissionsOnly="['Control Panel:Human Resources:View']" -->
+          <div >
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-bordered">
+                <thead class="thead-light">
+                  <tr>
+                    <th>
+                    </th>
+                    <th>Code</th>
+                    <th>ICD Version</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let MyDiagnosisCode of MyDiagnosisCode">
+                    <td>
+                      <input
+                        type="checkbox"
+                        [value]="MyDiagnosisCode" (click)="Rows()"
+                      />
+                    </td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ MyDiagnosisCode.icD9Code }}
+                      </span>
+                    </td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ MyDiagnosisCode.icdVersion }}
+                      </span>
+                    </td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ MyDiagnosisCode.providerDescription }}
+                      </span>
+                    </td>
+                  </tr>
+
+                  <tr *ngIf="MyDiagnosisCode.length === 0">
+                    <td colspan="4">No My Diagnosis Code found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
+            <app-pagination
+              [totalItems]="myData.length"
+              [pageSizeOptions]="[5, 10, 25, 100]"   
+              (pageData)="onPageChange($event)">
+            </app-pagination>
+            <!-- <app-my-diagnosis-code></app-my-diagnosis-code> -->
+          </ng-template>
+        </li>
+
+        <!-- My CPT Code -->
+        <li [ngbNavItem]="2">
+          <a ngbNavLink href="javascript:void(0)">My CPT Code</a>
+          <ng-template ngbNavContent>
+            <!-- <app-my-cpt-code></app-my-cpt-code> -->
+          </ng-template>
+        </li>
+
+        <!-- My HCPCS Code -->
+        <li [ngbNavItem]="3">
+            <a ngbNavLink href="javascript:void(0)">My HCPCS Code</a>
+            <ng-template ngbNavContent>
+              <!-- <app-my-hcpcs-code></app-my-hcpcs-code> -->
+            </ng-template>
+          </li>
+
+          <!-- My Dental Code -->
+        <li [ngbNavItem]="4">
+            <a ngbNavLink href="javascript:void(0)">My Dental Code</a>
+            <ng-template ngbNavContent>
+              <!-- <app-my-dental-code></app-my-dental-code> -->
+            </ng-template>
+          </li>
+
+
+          <!-- Diagnosis Code -->
+          <li [ngbNavItem]="5">
+            <a ngbNavLink href="javascript:void(0)">Diagnosis Code</a>
+            <ng-template ngbNavContent>
+              <!-- <app-diagnosis-code></app-diagnosis-code> -->
+            </ng-template>
+          </li>
+
+          <!-- CPT Code -->
+          <li [ngbNavItem]="6">
+            <a ngbNavLink href="javascript:void(0)">CPT Code</a>
+            <ng-template ngbNavContent>
+              <!-- <app-cpt-code></app-cpt-code> -->
+            </ng-template>
+          </li>
+
+          <!-- HCPCS Code -->
+          <li [ngbNavItem]="7">
+            <a ngbNavLink href="javascript:void(0)">HCPCS Code</a>
+            <ng-template ngbNavContent>
+              <!-- <app-hcpcs-code></app-hcpcs-code> -->
+            </ng-template>
+          </li>
+          
+          <!-- Dental Code -->
+          <li [ngbNavItem]="8">
+            <a ngbNavLink href="javascript:void(0)">Dental Code</a>
+            <ng-template ngbNavContent>
+              <!-- <app-dental-code></app-dental-code> -->
+            </ng-template>
+          </li>          
+      </ul>
+
+      <!-- Tab Content -->
+      <div [ngbNavOutlet]="nav"></div>
+
+    </div>
+  </div>

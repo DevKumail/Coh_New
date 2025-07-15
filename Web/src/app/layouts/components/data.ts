@@ -146,6 +146,16 @@ export const menuItems: ExtendedMenuItemType[] = [
         { label: 'Human Resources Add', url: '/control-panel/human-resources-add' },
  ]
   },
+  {
+    label: 'Billing',
+    icon: 'tablerHeartbeat',
+    module: 'Billing', // 👈 this is used by PermissionService
+    isCollapsed: true,
+    children: [
+
+      { label: 'Charge Capture', url: '/billing/charge-capture' },
+    ]
+  },
 
 
 

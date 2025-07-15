@@ -14,15 +14,23 @@ constructor(private api: ApiService) {}
 
 
   submitPatientAllergy(data: any): Observable<any> {
-    debugger
+    // debugger
   return this.api.post('/Alergy/SubmitPatientAlergy', data);
 }
 
 
 
-GetCoverageAndRegPatient(filterData: any): Observable<any> {
-    //console.log('GetCoverageAndRegPatient called with:', filterData);
-    return this.api.post('/Common/GetCoverageAndRegPatient', filterData);
+GetCoverageAndRegPatient(demographicList:any,PaginationInfo:any): Observable<any> {
+    const data={...demographicList,PaginationInfo}
+		return this.api.post('Common/GetCoverageAndRegPatient',data);
+  }
+
+  getCoverageAndRegPatientbyMrno(MRNo:string='') {
+    return this.api.get(`Common/GetCoverageAndRegPatientDBByMrNo?MRNo=${MRNo}`).toPromise();
+  }
+
+  GetAppointmentByMRNO(MRNo:string='') {
+	  return this.api.get(`Common/GetAppointmentInfoByMRNo?MRNo=${MRNo}`);
   }
 
 }

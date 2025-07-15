@@ -27,7 +27,7 @@ export class RegistrationApiService {
     //     return this.api.delete(/api/patients/${id});
     // }
     // SubmitAlertType(data: any): Observable<any> {
-    //     debugger
+    //     // debugger
     //     return this.api.post(Alert/SubmitAlertType, data);
     // }
 
@@ -42,7 +42,7 @@ export class RegistrationApiService {
     // }
   GetSearch( CompanyOrIndividual?:any,  LastName?:string, SSN?: string, InsuredIDNo? : string, MRNo?:any,   PageNumber?:number, PageSize?:number) {
 
-    debugger
+    // debugger
 
     return this.api.get(`Coverages/GetSearch?CompanyOrIndividual=${CompanyOrIndividual}&LastName=${LastName}&SSN=${SSN}&InsuredIDNo=${InsuredIDNo}&MRNo=${MRNo}&PageNumber=${PageNumber}&PageSize=${PageSize}`).toPromise();
 
@@ -55,7 +55,7 @@ export class RegistrationApiService {
 
 
   GetCoverage(MRNo:string) {
-    debugger
+    // debugger
     return this.api.get(`Coverages/GetCoverage?MRNo=${MRNo}`).toPromise();
   }
 
@@ -66,12 +66,12 @@ const obj={CoverageListReq,PaginationInfo}
   }
 
   InsertSubscriber(object: any) {
-    debugger
+    // debugger
     return this.api.post('Coverages/InsertSubscriber', object).toPromise();
   }
 
   GetCoverageById(subscribedId:number) {
-    debugger
+    // debugger
     return this.api.get(`Coverages/GetCoveragesubscribedId?subscribedId=${subscribedId}`).toPromise();
   }
 
@@ -79,7 +79,7 @@ const obj={CoverageListReq,PaginationInfo}
     return this.api.post('Coverages/InsertCoverage', object).toPromise();
   }
 //   FetchImageData(obj:FormData) {
-//     debugger
+//     // debugger
 //   return this.api.imagepost(`Coverages/GetImageData`,obj).toPromise();
 //   }
 GetInsuranceRelation() {
@@ -87,12 +87,12 @@ GetInsuranceRelation() {
 }
 
 getCityByState(ProviderId:any) {
-debugger
+// debugger
   return this.api.get(`AllDropdowns/GetCityByState?ProviderId=${ProviderId}`).toPromise();
 }
 
 getStateByCountry(countryId:any) {
-  debugger
+  // debugger
   return this.api.get(`AllDropdowns/GetStateByCountry?countryId=${countryId}`).toPromise();
 }
 

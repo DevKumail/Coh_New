@@ -109,6 +109,7 @@ import { NotificationDropdownComponent } from '@layouts/components/topbar/compon
 import { IconsModule } from '@/app/shared/icons.module';
 import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { PatientSearchModalComponent } from '@/app/shared/modals/patient-search-modal/patient-search-modal.component';
+import { DataStorageService } from '@/app/shared/data-storage.service';
 
 
 
@@ -116,7 +117,7 @@ import { PatientSearchModalComponent } from '@/app/shared/modals/patient-search-
   selector: 'app-topbar',
   standalone: true,
   imports: [
-
+    NgIcon,
     RouterLink,
     MegaMenuComponent,
     ThemeTogglerComponent,
@@ -132,10 +133,12 @@ import { PatientSearchModalComponent } from '@/app/shared/modals/patient-search-
 export class TopbarComponent {
   constructor(
     public layout: LayoutStoreService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private DataStorage: DataStorageService
   ) {}
 
   Search = Search;
+  pinned: boolean = false;
 
   @Output() patientBannerToggle = new EventEmitter<boolean>();
   showPatientBanner = true;
@@ -169,7 +172,12 @@ export class TopbarComponent {
       this.patientBannerToggle.emit(this.showPatientBanner);
     } else {
       // No patient loaded, open modal
-      this.modalService.open(content, { size: 'lg' });
+      this.modalService.open(content, {
+        size: 'xl',              // ⬅️ Bootstrap XL width (~1140px)
+        scrollable: true,        // ⬅️ Enable vertical scroll
+        centered: true,          // Optional: center modal vertically
+        backdrop: 'static'       // Optional: prevent closing on outside click
+      });
     }
   }
 
@@ -182,5 +190,16 @@ handleSearchResults(results: any[]) {
 }
 
 
-    }
+togglePin(){
+  debugger
+  this.pinned = !this.pinned;
+  this.DataStorage.toggleShow(this.pinned);
+
+   var patient = this.DataStorage.getData('Demographics');
+   this.DataStorage.setData('Demographics', patient);
+
+}
+
+
+}
 

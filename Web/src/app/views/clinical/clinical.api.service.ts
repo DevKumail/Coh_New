@@ -13,7 +13,7 @@ constructor(private api: ApiService) {}
 //   }
 
   submitPatientAllergy(data: any): Observable<any> {
-    debugger
+    // debugger
   return this.api.post('/Alergy/SubmitPatientAlergy', data);
 }
 

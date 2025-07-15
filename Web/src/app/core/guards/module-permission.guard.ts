@@ -6,7 +6,7 @@ export const modulePermissionGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
-    debugger
+    // debugger
   const permissionService = inject(PermissionService);
   const router = inject(Router);
 

@@ -27,7 +27,7 @@ export class RegistrationApiService {
         return this.api.delete(`/api/patients/${id}`);
     }
     SubmitAlertType(data: any): Observable<any> {
-        debugger
+        // debugger
         return this.api.post(`Alert/SubmitAlertType`, data);
     }
  

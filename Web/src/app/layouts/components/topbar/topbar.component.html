@@ -14,15 +14,15 @@
       </div>
 
       <!-- Sidebar toggle -->
-      <!-- <button
+      <button
         (click)="toggleSidebar()"
         class="sidenav-toggle-button btn btn-primary btn-icon"
       >
         <ng-icon name="tablerMenu4" class="fs-22" />
-      </button> -->
+      </button>
 
       <!-- Search -->
-      <div class="app-search d-none d-xl-flex">
+      <!-- <div class="app-search d-none d-xl-flex">
         <input
           type="search4"
           class="form-control topbar-search"
@@ -30,18 +30,25 @@
           placeholder="Search for something..."
         />
         <lucide-icon [img]="Search" class="app-search-icon text-muted" />
-      </div>
+      </div> -->
 
       <!-- Mega Menu -->
       <app-mega-menu />
     </div>
 
+  
     <!-- Modal Template -->
     <ng-template #patientSearchModal let-modal>
     <app-patient-search-modal (patientsFound)="handleSearchResults($event)"></app-patient-search-modal>
     </ng-template>
 
     <div class="d-flex align-items-center gap-2">
+
+    <div style="height: 50px; text-align: right;" class="d-flex align-items-center gap-2">
+     <button (click)="togglePin()" class="btn btn-sm btn-outline-secondary" title="Pin/Unpin Panel">
+      <lucide-icon [name]="pinned ? 'pin' : 'pin-off'" class="fs-18"></lucide-icon>
+    </button>
+    </div>
       <!-- Button to trigger modal or banner -->
       <button
         (click)="togglePatientBanner(patientSearchModal)"

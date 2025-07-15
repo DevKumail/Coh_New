@@ -108,9 +108,9 @@ this.  GetPatientAlertsData() ;
   
   mrno: any
   GetPatientAlertsData() {
-    debugger
+    // debugger
     this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
-      debugger;
+      // debugger;
 
       const alertsTable = [] = res?.alert?.table1;
       if (Array.isArray(alertsTable) && alertsTable.length > 0) {
@@ -129,7 +129,7 @@ this.  GetPatientAlertsData() ;
 
   }
   GetAlertType() {
-    debugger
+    // debugger
     this.registrationApiService.GetAlertType().then(res => {
       console.log("GetAlertType", res)
       this.getAlert = res.result

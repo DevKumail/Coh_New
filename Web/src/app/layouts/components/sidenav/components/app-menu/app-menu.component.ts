@@ -40,7 +40,7 @@ export class AppMenuComponent implements OnInit {
     // }
 
     ngOnInit(): void {
-        debugger
+        // debugger
             const sessionData = sessionStorage.getItem('allowscreens');
 const allowedScreens = JSON.parse(sessionStorage.getItem('allowscreens') || '[]');
 
