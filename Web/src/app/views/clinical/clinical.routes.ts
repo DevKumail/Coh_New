@@ -6,6 +6,7 @@ import { ProblemListComponent } from './problem-list/problem-list.component';
 import { FavoritesComponent } from './favorites/favorites.component';
 import { ProblemComponent } from './problem/problem.component';
 import { AllergiesComponent } from './allergies/allergies.component';
+import { AppointmentsComponent } from '../Scheduling/appointments/appointments.component';
 
 
 export const CLINICAL_ROUTES: Routes = [
@@ -37,8 +38,9 @@ export const CLINICAL_ROUTES: Routes = [
       },
       {
         path: 'allergies',
-        component: AllergiesComponent,
+        component: AppointmentsComponent,
         data: { title: 'Allergies' }
+        // AllergiesComponent,
       }
 
     ]

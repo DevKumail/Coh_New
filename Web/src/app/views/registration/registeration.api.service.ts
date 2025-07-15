@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { ApiService } from '@/app/core/services/api.service';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { AlertDTO } from '@/app/shared/models/alert.model';
+import { AlertType } from '@/app/shared/models/alert-type.model';
 
 @Injectable({ providedIn: 'root' })
 export class RegistrationApiService {
@@ -27,19 +29,23 @@ export class RegistrationApiService {
         return this.api.delete(`/api/patients/${id}`);
     }
     SubmitAlertType(data: any): Observable<any> {
-        debugger
+         // debugger
         return this.api.post(`Alert/SubmitAlertType`, data);
     }
  
 
-    GetAlertType(): Promise<any> {
-        return this.api.get('AllDropdowns/GetAlertType').toPromise();
-    }
+   getAlertType(): Promise<{ result: AlertType[] } | undefined> {
+    debugger
+  return this.api.get<{ result: AlertType[] }>(`AllDropdowns/GetAlertType`).toPromise();
+}
     
-    GetAlertDetailsDb(mrno: string): Promise<any> {
-        const url = `Alert/GetAlertDeatilsDB?mrno=${mrno}`;
-        return this.api.get(url).toPromise();
-    }
+    // GetAlertDetailsDb(mrno: string): Promise<any> {
+    //     const url = `Alert/GetAlertDeatilsDB?mrno=${mrno}`;
+    //     return this.api.get(url).toPromise();
+    // }
+getAlertDetailsDb(mrno: string): Promise<{ alert: { table1: AlertDTO[] } } | undefined> {
+  return this.api.get<{ alert: { table1: AlertDTO[] } }>(`Alert/GetAlertDeatilsDB?mrno=${mrno}`).toPromise();
+}
 
 
 }

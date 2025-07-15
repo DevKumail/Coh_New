@@ -33,7 +33,7 @@ export class UserProfileComponent {
   }
 
   getUserFromLocalStorage() {
-    debugger
+     // debugger
     const userData = sessionStorage.getItem('userName');
     if (userData) {
      

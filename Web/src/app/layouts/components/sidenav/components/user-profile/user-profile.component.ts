@@ -29,7 +29,7 @@ export class UserProfileComponent {
   ) {}
 
   handleAction(action: string): void {
-    debugger
+     // debugger
     if (action === 'logout') {
       this.authService.logout();
       this.router.navigate(['/login']); // or your login route

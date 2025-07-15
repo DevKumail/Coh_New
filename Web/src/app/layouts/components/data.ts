@@ -112,6 +112,16 @@ export const menuItems: ExtendedMenuItemType[] = [
     ]
   },
 
+    {
+    label: 'Scheduling',
+    icon: 'tablerHeartbeat',
+    module: 'Scheduling', // 👈 this is used by PermissionService
+    isCollapsed: true,
+    children: [
+      { label: 'View Appointments', url: '/scheduling/View-Appointments' },
+    ]
+  },
+
   { label: 'Menu', isTitle: true },
 
   // ✅ Clinical Module Section (permission based)

@@ -33,6 +33,12 @@ export const routes: Routes = [
         canActivate: [authGuard, modulePermissionGuard],
         data: { module: 'Control Panel' },
         loadChildren: () => import('./views/control-panel/control-panel.module').then((m) => m.ControlPanelModule)
+      },
+      {
+        path: 'scheduling',
+        canActivate: [authGuard, modulePermissionGuard],
+        data: { module: 'Scheduling' },
+        loadChildren: () => import('./views/Scheduling/scheduling.module').then((m) => m.SchedulingModule)
       }
 
 

@@ -34,7 +34,7 @@ export class AuthService {
   constructor(private http: HttpClient,private router: Router) {}
 
    login(username: string, password: string): Observable<void> {
-     debugger
+      // debugger
      const headers = new HttpHeaders({
   'Content-Type': 'application/json-patch+json'
 });
@@ -58,7 +58,7 @@ export class AuthService {
 
 
 logout(): Observable<any> {
-   debugger
+    // debugger
      const token = localStorage.getItem(this.tokenKey);
     
     localStorage.removeItem(this.tokenKey);
