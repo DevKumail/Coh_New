@@ -11,11 +11,12 @@ import { ClinicalApiService } from '../clinical.api.service';
 import { Injectable } from '@angular/core';
 
 
+
 @Component({
   selector: 'app-allergies',
   imports: [ CommonModule,
-    ReactiveFormsModule
-    ,FormsModule,],
+    ReactiveFormsModule,
+    FormsModule,],
   templateUrl: './allergies.component.html',
   styleUrl: './allergies.component.scss'
 })
@@ -61,6 +62,11 @@ export class AllergiesComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private router: Router,private clinicalApiService: ClinicalApiService,) {}
    ActiveStatus = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
+
+    private clinicalApi: ClinicalApiService,
+    private fb: FormBuilder,
+    private router: Router
+    ) {}
 
   ngOnInit() {
     this.initForm();
@@ -168,7 +174,7 @@ initForm() {
 FillCache() {
   const cacheItems = [
       'Provider'
-    ];
+����];
 
   this.clinicalApiService.getCacheItem({ entities: cacheItems }).then((response:any) => {
     if (response.cache != null) {

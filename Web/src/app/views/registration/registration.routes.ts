@@ -1,7 +1,11 @@
 import { Routes } from '@angular/router';
-
 import { authGuard } from '@/app/core/guards/auth.guard';
 import { AlertComponent } from './alert/alert.component';
+import { CovrageCreateComponent } from './Covrage/covrage-create/covrage-create.component';
+import { CoverageListComponent } from './Covrage/coverage-list/coverage-list.component';
+import { DemographicListComponent } from './Demographic/demographic-list/demographic-list.component';
+import { DemographicCreateComponent } from './Demographic/demographic-create/demographic-create.component';
+
 
 export const Registration_ROUTES: Routes = [
   {
@@ -14,11 +18,38 @@ export const Registration_ROUTES: Routes = [
         component: AlertComponent,
         data: { title: 'Clinical Alerts' }
       },
-    //      {
-    //     path: 'medical-history',
-    //     component: MedicalHistoryComponent,
-    //     data: { title: 'Medical History' }
-    //   },
+         {
+        path: 'coverages',
+        component: CoverageListComponent,
+        data: { title: 'Coverage List' }
+      },
+
+        {
+          path: 'covrage-create',
+          component: CovrageCreateComponent,
+          data: { title: 'Coverage Create' }
+        },
+
+        {
+        path: 'demographics',
+        component: DemographicListComponent,
+        data: { title: 'Demographic List' }
+        },
+
+        {
+          path: 'demographic-create',
+          component: DemographicCreateComponent,
+          data: { title: 'Demographic Create' }
+        },
+
+
+
+        //   {
+        //   path: 'coverages',
+        //   component: CoverageListComponent,
+        //   data: { title: 'Coverage List' }
+        // },
+
     //   {
     //     path: 'problem-list',
     //     component: ProblemListComponent,

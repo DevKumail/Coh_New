@@ -1,0 +1,275 @@
+<div class="container-fluid mt-3">
+    <div class="card shadow-lg p-4 rounded">
+        <!-- 🔷 Optional Breadcrumb -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-0">Add Subscriber</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Add Coverage
+                    </li>
+                </ol>
+            </nav>
+        </div>
+
+        <!-- 📝 Reactive Form Starts -->
+        <form [formGroup]="subscriberForm" (ngSubmit)="insertsubscriber()">
+            <div class="row">
+                <!-- Type -->
+                <div class="col-3">
+                    <label>Type</label><span class="danger"> *</span>
+                    <select
+                        class="form-select"
+                        formControlName="CompanyOrIndividual"
+                        (change)="showRelation()"
+                    >
+                        <option value="">-- Select Type --</option>
+                        <option *ngFor="let t of type" [value]="t.value">
+                            {{ t.label }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Relationship Dropdown (Show only if isRelation == true) -->
+                <div class="col-3">
+                    <label>Relation</label><span class="danger"> *</span>
+                    <select
+                        class="form-select"
+                        formControlName="InsuranceRel"
+                        id="InsuranceRel"
+                        [disabled]="!isRelation"
+                    >
+                        <option value="">-- Select Relation --</option>
+                        <option
+                            *ngFor="let t of InsuranceRelation"
+                            [value]="t.id"
+                        >
+                            {{ t.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Title -->
+                <div class="col-3">
+                    <label>Title</label><span class="danger"> *</span>
+                    <select class="form-select" formControlName="Suffix">
+                        <option value="">-- Select Title --</option>
+                        <option *ngFor="let t of titles" [value]="t.code">
+                            {{ t.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- First Name -->
+                <div class="col-3">
+                    <label>First Name</label><span class="danger"> *</span>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="FirstName"
+                        placeholder="First Name"
+                    />
+                </div>
+
+                <!-- Middle Name -->
+                <div class="col-3">
+                    <label>Middle Name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="MiddleName"
+                        placeholder="Middle Name"
+                    />
+                </div>
+
+                <!-- Last Name -->
+                <div class="col-3">
+                    <label>Last Name</label><span class="danger"> *</span>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="LastName"
+                        placeholder="Last Name"
+                    />
+                </div>
+
+                <!-- Phone -->
+                <div class="col-3">
+                    <label>Cell Phone</label><span class="danger"> *</span>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="InsuredPhone"
+                        placeholder="03XXXXXXXXXX"
+                    />
+                </div>
+
+                <!-- DOB using ngxDaterangepickerBootstrap -->
+                <div class="col-3">
+                    <label>Date of Birth</label><span class="danger"> *</span>
+                   <!-- <input
+                       type="text"
+                       ngxDaterangepickerMd
+                       [singleDatePicker]="true"
+                       [showCancel]="true"
+                       formControlName="BirthDate"
+                    class="form-control"
+                    /> -->
+
+                </div>
+
+                <!-- Address -->
+                <div class="col-3">
+                    <label>Address</label><span class="danger"> *</span>
+                    <textarea
+                        class="form-control"
+                        formControlName="Address1"
+                        placeholder="Address"
+                    ></textarea>
+                </div>
+
+                <!-- Country -->
+                <div class="col-3">
+                    <label>Country</label><span class="danger"> *</span>
+                    <select
+                        class="form-select"
+                        formControlName="CountryId"
+                        (change)="onCountryChange()"
+                    >
+                        <option value="">-- Select Country --</option>
+                        <option *ngFor="let c of Country" [value]="c.code">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- State -->
+                <div class="col-3">
+                    <label>State</label><span class="danger"> *</span>
+                    <select
+                        class="form-select"
+                        formControlName="StateId"
+                        (change)="onStateChange()"
+                    >
+                        <option value="">-- Select State --</option>
+                        <option *ngFor="let s of states" [value]="s.stateId">
+                            {{ s.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- City -->
+                <div class="col-3">
+                    <label>City</label><span class="danger"> *</span>
+                    <select class="form-select" formControlName="CityId">
+                        <option value="">-- Select City --</option>
+                        <option *ngFor="let c of city" [value]="c.cityId">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Zip -->
+                <div class="col-3">
+                    <label>Zip Code</label><span class="danger"> *</span>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="ZipCode"
+                    />
+                </div>
+
+                <!-- Insurance Carrier -->
+                <div class="col-3">
+                    <label>Insurance Carrier</label
+                    ><span class="danger"> *</span>
+                    <select
+                        class="form-select"
+                        formControlName="CarrierId"
+                        (change)="onCarrierChange()"
+                    >
+                        <option *ngFor="let p of BLPayer" [value]="p.code">
+                            {{ p.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Policy Plan -->
+                <div class="col-3">
+                    <label>Policy Plan</label><span class="danger"> *</span>
+                    <select
+                        class="form-select"
+                        formControlName="selectedBLPayerPlan"
+                    >
+                        <option
+                            *ngFor="let plan of BLPayerPlan"
+                            [value]="plan.code"
+                        >
+                            {{ plan.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Package -->
+                <div class="col-3">
+                    <label>Package</label><span class="danger"> *</span>
+                    <select
+                        class="form-select"
+                        formControlName="selectedBLPayerPackage"
+                    >
+                        <option
+                            *ngFor="let pack of BLPayerPackage"
+                            [value]="pack.code"
+                        >
+                            {{ pack.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Gender -->
+                <div class="col-3">
+                    <label>Gender</label><span class="danger"> *</span>
+                    <select class="form-select" formControlName="Sex">
+                        <option *ngFor="let g of genders" [value]="g.code">
+                            {{ g.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Insured ID -->
+                <div class="col-3">
+                    <label>Member Id / Emp Id</label
+                    ><span class="danger"> *</span>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="InsuredIdNo"
+                        placeholder="Member Id / Emp Id"
+                    />
+                </div>
+
+                <!-- Active -->
+                <div class="col-3 d-flex align-items-center mt-4">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        formControlName="Inactive"
+                    />
+                    <label class="form-check-label ms-2">Active</label>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-success">Save</button>
+                <button
+                    type="button"
+                    class="btn btn-secondary ms-2"
+                    (click)="cancel()"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

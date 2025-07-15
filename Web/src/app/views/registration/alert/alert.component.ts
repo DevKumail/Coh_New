@@ -1,3 +1,4 @@
+import { RegistrationApiService } from '@/app/shared/Services/Registration/registration.api.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -17,7 +18,7 @@ import { AlertType } from '@/app/shared/models/alert-type.model';
   imports: [
     CommonModule,
     ReactiveFormsModule, NgIconComponent
-    , FormsModule,
+    , FormsModule
   ],
   templateUrl: './alert.component.html',
   styleUrl: './alert.component.scss'
@@ -51,13 +52,13 @@ export class AlertComponent implements OnInit {
   pageNumbers: number[] = [];
 
   constructor(private fb: FormBuilder, private router: Router,
-    private registrationApiService: RegistrationApiService
+  private registrationApiService: RegistrationApiService
 
 
   ) { }
   Active = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
 
-  
+
 
   ngOnInit(): void {
     this.alertForm = this.fb.group({
@@ -105,13 +106,18 @@ this.  GetPatientAlertsData() ;
     }
     return false;
   }
-  
+
   mrno: any
   // GetPatientAlertsData() {
   //    // debugger
   //   this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
   //      // debugger;
 
+      const alertsTable = res?.alert?.table1 || [];
+      if (Array.isArray(alertsTable) && alertsTable.length > 0) {
+        this.MyAlertsData = alertsTable;
+        this.filteredAlertsData = alertsTable;
+        console.log(this.MyAlertsData, "alerts")
   //     const alertsTable = [] = res?.alert?.table1;
   //     if (Array.isArray(alertsTable) && alertsTable.length > 0) {
   //       this.MyAlertsData = alertsTable;
@@ -236,7 +242,7 @@ GetAlertType(): void {
       }
     });
   }
-  
+
 
 
   // getAlertTypeName(typeId: number): string {
