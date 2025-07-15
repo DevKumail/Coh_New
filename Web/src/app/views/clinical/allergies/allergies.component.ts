@@ -60,13 +60,13 @@ export class AllergiesComponent implements OnInit {
   start = 0;
   end = this.pageSize;
 
-  constructor(private fb: FormBuilder, private router: Router,private clinicalApiService: ClinicalApiService,) {}
-   ActiveStatus = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
-
-    private clinicalApi: ClinicalApiService,
+  constructor(private clinicalApiService: ClinicalApiService,private clinicalApi: ClinicalApiService,
     private fb: FormBuilder,
     private router: Router
     ) {}
+   ActiveStatus = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
+
+    
 
   ngOnInit() {
     this.initForm();
@@ -124,9 +124,7 @@ initForm() {
 
 
   loadDummyData() {
-    this.allergyData = [
-
-    ];
+    this.allergyData = [];
     this.updatePagination();
   }
 
@@ -173,8 +171,7 @@ initForm() {
   }
 FillCache() {
   const cacheItems = [
-      'Provider'
-����];
+      'Provider'];
 
   this.clinicalApiService.getCacheItem({ entities: cacheItems }).then((response:any) => {
     if (response.cache != null) {
@@ -346,11 +343,11 @@ this.Allergy = formValues;
     errorReason: '',
     oldMrno: '',
     isDeleted: false,
-    appointmentId: 0,
+    appointmentId: 0,    
     providerDescription: ''
   });
     Swal.fire({
-      position: 'center',
+      position: 'center', 
       icon: 'success',
       title: 'Allergies Successfully Created',
       showConfirmButton: false,

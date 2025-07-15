@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class ClinicalApiService {
   constructor(private api: ApiService) { }
-constructor(private api: ApiService) {}
 
 
 //   submitPatientAllergy(data: any): Observable<any> {

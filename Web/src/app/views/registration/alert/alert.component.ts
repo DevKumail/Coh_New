@@ -111,16 +111,16 @@ this.  GetPatientAlertsData() ;
   //     // debugger;
 
 
-  
+  alertsTable: any
   GetPatientAlertsData() {
      // debugger
     this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
        // debugger;
 
-      const alertsTable = res?.alert?.table1 || [];
-      if (Array.isArray(alertsTable) && alertsTable.length > 0) {
-        this.MyAlertsData = alertsTable;
-        this.filteredAlertsData = alertsTable;
+      this.alertsTable = res?.alert?.table1 || [];
+      if (Array.isArray(this.alertsTable) && this.alertsTable.length > 0) {
+        this.MyAlertsData = this.alertsTable;
+        this.filteredAlertsData = this.alertsTable;
         console.log(this.MyAlertsData, "alerts")
       const alertsTable = [] = res?.alert?.table1;
       if (Array.isArray(alertsTable) && alertsTable.length > 0) {
@@ -132,8 +132,8 @@ this.  GetPatientAlertsData() ;
         console.warn("No alert data returned from API.");
         this.MyAlertsData = [];
         this.filteredAlertsData = [];
-      }
-    }).catch((error: any) => {
+      };
+    }}).catch((error: any) => {
       console.error("Failed to fetch alert data", error);
     });
 
