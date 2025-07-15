@@ -125,7 +125,8 @@ export const menuItems: ExtendedMenuItemType[] = [
       { label: 'Alerts', url: '/registration/alerts' },
       { label: 'Coverages', url: '/registration/coverage-list' },
       { label: 'Coverage Create', url: '/registration/covrage-create' },
-
+      { label: 'Demographics', url: '/registration/demographics' },
+      { label: 'Demographic Create', url: '/registration/demographic-create' }
     ]
   },
 

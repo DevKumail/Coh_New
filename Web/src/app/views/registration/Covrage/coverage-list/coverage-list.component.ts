@@ -44,28 +44,7 @@ export class CoverageListComponent {
   }
 
   loadData() {
-    // 🔁 Replace this with API call
-    this.coverages = [
-      {
-        subscriberId: 'SUB001',
-        subscriberName: 'John Doe',
-        mrNo: 'MR123',
-        insuranceCarrier: 'Carrier A',
-        insuranceIDNo: 'INS123',
-        type: 'Primary',
-        active: true,
-      },
-      {
-        subscriberId: 'SUB002',
-        subscriberName: 'Jane Smith',
-        mrNo: 'MR456',
-        insuranceCarrier: 'Carrier B',
-        insuranceIDNo: 'INS456',
-        type: 'Secondary',
-        active: false,
-      },
-      // ➕ Add more mock or real data here
-    ];
+
 
     this.updatePagination();
   }

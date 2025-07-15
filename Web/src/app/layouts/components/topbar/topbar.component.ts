@@ -123,7 +123,7 @@ import { PatientSearchModalComponent } from '@/app/shared/modals/patient-search-
     UserProfileComponent,
     NotificationDropdownComponent,
     IconsModule,
-    NgbModalModule,
+    NgbModalModule,NgIcon,
     PatientSearchModalComponent,
 
   ],

@@ -1,3 +1,4 @@
+import { ClinicalApiService } from './../clinical.api.service';
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -23,87 +24,140 @@ import { FavoritesComponent } from '../favorites/favorites.component';
   templateUrl: './problem-list.component.html',
   styleUrl: './problem-list.component.scss'
 })
-export class ProblemListComponent {
+export class ProblemListComponent implements OnInit {
 
-    activeTabId = 1;
+  medicalForm!: FormGroup;
+  currentPage = 1;
+  pageSize = 10;
+  pageSizes = [5, 10, 25, 50];
+  pageNumbers: number[] = [];
 
-    medicalForm!: FormGroup;
-    pageNumbers: number[] = [];
-    totalPages = 0;
-    searchResults: any[] = [];
-    currentPage: number = 1;
-    pageSize: number = 10;
-    pageSizes = [5, 10, 25, 50];
-    providerList: any[] = [];
+  medicalHistoryData: any[] = [];
+  totalPages = 0;
 
-    medicalHistoryData = [
-      {
-        provider: 1,
-        problem: 'Hypertension',
-        comments: 'Patient needs regular monitoring',
-        confidential: true,
-        status: 'Active',
-        startDate: '2024-01-01',
-        endDate: '2024-12-31'
-      },
-      {
-        provider: 2,
-        problem: 'Diabetes',
-        comments: 'Monthly insulin checkup',
-        confidential: false,
-        status: 'Inactive',
-        startDate: '2023-05-10',
-        endDate: '2023-12-15'
-      }
+  providerList: any[] = [];
+
+  constructor(
+    private fb: FormBuilder,
+    private clinicalApiService: ClinicalApiService, // Assuming you have a ClinicalService to handle API calls
+  ) { }
+
+  ngOnInit(): void {
+    this.medicalForm = this.fb.group({
+      provider: [''],
+      providerName: [''],
+      code: [''],
+      problem: [''],
+      icdVersion: [''],
+      confidential: [false],
+      startDate: [''],
+      endDate: [''],
+      comments: [''],
+      status: ['']
+    });
+
+    this.getRowData();
+    this.fetchProviders();
+  }
+
+  get start(): number {
+    return (this.currentPage - 1) * this.pageSize;
+  }
+
+  get end(): number {
+    const endValue = this.start + this.pageSize;
+    return endValue > this.medicalHistoryData.length ? this.medicalHistoryData.length : endValue;
+  }
+
+  get paginatedData() {
+    return this.medicalHistoryData.slice(this.start, this.end);
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) this.currentPage--;
+  }
+
+  nextPage() {
+    if (this.end < this.medicalHistoryData.length) this.currentPage++;
+  }
+
+  goToPage(page: number) {
+    this.currentPage = page;
+  }
+
+  onPageSizeChange(event: any) {
+    this.pageSize = +event.target.value;
+    this.currentPage = 1;
+  }
+
+  // ✅ Clear form
+  onClear(): void {
+    this.medicalForm.reset();
+  }
+
+  // ✅ Save problem
+  onSubmit(): void {
+    if (this.medicalForm.invalid) {
+      // TODO: Replace with your notification service, e.g. this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Please fill all required fields' });
+      return;
+    }
+
+    const formData = this.medicalForm.value;
+
+    const problemPayload = {
+      providerId: formData.provider,
+      providerName: formData.providerName,
+      code: formData.code,
+      icD9Description: formData.problem,
+      icdVersionId: formData.icdVersion,
+      confidential: formData.confidential,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      comments: formData.comments,
+      status: formData.status,
+      createdBy: 1, // ← Add actual userId here
+      updatedBy: 1,
+      mrno: '1023', // ← Add actual MRNo here
+      patientId: 1   // ← Add actual patientId here
+    };
+
+    this.clinicalApiService.SubmitPatientProblem(problemPayload).then(res => {
+      this.getRowData();
+      this.onClear();
+      // TODO: Replace with your notification service, e.g. this.messageService.add({ severity: 'success', summary: 'Saved', detail: 'Problem successfully created' });
+    }).catch(error => {
+      // TODO: Replace with your notification service, e.g. this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message });
+    });
+  }
+
+  // ✅ Load patient problem data
+  getRowData() {
+    const mrno = '1023'; // Replace with actual
+    const userId = 1;     // Replace with actual
+
+    this.clinicalApiService.GetRowDataOfPatientProblem(mrno, userId).then((res: any) => {
+      const problems = res?.patientProblems?.table1 || [];
+      this.medicalHistoryData = problems.map((item: any) => ({
+        provider: item.providerName,
+        problem: item.icD9Description,
+        comments: item.comments,
+        confidential: item.confidential ? true : false,
+        status: item.status,
+        startDate: item.startDate,
+        endDate: item.endDate
+      }));
+
+      this.totalPages = Math.ceil(this.medicalHistoryData.length / this.pageSize);
+      this.pageNumbers = Array(this.totalPages).fill(0).map((_, i) => i + 1);
+    });
+  }
+
+  // ✅ Load providers for dropdown
+  fetchProviders() {
+    // Replace with your actual provider service call
+    this.providerList = [
+      { id: 1, name: 'Dr. Ali' },
+      { id: 2, name: 'Dr. Sara' }
     ];
-
-    constructor(private fb: FormBuilder) {}
-
-    ngOnInit(): void {
-      this.medicalForm = this.fb.group({
-        provider: [''],
-        providerName: [''],
-        code: [''],
-        problem: [''],
-        icdVersion: [''],
-        confidential: [''],
-        startDate: [''],
-        endDate: [''],
-        comments: [''],
-        status: ['']
-      });
-    }
-
-    // ✅ Reset form
-    onClear(): void {
-      this.medicalForm;
-    }
-    get start(): number {
-        return (this.currentPage - 1) * this.pageSize;
-      }
-
-      get end(): number {
-        const endValue = this.start + this.pageSize;
-        return endValue > this.medicalHistoryData.length ? this.medicalHistoryData.length : endValue;
-      }
-
-      get paginatedData() {
-        return this.medicalHistoryData.slice(this.start, this.end);
-      }
-    prevPage() {
-        if (this.currentPage > 1) this.currentPage--;
-      }
-
-      nextPage() {
-        if (this.end < this.medicalHistoryData.length) this.currentPage++;
-      }
-
-      goToPage(page: number) {
-        this.currentPage = page;
-      }
-
-      onPageSizeChange(event: any) {
-        this.pageSize = +event.target.value;
-        this.currentPage = 1;
-      }
+  }
 }
