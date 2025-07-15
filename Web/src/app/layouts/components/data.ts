@@ -112,6 +112,16 @@ export const menuItems: ExtendedMenuItemType[] = [
     ]
   },
 
+    {
+    label: 'Scheduling',
+    icon: 'tablerHeartbeat',
+    module: 'Scheduling', // 👈 this is used by PermissionService
+    isCollapsed: true,
+    children: [
+      { label: 'View Appointments', url: '/scheduling/View-Appointments' },
+    ]
+  },
+
   { label: 'Menu', isTitle: true },
 
   // ✅ Clinical Module Section (permission based)
@@ -125,7 +135,8 @@ export const menuItems: ExtendedMenuItemType[] = [
       { label: 'Alerts', url: '/registration/alerts' },
       { label: 'Coverages', url: '/registration/coverage-list' },
       { label: 'Coverage Create', url: '/registration/covrage-create' },
-
+      { label: 'Demographics', url: '/registration/demographics' },
+      { label: 'Demographic Create', url: '/registration/demographic-create' }
     ]
   },
 

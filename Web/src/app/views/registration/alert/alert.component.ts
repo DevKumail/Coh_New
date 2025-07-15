@@ -1,3 +1,4 @@
+import { RegistrationApiService } from '@/app/shared/Services/Registration/registration.api.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,8 +7,8 @@ import { NgIconComponent } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Injectable } from '@angular/core';
-import { RegistrationApiService } from '../registeration.api.service';
-
+import { AlertDTO } from '@/app/shared/models/alert.model';
+import { AlertType } from '@/app/shared/models/alert-type.model';
 
 
 @Component({
@@ -16,7 +17,7 @@ import { RegistrationApiService } from '../registeration.api.service';
   imports: [
     CommonModule,
     ReactiveFormsModule, NgIconComponent
-    , FormsModule,
+    , FormsModule
   ],
   templateUrl: './alert.component.html',
   styleUrl: './alert.component.scss'
@@ -25,10 +26,10 @@ import { RegistrationApiService } from '../registeration.api.service';
   providedIn: 'root'
 })
 export class AlertComponent implements OnInit {
-  MyAlertsData: any[] = [];
+ MyAlertsData: AlertDTO[] = [];
   filteredAlertsData: any[] = [];
   alertForm!: FormGroup;
-  getAlert: any[] = [];
+  getAlert: AlertType[] = [];
   isLoading: boolean = false;
   buttontext = 'save'
   Eentereddate: any;
@@ -42,7 +43,7 @@ export class AlertComponent implements OnInit {
 
   Alert: any;
   AlertRow: any;
-
+  mrno: any
   currentPage: number = 1;
   pageSize: number = 10;
   pageSizes = [5, 10, 25, 50];
@@ -50,14 +51,13 @@ export class AlertComponent implements OnInit {
   pageNumbers: number[] = [];
 
   constructor(private fb: FormBuilder, private router: Router,
-    private registrationApiService: RegistrationApiService
-
+  private registrationApiService: RegistrationApiService
 
 
   ) { }
   Active = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
 
-  
+
 
   ngOnInit(): void {
     this.alertForm = this.fb.group({
@@ -105,13 +105,23 @@ this.  GetPatientAlertsData() ;
     }
     return false;
   }
-  
-  mrno: any
-  GetPatientAlertsData() {
-    // debugger
-    this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
-      // debugger;
+  // GetPatientAlertsData() {
+  //   // debugger
+  //   this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
+  //     // debugger;
 
+
+  
+  GetPatientAlertsData() {
+     // debugger
+    this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
+       // debugger;
+
+      const alertsTable = res?.alert?.table1 || [];
+      if (Array.isArray(alertsTable) && alertsTable.length > 0) {
+        this.MyAlertsData = alertsTable;
+        this.filteredAlertsData = alertsTable;
+        console.log(this.MyAlertsData, "alerts")
       const alertsTable = [] = res?.alert?.table1;
       if (Array.isArray(alertsTable) && alertsTable.length > 0) {
         this.MyAlertsData = alertsTable;
@@ -128,13 +138,45 @@ this.  GetPatientAlertsData() ;
     });
 
   }
-  GetAlertType() {
-    // debugger
-    this.registrationApiService.GetAlertType().then(res => {
-      console.log("GetAlertType", res)
-      this.getAlert = res.result
-    })
-  }
+
+
+// GetPatientAlertsData(): void {
+//   this.registrationApiService.getAlertDetailsDb(this.Mrno).then((res) => {
+//     if (!res || !res.alert || !Array.isArray(res.alert.table1)) {
+//       console.warn("No alert data returned from API.");
+//       this.MyAlertsData = [];
+//       this.filteredAlertsData = [];
+//       return;
+//     }
+
+//     const alertsTable: AlertDTO[] = res.alert.table1;
+//     this.MyAlertsData = alertsTable;
+//     this.filteredAlertsData = alertsTable;
+//     this.calculatePagination();
+//   }).catch((error) => {
+//     console.error("Failed to fetch alert data", error);
+//     this.MyAlertsData = [];
+//     this.filteredAlertsData = [];
+//   });
+// }
+
+GetAlertType(): void {
+  this.registrationApiService.getAlertType().then((res: { result: AlertType[] } | undefined) => {
+    if (!res || !res.result || !Array.isArray(res.result)) {
+      console.warn("No alert type data returned from API.");
+      this.getAlert = [];
+      return;
+    }
+
+    this.getAlert = res.result;
+    console.log("✅ GetAlertType:", this.getAlert);
+  }).catch((error: any) => {
+    console.error("❌ Failed to fetch alert types", error);
+    this.getAlert = [];
+  });
+}
+
+
   Alerts: any = {}
 
   onSubmit() {
@@ -163,9 +205,27 @@ this.  GetPatientAlertsData() ;
       OldMrno: null
     };
 
+    const alert2: AlertDTO = {
+  alertId: 0,
+  mrno: this.Mrno,
+  alertMessage: formValue.message,
+  repeatDate: new Date(formValue.repeatDate),
+  startDate: new Date(formValue.startDate),
+  enteredBy: formValue.enteredBy,
+  enteredDate: new Date(formValue.enteredDate),
+  updatedBy: formValue.updatedBy,
+  alertTypeId: parseInt(formValue.alertType),
+  active: parseInt(formValue.status),
+  isDeleted: false,
+  comments: formValue.message,
+  hasChild: false,
+  oldMrno: null,
+};
+
+
     console.log("🚀 Final Alert Payload:", alert);
 
-    this.registrationApiService.SubmitAlertType(alert).subscribe({
+    this.registrationApiService.SubmitAlertType(alert2).subscribe({
       next: (res) => {
         Swal.fire({
           position: "center",
@@ -186,7 +246,7 @@ this.  GetPatientAlertsData() ;
       }
     });
   }
-  
+
 
 
   // getAlertTypeName(typeId: number): string {

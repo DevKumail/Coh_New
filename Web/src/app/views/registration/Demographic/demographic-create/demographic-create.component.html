@@ -1,0 +1,421 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
+        <li class="breadcrumb-item">
+            <a href="javascript:void(0);">
+                <ng-icon name="tablerSmartHome"></ng-icon>
+                Clinical
+            </a>
+        </li>
+        <li
+            class="d-flex align-items-center text-muted mx-1"
+            aria-current="page"
+        >
+            <ng-icon name="tablerChevronRight"></ng-icon>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            demographic-create
+        </li>
+    </ol>
+</nav>
+<div class="container-fluid w-100">
+    <div class="card p-3 shadow mt-2">
+        <h3 class="card-title mb-3 fw-bold">Demographic Create</h3>
+        <!-- Form Starts -->
+        <form [formGroup]="demographicForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+                <div class="col-md-3">
+          <img
+                class="fileupload mb-2"
+                [src]="
+                    demographicForm.get('PatientPicture')?.value
+                    ? demographicForm.get('PatientPicture')?.value
+                    : 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'
+                "
+                alt="Image"
+                width="100px"
+                height="100px"
+                />
+
+                <input
+                type="file"
+                class="file-input d-none"
+                (change)="onFileSelected($event)"
+                #fileUpload
+                />
+
+                <div class="file-upload d-flex align-items-center">
+                <span class="me-2">{{ fileName || 'No file uploaded yet.' }}</span>
+                <button
+                    mat-mini-fab
+                    color="primary"
+                    class="upload-btn"
+                    type="button"
+                    (click)="fileUpload.click()"
+                >
+                    <i class="pi pi-upload" style="font-size: 1rem"></i>
+                </button>
+                </div>
+        </div>
+
+                <!-- Title -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Title <span class="danger">*</span></label>
+                    <select class="form-select" formControlName="PersonTitleId">
+                        <option value="">-- Select Title --</option>
+                        <option *ngFor="let t of titles" [value]="t.code">
+                            {{ t.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- First Name -->
+                <div class="col-3">
+                    <label>First Name <span class="danger">*</span></label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="PersonFirstName"
+                        placeholder="First Name"
+                    />
+                </div>
+
+                <!-- Middle Name -->
+                <div class="col-3">
+                    <label>Middle Name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="PersonMiddleName"
+                        placeholder="Middle Name"
+                    />
+                </div>
+
+                <!-- Last Name -->
+                <div class="col-3">
+                    <label>Last Name <span class="danger">*</span></label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="PersonLastName"
+                        placeholder="Last Name"
+                    />
+                </div>
+
+                <!-- Sex -->
+                <div class="col-3">
+                    <label>Sex <span class="danger">*</span></label>
+                    <select class="form-select" formControlName="PersonSexId">
+                        <option value="">-- Select Sex --</option>
+                        <option *ngFor="let g of gender" [value]="g.id">
+                            {{ g.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Preferred Name -->
+                <div class="col-3">
+                    <label>Preferred Name <span class="danger">*</span></label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="preferredName"
+                        placeholder="Preferred Name"
+                    />
+                </div>
+
+                <!-- Gender Identity -->
+                <div class="col-3">
+                    <label>Gender Identity <span class="danger">*</span></label>
+                    <select
+                        class="form-select"
+                        formControlName="genderIdentity"
+                    >
+                        <option value="">-- Select Gender Identity --</option>
+                        <option
+                            *ngFor="let g of genderIdentity"
+                            [value]="g.genderId"
+                        >
+                            {{ g.genderText }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Marital Status -->
+                <div class="col-3">
+                    <label>Marital Status <span class="danger">*</span></label>
+                    <select
+                        class="form-select"
+                        formControlName="PersonMaritalStatus"
+                    >
+                        <option value="">-- Select Marital Status --</option>
+                        <option *ngFor="let m of maritalstatus" [value]="m.id">
+                            {{ m.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Blood Group -->
+                <div class="col-3">
+                    <label>Blood Group <span class="danger">*</span></label>
+                    <select
+                        class="form-select"
+                        formControlName="PatientBloodGroupId"
+                    >
+                        <option value="">-- Select Blood Group --</option>
+                        <option *ngFor="let b of bloodgroup" [value]="b.id">
+                            {{ b.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label
+                        >Date of Birth <span style="color: red">*</span></label
+                    >
+                    <input
+                        type="date"
+                        class="form-control"
+                        formControlName="PatientBirthDate"
+                        (change)="calculateAgeOnChangeDOB()"
+                    />
+                </div>
+
+                <!-- Age -->
+                <div class="col-md-2 col-sm-4 col-12">
+                    <label>Age</label>
+                    <input
+                        type="text"
+                        class="form-control font-bold"
+                        formControlName="Age"
+                        placeholder="Age"
+                        [disabled]="true"
+                    />
+                </div>
+
+                <!-- VIP Checkbox -->
+                <div
+                    class="col-md-1 col-sm-4 col-12 mt-4 d-flex align-items-center"
+                >
+                    <input
+                        type="checkbox"
+                        formControlName="isVIP"
+                        id="vipCheck"
+                        class="mt-2"
+                    />
+                    <label for="vipCheck" class="ms-2">VIP</label>
+                </div>
+
+                <!-- Social Security Number -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label
+                        >Social Security Number (SSN)
+                        <span style="color: red">*</span></label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personSocialSecurityNo"
+                        placeholder="999-99-9999"
+                    />
+                </div>
+
+                <!-- Labor Card No -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Labor Card No</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="LaborCardNo"
+                        placeholder="Labor Card No"
+                    />
+                </div>
+
+                <!-- Nationality -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Nationality <span style="color: red">*</span></label>
+                    <select class="form-select" formControlName="Nationality">
+                        <option value="">-- Select Nationality --</option>
+                        <option *ngFor="let n of nationality" [value]="n.id">
+                            {{ n.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Religion -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Religion</label>
+                    <select class="form-select" formControlName="Religion">
+                        <option value="">-- Select Religion --</option>
+                        <option *ngFor="let r of religion" [value]="r.id">
+                            {{ r.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Ethnicity -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Ethnicity</label>
+                    <select
+                        class="form-select"
+                        formControlName="PersonEthnicityTypeId"
+                    >
+                        <option value="">-- Select Ethnicity --</option>
+                        <option *ngFor="let e of ethinic" [value]="e.id">
+                            {{ e.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Passport No -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Passport No</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="PersonPassportNo"
+                        placeholder="Passport No"
+                    />
+                </div>
+
+                <!-- Driving License -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Driving License No</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="PersonDriversLicenseNo"
+                        placeholder="Driving License No"
+                    />
+                </div>
+
+                <!-- Residence Visa / Unified No -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Unified No</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="ResidenceVisaNo"
+                        placeholder="Unified No"
+                    />
+                </div>
+
+                <!-- Language -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Language</label>
+                    <select
+                        class="form-select"
+                        formControlName="PrimaryLanguage"
+                    >
+                        <option value="">-- Select Language --</option>
+                        <option *ngFor="let l of language" [value]="l.id">
+                            {{ l.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Emirates ID Type -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label
+                        >Emirates ID Type
+                        <span style="color: red">*</span></label
+                    >
+                    <select class="form-select" formControlName="EmiratesIDN">
+                        <option value="">-- Select Emirates ID Type --</option>
+                        <option *ngFor="let e of Emirates" [value]="e.id">
+                            {{ e.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Primary Care Physician -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label
+                        >Primary Care Physician (PCP)
+                        <span style="color: red">*</span></label
+                    >
+                    <select
+                        class="form-select"
+                        formControlName="primarycarephysicianPcp"
+                    >
+                        <option value="">-- Select PCP --</option>
+                        <option *ngFor="let p of referred" [value]="p.code">
+                            {{ p.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Media Channel -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Referred Channel</label>
+                    <select
+                        class="form-select"
+                        formControlName="MediaChannelId"
+                    >
+                        <option value="">-- Select Channel --</option>
+                        <option *ngFor="let c of MediaChannel" [value]="c.id">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Referred By -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Referred By</label>
+                    <select class="form-select" formControlName="MediaItemId">
+                        <option value="">-- Select Referred By --</option>
+                        <option *ngFor="let m of MediaItem" [value]="m.id">
+                            {{ m.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Cause of Death -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Cause of Death</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="causeofDeath"
+                        placeholder="Cause of Death"
+                    />
+                </div>
+
+                <!-- Date of Death -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label>Date of Death</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        formControlName="DeathDate"
+                    />
+                </div>
+
+                <!-- Billing Note -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label
+                        >Billing Note <span style="color: red">*</span></label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="BillingNote"
+                        placeholder="Billing Note"
+                    />
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-success">Save</button>
+                <button
+                    type="button"
+                    class="btn btn-secondary ms-2"
+                    (click)="cancel()"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

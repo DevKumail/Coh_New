@@ -39,7 +39,13 @@ export const routes: Routes = [
           canActivate: [authGuard, modulePermissionGuard],
           data: { module: 'Billing' },
           loadChildren: () => import('./views/billing/billing.module').then((m) => m.BillingModule)
-        }
+        },
+        {
+        path: 'scheduling',
+        canActivate: [authGuard, modulePermissionGuard],
+        data: { module: 'Scheduling' },
+        loadChildren: () => import('./views/Scheduling/scheduling.module').then((m) => m.SchedulingModule)
+      }
 
 
     ],

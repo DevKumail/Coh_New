@@ -124,7 +124,7 @@ import { DataStorageService } from '@/app/shared/data-storage.service';
     UserProfileComponent,
     NotificationDropdownComponent,
     IconsModule,
-    NgbModalModule,
+    NgbModalModule,NgIcon,
     PatientSearchModalComponent,
 
   ],
