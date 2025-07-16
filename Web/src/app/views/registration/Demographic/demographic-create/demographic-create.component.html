@@ -24,45 +24,55 @@
         <form [formGroup]="demographicForm" (ngSubmit)="onSubmit()">
             <div class="row">
                 <div class="col-md-3">
-          <img
-                class="fileupload mb-2"
-                [src]="
-                    demographicForm.get('PatientPicture')?.value
-                    ? demographicForm.get('PatientPicture')?.value
-                    : 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'
-                "
-                alt="Image"
-                width="100px"
-                height="100px"
-                />
+                    <img
+                        class="fileupload mb-2"
+                        [src]="
+                            demographicForm.get('PatientPicture')?.value
+                                ? demographicForm.get('PatientPicture')?.value
+                                : 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'
+                        "
+                        alt="Image"
+                        width="100px"
+                        height="100px"
+                    />
 
-                <input
-                type="file"
-                class="file-input d-none"
-                (change)="onFileSelected($event)"
-                #fileUpload
-                />
+                    <input
+                        type="file"
+                        class="file-input d-none"
+                        (change)="onFileSelected($event)"
+                        #fileUpload
+                    />
 
-                <div class="file-upload d-flex align-items-center">
-                <span class="me-2">{{ fileName || 'No file uploaded yet.' }}</span>
-                <button
-                    mat-mini-fab
-                    color="primary"
-                    class="upload-btn"
-                    type="button"
-                    (click)="fileUpload.click()"
-                >
-                    <i class="pi pi-upload" style="font-size: 1rem"></i>
-                </button>
+                    <div class="file-upload d-flex align-items-center">
+                        <span class="me-2">{{
+                            fileName || "No file uploaded yet."
+                        }}</span>
+                        <button
+                            mat-mini-fab
+                            color="primary"
+                            class="upload-btn"
+                            type="button"
+                            (click)="fileUpload.click()"
+                        >
+                            <i class="pi pi-upload" style="font-size: 1rem"></i>
+                        </button>
+                    </div>
                 </div>
-        </div>
 
                 <!-- Title -->
                 <div class="col-md-3 col-sm-4 col-12">
                     <label>Title <span class="danger">*</span></label>
-                    <select class="form-select" formControlName="PersonTitleId">
+                    <!-- <select class="form-select" formControlName="PersonTitleId">
                         <option value="">-- Select Title --</option>
                         <option *ngFor="let t of titles" [value]="t.code">
+                            {{ t.name }}
+                        </option>
+                    </select> -->
+                    <select class="form-select" formControlName="PersonTitleId">
+                        <option [ngValue]="null" disabled>
+                            -- Select Title --
+                        </option>
+                        <option *ngFor="let t of titles" [ngValue]="t.code">
                             {{ t.name }}
                         </option>
                     </select>
@@ -105,8 +115,10 @@
                 <div class="col-3">
                     <label>Sex <span class="danger">*</span></label>
                     <select class="form-select" formControlName="PersonSexId">
-                        <option value="">-- Select Sex --</option>
-                        <option *ngFor="let g of gender" [value]="g.id">
+                        <option [ngValue]="null" disabled>
+                            -- Select Sex --
+                        </option>
+                        <option *ngFor="let g of gender" [ngValue]="g.code">
                             {{ g.name }}
                         </option>
                     </select>
@@ -130,7 +142,9 @@
                         class="form-select"
                         formControlName="genderIdentity"
                     >
-                        <option value="">-- Select Gender Identity --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select Gender Identity --
+                        </option>
                         <option
                             *ngFor="let g of genderIdentity"
                             [value]="g.genderId"
@@ -147,7 +161,9 @@
                         class="form-select"
                         formControlName="PersonMaritalStatus"
                     >
-                        <option value="">-- Select Marital Status --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select Marital Status --
+                        </option>
                         <option *ngFor="let m of maritalstatus" [value]="m.id">
                             {{ m.name }}
                         </option>
@@ -161,7 +177,9 @@
                         class="form-select"
                         formControlName="PatientBloodGroupId"
                     >
-                        <option value="">-- Select Blood Group --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select Blood Group --
+                        </option>
                         <option *ngFor="let b of bloodgroup" [value]="b.id">
                             {{ b.name }}
                         </option>
@@ -235,7 +253,9 @@
                 <div class="col-md-3 col-sm-4 col-12">
                     <label>Nationality <span style="color: red">*</span></label>
                     <select class="form-select" formControlName="Nationality">
-                        <option value="">-- Select Nationality --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select Nationality --
+                        </option>
                         <option *ngFor="let n of nationality" [value]="n.id">
                             {{ n.name }}
                         </option>
@@ -246,7 +266,9 @@
                 <div class="col-md-3 col-sm-4 col-12">
                     <label>Religion</label>
                     <select class="form-select" formControlName="Religion">
-                        <option value="">-- Select Religion --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select Religion --
+                        </option>
                         <option *ngFor="let r of religion" [value]="r.id">
                             {{ r.name }}
                         </option>
@@ -260,7 +282,9 @@
                         class="form-select"
                         formControlName="PersonEthnicityTypeId"
                     >
-                        <option value="">-- Select Ethnicity --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select Ethnicity --
+                        </option>
                         <option *ngFor="let e of ethinic" [value]="e.id">
                             {{ e.name }}
                         </option>
@@ -307,7 +331,9 @@
                         class="form-select"
                         formControlName="PrimaryLanguage"
                     >
-                        <option value="">-- Select Language --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select Language --
+                        </option>
                         <option *ngFor="let l of language" [value]="l.id">
                             {{ l.name }}
                         </option>
@@ -321,7 +347,9 @@
                         <span style="color: red">*</span></label
                     >
                     <select class="form-select" formControlName="EmiratesIDN">
-                        <option value="">-- Select Emirates ID Type --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select Emirates ID Type --
+                        </option>
                         <option *ngFor="let e of Emirates" [value]="e.id">
                             {{ e.name }}
                         </option>
@@ -338,7 +366,9 @@
                         class="form-select"
                         formControlName="primarycarephysicianPcp"
                     >
-                        <option value="">-- Select PCP --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select PCP --
+                        </option>
                         <option *ngFor="let p of referred" [value]="p.code">
                             {{ p.name }}
                         </option>
@@ -352,7 +382,9 @@
                         class="form-select"
                         formControlName="MediaChannelId"
                     >
-                        <option value="">-- Select Channel --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select Channel --
+                        </option>
                         <option *ngFor="let c of MediaChannel" [value]="c.id">
                             {{ c.name }}
                         </option>
@@ -363,7 +395,9 @@
                 <div class="col-md-3 col-sm-4 col-12">
                     <label>Referred By</label>
                     <select class="form-select" formControlName="MediaItemId">
-                        <option value="">-- Select Referred By --</option>
+                        <option [ngValue]="null" disabled>
+                            -- Select Referred By --
+                        </option>
                         <option *ngFor="let m of MediaItem" [value]="m.id">
                             {{ m.name }}
                         </option>

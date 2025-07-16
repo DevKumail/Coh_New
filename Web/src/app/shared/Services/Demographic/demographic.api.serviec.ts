@@ -5,71 +5,100 @@ import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class DemographicApiServices {
+    add(arg0: { severity: string; summary: string; detail: any }) {
+        throw new Error('Method not implemented.');
+    }
 
- constructor(private api: ApiService, private http: HttpClient) { }
+    constructor(private api: ApiService, private http: HttpClient) {}
 
-getDemographicsByMRNo(MRNo:string) {
-    return this.api.get(`Demographic/GetDemographics?MRNo=${MRNo}`).toPromise();
-}
+    getDemographicsByMRNo(MRNo: string) {
+        return this.api
+            .get(`Demographic/GetDemographics?MRNo=${MRNo}`)
+            .toPromise();
+    }
 
+    getPatientHistoryByMRNo(MRNo: string) {
+        return this.api
+            .get(`Demographic/GetPatientHistory?MRNo=${MRNo}`)
+            .toPromise();
+    }
 
-getPatientHistoryByMRNo(MRNo:string) {
-  return this.api.get(`Demographic/GetPatientHistory?MRNo=${MRNo}`).toPromise();
-}
+    getCacheItem(object: any) {
+        return this.api.post('Cache/GetCache', object).toPromise();
+    }
 
+    deletedemographics(demoid: any) {
+        return this.api
+            .delete(
+                `Demographic/deletedemographicByPatientId?PatientId=${demoid}`
+            )
+            .toPromise();
+    }
 
-deletedemographics(demoid:any){
-  return this.api.delete(`Demographic/deletedemographicByPatientId?PatientId=${demoid}`).toPromise();
-}
+    getAllEmirates() {
+        return this.api.get('AllDropdowns/GetEmirateType');
+    }
+    GetGenderIdentity() {
+        return this.api.get('AllDropdowns/GetGenderIdentity');
+    }
 
+    getAllFeeSchedule() {
+        return this.api.get('AllDropdowns/GetFeeSchedule');
+    }
 
-getAllEmirates() {
-  return this.api.get('AllDropdowns/GetEmirateType');
-}
-GetGenderIdentity() {
-  return this.api.get('AllDropdowns/GetGenderIdentity');
-}
+    getAllFinancialClass() {
+        return this.api.get('AllDropdowns/GetFinancialClass');
+    }
 
-getAllFeeSchedule(){
-  return this.api.get('AllDropdowns/GetFeeSchedule');
-}
+    getAllEntityTypes() {
+        return this.api.get('AllDropdowns/GetEntityTypes');
+    }
 
-getAllFinancialClass(){
-  return this.api.get('AllDropdowns/GetFinancialClass')
-}
+    submitDemographic(object: any) {
+        debugger;
+        return this.api
+            .post('Demographic/InsertPatientRecord', object)
+            .toPromise();
+    }
 
-getAllEntityTypes(){
-  return this.api.get('AllDropdowns/GetEntityTypes')
-}
+    UpdatePatientRecordByMRNo(object: any) {
+        return this.api
+            .put('Demographic/UpdatePatientRecordByMRNo', object)
+            .toPromise();
+    }
 
-submitDemographic(object: any) {
-debugger
-  return this.api.post('Demographic/InsertPatientRecord', object).toPromise();
-}
+    getStateByCountry(countryId: any) {
+        debugger;
+        return this.api
+            .get(`AllDropdowns/GetStateByCountry?countryId=${countryId}`)
+            .toPromise();
+    }
 
+    getCityByState(ProviderId: any) {
+        debugger;
+        return this.api
+            .get(`AllDropdowns/GetCityByState?ProviderId=${ProviderId}`)
+            .toPromise();
+    }
 
+    GetDemographicsById(PatientId: number) {
+        return this.api
+            .get(`Demographic/GetDemographicsById?PatientId=${PatientId}`)
+            .toPromise();
+    }
 
-UpdatePatientRecordByMRNo(object: any) {
-  return this.api.put('Demographic/UpdatePatientRecordByMRNo', object).toPromise();
-}
+    GetCoverageById(subscribedId: number) {
+        debugger;
+        return this.api
+            .get(`Coverages/GetCoverage?subscribedId=${subscribedId}`)
+            .toPromise();
+    }
 
-getStateByCountry(countryId:any) {
-  debugger
-  return this.api.get(`AllDropdowns/GetStateByCountry?countryId=${countryId}`).toPromise();
-}
-
-getCityByState(ProviderId:any) {
-debugger
-  return this.api.get(`AllDropdowns/GetCityByState?ProviderId=${ProviderId}`).toPromise();
-}
-
-GetDemographicsById(PatientId:number) {
-  return this.api.get(`Demographic/GetDemographicsById?PatientId=${PatientId}`).toPromise();
-}
-
-GetCoverageById(subscribedId:number) {
-  debugger
-  return this.api.get(`Coverages/GetCoverage?subscribedId=${subscribedId}`).toPromise();
-}
-
+    GetAllDemographicsData(demographicList: any, PaginationInfo: any) {
+        const data = { demographicList, PaginationInfo };
+        return this.api.post('Demographic/GetAllDemographicsData', data);
+    }
+    GetRegPatientList() {
+        return this.api.get(`Common/GetRegPatientList`).toPromise();
+    }
 }

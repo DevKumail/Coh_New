@@ -3,9 +3,8 @@ import { authGuard } from '@/app/core/guards/auth.guard';
 import { AlertComponent } from './alert/alert.component';
 import { CovrageCreateComponent } from './Covrage/covrage-create/covrage-create.component';
 import { CoverageListComponent } from './Covrage/coverage-list/coverage-list.component';
-import { DemographicListComponent } from './Demographic/demographic-list/demographic-list.component';
 import { DemographicCreateComponent } from './Demographic/demographic-create/demographic-create.component';
-
+import { DemographicsListComponent } from './Demographic/demographic-list/demographic-list.component';
 
 export const Registration_ROUTES: Routes = [
   {
@@ -32,7 +31,7 @@ export const Registration_ROUTES: Routes = [
 
         {
         path: 'demographics',
-        component: DemographicListComponent,
+        component: DemographicsListComponent,
         data: { title: 'Demographic List' }
         },
 
