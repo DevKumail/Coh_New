@@ -62,12 +62,6 @@
                 <!-- Title -->
                 <div class="col-md-3 col-sm-4 col-12">
                     <label>Title <span class="danger">*</span></label>
-                    <!-- <select class="form-select" formControlName="PersonTitleId">
-                        <option value="">-- Select Title --</option>
-                        <option *ngFor="let t of titles" [value]="t.code">
-                            {{ t.name }}
-                        </option>
-                    </select> -->
                     <select class="form-select" formControlName="PersonTitleId">
                         <option [ngValue]="null" disabled>
                             -- Select Title --
@@ -439,16 +433,680 @@
                 </div>
             </div>
 
-            <!-- Submit Buttons -->
-            <div class="d-flex justify-content-end mt-4">
-                <button type="submit" class="btn btn-success">Save</button>
-                <button
-                    type="button"
-                    class="btn btn-secondary ms-2"
-                    (click)="cancel()"
+            <!-- .............................Contact tab....................................... -->
+
+            <div class="card-body">
+                <ul
+                    ngbNav
+                    #nav="ngbNav"
+                    [(activeId)]="activeTabId"
+                    class="nav nav-tabs mb-3"
                 >
-                    Cancel
-                </button>
+                    <!-- Contact Tab -->
+                    <li [ngbNavItem]="1">
+                        <a ngbNavLink>Contact</a>
+                        <ng-template ngbNavContent>
+                            <form [formGroup]="contactForm" class="row g-3">
+                                <!-- Street Name -->
+                                <div class="col-md-3">
+                                    <label>Street Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="streetName"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Dwelling Number -->
+                                <div class="col-md-3">
+                                    <label>Dwelling Number</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="dwellingNumber"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Country -->
+                                <div class="col-md-3">
+                                    <label>Country</label
+                                    ><span class="text-danger">*</span>
+                                    <select
+                                        class="form-select"
+                                        formControlName="CountryId"
+                                        (change)="onCountryChange()"
+                                    >
+                                        <option value="">
+                                            -- Select Country --
+                                        </option>
+                                        <option
+                                            *ngFor="let c of Country"
+                                            [value]="c.code"
+                                        >
+                                            {{ c.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- State -->
+                                <div class="col-md-3">
+                                    <label>State</label
+                                    ><span class="text-danger">*</span>
+                                    <select
+                                        class="form-select"
+                                        formControlName="StateId"
+                                        (change)="onStateChange()"
+                                    >
+                                        <option value="">
+                                            -- Select State --
+                                        </option>
+                                        <option
+                                            *ngFor="let s of states"
+                                            [value]="s.stateId"
+                                        >
+                                            {{ s.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- City -->
+                                <div class="col-md-3">
+                                    <label>City</label
+                                    ><span class="text-danger">*</span>
+                                    <select
+                                        class="form-select"
+                                        formControlName="CityId"
+                                    >
+                                        <option value="">
+                                            -- Select City --
+                                        </option>
+                                        <option
+                                            *ngFor="let c of city"
+                                            [value]="c.code"
+                                        >
+                                            {{ c.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Fax No -->
+                                <div class="col-md-3">
+                                    <label>Fax No</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="faxNo"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Postal Code -->
+                                <div class="col-md-3">
+                                    <label>Postal Code</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="postalCode"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Home Phone -->
+                                <div class="col-md-3">
+                                    <label>Home Phone</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="homePhone"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Cell Phone -->
+                                <div class="col-md-3">
+                                    <label>Cell Phone *</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="cellPhone"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Work Phone -->
+                                <div class="col-md-3">
+                                    <label>Work Phone</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="workPhone"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Email -->
+                                <div class="col-md-3">
+                                    <label>Email</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="email"
+                                        type="email"
+                                    />
+                                </div>
+                            </form>
+                        </ng-template>
+                    </li>
+
+                    <li [ngbNavItem]="2">
+                        <a ngbNavLink>EmergencyCountry</a>
+                        <ng-template ngbNavContent>
+                            <form [formGroup]="contactForm" class="row g-3">
+                                <!-- Relationship -->
+                                <div class="col-md-3">
+                                    <label>Relationship</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="streetName"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- First Name -->
+                                <div class="col-md-3">
+                                    <label>First Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="dwellingNumber"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Middle Name -->
+                                <div class="col-md-3">
+                                    <label>Middle Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="faxNo"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="col-md-3">
+                                    <label>Last Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="postalCode"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Street Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="streetName"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Country -->
+                                <div class="col-md-3">
+                                    <label>Country</label
+                                    ><span class="text-danger">*</span>
+                                    <select
+                                        class="form-select"
+                                        formControlName="CountryId"
+                                        (change)="onCountryChange()"
+                                    >
+                                        <option value="">
+                                            -- Select Country --
+                                        </option>
+                                        <option
+                                            *ngFor="let c of Country"
+                                            [value]="c.code"
+                                        >
+                                            {{ c.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- State/ Emirate -->
+                                <div class="col-md-3">
+                                    <label>State/ Emirate</label
+                                    ><span class="text-danger">*</span>
+                                    <select
+                                        class="form-select"
+                                        formControlName="StateId"
+                                        (change)="onStateChange()"
+                                    >
+                                        <option value="">
+                                            -- Select State --
+                                        </option>
+                                        <option
+                                            *ngFor="let s of states"
+                                            [value]="s.stateId"
+                                        >
+                                            {{ s.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- City/ Location -->
+                                <div class="col-md-3">
+                                    <label>City/ Location</label
+                                    ><span class="text-danger">*</span>
+                                    <select
+                                        class="form-select"
+                                        formControlName="CityId"
+                                    >
+                                        <option value="">
+                                            -- Select City --
+                                        </option>
+                                        <option
+                                            *ngFor="let c of city"
+                                            [value]="c.code"
+                                        >
+                                            {{ c.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Postal Code -->
+                                <div class="col-md-3">
+                                    <label>Postal Code</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="postalCode"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Phone No -->
+                                <div class="col-md-3">
+                                    <label>Phone No</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="cellPhone"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Home Phone -->
+                                <div class="col-md-3">
+                                    <label>Home Phone</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="homePhone"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Work Phone -->
+                                <div class="col-md-3">
+                                    <label>Work Phone</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="workPhone"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Email -->
+                                <div class="col-md-3">
+                                    <label>Email</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="email"
+                                        type="email"
+                                    />
+                                </div>
+                            </form>
+                        </ng-template>
+                    </li>
+
+                    <li [ngbNavItem]="3">
+                        <a ngbNavLink>Next Of Kin</a>
+                        <ng-template ngbNavContent>
+                            <form [formGroup]="contactForm" class="row g-3">
+                                <!-- Relationship -->
+                                <div class="col-md-3">
+                                    <label>Relationship</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="streetName"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- First Name -->
+                                <div class="col-md-3">
+                                    <label>First Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="dwellingNumber"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Middle Name -->
+                                <div class="col-md-3">
+                                    <label>Middle Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="faxNo"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="col-md-3">
+                                    <label>Last Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="postalCode"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Street Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="streetName"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Country -->
+                                <div class="col-md-3">
+                                    <label>Country</label
+                                    ><span class="text-danger">*</span>
+                                    <select
+                                        class="form-select"
+                                        formControlName="CountryId"
+                                        (change)="onCountryChange()"
+                                    >
+                                        <option value="">
+                                            -- Select Country --
+                                        </option>
+                                        <option
+                                            *ngFor="let c of Country"
+                                            [value]="c.code"
+                                        >
+                                            {{ c.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- State/ Emirate -->
+                                <div class="col-md-3">
+                                    <label>State/ Emirate</label
+                                    ><span class="text-danger">*</span>
+                                    <select
+                                        class="form-select"
+                                        formControlName="StateId"
+                                        (change)="onStateChange()"
+                                    >
+                                        <option value="">
+                                            -- Select State --
+                                        </option>
+                                        <option
+                                            *ngFor="let s of states"
+                                            [value]="s.stateId"
+                                        >
+                                            {{ s.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- City/ Location -->
+                                <div class="col-md-3">
+                                    <label>City/ Location</label
+                                    ><span class="text-danger">*</span>
+                                    <select
+                                        class="form-select"
+                                        formControlName="CityId"
+                                    >
+                                        <option value="">
+                                            -- Select City --
+                                        </option>
+                                        <option
+                                            *ngFor="let c of city"
+                                            [value]="c.code"
+                                        >
+                                            {{ c.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Postal Code -->
+                                <div class="col-md-3">
+                                    <label>Postal Code</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="postalCode"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Phone No -->
+                                <div class="col-md-3">
+                                    <label>Phone No</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="cellPhone"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Home Phone -->
+                                <div class="col-md-3">
+                                    <label>Home Phone</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="homePhone"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Work Phone -->
+                                <div class="col-md-3">
+                                    <label>Work Phone</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="workPhone"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Email -->
+                                <div class="col-md-3">
+                                    <label>Email</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="email"
+                                        type="email"
+                                    />
+                                </div>
+                            </form>
+                        </ng-template>
+                    </li>
+
+                    <li [ngbNavItem]="4">
+                        <a ngbNavLink>Spouse</a>
+                        <ng-template ngbNavContent>
+                            <form [formGroup]="contactForm" class="row g-3">
+                                <!-- First Name -->
+                                <div class="col-md-3">
+                                    <label>First Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="dwellingNumber"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Middle Name -->
+                                <div class="col-md-3">
+                                    <label>Middle Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="faxNo"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="col-md-3">
+                                    <label>Last Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="postalCode"
+                                        type="text"
+                                    />
+                                </div>
+
+                                <div class="col-md-3">
+                    <label>Gender</label><span class="danger"> *</span>
+                    <select class="form-select" formControlName="Sex">
+                        <option *ngFor="let g of genders" [value]="g.code">
+                            {{ g.name }}
+                        </option>
+                    </select>
+                </div>
+                            </form>
+                        </ng-template>
+                    </li>
+
+                    <li [ngbNavItem]="5">
+                        <a ngbNavLink>Parents info</a>
+                        <ng-template ngbNavContent>
+                            <!-- FATHER SECTION -->
+                            <h5>Father</h5>
+
+                            <form [formGroup]="spouseForm" class="row g-3">
+                                <div class="col-md-3">
+                                    <label>First Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="fatherFirstName"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Middle Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="fatherMiddleName"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Last Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="fatherLastName"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Home Phone</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="fatherHomePhone"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Cell Phone</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="fatherCellPhone"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Email</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="fatherEmail"
+                                        type="email"
+                                    />
+                                </div>
+                            </form>
+
+                            <hr />
+
+                            <!-- MOTHER SECTION -->
+
+                            <h5>Mother</h5>
+                            <form [formGroup]="spouseForm" class="row g-3">
+                                <div class="col-md-3">
+                                    <label>First Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="motherFirstName"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Middle Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="motherMiddleName"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Last Name</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="motherLastName"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Home Phone</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="motherHomePhone"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Cell Phone</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="motherCellPhone"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Email</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="motherEmail"
+                                        type="email"
+                                    />
+                                </div>
+                            </form>
+                        </ng-template>
+                    </li>
+                </ul>
+
+                <!-- IMPORTANT: Put ngbNavOutlet outside the <ul> -->
+                <div [ngbNavOutlet]="nav"></div>
+                <!-- Submit and Back Buttons -->
+                <div class="mt-4 text-end">
+                    <button
+                        type="button"
+                        class="btn btn-secondary me-2"
+                        (click)="goBack()"
+                    >
+                        Back
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        [disabled]="spouseForm.invalid"
+                    >
+                        Submit
+                    </button>
+                </div>
             </div>
         </form>
     </div>

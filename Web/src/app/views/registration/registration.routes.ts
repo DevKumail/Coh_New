@@ -5,6 +5,8 @@ import { CovrageCreateComponent } from './Covrage/covrage-create/covrage-create.
 import { CoverageListComponent } from './Covrage/coverage-list/coverage-list.component';
 import { DemographicCreateComponent } from './Demographic/demographic-create/demographic-create.component';
 import { DemographicsListComponent } from './Demographic/demographic-list/demographic-list.component';
+import { Contact } from 'lucide-angular';
+import { title } from 'process';
 
 export const Registration_ROUTES: Routes = [
   {
@@ -40,6 +42,12 @@ export const Registration_ROUTES: Routes = [
           component: DemographicCreateComponent,
           data: { title: 'Demographic Create' }
         },
+        // {
+        //     path: 'Contact',
+        //     component: ContactComponent,
+        //     data: { title: 'contact'}
+
+        // }
 
 
 

@@ -285,8 +285,8 @@ facilities: any[] = [];
       //console.log('Titles:', this.titles);
     }
 
-    this.registrationApi.GetInsuranceRelation().subscribe((res) => {
-    });
+    // this.registrationApi.GetInsuranceRelation().subscribe((res) => {
+    // });
   }
 
 
