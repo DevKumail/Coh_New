@@ -38,10 +38,6 @@ export class AllergiesComponent implements OnInit {
 
   constructor(
 
-    private clinicalApi: ClinicalApiService,
-    private fb: FormBuilder,
-    private router: Router
-    ) {}
 
   ngOnInit() {
     this.initForm();
@@ -142,6 +138,13 @@ export class AllergiesComponent implements OnInit {
     this.currentPage = 1;
     this.updatePagination();
   }
+<<<<<<< Updated upstream
+=======
+FillCache() {
+  const cacheItems = [
+      'Provider'
+    ];
+>>>>>>> Stashed changes
 
   submitAllergyForm() {
     if (this.allergyForm.valid) {

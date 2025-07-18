@@ -7,6 +7,11 @@ import { NgIconComponent } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Injectable } from '@angular/core';
+<<<<<<< Updated upstream
+=======
+import { AlertDTO } from '@/app/shared/models/alert.model';
+import { AlertType } from '@/app/shared/models/alert-type.model';
+>>>>>>> Stashed changes
 
 
 @Component({
@@ -58,16 +63,7 @@ export class AlertComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.alertForm = this.fb.group({
-      alertType: [null, Validators.required],
-      repeatDate: [null, Validators.required],
-      startDate: [null, Validators.required],
-      message: ['', Validators.required],
-      status: [null],
-      updatedBy: [''],
-      enteredBy: [''],
-      enteredDate: [null],
-    });
+    
 this.  GetPatientAlertsData() ;
     this.GetAlertType();
 
@@ -110,11 +106,73 @@ this.  GetPatientAlertsData() ;
     this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
       debugger;
 
+<<<<<<< Updated upstream
       const alertsTable = res?.alert?.table1 || [];
       if (Array.isArray(alertsTable) && alertsTable.length > 0) {
         this.MyAlertsData = alertsTable;
         this.filteredAlertsData = alertsTable;
         console.log(this.MyAlertsData, "alerts")
+=======
+  //     const alertsTable = res?.alert?.table1 || [];
+  //     if (Array.isArray(alertsTable) && alertsTable.length > 0) {
+  //       this.MyAlertsData = alertsTable;
+  //       this.filteredAlertsData = alertsTable;
+  //       console.log(this.MyAlertsData, "alerts")
+  //     const alertsTable = [] = res?.alert?.table1;
+  //     if (Array.isArray(alertsTable) && alertsTable.length > 0) {
+  //       this.MyAlertsData = alertsTable;
+  //       this.filteredAlertsData = alertsTable;
+  //       console.log(this.MyAlertsData, "alerts")
+
+  //     } else {
+  //       console.warn("No alert data returned from API.");
+  //       this.MyAlertsData = [];
+  //       this.filteredAlertsData = [];
+  //     }
+  //   }).catch((error: any) => {
+  //     console.error("Failed to fetch alert data", error);
+  //   });
+
+  // }
+
+
+GetPatientAlertsData(): void {
+  this.Mrno = '1023';
+  this.registrationApiService.GetAlertDetailsDb(this.Mrno).then((res: any) => {
+    if (!res || !res.alert || !Array.isArray(res.alert.table1)) {
+      console.warn("No alert data returned from API.");
+      this.MyAlertsData = [];
+      this.filteredAlertsData = [];
+      return;
+    }
+
+    const alertsTable: AlertDTO[] = res.alert.table1;
+    this.MyAlertsData = alertsTable;
+    this.filteredAlertsData = alertsTable;
+    this.calculatePagination();
+  }).catch((error: any) => {
+    console.error("Failed to fetch alert data", error);
+    this.MyAlertsData = [];
+    this.filteredAlertsData = [];
+  });
+}
+
+GetAlertType(): void {
+  this.registrationApiService.GetAlertType().then((res: { result: AlertType[] } | undefined) => {
+    if (!res || !res.result || !Array.isArray(res.result)) {
+      console.warn("No alert type data returned from API.");
+      this.getAlert = [];
+      return;
+    }
+
+    this.getAlert = res.result;
+    console.log("✅ GetAlertType:", this.getAlert);
+  }).catch((error: any) => {
+    console.error("❌ Failed to fetch alert types", error);
+    this.getAlert = [];
+  });
+}
+>>>>>>> Stashed changes
 
       } else {
         console.warn("No alert data returned from API.");
@@ -163,8 +221,13 @@ this.  GetPatientAlertsData() ;
 
     console.log("🚀 Final Alert Payload:", alert);
 
+<<<<<<< Updated upstream
     this.registrationApiService.SubmitAlertType(alert).subscribe({
       next: (res) => {
+=======
+    this.registrationApiService.SubmitAlertType(alert2).subscribe({
+      next: (res:any) => {
+>>>>>>> Stashed changes
         Swal.fire({
           position: "center",
           icon: "success",
@@ -175,7 +238,7 @@ this.  GetPatientAlertsData() ;
         this.alertForm.reset(); // clear form
         this.GetPatientAlertsData();
       },
-      error: (error) => {
+      error: (error: any) => {
         Swal.fire({
           icon: 'error',
           title: 'Error',
