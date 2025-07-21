@@ -1,77 +1,40 @@
- <!-- <div
-  class="card patient-header-panel"
-  [@slideToggle]="state"
-  [class.sticky]="pinned"
->
-  <div class="card-body py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
-    <h5 class="text-danger mb-0">🩺 Patient Header Panel</h5>
-
-    <button (click)="togglePin()" class="btn btn-sm btn-outline-secondary" title="Pin/Unpin Panel">
-      <lucide-icon [name]="pinned ? 'pin' : 'pin-off'" class="fs-18"></lucide-icon>
-    </button>
+<div *ngIf="isVisible" class="topbar-banner d-flex flex-wrap align-items-start mx-2 my-2 position-relative">
+  <!-- Close icon -->
+  <button class="btn-close position-absolute top-0 end-0 m-2" (click)="closeBanner()" aria-label="Close"></button>
+<button (click)="pinnedChange.emit(!pinned)">
+  {{ pinned ? 'Unpin' : 'Pin' }}
+</button>
+  <!-- Patient Image -->
+  <div style="min-width: 80px;">
+    <img
+      src="assets/images/patient.jpg"
+      alt="Patient Image"
+      style="width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;"
+    />
   </div>
 
-  <div class="card-body pt-2 pb-3 px-4">
-    <div class="row g-3">
-      <div class="col-md-3"><strong>Name:</strong> </div>
-      <div class="col-md-3"><strong>Age:</strong> </div>
-      <div class="col-md-3"><strong>Gender:</strong> </div>
-      <div class="col-md-3"><strong>ID:</strong> </div>
-    </div>
-
-    <div *ngIf="pinned" class="alert alert-warning mt-3 mb-0 py-2 px-3 small">
-      <strong>🔒 This panel is pinned.</strong> Please unpin to collapse it.
-    </div>
-  </div>
-</div> -->
-
-
-<div class="card patient-header-panel" [@slideToggle]="state" [class.sticky]="pinned">
-  <div class="card-body py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
-    <h5 class="text-danger mb-0">🩺 Patient Header Panel</h5>
-    <button (click)="togglePin()" class="btn btn-sm btn-outline-secondary" title="Pin/Unpin Panel">
-      <lucide-icon [name]="pinned ? 'pin' : 'pin-off'" class="fs-18"></lucide-icon>
-    </button>
+  <!-- Patient Info -->
+  <div>
+    <div><strong>Name:</strong> Asma Othman Al Hammadi</div>
+    <div><strong>MR No:</strong> 123456</div>
+    <div><strong>Payer:</strong> ANTHEM OH</div>
+    <div><strong>Plan:</strong> Basic Plus</div>
   </div>
 
-  <div class="card-body pt-2 pb-3 px-4">
-    <div class="row g-3">
-      <div class="col-md-3"><strong>Name:</strong> {{ patient?.personFirstName || '-' }}</div>
-      <div class="col-md-3"><strong>Age:</strong> {{ patient?.age || '-' }}</div>
-      <div class="col-md-3"><strong>Gender:</strong> {{ patient?.gender || '-' }}</div>
-      <!-- <div class="col-md-3"><strong>ID:</strong> {{ patient?.mrNo || '-' }}</div> -->
-    </div>
+  <!-- Contact Info -->
+  <div>
+    <div><strong>Member ID:</strong> MBR-001122</div>
+    <div><strong>Gender:</strong> Male</div>
+    <div><strong>DOB:</strong> 10/06/2010</div>
+    <div><strong>PCP:</strong> Dr. John Smith</div>
+    <div><strong>Patient Type:</strong> Outpatient</div>
+  </div>
 
-    <div *ngIf="pinned" class="alert alert-warning mt-3 mb-0 py-2 px-3 small">
-      <strong>🔒 This panel is pinned.</strong> Please unpin to collapse it.
-    </div>
+  <!-- Phone Info -->
+  <div>
+    <div><strong>Cell Phone:</strong> +1 555-1234</div>
+    <div><strong>Home Phone:</strong> +1 555-5678</div>
+    <div><strong>Work Phone:</strong> +1 555-9876</div>
+    <div><strong>POD Type:</strong> Telehealth</div>
   </div>
 </div>
-
-
-<!-- <div
-  class="card patient-header-panel"
-  *ngIf="!isCollapsed"
-  [class.sticky]="pinned"
->
-  <div class="card-body py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
-    <h5 class="text-danger mb-0">🩺 Patient Header Panel</h5>
-
-    <button (click)="togglePin()" class="btn btn-sm btn-outline-secondary" title="Pin/Unpin Panel">
-      <lucide-icon [name]="pinned ? 'pin' : 'pin-off'" class="fs-18"></lucide-icon>
-    </button>
-  </div>
-
-  <div class="card-body pt-2 pb-3 px-4">
-    <div class="row g-3">
-      <div class="col-md-3"><strong>Name:</strong> John Doe</div>
-      <div class="col-md-3"><strong>Age:</strong> 45</div>
-      <div class="col-md-3"><strong>Gender:</strong> Male</div>
-      <div class="col-md-3"><strong>ID:</strong> P-1234567</div>
-    </div>
-
-    <div *ngIf="pinned" class="alert alert-warning mt-3 mb-0 py-2 px-3 small">
-      <strong> This panel is pinned.</strong> Please unpin to collapse it.
-    </div>
-  </div>
-</div> -->

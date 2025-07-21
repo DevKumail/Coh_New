@@ -1,5 +1,5 @@
 <header class="app-topbar">
-  <div class="topbar-menu">
+  <div class="topbar-menu d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-2">
       <!-- Logo -->
       <div class="logo-topbar">
@@ -30,34 +30,29 @@
       </button>
 
       <!-- Search -->
-      <div class="app-search d-none d-xl-flex">
-        <input
-          type="search4"
-          class="form-control topbar-search"
-          name="search"
-          placeholder="Search Patient..."
-        />
-        <lucide-icon [img]="Search" class="app-search-icon text-muted" />
-      </div>
+   
 
       <!-- Mega Menu -->
       <app-mega-menu />
     </div>
 
-    <!-- Modal Template -->
-    <ng-template #patientSearchModal let-modal>
-    <app-patient-search-modal (patientsFound)="handleSearchResults($event)"></app-patient-search-modal>
-    </ng-template>
+<app-patient-header-panel></app-patient-header-panel>
 
+
+
+
+    <!-- Modal Template -->
+   
     <div class="d-flex align-items-center gap-2">
-      <!-- Button to trigger modal or banner -->
-      <button
+       
+      <!-- Button to trigger modal or banner  -->
+       <!-- <button
         (click)="togglePatientBanner(patientSearchModal)"
         class="btn p-0 border-0 bg-transparent shadow-none"
         title="Toggle Patient Banner"
       >
         <lucide-icon name="stethoscope" class="fs-22 text-body"></lucide-icon>
-      </button>
+      </button> -->
 
       <app-notification-dropdown />
       <app-theme-toggler />
@@ -65,3 +60,4 @@
     </div>
   </div>
 </header>
+

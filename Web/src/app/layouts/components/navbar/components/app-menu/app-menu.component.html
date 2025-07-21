@@ -15,6 +15,15 @@
         }
 
     </ul>
+      <div class="app-search d-none d-xl-flex">
+        <input
+          type="search4"
+          class="form-control topbar-search"
+          name="search"
+          placeholder="Search Patient..."
+        />
+        <lucide-icon [img]="Search" class="app-search-icon text-muted" />
+      </div>
 </div>
 
 <ng-template #MenuItemWithChildren let-item="item" let-wrapperClass="wrapperClass" let-togglerClass="togglerClass">
@@ -72,4 +81,6 @@
             }
         </a>
     }
+    
 </ng-template>
+

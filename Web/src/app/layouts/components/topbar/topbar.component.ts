@@ -109,6 +109,7 @@ import { NotificationDropdownComponent } from '@layouts/components/topbar/compon
 import { IconsModule } from '@/app/shared/icons.module';
 import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { PatientSearchModalComponent } from '@/app/shared/modals/patient-search-modal/patient-search-modal.component';
+import { PatientHeaderPanelComponent } from "../patient-header-panel/patient-header-panel.component";
 
 
 
@@ -116,18 +117,17 @@ import { PatientSearchModalComponent } from '@/app/shared/modals/patient-search-
   selector: 'app-topbar',
   standalone: true,
   imports: [
-
     RouterLink,
     MegaMenuComponent,
     ThemeTogglerComponent,
     UserProfileComponent,
     NotificationDropdownComponent,
     IconsModule,
-    NgbModalModule,NgIcon,
-    PatientSearchModalComponent,
-
-  ],
+    NgbModalModule, NgIcon,
+    PatientHeaderPanelComponent
+],
   templateUrl: './topbar.component.html',
+  styleUrl: './topbar.component.scss'
 })
 export class TopbarComponent {
   constructor(

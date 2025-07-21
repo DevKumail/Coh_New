@@ -6,21 +6,23 @@ import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle} from '@ng-bootstrap/ng-
 import {NavigationEnd, Router, RouterLink} from '@angular/router';
 import {horizontalMenuItems} from '@layouts/components/data';
 import {filter} from 'rxjs';
+import { LucideAngularModule, Search } from 'lucide-angular';
 
 @Component({
     selector: 'app-menu-navbar',
     imports: [
-        CommonModule,
-        NgIcon,
-        NgbDropdown,
-        NgbDropdownToggle,
-        RouterLink,
-        NgbDropdownMenu
-    ],
+    CommonModule,
+    NgIcon,
+    NgbDropdown,
+    NgbDropdownToggle,
+    RouterLink,
+    NgbDropdownMenu,
+    LucideAngularModule
+],
     templateUrl: './app-menu.component.html'
 })
 export class AppMenuComponent {
-
+  Search = Search;
     constructor(public router: Router) {
     }
 
