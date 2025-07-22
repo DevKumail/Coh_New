@@ -37,6 +37,11 @@ export class AllergiesComponent implements OnInit {
   end = this.pageSize;
 
   constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private clinicalApi: ClinicalApiService)
+    {}
+  
 
 
   ngOnInit() {
@@ -138,13 +143,6 @@ export class AllergiesComponent implements OnInit {
     this.currentPage = 1;
     this.updatePagination();
   }
-<<<<<<< Updated upstream
-=======
-FillCache() {
-  const cacheItems = [
-      'Provider'
-    ];
->>>>>>> Stashed changes
 
   submitAllergyForm() {
     if (this.allergyForm.valid) {
@@ -195,13 +193,13 @@ submitAllergyForm1() {
   if (this.allergyForm.valid) {
     const formData = this.allergyForm.value;
     this.clinicalApi.submitPatientAllergy(formData).subscribe({
-      next: (response) => {
+      next: (response:any) => {
         console.log('Submitted', response);
         this.allergyData.push(formData);
         this.allergyForm.reset();
         this.updatePagination();
       },
-      error: (err) => console.error(err)
+      error: (err: any) => console.error(err)
     });
   }
 

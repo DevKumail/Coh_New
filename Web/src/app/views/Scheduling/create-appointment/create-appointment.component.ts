@@ -22,7 +22,7 @@ import { D } from 'node_modules/@angular/cdk/bidi-module.d-D-fEBKdS';
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, RouterModule],
   templateUrl: './create-appointment.component.html',
-  styleUrl: './create-appointment.component.scss'
+  // styleUrl: './create-appointment.component.scss'
 })
 export class CreateAppointmentComponent implements OnInit {
   date: any;
@@ -149,6 +149,21 @@ export class CreateAppointmentComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.appointmentForm.get('facility')?.valueChanges.subscribe((facilityId) => {
+  if (facilityId) {
+    this.GetSpecialitybyFacilityId(facilityId);
+  } else {
+    this.specialities = [];
+  }
+})
+this.appointmentForm.get('speciality')?.valueChanges.subscribe((specialityId) => {
+  if (specialityId) {
+    this.GetSitebySpecialityId(specialityId);
+  } else {
+    this.siteArray = [];
+  }
+});
+
     
     //this.GetSpecialitybyFacilityId(0)
     this.appointmentForm = this.fb.group({

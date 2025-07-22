@@ -5,11 +5,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ClinicalApiService {
-<<<<<<< Updated upstream
 constructor(private api: ApiService) {}
-=======
-  constructor(private api: ApiService) { }
->>>>>>> Stashed changes
 
 
 //   submitPatientAllergy(data: any): Observable<any> {

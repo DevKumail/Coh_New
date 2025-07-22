@@ -9,14 +9,22 @@
       <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
        
         <div class="row">
-          <div class="col-sm-3 mb-3">
+          <!-- <div class="col-sm-3 mb-3">
             <label>Facility <span class="text-danger">*</span></label>
             <select class="form-control form-select" formControlName="facility"
               (onChange)="GetSpecialitybyFacilityId(selectedFacility)">
               <option value="">Select Facility</option>
               <option *ngFor="let f of facilities" [value]="f.code">{{ f.name }}</option>
             </select>
-          </div>
+          </div> -->
+          <div class="col-sm-3 mb-3">
+  <label>Facility <span class="text-danger">*</span></label>
+  <select class="form-control form-select" formControlName="facility">
+    <option value="">Select Facility</option>
+    <option *ngFor="let f of facilities" [value]="f.code">{{ f.name }}</option>
+  </select>
+</div>
+
 
 
           <div class="col-sm-3 mb-3">

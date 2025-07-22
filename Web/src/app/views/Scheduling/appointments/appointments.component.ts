@@ -19,7 +19,8 @@ import { SchedulingApiService } from '../scheduling.api.service'; // or your act
   selector: 'app-appointments',
   imports: [ CommonModule,RouterModule,ReactiveFormsModule],
   templateUrl: './appointments.component.html',
-  styleUrl: './appointments.component.scss'
+  // styleUrl: './appointments.component.scss',
+  styleUrls: []
 })
 export class AppointmentsComponent {
   constructor(private router: Router,
