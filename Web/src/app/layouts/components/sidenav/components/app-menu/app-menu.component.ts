@@ -40,7 +40,7 @@ export class AppMenuComponent implements OnInit {
     // }
 
     ngOnInit(): void {
-        debugger
+
             const sessionData = sessionStorage.getItem('allowscreens');
 const allowedScreens = JSON.parse(sessionStorage.getItem('allowscreens') || '[]');
 
@@ -122,7 +122,7 @@ const allowedScreens = JSON.parse(sessionStorage.getItem('allowscreens') || '[]'
 //       menuMap.set(moduleName, {
 //         label: moduleName,
 //         isCollapsed: true,
-//          icon: iconLookup.get(moduleName), 
+//          icon: iconLookup.get(moduleName),
 //         children: []
 //       });
 //     }

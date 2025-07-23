@@ -13,18 +13,18 @@ constructor(private api: ApiService) {}
 //   }
 
   submitPatientAllergy(data: any): Observable<any> {
-    debugger
+
   return this.api.post('/Alergy/SubmitPatientAlergy', data);
 }
 
   SubmitPatientProblem(object: any) {
-    debugger;
+    ;
     return this.api
       .post(`PatientProblem/SubmitPatientProblem`, object)
       .toPromise();
   }
  GetRowDataOfPatientProblem(mrno:string,userId:number){
-      debugger
+
       return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}`).toPromise();
     }
 

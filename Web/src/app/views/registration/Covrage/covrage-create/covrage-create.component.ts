@@ -235,14 +235,14 @@ facilities: any[] = [];
     }
 
     if (regBLPayer) {
-      //debugger;
+      //;
       regBLPayer = regBLPayer.map((item: { PayerId: any; PayerName: any }) => {
         return {
           name: item.PayerName,
           code: item.PayerId,
         };
       });
-      //debugger;
+      //;
       this.BLPayer = regBLPayer;
     }
 
@@ -255,7 +255,7 @@ facilities: any[] = [];
           };
         }
       );
-      //debugger;
+      //;
       this.BLPayerPlan = regBLPayerPlan;
     }
 
@@ -268,7 +268,7 @@ facilities: any[] = [];
           };
         }
       );
-      //debugger;
+      //;
       this.BLPayerPackage = regBLPayerPackage;
     }
 
@@ -279,7 +279,7 @@ facilities: any[] = [];
           code: item.TitleId,
         };
       });
-      //debugger;
+      //;
       this.titles = regTitles;
 
       //console.log('Titles:', this.titles);
@@ -421,7 +421,7 @@ insertsubscriber() {
   }
 
 getStateByCountry(countryId: number) {
-    debugger
+
   this.registrationApi.getStateByCountry(countryId).then((res: any) => {
     this.states = res;
     this.subscriberForm.get('StateId')?.setValue(null); // Reset state
@@ -447,7 +447,7 @@ onCountryChange() {
   const countryId = this.subscriberForm.get('CountryId')?.value;
   if (countryId) {
     this.registrationApi.getStateByCountry(countryId).then((res: any) => {
-        debugger
+
         this.states = res;
       this.subscriberForm.get('StateId')?.setValue(null); // Reset State
       this.city = [];
@@ -463,7 +463,7 @@ onCountryChange() {
 
 onStateChange() {
   const stateId = this.subscriberForm.get('StateId')?.value;
-  debugger
+
   if (stateId) {
     this.registrationApi.getCityByState(stateId).then((res: any) => {
       this.city = res;

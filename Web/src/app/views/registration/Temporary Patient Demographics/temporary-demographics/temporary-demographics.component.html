@@ -1,0 +1,380 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
+        <li class="breadcrumb-item">
+            <a href="javascript:void(0);">
+                <ng-icon name="tablerSmartHome"></ng-icon>
+                Clinical
+            </a>
+        </li>
+        <li
+            class="d-flex align-items-center text-muted mx-1"
+            aria-current="page"
+        >
+            <ng-icon name="tablerChevronRight"></ng-icon>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            temporary-demographic-create
+        </li>
+    </ol>
+</nav>
+
+<div class="container-fluid w-100">
+    <div class="card p-3 shadow mt-2">
+        <h3 class="card-title mb-3 fw-bold">Temporary Demographic Create</h3>
+        <form [formGroup]="temporaryForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+                <!-- Temporary Patient ID -->
+                <div class="col-md-3">
+                    <label>Temporary Patient Id</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="tempId"
+
+                    />
+                </div>
+
+                <!-- Title -->
+                <div class="col-md-3">
+                    <label>Title <span class="text-danger">*</span></label>
+                    <select class="form-select" formControlName="PersonTitleId">
+                        <option [ngValue]="null" disabled>
+                            -- Select Title --
+                        </option>
+                        <option *ngFor="let t of titles" [ngValue]="t.code">
+                            {{ t.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- First Name -->
+                <div class="col-md-3">
+                    <label>First Name <span class="text-danger">*</span></label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personFirstName"
+                        placeholder="First Name"
+                    />
+                </div>
+
+                <!-- Middle Name -->
+                <div class="col-md-3">
+                    <label
+                        >Middle Name <span class="text-danger">*</span></label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personMiddleName"
+                        placeholder="Middle Name"
+                    />
+                </div>
+
+                <!-- Last Name -->
+                <div class="col-md-3">
+                    <label>Last Name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personLastName"
+                        placeholder="Last Name"
+                    />
+                </div>
+
+                <!-- Gender -->
+                <div class="col-md-3">
+                    <label>Gender</label><span class="danger"> *</span>
+                    <select class="form-select" formControlName="gender">
+                        <option *ngFor="let g of genders" [value]="g.code">
+                            {{ g.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="col-md-3">
+                    <label
+                        >Date of Birth <span class="text-danger">*</span></label
+                    >
+                    <input
+                        type="date"
+                        class="form-control"
+                        formControlName="bdate"
+                        placeholder="Date of Birth"
+                    />
+                </div>
+
+                <!-- Age -->
+                <div class="col-md-3">
+                    <label>Age</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        formControlName="personAge"
+                        placeholder="Age"
+                    />
+                </div>
+
+                <!-- Home Phone -->
+                <div class="col-md-3">
+                    <label>Home Phone</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personHomePhone1"
+                        placeholder="Home Phone"
+                    />
+                </div>
+
+                <!-- Work Phone -->
+                <div class="col-md-3">
+                    <label>Work Phone</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personWorkPhone1"
+                        placeholder="Work Phone"
+                    />
+                </div>
+
+                <!-- Street Number -->
+                <div class="col-md-3">
+                    <label>Street Number</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="streetNumber"
+                        placeholder="Street Number"
+                    />
+                </div>
+
+                <!-- Dwelling Number -->
+                <div class="col-md-3">
+                    <label>Dwelling Number</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="DwellingNumber"
+                        placeholder="Dwelling Number"
+                    />
+                </div>
+
+                <!-- Zip Code -->
+                <div class="col-md-3">
+                    <label>Zip/Postal Code</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personZipCode"
+                        placeholder="Zip Code"
+                    />
+                </div>
+
+                <!-- Country -->
+                <div class="col-md-3">
+                    <label>Select Country</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedCountry"
+                        (change)="onCountryChange()"
+                    >
+                        <option [ngValue]="null" disabled>
+                            -- Select Country --
+                        </option>
+                        <option *ngFor="let c of countries" [ngValue]="c.code">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- State -->
+                <div class="col-md-3">
+                    <label>Select State</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedState"
+                        (change)="onStateChange()"
+                    >
+                        <option [ngValue]="null" disabled>
+                            -- Select State --
+                        </option>
+                        <option *ngFor="let s of states" [ngValue]="s.code">
+                            {{ s.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- City -->
+                <div class="col-md-3">
+                    <label>Select City</label>
+                    <select class="form-select" formControlName="selectedCity">
+                        <option [ngValue]="null" disabled>
+                            -- Select City --
+                        </option>
+                        <option *ngFor="let c of cities" [ngValue]="c.code">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Nationality -->
+                <div class="col-md-3">
+                    <label>Select Nationality</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedNationality"
+                    >
+                        <option [ngValue]="null" disabled>
+                            -- Select Nationality --
+                        </option>
+                        <option
+                            *ngFor="let n of nationalities"
+                            [ngValue]="n.code"
+                        >
+                            {{ n.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Cell Phone -->
+                <div class="col-md-3">
+                    <label>Cell Phone <span class="text-danger">*</span></label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personCellPhone"
+                        placeholder="000-000-0000"
+                    />
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-3">
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        class="form-control"
+                        formControlName="personEmail"
+                        placeholder="Email"
+                    />
+                </div>
+
+                <!-- Kin Name -->
+                <div class="col-md-3">
+                    <label>Kin Name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nokFirstName"
+                        placeholder="Kin Name"
+                    />
+                </div>
+
+                <!-- Kin SSN -->
+                <div class="col-md-3">
+                    <label>Kin Social Security</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nokSocialSecurityNo"
+                        placeholder="999-99-9999"
+                    />
+                </div>
+
+                <!-- Kin Zip -->
+                <div class="col-md-3">
+                    <label>Kin Zip Code</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nokZipCode"
+                        placeholder="Zip Code"
+                    />
+                </div>
+
+                <!-- Kin Home Phone -->
+                <div class="col-md-3">
+                    <label>Kin Home Phone</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nokHomePhone"
+                        placeholder="Kin Home Phone"
+                    />
+                </div>
+
+                <!-- Kin Address -->
+                <div class="col-md-3">
+                    <label>Kin Address</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nokAddress1"
+                        placeholder="Kin Address"
+                    />
+                </div>
+
+                <!-- Kin Country -->
+                <div class="col-md-3">
+                    <label>Kin Country</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedCountryNOK"
+                    >
+                        <option *ngFor="let c of countries" [ngValue]="c.code">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Kin State -->
+                <div class="col-md-3">
+                    <label>Kin State</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedStateNOK"
+                    >
+                        <option *ngFor="let s of states" [ngValue]="s.code">
+                            {{ s.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Kin City -->
+                <div class="col-md-3">
+                    <label>Kin City</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedCityNOK"
+                    >
+                        <option *ngFor="let c of cities" [ngValue]="c.code">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Comment -->
+                <div class="col-md-3">
+                    <label>Comment</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="comments"
+                        placeholder="Comment"
+                    />
+                </div>
+            </div>
+
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-info me-2">Submit</button>
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    (click)="onCancel()"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

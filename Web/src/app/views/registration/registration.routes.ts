@@ -7,6 +7,9 @@ import { DemographicCreateComponent } from './Demographic/demographic-create/dem
 import { DemographicsListComponent } from './Demographic/demographic-list/demographic-list.component';
 import { Contact } from 'lucide-angular';
 import { title } from 'process';
+import { TemporaryPatientDemographicListComponent } from './Temporary Patient Demographics/temporary-patient-demographic-list/temporary-patient-demographic-list.component';
+import { TemporaryDemographicsComponent } from './Temporary Patient Demographics/temporary-demographics/temporary-demographics.component';
+
 
 export const Registration_ROUTES: Routes = [
   {
@@ -42,12 +45,23 @@ export const Registration_ROUTES: Routes = [
           component: DemographicCreateComponent,
           data: { title: 'Demographic Create' }
         },
-        // {
-        //     path: 'Contact',
-        //     component: ContactComponent,
-        //     data: { title: 'contact'}
 
-        // }
+        {
+            path: 'temporary-patient-demographics',
+            component: TemporaryPatientDemographicListComponent,
+            data: { title: 'Temporary Patient Demographic List' },
+        },
+
+
+        {
+            path: 'temporary-demographics',
+            component: TemporaryDemographicsComponent,
+            data: { title: 'Temporary Demographics' },
+        },
+
+
+
+
 
 
 

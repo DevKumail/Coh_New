@@ -128,6 +128,7 @@ export const menuItems: ExtendedMenuItemType[] = [
       { label: 'Demographics', url: '/registration/demographics' },
       { label: 'Demographic Create', url: '/registration/demographic-create' },
       { label: 'Demographic List',url: '/registration/demographic-list' },
+      { label: 'Temporary Patient Demographics', url: '/registration/temporary-patient-demographics' }
     ]
   },
 

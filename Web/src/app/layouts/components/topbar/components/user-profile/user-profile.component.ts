@@ -19,9 +19,9 @@ import { AuthService } from '@core/services/auth.service';
   templateUrl: './user-profile.component.html'
 })
 export class UserProfileComponent {
-  userName: string = ''; 
+  userName: string = '';
   menuItems = userDropdownItems;
-  
+
   constructor(
     public authService : AuthService
   ){}
@@ -33,10 +33,10 @@ export class UserProfileComponent {
   }
 
   getUserFromLocalStorage() {
-    debugger
+
     const userData = sessionStorage.getItem('userName');
     if (userData) {
-     
+
       this.userName = userData;
       this.displayName =  userData;
     }

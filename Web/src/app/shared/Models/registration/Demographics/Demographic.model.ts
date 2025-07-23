@@ -36,3 +36,14 @@ export interface Demographic {
   isDrugHist?: boolean;
   isExpReporting?: boolean;
 }
+
+
+export interface Contact {
+  CellPhone?: string;
+  HomePhone?: string;
+  
+}
+
+
+
+

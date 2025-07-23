@@ -5,9 +5,9 @@ import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class DemographicApiServices {
-    add(arg0: { severity: string; summary: string; detail: any }) {
-        throw new Error('Method not implemented.');
-    }
+
+
+
 
     constructor(private api: ApiService, private http: HttpClient) {}
 
@@ -38,6 +38,7 @@ export class DemographicApiServices {
     getAllEmirates() {
         return this.api.get('AllDropdowns/GetEmirateType');
     }
+
     GetGenderIdentity() {
         return this.api.get('AllDropdowns/GetGenderIdentity');
     }
@@ -55,11 +56,11 @@ export class DemographicApiServices {
     }
 
     submitDemographic(object: any) {
-        debugger;
+
         return this.api
             .post('Demographic/InsertPatientRecord', object)
-            .toPromise();
     }
+
 
     UpdatePatientRecordByMRNo(object: any) {
         return this.api
@@ -68,14 +69,14 @@ export class DemographicApiServices {
     }
 
     getStateByCountry(countryId: any) {
-        debugger;
+        ;
         return this.api
             .get(`AllDropdowns/GetStateByCountry?countryId=${countryId}`)
             .toPromise();
     }
 
     getCityByState(ProviderId: any) {
-        debugger;
+        ;
         return this.api
             .get(`AllDropdowns/GetCityByState?ProviderId=${ProviderId}`)
             .toPromise();
@@ -88,7 +89,7 @@ export class DemographicApiServices {
     }
 
     GetCoverageById(subscribedId: number) {
-        debugger;
+        ;
         return this.api
             .get(`Coverages/GetCoverage?subscribedId=${subscribedId}`)
             .toPromise();
@@ -101,4 +102,5 @@ export class DemographicApiServices {
     GetRegPatientList() {
         return this.api.get(`Common/GetRegPatientList`).toPromise();
     }
+
 }
