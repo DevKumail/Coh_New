@@ -24,13 +24,17 @@ import { IconsModule } from '@/app/shared/icons.module';
   ]
 })
 export class PatientHeaderPanelComponent {
-   @Input() state: boolean = false; // 👈 define this
-  isVisible = true;
-
-  @Input() pinned: boolean = false;
-
-  @Output() pinnedChange = new EventEmitter<boolean>();
+  @Input() patientData: any;
+  @Input() visible: boolean = false;
   closeBanner() {
-    this.isVisible = false;
+    this.visible = false;
+  }
+
+    get patientInfo() {
+    return this.patientData?.table2?.[0] || null;
+  }
+
+  get insuranceInfo() {
+    return this.patientData?.table1 || [];
   }
 }

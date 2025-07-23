@@ -81,15 +81,7 @@
   </form>
 </div>
 
-<!-- Patient Header Panel - visible only when patient is selected -->
-<app-patient-header-panel
- *ngIf="isTableVisible"
-  [patient]="selectedPatient"
-  [state]="state"
-  [pinned]="pinned"
-  (pinnedChange)="pinned = $event"
-  (tryToToggleWhilePinned)="onPinnedToggleAttempt()"
-></app-patient-header-panel>
+
 
 <div class="modal-footer">
   <button type="button" class="btn btn-secondary" (click)="close()">Close</button>

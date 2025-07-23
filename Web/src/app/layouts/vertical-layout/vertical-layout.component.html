@@ -17,10 +17,6 @@
 
 <app-patient-header-panel
 
-
-    [state]="showPatientBanner || isPinned ? 'visible' : 'hidden'"
-  [pinned]="isPinned"
-  (pinnedChange)="isPinned = $event"
   [ngClass]="{ 'sticky': isPinned }"    
 ></app-patient-header-panel>
 

@@ -1,9 +1,11 @@
-<div *ngIf="isVisible" class="topbar-banner d-flex flex-wrap align-items-start mx-2 my-2 position-relative">
-  <!-- Close icon -->
-  <button class="btn-close position-absolute top-0 end-0 m-2" (click)="closeBanner()" aria-label="Close"></button>
-<button (click)="pinnedChange.emit(!pinned)">
-  {{ pinned ? 'Unpin' : 'Pin' }}
-</button>
+<div *ngIf="visible" class="topbar-banner d-flex flex-wrap align-items-start mx-2 my-2 position-relative">
+
+  <button 
+    class="btn-close position-absolute" 
+    style="top: 8px; right: 8px; z-index: 10;" 
+    (click)="closeBanner()" 
+    aria-label="Close">
+  </button>
   <!-- Patient Image -->
   <div style="min-width: 80px;">
     <img

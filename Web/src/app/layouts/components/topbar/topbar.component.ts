@@ -97,7 +97,7 @@
 // // }
 
 // }
-import { Component, EventEmitter, Output, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, TemplateRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
 import { LayoutStoreService } from '@core/services/layout-store.service';
@@ -110,7 +110,14 @@ import { IconsModule } from '@/app/shared/icons.module';
 import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { PatientSearchModalComponent } from '@/app/shared/modals/patient-search-modal/patient-search-modal.component';
 import { PatientHeaderPanelComponent } from "../patient-header-panel/patient-header-panel.component";
-
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import {
+  trigger,
+  transition,
+  style,
+  animate
+} from '@angular/animations';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
@@ -118,6 +125,7 @@ import { PatientHeaderPanelComponent } from "../patient-header-panel/patient-hea
   standalone: true,
   imports: [
     RouterLink,
+    CommonModule,
     MegaMenuComponent,
     ThemeTogglerComponent,
     UserProfileComponent,
@@ -127,15 +135,28 @@ import { PatientHeaderPanelComponent } from "../patient-header-panel/patient-hea
     PatientHeaderPanelComponent
 ],
   templateUrl: './topbar.component.html',
-  styleUrl: './topbar.component.scss'
+  styleUrl: './topbar.component.scss',
+   animations: [
+    trigger('bannerAnimation', [
+      transition(':enter', [
+        style({ height: '0', opacity: 0 }),
+        animate('300ms ease-out', style({ height: '*', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ height: '0', opacity: 0 }))
+      ])
+    ])
+  ]
 })
-export class TopbarComponent {
+export class TopbarComponent implements OnInit {
   constructor(
     public layout: LayoutStoreService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private patientBannerService: PatientBannerService
   ) {}
 
-  Search = Search;
+  patientData: any = null;
+  showPatientPanel: boolean = false;
 
   @Output() patientBannerToggle = new EventEmitter<boolean>();
   showPatientBanner = true;
@@ -181,6 +202,12 @@ handleSearchResults(results: any[]) {
   console.log('Patients received from modal:', results);
 }
 
+ngOnInit() {
+    this.patientBannerService.patientData$.subscribe((data) => {
+      this.patientData = data;
+      this.showPatientPanel = !!data;
+    });
+  }
 
     }
 
