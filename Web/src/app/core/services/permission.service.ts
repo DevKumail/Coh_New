@@ -8,7 +8,7 @@ private screenPermissions: string[] = [];
   private modulePermissions: Set<string> = new Set();
 
   constructor() {
-    debugger
+
      this.loadPermissions();
        const allowscreensRaw = sessionStorage.getItem('allowscreens');
 
@@ -18,7 +18,7 @@ private screenPermissions: string[] = [];
   }
 
     private extractModules() {
-      debugger
+
     this.screenPermissions.forEach(screen => {
       const parts = screen.split(':');
       if (parts.length > 0) {
@@ -28,7 +28,7 @@ private screenPermissions: string[] = [];
   }
 
  private loadPermissions(): void {
-  debugger
+
     const sessionData = sessionStorage.getItem('allowscreens');
     if (sessionData) {
       try {
@@ -43,24 +43,24 @@ private screenPermissions: string[] = [];
   }
 
   hasPermission(permission: string): boolean {
-    debugger
+
     return this.permissions.has(permission);
   }
 
   hasAnyPermission(permissions: string[]): boolean {
-    debugger
+
     return permissions.some(permission => this.hasPermission(permission));
   }
 
   getPermissions(): string[] {
-    debugger
+
     return Array.from(this.permissions);
   }
    refresh(): void {
     this.loadPermissions();
   }
   hasModule(module: string): boolean {
-    debugger
+
   return this.modulePermissions.has(module);
 }
 

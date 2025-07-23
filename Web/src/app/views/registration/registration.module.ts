@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 // import { ContactComponent } from './Components/contact/contact.component';
 import { Registration_ROUTES } from './registration.routes';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+
 @NgModule({
   declarations: [],
   imports: [

@@ -4,7 +4,7 @@
 
 // export const authGuard: CanActivateFn = () => {
 //   const authService = inject(AuthService);
-  
+
 //   const router = inject(Router);
 
 //   if (authService.isAuthenticated()) {
@@ -21,29 +21,29 @@ import { AuthService } from '../services/auth.service';
 import { PermissionService } from '../services/permission.service';
 
 export const authGuard: CanActivateFn = (
-  
-  route: ActivatedRouteSnapshot, 
+
+  route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
-  debugger
+
   const authService = inject(AuthService);
   const permissionService = inject(PermissionService);
   const router = inject(Router);
 
   // Check authentication first
   if (!authService.isAuthenticated()) {
-    router.navigate(['/auth-2/sign-in'], { 
-      queryParams: { returnUrl: state.url } 
+    router.navigate(['/auth-2/sign-in'], {
+      queryParams: { returnUrl: state.url }
     });
     return false;
   }
 
   // Check permissions if specified in route data
   const requiredPermissions = route.data['permissions'] as string[] | undefined;
-  
+
   if (requiredPermissions && requiredPermissions.length > 0) {
     const hasPermission = permissionService.hasAnyPermission(requiredPermissions);
-    
+
     if (!hasPermission) {
       router.navigate(['/unauthorized']);
       return false;

@@ -34,7 +34,7 @@ export class AuthService {
   constructor(private http: HttpClient,private router: Router) {}
 
    login(username: string, password: string): Observable<void> {
-     debugger
+
      const headers = new HttpHeaders({
   'Content-Type': 'application/json-patch+json'
 });
@@ -58,9 +58,9 @@ export class AuthService {
 
 
 logout(): Observable<any> {
-   debugger
+
      const token = localStorage.getItem(this.tokenKey);
-    
+
     localStorage.removeItem(this.tokenKey);
     sessionStorage.clear();
 
@@ -104,7 +104,7 @@ isTokenExpired(): boolean {
   const expiry = payload.exp * 1000;
   return Date.now() > expiry;
 }
-  
+
   isAuthenticated(): boolean {
   const token = this.getToken();
   return !!token && !this.isTokenExpired();

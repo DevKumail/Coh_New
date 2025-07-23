@@ -9,7 +9,7 @@ export class AccordionService {
   activePanel$ = this.activePanel.asObservable();
 
   toggle(panelId: string) {
-    debugger
+
     this.activePanel.next(panelId);
   }
 }
