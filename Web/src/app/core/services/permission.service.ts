@@ -1,24 +1,14 @@
 import { Injectable } from '@angular/core';
-import { log } from 'console';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionService {
-  private permissions: Set<string> = new Set();
-private screenPermissions: string[] = [];
-  private modulePermissions: Set<string> = new Set();
-
+  private allowedScreens: Set<string> = new Set();
   constructor() {
-    // debugger
-     this.loadPermissions();
-       const allowscreensRaw = sessionStorage.getItem('allowscreens');
-
-         this.screenPermissions = allowscreensRaw ? JSON.parse(allowscreensRaw) : [];
-
-    this.extractModules();
+    this.loadPermissions();
   }
 
     private extractModules() {
-      // debugger
+      debugger
     this.screenPermissions.forEach(screen => {
       const parts = screen.split(':');
       if (parts.length > 0) {
@@ -28,7 +18,7 @@ private screenPermissions: string[] = [];
   }
 
  private loadPermissions(): void {
-  // debugger
+  debugger
     const sessionData = sessionStorage.getItem('allowscreens');
     if (sessionData) {
       try {
@@ -43,24 +33,24 @@ private screenPermissions: string[] = [];
   }
 
   hasPermission(permission: string): boolean {
-    // debugger
+    debugger
     return this.permissions.has(permission);
   }
 
   hasAnyPermission(permissions: string[]): boolean {
-    // debugger
+    debugger
     return permissions.some(permission => this.hasPermission(permission));
   }
 
   getPermissions(): string[] {
-    // debugger
+    debugger
     return Array.from(this.permissions);
   }
    refresh(): void {
     this.loadPermissions();
   }
   hasModule(module: string): boolean {
-    // debugger
+    debugger
   return this.modulePermissions.has(module);
 }
 

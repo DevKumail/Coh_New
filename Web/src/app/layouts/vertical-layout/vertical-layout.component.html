@@ -6,7 +6,12 @@
 
 
 
-<app-patient-header-panel *ngIf="isPinned" ></app-patient-header-panel>
+
+
+<app-patient-header-panel
+
+  [ngClass]="{ 'sticky': isPinned }"    
+></app-patient-header-panel>
 
     
     <router-outlet/>
