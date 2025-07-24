@@ -1,7 +1,7 @@
 <header class="app-topbar">
   <div class="topbar-menu d-flex justify-content-between align-items-center">
-    <div class="d-flex ">
-      <!-- Logo -->
+    <div class=" d-flex align-items-center gap-2">
+
       <div class="logo-topbar">
         <a routerLink="/" class="logo-light">
           <span class="logo-lg">
@@ -11,7 +11,7 @@
             <img src="assets/images/branding/coherent-dark.png" alt="small logo" />
           </span>
         </a>
-         <a routerLink="/" class="logo-dark">
+        <a routerLink="/" class="logo-dark">
           <span class="logo-lg">
             <img src="assets/images/branding/coherent-light.png" alt="logo" />
           </span>
@@ -21,29 +21,23 @@
         </a>
       </div>
 
-      <!-- Sidebar toggle -->
-      <button
-        (click)="toggleSidebar()"
-        class="sidenav-toggle-button btn btn-primary btn-icon"
-      >
+      <button (click)="toggleSidebar()" class="sidenav-toggle-button btn btn-primary btn-icon">
         <ng-icon name="tablerMenu4" class="fs-22" />
       </button>
-      <!-- Mega Menu -->
+
       <app-mega-menu />
+      
+      <div>
+        <app-patient-header-panel *ngIf="showPatientPanel" [@bannerAnimation] [patientData]="patientData"
+          [visible]="showPatientPanel"></app-patient-header-panel>
+      </div>
     </div>
 
-<app-patient-header-panel
-  *ngIf="showPatientPanel"
- [@bannerAnimation]
- [patientData]="patientData"
-  [visible]="showPatientPanel"
-></app-patient-header-panel>
 
-   
-    <div class="d-flex align-items-center gap-2">
-       
+    <div class="d-flex align-items-center gap-2 ">
+
       <!-- Button to trigger modal or banner  -->
-       <!-- <button
+      <!-- <button
         (click)="togglePatientBanner(patientSearchModal)"
         class="btn p-0 border-0 bg-transparent shadow-none"
         title="Toggle Patient Banner"
@@ -57,4 +51,3 @@
     </div>
   </div>
 </header>
-
