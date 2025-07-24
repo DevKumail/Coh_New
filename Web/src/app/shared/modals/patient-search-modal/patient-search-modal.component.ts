@@ -6,9 +6,9 @@ import { Subject } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { SharedApiService } from '../../shared.api.service';
 import { LucideAngularModule } from 'lucide-angular';
+import { UiCardComponent } from "@app/components/ui-card.component";
+import { PatientHeaderPanelComponent } from './../../../layouts/components/patient-header-panel/patient-header-panel.component';
 import { DataTablesModule } from 'angular-datatables';
-import { DataStorageService } from '../../data-storage.service';
-import Swal from 'sweetalert2'; 
 
 @Component({
   selector: 'app-patient-search-modal',
@@ -19,6 +19,8 @@ import Swal from 'sweetalert2';
     NgbModalModule,
     DataTablesModule,
     LucideAngularModule,
+    UiCardComponent,
+    PatientHeaderPanelComponent
   ],
   templateUrl: './patient-search-modal.component.html',
   styleUrls: ['./patient-search-modal.component.scss']
@@ -30,8 +32,8 @@ export class PatientSearchModalComponent implements AfterViewInit, OnDestroy {
 
   dtOptions: any = {
     pagingType: 'full_numbers',
-    pageLength: 100,
-    lengthMenu: [50, 10, 25, 50, 100],
+    pageLength: 10,
+    lengthMenu: [5, 10, 25, 50, 100],
     destroy: true,
     select: { style: 'single' },
     rowCallback: (row: Node, data: any[] | Object, index: number) => {
@@ -60,7 +62,7 @@ export class PatientSearchModalComponent implements AfterViewInit, OnDestroy {
 
   PaginationInfo = {
     page: 1,
-    limit: 100,
+    limit: 10,
   };
 
   private modalRef?: NgbModalRef;
@@ -69,7 +71,6 @@ export class PatientSearchModalComponent implements AfterViewInit, OnDestroy {
     private fb: FormBuilder,
     private modalService: NgbModal,
     private sharedApiService: SharedApiService,
-    private dataStorageService: DataStorageService
   ) {
     this.patientForm = this.fb.group({
       mrNo: [''],
@@ -78,12 +79,6 @@ export class PatientSearchModalComponent implements AfterViewInit, OnDestroy {
       phone: ['']
     });
   }
-
-
-    // ngOnInit(): void {
-    // debugger
-    //   const getdata = this.dataStorageService.getData('Demographics');
-    //   }
 
   ngAfterViewInit(): void {
     this.dtTrigger.next(0);
@@ -127,85 +122,64 @@ export class PatientSearchModalComponent implements AfterViewInit, OnDestroy {
   }
 
   searchPatient() {
-    this.dataStorageService.clearData('Demographics');
-
     const filterData = this.patientForm.value;
+
     const requestData = {
       demographicList: filterData,
+      PaginationInfo: {
+        RowsPerPage: this.PaginationInfo.limit,
+        Page: this.PaginationInfo.page
+      }
     };
 
     this.GetCoverageAndRegPatient(requestData);
   }
 
+//   GetCoverageAndRegPatient(req: any) {
+//     this.sharedApiService.GetCoverageAndRegPatient(req).subscribe({
+//       next: (demographics: any) => {
+//         console.log("getCoverageAndRegPatient", demographics);
 
+//         if (demographics?.table2) {
+//           const newResults = demographics.table2;
+//           this.searchResults = [...newResults, ...this.searchResults]; // ✅ Add at top
+//           this.PatientData = [...newResults, ...this.PatientData];
+//           this.Patient = [...newResults, ...this.Patient];
+
+//           this.patientsFound.emit(this.searchResults);
+//           this.totalRecord = demographics.table3?.[0]?.totalCount || 0;
+
+//           this.rerender(); // ✅ Update table
+//         }
+//       },
+//       error: (err: any) => {
+//         console.error('Error fetching patients:', err);
+//         this.sharedApiService.add({ severity: 'error', summary: 'Error', detail: err.message });
+//       }
+//     });
+//   }
 GetCoverageAndRegPatient(req: any) {
-
-    let PaginationInfo = {
-        RowsPerPage: this.PaginationInfo.limit,
-        Page: this.PaginationInfo.page
-      }
-
-  this.sharedApiService.GetCoverageAndRegPatient(req,PaginationInfo).subscribe({
+  this.sharedApiService.GetCoverageAndRegPatient(req).subscribe({
     next: (demographics: any) => {
       if (demographics?.table2) {
-        this.PatientData = demographics.table2;
-        this.Patient = demographics.table2;
+        const newResults = demographics.table2;
+
+        this.searchResults = [...newResults, ...this.searchResults];
+        this.PatientData = [...newResults, ...this.PatientData];
+        this.Patient = [...newResults, ...this.Patient];
 
         this.totalRecord = demographics.table3?.[0]?.totalCount || 0;
-        console.log('this.searchResults =>',this.PatientData);
-        
-        this.patientsFound.emit(this.PatientData);
+        this.patientsFound.emit(this.searchResults);
 
         this.rerender(); // 🔁 force reinitialize
       }
     },
     error: (err: any) => {
-         Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: err.message
-            })
+      console.error('Error fetching patients:', err);
     }
   });
 }
 
-    loadVisit(e: Event, Id: number) {
-     debugger
-       const mrNo = Id.toString(); 
-      //  this.patientForm.get('mrNo')?.value;
-     
-      this.GetDemographicsByMRNo(mrNo);
-      // this.GetAppointmentsByMRNO(mrNo);
-
-      console.log('Row clicked!', e);
-      this.dataStorageService.toggleShow(true);
-
-       if (this.modalRef) {
-      this.modalRef.close(); // ✅ Close current modal properly
-    } else {
-      this.modalService.dismissAll(); // fallback
-    }
-    }
-
-
-    GetDemographicsByMRNo(MrNo: string = '') {
-        this.sharedApiService.getCoverageAndRegPatientbyMrno(MrNo).then((demographics: any) => {
-          if (demographics) {
-
-            this.dataStorageService.setSearchData(demographics);
-            this.dataStorageService.setData('Demographics', demographics);
-
-            // localStorage.setItem('Demographics', JSON.stringify(demographics));
-          }
-        })
-        .catch((error: any) =>
-            Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message
-            })
-        );
-}
 
   onPageChanges(event: any) {
     this.PaginationInfo.page = event.page + 1;

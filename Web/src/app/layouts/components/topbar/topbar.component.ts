@@ -190,12 +190,7 @@ export class TopbarComponent implements OnInit {
       this.patientBannerToggle.emit(this.showPatientBanner);
     } else {
       // No patient loaded, open modal
-      this.modalService.open(content, {
-        size: 'xl',              // ⬅️ Bootstrap XL width (~1140px)
-        scrollable: true,        // ⬅️ Enable vertical scroll
-        centered: true,          // Optional: center modal vertically
-        backdrop: 'static'       // Optional: prevent closing on outside click
-      });
+      this.modalService.open(content, { size: 'lg' });
     }
   }
 
@@ -214,16 +209,4 @@ ngOnInit() {
     });
   }
 
-togglePin(){
-  debugger
-  this.pinned = !this.pinned;
-  this.DataStorage.toggleShow(this.pinned);
-
-   var patient = this.DataStorage.getData('Demographics');
-   this.DataStorage.setData('Demographics', patient);
-
-}
-
-
-}
-
+    }

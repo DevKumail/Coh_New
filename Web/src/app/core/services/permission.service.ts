@@ -7,51 +7,27 @@ export class PermissionService {
     this.loadPermissions();
   }
 
-    private extractModules() {
-      debugger
-    this.screenPermissions.forEach(screen => {
-      const parts = screen.split(':');
-      if (parts.length > 0) {
-        this.modulePermissions.add(parts[0]); // e.g., "Clinical"
-      }
-    });
+  private loadPermissions(): void {
+    const screens = JSON.parse(sessionStorage.getItem('allowscreens') || '[]');
+    this.allowedScreens = new Set(screens);
   }
 
- private loadPermissions(): void {
-  debugger
-    const sessionData = sessionStorage.getItem('allowscreens');
-    if (sessionData) {
-      try {
-        const parsed = JSON.parse(sessionData);
-        if (Array.isArray(parsed)) {
-          this.permissions = new Set(parsed);
-        }
-      } catch (e) {
-        console.error('Failed to parse session storage allowscreens:', e);
-      }
-    }
+  hasModuleAccess(module: string): boolean {
+    return [...this.allowedScreens].some(screen => screen.startsWith(`${module}:`));
   }
 
-  hasPermission(permission: string): boolean {
-    debugger
-    return this.permissions.has(permission);
+  hasComponentAccess(module: string, component: string): boolean {
+    return [...this.allowedScreens].some(screen =>
+      screen.startsWith(`${module}:${component}`)
+    );
   }
 
-  hasAnyPermission(permissions: string[]): boolean {
-    debugger
-    return permissions.some(permission => this.hasPermission(permission));
+  hasActionAccess(module: string, component: string, action: string): boolean {
+    return this.allowedScreens.has(`${module}:${component}:${action}`);
   }
 
-  getPermissions(): string[] {
-    debugger
-    return Array.from(this.permissions);
+  getAllowedScreens(): string[] {
+    return Array.from(this.allowedScreens);
   }
-   refresh(): void {
-    this.loadPermissions();
-  }
-  hasModule(module: string): boolean {
-    debugger
-  return this.modulePermissions.has(module);
-}
 
 }
