@@ -31,10 +31,12 @@ export class PatientHeaderPanelComponent {
   }
 
     get patientInfo() {
+      debugger
     return this.patientData?.table2?.[0] || null;
   }
 
   get insuranceInfo() {
+    debugger
     return this.patientData?.table1 || [];
   }
 }

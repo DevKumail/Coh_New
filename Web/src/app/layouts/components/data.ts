@@ -105,26 +105,26 @@ export const menuItems: ExtendedMenuItemType[] = [
         module: 'Control Panel',
         isCollapsed: true,
         children: [
-      { label: 'Alerts', url: '/registration/alerts' },
-      { label: 'Coverages', url: '/registration/coverage-list' },
-      { label: 'Coverage Create', url: '/registration/covrage-create' },
-      { label: 'Demographics', url: '/registration/demographics' },
-      { label: 'Demographic Create', url: '/registration/demographic-create' }
-    ]
-  },
+            { label: 'Alerts', url: '/registration/alerts' },
+            { label: 'Coverages', url: '/registration/coverage-list' },
+            { label: 'Coverage Create', url: '/registration/covrage-create' },
+            { label: 'Demographics', url: '/registration/demographics' },
+            { label: 'Demographic Create', url: '/registration/demographic-create' }
+        ]
+    },
 
 
 
-  { label: 'Menu', isTitle: true },
+    { label: 'Menu', isTitle: true },
 
-  // ✅ Clinical Module Section (permission based)
+    // ✅ Clinical Module Section (permission based)
 
-  {
-    label: 'Control Panel',
-    icon: 'pi pi-clipboard',
-    module: 'Control Panel',
-    isCollapsed: true,
-    children: [
+    {
+        label: 'Control Panel',
+        icon: 'pi pi-clipboard',
+        module: 'Control Panel',
+        isCollapsed: true,
+        children: [
 
             { label: 'Human Resources', url: 'control panel/human resources' },
             { label: 'Human Resources Add', url: '/control panel/human-resources-add' },
@@ -603,15 +603,47 @@ export const menuItems: ExtendedMenuItemType[] = [
 ];
 
 export const horizontalMenuItems: MenuItemType[] = [
+    // {
+    //     label: 'Dashboards',
+    //     icon: 'tablerLayoutDashboard',
+    //     children: [
+    //         { label: 'Dashboard v.1', url: '/dashboards/dashboard-1' },
+    //         { label: 'Dashboard v.2', url: '/dashboards/dashboard-2' },
+    //         { label: 'Dashboard v.3', url: '/dashboards/dashboard-3' },
+    //         { label: 'Dashboard v.4', url: '#!' },
+    //         { label: 'Dashboard v.5', url: '#!' },
+    //     ]
+    // },
     {
-        label: 'Dashboards',
-        icon: 'tablerLayoutDashboard',
+        label: 'Clinical',
+        icon: 'tablerStethoscope', // Use appropriate icon
+        isCollapsed: true,
         children: [
-            { label: 'Dashboard v.1', url: '/dashboards/dashboard-1' },
-            { label: 'Dashboard v.2', url: '/dashboards/dashboard-2' },
-            { label: 'Dashboard v.3', url: '/dashboards/dashboard-3' },
-            { label: 'Dashboard v.4', url: '#!' },
-            { label: 'Dashboard v.5', url: '#!' },
+            {
+                label: 'Alerts',
+                icon: 'tablerBell', // Choose a relevant icon
+                url: '/clinical/alerts',
+            },
+            {
+                label: 'Allergies',
+                icon: 'tablerAlertTriangle', // Choose a relevant icon
+                url: '/clinical/allergies',
+            },
+            {
+                label: 'Problem List',
+                icon: 'tablerListDetails',
+                url: '/clinical/problem',
+            },
+            {
+                label: 'Medical History',
+                icon: 'tablerHeartbeat', // Choose a relevant icon
+                url: '/clinical/medical-history',
+            },
+            {
+                label: 'Problem',
+                icon: 'tablerClipboardText',
+                url: '/clinical/Problem-List',
+            },
         ]
     },
     {

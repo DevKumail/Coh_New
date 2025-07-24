@@ -1,4 +1,4 @@
-<div *ngIf="visible" class="topbar-banner d-flex flex-wrap align-items-start mx-2 my-2 position-relative">
+<!-- <div *ngIf="visible" class="topbar-banner d-flex flex-wrap align-items-start mx-2 my-2 position-relative">
 
   <button 
     class="btn-close position-absolute" 
@@ -6,7 +6,6 @@
     (click)="closeBanner()" 
     aria-label="Close">
   </button>
-  <!-- Patient Image -->
   <div style="min-width: 80px;">
     <img
       src="assets/images/patient.jpg"
@@ -15,7 +14,6 @@
     />
   </div>
 
-  <!-- Patient Info -->
   <div>
     <div><strong>Name:</strong> Asma Othman Al Hammadi</div>
     <div><strong>MR No:</strong> 123456</div>
@@ -23,7 +21,6 @@
     <div><strong>Plan:</strong> Basic Plus</div>
   </div>
 
-  <!-- Contact Info -->
   <div>
     <div><strong>Member ID:</strong> MBR-001122</div>
     <div><strong>Gender:</strong> Male</div>
@@ -32,11 +29,63 @@
     <div><strong>Patient Type:</strong> Outpatient</div>
   </div>
 
-  <!-- Phone Info -->
   <div>
     <div><strong>Cell Phone:</strong> +1 555-1234</div>
     <div><strong>Home Phone:</strong> +1 555-5678</div>
     <div><strong>Work Phone:</strong> +1 555-9876</div>
     <div><strong>POD Type:</strong> Telehealth</div>
+  </div>
+</div> -->
+<div
+  *ngIf="visible"
+  [@slideToggle]="visible ? 'visible' : 'hidden'"
+  class="topbar-banner d-flex flex-wrap align-items-start mx-2 my-2 position-relative"
+>
+  <button 
+    class="btn-close position-absolute" 
+    style="top: 8px; right: 8px; z-index: 10;" 
+    (click)="closeBanner()" 
+    aria-label="Close">
+  </button>
+
+  <!-- Patient Image -->
+  <div style="min-width: 80px;">
+    <img
+      [src]="'data:image/jpeg;base64,' + patientInfo?.patientPicture"
+      alt="Patient Image"
+      style="width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;"
+    />
+  </div>
+
+  <!-- Patient Info -->
+  <div class="mx-3">
+    <div><strong>Name:</strong> {{ patientInfo?.personFirstName }}</div>
+    <div><strong>MR No:</strong> {{ patientInfo?.mrNo }}</div>
+    <div><strong>Payer:</strong> {{ insuranceInfo[0]?.payerName }}</div>
+    <div><strong>Plan:</strong> {{ insuranceInfo[0]?.plan }}</div>
+  </div>
+
+  <!-- Contact Info -->
+  <div class="mx-3">
+    <div><strong>Member ID:</strong> {{ insuranceInfo[0]?.memberId }}</div>
+    <div><strong>Gender:</strong> {{ patientInfo?.gender }}</div>
+    <div><strong>DOB:</strong> {{ patientInfo?.patientBirthDate | date:'MM/dd/yyyy' }}</div>
+    <div><strong>PCP:</strong> {{ patientInfo?.pcpName || 'N/A' }}</div>
+    <div><strong>Patient Type:</strong> {{ patientInfo?.patientType || 'N/A' }}</div>
+  </div>
+
+  <!-- Phone Info -->
+  <div class="mx-3">
+    <div><strong>Cell Phone:</strong> {{ patientInfo?.personCellPhone || 'N/A' }}</div>
+    <div><strong>Home Phone:</strong> {{ patientInfo?.homePhone || 'N/A' }}</div>
+    <div><strong>Work Phone:</strong> {{ patientInfo?.workPhone || 'N/A' }}</div>
+    <div><strong>POD Type:</strong> {{ patientInfo?.podType || 'N/A' }}</div>
+  </div>
+   <!-- Phone Info -->
+  <div class="mx-3">
+    <div><strong>Cell Phone:</strong> {{ patientInfo?.personCellPhone || 'N/A' }}</div>
+    <div><strong>Home Phone:</strong> {{ patientInfo?.homePhone || 'N/A' }}</div>
+    <div><strong>Work Phone:</strong> {{ patientInfo?.workPhone || 'N/A' }}</div>
+    <div><strong>POD Type:</strong> {{ patientInfo?.podType || 'N/A' }}</div>
   </div>
 </div>
