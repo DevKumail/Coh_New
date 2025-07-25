@@ -5,8 +5,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-pagination',
   imports: [CommonModule, FormsModule],
-  templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.scss']
+  templateUrl: './pagination.component.html'
 })
 export class PaginationComponent implements OnChanges {
   @Input() totalItems!: number;

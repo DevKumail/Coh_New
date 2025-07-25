@@ -25,9 +25,9 @@ import { log } from 'console';
     FormsModule,
     // NgxPermissionsDirective
   ],
-  standalone: true,
+  standalone: true, 
   templateUrl: './charge-capture.component.html',
-  styleUrl: './charge-capture.component.scss'
+  styles: ``,
 })
 export class ChargeCaptureComponent {
   @Output() yearFilterChange = new EventEmitter<any>();
