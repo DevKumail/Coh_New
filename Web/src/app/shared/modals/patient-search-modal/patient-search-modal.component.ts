@@ -19,8 +19,7 @@ import { DataTablesModule } from 'angular-datatables';
     NgbModalModule,
     DataTablesModule,
     LucideAngularModule,
-    UiCardComponent,
-    PatientHeaderPanelComponent
+    UiCardComponent
   ],
   templateUrl: './patient-search-modal.component.html',
   styleUrls: ['./patient-search-modal.component.scss']

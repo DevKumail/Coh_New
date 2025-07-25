@@ -14,7 +14,7 @@ export const Registration_ROUTES: Routes = [
     data: { permissions: ['Registration:Alerts']},
     children: [
       {
-        path: 'alerts',
+        path: 'Alerts',
         component: AlertComponent,
         data: { title: 'Clinical Alerts' }
       },

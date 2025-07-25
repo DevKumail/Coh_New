@@ -615,6 +615,23 @@ export const horizontalMenuItems: MenuItemType[] = [
     //     ]
     // },
     {
+        label: 'Registration',
+        icon: 'tablerIdBadge2',
+        module: 'Registration',
+        isCollapsed: true,
+        children: [
+            { label: 'Alerts',
+              icon: 'tablerBell',
+              url: '/registration/alerts'
+            },
+            { label: 'Coverages',
+              icon: 'tablerBell',
+              url: '/registration/coverage-list' 
+            },
+
+        ]
+    },
+    {
         label: 'Clinical',
         icon: 'tablerStethoscope', // Use appropriate icon
         isCollapsed: true,

@@ -1,85 +1,86 @@
-<div class="collapse navbar-collapse" id="topnav-menu-content">
-    <ul class="navbar-nav">
-        @for (item of menuItems; track $index) {
-        <!-- menu item without any child -->
-        @if (!hasSubMenu(item)) {
-        <li class="nav-item">
-            <ng-container *ngTemplateOutlet="MenuItem;context:{item,linkClass:'nav-link'}" />
-        </li>
-        }
-        <!-- menu item with child -->
-        @if (hasSubMenu(item)) {
-        <ng-container
-            *ngTemplateOutlet="MenuItemWithChildren;context:{item, wrapperClass:'nav-item', togglerClass:'nav-link'}" />
-        }
-        }
+<div class="collapse navbar-collapse d-flex align-items-center" id="topnav-menu-content">
 
+  <!-- LEFT SIDE MENU -->
+  <div class="menu-left d-flex">
+    <ul class="navbar-nav">
+      @for (item of menuItems; track $index) {
+        @if (!hasSubMenu(item)) {
+          <li class="nav-item">
+            <ng-container *ngTemplateOutlet="MenuItem; context: { item, linkClass: 'nav-link' }" />
+          </li>
+        }
+        @if (hasSubMenu(item)) {
+          <ng-container *ngTemplateOutlet="MenuItemWithChildren; context: { item, wrapperClass: 'nav-item', togglerClass: 'nav-link' }" />
+        }
+      }
     </ul>
-    <!-- <div class="app-search d-none d-xl-flex">
-        <input
-          type="search4"
-          class="form-control topbar-search"
-          name="search"
-          placeholder="Search Patient By Mr No"
-        />
-        <lucide-icon [img]="Search" class="app-search-icon text-muted" />
-      </div> -->
-    <div class="app-search d-none d-xl-flex">
-        <input type="text" class="form-control" placeholder="Search MRNo" [(ngModel)]="mrNo"
-            (ngModelChange)="onSearchInput()" />
-        <lucide-icon [img]="Search" class="app-search-icon text-muted" />
-    </div>
+  </div>
+
+  <!-- SEARCH BAR RIGHT MEIN -->
+  <div class="app-search app-search-right d-flex align-items-center" style="margin-right: -166%;">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Search MRNo"
+      [(ngModel)]="mrNo"
+      (ngModelChange)="onSearchInput()" />
+    <lucide-icon [img]="Search" class="app-search-icon text-muted"></lucide-icon>
+  </div>
+
 </div>
 
-<ng-template #MenuItemWithChildren let-item="item" let-wrapperClass="wrapperClass" let-togglerClass="togglerClass">
-    <li ngbDropdown [class]="wrapperClass" class="dropdown" [class.active]="isChildActive(item)">
-        <a ngbDropdownToggle [class]="togglerClass" class="dropdown-toggle drop-arrow-none" role="button">
+
+
+
+    <ng-template #MenuItemWithChildren let-item="item" let-wrapperClass="wrapperClass" let-togglerClass="togglerClass">
+        <li ngbDropdown [class]="wrapperClass" class="dropdown" [class.active]="isChildActive(item)">
+            <a ngbDropdownToggle [class]="togglerClass" class="dropdown-toggle drop-arrow-none" role="button">
+                @if (item.icon) {
+                <span>
+                    <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
+                </span>
+                }
+                <span class="menu-text"> {{ item.label }} </span>
+                @if (item.badge) {
+                <span [class]="`badge bg-${item.badge.variant}`">{{ item.badge.text }}</span>
+                }
+                @if (!item.badge) {
+                <span class="menu-arrow">
+                    <ng-icon name="tablerChevronDown"></ng-icon>
+                </span>
+                }
+            </a>
+            <div ngbDropdownMenu class="dropdown-menu">
+                @for (child of item.children; track $index) {
+                <!-- menu item without any child -->
+                @if (!hasSubMenu(child)) {
+                <ng-container *ngTemplateOutlet="MenuItem;context:{item:child,linkClass:'dropdown-item'}" />
+                }
+
+                <!-- menu item with child -->
+                @if (hasSubMenu(child)) {
+                <ng-container *ngTemplateOutlet="MenuItemWithChildren;context:{item:child,togglerClass:'dropdown-item'}" />
+                }
+
+                }
+            </div>
+        </li>
+    </ng-template>
+
+    <ng-template #MenuItem let-item="item" let-linkClass="linkClass">
+        @if (item.url) {
+        <a [routerLink]="item.url" [target]="item.target" [class]="linkClass" [class.active]="isActive(item)"
+            [class.disabled]="item.isDisabled" [class.special-menu]="item.isSpecial">
             @if (item.icon) {
             <span>
                 <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
             </span>
             }
-            <span class="menu-text"> {{ item.label }} </span>
+            <span class="menu-text">{{ item.label }}</span>
             @if (item.badge) {
-            <span [class]="`badge bg-${item.badge.variant}`">{{ item.badge.text }}</span>
-            }
-            @if (!item.badge) {
-            <span class="menu-arrow">
-                <ng-icon name="tablerChevronDown"></ng-icon>
-            </span>
+            <span class="badge text-bg-{{item.badge.variant}} opacity-50" [innerHTML]="item.badge.text"></span>
             }
         </a>
-        <div ngbDropdownMenu class="dropdown-menu">
-            @for (child of item.children; track $index) {
-            <!-- menu item without any child -->
-            @if (!hasSubMenu(child)) {
-            <ng-container *ngTemplateOutlet="MenuItem;context:{item:child,linkClass:'dropdown-item'}" />
-            }
-
-            <!-- menu item with child -->
-            @if (hasSubMenu(child)) {
-            <ng-container *ngTemplateOutlet="MenuItemWithChildren;context:{item:child,togglerClass:'dropdown-item'}" />
-            }
-
-            }
-        </div>
-    </li>
-</ng-template>
-
-<ng-template #MenuItem let-item="item" let-linkClass="linkClass">
-    @if (item.url) {
-    <a [routerLink]="item.url" [target]="item.target" [class]="linkClass" [class.active]="isActive(item)"
-        [class.disabled]="item.isDisabled" [class.special-menu]="item.isSpecial">
-        @if (item.icon) {
-        <span>
-            <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
-        </span>
         }
-        <span class="menu-text">{{ item.label }}</span>
-        @if (item.badge) {
-        <span class="badge text-bg-{{item.badge.variant}} opacity-50" [innerHTML]="item.badge.text"></span>
-        }
-    </a>
-    }
 
-</ng-template>
+    </ng-template>
