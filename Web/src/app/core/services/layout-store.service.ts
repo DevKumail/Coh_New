@@ -10,7 +10,7 @@ const STORAGE_KEY = '__INSPINIA_ANGULAR_CONFIG__';
 const defaultState: LayoutState = {
     skin: 'classic',
     theme: 'light',
-    orientation: 'vertical',
+    orientation: 'horizontal',
     position: 'fixed',
     width: 'fluid',
     topbar: {color: 'light'},

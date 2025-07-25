@@ -12,8 +12,8 @@ export const credits = {
   buyLink: '',
 }
 
-export const appName = 'Inspinia'
-export const appTitle = 'INSPINIA - Responsive Bootstrap 5 Admin Dashboard'
+export const appName = 'Coherent '// 'Inspinia'
+export const appTitle = ''//'INSPINIA - Responsive Bootstrap 5 Admin Dashboard'
 export const appDescription: string = 'Inspinia is the #1 best-selling admin dashboard template on WrapBootstrap. Perfect for building CRM, CMS, project management tools, and custom web apps with clean UI, responsive design, and powerful features.'
 
 export const basePath: string = ''

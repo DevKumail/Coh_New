@@ -18,19 +18,19 @@ export const routes: Routes = [
       },
       {
         path: 'clinical',
-        canActivate: [authGuard, modulePermissionGuard],
+        canActivate: [modulePermissionGuard],
         data: { module: 'Clinical' },
         loadChildren: () => import('./views/clinical/clinical.module').then((m) => m.ClinicalModule)
       },
       {
         path: 'registration',
-        canActivate: [authGuard, modulePermissionGuard],
+        canActivate: [modulePermissionGuard],
         data: { module: 'Registration' },
         loadChildren: () => import('./views/registration/registration.module').then((m) => m.RegistrationModule)
       },
       {
         path: 'control-panel',
-        canActivate: [authGuard, modulePermissionGuard],
+        canActivate: [modulePermissionGuard],
         data: { module: 'Control Panel' },
         loadChildren: () => import('./views/control-panel/control-panel.module').then((m) => m.ControlPanelModule)
       },

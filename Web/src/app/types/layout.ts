@@ -29,20 +29,29 @@ export interface LayoutState {
     isLoading: boolean
 }
 
-export type MenuItemType = {
-    label: string
-    isTitle?: boolean
-    icon?: string
-    url?: string
-    badge?: {
-        variant: string
-        text: string
-    }
-    target?: string
-    isDisabled?: boolean
-    isSpecial?: boolean
-    children?: MenuItemType[]
-    isCollapsed?: boolean
+// export type MenuItemType = {
+//     label: string
+//     isTitle?: boolean
+//     icon?: string
+//     url?: string
+//     badge?: {
+//         variant: string
+//         text: string
+//     }
+//     target?: string
+//     isDisabled?: boolean
+//     isSpecial?: boolean
+//     children?: MenuItemType[]
+//     isCollapsed?: boolean
+// }
+export interface MenuItemType {
+    label: string;
+    url?: string;
+    icon?: string;
+    module?: string;
+    isCollapsed?: boolean;
+    children?: MenuItemType[];
+    isTitle?: boolean;
 }
 
 export type LanguageOptionType = {

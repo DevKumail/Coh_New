@@ -72,4 +72,8 @@ GetCoverageById(subscribedId:number) {
   return this.api.get(`Coverages/GetCoverage?subscribedId=${subscribedId}`).toPromise();
 }
 
+ getPatientByMrNo(mrNo: string): Observable<any> {
+    return this.api.get(`Common/GetCoverageAndRegPatientDBByMrNo?MRNo=${mrNo}`);
+  }
+
 }

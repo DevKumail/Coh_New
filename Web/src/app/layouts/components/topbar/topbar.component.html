@@ -1,62 +1,49 @@
 <header class="app-topbar">
-  <div class="container-fluid topbar-menu">
-    <div class="d-flex align-items-center gap-2">
-      <!-- Logo -->
+  <div class="topbar-menu d-flex justify-content-between align-items-center">
+    <div class=" d-flex align-items-center gap-2">
+
       <div class="logo-topbar">
         <a routerLink="/" class="logo-light">
           <span class="logo-lg">
-            <img src="assets/images/logos/fuse2.png" alt="logo" />
+            <img src="assets/images/branding/coherent-dark.png" alt="logo" />
           </span>
           <span class="logo-sm">
-            <img src="assets/images/logos/fuse.png" alt="small logo" />
+            <img src="assets/images/branding/coherent-dark.png" alt="small logo" />
+          </span>
+        </a>
+        <a routerLink="/" class="logo-dark">
+          <span class="logo-lg">
+            <img src="assets/images/branding/coherent-light.png" alt="logo" />
+          </span>
+          <span class="logo-sm">
+            <img src="assets/images/branding/coherent-light.png" alt="small logo" />
           </span>
         </a>
       </div>
 
-      <!-- Sidebar toggle -->
-      <button
-        (click)="toggleSidebar()"
-        class="sidenav-toggle-button btn btn-primary btn-icon"
-      >
+      <button (click)="toggleSidebar()" class="sidenav-toggle-button btn btn-primary btn-icon">
         <ng-icon name="tablerMenu4" class="fs-22" />
       </button>
 
-      <!-- Search -->
-      <!-- <div class="app-search d-none d-xl-flex">
-        <input
-          type="search4"
-          class="form-control topbar-search"
-          name="search"
-          placeholder="Search for something..."
-        />
-        <lucide-icon [img]="Search" class="app-search-icon text-muted" />
-      </div> -->
-
-      <!-- Mega Menu -->
       <app-mega-menu />
+      
+      <div>
+        <app-patient-header-panel *ngIf="showPatientPanel" [@bannerAnimation] [patientData]="patientData"
+          [visible]="showPatientPanel"></app-patient-header-panel>
+      </div>
     </div>
 
-  
-    <!-- Modal Template -->
-    <ng-template #patientSearchModal let-modal>
-    <app-patient-search-modal (patientsFound)="handleSearchResults($event)"></app-patient-search-modal>
-    </ng-template>
 
-    <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-items-center gap-2 ">
 
-    <div style="height: 50px; text-align: right;" class="d-flex align-items-center gap-2">
-     <button (click)="togglePin()" class="btn btn-sm btn-outline-secondary" title="Pin/Unpin Panel">
-      <lucide-icon [name]="pinned ? 'pin' : 'pin-off'" class="fs-18"></lucide-icon>
-    </button>
-    </div>
-      <!-- Button to trigger modal or banner -->
-      <button
+      <!-- Button to trigger modal or banner  -->
+      <!-- <button
         (click)="togglePatientBanner(patientSearchModal)"
         class="btn p-0 border-0 bg-transparent shadow-none"
         title="Toggle Patient Banner"
       >
         <lucide-icon name="stethoscope" class="fs-22 text-body"></lucide-icon>
-      </button>
+      </button> -->
 
       <app-notification-dropdown />
       <app-theme-toggler />
