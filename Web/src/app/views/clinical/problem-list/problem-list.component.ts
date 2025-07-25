@@ -1,11 +1,11 @@
 import { ClinicalApiService } from './../clinical.api.service';
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FavoritesComponent } from '../favorites/favorites.component';
 
 
@@ -34,8 +34,19 @@ export class ProblemListComponent implements OnInit {
 
   medicalHistoryData: any[] = [];
   totalPages = 0;
+  modalService = new NgbModal();
+  FilterForm!: FormGroup;
+  @ViewChild('problemModal') problemModal: any;
+  
+
 
   providerList: any[] = [];
+DiagnosisCode: any;
+ICDVersions: any;
+Searchby: any;
+searchForm: any;
+diagnosisForm: any
+
 
   constructor(
     private fb: FormBuilder,
@@ -53,7 +64,8 @@ export class ProblemListComponent implements OnInit {
       startDate: [''],
       endDate: [''],
       comments: [''],
-      status: ['']
+      status: [''],
+      isProviderCheck: [false]
     });
 
     this.getRowData();
@@ -152,12 +164,53 @@ export class ProblemListComponent implements OnInit {
     });
   }
 
-  // ✅ Load providers for dropdown
+
   fetchProviders() {
-    // Replace with your actual provider service call
+   
     this.providerList = [
       { id: 1, name: 'Dr. Ali' },
       { id: 2, name: 'Dr. Sara' }
     ];
+  }
+  onCheckboxChange(){
+
+  }
+  
+ openModal() {}
+  RoutesearchProblem(){
+
+  }
+   filter(e: any) {
+
+    const inputString = e.target.value;
+    const trimmedString = inputString.split(' ').filter(Boolean).join(' ');
+    console.log(trimmedString); // Output: "Hello, World!"
+   //this.MyDiagnosis.filterGlobal(trimmedString, 'contains');
+    //this.AllDignosisApis();
+  }
+  onSearchClick(){
+
+  }
+    ClickFilter(modalRef: TemplateRef<any>) {
+  this.modalService.open(modalRef, {
+    backdrop: 'static',
+    size: 'xl',
+    centered: true
+  });
+}
+  openProblemModal(){
+
+  }
+  onSearch(){
+
+  }
+  onSearchByChange(){
+
+  }
+  SearchDiagnosis(){
+
+  }
+  onRowSelect(){
+
   }
 }

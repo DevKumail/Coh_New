@@ -1,78 +1,92 @@
-<!-- Provider Allergy Section -->
 <form [formGroup]="allergyForm">
   <div class="card p-3 shadow rounded mt-4">
     <h5 class="card-title mb-3 fw-bold">Allergies </h5>
 
     <div class="row">
-      <!-- Provider ID -->
-      <div class="col-lg-3 mb-3">
+
+      <!-- <div class="col-lg-3 mb-3">
         <label class="form-label">Provider</label>
         <input type="text" class="form-control" formControlName="providerName" placeholder="Enter Provider Name" />
+      </div> -->
+      <div class="col-lg-3 mb-3">
+        <label class="form-label">Provider</label>
+        <select class="form-select" formControlName="providerId">
+          <option value="" disabled selected>Select Provider</option>
+          <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">
+            {{ provider.name }}
+          </option>
+        </select>
       </div>
 
-      <!-- Allergy Type Dropdown -->
+
       <div class="col-lg-3 mb-3">
         <label class="form-label">Allergy Type</label>
         <select class="form-select" formControlName="allergyType">
           <option value="" disabled selected>Select Allergy Type</option>
-          <option *ngFor="let type of allergyTypes" [value]="type">{{ type }}</option>
+          <!-- <option *ngFor="let type of GetAlergy" [value]="">{{ type.alergyName }}</option> -->
+          <option *ngFor="let type of GetAlergy" [value]="type.alergyTypeId">
+            {{ type.alergyName }}
+          </option>
+
         </select>
       </div>
 
-      <!-- Allergen -->
+
       <div class="col-lg-3 mb-3">
         <label class="form-label">Allergen</label>
         <input type="text" class="form-control" formControlName="allergen" placeholder="Enter Allergen" />
       </div>
 
-      <!-- Severity Dropdown -->
+
       <div class="col-lg-3 mb-3">
         <label class="form-label">Severity</label>
         <select class="form-select" formControlName="severity">
           <option value="" disabled selected>Select Severity</option>
-          <option *ngFor="let sev of severityOptions" [value]="sev">{{ sev }}</option>
+          <option *ngFor="let sev of GetSeverity" [value]="sev.id">{{ sev.severityName }}</option>
         </select>
       </div>
+
+
     </div>
 
     <div class="row">
-      <!-- Reaction -->
+
       <div class="col-lg-3 mb-3">
         <label class="form-label">Reaction</label>
         <input type="text" class="form-control" formControlName="reaction" placeholder="Enter Reaction" />
       </div>
 
-      <!-- Start Date -->
+
       <div class="col-lg-3 mb-3">
         <label class="form-label">Start Date</label>
         <input type="date" class="form-control" formControlName="startDate" />
       </div>
 
-      <!-- End Date -->
+
       <div class="col-lg-3 mb-3">
         <label class="form-label">End Date</label>
         <input type="date" class="form-control" formControlName="endDate" />
       </div>
 
-      <!-- Status Dropdown -->
+
       <div class="col-lg-3 mb-3">
         <label class="form-label">Status</label>
         <select class="form-select" formControlName="status">
           <option value="" disabled selected>Select Status</option>
-          <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+          <option *ngFor="let status of statusOptions" [value]="status.id">{{ status.name}}</option>
         </select>
       </div>
     </div>
 
     <div class="d-flex justify-content-end">
       <button type="button" class="btn btn-secondary" (click)="resetForm()">Clear</button>
-      <button type="button" class="btn btn-success ms-2" (click)="submitAllergyForm1()">Submit</button>
+      <button type="button" class="btn btn-success ms-2" (click)="submit()">Submit</button>
 
     </div>
   </div>
 </form>
 
-<!-- Grid -->
+
 <div class="card mt-3">
   <div class="card-body">
     <div class="table-responsive">
@@ -108,44 +122,37 @@
         </tbody>
       </table>
     </div>
-     <div class="d-flex flex-column align-items-center mt-3 gap-2">
+    <div class="d-flex flex-column align-items-center mt-3 gap-2">
 
-            <div class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap">
+      <div class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap">
 
-              <!-- Showing entries + dropdown -->
-              <div class="d-flex align-items-center gap-2 flex-wrap">
-                <div class="me-2">
-                  Showing {{ start + 1 }} to {{ end > MyAlllergyData.length ? MyAlllergyData.length : end }} of {{ MyAlllergyData.length }} entries
-                </div>
-                <div>
-                  <select
-                    class="form-select form-select-sm"
-                    style="width: auto;"
-                    [(ngModel)]="pageSize"
-                    [ngModelOptions]="{ standalone: true }"
-                    (change)="onPageSizeChange($event)">
-                    <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
-                  </select>
-                </div>
-              </div>
 
-              <!-- Pagination Controls -->
-              <nav>
-                <ul class="pagination pagination-sm mb-0">
-                  <li class="page-item" [class.disabled]="currentPage === 1">
-                    <button class="page-link" (click)="prevPage()">Previous</button>
-                  </li>
-                  <li
-                    class="page-item"
-                    *ngFor="let page of pageNumbers"
-                    [class.active]="page === currentPage"
-                  >
-                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
-                  </li>
-                  <li class="page-item" [class.disabled]="currentPage === totalPages">
-                    <button class="page-link" (click)="nextPage()">Next</button>
-                  </li>
-                </ul>
-              </nav>
-  </div>
-</div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <div class="me-2">
+            Showing {{ start + 1 }} to {{ end > MyAlllergyData.length ? MyAlllergyData.length : end }} of {{
+            MyAlllergyData.length }} entries
+          </div>
+          <div>
+            <select class="form-select form-select-sm" style="width: auto;" [(ngModel)]="pageSize"
+              [ngModelOptions]="{ standalone: true }" (change)="onPageSizeChange($event)">
+              <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+            </select>
+          </div>
+        </div>
+
+
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="prevPage()">Previous</button>
+            </li>
+            <li class="page-item" *ngFor="let page of pageNumbers" [class.active]="page === currentPage">
+              <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="nextPage()">Next</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>

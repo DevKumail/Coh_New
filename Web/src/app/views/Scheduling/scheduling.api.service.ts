@@ -43,9 +43,9 @@ export class SchedulingApiService {
      getEmployeeFacilityFromCache() {
         return this.api.get('Common/GetEmployeeFacilityFromCache').toPromise();
     }
-  GetProviderByFacilityId(facilityId: number): Observable<any[]> {
-  return this.api.get<any[]>(`your-api-url/${facilityId}`);
-}
+  GetProviderByFacilityId(FacilityId: any) {
+    return this.api.get(`Appointment/GetProviderByFacilityId?FacilityId=${FacilityId}`);
+  }
 
    GetSchAppointmentList(SiteId: any,ProviderId: any,FacilityId: any,SpecialityId:any,Date:any) {
     return this.api.get(`Appointment/GetSchAppointmentList?SiteId=${SiteId}&ProviderId=${ProviderId}&FacilityId=${FacilityId}&SpecialityId=${SpecialityId}&Date=${Date}`).toPromise();

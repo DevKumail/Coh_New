@@ -7,25 +7,16 @@
 
     <div class="card-body">
       <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
-       
+
         <div class="row">
-          <!-- <div class="col-sm-3 mb-3">
+          <div class="col-sm-3 mb-3">
             <label>Facility <span class="text-danger">*</span></label>
             <select class="form-control form-select" formControlName="facility"
               (onChange)="GetSpecialitybyFacilityId(selectedFacility)">
               <option value="">Select Facility</option>
               <option *ngFor="let f of facilities" [value]="f.code">{{ f.name }}</option>
             </select>
-          </div> -->
-          <div class="col-sm-3 mb-3">
-  <label>Facility <span class="text-danger">*</span></label>
-  <select class="form-control form-select" formControlName="facility">
-    <option value="">Select Facility</option>
-    <option *ngFor="let f of facilities" [value]="f.code">{{ f.name }}</option>
-  </select>
-</div>
-
-
+          </div>
 
           <div class="col-sm-3 mb-3">
             <label>Speciality <span class="text-danger">*</span></label>
@@ -39,7 +30,7 @@
           <div class="col-sm-3 mb-3">
             <label>Provider <span class="text-danger">*</span></label>
             <select class="form-control form-select" fromControlName="provider"
-            (onChange)="GetSpecialityByEmployeeId(selectedProviders)">
+              (onChange)="GetSpecialityByEmployeeId(selectedProviders)">
               <option value="">Select Provider</option>
               <option *ngFor="let p of providers" [value]="p.employeeId">{{ p.fullName }}</option>
             </select>

@@ -1,3 +1,4 @@
+
 import { Routes } from '@angular/router';
 import { authGuard } from '@/app/core/guards/auth.guard';
 import { AppointmentsComponent } from './appointments/appointments.component';
@@ -16,29 +17,15 @@ export const Scheduling_ROUTES: Routes = [
         data: { permissions: ['Scheduling:View Appointments'] },
         children: [
             {
-                path: 'View-Appointments',
+                path: 'view-appointments',
                 component: AppointmentsComponent,
                 data: { title: 'View Appointments' }
             },
-            // {
-            //     path: 'Create-Appointments',
-            //     component: AppointmentsComponent,
-            //     data: { title: 'View Appointments' }
-            //   },
             {
-                path: 'Create-Appointments',
+                path: 'create-appointment',
                 component: CreateAppointmentComponent,
                 data: { title: 'Create Appointment' }
             },
- 
-
-
-
-            //   {
-            //     path: 'Appointments/Create',
-            //     component: AppointmentsComponent,
-            //     data: { title: 'Appointment Booking' }
-            //   },
 
         ]
     }
