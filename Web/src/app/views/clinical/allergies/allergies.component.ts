@@ -11,7 +11,6 @@ import { ClinicalApiService } from '../clinical.api.service';
 import { Injectable } from '@angular/core';
 
 
-
 @Component({
   selector: 'app-allergies',
   imports: [ CommonModule,

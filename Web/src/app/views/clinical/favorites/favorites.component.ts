@@ -1,4 +1,4 @@
-import { ClinicalApiService } from './../clinical.api.service';
+import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';

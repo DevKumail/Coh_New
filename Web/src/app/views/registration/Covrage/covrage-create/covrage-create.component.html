@@ -105,17 +105,28 @@
                 </div>
 
                 <!-- DOB using ngxDaterangepickerBootstrap -->
-                <div class="col-3">
+                <!-- <div class="col-3">
                     <label>Date of Birth</label><span class="danger"> *</span>
-                   <!-- <input
+                   <input
                        type="text"
                        ngxDaterangepickerMd
                        [singleDatePicker]="true"
                        [showCancel]="true"
                        formControlName="BirthDate"
                     class="form-control"
-                    /> -->
+                    />
 
+                </div> -->
+                <div class="col-3">
+                    <label>Date of Birth</label><span class="danger"> *</span>
+                    <input
+                        type="text"
+                        class="form-control date"
+                        formControlName="BirthDate"
+                        data-provider="flatpickr"
+                        id="birthDate"
+                        placeholder="Select date"
+                    />
                 </div>
 
                 <!-- Address -->

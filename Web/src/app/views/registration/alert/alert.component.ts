@@ -11,6 +11,7 @@ import { AlertDTO } from '@/app/shared/models/alert.model';
 import { AlertType } from '@/app/shared/models/alert-type.model';
 
 
+
 @Component({
   selector: 'app-alert',
   standalone: true,
@@ -113,9 +114,9 @@ this.  GetPatientAlertsData() ;
 
   alertsTable: any
   GetPatientAlertsData() {
-     // debugger
+
     this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
-       // debugger;
+      ;
 
       this.alertsTable = res?.alert?.table1 || [];
       if (Array.isArray(this.alertsTable) && this.alertsTable.length > 0) {
@@ -138,45 +139,13 @@ this.  GetPatientAlertsData() ;
     });
 
   }
+  GetAlertType() {
 
-
-// GetPatientAlertsData(): void {
-//   this.registrationApiService.getAlertDetailsDb(this.Mrno).then((res) => {
-//     if (!res || !res.alert || !Array.isArray(res.alert.table1)) {
-//       console.warn("No alert data returned from API.");
-//       this.MyAlertsData = [];
-//       this.filteredAlertsData = [];
-//       return;
-//     }
-
-//     const alertsTable: AlertDTO[] = res.alert.table1;
-//     this.MyAlertsData = alertsTable;
-//     this.filteredAlertsData = alertsTable;
-//     this.calculatePagination();
-//   }).catch((error) => {
-//     console.error("Failed to fetch alert data", error);
-//     this.MyAlertsData = [];
-//     this.filteredAlertsData = [];
-//   });
-// }
-
-GetAlertType(): void {
-  this.registrationApiService.getAlertType().then((res: { result: AlertType[] } | undefined) => {
-    if (!res || !res.result || !Array.isArray(res.result)) {
-      console.warn("No alert type data returned from API.");
-      this.getAlert = [];
-      return;
-    }
-
-    this.getAlert = res.result;
-    console.log("✅ GetAlertType:", this.getAlert);
-  }).catch((error: any) => {
-    console.error("❌ Failed to fetch alert types", error);
-    this.getAlert = [];
-  });
-}
-
-
+    this.registrationApiService.GetAlertType().then(res => {
+      console.log("GetAlertType", res)
+      this.getAlert = res.result
+    })
+  }
   Alerts: any = {}
 
   onSubmit() {

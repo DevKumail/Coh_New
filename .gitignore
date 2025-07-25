@@ -12,8 +12,14 @@
 /.vs/Coh_New/v17/DocumentLayout.json
 /.vs/ProjectSettings.json
 /.vs/Coh_New/v17/workspaceFileList.bin
+<<<<<<< HEAD
 *.vsidx
 /Web/.vs
+=======
+/Web/.vs
+/.gitignore
+/.gitignore
+>>>>>>> origin/hassan_dev
 =======
 ﻿################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
@@ -29,4 +35,8 @@
 /.vs/ProjectSettings.json
 /.vs/Coh_New/v17/workspaceFileList.bin
 /Web/.vs
+<<<<<<< HEAD
 >>>>>>> 0f63f4d91acafd79392abf108d7f472ae4c488b2
+=======
+>>>>>>> origin/main
+>>>>>>> origin/hassan_dev

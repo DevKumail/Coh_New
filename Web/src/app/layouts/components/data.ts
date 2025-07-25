@@ -91,6 +91,58 @@ export const menuItems: ExtendedMenuItemType[] = [
         module: 'Registration',
         isCollapsed: true,
         children: [
+    {label: 'Menu', isTitle: true},
+    // {
+    //     label: 'Dashboards',
+    //     icon: 'tablerLayoutDashboard',
+    //     isCollapsed: true,
+    //     badge: {variant: 'success', text: '5'},
+    //     children: [
+    //         {label: 'Dashboard v.1', url: '/dashboards/dashboard-1'},
+    //         {label: 'Dashboard v.2', url: '/dashboards/dashboard-2'},
+    //         {label: 'Dashboard v.3', url: '/dashboards/dashboard-3'},
+    //         {label: 'Dashboard v.4', url: '#!', isDisabled: true, badge: {variant: 'light', text: 'Soon'}},
+    //         {label: 'Dashboard v.5', url: '#!', isDisabled: true, badge: {variant: 'light', text: 'Soon'}},
+    //     ]
+    // },
+    // {
+    //     label: 'Landing Page',
+    //     icon: 'tablerStackFront',
+    //     url: '/landing',
+    // },
+
+  { label: 'Menu', isTitle: true },
+
+  // ✅ Clinical Module Section (permission based)
+  {
+    label: 'Clinical',
+    icon: 'tablerHeartbeat',
+    module: 'Clinical', // 👈 this is used by PermissionService
+    isCollapsed: true,
+    children: [
+
+      { label: 'Alerts', url: '/clinical/alerts' },
+      { label: 'Allergies', url: '/clinical/allergies'},
+    //   { label: 'Problem List', url: '/clinical/problem-list'},
+      { label: 'Problem List', url: '/clinical/problem'},
+      { label: 'Medical History', url: '/clinical/medical-history' },
+      //{ label: 'Favorites', url: '/clinical/favorites'}
+      { label: 'Problem', url: '/clinical/problem'},
+      { label: 'Vital Signs',url: '/clinical/vital-signs'},
+
+
+    ]
+  },
+
+  { label: 'Menu', isTitle: true },
+
+  // ✅ Clinical Module Section (permission based)
+  {
+    label: 'Registration',
+    icon: 'pi pi-clipboard',
+    module: 'Registration',
+    isCollapsed: true,
+    children: [
 
             { label: 'Alerts', url: '/registration/alerts' },
             { label: 'Coverages', url: '/registration/coverage-list' },
@@ -112,6 +164,15 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Demographic Create', url: '/registration/demographic-create' }
         ]
     },
+      { label: 'Alerts', url: '/registration/alerts' },
+      { label: 'Coverages', url: '/registration/coverage-list' },
+      { label: 'Coverage Create', url: '/registration/covrage-create' },
+      { label: 'Demographics', url: '/registration/demographics' },
+      { label: 'Demographic Create', url: '/registration/demographic-create' },
+      { label: 'Demographic List',url: '/registration/demographic-list' },
+      { label: 'Temporary Patient Demographics', url: '/registration/temporary-patient-demographics' }
+    ]
+  },
 
 
 

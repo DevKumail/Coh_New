@@ -4,7 +4,7 @@ import { MedicalHistoryComponent } from './medical-history/medical-history.compo
 import { FavoritesComponent } from './favorites/favorites.component';
 import { ProblemComponent } from './problem/problem.component';
 import { AllergiesComponent } from './allergies/allergies.component';
-import { modulePermissionGuard } from '@core/guards/module-permission.guard';
+import { VitalSignsComponent } from './vital-signs/vital-signs.component';
 
 export const CLINICAL_ROUTES: Routes = [
   {
@@ -32,9 +32,14 @@ export const CLINICAL_ROUTES: Routes = [
       {
         path: 'allergies',
         component: AllergiesComponent,
-        canActivate: [modulePermissionGuard],
-        data: { module: 'Clinical', component: 'Allergies', title: 'Allergies' }
-      }
+        data: { title: 'Allergies' }
+      },
+
+      {
+        path: 'vital-signs',
+        component: VitalSignsComponent,
+        data: { title: 'Vital Signs' }
+      },
     ]
   }
 ];
