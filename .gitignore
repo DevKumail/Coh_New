@@ -13,3 +13,6 @@
 /.vs/Coh_New/v17/workspaceFileList.bin
 Web/src/environments/environment.ts
 /Web/.vs/Web/FileContentIndex
+Web/src/environments/environment.ts
+/Web/.vs
+/.gitignore
