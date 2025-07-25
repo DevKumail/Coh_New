@@ -1,17 +1,10 @@
 <div class="wrapper">
-
   <app-sidenav/>
-
-  <!-- <app-topbar/> -->
   <app-topbar (patientBannerToggle)="togglePatientBanner($event)"></app-topbar>
 
-  <!-- <div class="content-page"> -->
- 
-  <!-- <div class="content-page scroll-wrapper"> -->
-    <!-- <div class="content-page scroll-wrapper" [ngClass]="{ 'with-pinned': isPinned }"> -->
+  <div class="content-page scroll-wrapper" [style.marginTop.px]="isPinned ? 10 : 10">
 
-      <!-- add by waleed -->
-      <div class="content-page scroll-wrapper" [style.marginTop.px]="isPinned ? 160 : 60">
+
 
 
 

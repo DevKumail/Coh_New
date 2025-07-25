@@ -56,3 +56,81 @@
     </div>
   </div>
 </app-ui-card>
+
+
+<!-- Result Table -->
+<!-- <div *ngIf="(searchResults?.length || 0) > 0" class="mt-4">
+  <table class="table table-bordered">
+    <thead class="table-light">
+      <tr>
+        <th>MR No</th>
+        <th>Name</th>
+        <th>Gender</th>
+        <th>Age</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let patient of searchResults">
+        <td>{{ patient.mrNo }}</td>
+       <td>{{ patient.personFirstName }}</td>
+        <td>{{ patient.gender }}</td>
+        <td>{{ patient.age }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div> -->
+
+
+
+<!-- ...................................................... -->
+
+
+
+<!-- <app-ui-card title="Patient List">
+  <div card-body>
+    <div *ngIf="(searchResults?.length || 0) > 0" class="mt-4">
+        <table datatable [dtOptions]="dtOptions" class="table dt-responsive align-middle mb-0" id="patient-select">
+      <thead class="thead-sm text-uppercase fs-xxs">
+        <tr>
+          <th>MR No</th>
+          <th>Name</th>
+          <th>Gender</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+       <tbody>
+      <tr *ngFor="let patient of searchResults">
+        <td>{{ patient.mrNo }}</td>
+       <td>{{ patient.personFirstName }}</td>
+        <td>{{ patient.gender }}</td>
+        <td>{{ patient.age }}</td>
+      </tr>
+    </tbody>
+    </table>
+  </div>
+    </div>
+</app-ui-card> -->
+<!-- <app-ui-card title="Patient List">
+  <div class="card-body">
+    <div *ngIf="(searchResults?.length || 0) > 0" class="mt-4">
+      <table datatable [dtOptions]="dtOptions" class="table dt-responsive align-middle mb-0" id="patient-select">
+        <thead class="thead-sm text-uppercase fs-xxs">
+          <tr>
+            <th>MR No</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Age</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let patient of searchResults">
+            <td>{{ patient.mrNo }}</td>
+            <td>{{ patient.personFirstName }}</td>
+            <td>{{ patient.gender }}</td>
+            <td>{{ patient.age }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</app-ui-card> -->

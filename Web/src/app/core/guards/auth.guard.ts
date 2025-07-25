@@ -12,6 +12,7 @@ export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
+  debugger
   const authService = inject(AuthService);
   const permissionService = inject(PermissionService);
   const router = inject(Router);

@@ -7,6 +7,7 @@ import {FooterComponent} from '@layouts/components/footer/footer.component';
 import {debounceTime, fromEvent, Subscription} from 'rxjs';
 import { PatientHeaderPanelComponent } from "../components/patient-header-panel/patient-header-panel.component";
 import { CommonModule } from '@angular/common';
+import { DataStorageService } from '@/app/shared/data-storage.service';
 
 @Component({
     selector: 'app-vertical-layout',
@@ -15,35 +16,42 @@ import { CommonModule } from '@angular/common';
     styles: ``
 })
 export class VerticalLayoutComponent implements OnInit, OnDestroy {
-    constructor(public layout: LayoutStoreService) {
+    constructor(
+        public layout: LayoutStoreService,
+        private DataStorage: DataStorageService
+    ) {
     }
     showPatientBanner = true;
-    isPinned = false;
+    isPinned : boolean = false;
     resizeSubscription!: Subscription;
 
     ngOnInit() {
-        this.onResize();
 
-        this.resizeSubscription = fromEvent(window, 'resize')
-            .pipe(debounceTime(200))
-            .subscribe(() => this.onResize());
-    }
 
-    onResize(): void {
-        const width = window.innerWidth;
-        const size = this.layout.sidenavSize;
-
-        if (width <= 767.98) {
-            this.layout.setSidenavSize('offcanvas', false);
-        } else if (width <= 1140 && !['offcanvas'].includes(size)) {
-            this.layout.setSidenavSize(size === 'on-hover' ? 'condensed' : 'condensed', false);
-        } else {
-            this.layout.setSidenavSize(size);
+        this.DataStorage.searchData$.subscribe((data) => {
+        debugger
+        if (data) {
+          var patient = data.table2[0];
+           console.log( 'patient => ',patient);
         }
+        if(patient){
+            debugger
+            this.DataStorage.show$.subscribe(value => {
+                debugger
+                this.isPinned = value;
+            console.log( 'this.isPinned => ',this.isPinned);
+            
+        });
+        }
+       
+        
+      });
+
+       
     }
+
 
     ngOnDestroy(): void {
-        this.resizeSubscription?.unsubscribe();
     }
      
 

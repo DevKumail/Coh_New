@@ -78,6 +78,7 @@
         "ngx-intl-tel-input": "^17.0.0",
         "ngx-mask": "^19.0.7",
         "ngx-masonry": "^14.0.1",
+        "ngx-permissions": "^19.0.0",
         "ngx-quill": "^27.0.2",
         "ngx-tagify": "^18.0.0",
         "nouislider": "^15.8.1",
