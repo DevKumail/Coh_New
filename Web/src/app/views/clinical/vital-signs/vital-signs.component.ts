@@ -39,7 +39,7 @@ declare var flatpickr: any;
         FormsModule,
         RouterModule,
         NgIconComponent,
-        FilePondModule,CounterDirective,
+        FilePondModule,
         NgbNavModule,
   ],
   templateUrl: './vital-signs.component.html',
@@ -127,7 +127,9 @@ declare var flatpickr: any;
 // }
 
 export class VitalSignsComponent implements OnInit {
+    
   @ViewChild('picker') picker!: NgxDaterangepickerBootstrapDirective;
+
   @ViewChild('pulseCounter') pulseCounter!: CounterDirective;
 
   vitalSignsForm!: FormGroup;
@@ -296,31 +298,55 @@ onSubmit() {
   }
 
   // Hardcoded values
-  const mrNo = "1004";
+  const mrNo = "1010";
   const appointmentId = 104080;
 
-  // Set BMI
-  this.calculateBMI();
+  
 
   const payload: vitalsingsDto = {
-    mrNo,
-    appointmentId,
-    entryDate: this.vitalSignsForm.value.entryDate,
-    dailyStartTime: this.vitalSignsForm.value.dailyStartTime,
-    bpSystolic: this.bpSystolic,
-    bpDiastolic: this.bpDiastolic,
-    bpArm: this.vitalSignsForm.value.bpArm === 'right' ? 1 : 0,
-    heartRate: this.heartRate,
-    respirationRate: this.respirationRate,
-    temperature: this.temperature,
-    weight: this.weight,
-    height: this.height,
-    bmi: this.bmi,
-    spo2: this.spo2,
-    glucose: this.glucose,
-    comment: this.vitalSignsForm.value.comment,
-    updateDate: new Date()
+    MRNo: mrNo,
+  AppointmentId: appointmentId,
+  VisitAccountNo: 123456,
+  EntryDate: this.vitalSignsForm.value.entryDate,
+  UpdateDate: new Date(),
+  UpdateBy: 'admin',
+  BPSystolic: this.bpSystolic,
+  BPDiastolic: this.bpDiastolic,
+  BPArm: this.vitalSignsForm.value.bpArm === 'right' ? 1 : 0,
+  PulseRate: this.heartRate,
+  HeartRate: this.heartRate,
+  RespirationRate: this.respirationRate,
+  Temperature: this.temperature,
+  Weight: this.weight,
+  Height: this.height,
+  BMI: this.bmi,
+  SPO2: this.spo2,
+  Glucose: this.glucose,
+  Comment: this.vitalSignsForm.value.comment,
   };
+
+
+// const payload: vitalsingsDto = {
+//   MRNo: mrNo,
+//   AppointmentId: appointmentId,
+//   VisitAccountNo: 123456, // ← set actual value
+//   EntryDate: this.vitalSignsForm.value.entryDate,
+//   UpdateDate: new Date(),
+//   UpdateBy: 'admin', // ← dynamic or fixed
+//   BPSystolic: this.bpSystolic,
+//   BPDiastolic: this.bpDiastolic,
+//   BPArm: this.vitalSignsForm.value.bpArm === 'right' ? 1 : 0,
+//   HeartRate: this.heartRate,
+//   PulseRate: this.heartRate, // ← or separate if needed
+//   RespirationRate: this.respirationRate,
+//   Temperature: this.temperature,
+//   Weight: this.weight,
+//   Height: this.height,
+//   BMI: this.bmi,
+//   SPO2: this.spo2,
+//   Glucose: this.glucose,
+//   Comment: this.vitalSignsForm.value.comment,
+// };
 
   console.log('🚀 Submitting payload:', payload);
 

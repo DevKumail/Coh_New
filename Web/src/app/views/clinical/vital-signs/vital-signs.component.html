@@ -6,12 +6,13 @@
                 Clinical
             </a>
         </li>
-        <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
+        <li
+            class="d-flex align-items-center text-muted mx-1"
+            aria-current="page"
+        >
             <ng-icon name="tablerChevronRight"></ng-icon>
         </li>
-        <li class="breadcrumb-item active" aria-current="page">
-            Vital Sings
-        </li>
+        <li class="breadcrumb-item active" aria-current="page">Vital Sings</li>
     </ol>
 </nav>
 
@@ -27,6 +28,7 @@
                     id="entryDate"
                     placeholder="Select date"
                     data-provider="flatpickr"
+                    
                 />
             </div>
 
@@ -42,341 +44,145 @@
                 />
             </div>
 
-            <!-- Systolic -->
-            <div class="col-sm-3">
-                <label
-                    >Systolic (mmHg) <span class="text-danger">*</span></label
-                >
-                <div
-                    class="input-group touchspin mt-2"
-                    appCounter
-                    [max]="300"
-                    [(count)]="bpSystolic"
-                    #systolic="appCounter"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="systolic.decrement()"
-                    >
-                        <ng-icon name="tablerMinus" />
-                    </button>
-                    <input
-                        type="number"
-                        class="form-control form-control-sm border-0"
-                        [value]="bpSystolic"
-                        min="0"
-                        max="300"
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="systolic.increment()"
-                    >
-                        <ng-icon name="tablerPlus" />
-                    </button>
-                </div>
-            </div>
+ <!-- Systolic -->
+<div class="col-sm-3">
+  <label>Systolic (mmHg) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="bpSystolic"
+      min="0"
+      max="300"
+    />
+  </div>
+</div>
 
-            <!-- Diastolic -->
-            <!-- Diastolic -->
-            <div class="col-sm-3">
-                <label
-                    >Diastolic (mmHg) <span class="text-danger">*</span></label
-                >
-                <div
-                    class="input-group mt-2 touchspin"
-                    appCounter
-                    [max]="200"
-                    [(count)]="bpDiastolic"
-                    #diastolic="appCounter"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="diastolic.decrement()"
-                    >
-                        <ng-icon name="tablerMinus" />
-                    </button>
-                    <input
-                        type="number"
-                        class="form-control form-control-sm border-0"
-                        [value]="bpDiastolic"
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="diastolic.increment()"
-                    >
-                        <ng-icon name="tablerPlus" />
-                    </button>
-                </div>
-            </div>
+<!-- Diastolic -->
+<div class="col-sm-3">
+  <label>Diastolic (mmHg) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="bpDiastolic"
+      min="0"
+      max="200"
+    />
+  </div>
+</div>
 
-            <!-- Heart Rate -->
-            <div class="col-sm-3 mb-3">
-                <label
-                    >Heart Rate (Beats/minute)
-                    <span class="text-danger">*</span></label
-                >
-                <div
-                    class="input-group mt-2 touchspin"
-                    appCounter
-                    [max]="200"
-                    [(count)]="heartRate"
-                    #hr="appCounter"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="hr.decrement()"
-                    >
-                        <ng-icon name="tablerMinus" />
-                    </button>
-                    <input
-                        type="number"
-                        class="form-control form-control-sm border-0"
-                        [value]="heartRate"
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="hr.increment()"
-                    >
-                        <ng-icon name="tablerPlus" />
-                    </button>
-                </div>
-            </div>
+<!-- Heart Rate -->
+<div class="col-sm-3">
+  <label>Heart Rate (Beats/minute) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="heartRate"
+      min="0"
+      max="200"
+    />
+  </div>
+</div>
 
-            <!-- Respiration Rate -->
-            <div class="col-sm-3 mb-3">
-                <label
-                    >Respiration Rate <span class="text-danger">*</span></label
-                >
-                <div
-                    class="input-group mt-2 touchspin"
-                    appCounter
-                    [max]="100"
-                    [(count)]="respirationRate"
-                    #rr="appCounter"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="rr.decrement()"
-                    >
-                        <ng-icon name="tablerMinus" />
-                    </button>
-                    <input
-                        type="number"
-                        class="form-control form-control-sm border-0"
-                        [value]="respirationRate"
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="rr.increment()"
-                    >
-                        <ng-icon name="tablerPlus" />
-                    </button>
-                </div>
-            </div>
+<!-- Respiration Rate -->
+<div class="col-sm-3">
+  <label>Respiration Rate <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="respirationRate"
+      min="0"
+      max="100"
+    />
+  </div>
+</div>
 
-            <!-- Temperature -->
-            <div class="col-sm-3 mb-3">
-                <label
-                    >Temperature (°F) <span class="text-danger">*</span></label
-                >
-                <div
-                    class="input-group mt-2 touchspin"
-                    appCounter
-                    [max]="150"
-                    [(count)]="temperature"
-                    #temp="appCounter"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="temp.decrement()"
-                    >
-                        <ng-icon name="tablerMinus" />
-                    </button>
-                    <input
-                        type="number"
-                        class="form-control form-control-sm border-0"
-                        [value]="temperature"
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="temp.increment()"
-                    >
-                        <ng-icon name="tablerPlus" />
-                    </button>
-                </div>
-            </div>
+<!-- Temperature -->
+<div class="col-sm-3">
+  <label>Temperature (°F) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="temperature"
+      min="0"
+      max="150"
+    />
+  </div>
+</div>
 
-            <!-- Weight -->
-            <div class="col-sm-3 mb-3">
-                <label>Weight (kgs) <span class="text-danger">*</span></label>
-                <div
-                    class="input-group mt-2 touchspin"
-                    appCounter
-                    [max]="300"
-                    [(count)]="weight"
-                    #wt="appCounter"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="wt.decrement()"
-                    >
-                        <ng-icon name="tablerMinus" />
-                    </button>
-                    <input
-                        type="number"
-                        class="form-control form-control-sm border-0"
-                        [value]="weight"
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="wt.increment()"
-                    >
-                        <ng-icon name="tablerPlus" />
-                    </button>
-                </div>
-            </div>
+<!-- Weight -->
+<div class="col-sm-3">
+  <label>Weight (kgs) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="weight"
+      min="0"
+      max="300"
+    />
+  </div>
+</div>
 
-            <!-- Height -->
-            <div class="col-sm-3 mb-3">
-                <label>Height (cms) <span class="text-danger">*</span></label>
-                <div
-                    class="input-group mt-2 touchspin"
-                    appCounter
-                    [max]="300"
-                    [(count)]="height"
-                    #ht="appCounter"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="ht.decrement()"
-                    >
-                        <ng-icon name="tablerMinus" />
-                    </button>
-                    <input
-                        type="number"
-                        class="form-control form-control-sm border-0"
-                        [value]="height"
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="ht.increment()"
-                    >
-                        <ng-icon name="tablerPlus" />
-                    </button>
-                </div>
-            </div>
+<!-- Height -->
+<div class="col-sm-3">
+  <label>Height (cms) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="height"
+      min="0"
+      max="300"
+    />
+  </div>
+</div>
 
-            <!-- BMI -->
-            <div class="col-sm-3 mb-3">
-                <label>BMI <span class="text-danger">*</span></label>
-                <div
-                    class="input-group mt-2 touchspin"
-                    appCounter
-                    [max]="100"
-                    [(count)]="bmi"
-                    #b="appCounter"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="b.decrement()"
-                    >
-                        <ng-icon name="tablerMinus" />
-                    </button>
-                    <input
-                        type="number"
-                        class="form-control form-control-sm border-0"
-                        [value]="bmi"
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="b.increment()"
-                    >
-                        <ng-icon name="tablerPlus" />
-                    </button>
-                </div>
-            </div>
+<!-- BMI -->
+<div class="col-sm-3">
+  <label>BMI <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="bmi"
+      min="0"
+      max="100"
+    />
+  </div>
+</div>
 
-            <!-- SPO2 -->
-            <div class="col-sm-3 mb-3">
-                <label>SPO2 (%) <span class="text-danger">*</span></label>
-                <div
-                    class="input-group mt-2 touchspin"
-                    appCounter
-                    [max]="100"
-                    [(count)]="spo2"
-                    #spo="appCounter"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="spo.decrement()"
-                    >
-                        <ng-icon name="tablerMinus" />
-                    </button>
-                    <input
-                        type="number"
-                        class="form-control form-control-sm border-0"
-                        [value]="spo2"
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="spo.increment()"
-                    >
-                        <ng-icon name="tablerPlus" />
-                    </button>
-                </div>
-            </div>
+<!-- SPO2 -->
+<div class="col-sm-3">
+  <label>SPO2 (%) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="spo2"
+      min="0"
+      max="100"
+    />
+  </div>
+</div>
 
-            <!-- Glucose -->
-            <div class="col-sm-3 mb-3">
-                <label
-                    >Glucose (mg/dl) <span class="text-danger">*</span></label
-                >
-                <div
-                    class="input-group mt-2 touchspin"
-                    appCounter
-                    [max]="400"
-                    [(count)]="glucose"
-                    #glu="appCounter"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="glu.decrement()"
-                    >
-                        <ng-icon name="tablerMinus" />
-                    </button>
-                    <input
-                        type="number"
-                        class="form-control form-control-sm border-0"
-                        [value]="glucose"
-                    />
-                    <button
-                        type="button"
-                        class="btn btn-primary rounded-circle floating"
-                        (click)="glu.increment()"
-                    >
-                        <ng-icon name="tablerPlus" />
-                    </button>
-                </div>
-            </div>
+<!-- Glucose -->
+<div class="col-sm-3">
+  <label>Glucose (mg/dl) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="glucose"
+      min="0"
+      max="400"
+    />
+  </div>
+</div>
 
             <!-- Comment -->
             <div class="col-sm-3 mb-3">
