@@ -107,6 +107,7 @@ export const menuItems: ExtendedMenuItemType[] = [
       { label: 'Medical History', url: '/clinical/medical-history' },
       //{ label: 'Favorites', url: '/clinical/favorites'}
       { label: 'Problem', url: '/clinical/problem'},
+      { label: 'Vital Signs',url: '/clinical/vital-signs'},
 
 
     ]

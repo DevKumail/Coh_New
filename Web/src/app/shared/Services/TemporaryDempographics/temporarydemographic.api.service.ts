@@ -57,12 +57,12 @@ export class TemporaryPatientDemographicApiServices {
   }
 
 GetStateByCountryId(countryId:any) {
-  debugger
+
   return this.api.get(`AllDropdowns/GetStateByCountry?countryId=${countryId}`).toPromise();
 }
 
 GetCityByState(ProviderId:any) {
-debugger
+
   return this.api.get(`AllDropdowns/GetCityByState?ProviderId=${ProviderId}`).toPromise();
 }
 

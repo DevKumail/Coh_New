@@ -27,6 +27,7 @@ import   Swal from 'sweetalert2';
 import { NgxDaterangepickerBootstrapModule } from 'ngx-daterangepicker-bootstrap';
 import { ViewChild } from '@angular/core';
 import { NgxDaterangepickerBootstrapDirective} from "ngx-daterangepicker-bootstrap";
+import {NgxMaskDirective, provideNgxMask} from 'ngx-mask'
 
 declare var flatpickr: any;
 
@@ -40,10 +41,13 @@ declare var flatpickr: any;
         RouterModule,
         NgIconComponent,
         FilePondModule,
-        NgbNavModule,
+        NgbNavModule,NgxMaskDirective,
         //NgxDaterangepickerootstrapModule,
 
     ],
+      providers: [
+    provideNgxMask()
+  ],
 
     standalone: true,
     templateUrl: './demographic-create.component.html',
@@ -506,6 +510,7 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
     }
 
 
+
     }
 
 
@@ -544,104 +549,6 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
     this.FillDropDown(this.qid);
   }
 
-    // onSubmit() {
-    //       ;
-
-    //     if (this.demographicForm.invalid) {
-    //         Swal.fire('Error', 'All fields are required.', 'error');
-    //         return;
-    //     }
-
-    //     const formData: DemographicDTO = this.demographicForm.getRawValue();
-
-    //     if (
-    //         !formData.PatientPicture ||
-    //         formData.PatientPicture === this.defaultImage
-    //     )
-    //     {
-    //         formData.PatientPicture = undefined;
-    //     }
-
-    //     const demographic: DemographicDTO = {
-    //         ...formData,
-    //         PatientPicture: formData.PatientPicture,
-    //         isVIP: this.demographicForm.get('isVIP')?.value,
-    //         isPregnant: this.demographicForm.get('isPregnant')?.value,
-    //         isDirective: this.demographicForm.get('isDirective')?.value,
-    //         isDrugHist: this.demographicForm.get('isDrugHist')?.value,
-    //         isExpReporting: this.demographicForm.get('isExpReporting')?.value,
-    //     };
-
-    //     this.DemographicApiServices.submitDemographic(demographic).subscribe({
-    //         next: (res: any) => {
-    //             Swal.fire({
-    //                 position: 'center',
-    //                 icon: 'success',
-    //                 title: 'Demographic saved successfully!',
-    //                 showConfirmButton: false,
-    //                 timer: 2000,
-    //             });
-    //             this.router.navigate(['/registration/demographic-list']);
-    //         },
-    //         error: (error: any) => {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Error',
-    //                 text: error.message || 'Something went wrong',
-    //             });
-    //         },
-    //     });
-    // }
-    //     onSubmit() {
-    //     ;
-
-    //     if (this.demographicForm.invalid) {
-    //         Swal.fire('Error', 'All fields are required.', 'error');
-    //         return;
-    //     }
-
-    //     const formData: DemographicDTO = this.demographicForm.getRawValue();
-
-    //     if (
-    //         !formData.PatientPicture ||
-    //         formData.PatientPicture === this.defaultImage
-    //     ) {
-    //         formData.PatientPicture = undefined;
-    //     }
-
-    //     const demographic: DemographicDTO = {
-    //         ...formData,
-    //         PatientPicture: formData.PatientPicture,
-    //         isVIP: this.demographicForm.get('isVIP')?.value,
-    //         isPregnant: this.demographicForm.get('isPregnant')?.value,
-    //         isDirective: this.demographicForm.get('isDirective')?.value,
-    //         isDrugHist: this.demographicForm.get('isDrugHist')?.value,
-    //         isExpReporting: this.demographicForm.get('isExpReporting')?.value,
-
-    //     };
-
-    //     console.log('Payload going to API:', demographic);
-
-    //     this.DemographicApiServices.submitDemographic(demographic).subscribe({
-    //         next: (res: any) => {
-    //             Swal.fire({
-    //                 position: 'center',
-    //                 icon: 'success',
-    //                 title: 'Demographic saved successfully!',
-    //                 showConfirmButton: false,
-    //                 timer: 2000,
-    //             });
-    //             this.router.navigate(['/registration/demographic-list']);
-    //         },
-    //         error: (error: any) => {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Error',
-    //                 text: error.message || 'Something went wrong',
-    //             });
-    //         },
-    //     });
-    // }
     onSubmit() {
 
         const formData: DemographicDTO = this.demographicForm.getRawValue();
@@ -733,53 +640,9 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
         }
     }
 
-    addNewRow() {
-        this.currentMaxId++;
-        const newRow = {
-            Id: this.currentMaxId,
-            EmploymentCompanyName: '',
-            EmploymentOccupationId: null,
-            EmploymentStatusId: null,
-            EmploymentTypeId: null,
-        };
-        this.MyEmployment.push(newRow);
-    }
 
-    onRowSelect(event: Event, rowData: any) {
-        const checkbox = event.target as HTMLInputElement;
-        const id = rowData.Id;
-        checkbox.checked
-            ? this.selectedRowIds.add(id)
-            : this.selectedRowIds.delete(id);
-    }
 
-    isAllSelected(): boolean {
-        return (
-            this.MyEmployment.length > 0 &&
-            this.selectedRowIds.size === this.MyEmployment.length
-        );
-    }
 
-    selectAllRows(event: Event) {
-        const checkbox = event.target as HTMLInputElement;
-        if (checkbox.checked) {
-            this.MyEmployment.forEach((row) => this.selectedRowIds.add(row.Id));
-        } else {
-            this.selectedRowIds.clear();
-        }
-    }
-
-    deleteSelectedRows() {
-        this.MyEmployment = this.MyEmployment.filter(
-            (row) => !this.selectedRowIds.has(row.Id)
-        );
-        this.selectedRowIds.clear();
-    }
-
-    // togglePregnantCheckbox() {
-    //     const sex = this.demographicForm.get('PersonSexId')?.value;
-    //     this.showcheckBox = sex?.name === 'Female';
-    // }
 
     onCountryChange() {
         ;

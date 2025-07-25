@@ -162,11 +162,17 @@
 
                 <!-- Social Security Number -->
                 <div class="col-md-3 col-sm-4 col-12">
-                    <label>Social Security Number (SSN)
-                        <span style="color: red">*</span></label>
-                    <input type="text" class="form-control" formControlName="personSocialSecurityNo"
-                        placeholder="999-99-9999" />
-                </div>
+    <label>Social Security Number (SSN)
+        <span style="color: red">*</span></label>
+    <input
+        type="text"
+        class="form-control"
+        formControlName="personSocialSecurityNo"
+        placeholder="999-99-9999"
+        [mask]="'000-00-0000'"
+    />
+</div>
+
 
                 <!-- Labor Card No -->
                 <div class="col-md-3 col-sm-4 col-12">
@@ -223,15 +229,26 @@
                 <!-- Driving License -->
                 <div class="col-md-3 col-sm-4 col-12">
                     <label>Driving License No</label>
-                    <input type="text" class="form-control" formControlName="PersonDriversLicenseNo"
-                        placeholder="Driving License No" />
+                   <input
+    type="text"
+    class="form-control"
+    formControlName="PersonDriversLicenseNo"
+    placeholder="Driving License No"
+    [mask]="'SS000000'"
+/>
                 </div>
 
                 <!-- Residence Visa / Unified No -->
                 <div class="col-md-3 col-sm-4 col-12">
                     <label>Unified No</label>
-                    <input type="text" class="form-control" formControlName="ResidenceVisaNo"
-                        placeholder="Unified No" />
+                    <input
+  type="text"
+  class="form-control"
+  formControlName="ResidenceVisaNo"
+  placeholder="Unified No"
+  [mask]="'000000000'"
+/>
+
                 </div>
 
                 <!-- Language -->
@@ -424,8 +441,13 @@
                                 <!-- Postal Code -->
                                 <div class="col-md-3">
                                     <label>Postal Code</label>
-                                    <input class="form-control" formControlName="postalCode" type="text" />
-                                </div>
+<input
+  class="form-control"
+  formControlName="postalCode"
+  type="text"
+  [mask]="'00000'"
+  placeholder="e.g. 75000"
+/>                                </div>
 
                                 <!-- Home Phone -->
                                 <div class="col-md-3">

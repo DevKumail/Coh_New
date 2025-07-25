@@ -30,18 +30,18 @@
                         type="text"
                         class="form-control"
                         formControlName="tempId"
-
+                        [disabled]="true"
                     />
                 </div>
 
                 <!-- Title -->
                 <div class="col-md-3">
                     <label>Title <span class="text-danger">*</span></label>
-                    <select class="form-select" formControlName="PersonTitleId">
+                    <select class="form-select" formControlName="personTitleId">
                         <option [ngValue]="null" disabled>
                             -- Select Title --
                         </option>
-                        <option *ngFor="let t of titles" [ngValue]="t.code">
+                        <option *ngFor="let t of titles" [value]="t.code">
                             {{ t.name }}
                         </option>
                     </select>
@@ -85,23 +85,24 @@
                 <!-- Gender -->
                 <div class="col-md-3">
                     <label>Gender</label><span class="danger"> *</span>
-                    <select class="form-select" formControlName="gender">
-                        <option *ngFor="let g of genders" [value]="g.code">
+                    <select class="form-select" formControlName="personSex">
+                        <option *ngFor="let g of personSexId" [value]="g.code">
                             {{ g.name }}
                         </option>
                     </select>
                 </div>
 
-                <!-- Date of Birth -->
                 <div class="col-md-3">
                     <label
                         >Date of Birth <span class="text-danger">*</span></label
                     >
                     <input
-                        type="date"
-                        class="form-control"
-                        formControlName="bdate"
-                        placeholder="Date of Birth"
+                        type="text"
+                        class="form-control date"
+                        formControlName="patientBirthDate"
+                        data-provider="flatpickr"
+                        id="birthDate"
+                        placeholder="Select date"
                     />
                 </div>
 
@@ -123,7 +124,8 @@
                         type="text"
                         class="form-control"
                         formControlName="personHomePhone1"
-                        placeholder="Home Phone"
+                        placeholder="(00) 0000-0000"
+                        [mask]="'(00) 0000-0000'"
                     />
                 </div>
 
@@ -134,7 +136,8 @@
                         type="text"
                         class="form-control"
                         formControlName="personWorkPhone1"
-                        placeholder="Work Phone"
+                        placeholder="(00) 0000-0000"
+                        [mask]="'(00) 0000-0000'"
                     />
                 </div>
 
@@ -146,6 +149,7 @@
                         class="form-control"
                         formControlName="streetNumber"
                         placeholder="Street Number"
+                        [mask]="'0000'"
                     />
                 </div>
 
@@ -155,7 +159,7 @@
                     <input
                         type="text"
                         class="form-control"
-                        formControlName="DwellingNumber"
+                        formControlName="dwellingNumber"
                         placeholder="Dwelling Number"
                     />
                 </div>
@@ -168,6 +172,7 @@
                         class="form-control"
                         formControlName="personZipCode"
                         placeholder="Zip Code"
+                        [mask]="'00000'"
                     />
                 </div>
 
@@ -182,7 +187,7 @@
                         <option [ngValue]="null" disabled>
                             -- Select Country --
                         </option>
-                        <option *ngFor="let c of countries" [ngValue]="c.code">
+                        <option *ngFor="let c of countries" [value]="c.code">
                             {{ c.name }}
                         </option>
                     </select>
@@ -199,7 +204,7 @@
                         <option [ngValue]="null" disabled>
                             -- Select State --
                         </option>
-                        <option *ngFor="let s of states" [ngValue]="s.code">
+                        <option *ngFor="let s of states" [value]="s.code">
                             {{ s.name }}
                         </option>
                     </select>
@@ -212,7 +217,7 @@
                         <option [ngValue]="null" disabled>
                             -- Select City --
                         </option>
-                        <option *ngFor="let c of cities" [ngValue]="c.code">
+                        <option *ngFor="let c of cities" [value]="c.code">
                             {{ c.name }}
                         </option>
                     </select>
@@ -221,16 +226,13 @@
                 <!-- Nationality -->
                 <div class="col-md-3">
                     <label>Select Nationality</label>
-                    <select
-                        class="form-select"
-                        formControlName="selectedNationality"
-                    >
+                    <select class="form-select" formControlName="nationality">
                         <option [ngValue]="null" disabled>
                             -- Select Nationality --
                         </option>
                         <option
-                            *ngFor="let n of nationalities"
-                            [ngValue]="n.code"
+                            *ngFor="let n of nationality"
+                            [value]="n.code"
                         >
                             {{ n.name }}
                         </option>
@@ -244,7 +246,8 @@
                         type="text"
                         class="form-control"
                         formControlName="personCellPhone"
-                        placeholder="000-000-0000"
+                        placeholder="(00) 0000-0000"
+                        [mask]="'(00) 0000-0000'"
                     />
                 </div>
 
@@ -255,12 +258,12 @@
                         type="email"
                         class="form-control"
                         formControlName="personEmail"
-                        placeholder="Email"
+                        placeholder="you@example.com"
                     />
                 </div>
 
                 <!-- Kin Name -->
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label>Kin Name</label>
                     <input
                         type="text"
@@ -268,10 +271,10 @@
                         formControlName="nokFirstName"
                         placeholder="Kin Name"
                     />
-                </div>
+                </div> -->
 
                 <!-- Kin SSN -->
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label>Kin Social Security</label>
                     <input
                         type="text"
@@ -279,10 +282,10 @@
                         formControlName="nokSocialSecurityNo"
                         placeholder="999-99-9999"
                     />
-                </div>
+                </div> -->
 
                 <!-- Kin Zip -->
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label>Kin Zip Code</label>
                     <input
                         type="text"
@@ -290,10 +293,10 @@
                         formControlName="nokZipCode"
                         placeholder="Zip Code"
                     />
-                </div>
+                </div> -->
 
                 <!-- Kin Home Phone -->
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label>Kin Home Phone</label>
                     <input
                         type="text"
@@ -301,10 +304,10 @@
                         formControlName="nokHomePhone"
                         placeholder="Kin Home Phone"
                     />
-                </div>
+                </div> -->
 
                 <!-- Kin Address -->
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label>Kin Address</label>
                     <input
                         type="text"
@@ -312,10 +315,10 @@
                         formControlName="nokAddress1"
                         placeholder="Kin Address"
                     />
-                </div>
+                </div> -->
 
                 <!-- Kin Country -->
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label>Kin Country</label>
                     <select
                         class="form-select"
@@ -325,10 +328,10 @@
                             {{ c.name }}
                         </option>
                     </select>
-                </div>
+                </div> -->
 
                 <!-- Kin State -->
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label>Kin State</label>
                     <select
                         class="form-select"
@@ -338,10 +341,10 @@
                             {{ s.name }}
                         </option>
                     </select>
-                </div>
+                </div> -->
 
                 <!-- Kin City -->
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label>Kin City</label>
                     <select
                         class="form-select"
@@ -352,7 +355,7 @@
                         </option>
                     </select>
                 </div>
-
+ -->
                 <!-- Comment -->
                 <div class="col-md-3">
                     <label>Comment</label>

@@ -5,8 +5,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NgIconComponent } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
-import { ClinicalApiService } from '../clinical.api.service';
-
+import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 
 
 @Component({
@@ -38,7 +37,7 @@ export class AllergiesComponent implements OnInit {
 
   constructor(
 
-    private clinicalApi: ClinicalApiService,
+    private ClinicalApiService: ClinicalApiService,
     private fb: FormBuilder,
     private router: Router
     ) {}
@@ -191,14 +190,14 @@ export class AllergiesComponent implements OnInit {
 submitAllergyForm1() {
   if (this.allergyForm.valid) {
     const formData = this.allergyForm.value;
-    this.clinicalApi.submitPatientAllergy(formData).subscribe({
-      next: (response) => {
+    this.ClinicalApiService.submitPatientAllergy(formData).subscribe({
+      next: (response: any) => {
         console.log('Submitted', response);
         this.allergyData.push(formData);
         this.allergyForm.reset();
         this.updatePagination();
       },
-      error: (err) => console.error(err)
+      error: (err: any) => console.error(err)
     });
   }
 

@@ -6,7 +6,7 @@ import { ProblemListComponent } from './problem-list/problem-list.component';
 import { FavoritesComponent } from './favorites/favorites.component';
 import { ProblemComponent } from './problem/problem.component';
 import { AllergiesComponent } from './allergies/allergies.component';
-
+import { VitalSignsComponent } from './vital-signs/vital-signs.component';
 
 export const CLINICAL_ROUTES: Routes = [
   {
@@ -39,8 +39,13 @@ export const CLINICAL_ROUTES: Routes = [
         path: 'allergies',
         component: AllergiesComponent,
         data: { title: 'Allergies' }
-      }
+      },
 
+      {
+        path: 'vital-signs',
+        component: VitalSignsComponent,
+        data: { title: 'Vital Signs' }
+      },
     ]
   }
 ];

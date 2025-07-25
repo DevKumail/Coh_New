@@ -31,20 +31,12 @@ import moment from 'moment';
   templateUrl: './temporary-patient-demographic-list.component.html',
   styleUrl: './temporary-patient-demographic-list.component.scss'
 })
-// export class TemporaryPatientDemographicListComponent {
-// pagedTemps: any;
-// buttonRoute(arg0: string) {
-// throw new Error('Method not implemented.');
-// }
-//  constructor(
-//     public router: Router,
-//     public DemographicApiServices: DemographicApiServices
-//   ) {}
 
-//   Patient: any[] = [];
-//   pagedPatients: any[] = [];
-//   RegPatient: any[] = [];
-//   genders: any[] = [];
+// export class TemporaryPatientDemographicListComponent  {
+
+//   pagedTemps: any[] = [];
+
+//   FilterData: any = {};
 
 //   pageSize = 25;
 //   currentPage = 1;
@@ -53,42 +45,146 @@ import moment from 'moment';
 //   pageNumbers: number[] = [];
 //   start = 0;
 //   end = 0;
-//   pageSizes = [5, 10, 20, 50];
+//   pageSizes = [5, 10, 25, 50];
+//   PaginationInfo: any = {
+//     RowsPerPage: 10,
+//     Page: 1,
+//   };
+
+//   // 🔘 Dialogs
+//   filter = false;
+//   position = 'center';
+
+//   constructor(
+//     public router: Router,
+//     public TemporaryPatientDemographicApiServices: TemporaryPatientDemographicApiServices,
+
+//   ) {}
+
+//   ngOnInit(): void {
+//     this.getTempDemographics(this.FilterData);
+//   }
+
+//   ClickFilter() {
+//     this.filter = true;
+//   }
+
+//   submitFilter() {
+//     this.filter = false;
+//     if (this.FilterData.dOB) {
+//       this.FilterData.dOB = moment(this.FilterData.dOB).format('yyyy-MM-DD');
+//     }
+//     this.getTempDemographics(this.FilterData);
+//   }
+
+//   buttonRoute(url: string) {
+//     this.router.navigate([url]);
+//   }
+
+//   // 🔃 Pagination Trigger
+//   onPageChanges(event: any) {
+//     this.PaginationInfo.RowsPerPage = event.rows;
+//     this.PaginationInfo.Page = Math.floor(event.first / event.rows) + 1;
+//     this.pageSize = event.rows;
+//     this.currentPage = Math.floor(event.first / event.rows) + 1;
+//     this.getTempDemographics(this.FilterData);
+//   }
 
 
+// getTempDemographics(data: any) {
+//   this.TemporaryPatientDemographicApiServices.getTempDemographics_pagination(data, this.PaginationInfo).then((res: any) => {
+//     if (res.table2) {
+//       this.pagedTemps = res.table2.map((item: any) => ({
+//         personFullName: item.personFullName,
+//         personEmail: item.personEmail,
+//         patientBirthDate: item.patientBirthDate,
+//         nationalityName: item.nationalityName,
+//         countryName: item.countryName,
+//         personSex: item.personSex,
+//         tempId: item.tempId,
+//       }));
 
-// prevPage(){
+//       this.totalRecord = res.table1[0]?.totalCount || 0;
 
+
+//       this.totalPages = Math.ceil(this.totalRecord / this.pageSize);
+//       this.start = (this.currentPage - 1) * this.pageSize;
+//       this.end = this.start + this.pageSize;
+//       this.pageNumbers = Array(this.totalPages)
+//         .fill(0)
+//         .map((_, i) => i + 1);
+//     }
+//   });
 // }
-//   onPageSizeChange(event: any) {
-//     this.currentPage = 1;
-//   }
 
-//   Remove(){
-
-//   }
-
-//    goToPage(page: number) {
+//   goToPage(page: number) {
 //     if (page >= 1 && page <= this.totalPages) {
 //       this.currentPage = page;
+//       this.PaginationInfo.Page = page;
+//       this.getTempDemographics(this.FilterData);
 //     }
 //   }
 
-//     nextPage() {
+//   prevPage() {
+//     if (this.currentPage > 1) {
+//       this.currentPage--;
+//       this.PaginationInfo.Page = this.currentPage;
+//       this.getTempDemographics(this.FilterData);
+//     }
+//   }
+
+//   nextPage() {
 //     if (this.currentPage < this.totalPages) {
 //       this.currentPage++;
+//       this.PaginationInfo.Page = this.currentPage;
+//       this.getTempDemographics(this.FilterData);
 //     }
 //   }
+
+//   onPageSizeChange(event: any) {
+//     this.pageSize = +event.target.value;
+//     this.currentPage = 1;
+//     this.PaginationInfo.Page = 1;
+//     this.PaginationInfo.RowsPerPage = this.pageSize;
+//     this.getTempDemographics(this.FilterData);
+//   }
+
+//   // ❌ Delete
+// //   Remove(id: number) {
+// //     this.confirmationService.confirm({
+// //       message: 'Are you sure that you want to delete this record?',
+// //       icon: 'pi pi-exclamation-triangle',
+// //       accept: () => {
+// //         this.tempService.deleteTempdemographics(id).then((res) => {
+// //           if (res.success) {
+// //             this.messageService.add({
+// //               severity: 'success',
+// //               summary: 'Deleted',
+// //               detail: 'Temporary patient deleted successfully',
+// //             });
+// //             this.getTempDemographics(this.FilterData);
+// //           }
+// //         });
+// //       },
+// //       reject: () => {
+// //         this.messageService.add({
+// //           severity: 'info',
+// //           summary: 'Cancelled',
+// //           detail: 'Action cancelled',
+// //         });
+// //       },
+// //       key: 'positionDialog',
+// //     });
+// //   }
+
+// Remove(){
+
 // }
-export class TemporaryPatientDemographicListComponent  {
-
-  // 🧾 Table Data
+// }
+export class TemporaryPatientDemographicListComponent {
   pagedTemps: any[] = [];
-
-  // 📋 Filter Form
   FilterData: any = {};
 
-  // 📊 Pagination State
   pageSize = 25;
   currentPage = 1;
   totalRecord = 0;
@@ -102,21 +198,22 @@ export class TemporaryPatientDemographicListComponent  {
     Page: 1,
   };
 
-  // 🔘 Dialogs
   filter = false;
   position = 'center';
 
   constructor(
     public router: Router,
     public TemporaryPatientDemographicApiServices: TemporaryPatientDemographicApiServices,
-
   ) {}
 
+//   ngOnInit(): void {
+//     this.getTempDemographics(this.FilterData);
+//   }
   ngOnInit(): void {
+
     this.getTempDemographics(this.FilterData);
   }
 
-  // 📥 Filtering
   ClickFilter() {
     this.filter = true;
   }
@@ -129,12 +226,10 @@ export class TemporaryPatientDemographicListComponent  {
     this.getTempDemographics(this.FilterData);
   }
 
-  // 📤 Navigate to create page
   buttonRoute(url: string) {
     this.router.navigate([url]);
   }
 
-  // 🔃 Pagination Trigger
   onPageChanges(event: any) {
     this.PaginationInfo.RowsPerPage = event.rows;
     this.PaginationInfo.Page = Math.floor(event.first / event.rows) + 1;
@@ -143,59 +238,29 @@ export class TemporaryPatientDemographicListComponent  {
     this.getTempDemographics(this.FilterData);
   }
 
-  // 🔁 Load Data from API
-//   getTempDemographics(data: any) {
-//     this.TemporaryPatientDemographicApiServices.getTempDemographics_pagination(data, this.PaginationInfo).then((res) => {
-//       if (res.table2) {
-//         this.pagedTemps = res.table2.map((item: any) => ({
-//           personFullName: item.personFullName,
-//           personEmail: item.personEmail,
-//           patientBirthDate: item.patientBirthDate,
-//           nationalityName: item.nationalityName,
-//           countryName: item.countryName,
-//           personSex: item.personSex,
-//           tempId: item.tempId,
-//         }));
+  getTempDemographics(data: any) {
+    this.TemporaryPatientDemographicApiServices.getTempDemographics_pagination(data, this.PaginationInfo).then((res: any) => {
+        debugger
+      if (res.table2) {
+        this.pagedTemps = res.table2.map((item: any) => ({
+          personFullName: item.personFullName,
+          personEmail: item.personEmail,
+          patientBirthDate: item.patientBirthDate,
+          nationalityName: item.nationalityName,
+          countryName: item.countryName,
+          personSex: item.personSex,
+          tempId: item.tempId,
+        }));
 
-//         this.totalRecord = res.table1[0]?.totalCount || 0;
+        this.totalRecord = res.table1[0]?.totalCount || 0;
+        this.totalPages = Math.ceil(this.totalRecord / this.pageSize);
+        this.start = (this.currentPage - 1) * this.pageSize;
+        this.end = this.start + this.pageSize;
+        this.pageNumbers = Array(this.totalPages).fill(0).map((_, i) => i + 1);
+      }
+    });
+  }
 
-//         // Setup pagination UI
-//         this.totalPages = Math.ceil(this.totalRecord / this.pageSize);
-//         this.start = (this.currentPage - 1) * this.pageSize;
-//         this.end = this.start + this.pageSize;
-//         this.pageNumbers = Array(this.totalPages)
-//           .fill(0)
-//           .map((_, i) => i + 1);
-//       }
-//     });
-//   }
-getTempDemographics(data: any) {
-  this.TemporaryPatientDemographicApiServices.getTempDemographics_pagination(data, this.PaginationInfo).then((res: any) => {
-    if (res.table2) {
-      this.pagedTemps = res.table2.map((item: any) => ({
-        personFullName: item.personFullName,
-        personEmail: item.personEmail,
-        patientBirthDate: item.patientBirthDate,
-        nationalityName: item.nationalityName,
-        countryName: item.countryName,
-        personSex: item.personSex,
-        tempId: item.tempId,
-      }));
-
-      this.totalRecord = res.table1[0]?.totalCount || 0;
-
-      // Setup pagination UI
-      this.totalPages = Math.ceil(this.totalRecord / this.pageSize);
-      this.start = (this.currentPage - 1) * this.pageSize;
-      this.end = this.start + this.pageSize;
-      this.pageNumbers = Array(this.totalPages)
-        .fill(0)
-        .map((_, i) => i + 1);
-    }
-  });
-}
-
-  // ➕ Pagination UI methods
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
@@ -228,35 +293,43 @@ getTempDemographics(data: any) {
     this.getTempDemographics(this.FilterData);
   }
 
-  // ❌ Delete
-//   Remove(id: number) {
-//     this.confirmationService.confirm({
-//       message: 'Are you sure that you want to delete this record?',
-//       icon: 'pi pi-exclamation-triangle',
-//       accept: () => {
-//         this.tempService.deleteTempdemographics(id).then((res) => {
-//           if (res.success) {
-//             this.messageService.add({
-//               severity: 'success',
-//               summary: 'Deleted',
-//               detail: 'Temporary patient deleted successfully',
-//             });
-//             this.getTempDemographics(this.FilterData);
-//           }
-//         });
-//       },
-//       reject: () => {
-//         this.messageService.add({
-//           severity: 'info',
-//           summary: 'Cancelled',
-//           detail: 'Action cancelled',
-//         });
-//       },
-//       key: 'positionDialog',
-//     });
-//   }
 
-Remove(){
+  editTemp(tempId: number) {
+    this.router.navigate(['/registration/temporary-demographics'], {
+      queryParams: { id: tempId },
+    });
+  }
 
+
+Remove(Id: number) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you really want to delete this record?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.TemporaryPatientDemographicApiServices.deleteTempdemographics(Id).then((response:any) => {
+        if (response.success) {
+          Swal.fire(
+            'Deleted!',
+            'Record has been successfully deleted.',
+            'success'
+          );
+          this.getTempDemographics(this.FilterData);
+        } else {
+          Swal.fire(
+            'Error!',
+            'Something went wrong while deleting.',
+            'error'
+          );
+        }
+      });
+    }
+  });
 }
 }

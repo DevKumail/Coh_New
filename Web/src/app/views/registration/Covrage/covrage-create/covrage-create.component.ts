@@ -1,5 +1,4 @@
-import { states } from '@/app/views/forms/other-plugins/data';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule,Validators  } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule } from '@angular/common';
@@ -9,17 +8,28 @@ import { Observable } from 'rxjs';
 import { ApiService } from '@core/services/api.service';
 import Swal from 'sweetalert2';
 import { RegistrationApiService } from '@/app/shared/Services/Registration/registration.api.service';
+import { NgxDaterangepickerBootstrapDirective} from "ngx-daterangepicker-bootstrap";
+import {NgxMaskDirective, provideNgxMask} from 'ngx-mask'
 
+declare var flatpickr: any;
 
 
 @Component({
+
   selector: 'app-covrage-create',
   imports: [ReactiveFormsModule, CommonModule, FormsModule,],
+     providers: [
+    provideNgxMask()
+  ],
+
   templateUrl: './covrage-create.component.html',
   styleUrl: './covrage-create.component.scss'
 })
 
 export class CovrageCreateComponent implements OnInit {
+
+@ViewChild('picker') picker!: NgxDaterangepickerBootstrapDirective;
+
   subscriberForm!: FormGroup;
 
   type: any[] = [];
@@ -474,5 +484,16 @@ onStateChange() {
     this.subscriberForm.get('CityId')?.setValue(null);
   }
 }
+
+
+  ngAfterViewInit(): void {
+    flatpickr('#deathDate', {
+      dateFormat: 'Y-m-d',
+      maxDate: 'today', // prevent future dates
+      onChange: (selectedDates: any, dateStr: string) => {
+        this.subscriberForm.get('DeathDate')?.setValue(dateStr);
+      },
+    });
+  }
 
 }

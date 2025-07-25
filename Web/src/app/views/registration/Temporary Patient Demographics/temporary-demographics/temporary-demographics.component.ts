@@ -1,3 +1,4 @@
+import { Api } from 'datatables.net';
 import { TemporaryPatientDemographicApiServices } from '@/app/shared/Services/TemporaryDempographics/temporarydemographic.api.service';
 import { Component } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -25,232 +26,339 @@ import { FilePondModule } from 'ngx-filepond';
 import { OnInit } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
 import { RegistrationApiService } from '@/app/shared/Services/Registration/registration.api.service';
-import { DemographicDTO } from '@/app/shared/Models/registration/Demographics/Demographic.type.model';
 import   Swal from 'sweetalert2';
 import { NgxDaterangepickerBootstrapModule } from 'ngx-daterangepicker-bootstrap';
 import { ViewChild } from '@angular/core';
 import { NgxDaterangepickerBootstrapDirective} from "ngx-daterangepicker-bootstrap";
+import {NgxMaskDirective, provideNgxMask} from 'ngx-mask'
+import { TempdemographicDto } from '@/app/shared/Models/registration/Tempdemo/Tempdemographic.model';
+
+declare var flatpickr: any;
 
 @Component({
   selector: 'app-temporary-demographics',
+  standalone: true,
   imports: [
-        CommonModule,
+        CommonModule,NgxMaskDirective,
         ReactiveFormsModule,
         FormsModule,
         RouterModule,
         NgIconComponent,
         FilePondModule,
-        NgbNavModule,],
+        NgbNavModule,NgxMaskDirective],
+
+
+        providers: [
+    provideNgxMask()
+  ],
   templateUrl: './temporary-demographics.component.html',
   styleUrl: './temporary-demographics.component.scss'
 })
-export class TemporaryDemographicsComponent {
-
-      constructor(
-        private fb: FormBuilder,
-        private router: Router,
-        private TemporaryPatientDemographicApiServices: TemporaryPatientDemographicApiServices,
-    ) {}
-
-temporaryForm!: FormGroup;
 
 
-    activeTabId = 1;
-    titles: any[] = [];
-    countries:any []=[];
-    nationalities: any []=[];
-    genderOptions:any []=[];
+export class TemporaryDemographicsComponent implements OnInit {
 
-    genderIdentity: any[] = [];
-    preferredName:[]=[];
-    maritalstatus: any[] = [];
-    bloodgroup: any[] = [];
-    religion: any[] = [];
-    ethinic: any[] = [];
-    nationality: any[] = [];
-    language: any[] = [];
-    MediaChannel: any[] = [];
-    MediaItem: any[] = [];
-    Emirates: any[] = [];
-    FeeSchedule: any[] = [];
-    FinancialClass: any[] = [];
-    Site: any []=[];
-    location: any []=[];
-    EntityTypes: any[] = [];
-    referred: any[] = [];
-    state: any[] = [];
-    cities: any[] = [];
-    country: any[]=[];
-    genders: any[] = [];
-    states: any[] = [];
-    city: any[] = [];
-    relationships: any[]=[];
+@ViewChild('picker') picker!: NgxDaterangepickerBootstrapDirective;
 
-    CarrierId: any;
-    ShowAccordian: boolean = true;
-    SelectAccordian: boolean = false;
+  temporaryForm!: FormGroup;
+  activeTabId = 1;
 
-    isDisabled: boolean = false;
-     initializeForm() {
+  titles: any[] = [];
+  countries: any[] = [];
+  states: any[] = [];
+  cities: any[] = [];
+  nationality: any[] = [];
+  personSexId: any[] = [];
+  relationships: any[] = [];
+
+  // UI State
+  CarrierId: any;
+  ShowAccordian: boolean = true;
+  SelectAccordian: boolean = false;
+  isDisabled: boolean = false;
+  tempid!: number;
+  TemporaryDemographic: any;
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private TemporaryPatientDemographicApiServices: TemporaryPatientDemographicApiServices,
+  ) {}
+
+   ngOnInit() {
+    this.TemporaryDemographic = {};
+    this.initializeForm();
+
+     this.FillCache();
+
+    // this.router.queryParams.subscribe(async (queryparam) => {
+    //   this.tempid = queryparam['id'];
+    //   if (this.tempid) {
+    //     await this.FillDropDown(this.tempid);
+    //   }
+    // });
+  }
+
+
+
+  initializeForm() {
     this.temporaryForm = this.fb.group({
-  tempId: [null],
-  PersonTitleId: [null, Validators.required],
-  personFirstName: ['', Validators.required],
-  personMiddleName: ['', Validators.required],
-  personLastName: [''],
-  gender: [null, Validators.required],
-  bdate: [null, Validators.required],
-  personAge: [''],
-  personHomePhone1: [''],
-  personWorkPhone1: [''],
-  streetNumber: [''],
-  DwellingNumber: [''],
-  personZipCode: [''],
-  selectedCountry: [null],
-  selectedState: [null],
-  selectedCity: [null],
-  selectedNationality: [null],
-  personCellPhone: ['', Validators.required],
-  personEmail: [''],
-  nokFirstName: [''],
-  nokSocialSecurityNo: [''],
-  nokZipCode: [''],
-  nokHomePhone: [''],
-  nokAddress1: [''],
-  selectedCountryNOK: [null],
-  selectedStateNOK: [null],
-  selectedCityNOK: [null],
-  comments: ['']
-});
-}
+      tempId: [{ value: '', disabled: true }],
+      personTitleId: [null],
+      personFirstName: ['', Validators.required],
+      personMiddleName: ['', Validators.required],
+      personLastName: [''],
+      personSex: [null, Validators.required],
+      patientBirthDate: [],
+      personAge: [''],
+      personHomePhone1: [''],
+      personWorkPhone1: [''],
+      streetNumber: [''],
+      dwellingNumber: [''],
+      personZipCode: [''],
+      selectedCountry: [null],
+      selectedState: [null],
+      selectedCity: [null],
+      nationality: [null],
+      personCellPhone: [''],
+      personEmail: [''],
+      nokFirstName: [''],
+      nokSocialSecurityNo: [''],
+      nokZipCode: [''],
+      nokHomePhone: [''],
+      nokAddress1: [''],
+      selectedCountryNOK: [null],
+      selectedStateNOK: [null],
+      selectedCityNOK: [null],
+      comments: ['']
+    });
+  }
 
-
-   ngOnInit(): void {
-        this.initializeForm();
-        this.fillDropdown();
-        this.FillCache();
-
-
+  async FillCache(): Promise<void> {
+    try {
+      const response: any = await this.TemporaryPatientDemographicApiServices.getCacheItem({
+        entities: [
+          'RegTitle',
+          'RegGender',
+          'RegCountries',
+          'Nationality',
+          'RegStates',
+          'RegCities',
+        ],
+      });
+      if (response?.cache) {
+        this.FillDropDown(response.cache);
+      }
+    } catch (error: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message,
+      });
     }
-        fillDropdown() {
-        this.FillCache();
+  }
 
+  FillDropDown(cache: any) {
+    const parsed = JSON.parse(cache);
+
+    if (parsed.RegCountries) {
+      this.countries = parsed.RegCountries.map((item: any) => ({
+        name: item.Name,
+        code: item.CountryId
+      })).slice(0, 100);
     }
-FillCache() {
-  this.TemporaryPatientDemographicApiServices.getCacheItem({
-    entities: [
-      'RegTitle',
-      'RegGender',
-      'RegCountries',
-      'Nationality',
-      'RegStates',         // Optional - if backend provides states separately
-      'RegCities',         // Optional - if backend provides cities separately
-    ],
-  })
-  .then((response: any) => {
-    if (response.cache) {
-      this.FillDropDown(JSON.parse(JSON.stringify(response)).cache);
+
+    if (parsed.Nationality) {
+      this.nationality = parsed.Nationality.map((item: any) => ({
+        name: item.NationalityName,
+        code: item.NationalityId
+      })).slice(0, 100);
     }
-  })
-  .catch((error: { message: string }) =>
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: error.message,
-    })
-  );
-}
-FillDropDown(cache: any) {
 
+    if (parsed.states) {
+      this.states = parsed.states.map((item: any) => ({
+        name: item.StateName,
+        code: item.StateId
+      })).slice(0, 100);
+    }
 
-
-        this.countries = this.mapToDropdown(cache.RegCountries, 'CountryId', 'CountryName');
-        this.states = this.mapToDropdown(cache.RegStates, 'StateId', 'StateName');
-        this.cities = this.mapToDropdown(cache.RegCities, 'CityId', 'CityName');
-        this.nationalities = this.mapToDropdown(cache.Nationality, 'NationalityId', 'Nationality');
-
-         this.titles = [
-          { name: 'Mr', code: 1 },
-          { name: 'Mrs', code: 0 },
-        ];
-
- if (cache.RegGender) {
-  this.genders = cache.RegGender.map(
-    (item: { GenderId: any; Gender: any }) => {
-      return {
+    if (parsed.RegGender) {
+      this.personSexId = parsed.RegGender.map((item: any) => ({
         name: item.Gender,
-        code: item.GenderId,
-      };
+        code: item.GenderId
+      }));
     }
-  );
-}
+
+    if (parsed.RegRelationShip) {
+      this.relationships = parsed.RegRelationShip.map((item: any) => ({
+        name: item.Relation,
+        code: item.RelationId
+      }));
+    }
+
+    this.titles = [
+      { name: 'Mr', code: 1 },
+      { name: 'Mrs', code: 2 }
+    ];
+  }
 
 
-}
 
-mapToDropdown(data: any[], valueField: string, labelField: string): any[] {
-  return data.map(item => ({
-    code: item[valueField],
-    name: item[labelField]
-  }));
-}
-
-
-
-
-onSubmit(){
-
-}
-
+  mapToDropdown(data: any[], valueField: string, labelField: string): any[] {
+    return data.map(item => ({
+      code: item[valueField],
+      name: item[labelField]
+    }));
+  }
 
   onCountryChange() {
-        debugger
-        const countryId = this.temporaryForm.get('CountryId')?.value;
-        if (countryId) {
-            this.TemporaryPatientDemographicApiServices
-                .GetStateByCountryId(countryId)
-                .then((res: any) => {
-                    ;
-                    this.states = res;
-                    this.temporaryForm.get('StateId')?.setValue(null); // Reset State
-                    this.city = [];
-                    this.temporaryForm.get('CityId')?.setValue(null); // Reset City
-                });
-        } else {
-            this.states = [];
-            this.city = [];
-            this.temporaryForm.get('StateId')?.setValue(null);
-            this.temporaryForm.get('CityId')?.setValue(null);
-        }
+    const countryId = this.temporaryForm.get('selectedCountry')?.value;
+    if (countryId) {
+      this.TemporaryPatientDemographicApiServices
+        .GetStateByCountryId(countryId)
+        .then((res: any) => {
+          this.states = this.mapToDropdown(res, 'stateId', 'name');
+          this.temporaryForm.get('selectedState')?.setValue(null);
+          this.cities = [];
+          this.temporaryForm.get('selectedCity')?.setValue(null);
+        });
+    } else {
+      this.states = [];
+      this.cities = [];
+      this.temporaryForm.get('selectedState')?.setValue(null);
+      this.temporaryForm.get('selectedCity')?.setValue(null);
     }
+  }
 
-    onStateChange() {
-        const stateId = this.temporaryForm.get('StateId')?.value;
-        ;
-        if (stateId) {
-            this.TemporaryPatientDemographicApiServices.GetCityByState(stateId).then((res: any) => {
-                this.city = res;
-                this.temporaryForm.get('CityId')?.setValue(null); // Reset City
-            });
-        } else {
-            this.city = [];
-            this.temporaryForm.get('CityId')?.setValue(null);
-        }
+  onStateChange() {
+    const stateId = this.temporaryForm.get('selectedState')?.value;
+    if (stateId) {
+      this.TemporaryPatientDemographicApiServices
+        .GetCityByState(stateId)
+        .then((res: any) => {
+          this.cities = this.mapToDropdown(res, 'cityId', 'name');
+          this.temporaryForm.get('selectedCity')?.setValue(null);
+        });
+    } else {
+      this.cities = [];
+      this.temporaryForm.get('selectedCity')?.setValue(null);
     }
-    onCarrierChange() {
-        if (this.CarrierId != null) {
-            if (this.CarrierId.name == 'Met Life') {
-                this.ShowAccordian = false;
-                this.SelectAccordian = true;
-            } else {
-                this.ShowAccordian = true;
-                this.SelectAccordian = false;
-            }
-        }
+  }
+
+  onCarrierChange() {
+    if (this.CarrierId && this.CarrierId.name === 'Met Life') {
+      this.ShowAccordian = false;
+      this.SelectAccordian = true;
+    } else {
+      this.ShowAccordian = true;
+      this.SelectAccordian = false;
     }
+  }
 
+//   onSubmit() {
+//     if (this.temporaryForm.invalid) {
+//       this.temporaryForm.markAllAsTouched();
+//       Swal.fire({
+//         icon: 'warning',
+//         title: 'Form Incomplete',
+//         text: 'Please fill all required fields.',
+//       });
+//       return;
+//     }
 
-    onCancel(){
+//     const payload = this.temporaryForm.value;
+//     this.TemporaryPatientDemographicApiServices
+//       .submitTempDemographic(payload)
+//       .then(() => {
+//         Swal.fire({
+//           icon: 'success',
+//           title: 'Saved',
+//           text: 'Temporary demographic saved successfully!',
+//         });
+//         this.router.navigate(['registration/temporary-patient-demographics']);
+//       })
+//       .catch((err: any) => {
+//         Swal.fire({
+//           icon: 'error',
+//           title: 'Error',
+//           text: err?.message || 'Failed to save data.',
+//         });
+//       });
+//   }
+onSubmit() {
+  if (this.temporaryForm.invalid) {
+    this.temporaryForm.markAllAsTouched();
+    Swal.fire({
+      icon: 'warning',
+      title: 'Form Incomplete',
+      text: 'Please fill all required fields.',
+    });
+    return;
+  }
 
-    }
+  const payload: TempdemographicDto = this.temporaryForm.value;
+
+  this.TemporaryPatientDemographicApiServices
+    .submitTempDemographic(payload)
+    .then(() => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Saved',
+        text: 'Temporary demographic saved successfully!',
+      });
+      this.router.navigate(['registration/temporary-patient-demographics']);
+    })
+    .catch((err: any) => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err?.message || 'Failed to save data.',
+      });
+    });
 }
+// onSubmit(): void {
+//     if (this.temporaryForm.valid) {
+//       const demographicData: TempdemographicDto = this.temporaryForm.value;
+
+//       this.api.post('https://your-api-url/api/TemporaryDemographic', demographicData)
+//         .subscribe({
+//           next: (response:any) => {
+//             console.log('✅ Data saved successfully:', response);
+//             alert('Data saved successfully!');
+//             this.temporaryForm.reset();  // Optional: reset form after save
+//           },
+//           error: (error) => {
+//             console.error('❌ Error saving data:', error);
+//             alert('Failed to save data. Please try again.');
+//           }
+//         });
+
+//     } else {
+//       console.warn('❗ Form is invalid');
+//       alert('Please fill all required fields.');
+//     }
+//   }
+
+  onCancel() {
+    this.router.navigate(['registration/temporary-patient-demographics']);
+  }
+
+    ngAfterViewInit(): void {
+    flatpickr('#deathDate', {
+      dateFormat: 'Y-m-d',
+      maxDate: 'today', // prevent future dates
+      onChange: (selectedDates: any, dateStr: string) => {
+        this.temporaryForm.get('DeathDate')?.setValue(dateStr);
+      },
+    });
+
+    flatpickr('#birthDate', {
+    dateFormat: 'Y-m-d',
+    maxDate: 'today', // typically DOB should not be in the future
+    onChange: (selectedDates: any, dateStr: string) => {
+      this.temporaryForm.get('PatientBirthDate')?.setValue(dateStr);
+    },
+  });
+  }
+}
+
