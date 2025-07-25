@@ -27,9 +27,9 @@ export const appConfig: ApplicationConfig = {
     ),
   provideAppInitializer(() => {
     console.log('test ping')
-  const http = inject(HttpClient);
+  const http = inject(ApiService);
   const router = inject(Router);
-  return http.get('/api/ping')
+  return http.get('ping')
     .toPromise()
     .catch(() => {
       router.navigate(['/maintenance']);
@@ -39,3 +39,4 @@ export const appConfig: ApplicationConfig = {
 
   ],
 };
+ 

@@ -29,12 +29,9 @@ export class UserProfileComponent {
   ) {}
 
   handleAction(action: string): void {
-
     if (action === 'logout') {
       this.authService.logout();
       this.router.navigate(['/login']); // or your login route
     }
   }
-
-
 }

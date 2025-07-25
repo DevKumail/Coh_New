@@ -103,4 +103,8 @@ export class DemographicApiServices {
         return this.api.get(`Common/GetRegPatientList`).toPromise();
     }
 
+ getPatientByMrNo(mrNo: string): Observable<any> {
+    return this.api.get(`Common/GetCoverageAndRegPatientDBByMrNo?MRNo=${mrNo}`);
+  }
+
 }

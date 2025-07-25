@@ -13,7 +13,7 @@ export const Control_Panel_ROUTES: Routes = [
     data: { permissions: ['Control Panel:Human Resources']},
     children: [
       {
-        path: 'human-resources',
+        path: 'human resources',
         component: HumanResourcesComponent,
         data: { title: 'Human Resources' }
       },

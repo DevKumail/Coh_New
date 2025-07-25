@@ -1,27 +1,14 @@
-// import { inject } from '@angular/core';
-// import { CanActivateFn, Router } from '@angular/router';
-// import { AuthService } from '../services/auth.service';
-
-// export const authGuard: CanActivateFn = () => {
-//   const authService = inject(AuthService);
-
-//   const router = inject(Router);
-
-//   if (authService.isAuthenticated()) {
-//     return true;
-//   }
-//  router.navigate(['/auth-2/sign-in']);
-//   return false;
-// };
-
-
 import { inject } from '@angular/core';
-import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import {
+  CanActivateFn,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  Router
+} from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { PermissionService } from '../services/permission.service';
 
 export const authGuard: CanActivateFn = (
-
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
@@ -30,7 +17,6 @@ export const authGuard: CanActivateFn = (
   const permissionService = inject(PermissionService);
   const router = inject(Router);
 
-  // Check authentication first
   if (!authService.isAuthenticated()) {
     router.navigate(['/auth-2/sign-in'], {
       queryParams: { returnUrl: state.url }
@@ -38,16 +24,23 @@ export const authGuard: CanActivateFn = (
     return false;
   }
 
-  // Check permissions if specified in route data
-  const requiredPermissions = route.data['permissions'] as string[] | undefined;
+  const module = route.data['module'];
+  const component = route.data['component'];
+  const action = route.data['action'];
 
-  if (requiredPermissions && requiredPermissions.length > 0) {
-    const hasPermission = permissionService.hasAnyPermission(requiredPermissions);
+  if (module && !permissionService.hasModuleAccess(module)) {
+    router.navigate(['/unauthorized']);
+    return false;
+  }
 
-    if (!hasPermission) {
-      router.navigate(['/unauthorized']);
-      return false;
-    }
+  if (component && !permissionService.hasComponentAccess(module, component)) {
+    router.navigate(['/unauthorized']);
+    return false;
+  }
+
+  if (action && !permissionService.hasActionAccess(module, component, action)) {
+    router.navigate(['/unauthorized']);
+    return false;
   }
 
   return true;

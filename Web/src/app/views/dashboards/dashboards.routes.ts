@@ -15,7 +15,7 @@ export const DASHBOARDS_ROUTES: Routes = [
         component: Dashboard2Component,
         // data: {title: "Dashboard 2"},
          data: { 
-      title: 'Dashboard 2',
+      title: '',
       permissions: ['Dashboards:View'] 
     }
     },
