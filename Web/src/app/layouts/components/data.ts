@@ -126,11 +126,34 @@ export const menuItems: ExtendedMenuItemType[] = [
         isCollapsed: true,
         children: [
 
-            { label: 'Human Resources', url: 'control panel/human resources' },
-            { label: 'Human Resources Add', url: '/control panel/human-resources-add' },
-        ]
-    },
-    { label: 'Apps', isTitle: true },
+        { label: 'Human Resources', url: '/control-panel/human-resources' },
+        { label: 'Human Resources Add', url: '/control-panel/human-resources-add' },
+ ]
+  },
+
+
+  {
+    label: 'Billing',
+    icon: 'tablerHeartbeat',
+    module: 'Billing', // 👈 this is used by PermissionService
+    isCollapsed: true,
+    children: [
+
+      { label: 'Charge Capture', url: '/billing/charge-capture' },
+    ]
+  },
+
+
+
+
+
+
+
+
+
+
+
+    {label: 'Apps', isTitle: true},
     {
         label: 'Ecommerce',
         icon: 'tablerBasket',
