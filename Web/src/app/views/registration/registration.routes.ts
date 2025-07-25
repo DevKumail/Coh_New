@@ -18,9 +18,9 @@ export const Registration_ROUTES: Routes = [
     data: { permissions: ['Registration:Alerts']},
     children: [
       {
-        path: 'Alerts',
+        path: 'alerts',
         component: AlertComponent,
-        data: { title: 'Clinical Alerts' }
+        data: { title: 'Alerts' }
       },
          {
         path: 'coverages',
@@ -47,7 +47,7 @@ export const Registration_ROUTES: Routes = [
         },
 
         {
-            path: 'temporary-patient-demographics',
+            path: 'temporary patient demographics',
             component: TemporaryPatientDemographicListComponent,
             data: { title: 'Temporary Patient Demographic List' },
         },
