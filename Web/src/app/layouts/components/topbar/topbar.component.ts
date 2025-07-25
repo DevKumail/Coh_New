@@ -124,7 +124,7 @@ import { PatientSearchModalComponent } from '@/app/shared/modals/patient-search-
     NotificationDropdownComponent,
     IconsModule,
     NgbModalModule,NgIcon,
-    PatientSearchModalComponent,
+    PatientSearchModalComponent
 
   ],
   templateUrl: './topbar.component.html',

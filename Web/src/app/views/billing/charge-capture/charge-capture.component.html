@@ -1,0 +1,1642 @@
+<!-- 🔹 Breadcrumb OUTSIDE card -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2 ">
+      <li class="breadcrumb-item">
+        <a href="javascript:void(0);">
+          <ng-icon name="tablerSmartHome"></ng-icon>
+          Clinical
+        </a>
+      </li>
+      <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
+        <ng-icon name="tablerChevronRight"></ng-icon>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Medical History</li>
+    </ol>
+  </nav>
+
+  <!-- hide Diagnosis gride -->
+  <div class="card shadow rounded">
+    <div class="card-body">
+     <div class="col-lg-3">
+          <label class="form-label">Provider / Nurse Name:</label>
+          <select class="form-select" [(ngModel)]="ProviderId" name="ProviderId" (change)="provider($event)">
+            <option *ngFor="let item of Provider" [value]="item.code">
+              {{ item.name }}
+            </option>
+          </select>
+      </div>
+      <hr>
+
+       <div class="col-12 mt-2 d-flex justify-content-between">
+        <div class="col-md-4">
+          <h2 style="font-weight: bold">Diagnosis</h2>
+        </div>
+        <div class="col-md-2 col-sm-4 col-12 d-flex">
+          <div class="col-md-1"></div>
+
+           <button (click)="DGridHide()" *ngIf=" DHide == true" type="button" class="btn btn-info" style="width: 180px; height: 50px; margin-left: 10px;">
+              <ng-icon 
+              name="tablerChevronDown"
+              class="avatar-xxs me-1"/>
+              Add Diagnosis
+          </button>
+
+          <button (click)="DGridShow()" *ngIf="Dshow == true" type="button" class="btn btn-info" style="width: 180px; height: 50px; margin-left: 10px;">
+              <ng-icon 
+              name="tablerChevronRight"
+              class="avatar-xxs me-1"/>
+              Add Diagnosis
+          </button>
+        </div>
+      </div>
+      <hr>
+
+      
+
+  <ng-container *ngIf="Diagnosis">
+      <ul ngbNav  #nav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs mb-3">
+        <!-- My Diagnosis Code -->
+        <li [ngbNavItem]="1">
+          <a ngbNavLink href="javascript:void(0)">My Diagnosis Code</a>
+          <ng-template ngbNavContent>
+
+              <div class="row">
+                  <div class="col-md-2 col-sm-4 col-12">
+                    <label  for="">Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      (input)="filter($event)"
+                      placeholder="Code"
+                      />
+                  </div>
+
+                  <div class="col-md-2 col-sm-4 col-12">
+                    <label for="">ICD Version</label>
+                    <select class="form-select" [(ngModel)]="ICDVersionId" name="ICDVersionId" (change)="filteVersion('ICD')">
+                      <option *ngFor="let item of ICDVersions" [value]="item.code">
+                        {{ item.name }}
+                      </option>
+                    </select>
+                  </div>
+
+
+                  <div class="col-md-2 col-sm-4 col-12">
+                  <label for="">Description</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="description"
+                    (input)="filter($event)"
+                    placeholder="Description"
+                  />
+                </div>
+
+
+                <div class="col-md-2 col-sm-4 col-12">
+                  <label for="">Group Name</label>
+                  <select class="form-select" [(ngModel)]="ICT9GroupId" name="ICT9GroupId" (change)="filteVersion('Group')">
+                    <option value="">Select Group</option>
+                    <option *ngFor="let item of ICT9Group" [value]="item.code">
+                      {{ item.name }}
+                    </option>
+                  </select>
+                </div>
+            </div>
+            <br />
+
+<!-- *ngxPermissionsOnly="['Control Panel:Human Resources:View']" -->
+          <div>
+              <div class="table-responsive">
+                <table class="table table-sm table-striped table-bordered">
+                  <thead class="thead-light">
+                    <tr>
+                      <th></th>
+                      <th>Code</th>
+                      <th>ICD Version</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let diagnosis of pagedMyDiagnosisCode ">
+                      <td>
+                        <input
+                          type="checkbox"
+                          [checked]="diagnosis.selected"
+                          (change)="onMyDiagnosisCheckboxChange($event, diagnosis)"
+                        />
+                      </td>
+                      <td style="font-size: 12px">
+                        <span class="ml-1 vertical-align-middle">
+                          {{ diagnosis.icD9Code }}
+                        </span>
+                      </td>
+                      <td style="font-size: 12px">
+                        <span class="ml-1 vertical-align-middle">
+                          {{ diagnosis.icdVersion }}
+                        </span>
+                      </td>
+                      <td style="font-size: 12px">
+                        <span class="ml-1 vertical-align-middle">
+                          {{ diagnosis.providerDescription }}
+                        </span>
+                      </td>
+                    </tr>
+
+                    <tr *ngIf="MyDiagnosisCode.length === 0">
+                      <td colspan="4">No My Diagnosis Code found.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+
+            <!-- PAGINATION START -->
+           <div class="d-flex flex-column align-items-center mt-3 gap-2">
+              <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
+
+                <div>
+                  Showing {{ MyDiagnosisCodeStart + 1 }} to {{ MyDiagnosisCodeEnd }} of {{ MyDiagnosisCodeTotalItems }} entries
+                </div>
+
+                <nav>
+                  <ul class="pagination pagination-sm mb-0">
+                    <!-- Prev -->
+                    <li class="page-item" [class.disabled]="MyDiagnosisCodeCurrentPage === 1">
+                      <button class="page-link" (click)="MyDiagnosisCodePrevPage()" [disabled]="MyDiagnosisCodeCurrentPage === 1">
+                        Previous
+                      </button>
+                    </li>
+
+                    <!-- Dynamic Page Numbers -->
+                    <li
+                      class="page-item"
+                      *ngFor="let page of MyDiagnosisCodePageNumbers"
+                      [class.active]="page === MyDiagnosisCodeCurrentPage"
+                      [class.disabled]="page === '...'">
+                      
+                      <button
+                        class="page-link"
+                        *ngIf="page !== '...'"
+                        (click)="MyDiagnosisCodeGoToPage(+page)">
+                        {{ page }}
+                      </button>
+                      
+                      <span class="page-link" *ngIf="page === '...'">…</span>
+                    </li>
+
+                    <!-- Next -->
+                    <li class="page-item" [class.disabled]="MyDiagnosisCodeCurrentPage === MyDiagnosisCodeTotalPages">
+                      <button class="page-link" (click)="MyDiagnosisCodeNextPage()" [disabled]="MyDiagnosisCodeCurrentPage === MyDiagnosisCodeTotalPages">
+                        Next
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+
+              </div>
+            </div>
+            <!-- PAGINATION END -->
+          </ng-template>
+        </li>
+
+        <!-- Old Problem -->
+        <li [ngbNavItem]="2">
+          <a ngbNavLink href="javascript:void(0)">Old Problem</a>
+          <ng-template ngbNavContent>
+          <div >
+
+             <div class="row">
+                  <div class="col-md-2 col-sm-4 col-12">
+                    <label  for="">Address</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      placeholder="Address"
+                      [required]="true"
+                      />
+                  </div>
+
+                  <div class="col-md-2 col-sm-4 col-12">
+                    <label for="">Marital Status</label>
+                    <select class="form-select"  name="ICDVersionId">
+                      <option value="">Select Marital Status</option>
+                      <option *ngFor="let item of maritalstatus" [value]="item.code">
+                        {{ item.name }}
+                      </option>
+                    </select>
+                  </div>
+
+
+                  <div class="col-md-2 col-sm-4 col-12">
+                  <label for="">Email</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="description"
+                    placeholder="Email"
+                    />
+                </div>
+
+
+                <div class="col-md-2 col-sm-4 col-12">
+                  <label for="">Group Name</label>
+                  <select class="form-select"  name="">
+                    <option value="">Select Group</option>
+                    <option *ngFor="let item of maritalstatus" [value]="item.code">
+                      {{ item.name }}
+                    </option>
+                  </select>
+                </div>
+            </div>
+
+            <hr>
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-bordered">
+                <thead class="thead-light">
+                  <tr>
+                    <th>
+                    </th>
+                    <th>Code</th>
+                    <th>ICD Version</th>
+                    <th>YearofOnset</th>                    
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let MyDiagnosisCode of status">
+                    <td>
+                      <input
+                        type="checkbox"
+                        [value]="MyDiagnosisCode" (click)="Rows()"
+                      />
+                    </td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ MyDiagnosisCode.icD9Code }}
+                      </span>
+                    </td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ MyDiagnosisCode.icdVersion }}
+                      </span>
+                    </td>
+                    <td></td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ MyDiagnosisCode.providerDescription }}
+                      </span>
+                    </td>
+                  </tr>
+
+                  <tr *ngIf="status.length === 0">
+                    <td colspan="4">No Old Problems found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </ng-template>
+        </li>
+
+        <!-- Diagnosis Code -->
+        <li [ngbNavItem]="3">
+            <a ngbNavLink href="javascript:void(0)">Diagnosis Code</a>
+            <ng-template ngbNavContent>
+          <div >
+
+                <div class="row">
+                  
+
+                  <div class="col-md-2 col-sm-4 col-12">
+                    <label for="">ICD Version</label>
+                    <select class="form-select" [(ngModel)]="ICDVersionId" name="ICDVersionId">
+                      <option value="">Select ICD Version</option>
+                      <option *ngFor="let item of ICDVersions" [value]="item.code">
+                        {{ item.name }}
+                      </option>
+                    </select>
+                  </div>
+
+
+                <div class="col-md-2 col-sm-4 col-12">
+                  <label for="">Search Code</label>
+                  <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (change)="searchBy($event)">
+                    <option value="">Select Group</option>
+                    <option *ngFor="let item of Searchby" [value]="item.code">
+                      {{ item.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById != 3">
+                    <label  for="">Starting Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      [(ngModel)]="DiagnosisStartCode"
+                      type="text"
+                      placeholder="Starting Code"
+                      />
+                  </div>
+
+                  <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2">
+                    <label  for="">Ending Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      [(ngModel)]="DiagnosisEndCode"
+                      type="text"
+                      placeholder="Ending Code"
+                      />
+                  </div>
+
+                  <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 3">
+                    <label  for="">Description</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      [(ngModel)]="DescriptionFilter"
+                      type="text"
+                      placeholder="Description"
+                      />
+                  </div>
+
+                    <div class="col-md-2 col-sm-12 col-12">
+                       <button (click)="SearchDiagnosis()" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
+                          <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
+                          aria-hidden="true"></span>
+                          Search
+                      </button>
+                    </div>
+            </div>
+            <br />
+
+
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-bordered">
+                <thead class="thead-light">
+                  <tr>
+                    <th></th>
+                    <th>Code</th>
+                    <th>ICD Version</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of pagedDiagnosisCode; trackBy: trackByCode">
+                    <td>
+                      <input
+                        type="checkbox"
+                        [checked]="item.selected"
+                        (change)="onDiagnosisCodeCheckboxChange(item)"
+                      />
+                    </td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ item.icD9Code }}
+                      </span>
+                    </td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ item.icdVersion }}
+                      </span>
+                    </td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ item.descriptionFull }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="DiagnosisCode.length === 0">
+                    <td colspan="4">No Diagnosis Code found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+            <div class="d-flex flex-column align-items-center mt-3 gap-2">
+              <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
+
+                <!-- Showing entries summary -->
+                <div>
+                  Showing {{ diagnosisCodeStart + 1 }} to {{ diagnosisCodeEnd }} of {{ diagnosisCodeTotalItems }} entries
+                </div>
+
+                <!-- Pagination Control -->
+                <nav>
+                  <ul class="pagination pagination-sm mb-0">
+
+                    <!-- Previous Button -->
+                    <li class="page-item" [class.disabled]="diagnosisCodeCurrentPage === 1">
+                      <button class="page-link" (click)="diagnosisCodePrevPage()" [disabled]="diagnosisCodeCurrentPage === 1">
+                        Previous
+                      </button>
+                    </li>
+
+                    <!-- Dynamic Page Buttons -->
+                    <li
+                      class="page-item"
+                      *ngFor="let page of diagnosisCodePageNumbers"
+                      [class.active]="page === diagnosisCodeCurrentPage"
+                      [class.disabled]="page === '...'">
+                      
+                      <!-- Numbered Pages -->
+                      <button
+                        class="page-link"
+                        *ngIf="page !== '...'"
+                        (click)="diagnosisCodeGoToPage(+page)">
+                        {{ page }}
+                      </button>
+
+                      <!-- Ellipsis -->
+                      <span class="page-link" *ngIf="page === '...'">…</span>
+                    </li>
+
+                    <!-- Next Button -->
+                    <li class="page-item" [class.disabled]="diagnosisCodeCurrentPage === diagnosisCodeTotalPages">
+                      <button class="page-link" (click)="diagnosisCodeNextPage()" [disabled]="diagnosisCodeCurrentPage === diagnosisCodeTotalPages">
+                        Next
+                      </button>
+                    </li>
+
+                  </ul>
+                </nav>
+              </div>
+            </div>
+
+        </ng-template>
+          </li>
+      </ul>
+
+      <!-- Tab Content -->
+      <div [ngbNavOutlet]="nav"></div>
+  </ng-container>
+    </div>
+  </div>
+
+  <!-- Always Diagnosis show  -->
+  <div class="card shadow rounded">
+    <div class="card-body">
+  <ng-container>
+           <div >
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-bordered">
+                <thead class="thead-light">
+                  <tr>
+                    <th>ICD Code</th>
+                    <th>ICD Version</th>
+                    <th>YearofOnset</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let MyDiagnosisData of allDiagnosisPaginatedItems">
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ MyDiagnosisData.ICDCode }}
+                      </span>
+                    </td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ MyDiagnosisData.version }}
+                      </span>
+                    </td>
+                    <td style="font-size: 12px">
+                    <div >
+                    <select class="form-select" [(ngModel)]="MyDiagnosisData.yearofOnset" 
+                    (onChange)="onYearFilterChange($event, MyDiagnosisData)" name="YearofOnset">
+                      <option *ngFor="let item of colDxYearofOnset" [value]="item" >
+                        {{ item }}
+                      </option>
+                    </select>
+                  </div>
+
+                    </td>
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">
+                        {{ MyDiagnosisData.description }}
+                      </span>
+                    </td>
+                    <td style="font-size: 12px">
+                      <div >
+                    <select class="form-select" [(ngModel)]="MyDiagnosisData.typeofDiagnosis" 
+                    (onChange)="onTypeofDiagnosisChange($event, MyDiagnosisData)" name="TypeofDiagnosis">
+                      <option *ngFor="let item of servicestype" [value]="item" >
+                        {{ item }}
+                      </option>
+                    </select>
+                  </div>
+                    </td>
+                  </tr>
+
+                  <tr *ngIf="MyDiagnosisData.length === 0">
+                    <td colspan="4">No Data found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
+            <div class="d-flex flex-column align-items-center mt-3 gap-2">
+              <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
+                <div> Showing {{ allDiagnosisStart + 1 }} to {{ allDiagnosisEnd }} of {{ allDiagnosisTotalItems }} entries</div>
+                <!-- Pagination buttons -->
+                    <nav>
+                      <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" [class.disabled]="allDiagnosisCurrentPage === 1">
+                          <button class="page-link" (click)="allDiagnosisPrevPage()">Previous</button>
+                        </li>
+                        <li
+                          class="page-item"
+                          *ngFor="let page of allDiagnosisPageNumbers"
+                          [class.active]="page === allDiagnosisCurrentPage">
+                          <button class="page-link" (click)="allDiagnosisGoToPage(page)">
+                            {{ page }}
+                          </button>
+                        </li>
+                        <li class="page-item" [class.disabled]="allDiagnosisCurrentPage === allDiagnosisTotalPages">
+                          <button class="page-link" (click)="allDiagnosisNextPage()">Next</button>
+                        </li>
+                      </ul>
+                    </nav>
+              </div>
+            </div>
+
+    </ng-container>
+    </div>
+    </div>
+
+
+
+
+<!-- Service Start -->
+    <div class="card shadow rounded">
+    <div class="card-body">
+
+      <!-- Button For hide and show grid -->
+       <div class="col-12 mt-2 d-flex justify-content-between">
+        <div class="col-md-4">
+          <h2 style="font-weight: bold">Service</h2>
+        </div>
+        <div class="col-md-2 col-sm-4 col-12 d-flex">
+          <div class="col-md-1"></div>
+
+           <button (click)="SGridHide()" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; height: 50px; margin-left: 10px;">
+              <ng-icon 
+              name="tablerChevronDown"
+              class="avatar-xxs me-1"/>
+              Add Service
+          </button>
+
+          <button (click)="SGridShow()" *ngIf="SShow == true" type="button" class="btn btn-info" style="width: 180px; height: 50px; margin-left: 10px;">
+              <ng-icon 
+              name="tablerChevronRight"
+              class="avatar-xxs me-1"/>
+              Add Service
+          </button>
+        </div>
+      </div>
+      <hr>
+
+      
+    <!-- hide Service gride -->
+      <ng-container *ngIf="Services">
+          <ul ngbNav  #nav="ngbNav" [(activeId)]="activeServiceTabId" class="nav nav-tabs mb-3">
+            <!-- My CPT Code -->
+            <li [ngbNavItem]="1">
+              <a ngbNavLink href="javascript:void(0)">My CPT Code</a>
+              <ng-template ngbNavContent>
+
+                  <div class="row">
+                      <div class="col-md-2 col-sm-4 col-12">
+                        <label  for="">Code</label>
+                        <input
+                          pInputText
+                          class="form-control"
+                          type="text"
+                          (input)="filterCPT($event)"
+                          placeholder="Code"
+                          />
+                      </div>
+
+                      <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Description</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="description"
+                        (input)="filterCPT($event)"
+                        placeholder="Description"
+                      />
+                    </div>
+
+
+                    <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Group Name</label>
+                      <select class="form-select" [(ngModel)]="CPTGroupId" name="ICT9GroupId" (onChange)="filteCPTGroup($event)">
+                        <option *ngFor="let item of CPTGroups" [value]="item.code">
+                          {{ item.name }}
+                        </option>
+                      </select>
+                    </div>
+                </div>
+                <br />
+
+    <!-- *ngxPermissionsOnly="['Control Panel:Human Resources:View']" -->
+              <div class="table-responsive">
+                  <table class="table table-sm table-striped table-bordered">
+                    <thead class="thead-light">
+                      <tr>
+                        <th></th>
+                        <th>Code</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of pagedMyCptCode">
+                        <td>
+                          <input
+                            type="checkbox"
+                            [(ngModel)]="item.selected"
+                            (change)="onCPTCheckboxChange($event, item)"
+                          />
+                        </td>
+                        <td style="font-size: 12px">{{ item.cptCode }}</td>
+                        <td style="font-size: 12px">{{ item.providerDescription }}</td>
+                      </tr>
+
+                      <tr *ngIf="pagedMyCptCode.length === 0">
+                        <td colspan="3">No My CPT Code found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="d-flex flex-column align-items-center mt-3 gap-2">
+                  <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
+
+                    <div>
+                      Showing {{ MyCptCodeStart + 1 }} to {{ MyCptCodeEnd }} of {{ MyCptCodeTotalItems }} entries
+                    </div>
+
+                    <nav>
+                      <ul class="pagination pagination-sm mb-0">
+
+                        <!-- Prev -->
+                        <li class="page-item" [class.disabled]="MyCptCodeCurrentPage === 1">
+                          <button class="page-link" (click)="MyCptCodePrevPage()" [disabled]="MyCptCodeCurrentPage === 1">
+                            Previous
+                          </button>
+                        </li>
+
+                        <!-- Page Numbers -->
+                        <li
+                          class="page-item"
+                          *ngFor="let page of MyCptCodePageNumbers"
+                          [class.active]="page === MyCptCodeCurrentPage"
+                          [class.disabled]="page === '...'">
+                          
+                          <button
+                            class="page-link"
+                            *ngIf="page !== '...'"
+                            (click)="MyCptCodeGoToPage(+page)">
+                            {{ page }}
+                          </button>
+                          
+                          <span class="page-link" *ngIf="page === '...'">…</span>
+                        </li>
+
+                        <!-- Next -->
+                        <li class="page-item" [class.disabled]="MyCptCodeCurrentPage === MyCptCodeTotalPages">
+                          <button class="page-link" (click)="MyCptCodeNextPage()" [disabled]="MyCptCodeCurrentPage === MyCptCodeTotalPages">
+                            Next
+                          </button>
+                        </li>
+
+                      </ul>
+                    </nav>
+
+                  </div>
+                </div>
+
+              </ng-template>
+            </li>
+
+            <!-- My HCPCS Code -->
+            <li [ngbNavItem]="2">
+              <a ngbNavLink href="javascript:void(0)">My HCPCS Code</a>
+              <ng-template ngbNavContent>
+
+
+                       <div class="row">
+                      <div class="col-md-2 col-sm-4 col-12">
+                        <label  for="">Code</label>
+                        <input
+                          pInputText
+                          class="form-control"
+                          type="text"
+                          (input)="filterMyHCPS($event)"
+                          placeholder="Code"
+                          />
+                      </div>
+
+                      <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Description</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="description"
+                        (input)="filterMyHCPS($event)"
+                        placeholder="Description"
+                      />
+                    </div>
+
+
+                    <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Group Name</label>
+                      <select class="form-select" [(ngModel)]="MyHCPSGroupId" name="ICT9GroupId" (onChange)="filteHCPCSGroup($event)">
+                        <option *ngFor="let item of MYHCPCSGroups" [value]="item.code">
+                          {{ item.name }}
+                        </option>
+                      </select>
+                    </div>
+                </div>
+                <br />
+
+
+              <div >
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped table-bordered">
+                    <thead class="thead-light">
+                      <tr>
+                        <th>
+                        </th>
+                        <th>Code</th>                 
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let hcpcs of pagedMyHCPCSCode">
+                        <td>
+                          <input
+                            type="checkbox"
+                            [(ngModel)]="hcpcs.selected"
+                            (change)="onMyhcpcsCheckboxChange($event, hcpcs)"
+                          />
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ hcpcs.hcpcsCode }}
+                          </span>
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ hcpcs.providerDescription }}
+                          </span>
+                        </td>
+                      </tr>
+
+                      <tr *ngIf="pagedMyHCPCSCode.length === 0">
+                        <td colspan="4">No My HCPCS Code found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+                <div class="d-flex flex-column align-items-center mt-3 gap-2">
+                    <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
+
+                      <!-- Showing Entries Info -->
+                      <div>
+                        Showing {{ MyHCPCSCodeStart + 1 }} to {{ MyHCPCSCodeEnd }} of {{ MyHCPCSCodeTotalItems }} entries
+                      </div>
+
+                      <nav>
+                        <ul class="pagination pagination-sm mb-0">
+
+                          <!-- Prev -->
+                          <li class="page-item" [class.disabled]="MyHCPCSCodeCurrentPage === 1">
+                            <button class="page-link" (click)="MyHCPCSCodePrevPage()" [disabled]="MyHCPCSCodeCurrentPage === 1">
+                              Previous
+                            </button>
+                          </li>
+
+                          <!-- Page Numbers -->
+                          <li
+                            class="page-item"
+                            *ngFor="let page of MyHCPCSCodePageNumbers"
+                            [class.active]="page === MyHCPCSCodeCurrentPage"
+                            [class.disabled]="page === '...'">
+                            
+                            <button
+                              class="page-link"
+                              *ngIf="page !== '...'"
+                              (click)="MyHCPCSCodeGoToPage(+page)">
+                              {{ page }}
+                            </button>
+                            
+                            <span class="page-link" *ngIf="page === '...'">…</span>
+                          </li>
+
+                          <!-- Next -->
+                          <li class="page-item" [class.disabled]="MyHCPCSCodeCurrentPage === MyHCPCSCodeTotalPages">
+                            <button class="page-link" (click)="MyHCPCSCodeNextPage()" [disabled]="MyHCPCSCodeCurrentPage === MyHCPCSCodeTotalPages">
+                              Next
+                            </button>
+                          </li>
+
+                        </ul>
+                      </nav>
+
+                    </div>
+                  </div>
+
+              </ng-template>
+            </li>
+
+            <!-- My Dental Code -->
+            <li [ngbNavItem]="3">
+                <a ngbNavLink href="javascript:void(0)">My Dental Code</a>
+                <ng-template ngbNavContent>
+
+
+                    <div class="row">
+                      <div class="col-md-2 col-sm-4 col-12">
+                        <label  for="">Code</label>
+                        <input
+                          pInputText
+                          class="form-control"
+                          type="text"
+                          (input)="filterMyDental($event)"
+                          placeholder="Code"
+                          />
+                      </div>
+
+                      <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Description</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="description"
+                        (input)="filterMyDental($event)"
+                        placeholder="Description"
+                      />
+                    </div>
+
+
+                    <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Group Name</label>
+                      <select class="form-select" [(ngModel)]="MyDentalGroupId" name="MyDentalGroups" (onChange)="filteDentalGroup($event)">
+                        <option value="">Select Group</option>
+                        <option *ngFor="let item of MyDentalGroups" [value]="item.code">
+                          {{ item.name }}
+                        </option>
+                      </select>
+                    </div>
+                </div>
+                <br />
+
+
+              <div>
+                  <div class="table-responsive">
+                    <table class="table table-sm table-striped table-bordered">
+                      <thead class="thead-light">
+                        <tr>
+                          <th></th>
+                          <th>Code</th>
+                          <th>Description</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of pagedMyDentalCode">
+                          <td>
+                            <input
+                              type="checkbox"
+                              [(ngModel)]="item.selected"
+                              (change)="onDentalCheckboxChange($event, item)"
+                            />
+                          </td>
+                          <td style="font-size: 12px">
+                            <span class="ml-1 vertical-align-middle">
+                              {{ item.dentalCode }}
+                            </span>
+                          </td>
+                          <td style="font-size: 12px">
+                            <span class="ml-1 vertical-align-middle">
+                              {{ item.providerDescription }}
+                            </span>
+                          </td>
+                        </tr>
+
+                        <tr *ngIf="MyDentalCode.length === 0">
+                          <td colspan="3">No My Dental Code found.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+
+                <div class="d-flex flex-column align-items-center mt-3 gap-2">
+                    <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
+
+                      <div>
+                        Showing {{ MyDentalCodeStart + 1 }} to {{ MyDentalCodeEnd }} of {{ MyDentalCodeTotalItems }} entries
+                      </div>
+
+                      <nav>
+                        <ul class="pagination pagination-sm mb-0">
+
+                          <!-- Previous -->
+                          <li class="page-item" [class.disabled]="MyDentalCodeCurrentPage === 1">
+                            <button class="page-link" (click)="MyDentalCodePrevPage()" [disabled]="MyDentalCodeCurrentPage === 1">
+                              Previous
+                            </button>
+                          </li>
+
+                          <!-- Page Numbers -->
+                          <li
+                            class="page-item"
+                            *ngFor="let page of MyDentalCodePageNumbers"
+                            [class.active]="page === MyDentalCodeCurrentPage"
+                            [class.disabled]="page === '...'">
+                            
+                            <button
+                              class="page-link"
+                              *ngIf="page !== '...'"
+                              (click)="MyDentalCodeGoToPage(+page)">
+                              {{ page }}
+                            </button>
+                            
+                            <span class="page-link" *ngIf="page === '...'">…</span>
+                          </li>
+
+                          <!-- Next -->
+                          <li class="page-item" [class.disabled]="MyDentalCodeCurrentPage === MyDentalCodeTotalPages">
+                            <button class="page-link" (click)="MyDentalCodeNextPage()" [disabled]="MyDentalCodeCurrentPage === MyDentalCodeTotalPages">
+                              Next
+                            </button>
+                          </li>
+
+                        </ul>
+                      </nav>
+
+                    </div>
+                  </div>
+
+            </ng-template>
+              </li>
+            <!-- CPT Code -->
+            <li [ngbNavItem]="4">
+                <a ngbNavLink href="javascript:void(0)">CPT Code</a>
+                <ng-template ngbNavContent>
+                    <div class="row">
+                      <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Search CPT Code</label>
+                      <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">
+                        <!-- <option value="">Select Group</option> -->
+                        <option *ngFor="let item of SearchCPTby" [value]="item.code">
+                          {{ item.name }}
+                        </option>
+                      </select>
+                    </div>
+
+                     <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2 || SearchById == 3">
+                    <label  for="">Starting Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="ProcedureStartCode"
+                      placeholder="Starting Code"
+                      />
+                  </div>
+
+                  <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 3">
+                    <label  for="">Ending Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="ProcedureEndCode"
+                      placeholder="Ending Code"
+                      />
+                  </div>   
+
+                  <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 4">
+                    <label  for="">Description</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="DescriptionFilter"
+                      placeholder="Description"
+                      />
+                  </div>
+                    <div class="col-md-2 col-sm-12 col-12"> 
+                       <button (click)="SearchProcedure(1)" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
+                          <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
+                          aria-hidden="true"></span>
+                          Search
+                      </button>
+                    </div>
+                </div>
+                <br />
+              <div >
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped table-bordered">
+                    <thead class="thead-light">
+                      <tr>
+                        <th>
+                        </th>
+                        <th>Code</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let Procedure of Procedure">
+                        <td>
+                          <input
+                            type="checkbox"
+                            [value]="Procedure" (click)="Rows()"
+                          />
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ Procedure.code }}
+                          </span>
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ Procedure.descriptionFull }}
+                          </span>
+                        </td>
+                      </tr>
+
+                      <tr *ngIf="Procedure.length === 0">
+                        <td colspan="4">No My CPT found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+                <app-pagination 
+                  [totalItems]="Procedure.length" 
+                  [pageSize]="10" 
+                  (pageData)="onPageChange($event)">
+                </app-pagination>
+            </ng-template>
+              </li>
+
+
+              <li [ngbNavItem]="5">
+                <a ngbNavLink href="javascript:void(0)">HCPCS Code</a>
+                <ng-template ngbNavContent>
+                    <div class="row">
+                      <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Search HCPCS</label>
+                      <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">
+                        <!-- <option value="">Select Group</option> -->
+                        <option *ngFor="let item of SearchHCPSby" [value]="item.code">
+                          {{ item.name }}
+                        </option>
+                      </select>
+                    </div>
+
+                      <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2 || SearchById == 3">
+                    <label  for="">Starting Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="ProcedureStartCode"
+                      placeholder="Starting Code"
+                      />
+                  </div>
+
+                  <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 3">
+                    <label  for="">Ending Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="ProcedureEndCode"
+                      placeholder="Ending Code"
+                      />
+                  </div>   
+
+                  <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 4">
+                    <label  for="">Description</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="DescriptionFilter"
+                      placeholder="Description"
+                      />
+                  </div>
+                    <div class="col-md-2 col-sm-12 col-12"> 
+                       <button (click)="SearchProcedure(2)" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
+                          <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
+                          aria-hidden="true"></span>
+                          Search
+                      </button>
+                    </div>
+                </div>
+                <br />
+              <div >
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped table-bordered">
+                    <thead class="thead-light">
+                      <tr>
+                        <th>
+                        </th>
+                        <th>HCPCS Code</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let Procedure of Procedure">
+                        <td>
+                          <input
+                            type="checkbox"
+                            [value]="Procedure" (click)="Rows()"
+                          />
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ Procedure.code }}
+                          </span>
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ Procedure.descriptionFull }}
+                          </span>
+                        </td>
+                      </tr>
+
+                      <tr *ngIf="Procedure.length === 0">
+                        <td colspan="4">No HCPSC Codes found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+                <app-pagination 
+                  [totalItems]="Procedure.length" 
+                  [pageSize]="10" 
+                  (pageData)="onPageChange($event)">
+                </app-pagination>
+            </ng-template>
+              </li>
+
+
+               <li [ngbNavItem]="6">
+                <a ngbNavLink href="javascript:void(0)">Dental Code</a>
+                <ng-template ngbNavContent>
+                    <div class="row">
+                      <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Search Dental Code:</label>
+                      <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">
+                        <!-- <option value="">Select Group</option> -->
+                        <option *ngFor="let item of SearchDentalby" [value]="item.code">
+                          {{ item.name }}
+                        </option>
+                      </select>
+                    </div>
+
+                     <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2 || SearchById == 3">
+                    <label  for="">Starting Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="ProcedureStartCode"
+                      placeholder="Starting Code"
+                      />
+                  </div>
+
+                  <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 3">
+                    <label  for="">Ending Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="ProcedureEndCode"
+                      placeholder="Ending Code"
+                      />
+                  </div>   
+
+                  <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 4">
+                    <label  for="">Description</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="DescriptionFilter"
+                      placeholder="Description"
+                      />
+                  </div>
+                    
+              <div class="col-md-2 col-sm-12 col-12">
+                       <button (click)="SearchProcedure(3)" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
+                          <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
+                          aria-hidden="true"></span>
+                          Search
+                      </button>
+                    </div>
+                </div>
+                <br />
+              <div >
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped table-bordered">
+                    <thead class="thead-light">
+                      <tr>
+                        <th>
+                        </th>
+                        <th>Dental Code</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of Procedure">
+                        <td>
+                          <input
+                            type="checkbox"
+                            [value]="item" (click)="Rows()"
+                          />
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ item.code }}
+                          </span>
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ item.descriptionFull }}
+                          </span>
+                        </td>
+                      </tr>
+
+                      <tr *ngIf="Procedure.length === 0">
+                        <td colspan="4">No Dental Code found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+                <app-pagination 
+                  [totalItems]="Procedure.length" 
+                  [pageSize]="10" 
+                  (pageData)="onPageChange($event)">
+                </app-pagination>
+            </ng-template>
+              </li>
+
+
+              <li [ngbNavItem]="7">
+                <a ngbNavLink href="javascript:void(0)">Unclassified Service</a>
+                <ng-template ngbNavContent>
+                    <div class="row">
+                      <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Search Unclassified:</label>
+                      <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">
+                        <option *ngFor="let item of SearchUnclassifiedby" [value]="item.code">
+                          {{ item.name }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2 || SearchById == 3">
+                    <label  for="">Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="ProcedureStartCode"
+                      placeholder="Code"
+                      />
+                  </div>
+
+                  <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 4">
+                    <label  for="">Description</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="ProcedureStartCode"
+                      placeholder="Description"
+                      />
+                  </div>
+
+                    <div class="col-md-2 col-sm-12 col-12"> 
+                       <button (click)="SearchProcedure(4)" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
+                          <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
+                          aria-hidden="true"></span>
+                          Search
+                      </button>
+                    </div>
+                </div>
+                <br />
+              <div >
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped table-bordered">
+                    <thead class="thead-light">
+                      <tr>
+                        <th>
+                        </th>
+                        <th>Code</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let Procedure of Procedure">
+                        <td>
+                          <input
+                            type="checkbox"
+                            [value]="Procedure" (click)="Rows()"
+                          />
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ Procedure.code }}
+                          </span>
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ Procedure.itemType }}
+                          </span>
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ Procedure.descriptionFull }}
+                          </span>
+                        </td>
+                      </tr>
+
+                      <tr *ngIf="Procedure.length === 0">
+                        <td colspan="4">No Dental Codes found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+                <app-pagination 
+                  [totalItems]="Procedure.length" 
+                  [pageSize]="10" 
+                  (pageData)="onPageChange($event)">
+                </app-pagination>
+            </ng-template>
+              </li>
+
+              <li [ngbNavItem]="8">
+                <a ngbNavLink href="javascript:void(0)">Comment</a>
+                <ng-template ngbNavContent>
+              <div class="col-md-2 col-sm-12 col-12"></div>
+              <div class="col-md-2 col-sm-12 col-12">
+                <label for="">Comments:</label>
+              </div>
+              <div class="col-md-5 col-sm-12 col-12">
+                <textarea rows="10" cols="70" name="comment" form="usrform">
+Enter comment here...</textarea
+                >
+              </div>
+              <div class="col-md-3 col-sm-12 col-12"></div>
+                </ng-template>
+                </li>
+
+                 <li [ngbNavItem]="9">
+                <a ngbNavLink href="javascript:void(0)">Service Item</a>
+                <ng-template ngbNavContent>
+                    <div class="row">
+                      <div class="col-md-2 col-sm-4 col-12">
+                      <label for="">Search Unclassified:</label>
+                      <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">                        <option *ngFor="let item of SearchUnclassifiedby" [value]="item.code">
+                          {{ item.name }}
+                        </option>
+                      </select>
+                    </div>
+
+                      <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2 || SearchById == 3">
+                    <label  for="">Code</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="ProcedureStartCode"
+                      placeholder="Code"
+                      />
+                  </div>
+
+                  <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 4">
+                    <label  for="">Description</label>
+                    <input
+                      pInputText
+                      class="form-control"
+                      type="text"
+                      [(ngModel)]="ProcedureStartCode"
+                      placeholder="Description"
+                      />
+                  </div>
+
+                    <div class="col-md-2 col-sm-12 col-12">
+                       <button (click)="SearchProcedure(5)" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
+                          <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
+                          aria-hidden="true"></span>
+                          Search
+                      </button>
+                    </div>
+                </div>
+                <br />
+              <div >
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped table-bordered">
+                    <thead class="thead-light">
+                      <tr>
+                        <th>
+                        </th>
+                        <th>Code</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of Procedure">
+                        <td>
+                          <input
+                            type="checkbox"
+                            [value]="item" (click)="Rows()"
+                          />
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ item.code }}
+                          </span>
+                        </td>
+                        <td style="font-size: 12px">
+                          <span class="ml-1 vertical-align-middle">
+                            {{ item.descriptionFull }}
+                          </span>
+                        </td>
+                      </tr>
+
+                      <tr *ngIf="Procedure.length === 0">
+                        <td colspan="4">No Service found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+                <app-pagination 
+                  [totalItems]="Procedure.length" 
+                  [pageSize]="10" 
+                  (pageData)="onPageChange($event)">
+                </app-pagination>
+            </ng-template>
+              </li>
+
+          </ul>
+
+          <!-- Tab Content -->
+          <div [ngbNavOutlet]="nav"></div>
+      </ng-container>
+        </div>
+      </div>
+
+
+    <!-- Always Service show  -->
+    <div class="card shadow rounded">
+    <div class="card-body">
+  <ng-container>
+           <div >
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-bordered">
+                <thead class="thead-light">
+                  <tr>
+                    <th style="width: 10%">Type</th>
+                    <th style="width: 10%">Code</th>
+                    <th style="width: 10%">Unit</th>
+                    <th style="width: 40%">Description</th>
+                    <th style="width: 10%" *ngIf="serviceToothCode">Tooth Code</th>
+                    <th style="width: 5%" *ngIf="ServiceM" >M1</th>
+                    <th style="width: 5%" *ngIf="ServiceM">M2</th>
+                    <th style="width: 5%" *ngIf="ServiceM">M3</th>
+                    <th style="width: 5%" *ngIf="ServiceM">M4</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let MyServicesData of MyServicesData">
+                    <td style="font-size: 12px">
+                      <span class="ml-1 vertical-align-middle">{{MyServicesData.type}}</span>
+                    </td>
+                    <td style="font-size: 12px">
+                      <span>{{MyServicesData.cptCode}}</span>
+                    </td>
+                    <td style="font-size: 12px">
+                     <div>
+                      <input
+                          pInputText
+                          class="form-control"
+                          type="number"
+                          [(ngModel)]="ServicesGrid.Unit"
+                          placeholder="Unit"
+                          />
+                     </div>
+                    </td>
+
+                    <td style="font-size: 12px">
+                    <span>{{MyServicesData.description}}</span>
+                    </td>
+                    <td style="font-size: 12px" *ngIf="serviceToothCode">
+                      <div >
+                      <select [disabled]="HCPCS == true" class="form-select" [(ngModel)]="ServicesGrid.universaltoothcode" name="YearofOnset">
+                        <option *ngFor="let item of universaltoothcodearray" [value]="item.code" >
+                          {{ item.name }}
+                        </option>
+                      </select>
+                    </div>
+                    </td>
+                    <td style="font-size: 12px" *ngIf="ServiceM">
+                    <div>
+                      <input
+                          pInputText
+                          class="form-control"
+                          type="text"
+                          [(ngModel)]="ServicesGrid.M1"
+                          placeholder="M1"
+                          type="number"
+                          />
+                     </div>
+                    </td>
+                    <td style="font-size: 12px" *ngIf="ServiceM">
+                    <div>
+                      <input
+                          pInputText
+                          class="form-control"
+                          type="text"
+                          [(ngModel)]="ServicesGrid.M2"
+                          placeholder="M2"
+                          type="number"
+                          />
+                     </div>
+                    </td>
+                    <td style="font-size: 12px" *ngIf="ServiceM">
+                    <div>
+                      <input
+                          pInputText
+                          class="form-control"
+                          type="text"
+                          [(ngModel)]="ServicesGrid.M3"
+                          placeholder="M3"
+                          type="number"
+                          />
+                     </div>
+                    </td>
+
+                    <td style="font-size: 12px" *ngIf="ServiceM">
+                    <div>
+                      <input
+                          pInputText
+                          class="form-control"
+                          type="text"
+                          [(ngModel)]="ServicesGrid.M4"
+                          placeholder="M4"
+                          type="number"
+                          />
+                     </div>
+                    </td>
+                  </tr>
+
+                  <tr *ngIf="MyDiagnosisCode.length === 0">
+                    <td colspan="4">No Data found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
+            <app-pagination 
+                  [totalItems]="myData.length" 
+                  [pageSize]="10" 
+                  (pageData)="onPageChange($event)">
+                </app-pagination>
+    </ng-container>
+    </div>
+    </div>
+
+
+
+    
