@@ -38,8 +38,8 @@ export class PatientHeaderPanelComponent {
     this.visible = false;
   }
 
-    get patientInfo() {
-      debugger
+  get patientInfo() {
+    debugger
     return this.patientData?.table2?.[0] || null;
   }
 

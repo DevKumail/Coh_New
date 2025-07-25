@@ -15,20 +15,21 @@
         }
 
     </ul>
-    <!-- <div class="app-search d-none d-xl-flex">
-        <input
-          type="search4"
-          class="form-control topbar-search"
-          name="search"
-          placeholder="Search Patient By Mr No"
-        />
-        <lucide-icon [img]="Search" class="app-search-icon text-muted" />
-      </div> -->
-    <div class="app-search d-none d-xl-flex">
-        <input type="text" class="form-control" placeholder="Search MRNo" [(ngModel)]="mrNo"
-            (ngModelChange)="onSearchInput()" />
-        <lucide-icon [img]="Search" class="app-search-icon text-muted" />
+
+    <div class="input-group app-search">
+
+        <button class="btn btn-light px-2" type="button" (click)="onAdvanceFilterClick()">
+            <lucide-icon [img]="SliderIcon" class="lucide-lg"></lucide-icon>
+        </button>
+
+        <input type="search4" class="form-control border-0 px-2" name="search" placeholder="Search Patient By Mr No"
+            style="box-shadow: none;" [(ngModel)]="mrNo" />
+
+        <button class="btn btn-light px-2" type="button" (click)="onSearchClick()">
+            <lucide-icon [img]="SearchIcon" class="lucide-lg"></lucide-icon>
+        </button>
     </div>
+
 </div>
 
 <ng-template #MenuItemWithChildren let-item="item" let-wrapperClass="wrapperClass" let-togglerClass="togglerClass">

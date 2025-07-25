@@ -133,10 +133,10 @@ import { CommonModule } from '@angular/common';
     IconsModule,
     NgbModalModule, NgIcon,
     PatientHeaderPanelComponent
-],
+  ],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
-   animations: [
+  animations: [
     trigger('bannerAnimation', [
       transition(':enter', [
         style({ height: '0', opacity: 0 }),
@@ -153,7 +153,7 @@ export class TopbarComponent implements OnInit {
     public layout: LayoutStoreService,
     private modalService: NgbModal,
     private patientBannerService: PatientBannerService
-  ) {}
+  ) { }
 
   patientData: any = null;
   showPatientPanel: boolean = false;
@@ -195,18 +195,18 @@ export class TopbarComponent implements OnInit {
   }
 
 
- allPatients: any[] = [];
+  allPatients: any[] = [];
 
-handleSearchResults(results: any[]) {
-  this.allPatients = results;
-  console.log('Patients received from modal:', results);
-}
+  handleSearchResults(results: any[]) {
+    this.allPatients = results;
+    console.log('Patients received from modal:', results);
+  }
 
-ngOnInit() {
+  ngOnInit() {
     this.patientBannerService.patientData$.subscribe((data) => {
       this.patientData = data;
       this.showPatientPanel = !!data;
     });
   }
 
-    }
+}

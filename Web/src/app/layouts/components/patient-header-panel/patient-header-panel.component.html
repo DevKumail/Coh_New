@@ -11,28 +11,29 @@
     </div>
 
     <div class="mx-1 px-2 border-start">
-      <div class="fs-4 fw-bold">{{ patientInfo?.personFirstName || '-' }}</div>
-      <div><strong>MR No:</strong> {{ patientInfo?.mrNo || '-' }}</div>
-      <div><strong>Payer:</strong> {{ insuranceInfo[0]?.payerName || '-' }}</div>
-      <div><strong>Plan:</strong> {{ insuranceInfo[0]?.plan || '-' }}</div>
+      <div class="fs-4 fw-bold">{{ patientInfo?.personFirstName || 'Johnathan' }}</div>
+      <div><strong>MR No:</strong> {{ patientInfo?.mrNo || 'MR1234567' }}</div>
+      <div><strong>Payer:</strong> {{ insuranceInfo[0]?.payerName || 'United Healthcare' }}</div>
+      <div><strong>Plan:</strong> {{ insuranceInfo[0]?.plan || 'Gold PPO Plan' }}</div>
     </div>
 
     <div class="mx-1 px-2 border-start">
-      <div><strong>Member ID:</strong> {{ insuranceInfo[0]?.memberId || '-' }}</div>
-      <div><strong>Gender:</strong> {{ patientInfo?.gender || '-' }}</div>
-      <div><strong>DOB:</strong> {{ patientInfo?.patientBirthDate ? (patientInfo.patientBirthDate | date:'MM/dd/yyyy') : '-' }}</div>
-      <div><strong>PCP:</strong> {{ patientInfo?.pcpName || '-' }}</div>
+      <div><strong>Member ID:</strong> {{ insuranceInfo[0]?.memberId || 'M1234567890' }}</div>
+      <div><strong>Gender:</strong> {{ patientInfo?.gender || 'Female' }}</div>
+      <div><strong>DOB:</strong> {{ patientInfo?.patientBirthDate ? (patientInfo.patientBirthDate | date:'MM/dd/yyyy') :
+        '02/14/1985' }}</div>
+      <div><strong>PCP:</strong> {{ patientInfo?.pcpName || 'Dr. Amanda Blake' }}</div>
     </div>
 
     <div class="mx-1 px-2 border-start">
-      <div><strong>Patient Type:</strong> {{ patientInfo?.patientType || '-' }}</div>
-      <div><strong>Cell Phone:</strong> {{ patientInfo?.personCellPhone || '-' }}</div>
-      <div><strong>Home Phone:</strong> {{ patientInfo?.homePhone || '-' }}</div>
-      <div><strong>Work Phone:</strong> {{ patientInfo?.workPhone || '-' }}</div>
+      <div><strong>Patient Type:</strong> {{ patientInfo?.patientType || 'Outpatient' }}</div>
+      <div><strong>Cell Phone:</strong> {{ patientInfo?.personCellPhone || '(555) 123-4567' }}</div>
+      <div><strong>Home Phone:</strong> {{ patientInfo?.homePhone || '(555) 987-6543' }}</div>
+      <div><strong>Work Phone:</strong> {{ patientInfo?.workPhone || '(555) 555-1212' }}</div>
     </div>
 
     <div class="mx-1 px-2 border-start">
-      <div><strong>POD Type:</strong> {{ patientInfo?.podType || '-' }}</div>
+      <div><strong>POD Type:</strong> {{ patientInfo?.podType || 'Primary Care' }}</div>
     </div>
 
 
