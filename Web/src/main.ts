@@ -10,6 +10,7 @@
   import { provideAnimations } from '@angular/platform-browser/animations';
   //import { LucideAngularModule } from 'node_modules/lucide-angular/lib/lucide-angular.module';
   import { LucideAngularModule } from 'lucide-angular';
+import {NgxDaterangepickerBootstrapDirective} from "ngx-daterangepicker-bootstrap";
 
   //import { User, Hospital, HeartPulse } from 'lucide-angular';
    import { User, Hospital, HeartPulse, ClipboardEdit  } from 'lucide-angular';

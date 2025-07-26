@@ -5,6 +5,7 @@ import { AppointmentsComponent } from './appointments/appointments.component';
 import { CreateAppointmentComponent } from './create-appointment/create-appointment.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SchedulingApiService } from './scheduling.api.service';
+import { FilterModalComponent } from './filter.modal/filter.modal.component';
 
 
 
@@ -21,11 +22,29 @@ export const Scheduling_ROUTES: Routes = [
                 component: AppointmentsComponent,
                 data: { title: 'View Appointments' }
             },
+            // {
+            //     path: 'Create-Appointments',
+            //     component: AppointmentsComponent,
+            //     data: { title: 'View Appointments' }
+            //   },
             {
                 path: 'create-appointment',
                 component: CreateAppointmentComponent,
                 data: { title: 'Create Appointment' }
             },
+          {
+  path: 'Filter',
+  component: FilterModalComponent,
+  data: { title: 'Filter Appointments' }
+}
+
+
+
+            //   {
+            //     path: 'Appointments/Create',
+            //     component: AppointmentsComponent,
+            //     data: { title: 'Appointment Booking' }
+            //   },
 
         ]
     }

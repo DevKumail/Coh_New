@@ -37,6 +37,14 @@
         <input type="text" class="form-control" formControlName="allergen" placeholder="Enter Allergen" />
       </div>
 
+      <!-- Severity Dropdown -->
+      <!-- <div class="col-lg-3 mb-3">
+        <label class="form-label">Severity</label>
+        <select class="form-select" formControlName="severity">
+          <option value="" disabled selected>Select Severity</option>
+          <option *ngFor="let sev of GetSeverity " [value]="sev">{{ sev }}</option>
+        </select>
+      </div> -->
 
       <div class="col-lg-3 mb-3">
         <label class="form-label">Severity</label>
@@ -46,6 +54,22 @@
         </select>
       </div>
 
+
+  <label class="form-label">Severity</label>
+  <!-- <select class="form-select" formControlName="SeverityCode">
+    <option value="" disabled selected>Select Severity</option>
+    <option *ngFor="let sev of GetSeverity" [value]="sev.id">
+      {{ sev.severityName }}
+    </option>
+  </select> -->
+  <select class="form-select" formControlName="SeverityCode">
+  <option value="" disabled selected hidden>Severity</option>
+  <option *ngFor="let sev of GetSeverity" [value]="sev.id">
+    {{ sev.severityName }}
+  </option>
+</select>
+
+</div>
 
     </div>
 
@@ -68,6 +92,14 @@
         <input type="date" class="form-control" formControlName="endDate" />
       </div>
 
+      <!-- Status Dropdown -->
+      <!-- <div class="col-lg-3 mb-3">
+        <label class="form-label">Status</label>
+        <select class="form-select" formControlName="status">
+          <option value="" disabled selected>Select Status</option>
+          <option *ngFor="let status of  ActiveStatus" [value]="status">{{ status }}</option>
+        </select>
+      </div> -->
 
       <div class="col-lg-3 mb-3">
         <label class="form-label">Status</label>
@@ -105,8 +137,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let allergy of allergyData; let i = index">
-            <td class="text-center">{{ allergy.providerName }}</td>
+          <tr *ngFor="let allergy of MyAllergiesData; let i = index">
+            <td class="text-center">{{ allergy.providerId }}</td>
             <td class="text-center">{{ allergy.allergyType }}</td>
             <td class="text-center">{{ allergy.allergen }}</td>
             <td class="text-center">{{ allergy.severity }}</td>
@@ -115,8 +147,8 @@
             <td class="text-center">{{ allergy.endDate }}</td>
             <td class="text-center">{{ allergy.status }}</td>
             <td class="text-center">
-              <button class="btn btn-sm btn-primary me-1" (click)="editAllergy(i)">Edit</button>
-              <button class="btn btn-sm btn-danger" (click)="deleteAllergy(i)">Delete</button>
+              <!-- <button class="btn btn-sm btn-primary me-1" (click)="editAllergy(i)">Edit</button>
+              <button class="btn btn-sm btn-danger" (click)="deleteAllergy(i)">Delete</button> -->
             </td>
           </tr>
         </tbody>

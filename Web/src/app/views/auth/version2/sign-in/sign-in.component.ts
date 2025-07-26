@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgIcon } from '@ng-icons/core';
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 
@@ -16,7 +16,7 @@ import { AuthService } from '../../../../core/services/auth.service';
     imports: [RouterLink,NgIcon,HttpClientModule ],
     templateUrl: './sign-in.component.html',
     styles: ``,
-    
+
 })
 export class SignInComponent {
     currentYear = currentYear
@@ -31,10 +31,10 @@ export class SignInComponent {
     private authService: AuthService,
     private router: Router
   ) {}
- 
-  
+
+
   onLogin(username: string, password: string): void {
-    debugger
+
   this.isLoading = true;
   this.errorMessage = '';
 

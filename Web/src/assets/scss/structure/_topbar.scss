@@ -8,7 +8,7 @@
     z-index: 1001;
     background: $topbar-bg;
     box-shadow: $card-box-shadow;
-    height: $topbar-height;
+    //height: $topbar-height; // fixed height has been removed due to inner components overflowing. ~hatim
     margin-left: $sidenav-width;
     transition: margin-left .25s ease-in-out;
 
@@ -24,7 +24,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: $topbar-height;
+            //height: $topbar-height;
 
             .topbar-link {
                 z-index: 1;
@@ -35,8 +35,8 @@
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
-                margin-top: 10px;
-                margin-bottom: 10px;
+                margin-top: 0px;
+                margin-bottom: 0px;
                 color: $topbar-item-color;
                 position: relative;
 
@@ -50,7 +50,7 @@
 
             .topbar-badge {
                 position: absolute;
-                top: -10px;
+                top: 0px;
                 right: -1px;
             }
 
@@ -130,11 +130,13 @@ html[data-topbar-color="gradient"] {
         display: none;
     }
 }
+
 html[data-bs-theme="dark"] {
     #light-dark-mode {
         .mode-light-sun {
             display: block;
         }
+
         .mode-light-moon {
             display: none;
         }
@@ -145,7 +147,7 @@ html[data-bs-theme="dark"] {
     display: flex;
     align-items: center;
     gap: 10px;
-    min-height: $topbar-height;
+    //min-height: $topbar-height;
     transition: none;
 
     &::before {
@@ -244,6 +246,46 @@ html[data-menu-color="light"][data-topbar-color="gradient"] {
 
         .sidenav-user {
             margin-top: 10px;
+        }
+    }
+}
+
+.topbar-banner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border: 1px solid #474747;
+    border-radius: 6px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 1rem;
+    padding: 4px 0px 4px 2px;
+
+    flex: 1 1 auto; // allow it to grow but also shrink
+
+    >div {
+        // flex: 1 1 160px;
+        min-width: 150px;
+        word-break: break-word;
+    }
+
+    img {
+        margin: 2px 2px 2px 2px;
+        width: 80px !important;
+        height: 80px !important;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    @include media-breakpoint-down(md) {
+        flex-direction: column;
+        align-items: flex-start;
+
+        >div {
+            width: 100%;
         }
     }
 }

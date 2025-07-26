@@ -1,3 +1,4 @@
+import { ClinicalApiService } from './../../../shared/Services/Clinical/clinical.api.service';
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -8,7 +9,7 @@ import { UiCardComponent} from '@app/components/ui-card.component';
 import { NgIcon} from '@ng-icons/core';
 import { NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 import { ProblemListComponent } from '../problem-list/problem-list.component';
-import { FavoritesComponent } from '../favorites/favorites.component';
+import { FavoritesComponent } from '../favorites/favorites.component'; 
 
 
 

@@ -1,0 +1,201 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
+        <li class="breadcrumb-item">
+            <a href="javascript:void(0);">
+                <ng-icon name="tablerSmartHome"></ng-icon>
+                Clinical
+            </a>
+        </li>
+        <li
+            class="d-flex align-items-center text-muted mx-1"
+            aria-current="page"
+        >
+            <ng-icon name="tablerChevronRight"></ng-icon>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Vital Sings</li>
+    </ol>
+</nav>
+
+<div class="card p-4 shadow">
+    <form [formGroup]="vitalSignsForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+            <div class="col-sm-3">
+                <label>Date <span class="text-danger">*</span></label>
+                <input
+                    type="text"
+                    class="form-control"
+                    formControlName="entryDate"
+                    id="entryDate"
+                    placeholder="Select date"
+                    data-provider="flatpickr"
+                    
+                />
+            </div>
+
+            <!-- Daily Start Time -->
+            <div class="col-sm-3">
+                <label
+                    >Daily Start Time <span class="text-danger">*</span></label
+                >
+                <input
+                    type="time"
+                    class="form-control"
+                    formControlName="dailyStartTime"
+                />
+            </div>
+
+ <!-- Systolic -->
+<div class="col-sm-3">
+  <label>Systolic (mmHg) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="bpSystolic"
+      min="0"
+      max="300"
+    />
+  </div>
+</div>
+
+<!-- Diastolic -->
+<div class="col-sm-3">
+  <label>Diastolic (mmHg) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="bpDiastolic"
+      min="0"
+      max="200"
+    />
+  </div>
+</div>
+
+<!-- Heart Rate -->
+<div class="col-sm-3">
+  <label>Heart Rate (Beats/minute) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="heartRate"
+      min="0"
+      max="200"
+    />
+  </div>
+</div>
+
+<!-- Respiration Rate -->
+<div class="col-sm-3">
+  <label>Respiration Rate <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="respirationRate"
+      min="0"
+      max="100"
+    />
+  </div>
+</div>
+
+<!-- Temperature -->
+<div class="col-sm-3">
+  <label>Temperature (°F) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="temperature"
+      min="0"
+      max="150"
+    />
+  </div>
+</div>
+
+<!-- Weight -->
+<div class="col-sm-3">
+  <label>Weight (kgs) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="weight"
+      min="0"
+      max="300"
+    />
+  </div>
+</div>
+
+<!-- Height -->
+<div class="col-sm-3">
+  <label>Height (cms) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="height"
+      min="0"
+      max="300"
+    />
+  </div>
+</div>
+
+<!-- BMI -->
+<div class="col-sm-3">
+  <label>BMI <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="bmi"
+      min="0"
+      max="100"
+    />
+  </div>
+</div>
+
+<!-- SPO2 -->
+<div class="col-sm-3">
+  <label>SPO2 (%) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="spo2"
+      min="0"
+      max="100"
+    />
+  </div>
+</div>
+
+<!-- Glucose -->
+<div class="col-sm-3">
+  <label>Glucose (mg/dl) <span class="text-danger">*</span></label>
+  <div class="mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm"
+      [value]="glucose"
+      min="0"
+      max="400"
+    />
+  </div>
+</div>
+
+            <!-- Comment -->
+            <div class="col-sm-3 mb-3">
+                <label>Comment <span class="text-danger">*</span></label>
+                <input
+                    type="text"
+                    class="form-control"
+                    formControlName="comment"
+                    placeholder="Enter your comment"
+                />
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+    </form>
+</div>

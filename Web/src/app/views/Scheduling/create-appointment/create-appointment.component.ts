@@ -1,4 +1,72 @@
+// import { Component } from '@angular/core';
+// import Swal from 'sweetalert2';
+// import { Router } from '@angular/router';
+// import { ApiService } from '@core/services/api.service';
+// import { CommonModule } from '@angular/common';
+// import { RouterModule } from '@angular/router';
+// // import { FormBuilder, Validators } from '@angular/forms';
+// import { ReactiveFormsModule } from '@angular/forms';
+// import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+
+// @Component({
+//   selector: 'app-create-appointment',
+//   imports: [ReactiveFormsModule, CommonModule, RouterModule],
+//   templateUrl: './create-appointment.component.html',
+//   styleUrl: './create-appointment.component.scss'
+// })
+
+// export class CreateAppointmentComponent {
+//   // form: FormGroup;
+//   constructor(private router: Router, private apiService: ApiService, private fb: FormBuilder) {}
+  
+//   // fb: FormBuilder;
+//   Patientpopup: boolean = false;
+//   mrNO: any;
+//   appId: any;
+//   patient_FName: any;
+//   appointments: any[] = [];
+//   facilities: any[] = [];
+//   specialities: any[] = [];
+//   providers: any[] = [];
+//   sites: any[] = [];
+//   visitTypes: any[] = [];
+//   appointmentTypes: any[] = [];
+//   appointmentPurposes: any[] = [];
+//   appointmentStatuses: any[] = [];
+//   appointmentPriorities: any[] = [];
+//   appointmentModes: any[] = [];
+//   siteArray: any[] = []; 
+//   facilityArray: any[] = [];
+//   Times: any[] = [];
+//   purpose: any[] = [];
+//   visittype: any[] = [];
+  
+// appointmentForm!: FormGroup;
+
+
+
+//   appointmentForm = this.fb.group({
+//     facility: ['', Validators.required],
+//     speciality: ['', Validators.required],
+//     provider: ['', Validators.required],
+//     site: ['', Validators.required],
+//     date: ['', Validators.required],
+//     time: ['', Validators.required],
+//     purpose: ['', Validators.required],
+//     visitType: ['', Validators.required],
+//     // Add rest of the controls similarly
+//   });
+  
+
+
+// onSubmit(){
+
+// }
+// onCancel(){
+
+// }
+// }
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -26,7 +94,7 @@ import { D } from 'node_modules/@angular/cdk/bidi-module.d-D-fEBKdS';
 })
 export class CreateAppointmentComponent implements OnInit {
   date: any;
-  
+
 
   appointmentForm!: FormGroup;
 minDate: any;
@@ -149,16 +217,16 @@ minDate: any;
     'BLPayerPlan'
   ];
 
-ngOnInit(): void {
-  this.appointmentForm = this.fb.group({
-    facility: ['', Validators.required],
-    speciality: ['', Validators.required],
-    provider: ['', Validators.required],
-    site: ['', Validators.required],
-    date: ['', Validators.required],
-    time: ['', Validators.required],
-    purpose: ['', Validators.required],
-    visitType: ['', Validators.required],
+  ngOnInit(): void {
+    this.appointmentForm = this.fb.group({
+      facility: ['', Validators.required],
+      speciality: ['', Validators.required],
+      provider: ['', Validators.required],
+      site: ['', Validators.required],
+      date: ['', Validators.required],
+      time: ['', Validators.required],
+      purpose: ['', Validators.required],
+      visitType: ['', Validators.required],
     type: ['', Validators.required],
     duration: ['', Validators.required],
     location: ['', Validators.required],
@@ -215,11 +283,11 @@ ngOnInit(): void {
     } else {
       this.siteArray = [];
     }
-  });
-  
+    });
+
 
   this.FillCache();
-}
+  }
 
   
 

@@ -1,7 +1,8 @@
-export interface DemographicDTO {
-  PatientPicture: any;
-  practice: string;
-  MrNo: string;
+
+export interface Demographic {
+  PatientPicture?: string;
+  practice?: string;
+  MrNo?: string;
   PersonTitleId: number;
   PersonFirstName: string;
   PersonMiddleName?: string;
@@ -12,7 +13,7 @@ export interface DemographicDTO {
   PersonMaritalStatus: number;
   PatientBloodGroupId: number;
   PatientBirthDate: Date;
-  Age: number;
+  Age?: number;
   personSocialSecurityNo: string;
   LaborCardNo?: string;
   Religion?: number;
@@ -30,8 +31,19 @@ export interface DemographicDTO {
   DeathDate?: Date;
   BillingNote: string;
   isVIP: boolean;
-  isPregnant: boolean;
-  isDirective: boolean;
-  isDrugHist: boolean;
-  isExpReporting: boolean;
+  isPregnant?: boolean;
+  isDirective?: boolean;
+  isDrugHist?: boolean;
+  isExpReporting?: boolean;
 }
+
+
+export interface Contact {
+  CellPhone?: string;
+  HomePhone?: string;
+  
+}
+
+
+
+

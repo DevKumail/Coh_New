@@ -134,6 +134,7 @@ messageService = {}
 
 
 
+  appointments: any[] = [];
   
   buttonRoute(path: string) {
     this.router.navigate([path]);
@@ -162,8 +163,13 @@ confirmCancel(event: any, appointment: any, position: string) {
 Reschedule(event: any, appointment: any, position: string) {
   // your logic
 }
+openModal(content: TemplateRef<HTMLElement>, options: NgbModalOptions) {
+        this.modalService.open(content, options)
+    }
+ buttonRouter(path: string): void {
+    this.router.navigate([path]);
 onSubmit(){
 
-}
+  }
   
 }

@@ -2,6 +2,14 @@
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h4>Appointments</h4>
+      <!-- <div>
+        <button class="btn btn-secondary mr-2" (click)="ClearFilter()">Clear</button>
+        <button class="btn btn-primary mr-2" (click)="ClickFilter()">Filter</button>
+        <button class="btn btn-success" (click)="buttonRoute('/scheduling/appointment/create')">Create</button>
+      </div> -->
+      <div>
+  <button class="btn btn-secondary me-2" (click)="ClearFilter()">Clear</button>
+  <!-- <button class="btn btn-primary me-2" (click)=" ClickFilter()">Filter</button> -->
 
       <div class="d-flex gap-2">
         <button class="btn btn-secondary flex-fill" (click)="ClearFilter()">
@@ -9,14 +17,22 @@
         </button>
 
         <button class="btn btn-primary flex-fill" (click)="ClickFilter(standardModal)">
-          <i class="bi bi-filter"></i> Filter
-        </button>
+  <i class="bi bi-filter"></i> Filter
+</button> -->
+<button class="btn btn-primary" (click)="buttonRouter('/scheduling/appointment/filter')">
+  <i class="bi bi-filter"></i> Filter
+</button>
 
         <button class="btn btn-success flex-fill" (click)="buttonRoute('/scheduling/create-appointment')">
-          Create
-        </button>
+  Create
+</button> -->
+<button class="btn btn-success" (click)="buttonRoute('/scheduling/Create-Appointments')">
+  Create
+</button>
       </div>
 
+
+</div>
 
     </div>
 
@@ -72,7 +88,7 @@
     [queryParams]="{ mrNo: appointment.mrNo }" title="History">
     <i class="bi bi-clock-history"></i>
   </button>
-</td>
+            </td>
 
 
 
@@ -90,12 +106,12 @@
 
 <ng-template #standardModal let-modal>
   <form [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
-    <div class="modal-header">
+  <div class="modal-header">
       <h5 class="modal-title">Filter Appointments</h5>
       <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
-    </div>
+  </div>
 
-    <div class="modal-body">
+  <div class="modal-body">
       <div class="card shadow-sm rounded-3">
         <div class="card-body">
           <div class="container-fluid">
@@ -189,13 +205,16 @@
             </div>
 
           </div>
-        </div>
-      </div>
     </div>
+    <div class="mb-3">
+      <label for="message-text" class="col-form-label">Message:</label>
+      <textarea class="form-control" id="message-text"></textarea>
+    </div>
+  </div>
 
-    <div class="modal-footer">
+  <div class="modal-footer">
       <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
       <button type="submit" class="btn btn-primary">Search</button>
-    </div>
+  </div>
   </form>
 </ng-template>

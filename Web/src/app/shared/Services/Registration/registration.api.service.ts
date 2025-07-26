@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { ApiService } from '@/app/core/services/api.service';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { AlertDTO } from '@/app/shared/models/alert.model';
+import { AlertType } from '@/app/shared/models/alert-type.model';
 
 @Injectable({ providedIn: 'root' })
 export class RegistrationApiService {
@@ -23,11 +25,18 @@ export class RegistrationApiService {
         return this.api.put(`/api/patients/${id}`, data);
     }
 
+    // deletePatient(id: string): Observable<any> {
+    //     return this.api.delete(/api/patients/${id});
+    // }
+    // SubmitAlertType(data: any): Observable<any> {
+    //     // debugger
+    //     return this.api.post(Alert/SubmitAlertType, data);
+    // }
     deletePatient(id: string): Observable<any> {
         return this.api.delete(`/api/patients/${id}`);
     }
     SubmitAlertType(data: any): Observable<any> {
-        debugger
+
         return this.api.post(`Alert/SubmitAlertType`, data);
     }
 
@@ -44,6 +53,7 @@ export class RegistrationApiService {
   GetSearch( CompanyOrIndividual?:any,  LastName?:string, SSN?: string, InsuredIDNo? : string, MRNo?:any,   PageNumber?:number, PageSize?:number) {
 
     debugger
+
 
     return this.api.get(`Coverages/GetSearch?CompanyOrIndividual=${CompanyOrIndividual}&LastName=${LastName}&SSN=${SSN}&InsuredIDNo=${InsuredIDNo}&MRNo=${MRNo}&PageNumber=${PageNumber}&PageSize=${PageSize}`).toPromise();
 
@@ -66,30 +76,35 @@ const obj={CoverageListReq,PaginationInfo}
   }
 
   InsertSubscriber(object: any) {
-    debugger
+
     return this.api.post('Coverages/InsertSubscriber', object).toPromise();
   }
 
   GetCoverageById(subscribedId:number) {
-    debugger
+
     return this.api.get(`Coverages/GetCoveragesubscribedId?subscribedId=${subscribedId}`).toPromise();
   }
 
   InsertCoverage(object: any) {
     return this.api.post('Coverages/InsertCoverage', object).toPromise();
   }
+//   FetchImageData(obj:FormData) {
+//     // debugger
+//   return this.api.imagepost(`Coverages/GetImageData`,obj).toPromise();
+//   }
 
 GetInsuranceRelation() {
   return this.api.get('Coverages/GetInsuranceRelation')
 }
 
 getCityByState(ProviderId:any) {
+// debugger
 
   return this.api.get(`AllDropdowns/GetCityByState?ProviderId=${ProviderId}`).toPromise();
 }
 
 getStateByCountry(countryId:any) {
-  debugger
+
   return this.api.get(`AllDropdowns/GetStateByCountry?countryId=${countryId}`).toPromise();
 }
 
@@ -97,6 +112,8 @@ getStateByCountry(countryId:any) {
         return this.api.post('Cache/GetCache', object).toPromise();
     }
 
-
-
+   getAlertType(): Promise<{ result: AlertType[] } | undefined> {
+    debugger
+  return this.api.get<{ result: AlertType[] }>(`AllDropdowns/GetAlertType`).toPromise();
+}
 }

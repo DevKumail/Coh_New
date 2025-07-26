@@ -23,24 +23,24 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
   currentYear = currentYear;
   credits = credits;
    ngOnInit(): void {
-    debugger
+
     this.pingSubscription = interval(5000)
       .pipe(
         switchMap(() =>
-          this.api.get('/api/ping').pipe(
-            catchError(() => of(null)) // catch and ignore errors
+          this.api.get('ping').pipe(
+            catchError(() => of(null)) 
           )
         )
       )
       .subscribe((response) => {
         if (response) {
-          this.router.navigateByUrl('/'); // redirect when backend is available
+          this.router.navigateByUrl('/'); 
         }
       });
   }
 
   ngOnDestroy(): void {
-    debugger
+
     if (this.pingSubscription) {
       this.pingSubscription.unsubscribe();
     }
