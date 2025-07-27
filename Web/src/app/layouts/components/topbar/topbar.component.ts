@@ -2,7 +2,7 @@ import { Component, EventEmitter, inject, OnInit, Output, TemplateRef } from '@a
 import { RouterLink } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
 import { LayoutStoreService } from '@core/services/layout-store.service';
-import { LucideAngularModule, Search, Sliders } from 'lucide-angular';
+import { LucideAngularModule, Search, Sliders, X } from 'lucide-angular';
 import { MegaMenuComponent } from '@layouts/components/topbar/components/mega-menu/mega-menu.component';
 import { ThemeTogglerComponent } from '@layouts/components/topbar/components/theme-toggler/theme-toggler.component';
 import { UserProfileComponent } from '@layouts/components/topbar/components/user-profile/user-profile.component';
@@ -39,7 +39,7 @@ import { NavbarComponent } from "../navbar/navbar.component";
     PatientHeaderPanelComponent,
     FormsModule,
     NavbarComponent
-],
+  ],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
   animations: [
@@ -117,16 +117,22 @@ export class TopbarComponent implements OnInit {
   mrNo: any;
 
   onSearchClick() {
-    debugger
     if (this.mrNo && this.mrNo.length >= 3) {
       this.searchPatient(this.mrNo);
     } else {
       this.patientBannerService.setPatientData(null);
+      console.log("data becomes null")
     }
   }
 
   onAdvanceFilterClick() {
 
+  }
+
+  onClearInput() {
+    this.mrNo = "";
+    this.showPatientBanner = false;
+    this.onSearchClick();
   }
 
   searchPatient(mrNo: string) {
@@ -135,8 +141,10 @@ export class TopbarComponent implements OnInit {
       next: (res: any) => {
         if (res?.table2?.length > 0) {
           this.patientBannerService.setPatientData(res);
+          this.showPatientBanner = true;
         } else {
           this.patientBannerService.setPatientData(null);
+          this.showPatientBanner = false;
         }
       },
       error: err => {
@@ -148,6 +156,7 @@ export class TopbarComponent implements OnInit {
 
   SearchIcon = Search;
   SliderIcon = Sliders;
+  XIcon = X;
 
 
 }

@@ -2,52 +2,62 @@
 
   <div class="">
 
-    <div class="container-fluid topbar-menu d-flex justify-content-between align-items-center">
-      <div class="d-flex align-items-center gap-2">
+    <div class="">
+      <div class="container-fluid topbar-menu d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
 
-        <div class="logo-topbar">
-          <a routerLink="/" class="logo-light">
-            <span class="logo-lg">
-              <img src="assets/images/logos/fuse-logo-sm.png" alt="logo" />
-            </span>
-            <span class="logo-sm">
-              <img src="assets/images/branding/coherent-dark.png" alt="small logo" />
-            </span>
-          </a>
-          <a routerLink="/" class="logo-dark">
-            <span class="logo-lg">
-              <img src="assets/images/logos/fuse-logo-sm.png" alt="logo" />
-            </span>
-            <span class="logo-sm">
-              <img src="assets/images/branding/coherent-light.png" alt="small logo" />
-            </span>
-          </a>
-        </div>
+          <div class="logo-topbar">
+            <a routerLink="/" class="logo-light">
+              <span class="logo-lg">
+                <img src="assets/images/logos/fuse-logo-sm.png" alt="logo" />
+              </span>
+              <span class="logo-sm">
+                <img src="assets/images/branding/coherent-dark.png" alt="small logo" />
+              </span>
+            </a>
+            <a routerLink="/" class="logo-dark">
+              <span class="logo-lg">
+                <img src="assets/images/logos/fuse-logo-sm.png" alt="logo" />
+              </span>
+              <span class="logo-sm">
+                <img src="assets/images/branding/coherent-light.png" alt="small logo" />
+              </span>
+            </a>
+          </div>
 
-        <button (click)="toggleSidebar()" class="sidenav-toggle-button btn btn-primary btn-icon">
-          <ng-icon name="tablerMenu4" class="fs-22" />
-        </button>
-
-        <div class="input-group">
-          <button class="btn btn-light px-2" type="button" (click)="onAdvanceFilterClick()">
-            <lucide-icon [img]="SliderIcon" class="lucide-lg"></lucide-icon>
+          <button (click)="toggleSidebar()" class="sidenav-toggle-button btn btn-primary btn-icon">
+            <ng-icon name="tablerMenu4" class="fs-22" />
           </button>
 
-          <input type="search4" class="form-control border-0 px-2" name="search" placeholder="Search Patient By Mr No"
-            style="box-shadow: none;" [(ngModel)]="mrNo" />
+          <div class="input-group">
+            <button class="btn btn-light px-2" type="button" (click)="onAdvanceFilterClick()">
+              <lucide-icon [img]="SliderIcon" class="lucide-lg"></lucide-icon>
+            </button>
 
-          <button class="btn btn-light px-2" type="button" (click)="onSearchClick()">
-            <lucide-icon [img]="SearchIcon" class="lucide-lg"></lucide-icon>
-          </button>
+            <input type="search4" class="form-control border-0 px-2" name="search" placeholder="Search Patient By Mr No"
+              style="box-shadow: none;" [(ngModel)]="mrNo" />
+
+            <button class="btn btn-light px-2" type="button" (click)="onSearchClick()">
+              <lucide-icon [img]="SearchIcon" class="lucide-lg"></lucide-icon>
+            </button>
+          </div>
+
+          <lucide-icon 
+          *ngIf="mrNo" 
+          [img]="XIcon" 
+          class="lucide-lg cursor-pointer" 
+          (click)="onClearInput()">
+
+          </lucide-icon>
+
+
+          <app-mega-menu />
         </div>
 
-        <app-mega-menu />
-      </div>
+        <div class="d-flex align-items-center gap-2 ">
 
-      <div class="d-flex align-items-center gap-2 ">
-
-        <!-- Button to trigger modal or banner  -->
-        <!-- <button
+          <!-- Button to trigger modal or banner  -->
+          <!-- <button
         (click)="togglePatientBanner(patientSearchModal)"
         class="btn p-0 border-0 bg-transparent shadow-none"
         title="Toggle Patient Banner"
@@ -55,13 +65,14 @@
         <lucide-icon name="stethoscope" class="fs-22 text-body"></lucide-icon>
       </button> -->
 
-        <app-notification-dropdown />
-        <app-theme-toggler />
-        <app-user-profile-topbar />
+          <app-notification-dropdown />
+          <app-theme-toggler />
+          <app-user-profile-topbar />
+        </div>
       </div>
     </div>
 
-    <div>
+    <div *ngIf="showPatientBanner">
       <app-patient-header-panel />
     </div>
 

@@ -3,11 +3,11 @@
     aria-label="Close">
   </button> -->
 
-  <div class="d-flex justify-content-start align-items-start rounded border shadow-lg m-1 p-1 small">
+  <div class="d-flex justify-content-start align-items-start border-bottom rounded-bottom-3 shadow p-1 small">
 
     <div class="me-2 flex-shrink-0">
       <img  [src]="patientInfo?.patientPicture ? 'data:image/jpeg;base64,' + patientInfo.patientPicture : 'assets/images/patient.jpg'"  alt="Patient Image"
-        class="shadow-lg rounded" style="width: 60px; height: 60px; object-fit: cover;" />
+        class="shadow rounded" style="width: 60px; height: 60px; object-fit: cover;" />
     </div>
 
     <div class="px-2 border-start">
