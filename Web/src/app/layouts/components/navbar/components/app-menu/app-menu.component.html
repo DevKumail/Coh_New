@@ -1,4 +1,4 @@
-<div class="collapse navbar-collapse" id="topnav-menu-content">
+<div class="collapse navbar-collapse d-flex justify-content-between" id="topnav-menu-content">
     <ul class="navbar-nav">
         @for (item of menuItems; track $index) {
         <!-- menu item without any child -->
@@ -14,21 +14,7 @@
         }
         }
 
-    </ul>
-
-    <div class="input-group app-search">
-
-        <button class="btn btn-light px-2" type="button" (click)="onAdvanceFilterClick()">
-            <lucide-icon [img]="SliderIcon" class="lucide-lg"></lucide-icon>
-        </button>
-
-        <input type="search4" class="form-control border-0 px-2" name="search" placeholder="Search Patient By Mr No"
-            style="box-shadow: none;" [(ngModel)]="mrNo" />
-
-        <button class="btn btn-light px-2" type="button" (click)="onSearchClick()">
-            <lucide-icon [img]="SearchIcon" class="lucide-lg"></lucide-icon>
-        </button>
-    </div>
+    </ul>   
 
 </div>
 

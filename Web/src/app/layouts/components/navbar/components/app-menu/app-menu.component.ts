@@ -39,13 +39,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
   templateUrl: './app-menu.component.html'
 })
 export class AppMenuComponent implements OnInit {
-  SearchIcon = Search;
-  SliderIcon = Sliders;
-  mrNo: string = '';
 
   router = inject(Router);
-  private patientBannerService = inject(PatientBannerService);
-  private demographicapi = inject(DemographicApiServices);
 
   @ViewChild('MenuItemWithChildren', { static: true })
   menuItemWithChildren!: TemplateRef<{
@@ -80,34 +75,6 @@ export class AppMenuComponent implements OnInit {
 
     this.expandActivePaths(this.menuItems);
 
-  }
-
-  onSearchClick() {
-    if (this.mrNo && this.mrNo.length >= 3) {
-      this.searchPatient(this.mrNo);
-    } else {
-      this.patientBannerService.setPatientData(null);
-    }
-  }
-
-  onAdvanceFilterClick() {
-    
-  }
-
-  searchPatient(mrNo: string) {
-    this.demographicapi.getPatientByMrNo(mrNo).subscribe({
-      next: (res: any) => {
-        if (res?.table2?.length > 0) {
-          this.patientBannerService.setPatientData(res);
-        } else {
-          this.patientBannerService.setPatientData(null);
-        }
-      },
-      error: err => {
-        console.error('API Error:', err);
-        this.patientBannerService.setPatientData(null);
-      }
-    });
   }
 
   hasSubMenu(item: MenuItemType): boolean {

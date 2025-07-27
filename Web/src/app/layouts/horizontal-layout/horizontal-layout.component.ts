@@ -7,16 +7,18 @@ import {NavbarComponent} from '@layouts/components/navbar/navbar.component';
 import {LayoutStoreService} from '@core/services/layout-store.service';
 import {debounceTime, fromEvent, Subscription} from 'rxjs';
 import {SidenavComponent} from '@layouts/components/sidenav/sidenav.component';
+import { PatientHeaderPanelComponent } from "@layouts/components/patient-header-panel/patient-header-panel.component";
 
 @Component({
     selector: 'app-horizontal-layout',
     imports: [
-        FooterComponent,
-        RouterOutlet,
-        TopbarComponent,
-        NavbarComponent,
-        SidenavComponent,
-    ],
+    FooterComponent,
+    RouterOutlet,
+    TopbarComponent,
+    NavbarComponent,
+    SidenavComponent,
+    PatientHeaderPanelComponent
+],
     templateUrl: './horizontal-layout.component.html'
 })
 export class HorizontalLayoutComponent implements OnInit, OnDestroy {

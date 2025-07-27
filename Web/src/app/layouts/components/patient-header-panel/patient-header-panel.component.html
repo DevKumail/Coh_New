@@ -1,23 +1,23 @@
-<div *ngIf="visible" [@slideToggle]="visible ? 'visible' : 'hidden'" class="rounded">
+<div *ngIf="visible" class="container-fluid">
   <!-- <button class="btn-close position-absolute" style="top: 8px; right: 8px; z-index: 10;" (click)="closeBanner()"
     aria-label="Close">
   </button> -->
 
-  <div class="card-body d-flex justify-content-between">
+  <div class="d-flex justify-content-start align-items-start rounded border shadow-lg m-1 p-1 small">
 
-    <div class="min-w-80 me-1">
-      <img [src]="'data:image/jpeg;base64,' + patientInfo?.patientPicture" alt="Patient Image"
-        class="img-thumbnail rounded" style="width: 90px; height: 90px; object-fit: cover;" />
+    <div class="me-2 flex-shrink-0">
+      <img  [src]="patientInfo?.patientPicture ? 'data:image/jpeg;base64,' + patientInfo.patientPicture : 'assets/images/patient.jpg'"  alt="Patient Image"
+        class="shadow-lg rounded" style="width: 60px; height: 60px; object-fit: cover;" />
     </div>
 
-    <div class="mx-1 px-2 border-start">
-      <div class="fs-4 fw-bold">{{ patientInfo?.personFirstName || 'Johnathan' }}</div>
+    <div class="px-2 border-start">
+      <div><strong>Name:</strong> {{ patientInfo?.personFirstName || 'Johnathan' }}</div>
       <div><strong>MR No:</strong> {{ patientInfo?.mrNo || 'MR1234567' }}</div>
       <div><strong>Payer:</strong> {{ insuranceInfo[0]?.payerName || 'United Healthcare' }}</div>
       <div><strong>Plan:</strong> {{ insuranceInfo[0]?.plan || 'Gold PPO Plan' }}</div>
     </div>
 
-    <div class="mx-1 px-2 border-start">
+    <div class="px-2 border-start">
       <div><strong>Member ID:</strong> {{ insuranceInfo[0]?.memberId || 'M1234567890' }}</div>
       <div><strong>Gender:</strong> {{ patientInfo?.gender || 'Female' }}</div>
       <div><strong>DOB:</strong> {{ patientInfo?.patientBirthDate ? (patientInfo.patientBirthDate | date:'MM/dd/yyyy') :
@@ -25,17 +25,16 @@
       <div><strong>PCP:</strong> {{ patientInfo?.pcpName || 'Dr. Amanda Blake' }}</div>
     </div>
 
-    <div class="mx-1 px-2 border-start">
+    <div class="px-2 border-start">
       <div><strong>Patient Type:</strong> {{ patientInfo?.patientType || 'Outpatient' }}</div>
       <div><strong>Cell Phone:</strong> {{ patientInfo?.personCellPhone || '(555) 123-4567' }}</div>
       <div><strong>Home Phone:</strong> {{ patientInfo?.homePhone || '(555) 987-6543' }}</div>
       <div><strong>Work Phone:</strong> {{ patientInfo?.workPhone || '(555) 555-1212' }}</div>
     </div>
 
-    <div class="mx-1 px-2 border-start">
+    <div class="px-2 border-start">
       <div><strong>POD Type:</strong> {{ patientInfo?.podType || 'Primary Care' }}</div>
     </div>
-
 
   </div>
 
