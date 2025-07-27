@@ -15,9 +15,7 @@ import { PatientHeaderPanelComponent } from "@layouts/components/patient-header-
     FooterComponent,
     RouterOutlet,
     TopbarComponent,
-    NavbarComponent,
     SidenavComponent,
-    PatientHeaderPanelComponent
 ],
     templateUrl: './horizontal-layout.component.html'
 })

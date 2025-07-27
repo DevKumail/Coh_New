@@ -5,9 +5,9 @@
 
   <div class="d-flex justify-content-start align-items-start border-bottom rounded-bottom-3 shadow p-1 small">
 
-    <div class="me-2 flex-shrink-0">
+    <div class="flex-shrink-0">
       <img  [src]="patientInfo?.patientPicture ? 'data:image/jpeg;base64,' + patientInfo.patientPicture : 'assets/images/patient.jpg'"  alt="Patient Image"
-        class="shadow rounded" style="width: 60px; height: 60px; object-fit: cover;" />
+        class="rounded-start" style="object-fit: cover; height: 60px; width: 60px" />
     </div>
 
     <div class="px-2 border-start">

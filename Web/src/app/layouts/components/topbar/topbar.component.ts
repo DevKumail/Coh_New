@@ -22,6 +22,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import { NavbarComponent } from "../navbar/navbar.component";
+import { AdvanceSearchModalComponent } from "./components/advance-search-modal/advance-search-modal.component";
 
 
 @Component({
@@ -38,8 +39,9 @@ import { NavbarComponent } from "../navbar/navbar.component";
     NgbModalModule, NgIcon,
     PatientHeaderPanelComponent,
     FormsModule,
-    NavbarComponent
-  ],
+    NavbarComponent,
+    AdvanceSearchModalComponent
+],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
   animations: [
@@ -60,6 +62,10 @@ export class TopbarComponent implements OnInit {
     private modalService: NgbModal,
     private patientBannerService: PatientBannerService
   ) { }
+
+  SearchIcon = Search;
+  SliderIcon = Sliders;
+  XIcon = X;
 
   patientData: any = null;
   showPatientPanel: boolean = false;
@@ -125,10 +131,6 @@ export class TopbarComponent implements OnInit {
     }
   }
 
-  onAdvanceFilterClick() {
-
-  }
-
   onClearInput() {
     this.mrNo = "";
     this.showPatientBanner = false;
@@ -153,10 +155,5 @@ export class TopbarComponent implements OnInit {
       }
     });
   }
-
-  SearchIcon = Search;
-  SliderIcon = Sliders;
-  XIcon = X;
-
 
 }

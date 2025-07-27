@@ -2,7 +2,7 @@
 
   <div class="">
 
-    <div class="">
+    <div class="py-1 border-bottom">
       <div class="container-fluid topbar-menu d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
 
@@ -30,7 +30,8 @@
           </button>
 
           <div class="input-group">
-            <button class="btn btn-light px-2" type="button" (click)="onAdvanceFilterClick()">
+            <button class="btn btn-light px-2" data-bs-toggle="modal" data-bs-target="#advance-filter-modal"
+              type="button">
               <lucide-icon [img]="SliderIcon" class="lucide-lg"></lucide-icon>
             </button>
 
@@ -42,11 +43,7 @@
             </button>
           </div>
 
-          <lucide-icon 
-          *ngIf="mrNo" 
-          [img]="XIcon" 
-          class="lucide-lg cursor-pointer" 
-          (click)="onClearInput()">
+          <lucide-icon *ngIf="mrNo" [img]="XIcon" class="lucide-lg cursor-pointer" (click)="onClearInput()">
 
           </lucide-icon>
 
@@ -55,16 +52,6 @@
         </div>
 
         <div class="d-flex align-items-center gap-2 ">
-
-          <!-- Button to trigger modal or banner  -->
-          <!-- <button
-        (click)="togglePatientBanner(patientSearchModal)"
-        class="btn p-0 border-0 bg-transparent shadow-none"
-        title="Toggle Patient Banner"
-      >
-        <lucide-icon name="stethoscope" class="fs-22 text-body"></lucide-icon>
-      </button> -->
-
           <app-notification-dropdown />
           <app-theme-toggler />
           <app-user-profile-topbar />
@@ -82,3 +69,5 @@
 
   </div>
 </header>
+
+<app-advance-search-modal (onPatientSelect)="searchPatient($event)"/>
