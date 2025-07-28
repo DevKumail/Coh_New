@@ -9,6 +9,8 @@ html[data-layout="topnav"] {
         z-index: 1005;
         box-shadow: none;
         border-bottom: 0;
+        position: sticky;
+        top: 0;
 
         .logo-topbar {
             display: block;
@@ -25,7 +27,7 @@ html[data-layout="topnav"] {
         }
     }
 
-    &[data-sidenav-size="offcanvas"]  {
+    &[data-sidenav-size="offcanvas"] {
         .sidenav-toggle-button {
             display: flex;
         }
@@ -38,9 +40,6 @@ html[data-layout="topnav"] {
 
     .topnav {
         width: 100%;
-        z-index: 1000;
-        position: sticky;
-        top: $topbar-height;
         background: $sidenav-bg;
         padding-left: $grid-gutter-width * 0.5;
         padding-right: $grid-gutter-width * 0.5;
@@ -62,6 +61,7 @@ html[data-layout="topnav"] {
                     }
                 }
             }
+
             .nav-link {
                 display: flex;
                 align-items: center;
@@ -186,6 +186,7 @@ html[data-layout="topnav"] {
             >.dropdown-item {
                 color: $dropdown-link-hover-color !important;
             }
+
             >.dropdown-menu {
                 display: block;
             }

@@ -1,0 +1,88 @@
+<div id="advance-filter-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="standard-modalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h4 class="modal-title" id="standard-modalLabel">Advance Filter</h4>
+                    <small>Search Patients By Advance Filter</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-2">
+
+                <div class="card p-2">
+                    <form [formGroup]="patientForm" (ngSubmit)="onSubmit()">
+                        <div formGroupName="demographicList">
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <label class="form-label">Mr No.</label>
+                                    <input type="text" class="form-control" formControlName="mrno"
+                                        placeholder="Enter MR No" />
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" class="form-control" formControlName="name"
+                                        placeholder="Enter Name" />
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Gender</label>
+                                    <select class="form-select" formControlName="genderId">
+                                        <option [ngValue]="0">All</option>
+                                        <option [ngValue]="1">Male</option>
+                                        <option [ngValue]="2">Female</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="text" class="form-control" formControlName="phone"
+                                        placeholder="Enter Phone No" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-3 justify-content-end">
+                            <button type="button" class="btn btn-outline-danger btn-sm" (click)="resetFilter()">
+                                <lucide-icon name="RefreshCcw" class="me-1"></lucide-icon>
+                                Reset
+                            </button>
+                            <button type="submit" class="btn btn-outline-light btn-sm">
+                                <lucide-icon name="Search" class="me-1"></lucide-icon>
+                                Search
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+
+                <app-ui-card *ngIf="searchResults.length > 0" title="Search Results">
+                    <div card-body>
+                        <div class="mt-1">
+                            <table class="table dt-responsive align-middle mb-0" id="patient-select">
+                                <thead class="thead-sm text-uppercase fs-xxs">
+                                    <tr>
+                                        <th>MR No</th>
+                                        <th>Name</th>
+                                        <th>Gender</th>
+                                        <th>Age</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let patient of searchResults" (click)="onRowSelect(patient.mrNo)">
+                                        <td>{{ patient.mrNo }}</td>
+                                        <td>{{ patient.personFirstName }}</td>
+                                        <td>{{ patient.gender }}</td>
+                                        <td>{{ patient.age }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </app-ui-card>
+            </div>
+        </div>
+    </div>
+</div>
