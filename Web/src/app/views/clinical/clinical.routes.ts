@@ -6,6 +6,8 @@ import { ProblemComponent } from './problem/problem.component';
 import { AllergiesComponent } from './allergies/allergies.component';
 import { Component } from 'lucide-angular';
 import { AppointmentsComponent } from '../Scheduling/appointments/appointments.component';
+import { modulePermissionGuard } from '@core/guards/module-permission.guard';
+import { VitalSignsComponent } from './vital-signs/vital-signs.component';
 
 export const CLINICAL_ROUTES: Routes = [
   {

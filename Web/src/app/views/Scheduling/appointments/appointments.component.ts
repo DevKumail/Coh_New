@@ -134,7 +134,7 @@ messageService = {}
 
 
 
-  appointments: any[] = [];
+  // appointments: any[] = [];
   
   buttonRoute(path: string) {
     this.router.navigate([path]);
@@ -168,6 +168,7 @@ openModal(content: TemplateRef<HTMLElement>, options: NgbModalOptions) {
     }
  buttonRouter(path: string): void {
     this.router.navigate([path]);
+ }
 onSubmit(){
 
   }

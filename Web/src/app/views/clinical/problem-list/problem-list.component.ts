@@ -133,11 +133,11 @@ diagnosisForm: any
       patientId: 1   // ← Add actual patientId here
     };
 
-    this.clinicalApiService.SubmitPatientProblem(problemPayload).then(res => {
+    this.clinicalApiService.SubmitPatientProblem(problemPayload).then((res:any) => {
       this.getRowData();
       this.onClear();
       // TODO: Replace with your notification service, e.g. this.messageService.add({ severity: 'success', summary: 'Saved', detail: 'Problem successfully created' });
-    }).catch(error => {
+    }).catch((error:any) => {
       // TODO: Replace with your notification service, e.g. this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message });
     });
   }
@@ -163,6 +163,9 @@ diagnosisForm: any
       this.pageNumbers = Array(this.totalPages).fill(0).map((_, i) => i + 1);
     });
   }
+  SubmitPatientProblem(){
+    
+  }
 
 
   fetchProviders() {
@@ -172,9 +175,30 @@ diagnosisForm: any
       { id: 2, name: 'Dr. Sara' }
     ];
   }
+  GetRowDataOfPatientProblem(mrno: string, userId: number) {
+    return this.clinicalApiService.GetRowDataOfPatientProblem(mrno, userId).then((res: any) => {
+      const problems = res?.patientProblems?.table1 || [];
+      this.medicalHistoryData = problems.map((item: any) => ({
+        provider: item.providerName,
+        problem: item.icD9Description,
+        comments: item.comments,
+        confidential: item.confidential ? true : false,
+        status: item.status,
+        startDate: item.startDate,
+        endDate: item.endDate
+      }));
+
+      this.totalPages = Math.ceil(this.medicalHistoryData.length / this.pageSize);
+      this.pageNumbers = Array(this.totalPages).fill(0).map((_, i) => i + 1);
+    });
+
+  }
   onCheckboxChange(){
 
   }
+
+
+  
   
  openModal() {}
   RoutesearchProblem(){

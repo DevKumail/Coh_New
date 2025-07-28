@@ -18,13 +18,15 @@ export class ClinicalApiService {
 //   return this.api.post('/Alergy/SubmitPatientAlergy', data);
 // }
 
-//   SubmitPatientProblem(object: any) {
-//     ;
-//     return this.api
-//       .post(`PatientProblem/SubmitPatientProblem`, object)
-//       .toPromise();
-//   }
-//  GetRowDataOfPatientProblem(mrno:string,userId:number){
+  SubmitPatientProblem(object: any) {
+    ;
+    return this.api
+      .post(`PatientProblem/SubmitPatientProblem`, object)
+      .toPromise();
+  }
+ GetRowDataOfPatientProblem(mrno:string,userId:number) {
+    return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}`).toPromise();
+  }
 
   submitPatientAllergy(data: any): Observable<any> {
     // debugger
@@ -50,10 +52,10 @@ export class ClinicalApiService {
   // GetAlergyType(mrno: string, userId: number) {
   //   return this.api.get(`AllDropdowns/GetAlergyType?mrno=${mrno}&userId=${userId}`).toPromise();
   // }
-   GetAlergyType(){
-     // debugger;
-    return this.api.get(`AllDropdowns/GetAlergyTypes`).toPromise();
-  }
+  //  GetAlergyType(){
+  //    // debugger;
+  //   return this.api.get(`AllDropdowns/GetAlergyTypes`).toPromise();
+  // }
    SubmitPatientAllergies(object:any){
     debugger
     return this.api.post(`Alergy/SubmitPatientAlergy`,object).toPromise();
@@ -65,9 +67,9 @@ export class ClinicalApiService {
   SubmitAllergy(data: any): Promise<any> {
     return this.api.post('Allergies/SubmitAllergy', data).toPromise();
   }
-  DeleteAllergy(id: string): Promise<any> {
-    const url = `Allergies/DeleteAllergy?id=${id}`;
-    return this.api.delete(url).toPromise();
+  DeleteAllergy(allergyId:number){
+    debugger
+    return this.api.delete(`Alergy/DeleteAlergy?Id=${allergyId}`).toPromise();
   }
   // GetAllergyById(id: string): Promise<any> {
   //     const url = `Allergies/GetAllergyById?id=${id}`;
@@ -76,10 +78,10 @@ export class ClinicalApiService {
     return this.api.get(`AllDropdowns/GetSeverityType`).toPromise();
   }
 
-  GetPatientAllergyData(mrno: String) {
-     // debugger;
-    return this.api.get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}`).toPromise();
-  }
+  // GetPatientAllergyData(mrno: String) {
+  //    // debugger;
+  //   return this.api.get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}`).toPromise();
+  // }
   GetAlergyType(): Observable<any> {
     return this.api.get('AllDropdowns/GetAlergyTypes');
   } 
@@ -99,15 +101,15 @@ export class ClinicalApiService {
 }
 
   
-  SubmitPatientAllergies(data: any) {
-    return this.api.post('Alergy/SubmitPatientAlergy', data).toPromise();
-  }
+  // SubmitPatientAllergies(data: any) {
+  //   return this.api.post('Alergy/SubmitPatientAlergy', data).toPromise();
+  // }
   GetAlergyByMRNo(MRNo: string) {
     return this.api.get(`Alergy/GetAlergyByMRNo?MRNo=${MRNo}`).toPromise();
   }
-    getCacheItem(object: any) {
-        return this.api.post('Cache/GetCache', object).toPromise();
-    }
+    // getCacheItem(object: any) {
+    //     return this.api.post('Cache/GetCache', object).toPromise();
+    // }
   GetAlergyById(id: string): Observable<any> {
     return this.api.get(`/Alergy/GetAlergyById/${id}`);
   }
@@ -136,9 +138,9 @@ export class ClinicalApiService {
     return this.api.get('Alert/GetAlertStatus').toPromise();
   
 }
-GetSeverity() {
-  return this.api.get('AllDropdowns/GetSeverityType').toPromise();
-}
+// GetSeverity() {
+//   return this.api.get('AllDropdowns/GetSeverityType').toPromise();
+// }
 
 
 }

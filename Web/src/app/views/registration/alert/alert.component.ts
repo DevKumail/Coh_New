@@ -62,7 +62,7 @@ export class AlertComponent implements OnInit {
 
   ngOnInit(): void {
     
-this.  GetPatientAlertsData() ;
+this.GetPatientAlertsData() ;
     this.GetAlertType();
 
     this.alertForm = this.fb.group({

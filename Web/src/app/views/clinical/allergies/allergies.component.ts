@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 // import { ClinicalApiService } from 'src/app/services/clinical-api.service';
 import { ClinicalApiService } from '../clinical.api.service';
 import { Injectable } from '@angular/core';
+import { AllergyDto } from '@/app/shared/models/clinical/allergy.model';
 
 
 @Component({
@@ -21,11 +22,19 @@ import { Injectable } from '@angular/core';
 })
 
 export class AllergiesComponent implements OnInit {
+  buttonText: string | undefined;
+
+  resetForm() {
+    throw new Error('Method not implemented.');
+  }
+
+
+
   validation(value: any): boolean {
-  return value === null || value === undefined || value === '';
-}
+    return value === null || value === undefined || value === '';
+  }
   MyAllergiesData: any[] = [];
-  filteredDiagnosisData: any[] = [];  
+  filteredDiagnosisData: any[] = [];
   cacheItems: string[] = [];
 
   // allergyForm!: FormGroup;
@@ -71,14 +80,14 @@ export class AllergiesComponent implements OnInit {
   // ClinicalApiService: any;
 
   GetSeverity: any;
-  cacheItems: any;
+  // cacheItems: any ;
   appId: any;
   Mrno: any;
   PatientId: any;
   userid: any;
   Allergy: any;
-  MyAllergiesData: any;
-  filteredDiagnosisData: any;
+  // MyAllergiesData: any;
+  // filteredDiagnosisData: any;
   id: number | undefined;
   than: any;
 
@@ -126,14 +135,15 @@ export class AllergiesComponent implements OnInit {
     }
   }
   ngOnInit(): void {
-     
+
     this.FillCache();
     this.GetAlergyType();
     this.GetSeverityType();
     this.initForm();
-    
-     var app =JSON.parse(sessionStorage.getItem('LoadvisitDetail') || '');
-    this.appId=app.appointmentId
+    this.GetPatientAllergyData();
+
+    var app = JSON.parse(sessionStorage.getItem('LoadvisitDetail') || '');
+    this.appId = app.appointmentId
 
     let visitAccountDetail: any = sessionStorage.getItem("LoadvisitDetail");
     var Demographicsinfo = sessionStorage.getItem('Demographics');
@@ -151,7 +161,7 @@ export class AllergiesComponent implements OnInit {
     console.log('this.userId', currentUser);
 
     if (currentUser) {
-      this.userid = currentUser || 0; 
+      this.userid = currentUser || 0;
     }
 
 
@@ -161,10 +171,11 @@ export class AllergiesComponent implements OnInit {
   }
 
   GetPatientAllergyData() {
-     
-    var mrno = this.Mrno
+
+    // var mrno = this.Mrno
+    var mrno = '1006'
     this.ClinicalApiService.GetPatientAllergyData(mrno).subscribe((res: any) => {
-       
+
       console.log('res', res);
       this.MyAllergiesData = res.allergys.table1
       this.filteredDiagnosisData = this.MyAllergiesData
@@ -182,7 +193,7 @@ export class AllergiesComponent implements OnInit {
     this.ClinicalApiService.GetAlergyType().subscribe((res: any) => {
       console.log(res);
       this.GetAlergy = res.result
-      console.log( 'GetAlergy =>',res.result)
+      console.log('GetAlergy =>', res.result)
     })
   }
   GetProviderType() {
@@ -227,43 +238,7 @@ export class AllergiesComponent implements OnInit {
 
 
 
-  // loadDummyData() {
-  //   this.allergyData = [
-  //     {
-  //       providerName: 'Dr. Smith',
-  //       allergyType: 'Food',
-  //       allergen: 'Peanuts',
-  //       severity: 'High',
-  //       reaction: 'Anaphylaxis',
-  //       startDate: '2023-01-01',
-  //       endDate: '2023-06-01',
-  //       status: 'Active'
-  //     },
-  //     {
-  //       providerName: 'Dr. Johnson',
-  //       allergyType: 'Drug',
-  //       allergen: 'Penicillin',
-  //       severity: 'Moderate',
-  //       reaction: 'Rash',
-  //       startDate: '2022-03-15',
-  //       endDate: '2022-10-20',
-  //       status: 'Resolved'
-  //     },
-  //     {
-  //       providerName: 'Dr. Brown',
-  //       allergyType: 'Environmental',
-  //       allergen: 'Dust',
-  //       severity: 'Low',
-  //       reaction: 'Sneezing',
-  //       startDate: '2024-02-01',
-  //       endDate: '2024-07-01',
-  //       status: 'Active'
-  //     },
 
-  //   ];
-  //   this.updatePagination();
-
-  // }
 
   get MyAlllergyData(): any[] {
     return this.allergyData.slice(this.start, this.end);
@@ -306,147 +281,21 @@ export class AllergiesComponent implements OnInit {
     this.currentPage = 1;
     this.updatePagination();
   }
-FillCache() {
-  const cacheItems = [
-      'Provider'];
-
-  this.clinicalApiService.getCacheItem({ entities: cacheItems }).then((response:any) => {
-    if (response.cache != null) {
-     this.FillDropDown(response);
-    }
-  }).catch((error) => {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: error.message || 'Something went wrong while fetching cache data.'
-    });
-  });
-}
-   GetAlergyType() {
-  this.clinicalApiService.GetAlergyType().then((res: any) => {
-    this.GetAlergy = res.result;
-  });
-}
-
-    GetSeverity: any = []
-  GetSeverityType() {
-    this.clinicalApiService.GetSeverity().then((res:any) => {
-      this.GetSeverity = res.result
-    })
-  }
-   GetPatientAllergyData(mrno: string) {
-     
-
-    this.clinicalApiService.GetPatientAllergyData(mrno).then((res:any) => {
-       
-
-      const allergyTable = res?.allergys?.table1;
-debugger
-      if (Array.isArray(allergyTable) && allergyTable.length > 0) {
-        this.MyAllergiesData = allergyTable;
-        this.filteredDiagnosisData = allergyTable;
-
-        console.log(" Allergy Records Found =>", this.MyAllergiesData.length);
-        console.log(" First Record =>", this.MyAllergiesData[0]);
 
 
-      } else {
-        console.warn("No allergy data returned from API.");
-        this.MyAllergiesData = [];
-        this.filteredDiagnosisData = [];
-      }
-    }).catch((error:any) => {
-      console.error("Failed to fetch allergy data", error);
-    });
-  }
-      DropFilled() {
-    this.Allergy.typeId = ""
-    this.Allergy.allergen = ""
-    this.Allergy.providerId = ""
-    this.Allergy.severityCode = ""
-    this.Allergy.reaction = ""
-    this.Allergy.startDate = ""
-    this.Allergy.endDate = ""
-    this.Allergy.status = ""
-    this.isProviderCheck=false;
-    // this.Allergy.severityCode = 0;
-  }
-  // FillDropDown(response: any) {
-  //   this.allergyTypes = response.cache.filter((item:any) => item.entityName === 'AllergyType').map((item:any) => item.entityValue);
-  //   this.severityOptions = response.cache.filter((item:any) => item.entityName === 'Severity').map((item:any) => item.entityValue);
-  //   this.statusOptions = response.cache.filter((item:any) => item.entityName === 'Status').map((item:any) => item.entityValue);
-  // }
-    FillDropDown(response: any) {
- debugger
-    let jParse = JSON.parse(JSON.stringify(response)).cache;
-    let provider = JSON.parse(jParse).Provider;
-
-    if (provider) {
-      provider = provider.map((item: { EmployeeId: any; FullName: any; }) => {
-        return {
-          name: item.FullName,
-          providerId: item.EmployeeId
-        };
-      });
-      this.provider = provider;
-      console.log('this.provider => ',this.provider);
-      
-    }
-  }
-
-alertForm!: FormGroup;
-
-submitAllergyForm() {
-  if (this.allergyForm.get('providerId')?.invalid) {
-    Swal.fire('Error', 'Select Provider', 'error');
-    return;
-  }
-  if (this.allergyForm.get('typeId')?.invalid) {
-    Swal.fire('Error', 'Select Allergy Type', 'error');
-    return;
-  }
-
-  if (this.allergyForm.get('allergen')?.invalid) {
-    Swal.fire('Error', 'Enter Allergen', 'error');
-    return;
-  }
-
-
-  if (this.allergyForm.get('severity')?.invalid) {
-    Swal.fire('Error', 'Select Severity', 'error');
-    return;
-  }
-
-  if (this.allergyForm.get('reaction')?.invalid) {
-    Swal.fire('Error', 'Enter Reaction', 'error');
-    return;
-  }
-  DropFilled() {
-    this.Allergy.typeId = ""
-    this.Allergy.allergen = ""
-    this.Allergy.providerId = ""
-    this.Allergy.severityCode = ""
-    this.Allergy.reaction = ""
-    this.Allergy.startDate = ""
-    this.Allergy.endDate = ""
-    this.Allergy.status = ""
-    this.isProviderCheck = false;
-  }
-
-
-
+  alertForm!: FormGroup;
 
 
   mrno = "1006";
 
   submit() {
-     debugger
+    debugger
     const formValue = this.allergyForm.value;
 
     const payload: AllergyDto = {
       // allergyType: this.id ?? 0,
       // allergyType:formValue.allergyType ,
-       allergyid:formValue.allergyType ,
+      allergyid: this.id || 0,
       typeId: formValue.allergyType,
       allergen: formValue.allergen,
       severityCode: formValue.severity,
@@ -458,14 +307,13 @@ submitAllergyForm() {
       updatedBy: this.userid,
       // updatedDate: new Date().toISOString(),
       updatedDate: new Date().toISOString().split('T')[0],
-
       providerId: formValue.providerId,
       mrno: '1006',
       createdBy: this.userid,
       // createdDate: new Date().toISOString(),
       createdDate: new Date().toISOString().split('T')[0],
       appointmentId: this.userid,
-      
+
     };
 
     console.log('Payload:', payload);
@@ -479,98 +327,109 @@ submitAllergyForm() {
       Swal.fire('Error', error.message || 'Something went wrong', 'error');
     });
   }
-  // this.Allergy = {
-  //   ...formValues,
-  //   createdBy: userId,
-  //   updatedBy: userId,
-  //   mrno: this.Mrno || '1024',
-  //   patientId: this.PatientId || 0,
-  //   AppointmentId: this.appId || 0,
-  //   providerDescription: this.allergyForm.get('providerDescription'),
-  //   allergyId: this.id ?? 0
-  // };
-  formValues.createdBy = userId;
-formValues.updatedBy = userId;
-formValues.mrno = this.Mrno || '1006';
-formValues.patientId = this.PatientId || 0;
-formValues.appointmentId = 104080;
-this.Allergy = formValues;
-
-  console.log('this.Allergy', this.Allergy);
-  
-  this.clinicalApiService.SubmitPatientAllergies(this.Allergy).then((list:any) => {
-    this.DropFilled();
-    this.GetPatientAllergyData(this.Mrno);
-       this.allergyForm.reset({
-    allergyId: 0,
-    typeId: null,
-    allergen: '',
-    reaction: '',
-    startDate: '',
-    endDate: '',
-    status: 0,
-    active: true,
-    updatedBy: 0,
-    updatedDate: new Date().toISOString(),
-    providerId: null,
-    mrno: '',
-    createdBy: 0,
-    createdDate: new Date().toISOString(),
-    severityCode: null,
-    isHl7msgCreated: false,
-    reviewedDate: new Date().toISOString(),
-    reviewedBy: '',
-    errorReason: '',
-    oldMrno: '',
-    isDeleted: false,
-    appointmentId: 0,    
-    providerDescription: ''
-  });
-    Swal.fire({
-      position: 'center', 
-      icon: 'success',
-      title: 'Allergies Successfully Created',
-      showConfirmButton: false,
-      timer: 2000
-    });
-      // this.allergyForm.reset();
-  }).catch((error:any) => {
-    Swal.fire('Error', error.message || 'An error occurred', 'error');
-  });
-  this.allergyForm.reset();
-
-
-}
-
+  formatDate(date: string): string {
+    return date ? date.split('T')[0] : '';
+  }
 
 
   onCheckboxChange2() {
     debugger;
     this.isProviderCheck
-    const isChecked = this.providerCheck; // Get the checked state
-    this.providerCheck=isChecked;
+    const isChecked = this.isProviderCheck; // Get the checked state
+    this.isProviderCheck = isChecked;
     console.log('providerCheck Checkbox Value:', this.isProviderCheck);
   }
+  DropFilled() {
+    this.allergyForm.reset({
+      typeId: '',
+      allergen: '',
+      severity: '',
+      reaction: '',
+      startDate: '',
+      endDate: '',
+      status: '',
+      isProviderCheck: false,
+      active: true,
+      updatedBy: this.userid,
+      updatedDate: new Date().toISOString().split('T')[0],
+      createdBy: this.userid,
+      createdDate: new Date().toISOString().split('T')[0],
+      appointmentId: this.appId
+    });
 
   }
 
-  // editAllergy(index: number) {
-  //   const globalIndex = this.start + index;
-  //   const selected = this.allergyData[globalIndex];
-  //   this.allergyForm.patchValue(selected);
-  //   this.allergyData.splice(globalIndex, 1);
-  //   this.updatePagination();
+
+
+  deleteAllergy(id: number) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover this allergy record!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ClinicalApiService.DeleteAllergy(id)
+          .then((res: any) => {
+            this.DropFilled();
+            this.GetPatientAllergyData();
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'Allergy has been successfully deleted.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          })
+          .catch((error) => {
+            Swal.fire({
+              title: 'Error!',
+              text: error.message || 'Something went wrong.',
+              icon: 'error'
+            });
+          });
+      }
+    });
+  }
+
+  //  editAllergy(i: any) {
+  //   debugger
+  //   this.buttonText = 'Update';
+  //  this.Allergy.typeId = i.typeId
+  //  this.Allergy.allergen = i.allergen
+  //  this.Allergy.providerId = i.providerId;
+  //  this.Allergy.severityCode = i.severity
+  //  this.Allergy.reaction = i.reaction
+  //  this.id=i.allergyId;
+  //  if(i.status=='Active')
+  //   {
+  //     this.Allergy.status = 1
+  //   }
+  //   else
+  //   {
+  //     this.Allergy.status = 2
+  //   }
+  //  this.Allergy.startDate = new Date(i.startDate)
+  //  this.Allergy.endDate = new Date (i.endDate)
+
   // }
+editAllergy(allergy: any) {
+  this.buttonText = 'Update';
+  this.id = allergy.allergyId;
+  this.allergyForm.patchValue({
+    providerId: allergy.providerId,
+    allergyType: allergy.typeId,
+    allergen: allergy.allergen,
+    severity: allergy.severity,
+    reaction: allergy.reaction,
+    startDate: this.formatDate(allergy.startDate),
+    endDate: this.formatDate(allergy.endDate),
+    status: allergy.status === 'Active' ? 1 : 2
+  });
+}
 
-  // deleteAllergy(index: number) {
-  //   const globalIndex = this.start + index;
-  //   this.allergyData.splice(globalIndex, 1);
-  //   this.updatePagination();
-  // }
-
-  // resetForm() {
-  //   this.allergyForm.reset();
-  // }
-
-
-
+}
