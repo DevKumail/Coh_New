@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace HMIS.Data.Models
+{
+    [Table("Language")]
+    public partial class Language
+    {
+        [Key]
+        public int LanguageId { get; set; }
+        [Required]
+        [StringLength(50)]
+        [Unicode(false)]
+        public string LanguageName { get; set; }
+        [StringLength(10)]
+        [Unicode(false)]
+        public string LanguageCode { get; set; }
+        public bool? IsDeleted { get; set; }
+    }
+}

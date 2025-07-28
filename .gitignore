@@ -40,3 +40,10 @@
 =======
 >>>>>>> origin/main
 >>>>>>> origin/hassan_dev
+/Server/HMIS.Persistence/obj
+/Server/HMIS.Domain/bin/Debug/net8.0
+/Server/HMIS.Domain/obj
+/Server/HMIS.Application/obj
+/Server/HMIS/obj
+/Server/HMIS/bin/Debug/net8.0
+/Server/.vs

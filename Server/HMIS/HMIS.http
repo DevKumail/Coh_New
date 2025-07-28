@@ -1,0 +1,6 @@
+@HMIS_HostAddress = http://localhost:5265
+
+GET {{HMIS_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

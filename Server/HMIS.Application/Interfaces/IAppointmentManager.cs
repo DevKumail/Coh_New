@@ -1,0 +1,52 @@
+﻿using HMIS.Data.Models;
+using HMIS.Service.DTOs.AppointmentDTOs;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HMIS.Service.DTOs;
+using HMIS.Service.DTOs.Clinical;
+using static HMIS.Service.DTOs.AppointmentDTOs.SpLocalModel.SchAppointmentIWithFilter;
+
+namespace HMIS.Service.Implementations
+{
+    public interface IAppointmentManager
+    {
+        Task<DataSet> SearchAppointmentDB(DateTime FromDate, DateTime ToDate, int? ProviderID, int? LocationID, int? SpecialityID, int? SiteID, int? FacilityID, int? ReferredProviderId, long? PurposeOfVisitId, int? AppTypeId, int? VisitTypeId, string? LastUpdatedBy, List<int> AppStatusId, int? Page, int? Size);
+        Task<DataSet> GetAppointmentDetailsDB(long VisitAccountNo);
+        Task<DataSet> GetViewAppointmentDetailsDB(ViewAppointments view);
+        Task<bool> InsertAppointmentDB(DTOs.AppointmentDTOs.SchAppointmentModel schApp);
+        Task<bool> UpdateAppointmentDB(DTOs.AppointmentDTOs.SchAppointmentModel schApp);
+        Task<DataSet> SearchAppointmentHistoryDB(string MRNo, int? ProviderId, int? PatientStatusId, int? AppStatusId, int? Page, int? Size, string SortColumn, string SortOrder);
+        Task<bool> CancelOrRescheduleAppointmentDB(long AppId, int AppStatusId, bool ByProvider, int RescheduledId);
+        Task<DataSet> ValidateAppointmentDB(DTOs.AppointmentDTOs.SchAppointmentModel sa);
+        Task<DataSet> ValidateCheckInDB(long AppId);
+        Task<bool> AppointmentStatus(long appId, int appStatusId, int appVisitId);
+
+        Task<bool> UpdateRescheduleAppointmentDB(SchRescheduleAppointments schReschedule);
+        Task<DataSet> SpeechtoText( int? MRNo);
+
+        Task<bool> InsertSpeech(SpeechModel sp);  
+        Task<SchAppointmentModel> GetAppoimentForEditById(long appId);
+
+        Task<object> GetTimeSlotbySiteId(int SiteId);
+        Task<List<VwSpecialitybyFacilityid>> GetVwSpecialitybyFacilityid(int FacilityId);
+
+        Task<List<VwSitebySpecialityid>> GetSitebySpecialityId(int SpecialtyId);
+        Task<List<VwProviderbySiteid>> GetProviderbySiteId(int SiteId);
+        Task<List<VwProviderByFacilityId>> GetProviderByFacilityId(int FacilityId);
+        Task<List<VwSpecialityByEmployeeId>> GetSpecialityByEmployeeId(int EmployeeId);
+        Task<List<VwSiteByproviderId>> GetSiteByproviderId(int providerId);
+        Task<object> GetTimeSlots(int SiteId, int ProviderId, int FacilityId, string Days);
+        Task<object> GetSchAppointmentList(int? SiteId, int? ProviderId, int? FacilityId, int? SpecialityId, string? Date);
+
+        //Task<string> AddBLPatientVisit(BlPatientVisitModel req);
+        Task<DataSet> SearchAppointmentDBWithPagination(SchAppointmentIWithFilterRequest req);
+
+
+
+    }
+}
