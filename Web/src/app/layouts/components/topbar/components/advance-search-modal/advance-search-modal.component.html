@@ -144,7 +144,7 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let patient of searchResults" (click)="onRowSelect(patient.mrNo)"
-                                    class="cursor-pointer small py-1 px-2">
+                                    class="cursor-pointer small py-1 px-2" [ngClass]="{'bg-primary-subtle text-dark': selectedMrNo === patient.mrNo}">
                                     <td class="py-1 px-2">{{ patient.mrNo }}</td>
                                     <td class="py-1 px-2">{{ patient.personFirstName }}</td>
                                     <td class="py-1 px-2">{{ patient.gender }}</td>

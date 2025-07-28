@@ -20,7 +20,7 @@ declare var bootstrap: any;
 })
 
 export class AdvanceSearchModalComponent {
-  selectedPatient: any = null;
+  selectedMrNo: string | null = null;
   patientForm: FormGroup;
   Patient: any[] = [];
   searchResults: any[] = [];
@@ -50,7 +50,7 @@ export class AdvanceSearchModalComponent {
   }
 
   onRowSelect(mrno: string) {
-    console.log("selected mrno: ", mrno)
+    this.selectedMrNo = mrno;
     this.onPatientSelect.emit(mrno);
     this.closeModal();
   }
