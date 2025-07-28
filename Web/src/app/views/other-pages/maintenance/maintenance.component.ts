@@ -23,7 +23,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
   currentYear = currentYear;
   credits = credits;
    ngOnInit(): void {
-    // debugger
+
     this.pingSubscription = interval(5000)
       .pipe(
         switchMap(() =>
@@ -40,7 +40,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // debugger
+
     if (this.pingSubscription) {
       this.pingSubscription.unsubscribe();
     }

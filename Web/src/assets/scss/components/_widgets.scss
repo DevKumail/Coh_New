@@ -1,8 +1,4 @@
-//
-// widgets.scss
-//
 
-// App Search
 .app-search {
     position: relative;
 
@@ -63,4 +59,7 @@
             border-bottom-right-radius: 50rem;
         }
     }
+}
+.app-search-right {
+  margin-left: auto;
 }

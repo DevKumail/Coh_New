@@ -129,13 +129,15 @@ html[data-layout="topnav"] {
                 color: $sidenav-item-color;
 
                 &:hover {
-                    color: $sidenav-item-hover-color;
+                     transform: translateY(-2px);
+                    color: white;
                 }
             }
 
             &.active {
                 >a {
-                    color: $sidenav-item-hover-color;
+                     transform: translateY(-2px);
+                    color: white;
                 }
             }
 
@@ -170,7 +172,8 @@ html[data-layout="topnav"] {
 
             &:hover {
                 .nav-link {
-                    color: $sidenav-item-hover-color !important;
+                     transform: translateY(-2px);
+                    color: white !important;
                 }
 
                 >.dropdown-menu {
