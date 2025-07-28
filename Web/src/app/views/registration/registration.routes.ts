@@ -15,86 +15,82 @@ export const Registration_ROUTES: Routes = [
   {
     path: '',
     canActivate: [authGuard],
-    data: { permissions: ['Registration:Alerts']},
+    data: { permissions: ['Registration:Alerts'] },
     children: [
       {
-<<<<<<< HEAD
-            path: 'alerts',
-=======
         path: 'alerts',
->>>>>>> origin/main
         component: AlertComponent,
         data: { title: 'Alerts' }
       },
-         {
+      {
         path: 'coverages',
         component: CoverageListComponent,
         data: { title: 'Coverage List' }
       },
 
-        {
-          path: 'covrage-create',
-          component: CovrageCreateComponent,
-          data: { title: 'Coverage Create' }
-        },
+      {
+        path: 'covrage-create',
+        component: CovrageCreateComponent,
+        data: { title: 'Coverage Create' }
+      },
 
-        {
+      {
         path: 'demographics',
         component: DemographicsListComponent,
         data: { title: 'Demographic List' }
-        },
+      },
 
-        {
-          path: 'demographic-create',
-          component: DemographicCreateComponent,
-          data: { title: 'Demographic Create' }
-        },
+      {
+        path: 'demographic-create',
+        component: DemographicCreateComponent,
+        data: { title: 'Demographic Create' }
+      },
 
-        {
-            path: 'temporary patient demographics',
-            component: TemporaryPatientDemographicListComponent,
-            data: { title: 'Temporary Patient Demographic List' },
-        },
-
-
-        {
-            path: 'temporary-demographics',
-            component: TemporaryDemographicsComponent,
-            data: { title: 'Temporary Demographics' },
-        },
+      {
+        path: 'temporary patient demographics',
+        component: TemporaryPatientDemographicListComponent,
+        data: { title: 'Temporary Patient Demographic List' },
+      },
 
 
+      {
+        path: 'temporary-demographics',
+        component: TemporaryDemographicsComponent,
+        data: { title: 'Temporary Demographics' },
+      },
 
 
 
 
 
-        //   {
-        //   path: 'coverages',
-        //   component: CoverageListComponent,
-        //   data: { title: 'Coverage List' }
-        // },
 
-    //   {
-    //     path: 'problem-list',
-    //     component: ProblemListComponent,
-    //     data: { title: 'Problem List' }
-    //   },
-    //   {
-    //     path: 'favorites',
-    //     component: FavoritesComponent,
-    //     data: { title: 'Favorites' }
-    //   },
-    //   {
-    //     path: 'problem',
-    //     component: ProblemComponent,
-    //     data: { title: 'problem-list' }
-    //   },
-    //   {
-    //     path: 'allergies',
-    //     component: AllergiesComponent,
-    //     data: { title: 'Allergies' }
-    //   }
+
+      //   {
+      //   path: 'coverages',
+      //   component: CoverageListComponent,
+      //   data: { title: 'Coverage List' }
+      // },
+
+      //   {
+      //     path: 'problem-list',
+      //     component: ProblemListComponent,
+      //     data: { title: 'Problem List' }
+      //   },
+      //   {
+      //     path: 'favorites',
+      //     component: FavoritesComponent,
+      //     data: { title: 'Favorites' }
+      //   },
+      //   {
+      //     path: 'problem',
+      //     component: ProblemComponent,
+      //     data: { title: 'problem-list' }
+      //   },
+      //   {
+      //     path: 'allergies',
+      //     component: AllergiesComponent,
+      //     data: { title: 'Allergies' }
+      //   }
 
     ]
   }
