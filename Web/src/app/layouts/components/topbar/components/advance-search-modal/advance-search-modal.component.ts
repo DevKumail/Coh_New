@@ -9,11 +9,12 @@ import { Subject } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SharedApiService } from '@/app/shared/shared.api.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { LoaderComponent } from "@app/components/loader/loader.component";
 
 declare var bootstrap: any;
 @Component({
   selector: 'app-advance-search-modal',
-  imports: [FormsModule, IconsModule, CommonModule, UiCardComponent, ReactiveFormsModule, DataTablesModule,],
+  imports: [FormsModule, IconsModule, CommonModule, UiCardComponent, ReactiveFormsModule, DataTablesModule, LoaderComponent],
   templateUrl: './advance-search-modal.component.html',
   styleUrl: './advance-search-modal.component.scss'
 })
@@ -24,6 +25,7 @@ export class AdvanceSearchModalComponent {
   Patient: any[] = [];
   searchResults: any[] = [];
   totalRecord: number = 0;
+  isLoading: boolean = false;
   @Output() onPatientSelect = new EventEmitter<any>();
 
   constructor(
@@ -59,13 +61,20 @@ export class AdvanceSearchModalComponent {
   }
 
   getSearchResults(req: any) {
-    this.sharedApiService.GetCoverageAndRegPatient(req).subscribe((res => {
-      if (res?.table2) {
-        this.searchResults = res.table2;
-        this.totalRecord = res.table3?.[0]?.totalCount || 0;
+    this.isLoading = true; 
+    this.sharedApiService.GetCoverageAndRegPatient(req).subscribe({
+      next: (res) => {
+        if (res?.table2) {
+          this.searchResults = res.table2;
+          this.totalRecord = res.table3?.[0]?.totalCount || 0;
+        }
+      },
+      complete: () => {
+        this.isLoading = false; 
       }
-    }))
+    });
   }
+
 
   resetFilter() {
     this.patientForm.reset({
