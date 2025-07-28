@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using HMIS.Application.Interfaces;
 using HMIS.Common.ORM;
 using HMIS.Data.Models;
 using HMIS.Service.DTOs.Clinical;
@@ -15,7 +16,8 @@ namespace HMIS.Service.ServiceLogics
 {
     public class AlergyManager : IAlergyManager
     {
-        public IConfiguration Configuration { get; }
+        private readonly IDapperRepository<PatientAllergy> _repository;
+        private readonly IConfiguration _configuration;
         private readonly HIMSDBContext _context;
 
         public AlergyManager(HIMSDBContext context, IConfiguration configuration)
