@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { LucideAngularModule  } from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
 import {
   Stethoscope,
   User,
@@ -7,10 +7,12 @@ import {
   PanelTop,
   ChevronDown,
   ChevronUp,
-    Pin,
-    PinOff,
-    Pencil,
-    
+  Pin,
+  PinOff,
+  Pencil,
+  RefreshCcw,
+  Search
+
 
 } from 'lucide-angular';
 
@@ -21,14 +23,15 @@ const icons = {
   PanelTop,
   ChevronDown,
   ChevronUp,
-    Pin,
-    PinOff,
-    Pencil,
-    
+  Pin,
+  PinOff,
+  Pencil,
+  RefreshCcw,
+  Search
 
 };
 @NgModule({
-    imports: [LucideAngularModule.pick(icons)],
+  imports: [LucideAngularModule.pick(icons)],
   exports: [LucideAngularModule]
 })
-export class IconsModule {}
+export class IconsModule { }

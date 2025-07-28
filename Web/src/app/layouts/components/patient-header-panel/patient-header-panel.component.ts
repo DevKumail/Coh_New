@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import {
   trigger,
@@ -12,6 +12,7 @@ import { DataStorageService } from '@/app/shared/data-storage.service';
 import { SharedApiService } from '@/app/shared/shared.api.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 
 @Component({
   selector: 'app-patient-header-panel',
@@ -31,20 +32,31 @@ import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
     ])
   ]
 })
-export class PatientHeaderPanelComponent {
-  @Input() patientData: any;
-  @Input() visible: boolean = false;
+export class PatientHeaderPanelComponent implements OnInit {
+  patientData: any;
+  visible: boolean = false;
+  patientBannerService = inject(PatientBannerService)
+
   closeBanner() {
     this.visible = false;
   }
 
-    get patientInfo() {
-      debugger
+  get patientInfo() {
+    debugger
     return this.patientData?.table2?.[0] || null;
   }
 
   get insuranceInfo() {
     debugger
     return this.patientData?.table1 || [];
+  }
+
+  ngOnInit(): void {
+    this.patientBannerService.patientData$.subscribe(data => {
+      this.patientData = data;
+      if (this.patientData) {
+        this.visible = true;
+      }
+    });
   }
 }

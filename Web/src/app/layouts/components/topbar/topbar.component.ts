@@ -1,107 +1,8 @@
-// import {Component, EventEmitter, Output} from '@angular/core';
-// import {RouterLink} from '@angular/router';
-// import {NgIcon} from '@ng-icons/core';
-// import {LayoutStoreService} from '@core/services/layout-store.service';
-// import {LucideAngularModule, Search} from 'lucide-angular';
-
-// import {MegaMenuComponent} from '@layouts/components/topbar/components/mega-menu/mega-menu.component';
-// import {
-//     LanguageDropdownComponent
-// } from '@layouts/components/topbar/components/language-dropdown/language-dropdown.component';
-// import {
-//     MessagesDropdownComponent
-// } from '@layouts/components/topbar/components/messages-dropdown/messages-dropdown.component';
-// import {ThemeTogglerComponent} from '@layouts/components/topbar/components/theme-toggler/theme-toggler.component';
-// import {
-//     CustomizerTogglerComponent
-// } from '@layouts/components/topbar/components/customizer-toggler/customizer-toggler.component';
-// import {UserProfileComponent} from '@layouts/components/topbar/components/user-profile/user-profile.component';
-// import {
-//     NotificationDropdownComponent
-// } from '@layouts/components/topbar/components/notification-dropdown/notification-dropdown.component';
-// import { AccordionService } from '@core/services/accordion.service';
-// import { IconsModule } from '@/app/shared/icons.module';
-// import { Stethoscope } from 'lucide-angular'; // 👈 this is required
-
-// @Component({
-//     selector: 'app-topbar',
-//     imports: [
-//         NgIcon,
-//         RouterLink,
-//         MegaMenuComponent,
-//         // LanguageDropdownComponent,
-//         // MessagesDropdownComponent,
-//         // CustomizerTogglerComponent,
-//         ThemeTogglerComponent,
-//         UserProfileComponent,
-//         NotificationDropdownComponent,
-//         IconsModule
-
-//     ],
-//      standalone: true,
-//     templateUrl: './topbar.component.html'
-// })
-// export class TopbarComponent {
-//     constructor(public layout: LayoutStoreService,
-//         private accordionService: AccordionService
-//     ) {
-//     }
-
-//     toggleSidebar() {
-
-//         const html = document.documentElement;
-//         const currentSize = html.getAttribute('data-sidenav-size');
-//         const savedSize = this.layout.sidenavSize;
-
-//         if (currentSize === 'offcanvas') {
-//             html.classList.toggle('sidebar-enable')
-//             this.layout.showBackdrop()
-//         } else if (savedSize === 'compact') {
-//             this.layout.setSidenavSize(currentSize === 'compact' ? 'condensed' : 'compact', false);
-//         } else {
-//             this.layout.setSidenavSize(currentSize === 'condensed' ? 'default' : 'condensed');
-//         }
-//     }
-
-//     Search = Search;
-
-//   @Output() patientBannerToggle = new EventEmitter<boolean>();
-//   showPatientBanner = true;
-
-
-//    togglePatientBanner() {
-//     this.showPatientBanner = !this.showPatientBanner;
-//     this.patientBannerToggle.emit(this.showPatientBanner);
-//   }
-
-// // togglePatientBanner() {
-// // //   const loadedPatient = sessionStorage.getItem('loadedPatient');
-
-// // //   if (loadedPatient) {
-// // //     // Patient already loaded, just toggle banner
-// // //     this.showPatientBanner = !this.showPatientBanner;
-// // //     this.patientBannerToggle.emit(this.showPatientBanner);
-// // //   } else {
-// // //     // No patient loaded, show modal for selection
-// // //     this.openPatientModal(); // <- Replace with your actual modal opening logic
-// // //   }
-
-// // }
-
-// // openPatientModal() {
-// //   // Modal open code, maybe using Angular Material or ngx-bootstrap
-// //   this.showPatientSearchModal = true;
-
-// //   // Optionally, you can call your patient list API here:
-// //   this.loadPatients();
-// // }
-
-// }
-import { Component, EventEmitter, OnInit, Output, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output, TemplateRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
 import { LayoutStoreService } from '@core/services/layout-store.service';
-import { LucideAngularModule, Search } from 'lucide-angular';
+import { LucideAngularModule, Search, Sliders, X } from 'lucide-angular';
 import { MegaMenuComponent } from '@layouts/components/topbar/components/mega-menu/mega-menu.component';
 import { ThemeTogglerComponent } from '@layouts/components/topbar/components/theme-toggler/theme-toggler.component';
 import { UserProfileComponent } from '@layouts/components/topbar/components/user-profile/user-profile.component';
@@ -118,6 +19,10 @@ import {
   animate
 } from '@angular/animations';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
+import { NavbarComponent } from "../navbar/navbar.component";
+import { AdvanceSearchModalComponent } from "./components/advance-search-modal/advance-search-modal.component";
 
 
 @Component({
@@ -132,11 +37,14 @@ import { CommonModule } from '@angular/common';
     NotificationDropdownComponent,
     IconsModule,
     NgbModalModule, NgIcon,
-    PatientHeaderPanelComponent
+    PatientHeaderPanelComponent,
+    FormsModule,
+    NavbarComponent,
+    AdvanceSearchModalComponent
 ],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
-   animations: [
+  animations: [
     trigger('bannerAnimation', [
       transition(':enter', [
         style({ height: '0', opacity: 0 }),
@@ -153,13 +61,18 @@ export class TopbarComponent implements OnInit {
     public layout: LayoutStoreService,
     private modalService: NgbModal,
     private patientBannerService: PatientBannerService
-  ) {}
+  ) { }
+
+  SearchIcon = Search;
+  SliderIcon = Sliders;
+  XIcon = X;
 
   patientData: any = null;
   showPatientPanel: boolean = false;
 
   @Output() patientBannerToggle = new EventEmitter<boolean>();
   showPatientBanner = true;
+  private demographicapi = inject(DemographicApiServices);
 
   toggleSidebar() {
     const html = document.documentElement;
@@ -194,19 +107,53 @@ export class TopbarComponent implements OnInit {
     }
   }
 
+  allPatients: any[] = [];
 
- allPatients: any[] = [];
+  handleSearchResults(results: any[]) {
+    this.allPatients = results;
+    console.log('Patients received from modal:', results);
+  }
 
-handleSearchResults(results: any[]) {
-  this.allPatients = results;
-  console.log('Patients received from modal:', results);
-}
-
-ngOnInit() {
-    this.patientBannerService.patientData$.subscribe((data) => {
+  ngOnInit() {
+    this.patientBannerService.patientData$.subscribe(data => {
       this.patientData = data;
-      this.showPatientPanel = !!data;
     });
   }
 
+  mrNo: any;
+
+  onSearchClick() {
+    if (this.mrNo && this.mrNo.length >= 3) {
+      this.searchPatient(this.mrNo);
+    } else {
+      this.patientBannerService.setPatientData(null);
+      console.log("data becomes null")
     }
+  }
+
+  onClearInput() {
+    this.mrNo = "";
+    this.showPatientBanner = false;
+    this.onSearchClick();
+  }
+
+  searchPatient(mrNo: string) {
+    debugger
+    this.demographicapi.getPatientByMrNo(mrNo).subscribe({
+      next: (res: any) => {
+        if (res?.table2?.length > 0) {
+          this.patientBannerService.setPatientData(res);
+          this.showPatientBanner = true;
+        } else {
+          this.patientBannerService.setPatientData(null);
+          this.showPatientBanner = false;
+        }
+      },
+      error: err => {
+        console.error('API Error:', err);
+        this.patientBannerService.setPatientData(null);
+      }
+    });
+  }
+
+}

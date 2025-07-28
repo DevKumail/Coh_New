@@ -1,20 +1,20 @@
 <div class="wrapper">
 
-    <app-topbar/>
+    <app-topbar />
 
-    @if (!isMobileSidebarVisible) {
-        <app-navbar/>
-    }
+<!--     @if (!isMobileSidebarVisible) {
+    <app-navbar />
+    } -->
 
     @if (isMobileSidebarVisible) {
-        <app-sidenav/>
+    <app-sidenav />
     }
 
     <div class="content-page">
 
-        <router-outlet/>
+        <router-outlet />
 
-        <app-footer/>
+        <app-footer />
 
     </div>
 
