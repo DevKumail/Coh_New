@@ -41,6 +41,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 export class AppMenuComponent implements OnInit {
 
   router = inject(Router);
+  patientBannerService = inject(PatientBannerService);
+  showPatientSummary = false;
 
   @ViewChild('MenuItemWithChildren', { static: true })
   menuItemWithChildren!: TemplateRef<{
@@ -74,6 +76,10 @@ export class AppMenuComponent implements OnInit {
       });
 
     this.expandActivePaths(this.menuItems);
+
+    this.patientBannerService.patientData$.subscribe(data => {
+      this.showPatientSummary = !!data;
+    });
 
   }
 

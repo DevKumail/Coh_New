@@ -1,7 +1,8 @@
-import {Routes} from '@angular/router';
-import {WidgetsComponent} from '@/app/views/widgets/widgets.component';
-import {MetricsComponent} from '@/app/views/metrics/metrics.component';
+import { Routes } from '@angular/router';
+import { WidgetsComponent } from '@/app/views/widgets/widgets.component';
+import { MetricsComponent } from '@/app/views/metrics/metrics.component';
 import { authGuard } from '@core/guards/auth.guard';
+import { PatientSummaryComponent } from './patient-summary/patient-summary.component';
 
 export const VIEWS_ROUTES: Routes = [
   {
@@ -72,6 +73,11 @@ export const VIEWS_ROUTES: Routes = [
       {
         path: 'metrics',
         component: MetricsComponent,
+        data: { title: "Metrics" }
+      },
+      {
+        path: 'patient-summary',
+        component: PatientSummaryComponent,
         data: { title: "Metrics" }
       }
     ]
