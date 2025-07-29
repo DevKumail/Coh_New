@@ -1,3 +1,13 @@
 .border-dashed {
   border-style: dashed !important;
 }
+.daterangepicker {
+  min-width: 50px; /* Adjust as needed */
+}
+// .flatpickr-calendar {
+//   min-width: 100% !important;
+// }
+.flatpickr-calendar {
+  width: 100% !important;
+  left: 0 !important;
+}

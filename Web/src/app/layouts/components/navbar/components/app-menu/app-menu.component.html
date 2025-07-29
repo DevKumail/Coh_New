@@ -1,7 +1,4 @@
-<div class="collapse navbar-collapse d-flex align-items-center" id="topnav-menu-content">
-
-  <!-- LEFT SIDE MENU -->
-  <div class="menu-left d-flex">
+<div class="collapse navbar-collapse d-flex justify-content-between" id="topnav-menu-content">
     <ul class="navbar-nav">
       @for (item of menuItems; track $index) {
         @if (!hasSubMenu(item)) {
@@ -12,20 +9,9 @@
         @if (hasSubMenu(item)) {
           <ng-container *ngTemplateOutlet="MenuItemWithChildren; context: { item, wrapperClass: 'nav-item', togglerClass: 'nav-link' }" />
         }
-      }
-    </ul>
-  </div>
+        }
 
-  <!-- SEARCH BAR RIGHT MEIN -->
-  <div class="app-search app-search-right d-flex align-items-center" style="margin-right: -166%;">
-    <input
-      type="text"
-      class="form-control"
-      placeholder="Search MRNo"
-      [(ngModel)]="mrNo"
-      (ngModelChange)="onSearchInput()" />
-    <lucide-icon [img]="Search" class="app-search-icon text-muted"></lucide-icon>
-  </div>
+    </ul>   
 
 </div>
 

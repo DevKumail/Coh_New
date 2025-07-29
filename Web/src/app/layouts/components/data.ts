@@ -8,8 +8,7 @@ type UserDropdownItemType = {
     isHeader?: boolean;
     class?: string;
     action?: 'logout' | string;
-
-}
+};
 
 export interface ExtendedMenuItemType extends MenuItemType {
     module?: string;
@@ -18,17 +17,17 @@ export interface ExtendedMenuItemType extends MenuItemType {
 export const userDropdownItems: UserDropdownItemType[] = [
     {
         label: 'Welcome back!',
-        isHeader: true
+        isHeader: true,
     },
     {
         label: 'Profile',
         icon: 'tablerUserCircle',
-        url: 'pages-profile.html'
+        url: 'pages-profile.html',
     },
     {
         label: 'Notifications',
         icon: 'tablerBellRinging',
-        url: '#'
+        url: '#',
     },
     {
         label: 'Balance: $985.25',
@@ -38,20 +37,20 @@ export const userDropdownItems: UserDropdownItemType[] = [
     {
         label: 'Account Settings',
         icon: 'tablerSettings2',
-        url: '#'
+        url: '#',
     },
     {
         label: 'Support Center',
         icon: 'tablerHeadset',
-        url: '#'
+        url: '#',
     },
     {
-        isDivider: true
+        isDivider: true,
     },
     {
         label: 'Lock Screen',
         icon: 'tablerLock',
-        url: 'auth-lock-screen.html'
+        url: 'auth-lock-screen.html',
     },
     {
         // label: 'Log Out',
@@ -64,13 +63,14 @@ export const userDropdownItems: UserDropdownItemType[] = [
         icon: 'tablerLogout2',
         url: '', // Remove the #
         class: 'text-danger fw-semibold',
-        action: 'logout'
-    }
+        action: 'logout',
+    },
 ];
 
 export const menuItems: ExtendedMenuItemType[] = [
     { label: 'Menu', isTitle: true },
     { label: 'Menu', isTitle: true },
+
     {
         label: 'Clinical',
         icon: 'tablerHeartbeat',
@@ -81,9 +81,10 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Allergies', url: '/clinical/allergies' },
             { label: 'Problem List', url: '/clinical/problem' },
             { label: 'Medical History', url: '/clinical/medical history' },
-            { label: 'Problem', url: '/clinical/problem list' }
-        ]
+            { label: 'Problem', url: '/clinical/problem list' },
+        ],
     },
+
     { label: 'Menu', isTitle: true },
     {
         label: 'Registration',
@@ -91,29 +92,107 @@ export const menuItems: ExtendedMenuItemType[] = [
         module: 'Registration',
         isCollapsed: true,
         children: [
+            { label: 'Menu', isTitle: true },
+            // {
+            //     label: 'Dashboards',
+            //     icon: 'tablerLayoutDashboard',
+            //     isCollapsed: true,
+            //     badge: {variant: 'success', text: '5'},
+            //     children: [
+            //         {label: 'Dashboard v.1', url: '/dashboards/dashboard-1'},
+            //         {label: 'Dashboard v.2', url: '/dashboards/dashboard-2'},
+            //         {label: 'Dashboard v.3', url: '/dashboards/dashboard-3'},
+            //         {label: 'Dashboard v.4', url: '#!', isDisabled: true, badge: {variant: 'light', text: 'Soon'}},
+            //         {label: 'Dashboard v.5', url: '#!', isDisabled: true, badge: {variant: 'light', text: 'Soon'}},
+            //     ]
+            // },
+            // {
+            //     label: 'Landing Page',
+            //     icon: 'tablerStackFront',
+            //     url: '/landing',
+            // },
 
-            { label: 'Alerts', url: '/registration/alerts' },
-            { label: 'Coverages', url: '/registration/coverage-list' },
-            { label: 'Coverage Create', url: '/registration/covrage-create' },
+            { label: 'Menu', isTitle: true },
 
-        ]
-    },
-    { label: 'Menu', isTitle: true },
-    {
-        label: 'Control Panel',
-        icon: 'tablerSettingsCog',
-        module: 'Control Panel',
-        isCollapsed: true,
-        children: [
+            // ✅ Clinical Module Section (permission based)
+            {
+                label: 'Clinical',
+                icon: 'tablerHeartbeat',
+                module: 'Clinical', // 👈 this is used by PermissionService
+                isCollapsed: true,
+                children: [
+                    { label: 'Alerts', url: '/clinical/alerts' },
+                    { label: 'Allergies', url: '/clinical/allergies' },
+                    //   { label: 'Problem List', url: '/clinical/problem-list'},
+                    { label: 'Problem List', url: '/clinical/problem' },
+                    {
+                        label: 'Medical History',
+                        url: '/clinical/medical-history',
+                    },
+                    //{ label: 'Favorites', url: '/clinical/favorites'}
+                    { label: 'Problem', url: '/clinical/problem' },
+                    { label: 'Vital Signs', url: '/clinical/vital-signs' },
+                ],
+            },
+
+            { label: 'Menu', isTitle: true },
+
+            // ✅ Clinical Module Section (permission based)
+            {
+                label: 'Registration',
+                icon: 'pi pi-clipboard',
+                module: 'Registration',
+                isCollapsed: true,
+                children: [
+                    { label: 'Alerts', url: '/registration/alerts' },
+                    { label: 'Coverages', url: '/registration/coverage-list' },
+                    {
+                        label: 'Coverage Create',
+                        url: '/registration/covrage-create',
+                    },
+                ],
+            },
+            { label: 'Menu', isTitle: true },
+            {
+                label: 'Control Panel',
+                icon: 'tablerSettingsCog',
+                module: 'Control Panel',
+                isCollapsed: true,
+                children: [
+                    { label: 'Alerts', url: '/registration/alerts' },
+                    { label: 'Coverages', url: '/registration/coverage-list' },
+                    {
+                        label: 'Coverage Create',
+                        url: '/registration/covrage-create',
+                    },
+                    {
+                        label: 'Demographics',
+                        url: '/registration/demographics',
+                    },
+                    {
+                        label: 'Demographic Create',
+                        url: '/registration/demographic-create',
+                    },
+                ],
+            },
             { label: 'Alerts', url: '/registration/alerts' },
             { label: 'Coverages', url: '/registration/coverage-list' },
             { label: 'Coverage Create', url: '/registration/covrage-create' },
             { label: 'Demographics', url: '/registration/demographics' },
-            { label: 'Demographic Create', url: '/registration/demographic-create' }
-        ]
+            {
+                label: 'Demographic Create',
+                url: '/registration/demographic-create',
+            },
+            {
+                label: 'Demographic List',
+                url: '/registration/demographic-list',
+            },
+            {
+                label: 'Temporary Patient Demographics',
+                url: '/registration/temporary-patient-demographics',
+            },
+        ],
     },
-
-
 
     { label: 'Menu', isTitle: true },
 
@@ -125,33 +204,21 @@ export const menuItems: ExtendedMenuItemType[] = [
         module: 'Control Panel',
         isCollapsed: true,
         children: [
-
             { label: 'Human Resources', url: '/control-panel/human-resources' },
-            { label: 'Human Resources Add', url: '/control-panel/human-resources-add' },
-        ]
+            {
+                label: 'Human Resources Add',
+                url: '/control-panel/human-resources-add',
+            },
+        ],
     },
-
 
     {
         label: 'Billing',
         icon: 'tablerHeartbeat',
         module: 'Billing', // 👈 this is used by PermissionService
         isCollapsed: true,
-        children: [
-
-            { label: 'Charge Capture', url: '/billing/charge-capture' },
-        ]
+        children: [{ label: 'Charge Capture', url: '/billing/charge-capture' }],
     },
-
-
-
-
-
-
-
-
-
-
 
     { label: 'Apps', isTitle: true },
     {
@@ -165,9 +232,12 @@ export const menuItems: ExtendedMenuItemType[] = [
                 children: [
                     { label: 'Products', url: '/ecommerce/products' },
                     { label: 'Products Grid', url: '/ecommerce/products/grid' },
-                    { label: 'Product Details', url: '/ecommerce/products/WB-10245' },
+                    {
+                        label: 'Product Details',
+                        url: '/ecommerce/products/WB-10245',
+                    },
                     { label: 'Add Product', url: '/ecommerce/products/add' },
-                ]
+                ],
             },
             { label: 'Categories', url: '/ecommerce/categories' },
             {
@@ -175,8 +245,11 @@ export const menuItems: ExtendedMenuItemType[] = [
                 isCollapsed: true,
                 children: [
                     { label: 'Orders', url: '/ecommerce/orders' },
-                    { label: 'Order Details', url: '/ecommerce/orders/WB20103' },
-                ]
+                    {
+                        label: 'Order Details',
+                        url: '/ecommerce/orders/WB20103',
+                    },
+                ],
             },
             { label: 'Customers', url: '/ecommerce/customers' },
             {
@@ -185,7 +258,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 children: [
                     { label: 'Sellers', url: '/ecommerce/sellers' },
                     { label: 'Seller Details', url: '/ecommerce/sellers/2' },
-                ]
+                ],
             },
             { label: 'Reviews', url: '/ecommerce/reviews' },
             {
@@ -194,10 +267,9 @@ export const menuItems: ExtendedMenuItemType[] = [
                 children: [
                     { label: 'Product Views', url: '/ecommerce/product-views' },
                     { label: 'sales', url: '/ecommerce/sales' },
-                ]
+                ],
             },
-
-        ]
+        ],
     },
     {
         label: 'Email',
@@ -208,7 +280,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Inbox', url: '/apps/email/inbox' },
             { label: 'Details', url: '/apps/email/detail' },
             { label: 'Compose', url: '/apps/email/compose' },
-        ]
+        ],
     },
     {
         label: 'Users',
@@ -218,7 +290,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Contacts', url: '/apps/users/contacts' },
             { label: 'Roles', url: '/apps/users/roles' },
             { label: 'Permissions', url: '/apps/users/permissions' },
-        ]
+        ],
     },
     {
         label: 'Projects',
@@ -231,7 +303,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Kanban Board', url: '/apps/projects/kanban-board' },
             { label: 'Team Board', url: '/apps/projects/team-board' },
             { label: 'Activity Stream', url: '/apps/projects/activity-stream' },
-        ]
+        ],
     },
     {
         label: 'File Manager',
@@ -256,7 +328,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Invoices', url: '/invoices' },
             { label: 'New Invoice', url: '/invoices/new' },
             { label: 'Single Invoice', url: '/invoice/INS-0120010' },
-        ]
+        ],
     },
     {
         label: 'Other Apps',
@@ -274,7 +346,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Pin Board', url: '/other-apps/pin-board' },
             { label: 'Forum View', url: '/other-apps/forum-view' },
             { label: 'Forum Post', url: '/other-apps/forum-post' },
-        ]
+        ],
     },
     { label: 'Custom Pages', isTitle: true },
     {
@@ -290,7 +362,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Search Results', url: '/pages/search-results' },
             { label: 'Coming Soon', url: '/coming-soon' },
             { label: 'Terms & Conditions', url: '/pages/terms-and-conditions' },
-        ]
+        ],
     },
     {
         label: 'Miscellaneous',
@@ -309,7 +381,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Masonry', url: '/miscellaneous/masonry' },
             { label: 'Tour', url: '/miscellaneous/tour' },
             { label: 'Animation', url: '/miscellaneous/animation' },
-        ]
+        ],
     },
     {
         label: 'Authentication',
@@ -329,7 +401,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                     { label: 'Success Mail', url: '/auth/success-mail' },
                     { label: 'Login with PIN', url: '/auth/login-pin' },
                     { label: 'Delete Account', url: '/auth/delete-account' },
-                ]
+                ],
             },
             {
                 label: 'Version 2',
@@ -344,7 +416,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                     { label: 'Success Mail', url: '/auth-2/success-mail' },
                     { label: 'Login with PIN', url: '/auth-2/login-pin' },
                     { label: 'Delete Account', url: '/auth-2/delete-account' },
-                ]
+                ],
             },
             {
                 label: 'Version 3',
@@ -359,9 +431,9 @@ export const menuItems: ExtendedMenuItemType[] = [
                     { label: 'Success Mail', url: '/auth-3/success-mail' },
                     { label: 'Login with PIN', url: '/auth-3/login-pin' },
                     { label: 'Delete Account', url: '/auth-3/delete-account' },
-                ]
+                ],
             },
-        ]
+        ],
     },
     {
         label: 'Error Pages',
@@ -375,7 +447,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: '408', url: '/error/408' },
             { label: '500', url: '/error/500' },
             { label: 'Maintenance', url: '/maintenance' },
-        ]
+        ],
     },
     { label: 'Layouts', isTitle: true },
     {
@@ -388,7 +460,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Boxed', url: '/layouts/boxed' },
             { label: 'Horizontal', url: '/layouts/horizontal' },
             { label: 'Preloader', url: '/layouts/preloader' },
-        ]
+        ],
     },
     {
         label: 'Sidebars',
@@ -402,11 +474,20 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Compact Menu', url: '/layouts/sidebars/compact' },
             { label: 'Icon View Menu', url: '/layouts/sidebars/icon-view' },
             { label: 'On Hover Menu', url: '/layouts/sidebars/on-hover' },
-            { label: 'On Hover Active', url: '/layouts/sidebars/on-hover-active' },
+            {
+                label: 'On Hover Active',
+                url: '/layouts/sidebars/on-hover-active',
+            },
             { label: 'Offcanvas Menu', url: '/layouts/sidebars/offcanvas' },
-            { label: 'No Icons with Lines', url: '/layouts/sidebars/no-icons-with-lines' },
-            { label: 'Sidebar with Lines', url: '/layouts/sidebars/with-lines' },
-        ]
+            {
+                label: 'No Icons with Lines',
+                url: '/layouts/sidebars/no-icons-with-lines',
+            },
+            {
+                label: 'Sidebar with Lines',
+                url: '/layouts/sidebars/with-lines',
+            },
+        ],
     },
     {
         label: 'Topbars',
@@ -416,9 +497,12 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Dark Topbar', url: '/layouts/topbars/dark' },
             { label: 'Gray Topbar', url: '/layouts/topbars/gray' },
             { label: 'Gradient Topbar', url: '/layouts/topbars/gradient' },
-            { label: 'Topbar with Sub Items', url: '/layouts/topbars/with-sub-items' },
+            {
+                label: 'Topbar with Sub Items',
+                url: '/layouts/topbars/with-sub-items',
+            },
             { label: 'Topbar with Tools', url: '/layouts/topbars/with-tools' },
-        ]
+        ],
     },
     { label: 'Components', isTitle: true },
     {
@@ -454,7 +538,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Tooltips', url: '/ui/tooltips' },
             { label: 'Typography', url: '/ui/typography' },
             { label: 'Utilities', url: '/ui/utilities' },
-        ]
+        ],
     },
     {
         label: 'Widgets',
@@ -495,7 +579,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                     { label: 'Range', url: '/graphs/apex/range' },
                     { label: 'Funnel', url: '/graphs/apex/funnel' },
                     { label: 'Slope', url: '/graphs/apex/slope' },
-                ]
+                ],
             },
             {
                 label: 'Echarts',
@@ -507,16 +591,19 @@ export const menuItems: ExtendedMenuItemType[] = [
                     { label: 'Scatter', url: '/graphs/echarts/scatter' },
                     { label: 'GEO Map', url: '/graphs/echarts/geo-map' },
                     { label: 'Gauge', url: '/graphs/echarts/gauge' },
-                    { label: 'Candlestick', url: '/graphs/echarts/candlestick' },
+                    {
+                        label: 'Candlestick',
+                        url: '/graphs/echarts/candlestick',
+                    },
                     { label: 'Area', url: '/graphs/echarts/area' },
                     { label: 'Radar', url: '/graphs/echarts/radar' },
                     { label: 'Heatmap', url: '/graphs/echarts/heatmap' },
                     { label: 'Other', url: '/graphs/echarts/other' },
-                ]
+                ],
             },
             { label: 'Apex Tree', url: '/charts/apextree' },
             { label: 'Apex Sankey', url: '/charts/apexsankey' },
-        ]
+        ],
     },
     {
         label: 'Forms',
@@ -533,7 +620,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Range Slider', url: '/forms/range-slider' },
             { label: 'Layouts', url: '/forms/layouts' },
             { label: 'Other Plugins', url: '/forms/other-plugins' },
-        ]
+        ],
     },
     {
         label: 'Tables',
@@ -551,16 +638,28 @@ export const menuItems: ExtendedMenuItemType[] = [
                     { label: 'Export Data', url: '/data-tables/export-data' },
                     { label: 'Select', url: '/data-tables/select' },
                     { label: 'Ajax', url: '/data-tables/ajax' },
-                    { label: 'Javascript Source', url: '/data-tables/javascript-source' },
-                    { label: 'Data Rendering', url: '/data-tables/data-rendering' },
+                    {
+                        label: 'Javascript Source',
+                        url: '/data-tables/javascript-source',
+                    },
+                    {
+                        label: 'Data Rendering',
+                        url: '/data-tables/data-rendering',
+                    },
                     { label: 'Scroll', url: '/data-tables/scroll' },
-                    { label: 'Show & Hide Column', url: '/data-tables/columns' },
+                    {
+                        label: 'Show & Hide Column',
+                        url: '/data-tables/columns',
+                    },
                     { label: 'Child Rows', url: '/data-tables/child-rows' },
-                    { label: 'Column Searching', url: '/data-tables/column-search' },
+                    {
+                        label: 'Column Searching',
+                        url: '/data-tables/column-search',
+                    },
                     { label: 'Fixed Header', url: '/data-tables/fixed-header' },
-                ]
+                ],
             },
-        ]
+        ],
     },
     {
         label: 'Icons',
@@ -580,7 +679,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Google Maps', url: '/maps/google' },
             { label: 'Vector Maps', url: '/maps/vector' },
             { label: 'Leaflet Maps', url: '/maps/leaflet' },
-        ]
+        ],
     },
     { label: 'Menu Items', isTitle: true },
     {
@@ -593,8 +692,8 @@ export const menuItems: ExtendedMenuItemType[] = [
                 isCollapsed: true,
                 children: [
                     { label: 'Item 2.1', url: 'javascript: void(0);' },
-                    { label: 'Item 2.2', url: 'javascript: void(0);' }
-                ]
+                    { label: 'Item 2.2', url: 'javascript: void(0);' },
+                ],
             },
             {
                 label: 'Third Level',
@@ -606,23 +705,23 @@ export const menuItems: ExtendedMenuItemType[] = [
                         isCollapsed: true,
                         children: [
                             { label: 'Item 3.1', url: 'javascript: void(0);' },
-                            { label: 'Item 3.2', url: 'javascript: void(0);' }
-                        ]
-                    }
-                ]
-            }
-        ]
+                            { label: 'Item 3.2', url: 'javascript: void(0);' },
+                        ],
+                    },
+                ],
+            },
+        ],
     },
     {
         label: 'Disabled Menu',
         icon: 'tablerBan',
-        url: '#!'
+        url: '#!',
     },
     {
         label: 'Special Menu',
         icon: 'tablerStar',
-        url: '#!'
-    }
+        url: '#!',
+    },
 ];
 
 export const horizontalMenuItems: MenuItemType[] = [
@@ -646,16 +745,36 @@ export const horizontalMenuItems: MenuItemType[] = [
             {
                 label: 'Alerts',
                 icon: 'tablerBell',
-                url: '/registration/alerts'
+                url: '/registration/alerts',
             },
+            // { label: 'Coverages',
+            //   icon: 'tablerBell',
+            //   url: '/registration/coverage-list'
+            // },
             {
                 label: 'Coverages',
                 icon: 'tablerBell',
-                url: '/registration/coverage-list'
+                url: '/registration/coverage-list',
+            },
+            {
+                label: 'Demographics',
+                icon: 'tablerBell',
+                url: '/registration/demographics',
             },
 
-        ]
+            {
+                label: 'Alerts',
+                icon: 'tablerBell',
+                url: '/registration/alerts',
+            },
+            {
+                label: 'Temporary Patient Demographics',
+                icon: 'tablerUserPlus', // 👈 icon optional — koi bhi use kar sakte ho
+                url: '/registration/temporary patient demographics',
+            },
+        ],
     },
+
     {
         label: 'Clinical',
         icon: 'tablerStethoscope', // Use appropriate icon
@@ -686,7 +805,13 @@ export const horizontalMenuItems: MenuItemType[] = [
                 icon: 'tablerClipboardText',
                 url: '/clinical/Problem-List',
             },
-        ]
+            {
+                label: 'Vital Signs',
+                icon: 'tablerClipboardText',
+                url: 'clinical/vital signs',
+                // url: '/clinical/vital-signs'
+            },
+        ],
     },
 
     {
@@ -731,10 +856,19 @@ export const horizontalMenuItems: MenuItemType[] = [
                         isCollapsed: true,
                         children: [
                             { label: 'Products', url: '/ecommerce/products' },
-                            { label: 'Products Grid', url: '/ecommerce/products/grid' },
-                            { label: 'Product Details', url: '/ecommerce/products/WB-10245' },
-                            { label: 'Add Product', url: '/ecommerce/products/add' },
-                        ]
+                            {
+                                label: 'Products Grid',
+                                url: '/ecommerce/products/grid',
+                            },
+                            {
+                                label: 'Product Details',
+                                url: '/ecommerce/products/WB-10245',
+                            },
+                            {
+                                label: 'Add Product',
+                                url: '/ecommerce/products/add',
+                            },
+                        ],
                     },
                     { label: 'Categories', url: '/ecommerce/categories' },
                     {
@@ -742,8 +876,11 @@ export const horizontalMenuItems: MenuItemType[] = [
                         isCollapsed: true,
                         children: [
                             { label: 'Orders', url: '/ecommerce/orders' },
-                            { label: 'Order Details', url: '/ecommerce/orders/WB20103' },
-                        ]
+                            {
+                                label: 'Order Details',
+                                url: '/ecommerce/orders/WB20103',
+                            },
+                        ],
                     },
                     { label: 'Customers', url: '/ecommerce/customers' },
                     {
@@ -751,20 +888,25 @@ export const horizontalMenuItems: MenuItemType[] = [
                         isCollapsed: true,
                         children: [
                             { label: 'Sellers', url: '/ecommerce/sellers' },
-                            { label: 'Seller Details', url: '/ecommerce/sellers/2' },
-                        ]
+                            {
+                                label: 'Seller Details',
+                                url: '/ecommerce/sellers/2',
+                            },
+                        ],
                     },
                     { label: 'Reviews', url: '/ecommerce/reviews' },
                     {
                         label: 'Reports',
                         isCollapsed: true,
                         children: [
-                            { label: 'Product Views', url: '/ecommerce/product-views' },
+                            {
+                                label: 'Product Views',
+                                url: '/ecommerce/product-views',
+                            },
                             { label: 'sales', url: '/ecommerce/sales' },
-                        ]
+                        ],
                     },
-
-                ]
+                ],
             },
             {
                 label: 'Email',
@@ -775,7 +917,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Inbox', url: '/apps/email/inbox' },
                     { label: 'Details', url: '/apps/email/detail' },
                     { label: 'Compose', url: '/apps/email/compose' },
-                ]
+                ],
             },
             {
                 label: 'Users',
@@ -785,7 +927,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Contacts', url: '/apps/users/contacts' },
                     { label: 'Roles', url: '/apps/users/roles' },
                     { label: 'Permissions', url: '/apps/users/permissions' },
-                ]
+                ],
             },
             {
                 label: 'Projects',
@@ -795,10 +937,16 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'My Projects', url: '/apps/projects' },
                     { label: 'Projects List', url: '/apps/projects/list' },
                     { label: 'View Project', url: '/apps/projects/view' },
-                    { label: 'Kanban Board', url: '/apps/projects/kanban-board' },
+                    {
+                        label: 'Kanban Board',
+                        url: '/apps/projects/kanban-board',
+                    },
                     { label: 'Team Board', url: '/apps/projects/team-board' },
-                    { label: 'Activity Stream', url: '/apps/projects/activity-stream' },
-                ]
+                    {
+                        label: 'Activity Stream',
+                        url: '/apps/projects/activity-stream',
+                    },
+                ],
             },
             {
                 label: 'Invoice',
@@ -808,7 +956,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Invoices', url: '/invoices' },
                     { label: 'New Invoice', url: '/invoices/new' },
                     { label: 'Single Invoice', url: '/invoice/INS-0120010' },
-                ]
+                ],
             },
             {
                 label: 'Other Apps',
@@ -819,16 +967,19 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Clients', url: '/other-apps/clients' },
                     { label: 'Outlook View', url: '/other-apps/outlook-view' },
                     { label: 'Vote List', url: '/other-apps/vote-list' },
-                    { label: 'Issue Tracker', url: '/other-apps/issue-tracker' },
+                    {
+                        label: 'Issue Tracker',
+                        url: '/other-apps/issue-tracker',
+                    },
                     { label: 'API Keys', url: '/other-apps/api-keys' },
                     { label: 'Blog', url: '/other-apps/blog' },
                     { label: 'Article', url: '/other-apps/article' },
                     { label: 'Pin Board', url: '/other-apps/pin-board' },
                     { label: 'Forum View', url: '/other-apps/forum-view' },
                     { label: 'Forum Post', url: '/other-apps/forum-post' },
-                ]
+                ],
             },
-        ]
+        ],
     },
     {
         label: 'Pages',
@@ -846,8 +997,11 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Timeline', url: '/pages/timeline' },
                     { label: 'Search Results', url: '/pages/search-results' },
                     { label: 'Coming Soon', url: '/coming-soon' },
-                    { label: 'Terms & Conditions', url: '/pages/terms-and-conditions' },
-                ]
+                    {
+                        label: 'Terms & Conditions',
+                        url: '/pages/terms-and-conditions',
+                    },
+                ],
             },
             {
                 label: 'Miscellaneous',
@@ -856,17 +1010,29 @@ export const horizontalMenuItems: MenuItemType[] = [
                 children: [
                     { label: 'Text Diff', url: '/miscellaneous/text-diff' },
                     { label: 'PDF Viewer', url: '/miscellaneous/pdf-viewer' },
-                    { label: 'Sweet Alerts', url: '/miscellaneous/sweet-alerts' },
+                    {
+                        label: 'Sweet Alerts',
+                        url: '/miscellaneous/sweet-alerts',
+                    },
                     { label: 'Idle Timer', url: '/miscellaneous/idle-timer' },
-                    { label: 'Password Meter', url: '/miscellaneous/password-meter' },
-                    { label: 'Live Favicon', url: '/miscellaneous/live-favicon' },
+                    {
+                        label: 'Password Meter',
+                        url: '/miscellaneous/password-meter',
+                    },
+                    {
+                        label: 'Live Favicon',
+                        url: '/miscellaneous/live-favicon',
+                    },
                     { label: 'Clipboard', url: '/miscellaneous/clipboard' },
-                    { label: 'Loading Buttons', url: '/miscellaneous/loading-buttons' },
+                    {
+                        label: 'Loading Buttons',
+                        url: '/miscellaneous/loading-buttons',
+                    },
                     { label: 'Gallery', url: '/miscellaneous/gallery' },
                     { label: 'Masonry', url: '/miscellaneous/masonry' },
                     { label: 'Tour', url: '/miscellaneous/tour' },
                     { label: 'Animation', url: '/miscellaneous/animation' },
-                ]
+                ],
             },
             {
                 label: 'Authentication 1',
@@ -881,7 +1047,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Success Mail', url: '/auth/success-mail' },
                     { label: 'Login with PIN', url: '/auth/login-pin' },
                     { label: 'Delete Account', url: '/auth/delete-account' },
-                ]
+                ],
             },
             {
                 label: 'Authentication 2',
@@ -896,7 +1062,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Success Mail', url: '/auth-2/success-mail' },
                     { label: 'Login with PIN', url: '/auth-2/login-pin' },
                     { label: 'Delete Account', url: '/auth-2/delete-account' },
-                ]
+                ],
             },
             {
                 label: 'Authentication 3',
@@ -911,7 +1077,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Success Mail', url: '/auth-3/success-mail' },
                     { label: 'Login with PIN', url: '/auth-3/login-pin' },
                     { label: 'Delete Account', url: '/auth-3/delete-account' },
-                ]
+                ],
             },
             {
                 label: 'Error Pages',
@@ -924,9 +1090,9 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: '408', url: '/error/408' },
                     { label: '500', url: '/error/500' },
                     { label: 'Maintenance', url: '/maintenance' },
-                ]
-            }
-        ]
+                ],
+            },
+        ],
     },
     {
         label: 'Components',
@@ -950,7 +1116,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Dropdowns', url: '/ui/dropdowns' },
                     { label: 'Videos', url: '/ui/videos' },
                     { label: 'Grid Options', url: '/ui/grid-options' },
-                ]
+                ],
             },
             {
                 label: 'Base UI Two',
@@ -972,7 +1138,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Tooltips', url: '/ui/tooltips' },
                     { label: 'Typography', url: '/ui/typography' },
                     { label: 'Utilities', url: '/ui/utilities' },
-                ]
+                ],
             },
             {
                 label: 'Widgets',
@@ -1000,7 +1166,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Timeline', url: '/graphs/apex/timeline' },
                     { label: 'Boxplot', url: '/graphs/apex/boxplot' },
                     { label: 'Treemap', url: '/graphs/apex/treemap' },
-                ]
+                ],
             },
             {
                 label: 'Apex Charts 2',
@@ -1018,7 +1184,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Slope', url: '/graphs/apex/slope' },
                     { label: 'Apex Tree', url: '/charts/apextree' },
                     { label: 'Apex Sankey', url: '/charts/apexsankey' },
-                ]
+                ],
             },
             {
                 label: 'Echarts',
@@ -1031,12 +1197,15 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Scatter', url: '/graphs/echarts/scatter' },
                     { label: 'GEO Map', url: '/graphs/echarts/geo-map' },
                     { label: 'Gauge', url: '/graphs/echarts/gauge' },
-                    { label: 'Candlestick', url: '/graphs/echarts/candlestick' },
+                    {
+                        label: 'Candlestick',
+                        url: '/graphs/echarts/candlestick',
+                    },
                     { label: 'Area', url: '/graphs/echarts/area' },
                     { label: 'Radar', url: '/graphs/echarts/radar' },
                     { label: 'Heatmap', url: '/graphs/echarts/heatmap' },
                     { label: 'Other', url: '/graphs/echarts/other' },
-                ]
+                ],
             },
             {
                 label: 'Forms',
@@ -1053,7 +1222,7 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Range Slider', url: '/forms/range-slider' },
                     { label: 'Layouts', url: '/forms/layouts' },
                     { label: 'Other Plugins', url: '/forms/other-plugins' },
-                ]
+                ],
             },
             {
                 label: 'Icons',
@@ -1073,17 +1242,25 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Google Maps', url: '/maps/google' },
                     { label: 'Vector Maps', url: '/maps/vector' },
                     { label: 'Leaflet Maps', url: '/maps/leaflet' },
-                ]
+                ],
             },
-        ]
+        ],
     },
     {
         label: 'Tables',
         icon: 'tablerTableColumn',
         isCollapsed: true,
         children: [
-            { icon: 'tablerBorderAll', label: 'Static Tables', url: '/tables/static' },
-            { icon: 'tablerStackForward', label: 'Custom Tables', url: '/tables/custom' },
+            {
+                icon: 'tablerBorderAll',
+                label: 'Static Tables',
+                url: '/tables/static',
+            },
+            {
+                icon: 'tablerStackForward',
+                label: 'Custom Tables',
+                url: '/tables/custom',
+            },
             {
                 icon: 'tablerTable',
                 label: 'Data Tables',
@@ -1093,16 +1270,28 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Export Data', url: '/data-tables/export-data' },
                     { label: 'Select', url: '/data-tables/select' },
                     { label: 'Ajax', url: '/data-tables/ajax' },
-                    { label: 'Javascript Source', url: '/data-tables/javascript-source' },
-                    { label: 'Data Rendering', url: '/data-tables/data-rendering' },
+                    {
+                        label: 'Javascript Source',
+                        url: '/data-tables/javascript-source',
+                    },
+                    {
+                        label: 'Data Rendering',
+                        url: '/data-tables/data-rendering',
+                    },
                     { label: 'Scroll', url: '/data-tables/scroll' },
-                    { label: 'Show & Hide Column', url: '/data-tables/columns' },
+                    {
+                        label: 'Show & Hide Column',
+                        url: '/data-tables/columns',
+                    },
                     { label: 'Child Rows', url: '/data-tables/child-rows' },
-                    { label: 'Column Searching', url: '/data-tables/column-search' },
+                    {
+                        label: 'Column Searching',
+                        url: '/data-tables/column-search',
+                    },
                     { label: 'Fixed Header', url: '/data-tables/fixed-header' },
-                ]
+                ],
             },
-        ]
+        ],
     },
     {
         label: 'Layouts',
@@ -1117,24 +1306,45 @@ export const horizontalMenuItems: MenuItemType[] = [
                     { label: 'Boxed', url: '/layouts/boxed' },
                     { label: 'Horizontal', url: '/layouts/horizontal' },
                     { label: 'Preloader', url: '/layouts/preloader' },
-                ]
+                ],
             },
             {
                 label: 'Sidebars',
                 icon: 'tablerLayoutSidebar',
                 children: [
                     { label: 'Light Menu', url: '/layouts/sidebars/light' },
-                    { label: 'Gradient Menu', url: '/layouts/sidebars/gradient' },
+                    {
+                        label: 'Gradient Menu',
+                        url: '/layouts/sidebars/gradient',
+                    },
                     { label: 'Gray Menu', url: '/layouts/sidebars/gray' },
                     { label: 'Image Menu', url: '/layouts/sidebars/image' },
                     { label: 'Compact Menu', url: '/layouts/sidebars/compact' },
-                    { label: 'Icon View Menu', url: '/layouts/sidebars/icon-view' },
-                    { label: 'On Hover Menu', url: '/layouts/sidebars/on-hover' },
-                    { label: 'On Hover Active', url: '/layouts/sidebars/on-hover-active' },
-                    { label: 'Offcanvas Menu', url: '/layouts/sidebars/offcanvas' },
-                    { label: 'No Icons with Lines', url: '/layouts/sidebars/no-icons-with-lines' },
-                    { label: 'Sidebar with Lines', url: '/layouts/sidebars/with-lines' },
-                ]
+                    {
+                        label: 'Icon View Menu',
+                        url: '/layouts/sidebars/icon-view',
+                    },
+                    {
+                        label: 'On Hover Menu',
+                        url: '/layouts/sidebars/on-hover',
+                    },
+                    {
+                        label: 'On Hover Active',
+                        url: '/layouts/sidebars/on-hover-active',
+                    },
+                    {
+                        label: 'Offcanvas Menu',
+                        url: '/layouts/sidebars/offcanvas',
+                    },
+                    {
+                        label: 'No Icons with Lines',
+                        url: '/layouts/sidebars/no-icons-with-lines',
+                    },
+                    {
+                        label: 'Sidebar with Lines',
+                        url: '/layouts/sidebars/with-lines',
+                    },
+                ],
             },
             {
                 label: 'Topbars',
@@ -1142,16 +1352,25 @@ export const horizontalMenuItems: MenuItemType[] = [
                 children: [
                     { label: 'Dark Topbar', url: '/layouts/topbars/dark' },
                     { label: 'Gray Topbar', url: '/layouts/topbars/gray' },
-                    { label: 'Gradient Topbar', url: '/layouts/topbars/gradient' },
-                    { label: 'Topbar with Sub Items', url: '/layouts/topbars/with-sub-items' },
-                    { label: 'Topbar with Tools', url: '/layouts/topbars/with-tools' },
-                ]
-            }
-        ]
+                    {
+                        label: 'Gradient Topbar',
+                        url: '/layouts/topbars/gradient',
+                    },
+                    {
+                        label: 'Topbar with Sub Items',
+                        url: '/layouts/topbars/with-sub-items',
+                    },
+                    {
+                        label: 'Topbar with Tools',
+                        url: '/layouts/topbars/with-tools',
+                    },
+                ],
+            },
+        ],
     },
     {
         label: 'Landing',
         icon: 'tablerRocket',
-        url: '/landing'
-    }
+        url: '/landing',
+    },
 ];

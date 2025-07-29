@@ -1,5 +1,4 @@
-import { states } from '@/app/views/forms/other-plugins/data';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule,Validators  } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule } from '@angular/common';
@@ -9,17 +8,28 @@ import { Observable } from 'rxjs';
 import { ApiService } from '@core/services/api.service';
 import Swal from 'sweetalert2';
 import { RegistrationApiService } from '@/app/shared/Services/Registration/registration.api.service';
+import { NgxDaterangepickerBootstrapDirective} from "ngx-daterangepicker-bootstrap";
+import {NgxMaskDirective, provideNgxMask} from 'ngx-mask'
 
+declare var flatpickr: any;
 
 
 @Component({
+
   selector: 'app-covrage-create',
   imports: [ReactiveFormsModule, CommonModule, FormsModule,],
+     providers: [
+    provideNgxMask()
+  ],
+
   templateUrl: './covrage-create.component.html',
   styleUrl: './covrage-create.component.scss'
 })
 
 export class CovrageCreateComponent implements OnInit {
+
+@ViewChild('picker') picker!: NgxDaterangepickerBootstrapDirective;
+
   subscriberForm!: FormGroup;
 
   type: any[] = [];
@@ -235,14 +245,14 @@ facilities: any[] = [];
     }
 
     if (regBLPayer) {
-      //debugger;
+      //;
       regBLPayer = regBLPayer.map((item: { PayerId: any; PayerName: any }) => {
         return {
           name: item.PayerName,
           code: item.PayerId,
         };
       });
-      //debugger;
+      //;
       this.BLPayer = regBLPayer;
     }
 
@@ -255,7 +265,7 @@ facilities: any[] = [];
           };
         }
       );
-      //debugger;
+      //;
       this.BLPayerPlan = regBLPayerPlan;
     }
 
@@ -268,7 +278,7 @@ facilities: any[] = [];
           };
         }
       );
-      //debugger;
+      //;
       this.BLPayerPackage = regBLPayerPackage;
     }
 
@@ -279,14 +289,14 @@ facilities: any[] = [];
           code: item.TitleId,
         };
       });
-      //debugger;
+      //;
       this.titles = regTitles;
 
       //console.log('Titles:', this.titles);
     }
 
-    this.registrationApi.GetInsuranceRelation().subscribe((res) => {
-    });
+    // this.registrationApi.GetInsuranceRelation().subscribe((res) => {
+    // });
   }
 
 
@@ -421,7 +431,7 @@ insertsubscriber() {
   }
 
 getStateByCountry(countryId: number) {
-    debugger
+
   this.registrationApi.getStateByCountry(countryId).then((res: any) => {
     this.states = res;
     this.subscriberForm.get('StateId')?.setValue(null); // Reset state
@@ -447,7 +457,7 @@ onCountryChange() {
   const countryId = this.subscriberForm.get('CountryId')?.value;
   if (countryId) {
     this.registrationApi.getStateByCountry(countryId).then((res: any) => {
-        debugger
+
         this.states = res;
       this.subscriberForm.get('StateId')?.setValue(null); // Reset State
       this.city = [];
@@ -463,7 +473,7 @@ onCountryChange() {
 
 onStateChange() {
   const stateId = this.subscriberForm.get('StateId')?.value;
-  debugger
+
   if (stateId) {
     this.registrationApi.getCityByState(stateId).then((res: any) => {
       this.city = res;
@@ -474,5 +484,16 @@ onStateChange() {
     this.subscriberForm.get('CityId')?.setValue(null);
   }
 }
+
+
+  ngAfterViewInit(): void {
+    flatpickr('#deathDate', {
+      dateFormat: 'Y-m-d',
+      maxDate: 'today', // prevent future dates
+      onChange: (selectedDates: any, dateStr: string) => {
+        this.subscriberForm.get('DeathDate')?.setValue(dateStr);
+      },
+    });
+  }
 
 }
