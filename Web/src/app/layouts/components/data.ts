@@ -126,25 +126,22 @@ export const menuItems: ExtendedMenuItemType[] = [
         isCollapsed: true,
         children: [
 
-        { label: 'Human Resources', url: '/control-panel/human-resources' },
-        { label: 'Human Resources Add', url: '/control-panel/human-resources-add' },
- ]
-  },
+            { label: 'Human Resources', url: '/control-panel/human-resources' },
+            { label: 'Human Resources Add', url: '/control-panel/human-resources-add' },
+        ]
+    },
 
 
-  {
-    label: 'Billing',
-    icon: 'tablerHeartbeat',
-    module: 'Billing', // 👈 this is used by PermissionService
-    isCollapsed: true,
-    children: [
+    {
+        label: 'Billing',
+        icon: 'tablerHeartbeat',
+        module: 'Billing', // 👈 this is used by PermissionService
+        isCollapsed: true,
+        children: [
 
-      { label: 'Charge Capture', url: '/billing/charge-capture' },
-    ]
-  },
-
-
-
+            { label: 'Charge Capture', url: '/billing/charge-capture' },
+        ]
+    },
 
 
 
@@ -153,7 +150,10 @@ export const menuItems: ExtendedMenuItemType[] = [
 
 
 
-    {label: 'Apps', isTitle: true},
+
+
+
+    { label: 'Apps', isTitle: true },
     {
         label: 'Ecommerce',
         icon: 'tablerBasket',
@@ -643,13 +643,15 @@ export const horizontalMenuItems: MenuItemType[] = [
         module: 'Registration',
         isCollapsed: true,
         children: [
-            { label: 'Alerts',
-              icon: 'tablerBell',
-              url: '/registration/alerts'
+            {
+                label: 'Alerts',
+                icon: 'tablerBell',
+                url: '/registration/alerts'
             },
-            { label: 'Coverages',
-              icon: 'tablerBell',
-              url: '/registration/coverage-list' 
+            {
+                label: 'Coverages',
+                icon: 'tablerBell',
+                url: '/registration/coverage-list'
             },
 
         ]
@@ -683,6 +685,20 @@ export const horizontalMenuItems: MenuItemType[] = [
                 label: 'Problem',
                 icon: 'tablerClipboardText',
                 url: '/clinical/Problem-List',
+            },
+        ]
+    },
+
+    {
+        label: 'Billing',
+        icon: 'tablerHeartbeat',
+        module: 'Billing', // 👈 this is used by PermissionService
+        isCollapsed: true,
+        children: [
+
+            { label: 'Charge Capture',
+                icon: 'tablerBell',
+              url: '/billing/charge capture' 
             },
         ]
     },

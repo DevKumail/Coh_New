@@ -74,3 +74,4 @@ onPageSizeChange(event: any) {
   }
 
 }
+ 
