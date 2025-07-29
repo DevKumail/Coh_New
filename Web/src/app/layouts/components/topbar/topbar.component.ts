@@ -9,7 +9,6 @@ import { UserProfileComponent } from '@layouts/components/topbar/components/user
 import { NotificationDropdownComponent } from '@layouts/components/topbar/components/notification-dropdown/notification-dropdown.component';
 import { IconsModule } from '@/app/shared/icons.module';
 import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { PatientSearchModalComponent } from '@/app/shared/modals/patient-search-modal/patient-search-modal.component';
 import { PatientHeaderPanelComponent } from "../patient-header-panel/patient-header-panel.component";
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import {
