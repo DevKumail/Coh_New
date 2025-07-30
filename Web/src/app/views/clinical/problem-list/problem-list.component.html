@@ -1,136 +1,241 @@
 <form [formGroup]="medicalForm">
-    <div class="card p-3 shadow rounded">
-      <!-- FORM SECTION -->
+  <div class="card p-3 shadow rounded">
+    <!-- FORM SECTION -->
+    <!-- <div class="row">
+      <div class="col-12" style="margin-top: -20px;">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" formControlName="isProviderCheck" id="isProviderCheck"
+            (change)="onCheckboxChange()" style="height: 20px; width: 20px;" />
+          <label class="form-check-label" for="isProviderCheck" style="margin-bottom: -22px;">
+            Provider Outside Clinic
+          </label>
+        </div>
+      </div>
+    </div> -->
+
+    <div class="row">
       <div class="row">
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">Provider</label>
-            <select class="form-select" formControlName="provider">
-              <option value="" disabled selected>Select Provider</option>
-              <option *ngFor="let provider" [value]="provider.id">{{ provider.name }}</option>
-            </select>
+        <div class="col-12" style="margin-top: -20px;">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" formControlName="isProviderCheck" id="isProviderCheck"
+              (change)="onCheckboxChange()" style="height: 20px; width: 20px;" />
+            <label class="form-check-label" for="isProviderCheck" style="margin-bottom: -22px;">
+              Provider Outside Clinic
+            </label>
           </div>
         </div>
-
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">Problem</label>
-            <input type="text" class="form-control" formControlName="problem" placeholder="Enter problem" />
-          </div>
-        </div>
-
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">Comments</label>
-            <input type="text" class="form-control" formControlName="comments" placeholder="Enter comments" />
-          </div>
-        </div>
-
-
       </div>
 
-      <div class="row">
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">Status</label>
-            <select class="form-select" formControlName="status">
-              <option value="" disabled selected>Select Status</option>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </div>
+      <div class="col-lg-3">
+        <div class="mb-3">
+          <label class="form-label">Provider</label>
+          <select class="form-select" formControlName="provider">
+            <option value="" disabled selected>Select Provider</option>
+            <option *ngFor="let provider" [value]="provider.id">{{ provider.name }}</option>
+          </select>
         </div>
+      </div>
 
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">Start Date</label>
-            <input type="date" class="form-control" formControlName="startDate" />
+
+      <div class="col-lg-3">
+        <div class="mb-3">
+          <label class="form-label">Problem</label>
+
+          <div class="input-group">
+            <input type="text" class="form-control" formControlName="problem" placeholder="Enter problem" />
+            <button class="btn btn-success" type="button" (click)="ClickFilter(standardModal)">
+              <i class="fa fa-search"></i>
+            </button>
           </div>
+
         </div>
+      </div>
 
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">End Date</label>
-            <input type="date" class="form-control" formControlName="endDate" />
-          </div>
+
+
+      <div class="col-lg-3">
+        <div class="mb-3">
+          <label class="form-label">Comments</label>
+          <input type="text" class="form-control" formControlName="comments" placeholder="Enter comments" />
         </div>
+      </div>
 
-        <div class="col-lg-3 ms-auto">
-            <div class="d-flex justify-content-end gap-2 mt-2">
 
-              <button type="button" class="btn btn-secondary" (click)="onClear()">Clear</button>
-              <button type="submit" class="btn btn-success">Save</button>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-3">
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" formControlName="status">
+            <option value="" disabled selected>Select Status</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-lg-3">
+        <div class="mb-3">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-control" formControlName="startDate" />
+        </div>
+      </div>
+
+      <div class="col-lg-3">
+        <div class="mb-3">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-control" formControlName="endDate" />
+        </div>
+      </div>
+
+      <div class="col-lg-3 ms-auto">
+        <div class="d-flex justify-content-end gap-2 mt-2">
+
+          <button type="button" class="btn btn-secondary" (click)="onClear()">Clear</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE SECTION -->
+    <div class="mt-4">
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr class="text-center">
+              <th>Provider</th>
+              <th>Problem</th>
+              <th>Comments</th>
+              <th>Confidential</th>
+              <th>Status</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let record of medicalHistoryData">
+              <td>{{ record.provider }}</td>
+              <td>{{ record.problem }}</td>
+              <td>{{ record.comments }}</td>
+              <td class="text-center">
+                <ng-icon [name]="record.confidential ? 'tablerCheck' : 'tablerX'"></ng-icon>
+              </td>
+              <td>{{ record.status }}</td>
+              <td>{{ record.startDate }}</td>
+              <td>{{ record.endDate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="d-flex flex-column align-items-center mt-3 gap-2">
+        <div class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap">
+          <!-- Showing entries + dropdown -->
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="me-2">
+              Showing {{ start + 1 }} to {{ end }} of {{ medicalHistoryData.length }} entries
+            </div>
+            <div>
+              <select class="form-select form-select-sm" style="width: auto;" [(ngModel)]="pageSize"
+                [ngModelOptions]="{ standalone: true }" (change)="onPageSizeChange($event)">
+                <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+              </select>
             </div>
           </div>
-      </div>
 
-      <!-- TABLE SECTION -->
-      <div class="mt-4">
-        <div class="table-responsive">
-          <table class="table table-bordered table-striped">
-            <thead>
-              <tr class="text-center">
-                <th>Provider</th>
-                <th>Problem</th>
-                <th>Comments</th>
-                <th>Confidential</th>
-                <th>Status</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let record of medicalHistoryData">
-                <td>{{ record.provider }}</td>
-                <td>{{ record.problem }}</td>
-                <td>{{ record.comments }}</td>
-                <td class="text-center">
-                  <ng-icon [name]="record.confidential ? 'tablerCheck' : 'tablerX'"></ng-icon>
-                </td>
-                <td>{{ record.status }}</td>
-                <td>{{ record.startDate }}</td>
-                <td>{{ record.endDate }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Pagination Controls -->
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="prevPage()">Previous</button>
+              </li>
+              <li class="page-item" *ngFor="let page of pageNumbers" [class.active]="page === currentPage">
+                <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="nextPage()">Next</button>
+              </li>
+            </ul>
+          </nav>
         </div>
+      </div>
+    </div>
+  </div>
+</form>
 
-        <!-- PAGINATION -->
-        <div class="d-flex flex-column align-items-center mt-3 gap-2">
-          <div class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap">
-            <!-- Showing entries + dropdown -->
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-              <div class="me-2">
-                Showing {{ start + 1 }} to {{ end }} of {{ medicalHistoryData.length }} entries
-              </div>
-              <div>
-                <select
-                  class="form-select form-select-sm"
-                  style="width: auto;"
-                  [(ngModel)]="pageSize"
-                  [ngModelOptions]="{ standalone: true }"
-                  (change)="onPageSizeChange($event)">
-                  <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+<ng-template #standardModal let-modal>
+  <form [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
+    <div class="modal-header">
+      <h5 class="modal-title">Search-Problem</h5>
+      <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="card shadow-sm rounded-3">
+        <div class="card-body">
+          <div class="container-fluid">
+            <div class="row g-3">
+              <div class="col-md-4 col-sm-12">
+                <label for="icdVersionId" class="form-label">ICD Versions:</label>
+                <select class="form-control" formControlName="icdVersionId" id="icdVersionId" required>
+                  <option value="">Select ICD Version</option>
+                  <option *ngFor="let version of ICDVersions" [value]="version.code">
+                    {{ version.name }}
+                  </option>
                 </select>
               </div>
-            </div>
 
-            <!-- Pagination Controls -->
-            <nav>
-              <ul class="pagination pagination-sm mb-0">
-                <li class="page-item" [class.disabled]="currentPage === 1">
-                  <button class="page-link" (click)="prevPage()">Previous</button>
-                </li>
-                <li class="page-item" *ngFor="let page of pageNumbers" [class.active]="page === currentPage">
-                  <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
-                </li>
-                <li class="page-item" [class.disabled]="currentPage === totalPages">
-                  <button class="page-link" (click)="nextPage()">Next</button>
-                </li>
-              </ul>
-            </nav>
+              <div class="col-md-4 col-sm-12">
+                <label for="searchById" class="form-label">Search Code:</label>
+                <select class="form-control" formControlName="searchById" id="searchById" required
+                  (change)="onSearchByChange()">
+                  <option value="">Select Option</option>
+                  <option *ngFor="let item of Searchby" [value]="item.code">
+                    {{ item.name }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="col-md-4 col-sm-12" *ngIf="Searchby != 3">
+                <label for="startingCode" class="form-label">Starting Code:</label>
+                <input type="text" class="form-control" formControlName="startingCode" id="startingCode"
+                  placeholder="Enter Starting Code" />
+              </div>
+              <form [formGroup]="diagnosisForm">
+                <div class="row col-12">
+                  <!-- Ending Code -->
+                  <!-- <div class="col-md-2 col-sm-12 col-12" *ngIf="diagnosisForm.get('searchBy')?.value == 2">
+                    <label for="endingCode">Ending Code</label>
+                    <input type="text" class="form-control" id="endingCode" formControlName="endingCode"
+                      placeholder="Ending Code" />
+                  </div> -->
+
+                  <!-- Description -->
+                  <!-- <div class="col-md-2 col-sm-12 col-12" *ngIf="diagnosisForm.get('searchBy')?.value == 3">
+                    <label for="description">Description</label>
+                    <input type="text" class="form-control" id="description" formControlName="description"
+                      placeholder="Description" />
+                  </div> -->
+
+                  <!-- Search Button -->
+                  <div class="col-md-2 col-sm-12 col-12 mt-3">
+                    <button class="btn btn-info mt-3 w-100" type="button" (click)="SearchDiagnosis()">Search</button>
+                  </div>
+                </div>
+              </form>
+
+
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </div>
   </form>
+</ng-template>

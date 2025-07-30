@@ -1,3 +1,5 @@
+import { LoaderService } from '@core/services/loader.service';
+import { LoaderComponent } from './../../../../components/loader/loader.component';
 import { Demographic } from './../../../../shared/Models/registration/Demographics/Demographic.model';
 import { DemographicApiServices } from './../../../../shared/Services/Demographic/demographic.api.serviec';
 import { Component } from '@angular/core';
@@ -19,6 +21,8 @@ import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
+
+
 @Component({
     selector: 'app-demographic-list',
     imports: [
@@ -35,13 +39,15 @@ import Swal from 'sweetalert2';
 export class DemographicsListComponent {
   constructor(
     public router: Router,
-    public DemographicApiServices: DemographicApiServices
+    public DemographicApiServices: DemographicApiServices,
+    public Loader : LoaderService,
   ) {}
 
   Patient: any[] = [];
   pagedPatients: any[] = [];
   RegPatient: any[] = [];
   genders: any[] = [];
+  loader: any
 
   pageSize = 25;
   currentPage = 1;
@@ -90,7 +96,8 @@ export class DemographicsListComponent {
   ngOnInit(): void {
     this.reloadData();
     this.FillCache();
-    this.GetCoverageAndRegPatient(this.FilterData);
+    // this.GetCoverageAndRegPatient(this.FilterData);
+    this.DemographicsFetchData(this.FilterData);
   }
 
   reloadData() {
@@ -115,65 +122,33 @@ export class DemographicsListComponent {
       });
   }
 
-  GetCoverageAndRegPatient(req: any) {
-    this.load = true;
-    this.PaginationInfo.RowsPerPage = this.pageSize;
-    this.PaginationInfo.Page = this.currentPage;
+//   GetCoverageAndRegPatient(req: any) {
+//     this.load = true;
+//     this.PaginationInfo.RowsPerPage = this.pageSize;
+//     this.PaginationInfo.Page = this.currentPage;
 
-    this.DemographicApiServices.GetAllDemographicsData(
-      req,
-      this.PaginationInfo
-    ).subscribe({
-      next: (demographics: any) => {
-        if (demographics?.table1) {
-          this.Patient = demographics.table1;
-          this.pagedPatients = this.Patient; // backend returns current page
-          this.totalRecord = demographics.table2?.[0]?.totalCount || 0;
-          this.RegPatient = demographics.table2 || [];
-        }
+//     this.DemographicApiServices.GetAllDemographicsData(
+//       req,
+//       this.PaginationInfo
+//     ).subscribe({
+//       next: (demographics: any) => {
+//         if (demographics?.table1) {
+//           this.Patient = demographics.table1;
+//           this.pagedPatients = this.Patient; // backend returns current page
+//           this.totalRecord = demographics.table2?.[0]?.totalCount || 0;
+//           this.RegPatient = demographics.table2 || [];
+//         }
 
-        this.updatePagination();
-        this.load = false;
-      },
-      error: (error: any) => {
-        this.load = false;
-        Swal.fire({ icon: 'error', title: 'Rejected', text: error.message });
-      },
-    });
-  }
+//         this.updatePagination();
+//         this.load = false;
+//       },
+//       error: (error: any) => {
+//         this.load = false;
+//         Swal.fire({ icon: 'error', title: 'Rejected', text: error.message });
+//       },
+//     });
+//   }
 
-  updatePagination() {
-    this.totalPages = Math.ceil(this.totalRecord / this.pageSize);
-    this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-    this.start = (this.currentPage - 1) * this.pageSize;
-    this.end = Math.min(this.start + this.pageSize, this.totalRecord);
-  }
-
-  onPageSizeChange(event: any) {
-    this.currentPage = 1;
-    this.GetCoverageAndRegPatient(this.FilterData);
-  }
-
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.GetCoverageAndRegPatient(this.FilterData);
-    }
-  }
-
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.GetCoverageAndRegPatient(this.FilterData);
-    }
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.GetCoverageAndRegPatient(this.FilterData);
-    }
-  }
 
   clearFilter() {
     this.FilterData = {
@@ -183,14 +158,14 @@ export class DemographicsListComponent {
       genderId: '',
     };
     this.currentPage = 1;
-    this.GetCoverageAndRegPatient(this.FilterData);
+    this.DemographicsFetchData(this.FilterData);
     this.filter = false;
   }
 
   submitFilter() {
     this.currentPage = 1;
     this.filter = false;
-    this.GetCoverageAndRegPatient(this.FilterData);
+    this.DemographicsFetchData(this.FilterData);
   }
 
   ClickFilter() {
@@ -242,7 +217,7 @@ export class DemographicsListComponent {
       if (result.isConfirmed) {
         this.DemographicApiServices.deletedemographics(Id).then((response: any) => {
           if (response.success) {
-            this.GetCoverageAndRegPatient(this.FilterData);
+            this.DemographicsFetchData(this.FilterData);
             Swal.fire({
               icon: 'info',
               title: 'Confirmed',
@@ -259,5 +234,93 @@ export class DemographicsListComponent {
       }
     });
   }
+
+
+DemographicsPagedData: any[] = [];
+DemographicsCurrentPage = 1;
+DemographicsPageSize = 10;
+DemographicsTotalItems = 0;
+
+get DemographicsTotalPages(): number {
+  return Math.ceil(this.DemographicsTotalItems / this.DemographicsPageSize);
+}
+
+get DemographicsStart(): number {
+  return (this.DemographicsCurrentPage - 1) * this.DemographicsPageSize;
+}
+
+get DemographicsEnd(): number {
+  return Math.min(this.DemographicsStart + this.DemographicsPageSize, this.DemographicsTotalItems);
+}
+
+get DemographicsPageNumbers(): (number | string)[] {
+  const total = this.DemographicsTotalPages;
+  const current = this.DemographicsCurrentPage;
+  const delta = 2;
+
+  const range: (number | string)[] = [];
+  const left = Math.max(2, current - delta);
+  const right = Math.min(total - 1, current + delta);
+
+  range.push(1);
+  if (left > 2) range.push('...');
+  for (let i = left; i <= right; i++) range.push(i);
+  if (right < total - 1) range.push('...');
+  if (total > 1) range.push(total);
+
+  return range;
+}
+
+DemographicsGoToPage(page: number) {
+  if (typeof page !== 'number' || page < 1 || page > this.DemographicsTotalPages) return;
+  this.DemographicsCurrentPage = page;
+  this.DemographicsFetchData(this.FilterData);
+}
+
+DemographicsNextPage() {
+  if (this.DemographicsCurrentPage < this.DemographicsTotalPages) {
+    this.DemographicsCurrentPage++;
+    this.DemographicsFetchData(this.FilterData);
+  }
+}
+
+DemographicsPrevPage() {
+  if (this.DemographicsCurrentPage > 1) {
+    this.DemographicsCurrentPage--;
+    this.DemographicsFetchData(this.FilterData);
+  }
+}
+
+DemographicsFetchData(req: any) {
+    debugger
+  this.Loader.show();
+  const paginationInfo = {
+    Page: this.DemographicsCurrentPage,
+    RowsPerPage: this.DemographicsPageSize
+  };
+
+  this.DemographicApiServices.GetAllDemographicsData(req, paginationInfo).subscribe({
+    next: (response: any) => {
+      this.DemographicsPagedData = response?.table1 || [];
+      console.log( 'this.DemographicsPagedData =>',this.DemographicsPagedData);
+
+      this.DemographicsTotalItems = response?.table2?.[0]?.totalCount || 0;
+      this.RegPatient = response.table2 || [];
+      this.Loader.hide();
+    },
+    error: (error: any) => {
+      this.Loader.hide();
+      Swal.fire({ icon: 'error', title: 'Rejected', text: error.message });
+    }
+  });
+}
+
+onDemographicsPageSizeChange(event: any) {
+  this.DemographicsPageSize = +event.target.value;
+  this.DemographicsCurrentPage = 1; // Reset to first page
+  debugger
+  this.DemographicsFetchData(this.FilterData);
+}
+
 }
 

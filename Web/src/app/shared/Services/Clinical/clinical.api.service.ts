@@ -5,7 +5,11 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class ClinicalApiService {
 
-    
+    getCacheItem(arg0: { entities: string[]; }) {
+        throw new Error('Method not implemented.');
+    }
+
+
     add(arg0: { severity: string; summary: string; detail: string; }) {
         throw new Error('Method not implemented.');
     }

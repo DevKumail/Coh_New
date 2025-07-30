@@ -16,7 +16,7 @@ export const Registration_ROUTES: Routes = [
     path: '',
     canActivate: [authGuard],
     data: { permissions: ['Registration:Alerts']},
-    children: [
+    children: [   
       {
         path: 'alerts',
         component: AlertComponent,

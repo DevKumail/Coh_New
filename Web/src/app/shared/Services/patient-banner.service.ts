@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -7,6 +7,8 @@ import { BehaviorSubject } from 'rxjs';
 export class PatientBannerService {
   private patientDataSource = new BehaviorSubject<any>(null);
   patientData$ = this.patientDataSource.asObservable();
+
+  data = new Subject<boolean>() 
 
   setPatientData(data: any) {
     this.patientDataSource.next(data);

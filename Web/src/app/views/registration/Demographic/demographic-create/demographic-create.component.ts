@@ -96,7 +96,7 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
 
     qid:any;
 
-
+isLoading: boolean = false;
 
 
     CarrierId: any;
