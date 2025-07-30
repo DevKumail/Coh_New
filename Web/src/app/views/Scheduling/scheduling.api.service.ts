@@ -37,12 +37,12 @@ export class SchedulingApiService {
     GetSpecialitybyFacilityId(facilityId: string): Observable<any> {
         return this.api.get(`Appointment/GetSpecialitybyFacilityId?facilityId=${facilityId}`);
     } 
-    getCacheItem(object: any) {
-        return this.api.post('Cache/GetCache', object).toPromise();
-    }
-     getEmployeeFacilityFromCache() {
-        return this.api.get('Common/GetEmployeeFacilityFromCache').toPromise();
-    }
+    // getCacheItem(object: any) {
+    //     return this.api.post('Cache/GetCache', object).toPromise();
+    // }
+    //  getEmployeeFacilityFromCache() {
+    //     return this.api.get('Common/GetEmployeeFacilityFromCache').toPromise();
+    // }
   GetProviderByFacilityId(FacilityId: any) {
     return this.api.get(`Appointment/GetProviderByFacilityId?FacilityId=${FacilityId}`);
   }
@@ -121,6 +121,7 @@ export class SchedulingApiService {
     getEmployeeFacilityFromCache() {
         return this.api.get('Common/GetEmployeeFacilityFromCache').toPromise();
     }
+    
 
     cancelBooking(AppId:number,AppStatusId:number ,ByProvider:boolean,RescheduledId:number) {
         return this.api.get(`Appointment/CancelOrRescheduleAppointment?AppId=${AppId}&AppStatusId=${AppStatusId}&ByProvider=${ByProvider}&RescheduledId=${RescheduledId}`).toPromise();
