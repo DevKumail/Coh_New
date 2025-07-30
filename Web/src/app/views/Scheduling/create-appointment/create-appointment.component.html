@@ -7,11 +7,12 @@
 
     <div class="card-body">
       <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
-        <!-- Row 1 -->
+
         <div class="row">
           <div class="col-sm-3 mb-3">
             <label>Facility <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="facility">
+            <select class="form-control form-select" formControlName="facility"
+              (onChange)="GetSpecialitybyFacilityId(selectedFacility)">
               <option value="">Select Facility</option>
               <option *ngFor="let f of facilities" [value]="f.code">{{ f.name }}</option>
             </select>
@@ -19,7 +20,8 @@
 
           <div class="col-sm-3 mb-3">
             <label>Speciality <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="speciality">
+            <select class="form-control form-select" formControlName="speciality"
+              (onChange)="GetSitebySpecialityId(selectedSpeciality)">
               <option value="">Select Speciality</option>
               <option *ngFor="let s of specialities" [value]="s.specialtyId">{{ s.specialtyName }}</option>
             </select>
@@ -27,7 +29,8 @@
 
           <div class="col-sm-3 mb-3">
             <label>Provider <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="provider">
+            <select class="form-control form-select" fromControlName="provider"
+              (onChange)="GetSpecialityByEmployeeId(selectedProviders)">
               <option value="">Select Provider</option>
               <option *ngFor="let p of providers" [value]="p.employeeId">{{ p.fullName }}</option>
             </select>
@@ -35,7 +38,7 @@
 
           <div class="col-sm-3 mb-3">
             <label>Sites <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="site">
+            <select class="form-control form-select" formControlName="site">
               <option value="">Select Site</option>
               <option *ngFor="let site of siteArray" [value]="site.siteId">{{ site.siteName }}</option>
             </select>
@@ -46,12 +49,12 @@
         <div class="row">
           <div class="col-sm-3 mb-3">
             <label>Date <span class="text-danger">*</span></label>
-            <input type="date" class="form-control" formControlName="date" />
+            <input type="date" class="form-control " formControlName="date" />
           </div>
 
           <div class="col-sm-3 mb-3">
             <label>Time <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="time">
+            <select class="form-control form-select" formControlName="time">
               <option value="">Select Time</option>
               <option *ngFor="let t of Times" [value]="t.Time">{{ t.Time }}</option>
             </select>
@@ -59,7 +62,7 @@
 
           <div class="col-sm-3 mb-3">
             <label>Purpose of Visit <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="purpose">
+            <select class="form-control form-select" formControlName="purpose">
               <option value="">Select Purpose</option>
               <option *ngFor="let p of purpose" [value]="p.code">{{ p.name }}</option>
             </select>
@@ -67,7 +70,7 @@
 
           <div class="col-sm-3 mb-3">
             <label>Visit Type <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="visitType">
+            <select class="form-control form-select" formControlName="visitType">
               <option value="">Select Visit Type</option>
               <option *ngFor="let v of visittype" [value]="v.code">{{ v.name }}</option>
             </select>
@@ -78,7 +81,7 @@
         <div class="row">
           <div class="col-sm-3 mb-3">
             <label>Referred By <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="referredBy">
+            <select class="form-control form-select" formControlName="referredBy">
               <option value="">Referred By</option>
               <option *ngFor="let r of referred" [value]="r.name">{{ r.name }}</option>
             </select>
@@ -86,7 +89,7 @@
 
           <div class="col-sm-3 mb-3">
             <label>Type <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="type">
+            <select class="form-control form-select" formControlName="type">
               <option value="">Select Type</option>
               <option *ngFor="let t of type" [value]="t.name">{{ t.name }}</option>
             </select>
@@ -94,7 +97,7 @@
 
           <div class="col-sm-3 mb-3">
             <label>Duration <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="duration">
+            <select class="form-control form-select" formControlName="duration">
               <option value="">Select Duration</option>
               <option *ngFor="let d of duration" [value]="d.name">{{ d.name }}</option>
             </select>
@@ -102,7 +105,7 @@
 
           <div class="col-sm-3 mb-3">
             <label>Location <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="location">
+            <select class="form-control form-select" formControlName="location">
               <option value="">Select Location</option>
               <option *ngFor="let l of location" [value]="l.name">{{ l.name }}</option>
             </select>
@@ -113,7 +116,7 @@
         <div class="row">
           <div class="col-sm-3 mb-3">
             <label>Appointment Criteria</label>
-            <select class="form-control" formControlName="criteria">
+            <select class="form-control form-select" formControlName="criteria">
               <option value="">Select Criteria</option>
               <option *ngFor="let c of criteria" [value]="c.name">{{ c.name }}</option>
             </select>
@@ -121,7 +124,7 @@
 
           <div class="col-sm-3 mb-3">
             <label>Patient Notified <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="notified">
+            <select class="form-control form-select" formControlName="notified">
               <option value="">Select</option>
               <option *ngFor="let n of notified" [value]="n.name">{{ n.name }}</option>
             </select>
@@ -129,7 +132,7 @@
 
           <div class="col-sm-3 mb-3">
             <label>Appointment Status <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="status">
+            <select class="form-control form-select" formControlName="status">
               <option value="">Select</option>
               <option *ngFor="let s of status" [value]="s.name">{{ s.name }}</option>
             </select>
@@ -137,7 +140,7 @@
 
           <div class="col-sm-3 mb-3">
             <label>Payer Info <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="payer">
+            <select class="form-control form-select" formControlName="payer">
               <option value="">Select</option>
               <option *ngFor="let p of payer" [value]="p.code">{{ p.name }}</option>
             </select>
@@ -148,22 +151,22 @@
         <div class="row">
           <div class="col-sm-3 mb-3">
             <label>Patient Balance</label>
-            <input type="text" class="form-control" formControlName="patientBalance" />
+            <input type="text" class="form-control" formControlName="patientBalance" placeholder=" Patient Balance" />
           </div>
 
           <div class="col-sm-3 mb-3">
             <label>Plan Balance</label>
-            <input type="text" class="form-control" formControlName="planBalance" />
+            <input type="text" class="form-control" formControlName="planBalance" placeholder=" Plan Balance" />
           </div>
 
           <div class="col-sm-3 mb-3">
             <label>Plan Copay</label>
-            <input type="text" class="form-control" formControlName="planCopay" />
+            <input type="text" class="form-control" formControlName="planCopay" placeholder=" Plan Copay" />
           </div>
 
           <div class="col-sm-3 mb-3">
             <label>Payer Plan</label>
-            <select class="form-control" formControlName="payerPlan">
+            <select class="form-control form-select" formControlName="payerPlan" placeholder=" Payer Plan">
               <option value="">Select</option>
               <option *ngFor="let plan of payerPlan" [value]="plan.code">{{ plan.name }}</option>
             </select>

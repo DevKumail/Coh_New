@@ -43,7 +43,7 @@ export class RegistrationApiService {
 
 
     GetAlertType(): Promise<any> {
-        return this.api.get('/AllDropdowns/GetAlertType').toPromise();
+        return this.api.get('AllDropdowns/GetAlertType').toPromise();
     }
 
     GetAlertDetailsDb(mrno: string): Promise<any> {
