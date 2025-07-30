@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,9 +6,9 @@ import { NgIconComponent } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 // import { ClinicalApiService } from 'src/app/services/clinical-api.service';
-import { ClinicalApiService } from '../clinical.api.service';
+// import { ClinicalApiService } from '../clinical.api.service';
 import { Injectable } from '@angular/core';
-
+import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 
 @Component({
   selector: 'app-allergies',
@@ -25,7 +24,7 @@ export class AllergiesComponent implements OnInit {
   return value === null || value === undefined || value === '';
 }
   MyAllergiesData: any[] = [];
-  filteredDiagnosisData: any[] = [];  
+  filteredDiagnosisData: any[] = [];
   cacheItems: string[] = [];
 
   allergyForm!: FormGroup;
@@ -59,13 +58,13 @@ export class AllergiesComponent implements OnInit {
   start = 0;
   end = this.pageSize;
 
-  constructor(private clinicalApiService: ClinicalApiService,private clinicalApi: ClinicalApiService,
+  constructor(private ClinicalApiService: ClinicalApiService ,private clinicalApi: ClinicalApiService,
     private fb: FormBuilder,
     private router: Router
     ) {}
    ActiveStatus = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
 
-    
+
 
   ngOnInit() {
     this.initForm();
@@ -169,38 +168,38 @@ initForm() {
     this.updatePagination();
   }
 FillCache() {
-  const cacheItems = [
-      'Provider'];
+//   const cacheItems = [
+//       'Provider'];
 
-  this.clinicalApiService.getCacheItem({ entities: cacheItems }).then((response:any) => {
-    if (response.cache != null) {
-     this.FillDropDown(response);
-    }
-  }).catch((error) => {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: error.message || 'Something went wrong while fetching cache data.'
-    });
-  });
+//   this.ClinicalApiService.getCacheItem({ entities: cacheItems }).then((response:any) => {
+//     if (response.cache != null) {
+//      this.FillDropDown(response);
+//     }
+//   }).catch((error:any) => {
+//     Swal.fire({
+//       icon: 'error',
+//       title: 'Error',
+//       text: error.message || 'Something went wrong while fetching cache data.'
+//     });
+//   });
 }
    GetAlergyType() {
-  this.clinicalApiService.GetAlergyType().then((res: any) => {
+  this.ClinicalApiService.GetAlergyType().then((res: any) => {
     this.GetAlergy = res.result;
   });
 }
 
     GetSeverity: any = []
   GetSeverityType() {
-    this.clinicalApiService.GetSeverity().then((res:any) => {
+    this.ClinicalApiService.GetSeverity().then((res:any) => {
       this.GetSeverity = res.result
     })
   }
    GetPatientAllergyData(mrno: string) {
-     
 
-    this.clinicalApiService.GetPatientAllergyData(mrno).then((res:any) => {
-       
+
+    this.ClinicalApiService.GetPatientAllergyData(mrno).then((res:any) => {
+
 
       const allergyTable = res?.allergys?.table1;
 debugger
@@ -252,7 +251,7 @@ debugger
       });
       this.provider = provider;
       console.log('this.provider => ',this.provider);
-      
+
     }
   }
 
@@ -316,8 +315,8 @@ formValues.appointmentId = 104080;
 this.Allergy = formValues;
 
   console.log('this.Allergy', this.Allergy);
-  
-  this.clinicalApiService.SubmitPatientAllergies(this.Allergy).then((list:any) => {
+
+  this.ClinicalApiService.SubmitPatientAllergies(this.Allergy).then((list:any) => {
     this.DropFilled();
     this.GetPatientAllergyData(this.Mrno);
        this.allergyForm.reset({
@@ -342,11 +341,11 @@ this.Allergy = formValues;
     errorReason: '',
     oldMrno: '',
     isDeleted: false,
-    appointmentId: 0,    
+    appointmentId: 0,
     providerDescription: ''
   });
     Swal.fire({
-      position: 'center', 
+      position: 'center',
       icon: 'success',
       title: 'Allergies Successfully Created',
       showConfirmButton: false,

@@ -340,7 +340,7 @@ onSubmit() {
 //   }
 
   onCancel() {
-    this.router.navigate(['registration/temporary-patient-demographics']);
+    this.router.navigate(['registration/temporary patient demographics']);
   }
 
     ngAfterViewInit(): void {

@@ -7,8 +7,9 @@ import { NgIconComponent } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Injectable } from '@angular/core';
-import { AlertDTO } from '@/app/shared/models/alert.model';
-import { AlertType } from '@/app/shared/models/alert-type.model';
+import { AlertDTO } from '@/app/shared/Models/alert.model';
+import { AlertType } from '@/app/shared/Models/alert-type.model';
+
 
 
 
