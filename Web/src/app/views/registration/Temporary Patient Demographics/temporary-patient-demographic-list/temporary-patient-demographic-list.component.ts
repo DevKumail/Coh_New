@@ -20,6 +20,7 @@ import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import moment from 'moment';
+import { LoaderService } from '@core/services/loader.service';
 
 @Component({
   selector: 'app-temporary-patient-demographic-list',
@@ -204,6 +205,8 @@ export class TemporaryPatientDemographicListComponent {
   constructor(
     public router: Router,
     public TemporaryPatientDemographicApiServices: TemporaryPatientDemographicApiServices,
+    public Loader : LoaderService,
+
   ) {}
 
 //   ngOnInit(): void {
@@ -238,28 +241,64 @@ export class TemporaryPatientDemographicListComponent {
     this.getTempDemographics(this.FilterData);
   }
 
-  getTempDemographics(data: any) {
-    this.TemporaryPatientDemographicApiServices.getTempDemographics_pagination(data, this.PaginationInfo).then((res: any) => {
-        debugger
-      if (res.table2) {
-        this.pagedTemps = res.table2.map((item: any) => ({
-          personFullName: item.personFullName,
-          personEmail: item.personEmail,
-          patientBirthDate: item.patientBirthDate,
-          nationalityName: item.nationalityName,
-          countryName: item.countryName,
-          personSex: item.personSex,
-          tempId: item.tempId,
-        }));
+//   getTempDemographics(data: any) {
+//     this.TemporaryPatientDemographicApiServices.getTempDemographics_pagination(data, this.PaginationInfo).then((res: any) => {
+//         debugger
+//       if (res.table2) {
+//         this.pagedTemps = res.table2.map((item: any) => ({
+//           personFullName: item.personFullName,
+//           personEmail: item.personEmail,
+//           patientBirthDate: item.patientBirthDate,
+//           nationalityName: item.nationalityName,
+//           countryName: item.countryName,
+//           personSex: item.personSex,
+//           tempId: item.tempId,
+//         }));
 
-        this.totalRecord = res.table1[0]?.totalCount || 0;
-        this.totalPages = Math.ceil(this.totalRecord / this.pageSize);
-        this.start = (this.currentPage - 1) * this.pageSize;
-        this.end = this.start + this.pageSize;
-        this.pageNumbers = Array(this.totalPages).fill(0).map((_, i) => i + 1);
-      }
+//         this.totalRecord = res.table1[0]?.totalCount || 0;
+//         this.totalPages = Math.ceil(this.totalRecord / this.pageSize);
+//         this.start = (this.currentPage - 1) * this.pageSize;
+//         this.end = this.start + this.pageSize;
+//         this.pageNumbers = Array(this.totalPages).fill(0).map((_, i) => i + 1);
+//       }
+//     });
+//   }
+getTempDemographics(data: any) {
+  this.Loader.show(); // ✅ Show loader at start
+
+  this.TemporaryPatientDemographicApiServices.getTempDemographics_pagination(data, this.PaginationInfo).then((res: any) => {
+    debugger
+
+    if (res.table2) {
+      this.pagedTemps = res.table2.map((item: any) => ({
+        personFullName: item.personFullName,
+        personEmail: item.personEmail,
+        patientBirthDate: item.patientBirthDate,
+        nationalityName: item.nationalityName,
+        countryName: item.countryName,
+        personSex: item.personSex,
+        tempId: item.tempId,
+      }));
+
+      this.totalRecord = res.table1[0]?.totalCount || 0;
+      this.totalPages = Math.ceil(this.totalRecord / this.pageSize);
+      this.start = (this.currentPage - 1) * this.pageSize;
+      this.end = this.start + this.pageSize;
+      this.pageNumbers = Array(this.totalPages).fill(0).map((_, i) => i + 1);
+    }
+
+    this.Loader.hide(); // ✅ Hide loader after data loaded
+
+  }).catch((error: any) => {
+    this.Loader.hide(); // ✅ Hide loader if error occurs
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: error.message || 'Failed to fetch temporary demographics'
     });
-  }
+  });
+}
 
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {

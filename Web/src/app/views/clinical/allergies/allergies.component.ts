@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,14 +6,13 @@ import { NgIconComponent, NgIcon } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 // import { ClinicalApiService } from 'src/app/services/clinical-api.service';
-import { ClinicalApiService } from '../clinical.api.service';
+// import { ClinicalApiService } from '../clinical.api.service';
 import { Injectable } from '@angular/core';
 import { AllergyDto } from '@/app/shared/models/clinical/allergy.model';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { Subscription, switchMap } from 'rxjs';
 import { LoaderService } from '@core/services/loader.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
-
 
 @Component({
   selector: 'app-allergies',
