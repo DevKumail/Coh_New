@@ -4,13 +4,13 @@
       <li class="breadcrumb-item">
         <a href="javascript:void(0);">
           <ng-icon name="tablerSmartHome"></ng-icon>
-          Clinical
+          Billing
         </a>
       </li>
       <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
         <ng-icon name="tablerChevronRight"></ng-icon>
       </li>
-      <li class="breadcrumb-item active" aria-current="page">Medical History</li>
+      <li class="breadcrumb-item active" aria-current="page">Charge Capture</li>
     </ol>
   </nav>
 
@@ -26,6 +26,7 @@
               {{ item.name }}
             </option>
           </select>
+      </div>
       </div>
       <hr>
 
@@ -475,11 +476,9 @@
         </ng-template>
           </li>
       </ul>
-
       <!-- Tab Content -->
       <div [ngbNavOutlet]="nav"></div>
   </ng-container>
-    </div>
   </div>
 
   <!-- Always Diagnosis show  -->
@@ -584,7 +583,7 @@
     <div class="card-body">
 
       <!-- Button For hide and show grid -->
-       <div class="col-12 mt-2 d-flex justify-content-between">
+       <div class="col-12 d-flex justify-content-between">
         <div class="col-md-4">
           <h2 style="font-weight: bold">Service</h2>
         </div>
@@ -1640,6 +1639,31 @@ Enter comment here...</textarea
     </ng-container>
     </div>
     </div>
+
+
+
+     <!-- <ng-template pTemplate="footer"> -->
+       
+       <!-- <p-button
+       icon="pi pi-user-plus"
+       label="Save"
+       
+       styleClass="p-button-success"
+       ></p-button> -->
+       <div class="row col-12">
+        <div class="col-12">
+          <button style="float: right" (click)="submit()" type="button" class="btn btn-info">Save</button>
+           <button style="float: right; margin-right: 5px;" (click)="delete()" type="button" class="btn btn-danger">Delete</button>
+        </div>
+       </div>
+
+      <!-- <p-button
+        icon="pi pi-user-bin" 
+        label="Delete"
+        (click)="delete()"
+        styleClass="p-button-secondary ml-2"
+      ></p-button> -->
+    <!-- </ng-template> -->
 
 
 

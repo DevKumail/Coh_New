@@ -839,6 +839,20 @@ export const horizontalMenuItems: MenuItemType[] = [
             },
         ],
     },
+
+    {
+        label: 'Billing',
+        icon: 'tablerHeartbeat',
+        module: 'Billing', // 👈 this is used by PermissionService
+        isCollapsed: true,
+        children: [
+
+            { label: 'Charge Capture',
+                icon: 'tablerBell',
+              url: '/billing/charge capture' 
+            },
+        ]
+    },
     {
         label: 'Apps',
         icon: 'tablerApps',

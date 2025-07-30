@@ -24,6 +24,7 @@
         "@fullcalendar/core": "^6.1.17",
         "@fullcalendar/daygrid": "^6.1.17",
         "@fullcalendar/interaction": "^6.1.17",
+        "@fullcalendar/list": "^6.1.17",
         "@fullcalendar/timegrid": "^6.1.17",
         "@ng-bootstrap/ng-bootstrap": "^18.0.0",
         "@ng-icons/core": "^31.4.0",

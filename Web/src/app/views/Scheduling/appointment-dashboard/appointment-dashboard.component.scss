@@ -1,0 +1,43 @@
+/* Toolbar background and text */
+.fc .fc-toolbar.fc-header-toolbar {
+  background-color: #ff7f00; /* orange */
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+/* Calendar header buttons */
+.fc .fc-button {
+  background-color: #ff8800; /* orange */
+  border: none;
+  color: white;
+}
+
+.fc .fc-button:hover,
+.fc .fc-button:focus {
+  background-color: #e06d00; /* darker orange */
+  color: white;
+}
+
+/* Active button */
+.fc .fc-button-active {
+  background-color: #cc5c00 !important;
+}
+
+/* Today's date background */
+.fc .fc-day-today {
+  background-color: #ffe6cc !important; /* light orange background */
+}
+
+/* Event styling */
+.fc-event {
+  background-color: #ff9900 !important; /* orange */
+  border: none;
+  color: white;
+  font-weight: bold;
+}
+
+/* Selected date range (when dragging/selecting) */
+.fc .fc-highlight {
+  background-color: #ffd699 !important;
+}
