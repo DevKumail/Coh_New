@@ -1,0 +1,318 @@
+<div class="card shadow rounded">
+<div class="card-body">
+      <div class="row col-lg-12">
+        <div class="col-lg-6 col-md-4 col-sm-2">
+            <h4 ><b>Appointment Dashboard</b></h4>
+        </div>
+        <div class="col-lg-6 col-md-4 col-sm-12 " style="float: right;">
+            <button class="btn btn-info" (click)="openModal(fullWidthModal, { size: 'xl' })" style="float: right ; margin-right: -18px">Filter</button>
+        </div>
+      </div>
+    <div>
+    <div class="mt-2 calendar-theme-orange">
+        <full-calendar [options]="calendarOptions"></full-calendar>
+    </div>
+    </div>
+</div>
+</div>
+
+
+
+<ng-template #fullWidthModal  let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title" id="standard-modalLabel">Filter</h4>
+            <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+            </div>
+            <div class="modal-body">
+            <div class="row">
+                    <div class="col-4">
+                            <label class="form-label">Date Range:</label>
+                            <input type="text" mwlFlatpickr [(ngModel)]="rangeDates" [options]="{dateFormat:'d M, Y',mode:'range'}" class="form-control" />
+                    </div>
+                    <div class="col-4">
+                    <label class="form-label">Criteria:</label>
+                    <select class="form-select" [(ngModel)]="selectedappointmentcriteria" name="appointmentcriteria">
+                        <option *ngFor="let item of appointmentcriteria" [value]="item">
+                        {{ item.name }}
+                        </option>
+                    </select>
+                    </div>
+
+                   <div class="col-4">
+                    <label class="form-label">Visit Type:</label>
+                    <select class="form-select" [(ngModel)]="selectedvisitType" name="selectedvisitType">
+                        <option *ngFor="let item of visitType" [value]="item">
+                        {{ item.name }}
+                        </option>
+                    </select>
+                    </div>
+
+                <div class="col-4">
+                    <label class="form-label">Speciality:</label>
+                    <select class="form-select" [(ngModel)]="selectedSpeciality" name="selectedSpeciality">
+                        <option *ngFor="let item of speciality" [value]="item">
+                        {{ item.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-4">
+                    <label class="form-label">Provider:</label>
+                    <select class="form-select" [(ngModel)]="selectedProviders" name="selectedSpeciality">
+                        <option *ngFor="let item of provider" [value]="item">
+                        {{ item.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-4">
+                    <label class="form-label">Sites:</label>
+                    <select class="form-select" [(ngModel)]="selectedSites" name="selectedSpeciality">
+                        <option *ngFor="let item of sites" [value]="item">
+                        {{ item.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-4">
+                    <label class="form-label">Location:</label>
+                    <select class="form-select" [(ngModel)]="selectedLocations" name="selectedSpeciality">
+                        <option *ngFor="let item of locations" [value]="item">
+                        {{ item.name }}
+                        </option>
+                    </select>
+                </div>
+
+                    <div class="col-4">
+                    <label class="form-label">Facility:</label>
+                    <select class="form-select" [(ngModel)]="selectedFacility" name="selectedSpeciality">
+                        <option *ngFor="let item of facilities" [value]="item">
+                        {{ item.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-4">
+                    <label class="form-label">Appointment Type:</label>
+                    <select class="form-select" [(ngModel)]="selectedappointmentType" name="selectedSpeciality">
+                        <option *ngFor="let item of appointmentType" [value]="item">
+                        {{ item.name }}
+                        </option>
+                    </select>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-left: 0px;">
+                <div *ngFor="let status of appointmentstatus" class="form-check mt-2">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        [id]="status.code"
+                        [value]="status"
+                        [(ngModel)]="selectedappointmentstatus"
+                        name="appointmentstatus"
+                        />
+                    <label class="form-check-label" [for]="status.code">
+                        {{ status.name }}
+                    </label>
+                    </div>
+
+                </div>
+            </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
+        <button type="button" (click)="SubmitFilter()" class="btn btn-primary">Filter</button>
+    </div>
+
+</ng-template>
+
+<ng-template #appointmentModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Appointment Action</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    <!-- Appointment No and Patient Name -->
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-md-4">
+          <label style="font-size: 14px;"><b><u>Appointment No:</u></b></label>
+        </div>
+        <div class="col-md-5">
+          <label style="font-size: 14px;"><b><u>Patient Name:</u></b></label>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label style="font-size: 12px;">{{ appId }}</label>
+        </div>
+        <div class="col-md-5">
+          <label style="font-size: 12px;">{{ fullName }}</label>
+        </div>
+      </div>
+
+      <!-- Radio Buttons for Appointments -->
+      <div class="row mb-2" *ngIf="appId == 0">
+        <div class="col-sm-6">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="appointment"
+              id="newAppointment"
+              [value]="0"
+              [(ngModel)]="appointment"
+            />
+            <label class="form-check-label" for="newAppointment">New Appointment</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-2" *ngIf="appId == 0">
+        <div class="col-sm-6">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="appointment"
+              id="searchAppointment"
+              [value]="1"
+              [(ngModel)]="appointment"
+            />
+            <label class="form-check-label" for="searchAppointment">Search Appointment</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-2" *ngIf="appId != 0">
+        <div class="col-sm-4">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="appointment"
+              id="cancelAppointment"
+              [value]="2"
+              [(ngModel)]="appointment"
+            />
+            <label class="form-check-label" for="cancelAppointment">Cancel Appointment</label>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="appointment"
+              id="rescheduleAppointment"
+              [value]="3"
+              [(ngModel)]="appointment"
+            />
+            <label class="form-check-label" for="rescheduleAppointment">Reschedule Appointment</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
+    <button type="button" class="btn btn-primary" (click)="SubmitAction()">Submit</button>
+  </div>
+</ng-template>
+
+
+
+<!-- Cancel Appointment Modal -->
+<ng-template #cancelAppointmentModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Cancel Appointment</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <label for="rescheduleReason" class="form-label">Select Reason</label>
+        <select
+          id="rescheduleReason"
+          class="form-select"
+          [(ngModel)]="selectedReschedulingReasons"
+        >
+          <option *ngFor="let reason of ReschedulingReasons" [ngValue]="reason">
+            {{ reason.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+    <button type="button" class="btn btn-primary" (click)="cancelApp()">Submit</button>
+  </div>
+</ng-template>
+
+<ng-template #rescheduleAppointmentModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Reschedule Appointment</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="container-fluid">
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <label for="providerSelect" class="form-label">Select Provider</label>
+          <select class="form-select" id="providerSelect" [(ngModel)]="selectedProviders">
+            <option *ngFor="let item of provider" [ngValue]="item">{{ item.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="locationSelect" class="form-label">Select Location</label>
+          <select class="form-select" id="locationSelect" [(ngModel)]="selectedLocations">
+            <option *ngFor="let item of locations" [ngValue]="item">{{ item.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="facilitySelect" class="form-label">Select Facility</label>
+          <select class="form-select" id="facilitySelect" [(ngModel)]="selectedFacility">
+            <option *ngFor="let item of facilities" [ngValue]="item">{{ item.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="siteSelect" class="form-label">Select Site</label>
+          <select class="form-select" id="siteSelect" [(ngModel)]="selectedSites">
+            <option *ngFor="let item of sites" [ngValue]="item">{{ item.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <label for="rescheduleReasonInput" class="form-label">Reason</label>
+          <input type="text" id="rescheduleReasonInput" class="form-control"/>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <label for="rescheduleDate" class="form-label">Date</label>
+          <input type="date" id="rescheduleDate" class="form-control" [(ngModel)]="date" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+    <button type="button" class="btn btn-primary" (click)="rescheduleApp()">Submit</button>
+  </div>
+</ng-template>
+
+
