@@ -13,6 +13,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { Subscription, switchMap } from 'rxjs';
 import { LoaderService } from '@core/services/loader.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
+import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 
 @Component({
   selector: 'app-allergies',
@@ -208,7 +209,7 @@ export class AllergiesComponent implements OnInit {
     console.log( 'mrNo =>',this.SearchPatientData.table2[0].mrNo);
     
     await this.ClinicalApiService.GetPatientAllergyData
-    (this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0,).subscribe((res: any) => {
+    (this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0,).then((res: any) => {
       console.log('res', res);
       this.loader.hide();
       this.MyAllergiesData = res.allergys?.table1 || [];
@@ -225,7 +226,7 @@ export class AllergiesComponent implements OnInit {
   async GetAlergyType() {
     this.loader.show();
     console.log('init');
-    await this.ClinicalApiService.GetAlergyType().subscribe((res: any) => {
+    await this.ClinicalApiService.GetAlergyType().then((res: any) => {
       console.log(res);
       this.GetAlergy = res.result;
       this.loader.hide();
