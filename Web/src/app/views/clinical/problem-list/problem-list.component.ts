@@ -1,4 +1,4 @@
-import { ClinicalApiService } from './../clinical.api.service';
+// import { ClinicalApiService } from './../clinical.api.service';
 
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FavoritesComponent } from '../favorites/favorites.component';
+import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import Swal from 'sweetalert2';
 
 
@@ -38,7 +39,7 @@ export class ProblemListComponent implements OnInit {
   modalService = new NgbModal();
   FilterForm!: FormGroup;
   @ViewChild('problemModal') problemModal: any;
-  
+
 
 
   providerList: any[] = [];
@@ -80,9 +81,9 @@ ProblemGrid: any = [];
       icdVersionId: [''],
       searchById: [''],
       startingCode: [''],
-     
+
     });
-     
+
     this.getRowdatapatientproblem()
     this.Problems.ActiveStatus=1
     this.loadData();
@@ -184,12 +185,12 @@ ProblemGrid: any = [];
     });
   }
   SubmitPatientProblem(){
-    
+
   }
 
 
   fetchProviders() {
-   
+
     this.providerList = [
       { id: 1, name: 'Dr. Ali' },
       { id: 2, name: 'Dr. Sara' }
@@ -218,8 +219,8 @@ ProblemGrid: any = [];
   }
 
 
-  
-  
+
+
  openModal() {}
   RoutesearchProblem(){
 
@@ -258,8 +259,8 @@ ProblemGrid: any = [];
 
   }
    async FillCache() {
-  
-      await this.clinicalApiService.getCacheItems({ entities: ['Provider'] }).then((response: any) => {
+
+      await this.clinicalApiService.getCacheItem({ entities: ['Provider'] }).then((response: any) => {
         if (response.cache != null) {
           this.FillDropDown(response);
         }
@@ -274,10 +275,10 @@ ProblemGrid: any = [];
         })
     }
     FillDropDown(response: any) {
-  
+
       let jParse = JSON.parse(JSON.stringify(response)).cache;
       let provider = JSON.parse(jParse).Provider;
-  
+
       if (provider) {
         provider = provider.map((item: { EmployeeId: any; FullName: any; }) => {
           return {
@@ -287,7 +288,7 @@ ProblemGrid: any = [];
         });
         this.hrEmployees = provider;
         console.log(this.hrEmployees);
-  
+
       }
     }
      getRowdatapatientproblem() {
@@ -334,9 +335,9 @@ ProblemGrid: any = [];
   onStatusChange() {
     throw new Error('Method not implemented.');
   }
-  
+
   loadData() {
 
   }
-  
+
 }

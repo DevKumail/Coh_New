@@ -1,0 +1,28 @@
+option span {
+  color: green;
+  font-weight: bold;
+}
+.scrollable-select {
+  overflow-y: auto;
+}
+.custom-scroll-select {
+  max-height: 150px; /* Approx height for 5 items */
+  overflow-y: auto;
+}
+
+.custom-scroll-select option {
+  height: 30px;
+}
+.custom-dropdown-wrapper {
+  position: relative;
+
+  select {
+    max-height: 38px; // default height
+    overflow: hidden;
+  }
+
+  // Force dropdown menu to scroll when opened
+  select option {
+    height: 40px;
+  }
+}
