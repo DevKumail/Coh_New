@@ -95,7 +95,7 @@ export class AppMenuComponent implements OnInit {
     return item.children.some(child => this.isChildActive(child));
   }
 
-  isActive(item: MenuItemType): boolean {
+  isActive(item: any): boolean {
     return item.url === this.router.url;
   }
 
