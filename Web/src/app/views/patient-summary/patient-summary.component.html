@@ -1,26 +1,26 @@
-<div class="mx-1 vh-100 mt-1">
-  <div class="row h-100">
+<div class="mx-1 mt-1">
+  <div class="row">
 
-    <div class="col-10 h-100">
-      <div class="row h-100">
+    <div class="col-10">
+      <div class="row">
 
-        <div class="col-2 bg-dark rounded p-1 mb-2 mb-sm-0 h-100">
-          <div class="h-100 d-flex flex-column">
-            <app-side-menu class="h-100 w-100"></app-side-menu>
+        <div class="col-2 bg-dark rounded p-1 mb-2 mb-sm-0 fixed-height">
+          <div>
+            <app-side-menu></app-side-menu>
           </div>
         </div>
 
-        <div class="col-10 h-100">
-          <div class="h-100 d-flex flex-column">
-            <app-content-section class="h-100 w-100"></app-content-section>
+        <div class="col-10 fixed-height">
+          <div>
+            <app-content-section></app-content-section>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="col-2 bg-dark text-white rounded h-100">
-      <div class="h-100 d-flex flex-column">
-        <app-notes class="h-100 w-100"></app-notes>
+    <div class="col-2 bg-dark text-white rounded fixed-height">
+      <div>
+        <app-notes></app-notes>
       </div>
     </div>
   </div>
