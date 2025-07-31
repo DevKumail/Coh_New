@@ -1,4 +1,4 @@
-import { ClinicalApiService } from './../clinical.api.service';
+// import { ClinicalApiService } from './../clinical.api.service';
 
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FavoritesComponent } from '../favorites/favorites.component';
-
+import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 
 @Component({
   selector: 'app-problem-list',
@@ -37,7 +37,7 @@ export class ProblemListComponent implements OnInit {
   modalService = new NgbModal();
   FilterForm!: FormGroup;
   @ViewChild('problemModal') problemModal: any;
-  
+
 
 
   providerList: any[] = [];
@@ -164,12 +164,12 @@ diagnosisForm: any
     });
   }
   SubmitPatientProblem(){
-    
+
   }
 
 
   fetchProviders() {
-   
+
     this.providerList = [
       { id: 1, name: 'Dr. Ali' },
       { id: 2, name: 'Dr. Sara' }
@@ -198,8 +198,8 @@ diagnosisForm: any
   }
 
 
-  
-  
+
+
  openModal() {}
   RoutesearchProblem(){
 
