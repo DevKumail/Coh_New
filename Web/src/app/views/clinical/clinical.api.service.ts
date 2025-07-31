@@ -44,6 +44,9 @@ export class ClinicalApiService {
   getCacheItem(object: any) {
     return this.api.post('Cache/GetCache', object).toPromise();
   }
+   getCacheItems(object: any) {
+    return this.api.post('Cache/GetCache', object).toPromise();
+    }
   // GetAlergyType(): Promise<any> {
   //     return this.api.get('AllDropdowns/GetAlergyType').toPromise();
   // }
