@@ -28,10 +28,10 @@
 
       <div class="col-lg-3">
         <div class="mb-3">
-          <label class="form-label">Provider</label>
-          <select class="form-select" formControlName="provider">
-            <option value="" disabled selected>Select Provider</option>
-            <option *ngFor="let provider" [value]="provider.id">{{ provider.name }}</option>
+           <label class="form-label fw-semibold">Provider</label>
+          <select class="form-select" formControlName="providerId">
+            <option [ngValue]="null" disabled>Select Provider</option>
+            <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}</option>
           </select>
         </div>
       </div>
@@ -166,7 +166,7 @@
 </form>
 
 <ng-template #standardModal let-modal>
-  <form [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
+  <form  [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
     <div class="modal-header">
       <h5 class="modal-title">Search-Problem</h5>
       <button type="button" class="btn-close" (click)="modal.dismiss()"></button>

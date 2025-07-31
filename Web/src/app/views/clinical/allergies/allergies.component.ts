@@ -13,11 +13,14 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { Subscription, switchMap } from 'rxjs';
 import { LoaderService } from '@core/services/loader.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
+import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 
 @Component({
   selector: 'app-allergies',
   imports: [CommonModule,
     ReactiveFormsModule,
+    GenericPaginationComponent,
     FormsModule, NgIcon],
   templateUrl: './allergies.component.html',
   styleUrl: './allergies.component.scss'
@@ -208,24 +211,23 @@ export class AllergiesComponent implements OnInit {
     console.log( 'mrNo =>',this.SearchPatientData.table2[0].mrNo);
     
     await this.ClinicalApiService.GetPatientAllergyData
-    (this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0,).subscribe((res: any) => {
+    (this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0,).then((res: any) => {
       console.log('res', res);
       this.loader.hide();
       this.MyAllergiesData = res.allergys?.table1 || [];
+      this.allergieTotalItems = this.MyAllergiesData.length;
+      this.onallergiePageChanged(1)
       this.filteredDiagnosisData = this.MyAllergiesData || [];
-      this.onStatusChange()
       console.log('this.MyAllergiesData', this.MyAllergiesData);
     })
     this.loader.hide();
 
   }
-  onStatusChange() {
 
-  }
   async GetAlergyType() {
     this.loader.show();
     console.log('init');
-    await this.ClinicalApiService.GetAlergyType().subscribe((res: any) => {
+    await this.ClinicalApiService.GetAlergyType().then((res: any) => {
       console.log(res);
       this.GetAlergy = res.result;
       this.loader.hide();
@@ -254,30 +256,6 @@ export class AllergiesComponent implements OnInit {
     this.loader.hide();
   }
 
-
-
-
-  // initForm() {
-  //   this.allergyForm = this.fb.group({
-  //     providerId: ['',this.validation],
-  //     allergyType: [''],
-  //     allergen: [''],
-  //     severity: [''],
-  //     reaction: [''],
-  //     startDate: [''],
-  //     endDate: [''],
-  //     status: [''],
-  //     isProviderCheck: [false],
-  //     typeId: [''],
-  //     active: [true],
-  //     updatedBy: [this.userid],
-  //     updatedDate: [new Date().toISOString().split('T')[0]],
-  //     createdBy: [this.userid],
-  //     createdDate: [new Date().toISOString().split('T')[0]],
-  //     appointmentId: [this.userid]
-
-  //   });
-  // }
   initForm() {
   this.allergyForm = this.fb.group({
     providerId: ['', Validators.required],
@@ -299,159 +277,11 @@ export class AllergiesComponent implements OnInit {
   });
 }
 
-
-
-
-
-
-  get MyAlllergyData(): any[] {
-    return this.allergyData.slice(this.start, this.end);
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.allergyData.length / this.pageSize);
-  }
-
-  get pageNumbers(): number[] {
-    return Array(this.totalPages).fill(0).map((x, i) => i + 1);
-  }
-
-  updatePagination() {
-    this.start = (this.currentPage - 1) * this.pageSize;
-    this.end = this.start + this.pageSize;
-  }
-
-  // goToPage(page: number) {
-  //   this.currentPage = page;
-  //   this.updatePagination();
-  // }
-
-  // nextPage() {
-  //   if (this.currentPage < this.totalPages) {
-  //     this.currentPage++;
-  //     this.updatePagination();
-  //   }
-  // }
-
-  // prevPage() {
-  //   if (this.currentPage > 1) {
-  //     this.currentPage--;
-  //     this.updatePagination();
-  //   }
-  // }
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-    }
-  }
-
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-    }
-  }
-
-  goToPage(page: number) {
-    this.currentPage = page;
-  }
-
-  onPageSizeChange(event: any) {
-    this.pageSize = +event.target.value;
-    this.currentPage = 1;
-    this.updatePagination();
-  }
-
-
   alertForm!: FormGroup;
 
 
-  mrno = "1006";
+  // mrno = "1006";
 
-  // submit() {
-  //   debugger
-  //   const formValue = this.allergyForm.value;
-
-  //   const payload: AllergyDto = {
-  //     // allergyType: this.id ?? 0,
-  //     // allergyType:formValue.allergyType ,
-  //     allergyid: this.id || 0,
-  //     typeId: formValue.allergyType,
-  //     allergen: formValue.allergen,
-  //     severityCode: formValue.severity,
-  //     reaction: formValue.reaction,
-  //     startDate: formValue.startDate,
-  //     endDate: formValue.endDate,
-  //     status: formValue.status,
-  //     active: true,
-  //     updatedBy: this.userid,
-  //     // updatedDate: new Date().toISOString(),
-  //     updatedDate: new Date().toISOString().split('T')[0],
-  //     providerId: formValue.providerId,
-  //     mrno: '1006',
-  //     createdBy: this.userid,
-  //     // createdDate: new Date().toISOString(),
-  //     createdDate: new Date().toISOString().split('T')[0],
-  //     appointmentId: this.userid,
-
-  //   };
-
-  //   console.log('Payload:', payload);
-
-  //   this.ClinicalApiService.SubmitPatientAllergies(payload).then(() => {
-  //     this.DropFilled();
-  //     this.GetPatientAllergyData();
-
-  //     Swal.fire('Success', 'Allergies Successfully Created', 'success');
-  //   }).catch((error: any) => {
-  //     Swal.fire('Error', error.message || 'Something went wrong', 'error');
-  //   });
-  // }
-// submit() {
-//   debugger;
-
-//   if (this.allergyForm.invalid) {
-//     this.allergyForm.markAllAsTouched();  // mark all fields as touched to trigger validation errors
-//     Swal.fire({
-//       icon: 'warning',
-//       title: 'Validation Error',
-//       text: 'Please fill all required fields before submitting.',
-//     });
-//     return;
-//   }
-
-//   const formValue = this.allergyForm.value;
-
-//   const payload: AllergyDto = {
-//     allergyid: this.id || 0,
-//     typeId: formValue.allergyType,
-//     allergen: formValue.allergen,
-//     severityCode: formValue.severity,
-//     reaction: formValue.reaction,
-//     startDate: formValue.startDate,
-//     endDate: formValue.endDate,
-//     status: formValue.status,
-//     active: true,
-//     updatedBy: this.userid,
-//     updatedDate: new Date().toISOString().split('T')[0],
-//     providerId: formValue.providerId,
-//     mrno: '1006',
-//     createdBy: this.userid,
-//     createdDate: new Date().toISOString().split('T')[0],
-//     appointmentId: this.userid,
-//   };
-
-//   console.log('Payload:', payload);
-
-//   this.ClinicalApiService.SubmitPatientAllergies(payload)
-//     .then(() => {
-//       this.DropFilled();
-//       this.GetPatientAllergyData();
-//       Swal.fire('Success', 'Allergies Successfully Created', 'success');
-//     })
-//     .catch((error: any) => {
-//       Swal.fire('Error', error.message || 'Something went wrong', 'error');
-//     });
-// }
 submit() {
     console.log( 'this.allergyForm =>',this.allergyForm.value);
       
@@ -580,27 +410,7 @@ debugger
 
   }
 
-  //  editAllergy(i: any) {
-  //   debugger
-  //   this.buttonText = 'Update';
-  //  this.Allergy.typeId = i.typeId
-  //  this.Allergy.allergen = i.allergen
-  //  this.Allergy.providerId = i.providerId;
-  //  this.Allergy.severityCode = i.severity
-  //  this.Allergy.reaction = i.reaction
-  //  this.id=i.allergyId;
-  //  if(i.status=='Active')
-  //   {
-  //     this.Allergy.status = 1
-  //   }
-  //   else
-  //   {
-  //     this.Allergy.status = 2
-  //   }
-  //  this.Allergy.startDate = new Date(i.startDate)
-  //  this.Allergy.endDate = new Date (i.endDate)
 
-  // }
 editAllergy(allergy: any) {
   debugger
   console.log('Editing Allergy:', allergy); 
@@ -623,5 +433,24 @@ editAllergy(allergy: any) {
       this.patientDataSubscription.unsubscribe();
     }
   }
+
+
+allergieCurrentPage = 1;
+allergiePageSize = 5;
+allergieTotalItems = 0;
+pagedallergie: any[] = [];
+
+async onallergiePageChanged(page: number) {
+  this.allergieCurrentPage = page;
+  this.setPagedallergieData();
+  // await this.GetPatientAllergyData();
+}
+
+setPagedallergieData() {
+  const startIndex = (this.allergieCurrentPage - 1) * this.allergiePageSize;
+  const endIndex = startIndex + this.allergiePageSize;
+  this.pagedallergie = this.MyAllergiesData.slice(startIndex, endIndex);
+  
+}
 
 }

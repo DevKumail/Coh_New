@@ -5,10 +5,13 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class ClinicalApiService {
 
-    getCacheItem(arg0: { entities: string[]; }) {
-        throw new Error('Method not implemented.');
-    }
+    // getCacheItem(arg0: { entities: string[]; }) {
+    //     throw new Error('Method not implemented.');
+    // }
 
+    GetAlergyByProviderId(): Observable<any> {
+    return this.api.get('Alergy/GetAlergyByProviderId');
+  }
 
     add(arg0: { severity: string; summary: string; detail: string; }) {
         throw new Error('Method not implemented.');
@@ -17,6 +20,10 @@ export class ClinicalApiService {
 
     submitPatientAllergy(data: any): Observable<any> {
         return this.api.post('/Alergy/SubmitPatientAlergy', data);
+    }
+
+    getCacheItem(object: any) {
+    return this.api.post('Cache/GetCache', object).toPromise();
     }
 
     // SubmitPatientProblem(object: any) {
