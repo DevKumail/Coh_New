@@ -1186,6 +1186,8 @@ diagnosisCodePageSize = 10;
 diagnosisCodeTotalItems = 0;
     
 
+
+
 get diagnosisCodeTotalPages(): number {
   return Math.ceil(this.diagnosisCodeTotalItems / this.diagnosisCodePageSize);
 }
