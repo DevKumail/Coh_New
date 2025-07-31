@@ -1,7 +1,7 @@
 <div class="collapse navbar-collapse d-flex justify-content-between" id="topnav-menu-content">
     <ul class="navbar-nav">
-        <li class="nav-item" *ngIf="showPatientSummary">
-            <a routerLink="/patient-summary" class="nav-link">
+        <li class="nav-item">
+            <a href="javascript:void(0)" class="nav-link" (click)="onPatientSummaryClick()">
                 <ng-icon name="tablerUser" class="menu-icon"></ng-icon>
                 <span class="menu-text">Patient Summary</span>
             </a>
