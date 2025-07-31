@@ -260,7 +260,7 @@ ProblemGrid: any = [];
   }
    async FillCache() {
 
-      await this.clinicalApiService.getCacheItems({ entities: ['Provider'] }).then((response: any) => {
+      await this.clinicalApiService.getCacheItem({ entities: ['Provider'] }).then((response: any) => {
         if (response.cache != null) {
           this.FillDropDown(response);
         }
