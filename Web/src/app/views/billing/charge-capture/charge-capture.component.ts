@@ -977,90 +977,6 @@ onMyhcpcsCheckboxChange(event: any, item: any): void {
     console.log(this.MyServicesData, "Processed Selected Services");
   }
 
-
-  // CPTRows(){
-     
-  //   let data:any=[];
-  //   for(let i=0;i<this.selectedServices.length;i++)
-  //   {
-  //     let oldData={
-  //       type: "",
-  //       cptCode:undefined,
-  //       description:undefined
-  //     };
-
-  //     if(this.selectedServices[i].procedureType == "Dental"){
-
-  //       oldData.type=this.selectedServices[i].procedureType;
-  //       oldData.cptCode=this.selectedServices[i].dentalCode;
-  //       oldData.description=this.selectedServices[i].providerDescription;
-  //       this.Dental = true;
-  //       this.cpt = false;
-  //       this.HCPCS = false;
-  //       data.push(oldData);
-
-  //     }
-  //     if(this.selectedServices[i].procedureType == "ALLDental"){
-
-  //       oldData.type="Dental";
-  //       oldData.cptCode=this.selectedServices[i].dentalCode;
-  //       oldData.description=this.selectedServices[i].descriptionFull;
-  //       this.Dental = true;
-  //       this.cpt = false;
-  //       this.HCPCS = false;
-  //       data.push(oldData);
-
-  //     }
-  //     //this.MyServicesData = data;
-
-  //     if(this.selectedServices[i].procedureType == "CPT"){
-  //       oldData.type=this.selectedServices[i].procedureType;
-  //       oldData.cptCode=this.selectedServices[i].cptCode;
-  //       oldData.description=this.selectedServices[i].providerDescription;
-  //       this.cpt = true;
-  //       this.Dental = false;
-  //       this.HCPCS = false;
-  //       data.push(oldData);
-
-  //     }
-  //     if(this.selectedServices[i].procedureType == "ALLCPT"){
-  //       oldData.type= "CPT";
-  //       oldData.cptCode=this.selectedServices[i].cptCode;
-  //       oldData.description=this.selectedServices[i].descriptionFull;
-  //       this.cpt = true;
-  //       this.Dental = false;
-  //       this.HCPCS = false;
-  //       data.push(oldData);
-
-  //     }
-
-  //     if(this.selectedServices[i].procedureType == "HCPCS"){
-  //       oldData.type=this.selectedServices[i].procedureType;
-  //       oldData.cptCode=this.selectedServices[i].hcpcsCode;
-  //       oldData.description=this.selectedServices[i].providerDescription;
-  //       this.HCPCS = true;
-  //       this.cpt = false;
-  //       this.Dental = false;
-  //       data.push(oldData);
-
-  //     }
-
-  //     if(this.selectedServices[i].procedureType == "ALLHCPCS"){
-  //       oldData.type= "HCPCS";
-  //       oldData.cptCode=this.selectedServices[i].cptCode;
-  //       oldData.description=this.selectedServices[i].descriptionFull;
-  //       this.cpt = true;
-  //       this.Dental = false;
-  //       this.HCPCS = false;
-  //       data.push(oldData);
-
-  //     }
-  //   }
-
-  //   this.MyServicesData = data;
-  //   console.log(this.MyServicesData,"kun");
-  // }
-
   editingValues: any = {};
 
   toggleEditMode(rowIndex: number, column: string): void {
@@ -1187,7 +1103,7 @@ diagnosisCodeTotalItems = 0;
     
 
 
-
+ 
 get diagnosisCodeTotalPages(): number {
   return Math.ceil(this.diagnosisCodeTotalItems / this.diagnosisCodePageSize);
 }
