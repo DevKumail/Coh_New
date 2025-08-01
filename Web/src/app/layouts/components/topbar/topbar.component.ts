@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, OnInit, Output, TemplateRef } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
 import { LayoutStoreService } from '@core/services/layout-store.service';
 import { LucideAngularModule, Search, Sliders, X } from 'lucide-angular';
@@ -40,7 +40,7 @@ import { AdvanceSearchModalComponent } from "./components/advance-search-modal/a
     FormsModule,
     NavbarComponent,
     AdvanceSearchModalComponent
-],
+  ],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
   animations: [
@@ -59,7 +59,8 @@ export class TopbarComponent implements OnInit {
   constructor(
     public layout: LayoutStoreService,
     private modalService: NgbModal,
-    private patientBannerService: PatientBannerService
+    private patientBannerService: PatientBannerService,
+    private router: Router
   ) { }
 
   SearchIcon = Search;
@@ -136,8 +137,16 @@ export class TopbarComponent implements OnInit {
     this.onSearchClick();
   }
 
-  searchPatient(mrNo: string) {
-    debugger
+  searchPatient(mrNo: string, context?: string) {
+    if (context === 'patient-summary') {
+      const sub = this.patientBannerService.patientData$.subscribe(data => {
+        if (data) {
+          this.router.navigate(['/patient-summary']);
+          sub.unsubscribe();
+        }
+      });
+    }
+
     this.demographicapi.getPatientByMrNo(mrNo).subscribe({
       next: (res: any) => {
         if (res?.table2?.length > 0) {

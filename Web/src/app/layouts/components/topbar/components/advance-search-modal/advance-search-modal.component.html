@@ -8,6 +8,7 @@
                     <small>Search Patients By Advanced Filter</small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button #hiddenCloseBtn type="button" class="d-none" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-2">
 
@@ -144,7 +145,8 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let patient of searchResults" (click)="onRowSelect(patient.mrNo)"
-                                    class="cursor-pointer small py-1 px-2" [ngClass]="{'bg-primary-subtle text-dark': selectedMrNo === patient.mrNo}">
+                                    class="cursor-pointer small py-1 px-2"
+                                    [ngClass]="{'bg-primary-subtle text-dark': selectedMrNo === patient.mrNo}">
                                     <td class="py-1 px-2">{{ patient.mrNo }}</td>
                                     <td class="py-1 px-2">{{ patient.personFirstName }}</td>
                                     <td class="py-1 px-2">{{ patient.gender }}</td>
@@ -158,3 +160,7 @@
         </div>
     </div>
 </div>
+
+<!-- this is a hidden trigger button to trigger the bs modal -->
+<button #hiddenTrigger type="button" class="d-none" data-bs-toggle="modal" data-bs-target="#advance-filter-modal">
+</button>

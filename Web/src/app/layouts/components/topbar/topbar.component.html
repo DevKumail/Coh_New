@@ -71,4 +71,4 @@
   </div>
 </header>
 
-<app-advance-search-modal (onPatientSelect)="searchPatient($event)"/>
+<app-advance-search-modal (onPatientSelect)="searchPatient($event.mrno, $event.context)"/>
