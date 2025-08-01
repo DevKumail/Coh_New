@@ -1,286 +1,514 @@
 <div class="container mt-4">
-  <!-- Book Appointment Form Card -->
-  <div class="card shadow-lg mb-4">
-    <div class="card-header bg-primary text-white">
-      <h5 class="mb-0">Book an Appointment</h5>
-    </div>
-
-    <div class="card-body">
-      <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
-        <!-- Row 1 -->
-        <div class="row">
-          <div class="col-sm-3 mb-3">
-            <label>Facility <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="facility">
-              <option value="">Select Facility</option>
-              <option *ngFor="let f of facilities" [value]="f.code">{{ f.name }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Speciality <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="speciality">
-              <option value="">Select Speciality</option>
-              <option *ngFor="let s of specialities" [value]="s.specialtyId">{{ s.specialtyName }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Provider <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="provider">
-              <option value="">Select Provider</option>
-              <option *ngFor="let p of providers" [value]="p.employeeId">{{ p.fullName }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Sites <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="site">
-              <option value="">Select Site</option>
-              <option *ngFor="let site of siteArray" [value]="site.siteId">{{ site.siteName }}</option>
-            </select>
-          </div>
+    <!-- Book Appointment Form Card -->
+    <div class="card shadow-lg mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Book an Appointment</h5>
         </div>
 
-        <!-- Row 2 -->
-        <div class="row">
-          <div class="col-sm-3 mb-3">
-            <label>Date <span class="text-danger">*</span></label>
-            <input type="date" class="form-control" formControlName="date" />
-          </div>
+        <div class="card-body">
+            <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+                <div class="row">
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Facility <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            formControlName="facility"
+                            (onChange)="
+                                GetSpecialitybyFacilityId(selectedFacility)
+                            "
+                        >
+                            <option value="">Select Facility</option>
+                            <option
+                                *ngFor="let f of facilities"
+                                [value]="f.code"
+                            >
+                                {{ f.name }}
+                            </option>
+                        </select>
+                    </div>
 
-          <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Speciality
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            formControlName="speciality"
+                            (onChange)="
+                                GetSitebySpecialityId(selectedSpeciality)
+                            "
+                        >
+                            <option value="">Select Speciality</option>
+                            <option
+                                *ngFor="let s of specialities"
+                                [value]="s.specialtyId"
+                            >
+                                {{ s.specialtyName }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Provider <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            fromControlName="provider"
+                            (onChange)="
+                                GetSpecialityByEmployeeId(selectedProviders)
+                            "
+                        >
+                            <option value="">Select Provider</option>
+                            <option
+                                *ngFor="let p of providers"
+                                [value]="p.employeeId"
+                            >
+                                {{ p.fullName }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label>Sites <span class="text-danger">*</span></label>
+                        <select
+                            class="form-control form-select"
+                            formControlName="site"
+                        >
+                            <option value="">Select Site</option>
+                            <option
+                                *ngFor="let site of siteArray"
+                                [value]="site.siteId"
+                            >
+                                {{ site.siteName }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="row">
+                    <div class="col-sm-3 mb-3">
+                        <label>Date <span class="text-danger">*</span></label>
+                        <input
+                            type="text"
+                            class="form-control date"
+                            formControlName="appointmentDate"
+                            data-provider="flatpickr"
+                            id="birthDate"
+                            placeholder="Select date"
+                        />
+                    </div>
+
+                    <!-- <div class="col-sm-3 mb-3">
             <label>Time <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="time">
+            <select class="form-control form-select" formControlName="time">
               <option value="">Select Time</option>
               <option *ngFor="let t of Times" [value]="t.Time">{{ t.Time }}</option>
             </select>
-          </div>
+          </div> -->
+                    <!-- <div class="col-sm-3 mb-3">
+                        <label>Time <span class="text-danger">*</span></label>
+                        <select
+                            class="form-control form-select"
+                            formControlName="time"
 
-          <div class="col-sm-3 mb-3">
-            <label>Purpose of Visit <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="purpose">
-              <option value="">Select Purpose</option>
-              <option *ngFor="let p of purpose" [value]="p.code">{{ p.name }}</option>
-            </select>
-          </div>
+                        >
+                            <option value="">Select Time</option>
+                            <option
+                                *ngFor="let t of Times"
+                                [value]="t.Time"
+                                [selected]="
+                                    t.Time === appointmentForm.get('time')?.value
+                                "
+                            >
+                                {{ t.Time }}
+                                <span
+                                    *ngIf="
+                                        t.Time === appointmentForm.get('time')?.value
+                                    "
+                                    >✔</span
+                                >
+                            </option>
+                        </select>
+                    </div> -->
 
-          <div class="col-sm-3 mb-3">
-            <label>Visit Type <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="visitType">
-              <option value="">Select Visit Type</option>
-              <option *ngFor="let v of visittype" [value]="v.code">{{ v.name }}</option>
-            </select>
-          </div>
+                    <div class="col-sm-3 mb-3">
+                        <label>Time <span class="text-danger">*</span></label>
+                        <div class="custom-dropdown-wrapper">
+                            <select
+                                class="form-control form-select"
+                                formControlName="time"
+                            >
+                                <option value="">Select Time</option>
+                                <option
+                                    *ngFor="let t of Times"
+                                    [value]="t.Time"
+                                    [selected]="
+                                        t.Time ===
+                                        appointmentForm.get('time')?.value
+                                    "
+                                >
+                                    {{ t.Time }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Purpose of Visit
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            formControlName="purpose"
+                        >
+                            <option value="">Select Purpose</option>
+                            <option *ngFor="let p of purpose" [value]="p.code">
+                                {{ p.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Visit Type
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            formControlName="visitType"
+                        >
+                            <option value="">Select Visit Type</option>
+                            <option
+                                *ngFor="let v of visittype"
+                                [value]="v.code"
+                            >
+                                {{ v.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="row">
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Referred By
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            formControlName="referredBy"
+                        >
+                            <option value="">Referred By</option>
+                            <option *ngFor="let r of referred" [value]="r.name">
+                                {{ r.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label>Type <span class="text-danger">*</span></label>
+                        <select
+                            class="form-control form-select"
+                            formControlName="type"
+                        >
+                            <option value="">Select Type</option>
+                            <option *ngFor="let t of type" [value]="t.name">
+                                {{ t.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Duration <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            formControlName="duration"
+                        >
+                            <option value="">Select Duration</option>
+                            <option *ngFor="let d of duration" [value]="d.name">
+                                {{ d.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Location <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            formControlName="location"
+                        >
+                            <option value="">Select Location</option>
+                            <option *ngFor="let l of location" [value]="l.name">
+                                {{ l.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="row">
+                    <div class="col-sm-3 mb-3">
+                        <label>Appointment Criteria</label>
+                        <select
+                            class="form-control form-select"
+                            formControlName="criteria"
+                        >
+                            <option value="">Select Criteria</option>
+                            <option *ngFor="let c of criteria" [value]="c.name">
+                                {{ c.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Patient Notified
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            formControlName="notified"
+                        >
+                            <option value="">Select</option>
+                            <option *ngFor="let n of notified" [value]="n.name">
+                                {{ n.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Appointment Status
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            formControlName="status"
+                        >
+                            <option value="">Select</option>
+                            <option *ngFor="let s of status" [value]="s.name">
+                                {{ s.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label
+                            >Payer Info
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-control form-select"
+                            formControlName="payer"
+                        >
+                            <option value="">Select</option>
+                            <option *ngFor="let p of payer" [value]="p.code">
+                                {{ p.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 5 -->
+                <div class="row">
+                    <div class="col-sm-3 mb-3">
+                        <label>Patient Balance</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            formControlName="patientBalance"
+                            placeholder=" Patient Balance"
+                        />
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label>Plan Balance</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            formControlName="planBalance"
+                            placeholder=" Plan Balance"
+                        />
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label>Plan Copay</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            formControlName="planCopay"
+                            placeholder=" Plan Copay"
+                        />
+                    </div>
+
+                    <div class="col-sm-3 mb-3">
+                        <label>Payer Plan</label>
+                        <select
+                            class="form-control form-select"
+                            formControlName="payerPlan"
+                            placeholder=" Payer Plan"
+                        >
+                            <option value="">Select</option>
+                            <option
+                                *ngFor="let plan of payerPlan"
+                                [value]="plan.code"
+                            >
+                                {{ plan.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 6 -->
+                <div class="row mt-3">
+                    <div class="col-sm-12">
+                        <label><b>Insurance No:</b> {{ insurranceNo }}</label>
+                        <div class="form-check form-check-inline ms-3">
+                            <input
+                                type="radio"
+                                class="form-check-input"
+                                formControlName="appointmentType"
+                                value="0"
+                            />
+                            <label class="form-check-label">Consultation</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input
+                                type="radio"
+                                class="form-check-input"
+                                formControlName="appointmentType"
+                                value="1"
+                            />
+                            <label class="form-check-label"
+                                >Non Consultation</label
+                            >
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <!-- Row 3 -->
-        <div class="row">
-          <div class="col-sm-3 mb-3">
-            <label>Referred By <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="referredBy">
-              <option value="">Referred By</option>
-              <option *ngFor="let r of referred" [value]="r.name">{{ r.name }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Type <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="type">
-              <option value="">Select Type</option>
-              <option *ngFor="let t of type" [value]="t.name">{{ t.name }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Duration <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="duration">
-              <option value="">Select Duration</option>
-              <option *ngFor="let d of duration" [value]="d.name">{{ d.name }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Location <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="location">
-              <option value="">Select Location</option>
-              <option *ngFor="let l of location" [value]="l.name">{{ l.name }}</option>
-            </select>
-          </div>
+    <!-- Timeslots Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Available Timeslots</h5>
         </div>
-
-        <!-- Row 4 -->
-        <div class="row">
-          <div class="col-sm-3 mb-3">
-            <label>Appointment Criteria</label>
-            <select class="form-control" formControlName="criteria">
-              <option value="">Select Criteria</option>
-              <option *ngFor="let c of criteria" [value]="c.name">{{ c.name }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Patient Notified <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="notified">
-              <option value="">Select</option>
-              <option *ngFor="let n of notified" [value]="n.name">{{ n.name }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Appointment Status <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="status">
-              <option value="">Select</option>
-              <option *ngFor="let s of status" [value]="s.name">{{ s.name }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Payer Info <span class="text-danger">*</span></label>
-            <select class="form-control" formControlName="payer">
-              <option value="">Select</option>
-              <option *ngFor="let p of payer" [value]="p.code">{{ p.name }}</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Row 5 -->
-        <div class="row">
-          <div class="col-sm-3 mb-3">
-            <label>Patient Balance</label>
-            <input type="text" class="form-control" formControlName="patientBalance" />
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Plan Balance</label>
-            <input type="text" class="form-control" formControlName="planBalance" />
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Plan Copay</label>
-            <input type="text" class="form-control" formControlName="planCopay" />
-          </div>
-
-          <div class="col-sm-3 mb-3">
-            <label>Payer Plan</label>
-            <select class="form-control" formControlName="payerPlan">
-              <option value="">Select</option>
-              <option *ngFor="let plan of payerPlan" [value]="plan.code">{{ plan.name }}</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Row 6 -->
-        <div class="row mt-3">
-          <div class="col-sm-12">
-            <label><b>Insurance No:</b> {{ insurranceNo }}</label>
-            <div class="form-check form-check-inline ms-3">
-              <input type="radio" class="form-check-input" formControlName="appointmentType" value="0" />
-              <label class="form-check-label">Consultation</label>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table
+                    class="table table-bordered table-hover table-sm text-center"
+                >
+                    <thead class="table-light">
+                        <tr>
+                            <th>Time</th>
+                            <th>Patient</th>
+                            <th>MR No.</th>
+                            <th>Duration</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            *ngFor="let a of AppointmentData"
+                            [ngClass]="{ 'table-warning': RowColor(a) }"
+                        >
+                            <td>{{ a.Time }}</td>
+                            <td>{{ a.personName }}</td>
+                            <td>{{ a.mrno }}</td>
+                            <td>{{ a.duration }}</td>
+                            <td>{{ a.purposeOfVisit }}</td>
+                        </tr>
+                        <tr *ngIf="AppointmentData.length === 0">
+                            <td colspan="5" class="text-center">
+                                No appointment found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="form-check form-check-inline">
-              <input type="radio" class="form-check-input" formControlName="appointmentType" value="1" />
-              <label class="form-check-label">Non Consultation</label>
-            </div>
-          </div>
         </div>
-      </form>
     </div>
-  </div>
 
-  <!-- Timeslots Card -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-header bg-info text-white">
-      <h5 class="mb-0">Available Timeslots</h5>
+    <!-- Eligibility Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Eligibility Info</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table
+                    class="table table-bordered table-sm table-striped text-center"
+                >
+                    <thead class="table-light">
+                        <tr>
+                            <th>MR No</th>
+                            <th>Status</th>
+                            <th>Payer Name</th>
+                            <th>Plan</th>
+                            <th>Facility</th>
+                            <th>Eligibility Date</th>
+                            <th>View Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let e of eligibty">
+                            <td>{{ e.mrno }}</td>
+                            <td>{{ e.status }}</td>
+                            <td>{{ e.payerName }}</td>
+                            <td>{{ e.planName }}</td>
+                            <td>{{ e.facility }}</td>
+                            <td>{{ e.eligiblityDate }}</td>
+                            <td>
+                                <button
+                                    class="btn btn-outline-primary btn-sm"
+                                    (click)="showDetailsDialog(e)"
+                                >
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="!eligibty || eligibty.length === 0">
+                            <td colspan="7" class="text-center">
+                                No data found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover table-sm text-center">
-          <thead class="table-light">
-            <tr>
-              <th>Time</th>
-              <th>Patient</th>
-              <th>MR No.</th>
-              <th>Duration</th>
-              <th>Purpose</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let a of AppointmentData" [ngClass]="{ 'table-warning': RowColor(a) }">
-              <td>{{ a.Time }}</td>
-              <td>{{ a.personName }}</td>
-              <td>{{ a.mrno }}</td>
-              <td>{{ a.duration }}</td>
-              <td>{{ a.purposeOfVisit }}</td>
-            </tr>
-            <tr *ngIf="AppointmentData.length === 0">
-              <td colspan="5" class="text-center">No appointment found.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 
-  <!-- Eligibility Card -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-header bg-success text-white">
-      <h5 class="mb-0">Eligibility Info</h5>
+    <!-- Action Buttons -->
+    <div class="text-end mb-5">
+        <button class="btn btn-secondary me-2" (click)="checkEligibility()">
+            Eligibility
+        </button>
+        <button class="btn btn-primary me-2" (click)="submitAppointment()">
+            Submit
+        </button>
+        <button class="btn btn-danger" (click)="cancel()">Cancel</button>
     </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-bordered table-sm table-striped text-center">
-          <thead class="table-light">
-            <tr>
-              <th>MR No</th>
-              <th>Status</th>
-              <th>Payer Name</th>
-              <th>Plan</th>
-              <th>Facility</th>
-              <th>Eligibility Date</th>
-              <th>View Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let e of eligibty">
-              <td>{{ e.mrno }}</td>
-              <td>{{ e.status }}</td>
-              <td>{{ e.payerName }}</td>
-              <td>{{ e.planName }}</td>
-              <td>{{ e.facility }}</td>
-              <td>{{ e.eligiblityDate }}</td>
-              <td>
-                <button class="btn btn-outline-primary btn-sm" (click)="showDetailsDialog(e)">
-                  View
-                </button>
-              </td>
-            </tr>
-            <tr *ngIf="!eligibty || eligibty.length === 0">
-              <td colspan="7" class="text-center">No data found.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Action Buttons -->
-  <div class="text-end mb-5">
-    <button class="btn btn-secondary me-2" (click)="checkEligibility()">Eligibility</button>
-    <button class="btn btn-primary me-2" (click)="submitAppointment()">Submit</button>
-    <button class="btn btn-danger" (click)="cancel()">Cancel</button>
-  </div>
 </div>
 
 <!-- </div> -->
 
-
-
-    <!-- <div class="row mt-4">
+<!-- <div class="row mt-4">
       <div class="col-12 text-end">
         <button type="submit" class="btn btn-primary me-2">Submit</button>
         <button type="button" class="btn btn-danger" (click)="onCancel()">Cancel</button>
       </div>
     </div> -->
-  <!-- </form> -->
+<!-- </form> -->
 <!-- </div> -->

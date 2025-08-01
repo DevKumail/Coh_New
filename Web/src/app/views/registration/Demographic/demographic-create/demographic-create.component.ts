@@ -27,7 +27,9 @@ import   Swal from 'sweetalert2';
 import { NgxDaterangepickerBootstrapModule } from 'ngx-daterangepicker-bootstrap';
 import { ViewChild } from '@angular/core';
 import { NgxDaterangepickerBootstrapDirective} from "ngx-daterangepicker-bootstrap";
-import {NgxMaskDirective, provideNgxMask} from 'ngx-mask'
+import {NgxMaskDirective, provideNgxMask} from 'ngx-mask';
+import { LoaderService } from '@core/services/loader.service';
+
 
 declare var flatpickr: any;
 
@@ -96,7 +98,7 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
 
     qid:any;
 
-
+isLoading: boolean = false;
 
 
     CarrierId: any;
@@ -114,7 +116,9 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
         private fb: FormBuilder,
         private router: Router,
         private DemographicApiServices: DemographicApiServices,
-        private registrationApi: RegistrationApiService
+        private registrationApi: RegistrationApiService,
+        public Loader: LoaderService,
+
     ) {}
 
     ngOnInit(): void {

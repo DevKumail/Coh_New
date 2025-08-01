@@ -20,6 +20,7 @@ export interface vitalsingsDto {
   Glucose?: number;
   Comment?: string;
   AppointmentId?: number;
+  DailyStartTime?: number;
 }
 
 

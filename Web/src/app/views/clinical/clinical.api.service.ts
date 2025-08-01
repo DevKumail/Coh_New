@@ -18,21 +18,21 @@ export class ClinicalApiService {
 //   return this.api.post('/Alergy/SubmitPatientAlergy', data);
 // }
 
-//   SubmitPatientProblem(object: any) {
-//     ;
-//     return this.api
-//       .post(`PatientProblem/SubmitPatientProblem`, object)
-//       .toPromise();
-//   }
-//  GetRowDataOfPatientProblem(mrno:string,userId:number){
-
+  SubmitPatientProblem(object: any) {
+    ;
+    return this.api
+      .post(`PatientProblem/SubmitPatientProblem`, object)
+      .toPromise();
+  }
+  
   submitPatientAllergy(data: any): Observable<any> {
     // debugger
-  return this.api.post('/Alergy/SubmitPatientAlergy', data);
-}
-
-//       return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}`).toPromise();
-//     }
+    return this.api.post('/Alergy/SubmitPatientAlergy', data);
+  }
+  
+   GetRowDataOfPatientProblem(mrno:string,userId:number){
+      return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}`).toPromise();
+    }
 
 //     GetICD9CMGroupByProvider(ProviderId:number) {
 // 	return this.api.get(`ChargeCapture/GetICD9CMGroupByProvider?ProviderId=${ProviderId}`).toPromise();
@@ -44,16 +44,19 @@ export class ClinicalApiService {
   getCacheItem(object: any) {
     return this.api.post('Cache/GetCache', object).toPromise();
   }
+   getCacheItems(object: any) {
+    return this.api.post('Cache/GetCache', object).toPromise();
+    }
   // GetAlergyType(): Promise<any> {
   //     return this.api.get('AllDropdowns/GetAlergyType').toPromise();
   // }
   // GetAlergyType(mrno: string, userId: number) {
   //   return this.api.get(`AllDropdowns/GetAlergyType?mrno=${mrno}&userId=${userId}`).toPromise();
   // }
-   GetAlergyType(){
-     // debugger;
-    return this.api.get(`AllDropdowns/GetAlergyTypes`).toPromise();
-  }
+  //  GetAlergyType(){
+  //    // debugger;
+  //   return this.api.get(`AllDropdowns/GetAlergyTypes`).toPromise();
+  // }
    SubmitPatientAllergies(object:any){
     debugger
     return this.api.post(`Alergy/SubmitPatientAlergy`,object).toPromise();
@@ -80,4 +83,65 @@ export class ClinicalApiService {
      // debugger;
     return this.api.get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}`).toPromise();
   }
+  GetAlergyType(): Observable<any> {
+    return this.api.get('AllDropdowns/GetAlergyTypes');
+  } 
+
+  GetAlergySeverity() {
+    return this.api.get('AllDropdowns/GetSeverityType').toPromise();
+  }
+  GetAlergyStatus() {
+    return this.api.get('Alergy/GetAlergyStatus').toPromise();
+  }
+  GetAlergyByProviderId(): Observable<any> {
+    return this.api.get('Alergy/GetAlergyByProviderId');
+  }
+ 
+//  GetPatientAllergyData(mrno: string): Observable<any> {
+//   return this.api.get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}`);
+// }
+
+  
+  // SubmitPatientAllergies(data: any) {
+  //   return this.api.post('Alergy/SubmitPatientAlergy', data).toPromise();
+  // }
+  GetAlergyByMRNo(MRNo: string) {
+    return this.api.get(`Alergy/GetAlergyByMRNo?MRNo=${MRNo}`).toPromise();
+  }
+    // getCacheItem(object: any) {
+    //     return this.api.post('Cache/GetCache', object).toPromise();
+    // }
+  GetAlergyById(id: string): Observable<any> {
+    return this.api.get(`/Alergy/GetAlergyById/${id}`);
+  }
+  UpdateAlergy(id: string, data: any): Observable<any> {
+    return this.api.put(`/Alergy/UpdateAlergy/${id}`, data);
+  }
+  DeleteAlergy(id: string): Observable<any> {
+    return this.api.delete(`/Alergy/DeleteAlergy/${id}`);
+  }
+  GetPatientProblemByMRNo(MRNo: string) {
+    return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${MRNo}`).toPromise();
+  }
+  GetPatientProblemById(id: string): Observable<any> {
+    return this.api.get(`/PatientProblem/GetPatientProblemById/${id}`);
+  }
+  UpdatePatientProblem(id: string, data: any): Observable<any> {
+    return this.api.put(`/PatientProblem/UpdatePatientProblem/${id}`, data);
+  }
+  DeletePatientProblem(id: string): Observable<any> {
+    return this.api.delete(`/PatientProblem/DeletePatientProblem/${id}`);
+  }
+  GetAlertType() {
+    return this.api.get('Alert/GetAlertType').toPromise();
+  }
+  GetAlertStatus() {
+    return this.api.get('Alert/GetAlertStatus').toPromise();
+  
+}
+// GetSeverity() {
+//   return this.api.get('AllDropdowns/GetSeverityType').toPromise();
+// }
+
+
 }

@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { ApiService } from '@/app/core/services/api.service';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { AlertDTO } from '@/app/shared/models/alert.model';
-import { AlertType } from '@/app/shared/models/alert-type.model';
+// import { AlertDTO } from '@/app/shared/models/alert.model';
+// import { AlertType } from '@/app/shared/models/alert-type.model';
+
 
 @Injectable({ providedIn: 'root' })
 export class RegistrationApiService {
@@ -42,7 +43,7 @@ export class RegistrationApiService {
 
 
     GetAlertType(): Promise<any> {
-        return this.api.get('/AllDropdowns/GetAlertType').toPromise();
+        return this.api.get('AllDropdowns/GetAlertType').toPromise();
     }
 
     GetAlertDetailsDb(mrno: string): Promise<any> {
@@ -112,8 +113,8 @@ getStateByCountry(countryId:any) {
         return this.api.post('Cache/GetCache', object).toPromise();
     }
 
-   getAlertType(): Promise<{ result: AlertType[] } | undefined> {
-    debugger
-  return this.api.get<{ result: AlertType[] }>(`AllDropdowns/GetAlertType`).toPromise();
-}
+//    getAlertType(): Promise<{ result: AlertType[] } | undefined> {
+//     debugger
+//   return this.api.get<{ result: AlertType[] }>(`AllDropdowns/GetAlertType`).toPromise();
+// }
 }
