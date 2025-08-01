@@ -22,6 +22,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ModalTriggerService } from '@core/services/modal-trigger.service';
 
 @Component({
   selector: 'app-menu-navbar',
@@ -41,6 +42,9 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 export class AppMenuComponent implements OnInit {
 
   router = inject(Router);
+  patientBannerService = inject(PatientBannerService);
+  modalTriggerService = inject(ModalTriggerService)
+  isPatientAvailable = false;
 
   @ViewChild('MenuItemWithChildren', { static: true })
   menuItemWithChildren!: TemplateRef<{
@@ -75,6 +79,10 @@ export class AppMenuComponent implements OnInit {
 
     this.expandActivePaths(this.menuItems);
 
+    this.patientBannerService.patientData$.subscribe(data => {
+      this.isPatientAvailable = data;
+    });
+
   }
 
   hasSubMenu(item: MenuItemType): boolean {
@@ -87,7 +95,7 @@ export class AppMenuComponent implements OnInit {
     return item.children.some(child => this.isChildActive(child));
   }
 
-  isActive(item: MenuItemType): boolean {
+  isActive(item: any): boolean {
     return item.url === this.router.url;
   }
 
@@ -161,6 +169,18 @@ export class AppMenuComponent implements OnInit {
     }
 
     return Array.from(menuMap.values());
+  }
+
+  onPatientSummaryClick() {
+    if (this.isPatientAvailable) {
+      this.router.navigate(['/patient-summary']);
+    } else {
+      this.openAdvancedSearchModal();
+    }
+  }
+
+  openAdvancedSearchModal() {
+    this.modalTriggerService.openModal('advance-filter-modal', 'patient-summary');
   }
 
 }

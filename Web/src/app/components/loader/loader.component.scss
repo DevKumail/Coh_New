@@ -1,7 +1,19 @@
-.col {
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1AB394;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.full-screen-loader {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   width: 100vw;
   height: 100vh;
   background-color: rgba(240, 240, 240, 0.7);
@@ -9,4 +21,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.table-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 150px;
+}
+
+.inline-loader {
+  display: inline-block;
+  vertical-align: middle;
 }
