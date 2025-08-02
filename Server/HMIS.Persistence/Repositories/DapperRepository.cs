@@ -26,7 +26,7 @@ namespace HMIS.Persistence.Repositories
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            string sql = $"SELECT * FROM {typeof(T).Name}s WITH(NOLOCK)";
+            string sql = $"SELECT * FROM {typeof(T).Name}s ";
             return await RetryPolicy(async () =>
             {
                 using var conn = GetConnection();
@@ -36,7 +36,7 @@ namespace HMIS.Persistence.Repositories
 
         public async Task<T?> GetByIdAsync(int id)
         {
-            string sql = $"SELECT * FROM {typeof(T).Name}s WITH(NOLOCK) WHERE Id = @Id";
+            string sql = $"SELECT * FROM {typeof(T).Name}s  WHERE Id = @Id";
             return await RetryPolicy(async () =>
             {
                 using var conn = GetConnection();
@@ -215,7 +215,7 @@ namespace HMIS.Persistence.Repositories
                 {
                     return await operation();
                 }
-                catch (SqlException ex) when (ex.Number == 1205) // Deadlock
+                catch (SqlException ex) when (ex.Number == 1205) 
                 {
                     if (++retries >= MaxRetryCount)
                         throw;

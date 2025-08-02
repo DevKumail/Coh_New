@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -23,28 +24,25 @@ using Task = System.Threading.Tasks.Task;
 
 namespace HMIS.Service.ServiceLogics
 {
-    public class BillGeneratorManager : GenericRepositoryAsync<BlsuperBillDiagnosis>, IBillGeneratorManager
+    public class BillGeneratorManager : IBillGeneratorManager
     {
-        private readonly HIMSDBContext _dbContext;
-        public BillGeneratorManager(HIMSDBContext dbContext) : base(dbContext)
+        private readonly IDbConnection _dbConnection;
+
+        public BillGeneratorManager(IDbConnection dbConnection) 
         {
-            _dbContext = dbContext;
+            _dbConnection = dbConnection;
         }
-       
+
         public async Task<DataSet> GetDiagnosis(long VisitAccountNo)
         {
             try
             {
-                DynamicParameters parameters = new DynamicParameters();
+                var parameters = new DynamicParameters();
                 parameters.Add("@VisitAccountNo", VisitAccountNo);
-                DataSet dataSet = await DapperHelper.GetDataSetBySP("BL_DiagnosisGet", parameters);
-                if (dataSet.Tables.Count == 0)
-                {
-                    throw new Exception("No Data Found!");
-                }
-                return dataSet;
+
+                return await DapperHelper.GetDataSetBySP("BL_DiagnosisGet", parameters);
             }
-            catch (Exception ex)
+            catch
             {
                 return new DataSet();
             }

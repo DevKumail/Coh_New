@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "QbgI0HmgKRM=",
+  "dgSpecHash": "5onPCPrSPiY=",
   "success": false,
   "projectFilePath": "D:\\Kumail Work\\Coh_New\\Server\\HMIS.Infrastructure\\HMIS.Infrastructure.csproj",
   "expectedPackageFiles": [
@@ -29,7 +29,7 @@
     {
       "code": "NU1605",
       "level": "Error",
-      "message": "Warning As Error: Detected package downgrade: Microsoft.Extensions.Configuration.Abstractions from 9.0.7 to 9.0.6. Reference the package directly from the project to select a different version. \r\n HMIS.Infrastructure -> HMIS.Application -> Microsoft.Extensions.Configuration.Abstractions (>= 9.0.7) \r\n HMIS.Infrastructure -> Microsoft.Extensions.Configuration.Abstractions (>= 9.0.6)",
+      "message": "Warning As Error: Detected package downgrade: Microsoft.Extensions.Configuration.Abstractions from 9.0.7 to 9.0.6. Reference the package directly from the project to select a different version. \r\n HMIS.Infrastructure -> HMIS.Persistence -> Microsoft.Extensions.Configuration.Abstractions (>= 9.0.7) \r\n HMIS.Infrastructure -> Microsoft.Extensions.Configuration.Abstractions (>= 9.0.6)",
       "libraryId": "Microsoft.Extensions.Configuration.Abstractions",
       "targetGraphs": [
         "net8.0"

@@ -1,20 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 
-namespace HMIS.Service
+namespace HMIS.Application.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        //int SaveChanges();
-        Task<int> SaveChangesAsync();
-        IDbContextTransaction BeginTransaction();
-        Task<IDbContextTransaction> BeginTransactionAsync();
+        IDbConnection Connection { get; }
+        IDbTransaction Transaction { get; }
 
-        Task<int> SaveChangesCheckerApprovalAsync();
+        void BeginTransaction();
+        void Commit();
+        void Rollback();
 
+        Task<int> ExecuteAsync(string sql, object param = null);
+        Task<T> QueryFirstOrDefaultAsync<T>(string sql, object param = null);
+        Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null);
     }
 }

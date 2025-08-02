@@ -7,7 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using HMIS.Data.Models;
 using Task = System.Threading.Tasks.Task;
-using Microsoft.EntityFrameworkCore;
+
 using AutoMapper;
 using HMIS.Service.Implementations;
 using HMIS.Service.DTOs.Clinical;

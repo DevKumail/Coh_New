@@ -323,8 +323,10 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
+          "Dapper": "2.1.66",
           "HMIS.Domain": "1.0.0",
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7"
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7"
         },
         "compile": {
           "bin/placeholder/HMIS.Application.dll": {}
@@ -341,6 +343,24 @@
         },
         "runtime": {
           "bin/placeholder/HMIS.Domain.dll": {}
+        }
+      },
+      "HMIS.Persistence/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "Dapper": "2.1.66",
+          "HMIS.Application": "1.0.0",
+          "HMIS.Domain": "1.0.0",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
+          "Newtonsoft.Json": "13.0.3",
+          "System.Data.SqlClient": "4.8.6"
+        },
+        "compile": {
+          "bin/placeholder/HMIS.Persistence.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/HMIS.Persistence.dll": {}
         }
       }
     }
@@ -890,6 +910,11 @@
       "type": "project",
       "path": "../HMIS.Domain/HMIS.Domain.csproj",
       "msbuildProject": "../HMIS.Domain/HMIS.Domain.csproj"
+    },
+    "HMIS.Persistence/1.0.0": {
+      "type": "project",
+      "path": "../HMIS.Persistence/HMIS.Persistence.csproj",
+      "msbuildProject": "../HMIS.Persistence/HMIS.Persistence.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -897,6 +922,7 @@
       "Dapper >= 2.1.66",
       "HMIS.Application >= 1.0.0",
       "HMIS.Domain >= 1.0.0",
+      "HMIS.Persistence >= 1.0.0",
       "Microsoft.EntityFrameworkCore >= 9.0.7",
       "Microsoft.Extensions.Configuration.Abstractions >= 9.0.6",
       "Newtonsoft.Json >= 13.0.3",
@@ -941,6 +967,9 @@
             },
             "D:\\Kumail Work\\Coh_New\\Server\\HMIS.Domain\\HMIS.Domain.csproj": {
               "projectPath": "D:\\Kumail Work\\Coh_New\\Server\\HMIS.Domain\\HMIS.Domain.csproj"
+            },
+            "D:\\Kumail Work\\Coh_New\\Server\\HMIS.Persistence\\HMIS.Persistence.csproj": {
+              "projectPath": "D:\\Kumail Work\\Coh_New\\Server\\HMIS.Persistence\\HMIS.Persistence.csproj"
             }
           }
         }
@@ -1006,7 +1035,7 @@
     {
       "code": "NU1605",
       "level": "Error",
-      "message": "Warning As Error: Detected package downgrade: Microsoft.Extensions.Configuration.Abstractions from 9.0.7 to 9.0.6. Reference the package directly from the project to select a different version. \r\n HMIS.Infrastructure -> HMIS.Application -> Microsoft.Extensions.Configuration.Abstractions (>= 9.0.7) \r\n HMIS.Infrastructure -> Microsoft.Extensions.Configuration.Abstractions (>= 9.0.6)",
+      "message": "Warning As Error: Detected package downgrade: Microsoft.Extensions.Configuration.Abstractions from 9.0.7 to 9.0.6. Reference the package directly from the project to select a different version. \r\n HMIS.Infrastructure -> HMIS.Persistence -> Microsoft.Extensions.Configuration.Abstractions (>= 9.0.7) \r\n HMIS.Infrastructure -> Microsoft.Extensions.Configuration.Abstractions (>= 9.0.6)",
       "libraryId": "Microsoft.Extensions.Configuration.Abstractions",
       "targetGraphs": [
         "net8.0"

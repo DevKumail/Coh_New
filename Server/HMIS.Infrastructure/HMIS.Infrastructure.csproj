@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HMIS.Application\HMIS.Application.csproj" />
     <ProjectReference Include="..\HMIS.Domain\HMIS.Domain.csproj" />
+    <ProjectReference Include="..\HMIS.Persistence\HMIS.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

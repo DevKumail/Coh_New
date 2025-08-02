@@ -20,10 +20,10 @@ namespace HMIS.Service.ServiceLogics
         private readonly IConfiguration _configuration;
         private readonly HIMSDBContext _context;
 
-        public AlergyManager(HIMSDBContext context, IConfiguration configuration)
+        public AlergyManager(HIMSDBContext context, IDapperRepository<PatientAllergy> repository, IConfiguration configuration)
         {
-            _context = context;
-            Configuration = configuration;
+            _repository = repository;
+            _configuration = configuration;
         }
 
         public async Task<DataSet> GetAlergyDetailsDB(string mrno)

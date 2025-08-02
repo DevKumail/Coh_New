@@ -1,4 +1,8 @@
-﻿using HMIS.Service.DTOs.Clinical;
+﻿using HMIS.Application.Interfaces;
+using HMIS.Persistence;
+using HMIS.Persistence.Repositories;
+using HMIS.Persistence.Services;
+using HMIS.Service.DTOs.Clinical;
 using HMIS.Service.Implementations;
 using HMIS.Service.ServiceLogics;
 using Microsoft.Extensions.Configuration;
@@ -9,13 +13,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HMIS.Service.ServiceRegistry
+namespace HMIS.Infrastructure
 {
     public static class ServiceRegistration
     {
         public static void AddSharedInfrastructure(this IServiceCollection services, IConfiguration _config)
         {
+            services.AddScoped(typeof(IDapperRepository<>), typeof(DapperRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IDapperSPService, DapperSPService>();
             services.AddScoped<IAuthenticateUserToken, AuthenticateUserToken>();
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<ILoginHistoryService, LoginHistoryService>();

@@ -22,6 +22,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { PermissionService } from '@core/services/permission.service';
 
 @Component({
   selector: 'app-menu-navbar',
@@ -38,9 +39,10 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
   ],
   templateUrl: './app-menu.component.html'
 })
-export class AppMenuComponent implements OnInit {
+export class AppMenuComponent implements OnInit, OnDestroy {
 
   router = inject(Router);
+  permissionService = inject(PermissionService);
 
   @ViewChild('MenuItemWithChildren', { static: true })
   menuItemWithChildren!: TemplateRef<{
@@ -53,18 +55,26 @@ export class AppMenuComponent implements OnInit {
   menuItem!: TemplateRef<{ item: MenuItemType; linkClass?: string }>;
 
   menuItems: MenuItemType[] = horizontalMenuItems;
+  private subscription = new Subscription();
 
   ngOnInit() {
     // Dynamic menu filtering based on allowed screens
 
-
-    debugger
     const allowedScreens = JSON.parse(sessionStorage.getItem('allowscreens') || '[]');
 
     if (allowedScreens?.length) {
       this.menuItems = this.buildMenuItemsFromScreens(allowedScreens, horizontalMenuItems);
     }
 
+    // Subscribe to permission changes
+    this.subscription.add(
+      this.permissionService.onPermissionsRefreshed().subscribe(() => {
+        const updatedScreens = JSON.parse(sessionStorage.getItem('allowscreens') || '[]');
+        if (updatedScreens?.length) {
+          this.menuItems = this.buildMenuItemsFromScreens(updatedScreens, horizontalMenuItems);
+        }
+      })
+    );
 
     // Watch for navigation changes
     this.router.events
@@ -75,6 +85,10 @@ export class AppMenuComponent implements OnInit {
 
     this.expandActivePaths(this.menuItems);
 
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   hasSubMenu(item: MenuItemType): boolean {
@@ -101,7 +115,6 @@ export class AppMenuComponent implements OnInit {
   }
 
   buildMenuItemsFromScreens(screens: string[], staticMenu: MenuItemType[]): MenuItemType[] {
-    debugger
     const menuMap = new Map<string, MenuItemType>();
     const validModules = new Set<string>();
     const validComponentsPerModule = new Map<string, Set<string>>();

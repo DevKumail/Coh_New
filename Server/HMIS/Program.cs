@@ -1,5 +1,5 @@
 using HMIS.Application.Interfaces;
-using HMIS.Infrastructure.Repositories;
+using HMIS.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
