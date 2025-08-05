@@ -7,10 +7,10 @@ import { NgIconComponent } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Injectable } from '@angular/core';
-import { AlertDTO } from '@/app/shared/models/alert.model';
-import { AlertType } from '@/app/shared/models/alert-type.model';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
+import { AlertDTO } from '@/app/shared/Models/Clinical/alert.model';
+import { AlertType } from '@/app/shared/Models/Clinical/alert-type.model';
 
 
 @Component({
@@ -52,7 +52,7 @@ export class AlertComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private router: Router,
   private registrationApiService: RegistrationApiService,
-  private patientBannerService: PatientBannerService
+  private patientBannerService: PatientBannerService,
 
 
   ) { }
@@ -64,7 +64,7 @@ export class AlertComponent implements OnInit {
          this.patientBannerService.patientData$
           .pipe(
             filter((data: any) => !!data?.table2?.[0]?.mrNo),
-            distinctUntilChanged((prev, curr) => 
+            distinctUntilChanged((prev, curr) =>
               prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
             )
           )
@@ -173,7 +173,7 @@ export class AlertComponent implements OnInit {
     };
 
     console.log( 'this.SearchPatientData?.table2[0]?.mrNo =>' ,this.SearchPatientData?.table2[0]?.mrNo);
-    
+
     const alert2: AlertDTO = {
   alertId: 0,
   mrno: this.SearchPatientData?.table2[0]?.mrNo || null,
@@ -218,7 +218,7 @@ export class AlertComponent implements OnInit {
 
 
 
- 
+
   getAlertTypeName(typeId: number): string {
   if (typeof typeId !== 'number') {
     console.warn('⚠️ Invalid typeId:', typeId);

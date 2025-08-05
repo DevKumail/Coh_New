@@ -9,6 +9,7 @@ import { RouterModule } from '@angular/router';
 import { SchedulingApiService } from '../scheduling.api.service';
 
 import moment from 'moment';
+import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 import { HttpClient } from '@angular/common/http';
@@ -25,7 +26,8 @@ declare var flatpickr: any;
   imports: [
             ReactiveFormsModule,
             CommonModule,
-            RouterModule],
+            RouterModule,
+        NgbTimepickerModule],
 
   templateUrl: './create-appointment.component.html',
   styleUrl: './create-appointment.component.scss'
@@ -209,12 +211,12 @@ Times = [
   ngOnInit(): void {
     this.appointmentForm = this.fb.group({
       facility: ['', Validators.required],
-
+  time: [{ hour: 10, minute: 30 }],
       speciality: ['', Validators.required],
       provider: ['', Validators.required],
       site: ['', Validators.required],
       date: ['', Validators.required],
-      time: ['', Validators.required],
+      //time: ['', Validators.required],
       purpose: ['', Validators.required],
       visitType: ['', Validators.required],
     type: ['', Validators.required],
@@ -278,6 +280,14 @@ Times = [
 
 
   this.FillCache();
+
+    flatpickr('#entryDate', {
+      dateFormat: 'Y-m-d',
+      maxDate: 'today',
+      onChange: (selectedDates: any, dateStr: string) => {
+        this.appointmentForm.get('entryDate')?.setValue(dateStr);
+      },
+    });
   }
 
 
@@ -941,16 +951,16 @@ showDetailsDialog(element: any) {
       );
   }
 
-    ngAfterViewInit(): void {
+//     ngAfterViewInit(): void {
 
-    flatpickr('#appointmentDate', {
-    dateFormat: 'Y-m-d',
-    maxDate: 'today',
-    onChange: (selectedDates: any, dateStr: string) => {
-      this.appointmentForm.get('appointmentDate')?.setValue(dateStr);
-    },
-  });
-  }
+//     flatpickr('#appointmentDate', {
+//     dateFormat: 'Y-m-d',
+//     maxDate: 'today',
+//     onChange: (selectedDates: any, dateStr: string) => {
+//       this.appointmentForm.get('appointmentDate')?.setValue(dateStr);
+//     },
+//   });
+//   }
 
 
 

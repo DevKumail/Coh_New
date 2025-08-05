@@ -98,54 +98,52 @@
                             class="form-control date"
                             formControlName="appointmentDate"
                             data-provider="flatpickr"
-                            id="birthDate"
+                            id="entryDate"
                             placeholder="Select date"
                         />
                     </div>
 
-                    <!-- <div class="col-sm-3 mb-3">
-            <label>Time <span class="text-danger">*</span></label>
-            <select class="form-control form-select" formControlName="time">
-              <option value="">Select Time</option>
-              <option *ngFor="let t of Times" [value]="t.Time">{{ t.Time }}</option>
-            </select>
-          </div> -->
+                    <div class="col-sm-3 mb-3">
+                        <label>Time <span class="text-danger">*</span></label>
+                        <select
+                            class="form-control form-select scrollable-select"
+                            formControlName="time"
+                            style="max-height: 50px !important;         /* Approx 3-4 options height */
+  overflow-y: auto !important;"
+                        >
+                            <option value="" disabled selected hidden>
+                                Select Time
+                            </option>
+                            <option *ngFor="let t of Times" [value]="t.Time">
+                                {{ t.Time }}
+                            </option>
+                        </select>
+                    </div>
+
                     <!-- <div class="col-sm-3 mb-3">
                         <label>Time <span class="text-danger">*</span></label>
                         <select
-                            class="form-control form-select"
+                            class="form-control form-select scrollable-select"
                             formControlName="time"
-
                         >
-                            <option value="">Select Time</option>
-                            <option
-                                *ngFor="let t of Times"
-                                [value]="t.Time"
-                                [selected]="
-                                    t.Time === appointmentForm.get('time')?.value
-                                "
-                            >
+                            <option value="" disabled selected hidden>Select Time</option>
+                            <option *ngFor="let t of Times" [value]="t.Time">
                                 {{ t.Time }}
-                                <span
-                                    *ngIf="
-                                        t.Time === appointmentForm.get('time')?.value
-                                    "
-                                    >✔</span
-                                >
                             </option>
                         </select>
                     </div> -->
 
-                    <div class="col-sm-3 mb-3">
+                    <!-- <div class="col-sm-3 mb-3">
                         <label>Time <span class="text-danger">*</span></label>
                         <div class="custom-dropdown-wrapper">
                             <select
                                 class="form-control form-select"
                                 formControlName="time"
                             >
-                                <option value="">Select Time</option>
+                                <option class="select-option" value="">Select Time</option>
                                 <option
                                     *ngFor="let t of Times"
+                                    class="select-option"
                                     [value]="t.Time"
                                     [selected]="
                                         t.Time ===
@@ -156,7 +154,7 @@
                                 </option>
                             </select>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div class="col-sm-3 mb-3">
                         <label

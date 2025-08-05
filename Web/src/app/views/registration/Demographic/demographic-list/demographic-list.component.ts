@@ -197,9 +197,10 @@ export class DemographicsListComponent {
   }
 
   editPatient(patient: any) {
-    this.router.navigate(['/registration/demographic-create'], {
-      queryParams: { id: patient.mrNo },
-    });
+    this.router.navigate(['/registration/demographic-create'], //{
+    {
+    state: { patient },
+  });
   }
 
   Remove(e: Event, Id: number, position: string) {
