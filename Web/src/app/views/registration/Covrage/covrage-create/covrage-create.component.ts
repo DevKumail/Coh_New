@@ -20,6 +20,7 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FilePondOptions } from "filepond";
 import { FilePondModule, registerPlugin } from 'ngx-filepond';
+import { InsuranceSubscriberDTO } from '@/app/shared/Models/registration/Coverages/coverage.model';
 
 
 declare var flatpickr: any;
@@ -58,7 +59,9 @@ export class CovrageCreateComponent implements OnInit {
     facilities: any[] = [];
 
     activeTabId = 1;
-
+PaginationInfo: any = {};
+totalRecord: number = 0;
+insuredsubs: any[] = [];
     CarrierId: any;
     ShowAccordian: boolean = true;
     SelectAccordian: boolean = false;
@@ -104,7 +107,8 @@ export class CovrageCreateComponent implements OnInit {
         private fb: FormBuilder,
         private router: Router,
         private registrationApi: RegistrationApiService,
-        private modalService: NgbModal
+        private modalService: NgbModal,
+
     ) {}
 
     ngOnInit(): void {
@@ -287,7 +291,7 @@ formatDate(date: string): string {
                 }
             );
 
-            //this.relationships = regrelationships;
+
         }
 
         if (regcountries) {
@@ -465,53 +469,103 @@ formatDate(date: string): string {
 
 
 
+    // insertsubscriber() {
+    //     debugger
+    //     if (this.subscriberForm.invalid) {
+    //         Swal.fire('Error', 'Please fill all required fields', 'error');
+    //         this.subscriberForm.markAllAsTouched();
+    //         return;
+    //     }
+
+    //     const username = sessionStorage.getItem('userName');
+
+    //     this.subscriberForm.patchValue({
+    //         EnteredBy: username,
+    //     });
+
+    //     const data = this.subscriberForm.value;
+
+    //     this.registrationApi
+    //         .InsertSubscriber(data)
+    //         .then((res: any) => {
+    //             if (res.success) {
+    //                 Swal.fire({
+    //                     position: 'center',
+    //                     icon: 'success',
+    //                     title: 'Subscriber inserted successfully',
+    //                     showConfirmButton: false,
+    //                     timer: 2000,
+    //                 });
+    //                 this.subscriberForm.reset();
+    //             } else {
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Error',
+    //                     text: res?.message || 'Failed to insert subscriber',
+    //                 });
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Error',
+    //                 text:
+    //                     error?.error?.message ||
+    //                     error?.message ||
+    //                     'Something went wrong',
+    //             });
+    //         });
+    // }
+
     insertsubscriber() {
-        debugger
-        if (this.subscriberForm.invalid) {
-            Swal.fire('Error', 'Please fill all required fields', 'error');
-            this.subscriberForm.markAllAsTouched();
-            return;
-        }
+    debugger;
+    if (this.subscriberForm.invalid) {
+        Swal.fire('Error', 'Please fill all required fields', 'error');
+        this.subscriberForm.markAllAsTouched();
+        return;
+    }
 
-        const username = sessionStorage.getItem('userName');
+    const username = sessionStorage.getItem('userName');
 
-        this.subscriberForm.patchValue({
-            EnteredBy: username,
-        });
+    this.subscriberForm.patchValue({
+        EnteredBy: username,
+    });
 
-        const data = this.subscriberForm.value;
+    const dto: InsuranceSubscriberDTO = {
+        ...this.subscriberForm.value,
+        BirthDate: this.subscriberForm.value.BirthDate // ensure it’s in string format (e.g. ISO)
+            ? new Date(this.subscriberForm.value.BirthDate).toISOString()
+            : '',
+        policyList: this.patient?.policyList || [],
+    };
 
-        this.registrationApi
-            .InsertSubscriber(data)
-            .then((res: any) => {
-                if (res.success) {
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Subscriber inserted successfully',
-                        showConfirmButton: false,
-                        timer: 2000,
-                    });
-                    this.subscriberForm.reset();
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: res?.message || 'Failed to insert subscriber',
-                    });
-                }
-            })
-            .catch((error) => {
+    this.registrationApi.InsertSubscriber(dto)
+        .then((res: any) => {
+            if (res.success) {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Subscriber inserted successfully',
+                    showConfirmButton: false,
+                    timer: 2000,
+                });
+                this.subscriberForm.reset();
+            } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text:
-                        error?.error?.message ||
-                        error?.message ||
-                        'Something went wrong',
+                    text: res?.message || 'Failed to insert subscriber',
                 });
+            }
+        })
+        .catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error?.error?.message || error?.message || 'Something went wrong',
             });
-    }
+        });
+}
 
     cancel() {
         // this.subscriberForm.reset();
@@ -572,16 +626,21 @@ formatDate(date: string): string {
         }
     }
 
-    ngAfterViewInit(): void {
+  ngAfterViewInit(): void {
+  flatpickr('#BirthDate', {
+    dateFormat: 'Y-m-d',
+    maxDate: 'today'  // Optional: future date disable karne ke liye
+  });
+   flatpickr('#effectiveDate', {
+    dateFormat: 'Y-m-d',
+    maxDate: 'today'  // Optional
+  });
 
-        flatpickr('#birthDate', {
-        dateFormat: 'Y-m-d',
-        maxDate: 'today',
-        onChange: (selectedDates: any, dateStr: string) => {
-            this.subscriberForm.get('BirthDate')?.setValue(dateStr);
-        },
-        });
-    }
+  flatpickr('#terminationDate', {
+    dateFormat: 'Y-m-d',
+    maxDate: 'today'  // Optional
+  });
+}
 
 openLargeModal(content: any) {
   const carrierId = this.subscriberForm.get('CarrierId')?.value;
@@ -686,6 +745,37 @@ openModal(content: any) {
 //       );
 //   }
 
+// GetCoveragesList(Data: any) {
+//   this.registrationApi.GetCoverageList(Data, this.PaginationInfo)
+//     .then((inssub) => {
+//         this.totalRecord = 0;
+//       if (inssub.table2 && inssub.table2.length > 0) {
+//         this.totalRecord = inssub.table2[0].totalCount;
+//       }
+
+//       if (inssub.table1 && Array.isArray(inssub.table1)) {
+//         this.insuredsubs = inssub.table1.map((item: any) => ({
+//           subscriberId: item.subscriberId,
+//           subscriberName: item.subscriberName,
+//           insuranceCarrier: item.insuranceCarrier,
+//           insuranceIDNo: item.insuranceIDNo,
+//           mrNo: item.mrNo,
+//           type: item.typeinText,
+//           active: item.active,
+//           carrierAddress: item.carrierAddress
+//         }));
+//       }
+//     })
+//    .catch((error) => {
+
+//   this.registrationApi.add({
+//     severity: 'error',
+//     summary: 'Error',
+//     detail: error.message || 'Something went wrong.'
+
+//   });
+// });
+// }
 
 
 }
@@ -699,4 +789,9 @@ interface Policy {
   amount: number;
   status: string;
   isEdit?: boolean; // Add this property to control edit mode
+}
+
+interface CoverageResponse {
+  table1: any[];
+  table2: { totalCount: number }[];
 }

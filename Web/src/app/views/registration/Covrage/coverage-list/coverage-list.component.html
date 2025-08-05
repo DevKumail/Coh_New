@@ -17,10 +17,10 @@
         </li>
     </ol>
 </nav>
-  <div class="card mt-3">
+<div class="card mt-3">
     <div class="card-body">
-<!-- <div class="container-fluid w-100"> -->
-    <!-- <div class="card p-3 shadow mt-2"> -->
+        <!-- <div class="container-fluid w-100"> -->
+        <!-- <div class="card p-3 shadow mt-2"> -->
         <!-- Header section inside the card -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 style="font-weight: bold" class="m-0">Coverage List</h3>
@@ -34,7 +34,7 @@
         </div>
 
         <!-- Table -->
-           <!-- <div class="card mt-3">
+        <!-- <div class="card mt-3">
     <div class="card-body"> -->
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
@@ -46,7 +46,7 @@
                         <th>Insurance Carrier</th>
                         <th>Insured Id No</th>
                         <th>Type</th>
-                        <th>Edit Action</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,8 +55,8 @@
                         <td>{{ inssub.subscriberName }}</td>
                         <td class="text-center">{{ inssub.mrNo }}</td>
                         <td>{{ inssub.insuranceCarrier }}</td>
-                        <td>{{ inssub.insuranceIDNo }}</td>
-                        <td class="text-center">{{ inssub.type }}</td>
+                        <td>{{ inssub.insuredIDNo }}</td>
+                        <td class="text-center">{{ inssub.type || "N/A" }}</td>
                         <td class="text-center">
                             <button
                                 class="btn btn-info btn-sm"
@@ -66,7 +66,11 @@
                                 [queryParams]="{ id: inssub.subscriberId }"
                                 title="Edit Coverage"
                             >
-                                <i class="pi pi-user-edit"></i>
+                                <ng-icon
+                                    name="tablerEdit"
+                                    class="me-1"
+                                ></ng-icon>
+                                Edit
                             </button>
                         </td>
                     </tr>

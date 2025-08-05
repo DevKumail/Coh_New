@@ -104,33 +104,13 @@
                     />
                 </div>
 
-                <!-- DOB using ngxDaterangepickerBootstrap -->
-                <!-- <div class="col-3">
-                    <label>Date of Birth</label><span class="danger"> *</span>
-                   <input
-                       type="text"
-                       ngxDaterangepickerMd
-                       [singleDatePicker]="true"
-                       [showCancel]="true"
-                       formControlName="BirthDate"
-                    class="form-control"
-                    />
-
-                </div> -->
                 <div class="col-3">
                     <label>Date of Birth</label><span class="danger"> *</span>
-                    <!-- <input
-                        type="text"
-                        class="form-control date"
-                        formControlName="BirthDate"
-                        data-provider="flatpickr"
-                        id="birthDate"
-                        placeholder="Select date"
-                    /> -->
                     <input
                         type="text"
                         class="form-control date"
                         formControlName="BirthDate"
+                        data-provider="flatpickr"
                         id="BirthDate"
                         placeholder="Select date"
                     />
@@ -345,79 +325,6 @@
                         [(activeId)]="activeTabId"
                         class="nav nav-tabs mb-3"
                     >
-                        <!-- 🟢 Tab 1: Policy Info -->
-                        <!-- <li [ngbNavItem]="1">
-                            <a ngbNavLink>Policy Info</a>
-                            <ng-template ngbNavContent>
-                                <div class="table-responsive">
-                                    <table class="table align-middle mb-0">
-                                        <thead class="thead-sm">
-                                            <tr
-                                                class="text-uppercase text-center"
-                                            >
-                                                <th>Effective Date</th>
-                                                <th>Termination Date</th>
-                                                <th>Group No</th>
-                                                <th>No of Visits</th>
-                                                <th>Amount</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="text-center">
-                                            <tr
-                                                *ngFor="
-                                                    let policy of patient?.policyList
-                                                "
-                                            >
-                                                <td>
-                                                    {{
-                                                        policy.effectiveDate
-                                                            | date
-                                                                : "MM/dd/yyyy"
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    {{
-                                                        policy.terminationDate
-                                                            | date
-                                                                : "MM/dd/yyyy"
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    {{
-                                                        policy.groupNo || "N/A"
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    {{
-                                                        policy.noOfVisits ||
-                                                            "N/A"
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    {{
-                                                        policy.amount | currency
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    {{ policy.status || "N/A" }}
-                                                </td>
-                                            </tr>
-                                            <tr
-                                                *ngIf="
-                                                    patient?.policyList
-                                                        ?.length === 0
-                                                "
-                                            >
-                                                <td colspan="6">
-                                                    No policy data available.
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </ng-template>
-                        </li> -->
                         <li [ngbNavItem]="1">
                             <a ngbNavLink>Policy Info</a>
                             <ng-template ngbNavContent>
@@ -632,7 +539,13 @@
             <div class="d-flex justify-content-between mt-4">
                 <!-- Left buttons: Save & Cancel -->
                 <div>
-                    <button type="submit" class="btn btn-success" (click)="insertsubscriber()">Save</button>
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                        (click)="insertsubscriber()"
+                    >
+                        Save
+                    </button>
                     <button
                         type="button"
                         class="btn btn-secondary ms-2"

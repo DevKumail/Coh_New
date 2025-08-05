@@ -92,13 +92,7 @@ export class AlertComponent implements OnInit {
     });
 
      this.calculatePagination();
-    // const demographicsInfo = localStorage.getItem('Demographics');
-    // if (demographicsInfo) {
-    //   const demographics = JSON.parse(demographicsInfo);
-    //   this.Mrno = demographics.table2[0].mrNo;      // ✅ Mrno
-    //   this.PatientId = demographics.table2[0].patientId;
-    //   this.alertForm.patchValue({ mrno: this.Mrno }); // Optional if needed
-    // }
+
   }
 
   goBackToList() {
@@ -111,11 +105,6 @@ export class AlertComponent implements OnInit {
     }
     return false;
   }
-  // GetPatientAlertsData() {
-  //   // debugger
-  //   this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
-  //     // debugger;
-
 
   alertsTable: any
   GetPatientAlertsData() {
