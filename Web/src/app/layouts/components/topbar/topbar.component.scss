@@ -1,0 +1,13 @@
+.custom-border-right {
+  display: inline-flex;
+  align-items: center;
+
+  &::after {
+    content: "";
+    height: 18px;
+    opacity: 0.35;
+    width: 1px;
+    border-left: 1px solid #6c757d;
+    margin-left: 8px; // 👈 Adjust this for desired spacing
+  }
+}

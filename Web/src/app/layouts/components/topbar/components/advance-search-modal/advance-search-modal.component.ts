@@ -1,5 +1,5 @@
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
-import { AfterViewInit, Component, EventEmitter, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IconsModule } from '@/app/shared/icons.module';
 import { DataTableDirective, DataTablesModule } from 'angular-datatables';
@@ -9,29 +9,34 @@ import { Subject } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SharedApiService } from '@/app/shared/shared.api.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { LoaderComponent } from "@app/components/loader/loader.component";
+import { ModalTriggerService } from '@core/services/modal-trigger.service';
 
 declare var bootstrap: any;
 @Component({
   selector: 'app-advance-search-modal',
-  imports: [FormsModule, IconsModule, CommonModule, UiCardComponent, ReactiveFormsModule, DataTablesModule,],
+  imports: [FormsModule, IconsModule, CommonModule, UiCardComponent, ReactiveFormsModule, DataTablesModule, LoaderComponent],
   templateUrl: './advance-search-modal.component.html',
   styleUrl: './advance-search-modal.component.scss'
 })
 
-export class AdvanceSearchModalComponent {
-  selectedPatient: any = null;
+export class AdvanceSearchModalComponent implements AfterViewInit {
+  lastOpenContext: string | undefined;
+  selectedMrNo: string | null = null;
   patientForm: FormGroup;
   Patient: any[] = [];
   searchResults: any[] = [];
   totalRecord: number = 0;
-  @Output() onPatientSelect = new EventEmitter<any>();
+  isLoading: boolean = false;
+  @Output() onPatientSelect = new EventEmitter<{ mrno: string, context?: string }>();
+
+  @ViewChild('hiddenTrigger') hiddenTrigger!: ElementRef<HTMLButtonElement>;
+  @ViewChild('hiddenCloseBtn') hiddenCloseBtn!: ElementRef<HTMLButtonElement>;
 
   constructor(
     private fb: FormBuilder,
     private sharedApiService: SharedApiService,
-    private modalService: NgbModal,
-    private patientBannerService: PatientBannerService,
-    private demographicApiService: DemographicApiServices
+    private modalTriggerService: ModalTriggerService,
   ) {
     this.patientForm = this.fb.group({
       demographicList: this.fb.group({
@@ -47,25 +52,40 @@ export class AdvanceSearchModalComponent {
     });
   }
 
+  ngAfterViewInit(): void {
+    this.modalTriggerService.modalTrigger$.subscribe(({ modalId, context }) => {
+      this.lastOpenContext = context;
+      if (modalId === 'advance-filter-modal') {
+        this.hiddenTrigger.nativeElement.click();
+      }
+    });
+  }
+
   onRowSelect(mrno: string) {
-    console.log("selected mrno: ", mrno)
-    this.onPatientSelect.emit(mrno);
+    this.selectedMrNo = mrno;
+    this.onPatientSelect.emit({ mrno, context: this.lastOpenContext });
     this.closeModal();
   }
 
   onSubmit() {
-    console.log("payload: ", this.patientForm.value);
     this.getSearchResults(this.patientForm.value);
   }
 
   getSearchResults(req: any) {
-    this.sharedApiService.GetCoverageAndRegPatient(req).subscribe((res => {
-      if (res?.table2) {
-        this.searchResults = res.table2;
-        this.totalRecord = res.table3?.[0]?.totalCount || 0;
+    this.isLoading = true;
+    this.sharedApiService.GetCoverageAndRegPatient(req).subscribe({
+      next: (res) => {
+        if (res?.table2) {
+          this.searchResults = res.table2;
+          this.totalRecord = res.table3?.[0]?.totalCount || 0;
+        }
+      },
+      complete: () => {
+        this.isLoading = false;
       }
-    }))
+    });
   }
+
 
   resetFilter() {
     this.patientForm.reset({
@@ -83,11 +103,7 @@ export class AdvanceSearchModalComponent {
   }
 
   closeModal() {
-    const modalElement = document.getElementById('advance-filter-modal');
-    if (modalElement) {
-      const modalInstance = bootstrap.Modal.getInstance(modalElement);
-      modalInstance?.hide();
-    }
+    this.hiddenCloseBtn.nativeElement.click();
   }
 
 }

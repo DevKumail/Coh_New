@@ -44,6 +44,7 @@ export class PatientHeaderPanelComponent implements OnInit {
 
   closeBanner() {
     this.visible = false;
+    this.patientBannerService.setPatientData(null);
   }
 
   // get patientInfo() {

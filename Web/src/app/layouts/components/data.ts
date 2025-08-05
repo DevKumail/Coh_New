@@ -863,7 +863,12 @@ export const horizontalMenuItems: MenuItemType[] = [
             {
                 label: 'View Appointments',
                 icon: 'tablerCalendar',
-                url: '/scheduling/view appointments',
+                url: '/scheduling/View Appointments',
+            },
+            {
+            label: 'Appointment Dashboard',
+            icon: 'tablerLayoutDashboard',
+            url: '/scheduling/appointment-dashboard',
             },
             // {
             //     label: 'Create Appointment',
