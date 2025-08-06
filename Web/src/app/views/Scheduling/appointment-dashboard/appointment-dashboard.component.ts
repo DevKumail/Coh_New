@@ -40,7 +40,7 @@ import { FlatpickrModule } from 'angularx-flatpickr';
     ColorTwitterModule, 
     // PageTitleComponent, 
     // NgIcon, 
-    NgxDaterangepickerBootstrapDirective
+    // NgxDaterangepickerBootstrapDirective
     // NgxDaterangepickerBootstrapDirective
     // NgxPermissionsDirective
   ],
