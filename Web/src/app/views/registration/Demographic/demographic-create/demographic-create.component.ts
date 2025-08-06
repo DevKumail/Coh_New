@@ -118,10 +118,10 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
     ) {}
 
     ngOnInit(): void {
-        const patient = history.state.patient;
         this.initializeForm();
         this.fillDropdown();
         this.FillCache();
+        const patient = history.state.patient;
         debugger
         if (patient != null) {
             this.getDemographicsByMRNo(patient.mrNo);

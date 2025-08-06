@@ -17,6 +17,8 @@ import Swal from 'sweetalert2';
 import { filter, distinctUntilChanged } from 'rxjs/operators';
 import { OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { LoaderService } from '@core/services/loader.service';
+
 
 
 @Component({
@@ -34,234 +36,16 @@ import { Subscription } from 'rxjs';
 })
 
 
-// export class CoverageListComponent implements OnInit, OnDestroy {
-//   SearchPatientData: any;
-//   coverages: any[] = [];
-//   pagedCoverages: any[] = [];
-
-//   currentPage: number = 1;
-//   pageSize: number = 10;
-//   totalPages: number = 0;
-//   pageSizes: number[] = [5, 10, 25, 50];
-//   start: number = 0;
-//   end: number = 0;
-//   pageNumbers: number[] = [];
-
-//     patientSubscription: Subscription | undefined;
-//   constructor(
-//     private fb: FormBuilder,
-//     public router: Router,
-//     private patientBannerService: PatientBannerService,
-//     private CoveragesApiService: CoveragesApiService,
-//     private registrationApiService: RegistrationApiService,
-//   ) {}
-
-//   ngOnInit(): void {
-//     this.patientSubscription = this.patientBannerService.patientData$
-//       .pipe(
-//         filter((data: any) => !!data?.table2?.[0]?.mrNo),
-//         distinctUntilChanged((prev, curr) =>
-//           prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
-//         )
-//       )
-//       .subscribe((data: any) => {
-//         console.log('✅ Patient selected:', data?.table2?.[0]?.mrNo);
-//         this.SearchPatientData = data;
-//         this.GetCoverageData();
-//       });
-//   }
-
-//   GetCoverageData(): void {
-//     if (!this.SearchPatientData) {
-//       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
-//       return;
-//     }
-
-//     const mrNo = this.SearchPatientData.table2[0]?.mrNo;
-
-//     const paginationInfo = {
-//       page: this.currentPage,
-//       pageSize: this.pageSize
-//     };
-
-//     this.CoveragesApiService.GetCoverageList(mrNo, paginationInfo).then((res: any) => {
-//       console.log("📦 API Response:", res);
-//       this.coverages = res?.table1 || [];
-
-//       if (this.coverages.length === 0) {
-//         Swal.fire('No Data', 'No coverage records found for this patient.', 'info');
-//       }
-
-//       this.updatePagination();
-//     }).catch((error) => {
-//       console.error("❌ Error loading coverage data", error);
-//       Swal.fire('Error', 'Failed to load coverage data.', 'error');
-//     });
-//   }
-
-//   updatePagination(): void {
-//     this.totalPages = Math.ceil(this.coverages.length / this.pageSize);
-//     this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-//     this.start = (this.currentPage - 1) * this.pageSize;
-//     this.end = Math.min(this.start + this.pageSize, this.coverages.length);
-//     this.pagedCoverages = this.coverages.slice(this.start, this.end);
-//   }
-
-//   onPageSizeChange(event: any): void {
-//     this.pageSize = parseInt(event.target.value, 10);
-//     this.currentPage = 1;
-//     this.updatePagination();
-//   }
-
-//   goToPage(page: number): void {
-//     if (page >= 1 && page <= this.totalPages) {
-//       this.currentPage = page;
-//       this.updatePagination();
-//     }
-//   }
-
-//   prevPage(): void {
-//     if (this.currentPage > 1) {
-//       this.currentPage--;
-//       this.updatePagination();
-//     }
-//   }
-
-//   nextPage(): void {
-//     if (this.currentPage < this.totalPages) {
-//       this.currentPage++;
-//       this.updatePagination();
-//     }
-//   }
-
-//   ngOnDestroy(): void {
-//     if (this.patientSubscription) {
-//       this.patientSubscription.unsubscribe();
-//     }
-//   }
-// }
-
-
-// export class CoverageListComponent implements OnInit, OnDestroy {
-//   SearchPatientData: any;
-//   coverages: any[] = [];
-//   pagedCoverages: any[] = [];
-
-//   currentPage: number = 1;
-//   pageSize: number = 10;
-//   totalPages: number = 0;
-//   pageSizes: number[] = [5, 10, 25, 50];
-//   start: number = 0;
-//   end: number = 0;
-//   pageNumbers: number[] = [];
-
-//   patientSubscription: Subscription | undefined;
-
-//   constructor(
-//     private patientBannerService: PatientBannerService,
-//     private CoveragesApiService: CoveragesApiService,
-//     private registrationApiService: RegistrationApiService,
-//     private route: ActivatedRoute,
-//     public router: Router,
-//   ) {}
-
-//   ngOnInit(): void {
-//     console.log("📢 ngOnInit chala");
-
-//     this.patientSubscription = this.patientBannerService.patientData$
-//       .pipe(
-//         filter((data: any) => !!data?.table2?.[0]?.mrNo),
-//         distinctUntilChanged((prev, curr) =>
-//           prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
-//         )
-//       )
-//       .subscribe((data: any) => {
-//         console.log('✅ Patient selected:', data?.table2?.[0]?.mrNo);
-//         this.SearchPatientData = data;
-//         this.GetCoverageData();
-//       });
-//   }
-
-//   GetCoverageData(): void {
-//     debugger
-//     if (!this.SearchPatientData) {
-//       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
-//       return;
-//     }
-
-//     const mrNo = this.SearchPatientData.table2[0]?.mrNo;
-//     console.log("🧾 MrNo =>", mrNo);
-
-//     const paginationInfo = {
-//       page: this.currentPage,
-//       pageSize: this.pageSize
-//     };
-
-//     console.log("📤 Calling API with:", mrNo, paginationInfo);
-
-//     this.CoveragesApiService.GetCoverageList(mrNo, paginationInfo).then((res: any) => {
-//       console.log("📦 API Response:", res);
-//       this.coverages = res?.table1 || [];
-
-//       if (this.coverages.length === 0) {
-//         Swal.fire('No Data', 'No coverage records found for this patient.', 'info');
-//       }
-
-//       this.updatePagination();
-//     }).catch((error) => {
-//       console.error("❌ Error loading coverage data", error);
-//       Swal.fire('Error', 'Failed to load coverage data.', 'error');
-//     });
-//   }
-
-//   updatePagination(): void {
-//     this.totalPages = Math.ceil(this.coverages.length / this.pageSize);
-//     this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-//     this.start = (this.currentPage - 1) * this.pageSize;
-//     this.end = Math.min(this.start + this.pageSize, this.coverages.length);
-//     this.pagedCoverages = this.coverages.slice(this.start, this.end);
-//   }
-
-//   onPageSizeChange(event: any): void {
-//     this.pageSize = parseInt(event.target.value, 10);
-//     this.currentPage = 1;
-//     this.updatePagination();
-//   }
-
-//   goToPage(page: number): void {
-//     if (page >= 1 && page <= this.totalPages) {
-//       this.currentPage = page;
-//       this.updatePagination();
-//     }
-//   }
-
-//   prevPage(): void {
-//     if (this.currentPage > 1) {
-//       this.currentPage--;
-//       this.updatePagination();
-//     }
-//   }
-
-//   nextPage(): void {
-//     if (this.currentPage < this.totalPages) {
-//       this.currentPage++;
-//       this.updatePagination();
-//     }
-//   }
-
-//   ngOnDestroy(): void {
-//     if (this.patientSubscription) {
-//       this.patientSubscription.unsubscribe();
-//     }
-//   }
-// }
-
-
-
 export class CoverageListComponent implements OnInit, OnDestroy {
+
+
+
+
+
   SearchPatientData: any;
   coverages: any[] = [];
   pagedCoverages: any[] = [];
+      loader: any
 
   currentPage: number = 1;
   pageSize: number = 10;
@@ -279,6 +63,8 @@ export class CoverageListComponent implements OnInit, OnDestroy {
     private registrationApiService: RegistrationApiService,
     private route: ActivatedRoute,
     public router: Router,
+    public Loader : LoaderService,
+
   ) {}
 
   ngOnInit(): void {
@@ -294,13 +80,14 @@ export class CoverageListComponent implements OnInit, OnDestroy {
       .subscribe((data: any) => {
         const mrNo = data?.table2?.[0]?.mrNo;
         // console.log('Patient selected:', mrNo);
-        Swal.fire('Patient Selected', `MrNo: ${mrNo}`, 'success');
+        //Swal.fire('Patient Selected', `MrNo: ${mrNo}`, 'success');
 
         this.SearchPatientData = data;
         this.GetCoverageData();
       });
 
       this.GetCoverageData();
+
   }
 
 
@@ -337,77 +124,70 @@ GetCoverage(MrNo: string) {
 }
 
 
-    GetCoverageData() {
+//     GetCoverageData() {
 
-    if (!this.SearchPatientData) {
-      Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
-      return;
-    }
-
-    const paginationInfo = {
-      page: this.currentPage,
-      RowsPerPage: this.pageSize
-    };
-
-    const coverageListReq = {
-        mrno: this.SearchPatientData?.table2[0]?.mrNo || 0
-    }
-
-
-
-    this.CoveragesApiService.GetCoverageList(coverageListReq, paginationInfo).then((res: any) => {
-
-      this.coverages = res?.table1 || [];
-
-    //   if (this.coverages.length === 1) {
-    //     Swal.fire('No Data', 'No coverage records found for this patient.', 'info');
-    //   } else {
-    //     Swal.fire('Success', `${this.coverages.length} record(s) loaded.`, 'success');
-    //   }
-
-      this.updatePagination();
-    }).catch((error) => {
-
-      Swal.fire('Error', 'Failed to load coverage data.', 'error');
-    });
-  }
-
-// GetCoverageData() {
-//   console.log("🔍 GetCoverageData called");
-
-//   if (!this.SearchPatientData) {
-//     Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
-//     return;
-//   }
-
-//   const mrNo = this.SearchPatientData.table2[0]?.mrNo;
-//   console.log(" Sending API call with MRNO:", mrNo);
-
-//   const coverageListReq = {
-//     mrno: mrNo
-//   };
-
-//   const paginationInfo = {
-//     page: this.currentPage,
-//     pageSize: this.pageSize
-//   };
-
-//   this.CoveragesApiService.GetCoverageList(coverageListReq, paginationInfo).then((res: any) => {
-//     console.log("📦 API Response:", res);
-//     this.coverages = res?.table1 || [];
-
-//     if (this.coverages.length === 0) {
-//       Swal.fire('No Data', 'No coverage records found for this patient.', 'info');
-//     } else {
-//       Swal.fire('Success', `${this.coverages.length} record(s) loaded.`, 'success');
+//     if (!this.SearchPatientData) {
+//       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+//       return;
 //     }
 
-//     this.updatePagination();
-//   }).catch((error) => {
-//     console.error("❌ API Error:", error);
-//     Swal.fire('Error', 'Failed to load coverage data.', 'error');
-//   });
-// }
+//     const paginationInfo = {
+//       page: this.currentPage,
+//       RowsPerPage: this.pageSize
+//     };
+
+//     const coverageListReq = {
+//         mrno: this.SearchPatientData?.table2[0]?.mrNo || 0
+//     }
+
+
+
+//     this.CoveragesApiService.GetCoverageList(coverageListReq, paginationInfo).then((res: any) => {
+
+//       this.coverages = res?.table1 || [];
+
+//     //   if (this.coverages.length === 1) {
+//     //     Swal.fire('No Data', 'No coverage records found for this patient.', 'info');
+//     //   } else {
+//     //     Swal.fire('Success', `${this.coverages.length} record(s) loaded.`, 'success');
+//     //   }
+
+//       this.updatePagination();
+//     }).catch((error) => {
+
+//       Swal.fire('Error', 'Failed to load coverage data.', 'error');
+//     });
+//   }
+
+GetCoverageData() {
+  if (!this.SearchPatientData) {
+    Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+    return;
+  }
+
+  this.Loader.show();
+
+  const paginationInfo = {
+    page: this.currentPage,
+    RowsPerPage: this.pageSize
+  };
+
+  const coverageListReq = {
+    mrno: this.SearchPatientData?.table2[0]?.mrNo || 0
+  }
+
+  this.CoveragesApiService.GetCoverageList(coverageListReq, paginationInfo)
+    .then((res: any) => {
+      this.coverages = res?.table1 || [];
+      this.updatePagination();
+      this.Loader.hide();
+    })
+    .catch((error) => {
+      this.Loader.hide();
+      Swal.fire('Error', 'Failed to load coverage data.', 'error');
+    });
+}
+
 
 
   updatePagination(): void {
@@ -450,8 +230,41 @@ GetCoverage(MrNo: string) {
     if (this.patientSubscription) {
       this.patientSubscription.unsubscribe();
     }
-  }}
 
+  }
+
+Remove($event: MouseEvent,arg1: any,arg2: string) {
+Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to delete this Coverage?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, confirm it!',
+      cancelButtonText: 'No, cancel',
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Call the API to delete the coverage
+        // this.CoveragesApiService.RemoveCoverage(arg1, arg2).then(() => {
+        //   Swal.fire('Deleted!', 'The coverage has been deleted.', 'success');
+        //   this.GetCoverageData(); // Refresh the coverage list
+        // }).catch((error) => {
+        //   Swal.fire('Error', 'Failed to delete coverage.', 'error');
+        // });
+      }
+    });
+}
+
+
+EditCoverage(subscriberId: number) {
+  this.router.navigate(['registration/covrage-create'], {
+    state: { subscriberId },
+  });
+
+}
+
+
+}
   interface CoverageResponse {
   table1: {
     type: string;
@@ -464,5 +277,7 @@ GetCoverage(MrNo: string) {
     relationCode: string;
     priority: number;
   }[];
+
+
   }
 

@@ -58,21 +58,27 @@
                         <td>{{ inssub.insuredIDNo }}</td>
                         <td class="text-center">{{ inssub.type || "N/A" }}</td>
                         <td class="text-center">
-                            <button
-                                class="btn btn-info btn-sm"
-                                [routerLink]="[
-                                    '/registration/coverages/addnewsubscriber'
-                                ]"
-                                [queryParams]="{ id: inssub.subscriberId }"
-                                title="Edit Coverage"
-                            >
-                                <ng-icon
-                                    name="tablerEdit"
-                                    class="me-1"
-                                ></ng-icon>
-                                Edit
-                            </button>
+
+                            <div ngbDropdown placement="left-top" class="text-muted">
+                                <div
+                                    ngbDropdownMenu
+                                    class="dropdown-menu-end d-flex gap-2 px-2 py-1"
+                                >
+                                    <ng-icon
+                                        name="tablerEdit"
+                                        class="me-1"
+                                        (click)="EditCoverage(inssub.subscriberId)"
+                                    ></ng-icon>
+                                    <ng-icon
+                                        name="tablerTrash"
+                                        class="text-danger me-1"
+                                        (click)="Remove($event, inssub.SubscriberId, 'center')"
+                                    ></ng-icon>
+                                </div>
+                            </div>
                         </td>
+
+
                     </tr>
                     <tr *ngIf="pagedCoverages.length === 0">
                         <td colspan="8" class="text-center">

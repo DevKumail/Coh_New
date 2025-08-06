@@ -22,6 +22,7 @@ export const Registration_ROUTES: Routes = [
         component: AlertComponent,
         data: { title: 'Alerts' }
       },
+
       {
         path: 'coverages',
         component: CoverageListComponent,
@@ -58,39 +59,6 @@ export const Registration_ROUTES: Routes = [
         component: TemporaryDemographicsComponent,
         data: { title: 'Temporary Demographics' },
       },
-
-
-
-
-
-
-
-      //   {
-      //   path: 'coverages',
-      //   component: CoverageListComponent,
-      //   data: { title: 'Coverage List' }
-      // },
-
-      //   {
-      //     path: 'problem-list',
-      //     component: ProblemListComponent,
-      //     data: { title: 'Problem List' }
-      //   },
-      //   {
-      //     path: 'favorites',
-      //     component: FavoritesComponent,
-      //     data: { title: 'Favorites' }
-      //   },
-      //   {
-      //     path: 'problem',
-      //     component: ProblemComponent,
-      //     data: { title: 'problem-list' }
-      //   },
-      //   {
-      //     path: 'allergies',
-      //     component: AllergiesComponent,
-      //     data: { title: 'Allergies' }
-      //   }
 
     ]
   }

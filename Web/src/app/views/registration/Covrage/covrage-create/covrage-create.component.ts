@@ -1,3 +1,5 @@
+import { title } from 'process';
+import { CoveragesApiService } from '@/app/shared/Services/Coverages/coverages.api.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import {
     FormBuilder,
@@ -18,23 +20,32 @@ import { RegistrationApiService } from '@/app/shared/Services/Registration/regis
 import { NgxDaterangepickerBootstrapDirective } from 'ngx-daterangepicker-bootstrap';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
-import { FilePondOptions } from "filepond";
+import { FilePondOptions } from 'filepond';
 import { FilePondModule, registerPlugin } from 'ngx-filepond';
 import { InsuranceSubscriberDTO } from '@/app/shared/Models/registration/Coverages/coverage.model';
-
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { Subscription } from 'rxjs';
+import { filter, distinctUntilChanged } from 'rxjs/operators';
+import { OnDestroy } from '@angular/core';
+import { LoaderService } from '@core/services/loader.service';
 
 declare var flatpickr: any;
 
 @Component({
     selector: 'app-covrage-create',
-    imports: [ReactiveFormsModule, CommonModule, FormsModule, NgbNavModule,FilePondModule,],
+    imports: [
+        ReactiveFormsModule,
+        CommonModule,
+        FormsModule,
+        NgbNavModule,
+        FilePondModule,
+    ],
     providers: [provideNgxMask()],
 
     templateUrl: './covrage-create.component.html',
     styleUrl: './covrage-create.component.scss',
 })
 export class CovrageCreateComponent implements OnInit {
-
     @ViewChild('picker') picker!: NgxDaterangepickerBootstrapDirective;
 
     subscriberForm!: FormGroup;
@@ -57,161 +68,176 @@ export class CovrageCreateComponent implements OnInit {
     BLPayerPlan: any[] = [];
     BLPayerPackage: any[] = [];
     facilities: any[] = [];
-
+    SearchPatientData: any;
     activeTabId = 1;
-PaginationInfo: any = {};
-totalRecord: number = 0;
-insuredsubs: any[] = [];
+    PaginationInfo: any = {};
+    totalRecord: number = 0;
+    insuredsubs: any[] = [];
     CarrierId: any;
     ShowAccordian: boolean = true;
     SelectAccordian: boolean = false;
-
     isRelation = true;
-    //policyList: any;
     patient: any;
     modalLg: any;
 
-    policyList = [
-
-    {
-      effectiveDate: new Date('2024-01-01'),
-      terminationDate: new Date('2024-12-31'),
-      groupNo: 'GRP-001',
-      noOfVisits: 10,
-      amount: 5000,
-      status: 'Active',
-      isEdit: false
-    },
-    {
-      effectiveDate: new Date('2023-05-01'),
-      terminationDate: new Date('2024-04-30'),
-      groupNo: 'GRP-002',
-      noOfVisits: 5,
-      amount: 3000,
-      status: 'Expired',
-      isEdit: false
-    },
-    {
-      effectiveDate: new Date('2025-01-01'),
-      terminationDate: new Date('2025-12-31'),
-      groupNo: '',
-      noOfVisits: 0,
-      amount: 0,
-      status: 'Pending',
-      isEdit: false
-    }
-  ];
-
+  patientSubscription: Subscription | undefined;
 
     constructor(
         private fb: FormBuilder,
         private router: Router,
-        private registrationApi: RegistrationApiService,
+        private CoveragesApiService: CoveragesApiService,
         private modalService: NgbModal,
+        private patientBannerService: PatientBannerService,
+        private registrationApi: RegistrationApiService,
 
     ) {}
 
-    ngOnInit(): void {
-        this.initForm();
-        this.FillCache();
-
+    async ngOnInit() {
+        await this.initForm();
+        await this.FillCache();
         this.type = [
             { label: 'Self', value: '1' },
             { label: 'Relationship', value: '2' },
         ];
-          this.patient = {
-      mrNo: '1001',
-      personFirstName: 'Ali',
-      patientBirthDate: '1990-01-01'
-    };
+        this.patientSubscription = this.patientBannerService.patientData$
+              .pipe(
+                filter((data: any) => !!data?.table2?.[0]?.mrNo),
+                distinctUntilChanged((prev, curr) =>
+                  prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+                )
+              )
+              .subscribe((data: any) => {
+                const mrNo = data?.table2?.[0]?.mrNo;
+                this.SearchPatientData = data;
+              });
+
+
+        const subscriberId = history.state.subscriberId;
+        if (subscriberId != null) {
+            this.GetCoverageById(subscriberId);
+        }
+    }
+//     ngOnInit(): void {
+//   debugger;
+
+//   // 🟢 Step 1: Get subscriberId from router state (if navigated from EditCoverage)
+//   const subscriberIdFromState = history.state?.subscriberId;
+
+//   if (subscriberIdFromState) {
+//     this.GetCoverageById(subscriberIdFromState);
+//   } else {
+//     // 🔁 Step 2: If not from router, get it from patientData$
+//     this.patientSubscription = this.patientBannerService.patientData$
+//       .pipe(
+//         filter((data: any) => !!data?.table2?.[0]?.mrNo),
+//         distinctUntilChanged((prev, curr) =>
+//           prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+//         )
+//       )
+//       .subscribe((data: any) => {
+//         const patientData = data?.table2?.[0];
+//         this.SearchPatientData = data;
+
+//         const subscriberId = patientData?.subscriberId;
+//         if (subscriberId) {
+//           this.GetCoverageById(subscriberId);
+//         } else {
+//           console.warn("❌ subscriberId not found in patientData", data);
+//         }
+//       });
+//   }
+
+//   // 🛠️ Initialize other data
+//   this.initForm();
+//   this.FillCache();
+
+//   this.type = [
+//     { label: 'Self', value: '1' },
+//     { label: 'Relationship', value: '2' },
+//   ];
+// }
+
+    initForm() {
+        this.subscriberForm = this.fb.group({
+            CompanyOrIndividual: [''],
+            InsuranceRel: [''],
+            Address1: [''],
+            Suffix: [''],
+            FirstName: [''],
+            MiddleName: [''],
+            LastName: [''],
+            InsuredPhone: [''],
+            BirthDate: [''],
+            Sex: [''],
+            InsuredIdNo: [''],
+            CountryId: [''],
+            StateId: [''],
+            CityId: [''],
+            ZipCode: [''],
+            CarrierId: [''],
+            selectedBLPayerPlan: [''],
+            selectedBLPayerPackage: [''],
+            Inactive: [false],
+            EnteredBy: [''],
+            Deductibles: [''],
+            Copay: [''],
+            DNDeductible: [''],
+            BLPayerPlan: [''],
+            OpCopay: [''],
+            IpCopay: [''],
+        });
+
+        this.policyForm = this.fb.group({
+            effectiveDate: [''],
+            terminationDate: [''],
+            groupNo: [''],
+            noOfVisits: [''],
+            amount: [''],
+            status: [''],
+        });
+        this.copayForm = this.fb.group({
+            serviceType: [''],
+            copayPercentage: [''],
+        });
+
+        this.policyForm1 = this.fb.group({
+            effectiveDate: [''],
+            terminationDate: [''],
+            groupNo: [''],
+            noOfVisits: [''],
+            amount: [''],
+            status: [''],
+        });
     }
 
+    openPolicyModal(content: any) {
+        this.policyForm1.reset();
+        this.modalService.open(content, { size: 'lg' });
+    }
 
-initForm() {
-  this.subscriberForm = this.fb.group({
-    CompanyOrIndividual: [''],
-    InsuranceRel: [''],
-    Address1: [''],
-    Suffix: [''],
-    FirstName: [''],
-    MiddleName: [''],
-    LastName: [''],
-    InsuredPhone: [''],
-    BirthDate: [''],
-    Sex: [''],
-    InsuredIdNo: [''],
-    CountryId: [''],
-    StateId: [''],
-    CityId: [''],
-    ZipCode: [''],
-    CarrierId: [''],
-    selectedBLPayerPlan: [''],
-    selectedBLPayerPackage: [''],
-    Inactive: [false],
-    EnteredBy: [''],
-    Deductibles: [''],
-    Copay: [''],
-    DNDeductible:[''],
+    onSavePolicy(modal: any) {
+        if (this.policyForm1.valid) {
+            const policy = this.policyForm1.value;
 
+            policy.effectiveDate = this.formatDate(policy.effectiveDate);
+            policy.terminationDate = this.formatDate(policy.terminationDate);
 
-    OpCopay: [''],
-    IpCopay: [''],
- });
+            this.patient.policyList = this.patient.policyList || [];
+            this.patient.policyList.push(policy);
 
-    this.policyForm = this.fb.group({
-        effectiveDate: [''],
-        terminationDate: [''],
-        groupNo: [''],
-        noOfVisits: [''],
-        amount: [''],
-        status: ['']
-      })
-this.copayForm = this.fb.group({
-    serviceType: [''],
-    copayPercentage: ['']
-  });
+            modal.close();
+        } else {
+            Swal.fire('Please fill all required fields in Policy form.');
+            this.policyForm1.markAllAsTouched();
+        }
+    }
 
-this.policyForm1 = this.fb.group({
-  effectiveDate: [''],
-  terminationDate: [''],
-  groupNo: [''],
-  noOfVisits: [''],
-  amount: [''],
-  status: ['']
-});
+    formatDate(date: string): string {
+        const d = new Date(date);
+        return d.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    }
 
-}
-
-
-openPolicyModal(content :any) {
-    this.policyForm1.reset();
-    this.modalService.open(content, { size: 'lg' });
-}
-
-onSavePolicy(modal: any) {
-  if (this.policyForm1.valid) {
-    const policy = this.policyForm1.value;
-
-    policy.effectiveDate = this.formatDate(policy.effectiveDate);
-    policy.terminationDate = this.formatDate(policy.terminationDate);
-
-    this.patient.policyList = this.patient.policyList || [];
-    this.patient.policyList.push(policy);
-
-    modal.close();
-  } else {
-    Swal.fire('Please fill all required fields in Policy form.');
-    this.policyForm1.markAllAsTouched();
-  }
-}
-
-formatDate(date: string): string {
-  const d = new Date(date);
-  return d.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-}
-
-
-    FillCache() {
+    async FillCache() {
         const cacheItems = [
             'HREmployeeType',
             'RegBloodGroup',
@@ -227,7 +253,7 @@ formatDate(date: string): string {
             'BLPayerPackage',
         ];
 
-        this.registrationApi
+        await this.registrationApi
             .getCacheItem({ entities: cacheItems })
             .then((response: any) => {
                 if (response.cache != null) {
@@ -236,7 +262,7 @@ formatDate(date: string): string {
                 }
             });
 
-        this.registrationApi.GetInsuranceRelation().subscribe((res: any) => {
+        await this.registrationApi.GetInsuranceRelation().subscribe((res: any) => {
             this.InsuranceRelation = res;
             //   console.log('InsuranceRelation:', this.InsuranceRelation);
         });
@@ -290,8 +316,6 @@ formatDate(date: string): string {
                     };
                 }
             );
-
-
         }
 
         if (regcountries) {
@@ -411,7 +435,6 @@ formatDate(date: string): string {
 
             //console.log('Titles:', this.titles);
         }
-
     }
 
     showRelation() {
@@ -467,8 +490,6 @@ formatDate(date: string): string {
         this.copayTable.removeAt(index);
     }
 
-
-
     // insertsubscriber() {
     //     debugger
     //     if (this.subscriberForm.invalid) {
@@ -517,59 +538,121 @@ formatDate(date: string): string {
     //         });
     // }
 
+    // insertsubscriber() {
+    // debugger;
+    // if (this.subscriberForm.invalid) {
+    //     Swal.fire('Error', 'Please fill all required fields', 'error');
+    //     this.subscriberForm.markAllAsTouched();
+    //     return;
+    // }
+
+    // const username = sessionStorage.getItem('userName');
+
+    // this.subscriberForm.patchValue({
+    //     EnteredBy: username,
+    // });
+
+    // const dto: InsuranceSubscriberDTO = {
+    //     ...this.subscriberForm.value,
+    //     BirthDate: this.subscriberForm.value.BirthDate // ensure it’s in string format (e.g. ISO)
+    //         ? new Date(this.subscriberForm.value.BirthDate).toISOString()
+    //         : '',
+    //     policyList: this.patient?.policyList || [],
+    // };
+
+    // this.registrationApi.InsertSubscriber(dto)
+    //     .then((res: any) => {
+    //         if (res.success) {
+    //             Swal.fire({
+    //                 position: 'center',
+    //                 icon: 'success',
+    //                 title: 'Subscriber inserted successfully',
+    //                 showConfirmButton: false,
+    //                 timer: 2000,
+    //             });
+    //             this.subscriberForm.reset();
+    //         } else {
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Error',
+    //                 text: res?.message || 'Failed to insert subscriber',
+    //             });
+    //         }
+    //     })
+    //     .catch((error) => {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Error',
+    //             text: error?.error?.message || error?.message || 'Something went wrong',
+    //         });
+    //     });
+    // }
+
     insertsubscriber() {
-    debugger;
-    if (this.subscriberForm.invalid) {
-        Swal.fire('Error', 'Please fill all required fields', 'error');
-        this.subscriberForm.markAllAsTouched();
-        return;
-    }
+        debugger;
+        if (this.subscriberForm.invalid) {
+            Swal.fire('Error', 'Please fill all required fields', 'error');
+            this.subscriberForm.markAllAsTouched();
+            return;
+        }
+         if (!this.SearchPatientData) {
+              Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+              return;
+            }
 
-    const username = sessionStorage.getItem('userName');
+        const username = sessionStorage.getItem('userName');
 
-    this.subscriberForm.patchValue({
-        EnteredBy: username,
-    });
+        this.subscriberForm.patchValue({
+            EnteredBy: username,
+            MRNo: this.SearchPatientData?.table2[0]?.mrNo || 0
+        });
 
-    const dto: InsuranceSubscriberDTO = {
-        ...this.subscriberForm.value,
-        BirthDate: this.subscriberForm.value.BirthDate // ensure it’s in string format (e.g. ISO)
-            ? new Date(this.subscriberForm.value.BirthDate).toISOString()
-            : '',
-        policyList: this.patient?.policyList || [],
-    };
+        const dto: InsuranceSubscriberDTO = {
+            ...this.subscriberForm.value,
+            BirthDate: this.subscriberForm.value.BirthDate
+                ? new Date(this.subscriberForm.value.BirthDate).toISOString()
+                : '',
+            policyList: this.patient?.policyList || [],
+            MRNo: this.SearchPatientData?.table2[0]?.mrNo || 0
+        };
 
-    this.registrationApi.InsertSubscriber(dto)
-        .then((res: any) => {
-            if (res.success) {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: 'Subscriber inserted successfully',
-                    showConfirmButton: false,
-                    timer: 2000,
-                });
-                this.subscriberForm.reset();
-            } else {
+        this.CoveragesApiService
+            .InsertSubscriber(dto)
+            .then((res: any) => {
+                if (res.success) {
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Subscriber inserted successfully',
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                    this.subscriberForm.reset();
+                    this.router.navigate(['coverages']);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: res?.message || 'Failed to insert subscriber',
+                    });
+                }
+            })
+
+            .catch((error) => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: res?.message || 'Failed to insert subscriber',
+                    text:
+                        error?.error?.message ||
+                        error?.message ||
+                        'Something went wrong',
                 });
-            }
-        })
-        .catch((error) => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error?.error?.message || error?.message || 'Something went wrong',
             });
-        });
-}
+    }
 
     cancel() {
         // this.subscriberForm.reset();
-        this.router.navigate(['coverages']);
+        this.router.navigate(['registration/coverages']);
     }
 
     getStateByCountry(countryId: number) {
@@ -626,172 +709,175 @@ formatDate(date: string): string {
         }
     }
 
-  ngAfterViewInit(): void {
-  flatpickr('#BirthDate', {
-    dateFormat: 'Y-m-d',
-    maxDate: 'today'  // Optional: future date disable karne ke liye
-  });
-   flatpickr('#effectiveDate', {
-    dateFormat: 'Y-m-d',
-    maxDate: 'today'  // Optional
-  });
+    ngAfterViewInit(): void {
+        flatpickr('#BirthDate', {
+            dateFormat: 'Y-m-d',
+            maxDate: 'today', // Optional: future date disable karne ke liye
+        });
+        flatpickr('#effectiveDate', {
+            dateFormat: 'Y-m-d',
+            maxDate: 'today', // Optional
+        });
 
-  flatpickr('#terminationDate', {
-    dateFormat: 'Y-m-d',
-    maxDate: 'today'  // Optional
-  });
-}
+        flatpickr('#terminationDate', {
+            dateFormat: 'Y-m-d',
+            maxDate: 'today', // Optional
+        });
+    }
 
-openLargeModal(content: any) {
-  const carrierId = this.subscriberForm.get('CarrierId')?.value;
-  if (!carrierId) {
-    Swal.fire('Please fill Insurance Carrier.');
-    return;
-  }
+    openLargeModal(content: any) {
+        const carrierId = this.subscriberForm.get('CarrierId')?.value;
+        if (!carrierId) {
+            Swal.fire('Please fill Insurance Carrier.');
+            return;
+        }
 
-  this.modalService.open(content, { size: 'lg' });
-}
+        this.modalService.open(content, { size: 'lg' });
+    }
 
-onFilePondFileUpdate(event: any): void {
-  const files = event?.length ? event : [];
-//   if (files.length > 0) {
-//     this.selectedFile = files[0].file;
-//   } else {
-//     this.selectedFile = null;
-//   }
-}
+    onFilePondFileUpdate(event: any): void {
+        const files = event?.length ? event : [];
+        //   if (files.length > 0) {
+        //     this.selectedFile = files[0].file;
+        //   } else {
+        //     this.selectedFile = null;
+        //   }
+    }
 
-uploadImage(){
+    uploadImage() {}
 
-}
-
-userFilePondConfig = {
+    userFilePondConfig = {
         imageResizeTargetWidth: 200,
         imageResizeTargetHeight: 200,
-        stylePanelLayout: "compact circle",
-        styleLoadIndicatorPosition: "center bottom",
-        styleProgressIndicatorPosition: "right bottom",
-        styleButtonRemoveItemPosition: "left bottom",
-        styleButtonProcessItemPosition: "right bottom",
+        stylePanelLayout: 'compact circle',
+        styleLoadIndicatorPosition: 'center bottom',
+        styleProgressIndicatorPosition: 'right bottom',
+        styleButtonRemoveItemPosition: 'left bottom',
+        styleButtonProcessItemPosition: 'right bottom',
         allowImagePreview: true,
         imagePreviewHeight: 100,
         labelIdle: `<svg  xmlns="http://www.w3.org/2000/svg"  width="32"  height="32"  viewBox="0 0 24 24"  fill="none"  stroke="#9ba6b7"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-camera"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" /><path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>`,
+    };
+
+    editPolicy(policy: any) {
+        policy.original = { ...policy };
+        policy.isEdit = true;
+    }
+
+    savePolicy(policy: any) {
+        policy.isEdit = false;
+        delete policy.original;
+        console.log('Saved:', policy);
+    }
+
+    cancelEdit(policy: any) {
+        Object.assign(policy, policy.original);
+        policy.isEdit = false;
+        delete policy.original;
+    }
+
+    openModal(content: any) {
+        this.modalService.open(content, { size: 'lg' });
     }
 
 
-     editPolicy(policy: any) {
-    policy.original = { ...policy };
-    policy.isEdit = true;
-  }
-
-  savePolicy(policy: any) {
-    policy.isEdit = false;
-    delete policy.original;
-    console.log('Saved:', policy);
-  }
-
-  cancelEdit(policy: any) {
-    Object.assign(policy, policy.original);
-    policy.isEdit = false;
-    delete policy.original;
+     ngOnDestroy(): void {
+    if (this.patientSubscription) {
+      this.patientSubscription.unsubscribe();
+    }
   }
 
 
-openModal(content: any) {
-  this.modalService.open(content, { size: 'lg' });
+async GetCoverageById(subscribedId: number) {
+    debugger
+  if (subscribedId != null) {
+    const sid = subscribedId
+    await this.CoveragesApiService.GetCoverageById(subscribedId)
+      .then(async (response: any) => {
+        if (response) {
+            const data = response?.table1[0];
+            this.subscriberForm.patchValue(data);
+
+            debugger
+            const carrierCode = this.BLPayer.find((e: any) => e.name == data?.carrierName)?.code;
+            const CountryId = this.Country.find((e: any) => e.name == data?.countryName)?.code;
+            if(CountryId){
+                await this.registrationApi.getStateByCountry(CountryId).then((res: any) => {
+                    this.states = res;
+                });
+            }
+            const StateId = this.states.find((e: any) => e.name == data?.stateName)?.code;
+            if(StateId){
+                await this.registrationApi.getCityByState(StateId).then((res: any) => {
+                this.city = res;
+                });
+            }
+            const cityId = this.city.find((e: any) => e.name == data?.cityName)?.code;
+            const selectedBLPayerPlan =this.BLPayerPlan.find((e: any) => e.name == data?.selectedBLPayerPlan)?.code;
+            // const country = this.Country.find((e: any) => e.code === data?.countryId);
+            // const state = this.states.find((e: any) => e.code === data?.stateId);
+            // const city = this.city.find((e: any) => e.code === data?.cityId);
+          this.subscriberForm.patchValue({
+              FirstName: data?.firstName,
+              lasMiddleName: data?.middleName,
+              LastName: data?.lastName,
+            Suffix: data?.suffix,
+            CompanyOrIndividual: data?.companyOrIndividual,
+            InsuredPhone: data?.insuredPhone,
+            BirthDate: data?.birthDate ? new Date(data?.birthDate) : null,
+            Address1: data?.address1,
+            selectedBLPayerPlan: data?.selectedBLPayerPlan,
+            selectedBLPayerPackage: data?.selectedBLPayerPackage,
+            Sex: data?.sex,
+            CarrierId: carrierCode || null,
+            CountryId: CountryId || null,
+            cityId: cityId || null,
+            StateId: StateId || null,
+            //countryId: country ? country.code : null,
+            // stateId: state ? state.code : null,
+            // cityId: city ? city.code : null,
+            InsuredIdNo: data?.insuredIdNo,
+            OpCopay: data?.opCopay,
+            IpCopay: data?.ipCopay,
+            ZipCode: data?.zipCode,
+            InsuranceRel: data?.insuranceRel,
+            SubscriberId: data?.subscriberId,
+            InsuredIDNo: data?.insuredIDNo,
+            InsuranceTypeCode: data?.insuranceTypeCode,
+            InsuredGroupOrPolicyNo: data?.insuredGroupOrPolicyNo,
+            Relationship: data?.relationship,
+            EffectiveDate: data?.effectiveDate,
+            TerminationDate: data?.terminationDate,
+            Copay: data?.copay,
+            CoverageLevel: data?.coverageLevel,
+            CoverageStatus: data?.coverageStatus,
+            Notes: data?.notes,
+
+          });
+        }
+      })
+      .catch((error: any) => {
+        console.error('Error fetching coverage data:', error);
+      });
+  }
 }
 
-//  GetCoveragesList(Data: any) {
-
-//     this.registrationApi.GetCoverageList(Data,this.PaginationInfo)
-//       .then((inssub) => {
-
-//         this.totalRecord=inssub.table2[0].totalCount
-
-//         if (inssub.table1) {
-
-//           let inssubarray: any[] = [];
-
-//           for (let i = 0; i < inssub.table1.length; i++) {
-//             let subscriberName = inssub.table1[i].subscriberName;
-//             let insuranceCarrier = inssub.table1[i].insuranceCarrier;
-//             let insuranceIDNo = inssub.table1[i].insuranceIDNo;
-//             let subscriberId = inssub.table1[i].subscriberId;
-//             let type = inssub.table1[i].typeinText;
-//             let active = inssub.table1[i].active;
-//             let carrierAddress = inssub.table1[i].carrierAddress;
-//             let mrNo = inssub.table1[i].mrNo;
-//             inssubarray.push({
-//               subscriberId: inssub.table1[i].subscriberId,
-//               subscriberName: inssub.table1[i].subscriberName,
-//               insuranceCarrier: inssub.table1[i].insuranceCarrier,
-//               insuranceIDNo: inssub.table1[i].insuranceIDNo,
-//               mrNo: inssub.table1[i].mrNo,
-//               type: inssub.table1[i].typeinText,
-//               active: inssub.table1[i].active,
-//               carrierAddress: inssub.table1[i].carrierAddress,
-//             });
-//           }
-
-//           this.insuredsubs = inssubarray;
-//         }
-//       })
-//       .catch((error) =>
-//         this.registrationApi.add({
-//           severity: 'error',
-//           summary: 'Error',
-//           detail: error.message,
-//         })
-//       );
-//   }
-
-// GetCoveragesList(Data: any) {
-//   this.registrationApi.GetCoverageList(Data, this.PaginationInfo)
-//     .then((inssub) => {
-//         this.totalRecord = 0;
-//       if (inssub.table2 && inssub.table2.length > 0) {
-//         this.totalRecord = inssub.table2[0].totalCount;
-//       }
-
-//       if (inssub.table1 && Array.isArray(inssub.table1)) {
-//         this.insuredsubs = inssub.table1.map((item: any) => ({
-//           subscriberId: item.subscriberId,
-//           subscriberName: item.subscriberName,
-//           insuranceCarrier: item.insuranceCarrier,
-//           insuranceIDNo: item.insuranceIDNo,
-//           mrNo: item.mrNo,
-//           type: item.typeinText,
-//           active: item.active,
-//           carrierAddress: item.carrierAddress
-//         }));
-//       }
-//     })
-//    .catch((error) => {
-
-//   this.registrationApi.add({
-//     severity: 'error',
-//     summary: 'Error',
-//     detail: error.message || 'Something went wrong.'
-
-//   });
-// });
-// }
 
 
 }
 
 
 interface Policy {
-  effectiveDate: Date;
-  terminationDate: Date;
-  groupNo: string;
-  noOfVisits: number;
-  amount: number;
-  status: string;
-  isEdit?: boolean; // Add this property to control edit mode
+    effectiveDate: Date;
+    terminationDate: Date;
+    groupNo: string;
+    noOfVisits: number;
+    amount: number;
+    status: string;
+    isEdit?: boolean; // Add this property to control edit mode
 }
 
 interface CoverageResponse {
-  table1: any[];
-  table2: { totalCount: number }[];
+    table1: any[];
+    table2: { totalCount: number }[];
 }
