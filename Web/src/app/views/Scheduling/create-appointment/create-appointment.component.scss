@@ -1,0 +1,27 @@
+::ng-deep .choices__list--dropdown {
+  max-height: 150px !important;
+  overflow-y: auto !important;
+}
+
+::ng-deep .choices__item--selectable {
+  padding: 6px 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+::ng-deep .choices__item--selectable.is-highlighted {
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+::ng-deep .choices__inner {
+  border: 1px solid #ced4da;
+  min-height: 38px;
+  border-radius: 4px;
+}
+
+/* Add this CSS to your component stylesheet or global styles */
+.custom-scroll-select {
+  max-height: 50px !important;         /* Approx 3-4 options height */
+  overflow-y: auto !important;
+}

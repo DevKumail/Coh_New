@@ -29,7 +29,7 @@ export class DemographicDTO implements Demographic {
   EmiratesIDN: number = 0;
   primarycarephysicianPcp: number = 0;
   causeofDeath?: string;
-  DeathDate?: Date;
+  deathDate?: Date;
   BillingNote: string = '';
   isVIP: boolean = false;
   isPregnant: boolean = false;

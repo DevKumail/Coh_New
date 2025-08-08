@@ -6,10 +6,7 @@
                 Registration
             </a>
         </li>
-        <li
-            class="d-flex align-items-center text-muted mx-1"
-            aria-current="page"
-        >
+        <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
             <ng-icon name="tablerChevronRight"></ng-icon>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
@@ -18,11 +15,11 @@
     </ol>
 </nav>
 
-<div class="container-fluid w-100">
-    <div class="card p-3 shadow mt-2">
+<div class="card mt-3">
+    <div class="card-body">
         <!-- Header section -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="m-0 fw-bold">Demographics List</h4>
+            <h3 style="font-weight: bold" class="m-0">Demographics List</h3>
             <button
                 class="btn btn-success btn-sm w-150"
                 type="button"
@@ -31,10 +28,12 @@
                 <i class="pi pi-user-plus"></i> New Patient
             </button>
         </div>
+
+        <!-- Table -->
         <div class="table-responsive">
-            <table class="table align-middle mb-0">
-                <thead class="thead-sm">
-                    <tr class="text-uppercase text-center">
+            <table class="table table-bordered table-striped">
+                <thead class="text-center">
+                    <tr>
                         <th>Mr No</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -46,7 +45,7 @@
                         <th style="width: 1%">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="table-group-divider text-center">
+                <tbody class="text-center">
                     <tr *ngFor="let patient of DemographicsPagedData">
                         <td>{{ patient.mrNo || "N/A" }}</td>
                         <td>{{ patient.personFirstName || "N/A" }}</td>
@@ -55,24 +54,9 @@
                         <td>{{ patient.personSex || "N/A" }}</td>
                         <td>{{ patient.personSocialSecurityNo || "N/A" }}</td>
                         <td>{{ patient.personZipCode || "N/A" }}</td>
+                        <td>{{ patient.patientBirthDate | date: "MM/dd/yyyy" }}</td>
                         <td>
-                            {{
-                                patient.patientBirthDate || "N/A"
-                                    | date : "MM/dd/yyyy"
-                            }}
-                        </td>
-                        <td class="text-end">
-                            <div
-                                ngbDropdown
-                                placement="left-top"
-                                class="text-muted"
-                            >
-                                <!-- Toggle Button for Dropdown -->
-                                <!-- <button class="btn btn-sm btn-light" ngbDropdownToggle>
-              <ng-icon name="tablerDotsVertical" class="text-secondary"></ng-icon>
-            </button> -->
-
-                                <!-- Dropdown Menu -->
+                            <div ngbDropdown placement="left-top" class="text-muted">
                                 <div
                                     ngbDropdownMenu
                                     class="dropdown-menu-end d-flex gap-2 px-2 py-1"
@@ -81,44 +65,33 @@
                                         name="tablerEdit"
                                         class="me-1"
                                         (click)="editPatient(patient)"
-                                    >
-                                    </ng-icon>
+                                    ></ng-icon>
                                     <ng-icon
                                         name="tablerTrash"
                                         class="text-danger me-1"
-                                        (click)="
-                                            Remove(
-                                                $event,
-                                                patient.patientId,
-                                                'center'
-                                            )
-                                        "
-                                    >
-                                    </ng-icon>
+                                        (click)="Remove($event, patient.patientId, 'center')"
+                                    ></ng-icon>
                                 </div>
                             </div>
                         </td>
                     </tr>
                     <tr *ngIf="DemographicsPagedData?.length === 0">
-                        <td colspan="9" class="text-center">
-                            No patient found.
-                        </td>
+                        <td colspan="9" class="text-center">No patient found.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Pagination Section -->
+        <!-- Pagination -->
         <div class="d-flex flex-column align-items-center mt-3 gap-2">
             <div
                 class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap"
             >
-                <!-- Showing entries + dropdown -->
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <div class="me-2">
-                        Showing {{ start + 1 }} to
-                        {{ end > totalRecord ? totalRecord : end }} of
-                        {{ totalRecord }} entries
+                        Showing {{ DemographicsStart + 1 }} to
+                        {{ DemographicsEnd > DemographicsTotalItems ? DemographicsTotalItems : DemographicsEnd }}
+                        of {{ DemographicsTotalItems }} entries
                     </div>
                     <div>
                         <select
@@ -128,93 +101,34 @@
                             [ngModelOptions]="{ standalone: true }"
                             (change)="onDemographicsPageSizeChange($event)"
                         >
-                            <option
-                                *ngFor="let size of pageSizes"
-                                [value]="size"
-                            >
+                            <option *ngFor="let size of pageSizes" [value]="size">
                                 {{ size }}
                             </option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Pagination -->
-                <div class="d-flex flex-column align-items-center mt-3 gap-2">
-                    <div
-                        class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap"
-                    >
-                        <div>
-                            Showing {{ DemographicsStart + 1 }} to
-                            {{ DemographicsEnd }} of
-                            {{ DemographicsTotalItems }} entries
-                        </div>
-
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0">
-                                <!-- Prev -->
-                                <li
-                                    class="page-item"
-                                    [class.disabled]="
-                                        DemographicsCurrentPage === 1
-                                    "
-                                >
-                                    <button
-                                        class="page-link"
-                                        (click)="DemographicsPrevPage()"
-                                        [disabled]="
-                                            DemographicsCurrentPage === 1
-                                        "
-                                    >
-                                        Previous
-                                    </button>
-                                </li>
-
-                                <!-- Page Numbers -->
-                                <li
-                                    class="page-item"
-                                    *ngFor="let page of DemographicsPageNumbers"
-                                    [class.active]="
-                                        page === DemographicsCurrentPage
-                                    "
-                                    [class.disabled]="page === '...'"
-                                >
-                                    <button
-                                        class="page-link"
-                                        *ngIf="page !== '...'"
-                                        (click)="DemographicsGoToPage(+page)"
-                                    >
-                                        {{ page }}
-                                    </button>
-                                    <span
-                                        class="page-link"
-                                        *ngIf="page === '...'"
-                                        >…</span
-                                    >
-                                </li>
-
-                                <!-- Next -->
-                                <li
-                                    class="page-item"
-                                    [class.disabled]="
-                                        DemographicsCurrentPage ===
-                                        DemographicsTotalPages
-                                    "
-                                >
-                                    <button
-                                        class="page-link"
-                                        (click)="DemographicsNextPage()"
-                                        [disabled]="
-                                            DemographicsCurrentPage ===
-                                            DemographicsTotalPages
-                                        "
-                                    >
-                                        Next
-                                    </button>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" [class.disabled]="DemographicsCurrentPage === 1">
+                            <button class="page-link" (click)="DemographicsPrevPage()">Previous</button>
+                        </li>
+                        <li
+                            class="page-item"
+                            *ngFor="let page of DemographicsPageNumbers"
+                            [class.active]="page === DemographicsCurrentPage"
+                            [class.disabled]="page === '...'"
+                        >
+                            <button *ngIf="page !== '...'" class="page-link" (click)="DemographicsGoToPage(+page)">
+                                {{ page }}
+                            </button>
+                            <span *ngIf="page === '...'" class="page-link">…</span>
+                        </li>
+                        <li class="page-item" [class.disabled]="DemographicsCurrentPage === DemographicsTotalPages">
+                            <button class="page-link" (click)="DemographicsNextPage()">Next</button>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>

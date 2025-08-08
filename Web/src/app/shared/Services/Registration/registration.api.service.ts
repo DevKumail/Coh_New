@@ -81,10 +81,7 @@ const obj={CoverageListReq,PaginationInfo}
     return this.api.post('Coverages/InsertSubscriber', object).toPromise();
   }
 
-  GetCoverageById(subscribedId:number) {
 
-    return this.api.get(`Coverages/GetCoveragesubscribedId?subscribedId=${subscribedId}`).toPromise();
-  }
 
   InsertCoverage(object: any) {
     return this.api.post('Coverages/InsertCoverage', object).toPromise();

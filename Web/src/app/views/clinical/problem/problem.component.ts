@@ -4,10 +4,12 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
-import Swal from 'sweetalert2';
-import {PatientProblemModel} from '@/app/shared/models/clinical/problemlist.model';
+import { PageTitleComponent} from '@app/components/page-title.component';
+import { UiCardComponent} from '@app/components/ui-card.component';
+import { NgIcon} from '@ng-icons/core';
+import { NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
+import { ProblemListComponent } from '../problem-list/problem-list.component';
+import { FavoritesComponent } from '../favorites/favorites.component'; 
 
 @Component({
   selector: 'app-problem',

@@ -17,8 +17,10 @@
         </li>
     </ol>
 </nav>
-<div class="container-fluid w-100">
-    <div class="card p-3 shadow mt-2">
+<div class="card mt-3">
+    <div class="card-body">
+        <!-- <div class="container-fluid w-100"> -->
+        <!-- <div class="card p-3 shadow mt-2"> -->
         <!-- Header section inside the card -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 style="font-weight: bold" class="m-0">Coverage List</h3>
@@ -32,6 +34,8 @@
         </div>
 
         <!-- Table -->
+        <!-- <div class="card mt-3">
+    <div class="card-body"> -->
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
                 <thead>
@@ -42,7 +46,7 @@
                         <th>Insurance Carrier</th>
                         <th>Insured Id No</th>
                         <th>Type</th>
-                        <th>Edit Action</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,20 +55,30 @@
                         <td>{{ inssub.subscriberName }}</td>
                         <td class="text-center">{{ inssub.mrNo }}</td>
                         <td>{{ inssub.insuranceCarrier }}</td>
-                        <td>{{ inssub.insuranceIDNo }}</td>
-                        <td class="text-center">{{ inssub.type }}</td>
+                        <td>{{ inssub.insuredIDNo }}</td>
+                        <td class="text-center">{{ inssub.type || "N/A" }}</td>
                         <td class="text-center">
-                            <button
-                                class="btn btn-info btn-sm"
-                                [routerLink]="[
-                                    '/registration/coverages/addnewsubscriber'
-                                ]"
-                                [queryParams]="{ id: inssub.subscriberId }"
-                                title="Edit Coverage"
-                            >
-                                <i class="pi pi-user-edit"></i>
-                            </button>
+
+                            <div ngbDropdown placement="left-top" class="text-muted">
+                                <div
+                                    ngbDropdownMenu
+                                    class="dropdown-menu-end d-flex gap-2 px-2 py-1"
+                                >
+                                    <ng-icon
+                                        name="tablerEdit"
+                                        class="me-1"
+                                        (click)="EditCoverage(inssub.subscriberId)"
+                                    ></ng-icon>
+                                    <!-- <ng-icon
+                                        name="tablerTrash"
+                                        class="text-danger me-1"
+                                        (click)="Remove($event, inssub.SubscriberId, 'center')"
+                                    ></ng-icon> -->
+                                </div>
+                            </div>
                         </td>
+
+
                     </tr>
                     <tr *ngIf="pagedCoverages.length === 0">
                         <td colspan="8" class="text-center">
@@ -75,15 +89,16 @@
             </table>
         </div>
 
-        <!-- Pagination Controls -->
+            <!-- Pagination -->
         <div class="d-flex flex-column align-items-center mt-3 gap-2">
             <div
                 class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap"
             >
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <div class="me-2">
-                        Showing {{ start + 1 }} to {{ end }} of
-                        {{ coverages.length }} entries
+                        Showing {{ coverageStart + 1 }} to
+                        {{ coverageEnd > coverageTotalItems ? coverageTotalItems : coverageEnd }}
+                        of {{ coverageTotalItems }} entries
                     </div>
                     <div>
                         <select
@@ -91,12 +106,9 @@
                             style="width: auto"
                             [(ngModel)]="pageSize"
                             [ngModelOptions]="{ standalone: true }"
-                            (change)="onPageSizeChange($event)"
+                            (change)="oncoveragePageSizeChange($event)"
                         >
-                            <option
-                                *ngFor="let size of pageSizes"
-                                [value]="size"
-                            >
+                            <option *ngFor="let size of pageSizes" [value]="size">
                                 {{ size }}
                             </option>
                         </select>
@@ -105,30 +117,22 @@
 
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
-                        <li
-                            class="page-item"
-                            [class.disabled]="currentPage === 1"
-                        >
-                            <button class="page-link" (click)="prevPage()">
-                                Previous
-                            </button>
+                        <li class="page-item" [class.disabled]="coverageCurrentPage === 1">
+                            <button class="page-link" (click)="coveragePrevPage()">Previous</button>
                         </li>
                         <li
                             class="page-item"
-                            *ngFor="let page of pageNumbers"
-                            [class.active]="page === currentPage"
+                            *ngFor="let page of coveragePageNumbers"
+                            [class.active]="page === coverageCurrentPage"
+                            [class.disabled]="page === '...'"
                         >
-                            <button class="page-link" (click)="goToPage(page)">
+                            <button *ngIf="page !== '...'" class="page-link" (click)="coverageGoToPage(+page)">
                                 {{ page }}
                             </button>
+                            <span *ngIf="page === '...'" class="page-link">…</span>
                         </li>
-                        <li
-                            class="page-item"
-                            [class.disabled]="currentPage === totalPages"
-                        >
-                            <button class="page-link" (click)="nextPage()">
-                                Next
-                            </button>
+                        <li class="page-item" [class.disabled]="coverageCurrentPage === coverageTotalPages">
+                            <button class="page-link" (click)="coverageNextPage()">Next</button>
                         </li>
                     </ul>
                 </nav>

@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FavoritesComponent } from '../favorites/favorites.component';
+import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import Swal from 'sweetalert2';
 import {PatientProblemModel} from '@/app/shared/models/clinical/problemlist.model';
 
