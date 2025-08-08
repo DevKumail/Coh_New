@@ -1,3 +1,4 @@
+import { Patient } from './../../Scheduling/appointment-dashboard/appointment-dashboard.component';
 import { ClinicalApiService } from './../clinical.api.service';
 // import Swal from 'sweetalert2';
 
@@ -8,9 +9,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FavoritesComponent } from '../favorites/favorites.component';
-import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
+//import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import Swal from 'sweetalert2';
-import {PatientProblemModel} from '@/app/shared/models/clinical/problemlist.model';
+import { PatientProblemModel } from '../../../shared/Models/Clinical/problemlist.model';
 
 
 @Component({
@@ -111,7 +112,7 @@ appId:any;
 
   async ngOnInit() {
 
-    
+
     var app =JSON.parse(localStorage.getItem('LoadvisitDetail') || '');
     this.appId=app.appointmentId
     this.FillDropDown
@@ -120,7 +121,7 @@ appId:any;
     //   // provider: [''],
     //   providerId: [''],
     //   providerName: [''],
-      
+
     //   code: [''],
     //   problem: [''],
     //   icdVersion: [''],
@@ -219,7 +220,7 @@ appId:any;
     this.DropFilled();
   }
 
- 
+
 //   const formData = this.medicalForm.value;
 
 //   // const problemPayload: PatientProblemModel = {
@@ -240,17 +241,17 @@ appId:any;
 //   //   mrno: '1023',
 //   //   patientId: 1,
 
-    
+
 //   //   active: true,
 //   //   updatedDate: new Date(),
 //   //   createdDate: new Date(),
-//   //   diagnosisPriority: 'Primary',       
-//   //   diagnosisType: 'Diagnosis',         
+//   //   diagnosisPriority: 'Primary',
+//   //   diagnosisType: 'Diagnosis',
 //   //   socialHistory: false,
-//   //   outsideClinic: 'No',                
+//   //   outsideClinic: 'No',
 //   //   isHl7msgCreated: false,
 //   //   isMedicalHistory: false,
-//   //   caseId: null,                         
+//   //   caseId: null,
 //   //   errorReason: '',
 //   //   oldMrno: '',
 //   //   isDeleted: false,
@@ -288,12 +289,12 @@ appId:any;
 //     providerDescription: '',
 
 //   };
- 
+
 //   console.log('Submitting Patient Problem Payload:', problemPayload);
 
 //   this.clinicalApiService.SubmitPatientProblem(problemPayload).then((res: any) => {
 //     console.log("my payload",res);
-    
+
 //     this.getRowData();
 //     this.onClear();
 //   }).catch((error: any) => {
@@ -301,7 +302,7 @@ appId:any;
 //   });
 // }
 onSubmit() {
-  
+
   // if (this.medicalForm.invalid) {
   //   return;
   // }
@@ -318,13 +319,13 @@ onSubmit() {
 
   const problemPayload: PatientProblemModel = {
     id: 0,
-    appointmentId:formData.appId,                   
+    appointmentId:formData.appId,
     providerId: formData.providerId,
     icd9: formData.code,
     icd9code: formData.code,
     icd9description: formData.problem,
     icdversionId: formData.icdVersion,
-    icdVersionValue: formData.problem,     
+    icdVersionValue: formData.problem,
     confidential: formData.confidential,
     startDate: formData.startDate,
     endDate: formData.endDate,
@@ -332,14 +333,14 @@ onSubmit() {
     status: status || 0,
     createdBy: 2,
     updatedBy: 2,
-    mrno: '1006',                            
+    mrno: '1006',
     patientId: 6,
     activeStatus: 1,
     active: true,
     updatedDate: new Date(),
     createdDate: new Date(),
-    diagnosisPriority: 'Primary',           
-    diagnosisType: 'Diagnosis',             
+    diagnosisPriority: 'Primary',
+    diagnosisType: 'Diagnosis',
     socialHistory: false,
     outsideClinic: 'No',
     // confidential: formData.confidential,
@@ -515,7 +516,7 @@ onSubmit() {
       console.log('Modal dismissed');
     });
 
-    
+
   }
   openProblemModal() {
 

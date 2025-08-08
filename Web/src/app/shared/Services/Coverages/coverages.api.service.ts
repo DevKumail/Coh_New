@@ -61,7 +61,7 @@ export class CoveragesApiService {
 
     return this.api.post('Coverages/InsertSubscriber', object).toPromise();
   }
-  GetCoverageById(subscribedId:number) {
+    GetCoverageById(subscribedId:number) {
     return this.api.get(`Coverages/GetCoveragesubscribedId?subscribedId=${subscribedId}`).toPromise();
   }
 

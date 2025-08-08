@@ -7,9 +7,11 @@ import { CommonModule } from '@angular/common';
 import { PageTitleComponent} from '@app/components/page-title.component';
 import { UiCardComponent} from '@app/components/ui-card.component';
 import { NgIcon} from '@ng-icons/core';
-import { NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 import { ProblemListComponent } from '../problem-list/problem-list.component';
-import { FavoritesComponent } from '../favorites/favorites.component'; 
+import { FavoritesComponent } from '../favorites/favorites.component';
+import Swal from 'sweetalert2';
+import { PatientProblemModel } from '@/app/shared/Models/Clinical/problemlist.model';
 
 @Component({
   selector: 'app-problem',
@@ -120,14 +122,14 @@ export class ProblemComponent {
   totalPagesDiagnoseCode:any;
 
   // add 4 aug
-  
+
 
   constructor(
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService, // Assuming you have a ClinicalService to handle API calls
   ) { }
 
-  
+
 
   async ngOnInit() {
 
@@ -153,13 +155,13 @@ export class ProblemComponent {
   code: [''],
   problem: [''],
   icdVersion: [null],
-  icdVersionValue: [''], 
+  icdVersionValue: [''],
   startDate: [null],
   endDate: [null],
   status: [null],
   comments: [''],
   confidential: [false],
-  appointmentId: [null] 
+  appointmentId: [null]
 });
 
 
@@ -198,14 +200,14 @@ export class ProblemComponent {
   onSubmit(): void {
     debugger
     if (this.medicalForm.invalid) {
-      
+
       return;
     }
 
     const formData = this.medicalForm.value;
 
     // const problemPayload:PatientProblemModel = {
-      
+
     //   providerId: formData.providerId,
     //   providerName: formData.providerName,
     //   code: formData.code,
@@ -240,14 +242,14 @@ export class ProblemComponent {
     // };
 //     const problemPayload: PatientProblemModel = {
 //   id: 0,
-//   appointmentId: formData.appointmentId, 
+//   appointmentId: formData.appointmentId,
 //   providerId: formData.providerId,
-//   icd9: formData.code, 
+//   icd9: formData.code,
 //   icd9code: formData.code,
 //   icd9description: formData.problem,
 //   comments: formData.comments,
 //   icdversionId: formData.icdVersion,
-//   icdVersionValue: formData.icdVersionValue, 
+//   icdVersionValue: formData.icdVersionValue,
 //   startDate: formData.startDate,
 //   endDate: formData.endDate,
 //   status: formData.status,
@@ -266,7 +268,7 @@ export class ProblemComponent {
 //   errorReason: '',
 //   oldMrno: '',
 //   isDeleted: false,
-//   startstrdate: '',  
+//   startstrdate: '',
 //   endstrdate: '',
 //   providerDescription: '',
 //   socialHistory: false,
@@ -302,9 +304,9 @@ const problemPayload: Partial<PatientProblemModel> = {
     text: 'Patient problem has been submitted.',
     confirmButtonText: 'OK'
   });
-      
+
     }).catch((error: any) => {
-    
+
     });
   }
   onClear(): void {
@@ -387,8 +389,8 @@ const problemPayload: Partial<PatientProblemModel> = {
 
   // ✅ Load patient problem data
   getRowData() {
-    const mrno = '1006'; 
-    const userId = 1;     
+    const mrno = '1006';
+    const userId = 1;
 
     this.clinicalApiService.GetRowDataOfPatientProblem(mrno, userId).then((res: any) => {
       const problems = res?.patientProblems?.table1 || [];
