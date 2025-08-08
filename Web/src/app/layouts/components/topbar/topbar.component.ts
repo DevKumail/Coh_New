@@ -22,6 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { AdvanceSearchModalComponent } from "./components/advance-search-modal/advance-search-modal.component";
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -155,6 +156,7 @@ export class TopbarComponent implements OnInit {
         } else {
           this.patientBannerService.setPatientData(null);
           this.showPatientBanner = false;
+          Swal.fire('Error', 'No patient found with the provided MRNO.', 'error');
         }
       },
       error: err => {

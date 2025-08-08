@@ -18,16 +18,17 @@
                 <!-- Type -->
                 <div class="col-3">
                     <label>Type</label><span class="danger"> *</span>
-                    <select
+                   <select
                         class="form-select"
                         formControlName="CompanyOrIndividual"
                         (change)="showRelation()"
                     >
                         <option value="">-- Select Type --</option>
-                        <option *ngFor="let t of type" [value]="t.value">
+                        <option *ngFor="let t of type" [value]="t.value" >
                             {{ t.label }}
                         </option>
                     </select>
+
                 </div>
 
                 <!-- Relationship Dropdown (Show only if isRelation == true) -->
@@ -96,11 +97,13 @@
                 <!-- Phone -->
                 <div class="col-3">
                     <label>Cell Phone</label><span class="danger"> *</span>
+
                     <input
                         type="text"
                         class="form-control"
                         formControlName="InsuredPhone"
-                        placeholder="03XXXXXXXXXX"
+                        placeholder="(00) 0000-0000"
+                        [mask]="'(00) 0000-0000'"
                     />
                 </div>
 
@@ -174,7 +177,14 @@
                         type="text"
                         class="form-control"
                         formControlName="ZipCode"
+                        placeholder="Zip Code"
+                        [mask]="'00000'"
                     />
+                    <!-- <input
+                        type="text"
+                        class="form-control"
+                        formControlName="ZipCode"
+                    /> -->
                 </div>
 
                 <!-- Insurance Carrier -->
@@ -192,16 +202,16 @@
                     </select>
                 </div>
 
-                <!-- Policy Plan -->
                 <div class="col-3">
                     <label>Policy Plan</label><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select policy-select"
                         formControlName="selectedBLPayerPlan"
                     >
                         <option
                             *ngFor="let plan of BLPayerPlan"
                             [value]="plan.code"
+                            [title]="plan.name"
                         >
                             {{ plan.name }}
                         </option>
@@ -483,7 +493,25 @@
                                             </div>
                                         </div>
 
-                                        <div class="modal-footer">
+                                        <!-- <div class="modal-footer">
+                                            <button
+                                                class="btn btn-secondary"
+                                                type="button"
+                                                (click)="modal.dismiss()"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                class="btn btn-primary"
+                                                type="submit"
+                                                [disabled]="policyForm1.invalid"
+                                            >
+                                                Save
+                                            </button>
+                                        </div> -->
+                                        <div
+                                            class="modal-footer justify-content-end"
+                                        >
                                             <button
                                                 class="btn btn-secondary"
                                                 type="button"
@@ -540,6 +568,17 @@
                 <!-- Left buttons: Save & Cancel -->
                 <div>
                     <button
+                        type="button"
+                        class="btn btn-info"
+                        (click)="openLargeModal(modalLg)"
+                    >
+                        Add Card
+                    </button>
+                </div>
+
+                <!-- Right button: Add Card -->
+                <div>
+                    <button
                         type="submit"
                         class="btn btn-success"
                         (click)="insertsubscriber()"
@@ -553,17 +592,7 @@
                     >
                         Cancel
                     </button>
-                </div>
 
-                <!-- Right button: Add Card -->
-                <div>
-                    <button
-                        type="button"
-                        class="btn btn-info"
-                        (click)="openLargeModal(modalLg)"
-                    >
-                        Add Card
-                    </button>
                 </div>
             </div>
             <ng-template #modalLg let-modal>

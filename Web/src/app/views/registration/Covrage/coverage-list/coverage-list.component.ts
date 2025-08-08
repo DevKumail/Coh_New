@@ -48,7 +48,7 @@ export class CoverageListComponent implements OnInit, OnDestroy {
       loader: any
 
   currentPage: number = 1;
-  pageSize: number = 10;
+  pageSize: number = 1;
   totalPages: number = 0;
   pageSizes: number[] = [5, 10, 25, 50];
   start: number = 0;
@@ -71,17 +71,13 @@ export class CoverageListComponent implements OnInit, OnDestroy {
 
 
     this.patientSubscription = this.patientBannerService.patientData$
-      .pipe(
+    .pipe(
         filter((data: any) => !!data?.table2?.[0]?.mrNo),
         distinctUntilChanged((prev, curr) =>
-          prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
-        )
+            prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+    )
       )
       .subscribe((data: any) => {
-        const mrNo = data?.table2?.[0]?.mrNo;
-        // console.log('Patient selected:', mrNo);
-        //Swal.fire('Patient Selected', `MrNo: ${mrNo}`, 'success');
-
         this.SearchPatientData = data;
         this.GetCoverageData();
       });
@@ -168,8 +164,8 @@ GetCoverageData() {
   this.Loader.show();
 
   const paginationInfo = {
-    page: this.currentPage,
-    RowsPerPage: this.pageSize
+    page: this.coverageCurrentPage,
+    RowsPerPage: this.coveragePageSize
   };
 
   const coverageListReq = {
@@ -178,8 +174,8 @@ GetCoverageData() {
 
   this.CoveragesApiService.GetCoverageList(coverageListReq, paginationInfo)
     .then((res: any) => {
-      this.coverages = res?.table1 || [];
-      this.updatePagination();
+      this.pagedCoverages = res?.table1 || [];
+      this.coverageTotalItems = res?.table2?.[0]?.totalCount || 0;
       this.Loader.hide();
     })
     .catch((error) => {
@@ -190,41 +186,76 @@ GetCoverageData() {
 
 
 
-  updatePagination(): void {
-    this.totalPages = Math.ceil(this.coverages.length / this.pageSize);
-    this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-    this.start = (this.currentPage - 1) * this.pageSize;
-    this.end = Math.min(this.start + this.pageSize, this.coverages.length);
-    this.pagedCoverages = this.coverages.slice(this.start, this.end);
-    console.log(`📄 Showing page ${this.currentPage} (items ${this.start + 1}-${this.end})`);
-  }
+coverageCurrentPage = 1;
+coveragePageSize = 5;
+coverageTotalItems = 0;
 
-  onPageSizeChange(event: any): void {
-    this.pageSize = parseInt(event.target.value, 10);
-    this.currentPage = 1;
-    this.updatePagination();
-  }
+get coverageTotalPages(): number {
+  return Math.ceil(this.coverageTotalItems / this.coveragePageSize);
+}
 
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updatePagination();
-    }
-  }
+get coverageStart(): number {
+  return (this.coverageCurrentPage - 1) * this.coveragePageSize;
+}
 
-  prevPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagination();
-    }
-  }
+get coverageEnd(): number {
+  return Math.min(this.coverageStart + this.coveragePageSize, this.coverageTotalItems);
+}
 
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagination();
-    }
+get coveragePageNumbers(): (number | string)[] {
+  const total = this.coverageTotalPages;
+  const current = this.coverageCurrentPage;
+  const delta = 2;
+
+  const range: (number | string)[] = [];
+  const left = Math.max(2, current - delta);
+  const right = Math.min(total - 1, current + delta);
+
+  range.push(1);
+  if (left > 2) range.push('...');
+  for (let i = left; i <= right; i++) range.push(i);
+  if (right < total - 1) range.push('...');
+  if (total > 1) range.push(total);
+
+  return range;
+}
+
+coverageGoToPage(page: number) {
+  if (typeof page !== 'number' || page < 1 || page > this.coverageTotalPages) return;
+  this.coverageCurrentPage = page;
+  this.coverageFetchData();
+}
+
+coverageNextPage() {
+  if (this.coverageCurrentPage < this.coverageTotalPages) {
+    this.coverageCurrentPage++;
+    this.coverageFetchData();
   }
+}
+
+coveragePrevPage() {
+  if (this.coverageCurrentPage > 1) {
+    this.coverageCurrentPage--;
+    this.coverageFetchData();
+  }
+}
+
+async coverageFetchData() {
+  this.Loader.show();
+  const paginationInfo = {
+    Page: this.coverageCurrentPage,
+    RowsPerPage: this.coveragePageSize
+  };
+  await this.GetCoverageData();
+}
+
+oncoveragePageSizeChange(event: any) {
+  this.coveragePageSize = +event.target.value;
+  this.coverageCurrentPage = 1; // Reset to first page
+  debugger
+  this.coverageFetchData();
+}
+
 
   ngOnDestroy(): void {
     if (this.patientSubscription) {

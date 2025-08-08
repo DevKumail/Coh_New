@@ -1,3 +1,4 @@
+import { ColorSliderModule } from 'ngx-color/slider';
 import { title } from 'process';
 import { CoveragesApiService } from '@/app/shared/Services/Coverages/coverages.api.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
@@ -38,7 +39,7 @@ declare var flatpickr: any;
         CommonModule,
         FormsModule,
         NgbNavModule,
-        FilePondModule,
+        FilePondModule,NgxMaskDirective,
     ],
     providers: [provideNgxMask()],
 
@@ -53,6 +54,7 @@ export class CovrageCreateComponent implements OnInit {
     policyForm1!: FormGroup;
     copayForm!: FormGroup;
 
+
     type: any[] = [];
     InsuranceRelation: any[] = [];
     titles: any[] = [];
@@ -60,6 +62,7 @@ export class CovrageCreateComponent implements OnInit {
     Country: any[] = [];
     states: any[] = [];
     city: any[] = [];
+    LastName: any[] = [];
     genders: any[] = [];
     maritalstatuses: any[] = [];
     employeetypes: any[] = [];
@@ -67,7 +70,6 @@ export class CovrageCreateComponent implements OnInit {
     BLPayer: any[] = [];
     BLPayerPlan: any[] = [];
     BLPayerPackage: any[] = [];
-    facilities: any[] = [];
     SearchPatientData: any;
     activeTabId = 1;
     PaginationInfo: any = {};
@@ -93,30 +95,42 @@ export class CovrageCreateComponent implements OnInit {
     ) {}
 
     async ngOnInit() {
-        await this.initForm();
-        await this.FillCache();
-        this.type = [
-            { label: 'Self', value: '1' },
-            { label: 'Relationship', value: '2' },
-        ];
-        this.patientSubscription = this.patientBannerService.patientData$
-              .pipe(
-                filter((data: any) => !!data?.table2?.[0]?.mrNo),
-                distinctUntilChanged((prev, curr) =>
-                  prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
-                )
-              )
-              .subscribe((data: any) => {
-                const mrNo = data?.table2?.[0]?.mrNo;
-                this.SearchPatientData = data;
-              });
-
-
-        const subscriberId = history.state.subscriberId;
-        if (subscriberId != null) {
-            this.GetCoverageById(subscriberId);
-        }
+    await this.initForm();
+    await this.FillCache();
+    const subscriberId = history.state.subscriberId;
+    if (subscriberId != null) {
+        await this.GetCoverageById(subscriberId);
     }
+    this.type = [
+        { label: 'Self', value: '1' },
+        { label: 'Relationship', value: '2' },
+    ];
+
+    let isFirstLoad = true; // <-- add flag to skip redirect on first load
+
+    this.patientSubscription = this.patientBannerService.patientData$
+        .pipe(
+            filter((data: any) => !!data?.table2?.[0]?.mrNo),
+            distinctUntilChanged((prev, curr) =>
+                prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+            )
+        )
+        .subscribe((data: any) => {
+            const mrNo = data?.table2?.[0]?.mrNo;
+            this.SearchPatientData = data;
+
+            if (isFirstLoad) {
+                isFirstLoad = false;
+                return;
+            }
+
+
+            this.router.navigate(['registration/coverages']);
+        });
+
+
+}
+
 //     ngOnInit(): void {
 //   debugger;
 
@@ -159,7 +173,7 @@ export class CovrageCreateComponent implements OnInit {
 
     initForm() {
         this.subscriberForm = this.fb.group({
-            CompanyOrIndividual: [''],
+            CompanyOrIndividual: ['2'],
             InsuranceRel: [''],
             Address1: [''],
             Suffix: [''],
@@ -442,7 +456,7 @@ export class CovrageCreateComponent implements OnInit {
             'CompanyOrIndividual'
         )?.value;
 
-        this.isRelation = selectedType === '2';
+        this.isRelation = selectedType === '';
 
         if (selectedType === '1') {
             this.subscriberForm.get('InsuranceRel')?.disable();
@@ -607,14 +621,19 @@ export class CovrageCreateComponent implements OnInit {
             MRNo: this.SearchPatientData?.table2[0]?.mrNo || 0
         });
 
+        const IGPN = this.BLPayerPlan.find((e: any) => e.code == this.subscriberForm.value.selectedBLPayerPlan);
         const dto: InsuranceSubscriberDTO = {
             ...this.subscriberForm.value,
             BirthDate: this.subscriberForm.value.BirthDate
                 ? new Date(this.subscriberForm.value.BirthDate).toISOString()
                 : '',
             policyList: this.patient?.policyList || [],
-            MRNo: this.SearchPatientData?.table2[0]?.mrNo || 0
+            MRNo: this.SearchPatientData?.table2[0]?.mrNo || 0,
+            InsuredGroupOrPolicyName: IGPN?.name || null,
+            InsuredGroupOrPolicyNo: IGPN?.code || null,
+            PayerPackageId : this.subscriberForm.value.selectedBLPayerPackage || null
         };
+        debugger
 
         this.CoveragesApiService
             .InsertSubscriber(dto)
@@ -799,6 +818,8 @@ async GetCoverageById(subscribedId: number) {
             this.subscriberForm.patchValue(data);
 
             debugger
+            const surffix =this.titles.find((e: any) => e.code == data?.suffix)?.code;
+
             const carrierCode = this.BLPayer.find((e: any) => e.name == data?.carrierName)?.code;
             const CountryId = this.Country.find((e: any) => e.name == data?.countryName)?.code;
             if(CountryId){
@@ -806,36 +827,39 @@ async GetCoverageById(subscribedId: number) {
                     this.states = res;
                 });
             }
-            const StateId = this.states.find((e: any) => e.name == data?.stateName)?.code;
+            const StateId = this.states.find((e: any) => e.name == data?.stateName)?.stateId;
             if(StateId){
                 await this.registrationApi.getCityByState(StateId).then((res: any) => {
                 this.city = res;
                 });
             }
-            const cityId = this.city.find((e: any) => e.name == data?.cityName)?.code;
-            const selectedBLPayerPlan =this.BLPayerPlan.find((e: any) => e.name == data?.selectedBLPayerPlan)?.code;
-            // const country = this.Country.find((e: any) => e.code === data?.countryId);
-            // const state = this.states.find((e: any) => e.code === data?.stateId);
-            // const city = this.city.find((e: any) => e.code === data?.cityId);
-          this.subscriberForm.patchValue({
-              FirstName: data?.firstName,
-              lasMiddleName: data?.middleName,
-              LastName: data?.lastName,
+            const cityId = this.city.find((e: any) => e.name == data?.cityName)?.cityId;
+            const selectedBLPayerPlan = this.BLPayerPlan.find((e: any) => e.name == data?.insuredGroupOrPolicyName)?.code;
+            const BLPayerPackage = this.BLPayerPackage.find((e: any) => e.name == data?.payerPackageName)?.code;
+            const InsuranceRelation = this.InsuranceRelation.find((e: any) => e.name == data?.insuranceRel)?.id;
+
+
+        this.subscriberForm.patchValue({
+            type: data?.type,
+            FirstName: data?.firstName,
+            MiddleName: data?.middleName,
+            LastName: data?.lastName,
             Suffix: data?.suffix,
             CompanyOrIndividual: data?.companyOrIndividual,
             InsuredPhone: data?.insuredPhone,
-            BirthDate: data?.birthDate ? new Date(data?.birthDate) : null,
+            // BirthDate: data?.birthDate ? new Date(data?.birthDate) : null,
+            BirthDate: data?.birthDate ? new Date(data.birthDate).toISOString().slice(0, 10) : null,
+
             Address1: data?.address1,
-            selectedBLPayerPlan: data?.selectedBLPayerPlan,
-            selectedBLPayerPackage: data?.selectedBLPayerPackage,
+            selectedBLPayerPlan: selectedBLPayerPlan || null,
             Sex: data?.sex,
             CarrierId: carrierCode || null,
             CountryId: CountryId || null,
-            cityId: cityId || null,
+            CityId: cityId || null,
             StateId: StateId || null,
-            //countryId: country ? country.code : null,
-            // stateId: state ? state.code : null,
-            // cityId: city ? city.code : null,
+            InsuranceRelation: InsuranceRelation || null,
+            selectedBLPayerPackage: BLPayerPackage || null,
+
             InsuredIdNo: data?.insuredIdNo,
             OpCopay: data?.opCopay,
             IpCopay: data?.ipCopay,
@@ -846,12 +870,7 @@ async GetCoverageById(subscribedId: number) {
             InsuranceTypeCode: data?.insuranceTypeCode,
             InsuredGroupOrPolicyNo: data?.insuredGroupOrPolicyNo,
             Relationship: data?.relationship,
-            EffectiveDate: data?.effectiveDate,
-            TerminationDate: data?.terminationDate,
-            Copay: data?.copay,
-            CoverageLevel: data?.coverageLevel,
-            CoverageStatus: data?.coverageStatus,
-            Notes: data?.notes,
+
 
           });
         }
@@ -874,7 +893,7 @@ interface Policy {
     noOfVisits: number;
     amount: number;
     status: string;
-    isEdit?: boolean; // Add this property to control edit mode
+    isEdit?: boolean;
 }
 
 interface CoverageResponse {

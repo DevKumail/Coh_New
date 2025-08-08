@@ -36,7 +36,7 @@ import Swal from 'sweetalert2';
     styleUrl: './demographic-list.component.scss',
 })
 
-export class DemographicsListComponent {
+export class DemographicListComponent {
   constructor(
     public router: Router,
     public DemographicApiServices: DemographicApiServices,
@@ -73,7 +73,7 @@ export class DemographicsListComponent {
   };
 
   PaginationInfo: any = {
-    RowsPerPage: 10,
+    RowsPerPage: 5,
     Page: 1,
   };
 

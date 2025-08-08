@@ -181,8 +181,7 @@ onSubmit() {
             confirmButtonText: 'OK'
           }).then(() => {
              this.vitalSignsForm.reset();
-            this.isSubmitting = false;
-            this.router.navigate(['/clinical/summary-sheet']);
+            this.vitalSign(this.SearchPatientData?.table2[0]?.mrNo || '' );
           });
         })
         .catch((err: any) => {
@@ -235,4 +234,23 @@ onSubmit() {
       this.patientDataSubscription.unsubscribe();
     }
   }
+
+  editVital(vital: any) {
+debugger
+    this.vitalSignsForm.patchValue({
+        entryDate: vital?.entryDate?.split('T')[0],
+        dailyStartTime: vital?.dailyStartTime,
+        temperature: vital?.temperature,
+        respirationRate: vital?.respirationRate,
+        bpSystolic: vital?.bpSystolic,
+        bpDiastolic: vital?.bpDiastolic,
+        spo2: vital?.spO2,
+        height: vital?.height,
+        weight: vital?.weight,
+        bmi: vital?.bmi,
+        comment: vital?.comment,
+        heartRate: vital?.heartrate,
+        glucose: vital?.glucose,
+    });
+}
 }

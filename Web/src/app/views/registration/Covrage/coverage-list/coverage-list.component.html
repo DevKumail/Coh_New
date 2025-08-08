@@ -69,11 +69,11 @@
                                         class="me-1"
                                         (click)="EditCoverage(inssub.subscriberId)"
                                     ></ng-icon>
-                                    <ng-icon
+                                    <!-- <ng-icon
                                         name="tablerTrash"
                                         class="text-danger me-1"
                                         (click)="Remove($event, inssub.SubscriberId, 'center')"
-                                    ></ng-icon>
+                                    ></ng-icon> -->
                                 </div>
                             </div>
                         </td>
@@ -89,15 +89,16 @@
             </table>
         </div>
 
-        <!-- Pagination Controls -->
+            <!-- Pagination -->
         <div class="d-flex flex-column align-items-center mt-3 gap-2">
             <div
                 class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap"
             >
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <div class="me-2">
-                        Showing {{ start + 1 }} to {{ end }} of
-                        {{ coverages.length }} entries
+                        Showing {{ coverageStart + 1 }} to
+                        {{ coverageEnd > coverageTotalItems ? coverageTotalItems : coverageEnd }}
+                        of {{ coverageTotalItems }} entries
                     </div>
                     <div>
                         <select
@@ -105,12 +106,9 @@
                             style="width: auto"
                             [(ngModel)]="pageSize"
                             [ngModelOptions]="{ standalone: true }"
-                            (change)="onPageSizeChange($event)"
+                            (change)="oncoveragePageSizeChange($event)"
                         >
-                            <option
-                                *ngFor="let size of pageSizes"
-                                [value]="size"
-                            >
+                            <option *ngFor="let size of pageSizes" [value]="size">
                                 {{ size }}
                             </option>
                         </select>
@@ -119,30 +117,22 @@
 
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
-                        <li
-                            class="page-item"
-                            [class.disabled]="currentPage === 1"
-                        >
-                            <button class="page-link" (click)="prevPage()">
-                                Previous
-                            </button>
+                        <li class="page-item" [class.disabled]="coverageCurrentPage === 1">
+                            <button class="page-link" (click)="coveragePrevPage()">Previous</button>
                         </li>
                         <li
                             class="page-item"
-                            *ngFor="let page of pageNumbers"
-                            [class.active]="page === currentPage"
+                            *ngFor="let page of coveragePageNumbers"
+                            [class.active]="page === coverageCurrentPage"
+                            [class.disabled]="page === '...'"
                         >
-                            <button class="page-link" (click)="goToPage(page)">
+                            <button *ngIf="page !== '...'" class="page-link" (click)="coverageGoToPage(+page)">
                                 {{ page }}
                             </button>
+                            <span *ngIf="page === '...'" class="page-link">…</span>
                         </li>
-                        <li
-                            class="page-item"
-                            [class.disabled]="currentPage === totalPages"
-                        >
-                            <button class="page-link" (click)="nextPage()">
-                                Next
-                            </button>
+                        <li class="page-item" [class.disabled]="coverageCurrentPage === coverageTotalPages">
+                            <button class="page-link" (click)="coverageNextPage()">Next</button>
                         </li>
                     </ul>
                 </nav>

@@ -2,16 +2,16 @@ export interface InsuranceSubscriberDTO {
   SubscriberID?: number;
   CarrierId: number;
   InsuredIDNo: string;
-  InsuranceTypeCode?: string;
-  InsuredGroupOrPolicyNo?: string;
+  InsuranceTypeCode: string;
+  InsuredGroupOrPolicyNo: string;
   InsuredGroupOrPolicyName: string;
   CompanyOrIndividual: number;
   Copay: number;
   Suffix: string;
   FirstName: string;
-  MiddleName?: string;
+  MiddleName: string;
   LastName: string;
-  BirthDate: string; // Date string in ISO format
+  BirthDate: string;
   Sex: string;
   InsuredPhone: string;
   OtherPhone?: string;
@@ -25,12 +25,13 @@ export interface InsuranceSubscriberDTO {
   EnteredBy: string;
   Verified?: boolean;
   ChkDeductible?: boolean;
-  Deductibles?: number;
-  DNDeductible?: number;
-  OpCopay?: number;
+  Deductibles: number;
+  DNDeductible: number;
+  OpCopay: number;
   MRNo?: string;
   CoverageOrder?: number;
   IsSelected?: boolean;
+  PayerPackageId?: number;
 
   policyList?: any[];
 }

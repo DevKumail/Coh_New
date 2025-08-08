@@ -34,13 +34,13 @@ import { FlatpickrModule } from 'angularx-flatpickr';
     FlatpickrModule,
     FullCalendarModule,
     FlatpickrDirective,
-    ColorSketchModule, 
-    ColorChromeModule, 
-    ColorSliderModule, 
-    ColorTwitterModule, 
-    // PageTitleComponent, 
-    // NgIcon, 
-    NgxDaterangepickerBootstrapDirective
+    ColorSketchModule,
+    ColorChromeModule,
+    ColorSliderModule,
+    ColorTwitterModule,
+    // PageTitleComponent,
+    // NgIcon,
+    // NgxDaterangepickerBootstrapDirective
     // NgxDaterangepickerBootstrapDirective
     // NgxPermissionsDirective
   ],
@@ -266,7 +266,7 @@ export class AppointmentDashboardComponent implements OnInit {
         break;
     }
     this.action = false;
-    this.modalService.dismissAll(); 
+    this.modalService.dismissAll();
   }
 
   // confirmCancel(position: string) {
