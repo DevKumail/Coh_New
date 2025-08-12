@@ -543,9 +543,6 @@ onSubmit() {
     });
 
   }
-  onCheckboxChange() {
-
-  }
 
 
 

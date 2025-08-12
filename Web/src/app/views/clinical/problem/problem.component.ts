@@ -8,7 +8,7 @@ import { PageTitleComponent} from '@app/components/page-title.component';
 import { UiCardComponent} from '@app/components/ui-card.component';
 import { NgIcon} from '@ng-icons/core';
 import { NgbModal, NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
-import { ProblemListComponent } from '../problem-list/problem-list.component';
+// import { ProblemListComponent } from '../problem-list/problem-list.component';
 import { FavoritesComponent } from '../favorites/favorites.component';
 import Swal from 'sweetalert2';
 import {PatientProblemModel} from '@/app/shared/models/clinical/problemlist.model';
@@ -523,7 +523,8 @@ const problemPayload: Partial<PatientProblemModel> = {
   }
 
   onCheckboxChange() {
-
+    console.log();
+    
   }
 
   // ClickFilter(modalRef: TemplateRef<any>) {

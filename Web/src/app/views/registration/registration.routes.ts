@@ -20,8 +20,6 @@ export const Registration_ROUTES: Routes = [
     children: [
       {
         path: 'alerts',
-
-        path: 'alerts',
         canActivate: [modulePermissionGuard],
         component: AlertComponent,
         data: { title: 'Alerts' }
@@ -44,7 +42,7 @@ export const Registration_ROUTES: Routes = [
       {
         path: 'demographics',
         canActivate: [modulePermissionGuard],
-        component: DemographicsListComponent,
+        component: DemographicListComponent,
         data: { title: 'Demographic List' }
       },
 

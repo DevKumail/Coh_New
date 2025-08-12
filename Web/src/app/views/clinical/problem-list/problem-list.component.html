@@ -1,9 +1,23 @@
-<!-- <form [formGroup]="medicalForm">
+<form [formGroup]="medicalForm">
   <div class="card p-3 shadow rounded">
+    <!-- FORM SECTION -->
+    <!-- <div class="row">
+      <div class="col-12" style="margin-top: -20px;">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" formControlName="isProviderCheck" id="isProviderCheck"
+            (change)="onCheckboxChange()" style="height: 20px; width: 20px;" />
+          <label class="form-check-label" for="isProviderCheck" style="margin-bottom: -22px;">
+            Provider Outside Clinic
+          </label>
+        </div>
+      </div>
+    </div> -->
+
     <div class="row">
       <div class="row">
         <div class="col-12" style="margin-top: -20px;">
           <div class="form-check">
+            <input type="checkbox" class="form-check-input" formControlName="isProviderCheck" id="isProviderCheck" style="height: 20px; width: 20px;" />
             <label class="form-check-label" for="isProviderCheck" style="margin-bottom: -22px;">
               Provider Outside Clinic
             </label>
@@ -13,10 +27,10 @@
 
       <div class="col-lg-3">
         <div class="mb-3">
-          <label class="form-label fw-semibold">Provider</label>
+           <label class="form-label fw-semibold">Provider</label>
           <select class="form-select" formControlName="providerId">
             <option [ngValue]="null" disabled>Select Provider</option>
-            <option *ngFor="let provider of hrEmployees" [value]="provider.ProviderId">{{ provider.name }}</option>
+            <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}</option>
           </select>
         </div>
       </div>
@@ -27,7 +41,7 @@
           <label class="form-label">Problem</label>
 
           <div class="input-group">
-            <input type="text" class="form-control" formControlName="problem" placeholder="Problem" />
+            <input type="text" class="form-control" formControlName="problem" placeholder="Enter problem" />
             <button class="btn btn-success" type="button" (click)="ClickFilter(standardModal)">
               <i class="fa fa-search"></i>
             </button>
@@ -54,8 +68,8 @@
           <label class="form-label">Status</label>
           <select class="form-select" formControlName="status">
             <option value="" disabled selected>Select Status</option>
-            <option value=1>Active</option>
-            <option value=2>Inactive</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
           </select>
         </div>
       </div>
@@ -78,11 +92,12 @@
         <div class="d-flex justify-content-end gap-2 mt-2">
 
           <button type="button" class="btn btn-secondary" (click)="onClear()">Clear</button>
-          <button type="submit" class="btn btn-success" (click)="onSubmit()">Save</button>
+          <button type="submit" class="btn btn-success">Save</button>
         </div>
       </div>
     </div>
 
+    <!-- TABLE SECTION -->
     <div class="mt-4">
       <div class="table-responsive">
         <table class="table table-bordered table-striped">
@@ -113,8 +128,10 @@
         </table>
       </div>
 
+      <!-- PAGINATION -->
       <div class="d-flex flex-column align-items-center mt-3 gap-2">
         <div class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap">
+          <!-- Showing entries + dropdown -->
           <div class="d-flex align-items-center gap-2 flex-wrap">
             <div class="me-2">
               Showing {{ start + 1 }} to {{ end }} of {{ medicalHistoryData.length }} entries
@@ -127,6 +144,7 @@
             </div>
           </div>
 
+          <!-- Pagination Controls -->
           <nav>
             <ul class="pagination pagination-sm mb-0">
               <li class="page-item" [class.disabled]="currentPage === 1">
@@ -147,7 +165,7 @@
 </form>
 
 <ng-template #standardModal let-modal>
-  <form  [formGroup]="FilterForm" (ngSubmit)="SearchDiagnosis()">
+  <form  [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
     <div class="modal-header">
       <h5 class="modal-title">Search-Problem</h5>
       <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
@@ -178,29 +196,35 @@
                   </option>
                 </select>
               </div>
-              <div class="col-md-4 col-sm-12" *ngIf="FilterForm.value.searchById != 3">
+
+              <div class="col-md-4 col-sm-12" *ngIf="Searchby != 3">
                 <label for="startingCode" class="form-label">Starting Code:</label>
                 <input type="text" class="form-control" formControlName="startingCode" id="startingCode"
                   placeholder="Enter Starting Code" />
               </div>
-              <div class="col-md-2 col-sm-12 col-12" *ngIf="FilterForm.value.searchById == 2">
-                <label for="">Ending Code</label>
-                <input class="form-control w-100" type="text" formControlName="diagnosisEndCode"
-                  placeholder="Ending Code" />
-              </div>
+              <form [formGroup]="diagnosisForm">
+                <div class="row col-12">
+                  <!-- Ending Code -->
+                  <!-- <div class="col-md-2 col-sm-12 col-12" *ngIf="diagnosisForm.get('searchBy')?.value == 2">
+                    <label for="endingCode">Ending Code</label>
+                    <input type="text" class="form-control" id="endingCode" formControlName="endingCode"
+                      placeholder="Ending Code" />
+                  </div> -->
 
-              <div class="col-md-2 col-sm-12 col-12" *ngIf="FilterForm.value.searchById == 3">
-                <label for="">Description</label>
-                <input class="form-control w-100" type="text" formControlName="descriptionFilter"
-                  placeholder="Description" />
-              </div>
-              <div class="row col-12">
+                  <!-- Description -->
+                  <!-- <div class="col-md-2 col-sm-12 col-12" *ngIf="diagnosisForm.get('searchBy')?.value == 3">
+                    <label for="description">Description</label>
+                    <input type="text" class="form-control" id="description" formControlName="description"
+                      placeholder="Description" />
+                  </div> -->
 
-                <div class="col-md-2 col-sm-12 col-12 mt-3">
-                  <button class="btn btn-info mt-3 w-100" type="submit">Searchhh</button>
+                  <!-- Search Button -->
+                  <div class="col-md-2 col-sm-12 col-12 mt-3">
+                    <button class="btn btn-info mt-3 w-100" type="button" (click)="SearchDiagnosis()">Search</button>
+                  </div>
                 </div>
-              </div>
-              
+              </form>
+
 
             </div>
           </div>
@@ -211,13 +235,6 @@
     <div class="modal-footer">
       <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
       <button type="submit" class="btn btn-primary">Search</button>
-     
     </div>
   </form>
-  <ng-template pTemplate="emptymessage">
-    <tr>
-      <td colspan="7">No Diagnosis Code found.</td>
-    </tr>
-  </ng-template>
-   
-</ng-template> -->
+</ng-template>

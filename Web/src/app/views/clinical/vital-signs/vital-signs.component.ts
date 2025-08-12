@@ -26,7 +26,7 @@ import { ViewChild } from '@angular/core';
 import { NgxDaterangepickerBootstrapDirective } from 'ngx-daterangepicker-bootstrap';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { CounterDirective } from '@core/directive/counter.directive';
-import { vitalsingsDto } from '@/app/shared/Models/Clinical/vitalsings.model';
+import { vitalsingsDto } from '@/app/shared/models/clinical/vitalsings.model';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { LoaderService } from '@core/services/loader.service';
 import { error } from 'console';
