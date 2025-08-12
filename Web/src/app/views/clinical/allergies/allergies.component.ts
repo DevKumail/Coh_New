@@ -6,13 +6,13 @@ import { NgIconComponent, NgIcon } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Injectable } from '@angular/core';
-import { AllergyDto } from '@/app/shared/models/clinical/allergy.model';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { Subscription, switchMap } from 'rxjs';
 import { LoaderService } from '@core/services/loader.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { AllergyDto} from '@/app/shared/models/clinical/allergy.model'
 
 @Component({
   selector: 'app-allergies',
@@ -148,7 +148,7 @@ export class AllergiesComponent implements OnInit {
     this.patientDataSubscription = this.PatientData.patientData$
   .pipe(
     filter((data: any) => !!data?.table2?.[0]?.mrNo),
-    distinctUntilChanged((prev, curr) => 
+    distinctUntilChanged((prev, curr) =>
       prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
     )
   )
@@ -183,6 +183,11 @@ export class AllergiesComponent implements OnInit {
     this.GetPatientAllergyData();
     this.Allergy.ActiveStatus = 1
   }
+
+
+
+
+
   async GetPatientAllergyData() {
     this.loader.show();
     if(this.SearchPatientData == undefined){
@@ -193,7 +198,7 @@ export class AllergiesComponent implements OnInit {
     this.loader.show();
     debugger
     console.log( 'mrNo =>',this.SearchPatientData.table2[0].mrNo);
-    
+
     await this.ClinicalApiService.GetPatientAllergyData
     (this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0,).then((res: any) => {
       console.log('res', res);
@@ -268,7 +273,7 @@ export class AllergiesComponent implements OnInit {
 
 submit() {
     console.log( 'this.allergyForm =>',this.allergyForm.value);
-      
+
   if (this.allergyForm.invalid) {
     this.allergyForm.markAllAsTouched(); // show validation messages
     Swal.fire('Validation Error', 'Please fill all required fields.', 'warning');
@@ -279,8 +284,8 @@ submit() {
     Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
     return;
   }
-  
-  
+
+
   this.isSubmitting = true;
 
   const formValue = this.allergyForm.value;
@@ -397,7 +402,7 @@ submit() {
 
 editAllergy(allergy: any) {
   debugger
-  console.log('Editing Allergy:', allergy); 
+  console.log('Editing Allergy:', allergy);
   this.buttonText = 'Update';
   this.id = allergy.allergyId;
   this.allergyForm.patchValue({
@@ -434,7 +439,7 @@ setPagedallergieData() {
   const startIndex = (this.allergieCurrentPage - 1) * this.allergiePageSize;
   const endIndex = startIndex + this.allergiePageSize;
   this.pagedallergie = this.MyAllergiesData.slice(startIndex, endIndex);
-  
+
 }
 
 }

@@ -1,72 +1,4 @@
-// import { Component } from '@angular/core';
-// import Swal from 'sweetalert2';
-// import { Router } from '@angular/router';
-// import { ApiService } from '@core/services/api.service';
-// import { CommonModule } from '@angular/common';
-// import { RouterModule } from '@angular/router';
-// // import { FormBuilder, Validators } from '@angular/forms';
-// import { ReactiveFormsModule } from '@angular/forms';
-// import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-
-// @Component({
-//   selector: 'app-create-appointment',
-//   imports: [ReactiveFormsModule, CommonModule, RouterModule],
-//   templateUrl: './create-appointment.component.html',
-//   styleUrl: './create-appointment.component.scss'
-// })
-
-// export class CreateAppointmentComponent {
-//   // form: FormGroup;
-//   constructor(private router: Router, private apiService: ApiService, private fb: FormBuilder) {}
-  
-//   // fb: FormBuilder;
-//   Patientpopup: boolean = false;
-//   mrNO: any;
-//   appId: any;
-//   patient_FName: any;
-//   appointments: any[] = [];
-//   facilities: any[] = [];
-//   specialities: any[] = [];
-//   providers: any[] = [];
-//   sites: any[] = [];
-//   visitTypes: any[] = [];
-//   appointmentTypes: any[] = [];
-//   appointmentPurposes: any[] = [];
-//   appointmentStatuses: any[] = [];
-//   appointmentPriorities: any[] = [];
-//   appointmentModes: any[] = [];
-//   siteArray: any[] = []; 
-//   facilityArray: any[] = [];
-//   Times: any[] = [];
-//   purpose: any[] = [];
-//   visittype: any[] = [];
-  
-// appointmentForm!: FormGroup;
-
-
-
-//   appointmentForm = this.fb.group({
-//     facility: ['', Validators.required],
-//     speciality: ['', Validators.required],
-//     provider: ['', Validators.required],
-//     site: ['', Validators.required],
-//     date: ['', Validators.required],
-//     time: ['', Validators.required],
-//     purpose: ['', Validators.required],
-//     visitType: ['', Validators.required],
-//     // Add rest of the controls similarly
-//   });
-  
-
-
-// onSubmit(){
-
-// }
-// onCancel(){
-
-// }
-// }
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -76,7 +8,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { RouterModule } from '@angular/router';
 import { SchedulingApiService } from '../scheduling.api.service';
 
-import moment from 'moment'; 
+import moment from 'moment';
+import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 import { HttpClient } from '@angular/common/http';
@@ -84,13 +17,20 @@ import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { D } from 'node_modules/@angular/cdk/bidi-module.d-D-fEBKdS';
 
+declare var flatpickr: any;
 
 @Component({
   selector: 'app-create-appointment',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterModule],
+
+  imports: [
+            ReactiveFormsModule,
+            CommonModule,
+            RouterModule,
+        NgbTimepickerModule],
+
   templateUrl: './create-appointment.component.html',
-  // styleUrl: './create-appointment.component.scss'
+  styleUrl: './create-appointment.component.scss'
 })
 export class CreateAppointmentComponent implements OnInit {
   date: any;
@@ -98,6 +38,56 @@ export class CreateAppointmentComponent implements OnInit {
 
   appointmentForm!: FormGroup;
 minDate: any;
+Times = [
+  { Time: '01:00 AM' },
+  { Time: '01:30 AM' },
+  { Time: '02:00 AM' },
+  { Time: '02:30 AM' },
+  { Time: '03:00 AM' },
+  { Time: '03:30 AM' },
+  { Time: '04:00 AM' },
+  { Time: '04:30 AM' },
+  { Time: '05:00 AM' },
+  { Time: '05:30 AM' },
+  { Time: '06:00 AM' },
+  { Time: '06:30 AM' },
+  { Time: '07:00 AM' },
+  { Time: '07:30 AM' },
+  { Time: '08:00 AM' },
+  { Time: '08:30 AM' },
+  { Time: '09:00 AM' },
+  { Time: '09:30 AM' },
+  { Time: '10:00 AM' },
+  { Time: '10:30 AM' },
+  { Time: '11:00 AM' },
+  { Time: '11:30 AM' },
+  { Time: '12:00 PM' },
+  { Time: '12:30 PM' },
+  { Time: '01:00 PM' },
+  { Time: '01:30 PM' },
+  { Time: '02:00 PM' },
+  { Time: '02:30 PM' },
+  { Time: '03:00 PM' },
+  { Time: '03:30 PM' },
+  { Time: '04:00 PM' },
+  { Time: '04:30 PM' },
+  { Time: '05:00 PM' },
+  { Time: '05:30 PM' },
+  { Time: '06:00 PM' },
+  { Time: '06:30 PM' },
+  { Time: '07:00 PM' },
+  { Time: '07:30 PM' },
+  { Time: '08:00 PM' },
+  { Time: '08:30 PM' },
+  { Time: '09:00 PM' },
+  { Time: '09:30 PM' },
+  { Time: '10:00 PM' },
+  { Time: '10:30 PM' },
+  { Time: '11:00 PM' },
+  { Time: '11:30 PM' },
+  { Time: '12:00 AM' }
+];
+
 
   constructor(
     private router: Router,
@@ -107,12 +97,12 @@ minDate: any;
     private http: HttpClient,
   ) {}
 
-  
+
   facilities: any[] = [];
   specialities: any[] = [];
+  appointmentType:any []=[];
   providers: any[] = [];
   sites: any[] = [];
-  Times: any[] = [];
   purpose: any[] = [];
   visittype: any[] = [];
   siteArray: any[] = [];
@@ -175,21 +165,22 @@ minDate: any;
   showTable: boolean = false;
   TimeSlotGridTime: any;
   qid: any;
- 
+
   Time: any[] = [];
   TimeSlot: any[] = [];
   TimeSlotGrid: any[] = [];
-  
- 
+
+
   TimeSlotGridTimeArray: any[] = [];
   TimeSlotGridTimeArray1: any[] = [];
   TimeSlotGridTimeArray2: any[] = [];
   TimeSlotGridTimeArray3: any[] = [];
   TimeSlotGridTimeArray4: any[] = [];
 
-  
 
-  
+
+
+
 
 
 
@@ -220,11 +211,12 @@ minDate: any;
   ngOnInit(): void {
     this.appointmentForm = this.fb.group({
       facility: ['', Validators.required],
+  time: [{ hour: 10, minute: 30 }],
       speciality: ['', Validators.required],
       provider: ['', Validators.required],
       site: ['', Validators.required],
       date: ['', Validators.required],
-      time: ['', Validators.required],
+      //time: ['', Validators.required],
       purpose: ['', Validators.required],
       visitType: ['', Validators.required],
     type: ['', Validators.required],
@@ -266,9 +258,10 @@ minDate: any;
     planBalance: [''],
     patientBalance: [''],
     DurationData: [''],
+    appointmentType: [''],
   });
 
- 
+
   this.appointmentForm.get('facility')?.valueChanges.subscribe((facilityId) => {
     if (facilityId) {
       this.GetSpecialitybyFacilityId(facilityId);
@@ -287,9 +280,17 @@ minDate: any;
 
 
   this.FillCache();
+
+    flatpickr('#entryDate', {
+      dateFormat: 'Y-m-d',
+      maxDate: 'today',
+      onChange: (selectedDates: any, dateStr: string) => {
+        this.appointmentForm.get('entryDate')?.setValue(dateStr);
+      },
+    });
   }
 
-  
+
 
   onSubmit(): void {
     if (this.appointmentForm.invalid) {
@@ -324,15 +325,15 @@ minDate: any;
     }
     this.Times = times;
   }
- 
+
  GetSitebySpecialityId(SpecialtyId: any) {
     if(SpecialtyId==null||SpecialtyId==undefined){
       SpecialtyId=0
     }
       this.SchedulingApiService.GetSitebySpecialityId(SpecialtyId).then((res: any) => {
         this.siteArray=res
-        
-      }).catch((error: { message: any }) => 
+
+      }).catch((error: { message: any }) =>
             Swal.fire({
       icon: 'error',
       title: 'error',
@@ -384,8 +385,8 @@ GetSpecialitybyFacilityId(FacilityId: any) {
   this.SchedulingApiService.GetProviderByFacilityId(FacilityId).subscribe({
     next: (providerRes: any) => {
     this.providers = providerRes;
-    
-    
+
+
     const provider: number = this.filterForm.get('provider')?.value || 0;
     const facility: number = this.filterForm.get('facility')?.value || 0;
     const site: number = this.filterForm.get('site')?.value || 0;
@@ -397,7 +398,7 @@ GetSpecialitybyFacilityId(FacilityId: any) {
       'yyyy-MM-dd'
     ) || '';
 
-   
+
     this.SchedulingApiService.GetSchAppointmentList(site, provider, facility, speciality, currentDate)
       .then((appointmentRes: any) => {
         if (Array.isArray(appointmentRes)) {
@@ -454,7 +455,7 @@ GetSpecialitybyFacilityId(FacilityId: any) {
       })
         this.SchedulingApiService.GetProviderScheduleData(EmployeeId).then((res:any) => {
       })
-      }).catch((error: { message: any }) => 
+      }).catch((error: { message: any }) =>
         Swal.fire({
       icon: 'error',
       title: 'Error',
@@ -465,7 +466,7 @@ GetSpecialitybyFacilityId(FacilityId: any) {
       let site=this.selectedSites||0
       let speciality=this.selectedSpeciality||0
       let date:any
-    
+
       if(this.date==undefined)
       {
         date=new Date();
@@ -495,9 +496,9 @@ GetSpecialitybyFacilityId(FacilityId: any) {
     this.Times=this.AppointmentData;
 
   }
-  
+
   GetProviderbySiteId(SiteId: any) {
-    
+
     if(SiteId==null||SiteId==undefined){
       SiteId=0
       this.AppointmentData.length=0
@@ -531,12 +532,12 @@ let facility=this.selectedFacility||0
       if(DataDuration.duration==null)
       {
         Duration=60/DataDuration.appPerHour
-      } 
+      }
       else
       {
         Duration=DataDuration.duration
       }
-      
+
           Data=res
           const StartTime = moment(Data.startTime, 'HH:mm:ss a')
           const EndTime = moment(Data.endTime, 'HH:mm:ss a')
@@ -546,17 +547,17 @@ let facility=this.selectedFacility||0
             let timeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
             currentTime.setMinutes(currentTime.getMinutes() + Duration);
             this.AppointmentData.push({ Time:timeString })
-          }          
-          this.showTable=true      
-    
+          }
+          this.showTable=true
+
     })
-  
+
       }else
       {
         this.AppointmentData.length=0
       }
     })
- 
+
     let site=this.selectedSites||0
     let speciality=this.selectedSpeciality||0
     let Currentdate:any= this.datePipe.transform(
@@ -621,7 +622,7 @@ let facility=this.selectedFacility||0
   }
    GetAppointmentByTime(date:any)
   {
-    
+
     let Data:any
     let DataDuration:any
     let Duration:any
@@ -648,7 +649,7 @@ const dayName = days[dates.getDay()];
       DataDuration=ress
       if(DataDuration.duration==null)
       {
-        
+
         Duration=60/DataDuration.appPerHour||1
       }
       else
@@ -661,12 +662,12 @@ const dayName = days[dates.getDay()];
           let currentTime = new Date(StartTime.toISOString());
           let endTime = new Date(EndTime.toISOString());
           while (currentTime <= endTime) {
-            
+
             let timeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
             currentTime.setMinutes(currentTime.getMinutes() + Duration);
             this.AppointmentData.push({ Time:timeString })
-          }          
-          this.showTable=true      
+          }
+          this.showTable=true
     })
       }else
       {
@@ -681,7 +682,7 @@ const dayName = days[dates.getDay()];
         date,
         'yyyy-MM-dd'
       );
-      this.SchedulingApiService.GetSchAppointmentList(SiteId,provider,facility,speciality,Currentdate).then((ress:any) => {      
+      this.SchedulingApiService.GetSchAppointmentList(SiteId,provider,facility,speciality,Currentdate).then((ress:any) => {
       if(ress.length>0)
       {
         let mappedArray = this.AppointmentData.map((item: any) => {
@@ -829,7 +830,7 @@ showDetailsDialog(element: any) {
       this.visittype = visitType;
     }
     if (blPayerPlan) {
-      
+
       blPayerPlan = blPayerPlan.map(
       (item: { PlanId: any; PlanName: any }) => {
         return {
@@ -949,6 +950,17 @@ showDetailsDialog(element: any) {
         })
       );
   }
+
+//     ngAfterViewInit(): void {
+
+//     flatpickr('#appointmentDate', {
+//     dateFormat: 'Y-m-d',
+//     maxDate: 'today',
+//     onChange: (selectedDates: any, dateStr: string) => {
+//       this.appointmentForm.get('appointmentDate')?.setValue(dateStr);
+//     },
+//   });
+//   }
 
 
 

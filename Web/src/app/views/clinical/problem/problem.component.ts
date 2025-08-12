@@ -4,15 +4,18 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { PageTitleComponent} from '@app/components/page-title.component';
+import { UiCardComponent} from '@app/components/ui-card.component';
+import { NgIcon} from '@ng-icons/core';
+import { NgbModal, NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
+import { ProblemListComponent } from '../problem-list/problem-list.component';
+import { FavoritesComponent } from '../favorites/favorites.component';
 import Swal from 'sweetalert2';
 import {PatientProblemModel} from '@/app/shared/models/clinical/problemlist.model';
 import { number } from 'echarts';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { LoaderService } from '@core/services/loader.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
-
 
 @Component({
   selector: 'app-problem',
@@ -143,7 +146,7 @@ problemData: any[] = [];   // Full list of problems
 pagedProblems: any[] = [];
 
   // add 4 aug
-  
+
 
   constructor(
     private fb: FormBuilder,
@@ -152,7 +155,7 @@ pagedProblems: any[] = [];
         private PatientData: PatientBannerService, 
   ) { }
 
-  
+
 
   async ngOnInit() {
     this.GetPatientProblemData();
@@ -181,7 +184,7 @@ pagedProblems: any[] = [];
   code: [''],
   problem: [''],
   icdVersion: [null],
-  icdVersionValue: [''], 
+  icdVersionValue: [''],
   startDate: [null],
   endDate: [null],
   status: [null],
@@ -259,14 +262,14 @@ pagedProblems: any[] = [];
   onSubmit(): void {
     debugger
     if (this.medicalForm.invalid) {
-      
+
       return;
     }
 
     const formData = this.medicalForm.value;
 
     // const problemPayload:PatientProblemModel = {
-      
+
     //   providerId: formData.providerId,
     //   providerName: formData.providerName,
     //   code: formData.code,
@@ -301,14 +304,14 @@ pagedProblems: any[] = [];
     // };
 //     const problemPayload: PatientProblemModel = {
 //   id: 0,
-//   appointmentId: formData.appointmentId, 
+//   appointmentId: formData.appointmentId,
 //   providerId: formData.providerId,
-//   icd9: formData.code, 
+//   icd9: formData.code,
 //   icd9code: formData.code,
 //   icd9description: formData.problem,
 //   comments: formData.comments,
 //   icdversionId: formData.icdVersion,
-//   icdVersionValue: formData.icdVersionValue, 
+//   icdVersionValue: formData.icdVersionValue,
 //   startDate: formData.startDate,
 //   endDate: formData.endDate,
 //   status: formData.status,
@@ -327,7 +330,7 @@ pagedProblems: any[] = [];
 //   errorReason: '',
 //   oldMrno: '',
 //   isDeleted: false,
-//   startstrdate: '',  
+//   startstrdate: '',
 //   endstrdate: '',
 //   providerDescription: '',
 //   socialHistory: false,
@@ -364,9 +367,9 @@ const problemPayload: Partial<PatientProblemModel> = {
     text: 'Patient problem has been submitted.',
     confirmButtonText: 'OK'
   });
-      
+
     }).catch((error: any) => {
-    
+
     });
   }
   onClear(): void {
@@ -445,7 +448,7 @@ const problemPayload: Partial<PatientProblemModel> = {
 
   getRowData() {
     const mrno = '1004'; 
-    const userId = 1;     
+    const userId = 1;
 
     this.clinicalApiService.GetRowDataOfPatientProblem(mrno, userId).then((res: any) => {
       debugger

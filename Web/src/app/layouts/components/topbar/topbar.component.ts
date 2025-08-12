@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, OnInit, Output, TemplateRef } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
 import { LayoutStoreService } from '@core/services/layout-store.service';
 import { LucideAngularModule, Search, Sliders, X } from 'lucide-angular';
@@ -9,7 +9,6 @@ import { UserProfileComponent } from '@layouts/components/topbar/components/user
 import { NotificationDropdownComponent } from '@layouts/components/topbar/components/notification-dropdown/notification-dropdown.component';
 import { IconsModule } from '@/app/shared/icons.module';
 import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { PatientSearchModalComponent } from '@/app/shared/modals/patient-search-modal/patient-search-modal.component';
 import { PatientHeaderPanelComponent } from "../patient-header-panel/patient-header-panel.component";
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import {
@@ -23,6 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { AdvanceSearchModalComponent } from "./components/advance-search-modal/advance-search-modal.component";
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -41,7 +41,7 @@ import { AdvanceSearchModalComponent } from "./components/advance-search-modal/a
     FormsModule,
     NavbarComponent,
     AdvanceSearchModalComponent
-],
+  ],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
   animations: [
@@ -60,7 +60,8 @@ export class TopbarComponent implements OnInit {
   constructor(
     public layout: LayoutStoreService,
     private modalService: NgbModal,
-    private patientBannerService: PatientBannerService
+    private patientBannerService: PatientBannerService,
+    private router: Router
   ) { }
 
   SearchIcon = Search;
@@ -137,8 +138,16 @@ export class TopbarComponent implements OnInit {
     this.onSearchClick();
   }
 
-  searchPatient(mrNo: string) {
-    debugger
+  searchPatient(mrNo: string, context?: string) {
+    if (context === 'patient-summary') {
+      const sub = this.patientBannerService.patientData$.subscribe(data => {
+        if (data) {
+          this.router.navigate(['/patient-summary']);
+          sub.unsubscribe();
+        }
+      });
+    }
+
     this.demographicapi.getPatientByMrNo(mrNo).subscribe({
       next: (res: any) => {
         if (res?.table2?.length > 0) {
@@ -147,6 +156,7 @@ export class TopbarComponent implements OnInit {
         } else {
           this.patientBannerService.setPatientData(null);
           this.showPatientBanner = false;
+          Swal.fire('Error', 'No patient found with the provided MRNO.', 'error');
         }
       },
       error: err => {

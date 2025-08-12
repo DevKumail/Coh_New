@@ -1,7 +1,6 @@
 import { ProblemComponent } from './../../views/clinical/problem/problem.component';
 import { MenuItemType } from '@/app/types/layout';
 
-
 type UserDropdownItemType = {
     label?: string;
     icon?: string;
@@ -113,27 +112,27 @@ export const menuItems: ExtendedMenuItemType[] = [
             //     icon: 'tablerStackFront',
             //     url: '/landing',
             // },
-    { label: 'Menu', isTitle: true },
-    // {
-    //     label: 'Dashboards',
-    //     icon: 'tablerLayoutDashboard',
-    //     isCollapsed: true,
-    //     badge: {variant: 'success', text: '5'},
-    //     children: [
-    //         {label: 'Dashboard v.1', url: '/dashboards/dashboard-1'},
-    //         {label: 'Dashboard v.2', url: '/dashboards/dashboard-2'},
-    //         {label: 'Dashboard v.3', url: '/dashboards/dashboard-3'},
-    //         {label: 'Dashboard v.4', url: '#!', isDisabled: true, badge: {variant: 'light', text: 'Soon'}},
-    //         {label: 'Dashboard v.5', url: '#!', isDisabled: true, badge: {variant: 'light', text: 'Soon'}},
-    //     ]
-    // },
-    // {
-    //     label: 'Landing Page',
-    //     icon: 'tablerStackFront',
-    //     url: '/landing',
-    // },
+            { label: 'Menu', isTitle: true },
+            // {
+            //     label: 'Dashboards',
+            //     icon: 'tablerLayoutDashboard',
+            //     isCollapsed: true,
+            //     badge: {variant: 'success', text: '5'},
+            //     children: [
+            //         {label: 'Dashboard v.1', url: '/dashboards/dashboard-1'},
+            //         {label: 'Dashboard v.2', url: '/dashboards/dashboard-2'},
+            //         {label: 'Dashboard v.3', url: '/dashboards/dashboard-3'},
+            //         {label: 'Dashboard v.4', url: '#!', isDisabled: true, badge: {variant: 'light', text: 'Soon'}},
+            //         {label: 'Dashboard v.5', url: '#!', isDisabled: true, badge: {variant: 'light', text: 'Soon'}},
+            //     ]
+            // },
+            // {
+            //     label: 'Landing Page',
+            //     icon: 'tablerStackFront',
+            //     url: '/landing',
+            // },
 
-    { label: 'Menu', isTitle: true },
+            { label: 'Menu', isTitle: true },
             { label: 'Menu', isTitle: true },
 
             // ✅ Clinical Module Section (permission based)
@@ -157,7 +156,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 ],
             },
 
-    { label: 'Menu', isTitle: true },
+            { label: 'Menu', isTitle: true },
             { label: 'Menu', isTitle: true },
 
             // ✅ Clinical Module Section (permission based)
@@ -454,12 +453,11 @@ export const menuItems: ExtendedMenuItemType[] = [
                     { label: 'Success Mail', url: '/auth-3/success-mail' },
                     { label: 'Login with PIN', url: '/auth-3/login-pin' },
                     { label: 'Delete Account', url: '/auth-3/delete-account' },
-                ]
-                
+                ],
             },
         ],
     },
-    
+
     {
         label: 'Error Pages',
         icon: 'tablerAlertHexagon',
@@ -471,8 +469,8 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: '404', url: '/error/404' },
             { label: '408', url: '/error/408' },
             { label: '500', url: '/error/500' },
-            { label: 'Maintenance', url: '/maintenance' }
-        ]
+            { label: 'Maintenance', url: '/maintenance' },
+        ],
     },
     { label: 'Layouts', isTitle: true },
     {
@@ -485,9 +483,9 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Boxed', url: '/layouts/boxed' },
             { label: 'Horizontal', url: '/layouts/horizontal' },
             { label: 'Preloader', url: '/layouts/preloader' },
-        ]
+        ],
     },
-    
+
     {
         label: 'Sidebars',
         icon: 'tablerLayoutSidebar',
@@ -513,7 +511,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 label: 'Sidebar with Lines',
                 url: '/layouts/sidebars/with-lines',
             },
-        ]
+        ],
     },
     {
         label: 'Topbars',
@@ -528,7 +526,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 url: '/layouts/topbars/with-sub-items',
             },
             { label: 'Topbar with Tools', url: '/layouts/topbars/with-tools' },
-        ]
+        ],
     },
     { label: 'Components', isTitle: true },
     {
@@ -564,7 +562,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Tooltips', url: '/ui/tooltips' },
             { label: 'Typography', url: '/ui/typography' },
             { label: 'Utilities', url: '/ui/utilities' },
-        ]
+        ],
     },
     {
         label: 'Widgets',
@@ -629,7 +627,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             },
             { label: 'Apex Tree', url: '/charts/apextree' },
             { label: 'Apex Sankey', url: '/charts/apexsankey' },
-        ]
+        ],
     },
     {
         label: 'Forms',
@@ -646,7 +644,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Range Slider', url: '/forms/range-slider' },
             { label: 'Layouts', url: '/forms/layouts' },
             { label: 'Other Plugins', url: '/forms/other-plugins' },
-        ]
+        ],
     },
     {
         label: 'Tables',
@@ -685,7 +683,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                     { label: 'Fixed Header', url: '/data-tables/fixed-header' },
                 ],
             },
-        ]
+        ],
     },
     {
         label: 'Icons',
@@ -695,7 +693,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Tabler', url: '/icons/tabler' },
             { label: 'Lucide', url: '/icons/lucide' },
             { label: 'Flags', url: '/icons/flags' },
-        ]
+        ],
     },
     {
         label: 'Maps',
@@ -705,7 +703,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Google Maps', url: '/maps/google' },
             { label: 'Vector Maps', url: '/maps/vector' },
             { label: 'Leaflet Maps', url: '/maps/leaflet' },
-        ]
+        ],
     },
     { label: 'Menu Items', isTitle: true },
     {
@@ -736,7 +734,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                     },
                 ],
             },
-        ]
+        ],
     },
     {
         label: 'Disabled Menu',
@@ -747,7 +745,7 @@ export const menuItems: ExtendedMenuItemType[] = [
         label: 'Special Menu',
         icon: 'tablerStar',
         url: '#!',
-    }
+    },
 ];
 
 export const horizontalMenuItems: MenuItemType[] = [
@@ -848,16 +846,50 @@ export const horizontalMenuItems: MenuItemType[] = [
     {
         label: 'Billing',
         icon: 'tablerHeartbeat',
-        module: 'Billing', // 👈 this is used by PermissionService
+        module: 'Billing',
         isCollapsed: true,
         children: [
-
-            { label: 'Charge Capture',
+            {
+                label: 'Charge Capture',
                 icon: 'tablerBell',
-              url: '/billing/charge capture' 
+                url: '/billing/charge capture',
             },
-        ]
+        ],
     },
+
+
+
+    {
+        label: 'Scheduling',
+        icon: 'tablerCalendarEvent',
+        module: 'Scheduling',
+        isCollapsed: true,
+        children: [
+            {
+                label: 'View Appointments',
+                icon: 'tablerCalendar',
+                url: '/scheduling/View Appointments',
+            },
+            {
+            label: 'Appointment Dashboard',
+            icon: 'tablerLayoutDashboard',
+            url: '/scheduling/appointment-dashboard',
+            },
+            // {
+            //     label: 'Create Appointment',
+            //     icon: 'tablerPlus',
+            //     url: '/scheduling/create appointment',
+            // },
+            // {
+            //     label: 'Filter Appointments',
+            //     icon: 'tablerFilter',
+            //     url: '/scheduling/Filter',
+            // },
+        ],
+    },
+
+
+
     {
         label: 'Apps',
         icon: 'tablerApps',
