@@ -47,3 +47,11 @@
 /Server/HMIS/obj
 /Server/HMIS/bin/Debug/net8.0
 /Server/.vs
+/Server/HMIS.Application/bin/Debug/net8.0
+/Server/HMIS.Core/bin/Debug/net8.0
+/Server/HMIS.Core/obj
+/Server/HMIS.Infrastructure/bin/Debug/net8.0
+/Server/HMIS.Infrastructure/obj
+/Server/HMIS.Service/obj/Debug/net8.0
+/Server/HMIS.Web.API/bin/Debug/net8.0
+/Server/HMIS.Web.API/obj

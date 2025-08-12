@@ -1,0 +1,588 @@
+﻿using HMIS.Core.Entities;
+using HMIS.Application.DTOs;
+using HMIS.Application.Implementations;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Configuration;
+using System.Data;
+using System.IO;
+using System.Reflection.Emit;
+using System.Security.Policy;
+using static HMIS.Application.DTOs.SpLocalModel.ProviderScheduleModel;
+
+namespace HMIS.API.Controllers.ControllerPanel
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class ProviderScheduleController : BaseApiController
+    {
+        #region Fields
+        private readonly IProviderScheduleManager _providerSceduleManager;
+        private readonly IConfiguration _configuration;
+        TimerElapsed timerElapsed = new TimerElapsed();
+        #endregion
+
+        #region Ctor
+        public ProviderScheduleController(
+           IConfiguration configuration,
+           IProviderScheduleManager providerScheduleManager)
+        {
+            _configuration = configuration;
+            this._providerSceduleManager = providerScheduleManager;
+        }
+        #endregion
+
+        #region Methods
+
+        #region GetProviderScheduleList
+        //[HttpGet("GetProviderScheduleList")]  
+        //    public async Task<IActionResult> GetProviderScheduleList(long? ProviderId, int? SiteId, int? FacilityId, int? UsageId, bool? Sunday, bool? Monday, bool? Tuesday, bool? Wednesday, bool? Thursday, bool? Friday, bool? Saturday, string? StartTime, string? EndTime, int? Priority, int? OffsetValue, int? PagingSize)
+        //    {
+        //        var method = HttpContext.Request.Method;
+        //        var path = HttpContext.Request.Path;
+        //        var configuration = new ConfigurationBuilder()
+        //.AddJsonFile("appsettings.json")
+        //.Build();
+        //        var requestMessage = "ProviderId:" + (ProviderId == null ? 0 : ProviderId) + "\nSiteId:" + (SiteId == null ? 0 : SiteId) + "\nFacilityId:" + (FacilityId == null ? 0 : FacilityId) +
+        //            "\nUsageId:" + (UsageId == null ? 0 : UsageId) + "\nSunday:" + (Sunday == null ? 0 : Sunday) + "\nMonday:" + (Monday == null ? 0 : Monday) + "\nTuesday:" + (Tuesday == null ? 0 : Tuesday) +
+        //            "\nWednesday:" + (Wednesday == null ? 0 : Wednesday) + "\nThursday:" + (Thursday == null ? 0 : Thursday) + "\nFriday:" + (Friday == null ? 0 : Friday) + "\nSaturday:" + (Saturday == null ? 0 : Saturday) +
+        //            "\nStartTime:" + (StartTime == null ? null : StartTime) + "\nEndTime:" + (EndTime == null ? null : EndTime) + "\nPriority:" + (Priority == null ? 0 : Priority) +
+        //            "\nOffsetValue:" + (OffsetValue == null ? 0 : OffsetValue) + "\nPagingSize:" + (PagingSize == null ? 0 : PagingSize);
+        //        double elapsed = 0;
+        //        timerElapsed.StartTimer();
+        //        try
+        //        {
+        //            DataSet result = await _providerSceduleManager.GetProviderScheduleListDB(ProviderId, SiteId, FacilityId, UsageId, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, StartTime, EndTime, Priority, OffsetValue, PagingSize);
+        //            elapsed = timerElapsed.StopTimer();
+        //            if (result != null)
+        //            {
+        //                var statusCode = HttpContext.Response.StatusCode;
+        //                var responseMessage = JsonConvert.SerializeObject(result);
+        //                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+        //                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        //    method, path, statusCode, elapsed, requestMessage, responseMessage);
+        //                return Ok(result);
+        //            }
+        //            else
+        //            {
+        //                var statusCode = HttpContext.Response.StatusCode;
+        //                var responseMessage = JsonConvert.SerializeObject(result);
+        //                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+        //                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        //    method, path, statusCode, elapsed, requestMessage, responseMessage);
+        //                return BadRequest(result);
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            var statusCode = HttpContext.Response.StatusCode;
+        //            var responseMessage = JsonConvert.SerializeObject(ex.Message);
+        //            var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+        //            logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        //method, path, statusCode, elapsed, requestMessage, responseMessage);
+
+        //            return BadRequest(ex.Message);
+        //        }
+
+
+        //    }
+
+        [HttpPost("GetProviderScheduleList")]
+        public async Task<IActionResult> GetProviderScheduleList([FromBody] FilterProviderScheduleListRequest request)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
+            var requestMessage = "ProviderId:" + (request.ProviderScheduleList.ProviderId == null ? 0 : request.ProviderScheduleList.ProviderId) + "\nSiteId:" + (request.ProviderScheduleList.SiteId == null ? 0 : request.ProviderScheduleList.SiteId) + "\nFacilityId:" + (request.ProviderScheduleList.FacilityId == null ? 0 : request.ProviderScheduleList.FacilityId) +
+                "\nUsageId:" + (request.ProviderScheduleList.UsageId == null ? 0 : request.ProviderScheduleList.UsageId) + "\nSunday:" + (request.ProviderScheduleList.Sunday == null ? 0 : request.ProviderScheduleList.Sunday) + "\nMonday:" + (request.ProviderScheduleList.Monday == null ? 0 : request.ProviderScheduleList.Monday) + "\nTuesday:" + (request.ProviderScheduleList.Tuesday == null ? 0 : request.ProviderScheduleList.Tuesday) +
+                "\nWednesday:" + (request.ProviderScheduleList.Wednesday == null ? 0 : request.ProviderScheduleList.Wednesday) + "\nThursday:" + (request.ProviderScheduleList.Thursday == null ? 0 : request.ProviderScheduleList.Thursday) + "\nFriday:" + (request.ProviderScheduleList.Friday == null ? 0 : request.ProviderScheduleList.Friday) + "\nSaturday:" + (request.ProviderScheduleList.Saturday == null ? 0 : request.ProviderScheduleList.Saturday) +
+                "\nStartTime:" + (request.ProviderScheduleList.StartTime == null ? null : request.ProviderScheduleList.StartTime) + "\nEndTime:" + (request.ProviderScheduleList.EndTime == null ? null : request.ProviderScheduleList.EndTime) + "\nPriority:" + (request.ProviderScheduleList.Priority == null ? 0 : request.ProviderScheduleList.Priority) +
+                "\nOffsetValue:" + (request.ProviderScheduleList.OffsetValue == null ? 0 : request.ProviderScheduleList.OffsetValue) + "\nPagingSize:" + (request.ProviderScheduleList.PagingSize == null ? 0 : request.ProviderScheduleList.PagingSize);
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                DataSet result = await _providerSceduleManager.GetProviderScheduleListDB(request);
+                elapsed = timerElapsed.StopTimer();
+                if (result != null)
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(result);
+                }
+                else
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+
+                return BadRequest(ex.Message);
+            }
+
+
+        }
+
+        #endregion
+        [HttpGet("ViewPatientStatus")]
+        public async Task<IActionResult> GetViewPatientStatusDB(int MRNo)
+        {
+            DataSet result = await _providerSceduleManager.GetViewPatientStatusDB(MRNo);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
+        }
+        #region GetProviderScheduleByProviderId
+        [HttpGet("GetProviderScheduleByProviderId")]
+        public async Task<IActionResult> GetProviderSchedule(long ProviderId, int SiteId, int FacilityId, int UsageId)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
+            var requestMessage = "ProviderId:" + ProviderId + "\nSiteId:" + SiteId + "\nFacilityId:" + FacilityId + "\nUsageId:" + UsageId;
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                DataSet result = await _providerSceduleManager.GetProviderScheduleDB(ProviderId, SiteId, FacilityId, UsageId);
+                elapsed = timerElapsed.StopTimer();
+                if (result != null)
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(result);
+                }
+                else
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        #region GetProviderScheduleByPSId
+        [HttpGet("GetProviderScheduleByPSId")]
+        public async Task<IActionResult> GetProviderSingleSchedule(long PSId)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+    .Build();
+            var requestMessage = "PSId:" + PSId;
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                DataSet result = await _providerSceduleManager.GetProviderSingleScheduleDB(PSId);
+                elapsed = timerElapsed.StopTimer();
+                if (result != null)
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(result);
+                }
+                else
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+            method, path, statusCode, elapsed, requestMessage, responseMessage);
+
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        #region GetProviderFacilityByProviderId
+        [HttpGet("GetProviderFacilityByProviderId")]
+        public async Task<IActionResult> GetProviderFacility(long ProviderId)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+    .Build();
+            var requestMessage = "ProviderId:" + ProviderId;
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                DataSet result = await _providerSceduleManager.GetProviderFacilityDB(ProviderId);
+                elapsed = timerElapsed.StopTimer();
+                if (result != null)
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(result);
+                }
+                else
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+                    method, path, statusCode, elapsed, requestMessage, responseMessage);
+
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        #region GetProviderSiteByFacilityId
+        [HttpGet("GetProviderSiteByFacilityId")]
+        public async Task<IActionResult> GetProviderSite(int FacilityId)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+    .Build();
+            var requestMessage = "FacilityId:" + FacilityId;
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                DataSet result = await _providerSceduleManager.GetProviderSiteDB(FacilityId);
+                elapsed = timerElapsed.StopTimer();
+                if (result != null)
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(result);
+                }
+                else
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+                    method, path, statusCode, elapsed, requestMessage, responseMessage);
+
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        #region InsertProviderSchedule
+        [HttpPost("InsertProviderSchedule")]
+        public async Task<IActionResult> InsertProviderSchedule(Service.DTOs.ProviderSchedule PS)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
+            var requestMessage = JsonConvert.SerializeObject(PS);
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            if (!ModelState.IsValid)
+            {
+                elapsed = timerElapsed.StopTimer();
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject("Not Valid Call!");
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                if (PS.PSId == 0)
+                {
+
+                    PS.CreatedBy = User.Claims.Where(c => c.Type == "UserName").First().Value;
+
+                    var result = await _providerSceduleManager.InsertProviderScheduleDB(PS);
+                    elapsed = timerElapsed.StopTimer();
+                    if (result)
+                    {
+                        var statusCode = HttpContext.Response.StatusCode;
+                        var responseMessage = JsonConvert.SerializeObject(result);
+                        var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                        logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+            method, path, statusCode, elapsed, requestMessage, responseMessage);
+                        return Ok(new { Success = true });
+                    }
+                    else
+                    {
+                        var statusCode = HttpContext.Response.StatusCode;
+                        var responseMessage = JsonConvert.SerializeObject(result);
+                        var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                        logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+            method, path, statusCode, elapsed, requestMessage, responseMessage);
+                        return BadRequest(result);
+                    }
+                }
+                else
+                {
+
+                    PS.UpdatedBy = User.Claims.Where(c => c.Type == "UserName").First().Value;
+
+                    var result = await _providerSceduleManager.UpdateProviderScheduleDB(PS);
+                    elapsed = timerElapsed.StopTimer();
+                    if (result)
+                    {
+                        var statusCode = HttpContext.Response.StatusCode;
+                        var responseMessage = JsonConvert.SerializeObject(result);
+                        var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                        logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+            method, path, statusCode, elapsed, requestMessage, responseMessage);
+                        return Ok(new { Success = true });
+                    }
+                    else
+                    {
+                        var statusCode = HttpContext.Response.StatusCode;
+                        var responseMessage = JsonConvert.SerializeObject(result);
+                        var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                        logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+            method, path, statusCode, elapsed, requestMessage, responseMessage);
+                        return BadRequest(result);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                elapsed = timerElapsed.StopTimer();
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+                return BadRequest(ex.Message);
+            }
+
+
+        }
+        #endregion
+
+        #region UpdateProviderScheduleByPSId
+        //    [HttpPut("UpdateProviderScheduleByPSId")]
+        //    public async Task<IActionResult> UpdatePrioritySchedule(ProviderSchedule PS)
+        //    {
+        //        var method = HttpContext.Request.Method;
+        //        var path = HttpContext.Request.Path;
+        //        var configuration = new ConfigurationBuilder()
+        //.AddJsonFile("appsettings.json")
+        //.Build();
+        //        var requestMessage = JsonConvert.SerializeObject(PS);
+        //        double elapsed = 0;
+        //        timerElapsed.StartTimer();
+        //        PS.UpdatedBy = User.Claims.Where(c => c.Type == "UserName").First().Value;
+        //        try
+        //        {
+        //            var result = await _providerSceduleManager.UpdateProviderScheduleDB(PS);
+        //            elapsed = timerElapsed.StopTimer();
+        //            if (result)
+        //            {
+        //                var statusCode = HttpContext.Response.StatusCode;
+        //                var responseMessage = JsonConvert.SerializeObject(result);
+        //                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+        //                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        //    method, path, statusCode, elapsed, requestMessage, responseMessage);
+        //                return Ok(new { Success = true });
+        //            }
+        //            else
+        //            {
+        //                var statusCode = HttpContext.Response.StatusCode;
+        //                var responseMessage = JsonConvert.SerializeObject(result);
+        //                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+        //                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        //    method, path, statusCode, elapsed, requestMessage, responseMessage);
+        //                return BadRequest(result);
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            elapsed = timerElapsed.StopTimer();
+        //            var statusCode = HttpContext.Response.StatusCode;
+        //            var responseMessage = JsonConvert.SerializeObject(ex.Message);
+        //            var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+        //            logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        //method, path, statusCode, elapsed, requestMessage, responseMessage);
+        //            return BadRequest(ex.Message);
+        //        }
+        //    }
+        #endregion
+
+        #region DeleteProviderSchedule
+        [HttpDelete("DeleteProviderSchedule/{PSId}")]
+        public async Task<IActionResult> Delete(long PSId)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
+            var requestMessage = "PSID" + PSId;
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                bool result = await _providerSceduleManager.DeleteProviderSchedule(PSId);
+                elapsed = timerElapsed.StopTimer();
+                if (result)
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(new { Success = true });
+                }
+                else
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+                elapsed = timerElapsed.StopTimer();
+                return BadRequest(ex.Message);
+            }
+
+        }
+        #endregion
+
+        #region priority
+        [HttpPut("priority")]
+        public async Task<IActionResult> UpdatePrority(List<PrioritySet> prioritySet)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
+            var requestMessage = JsonConvert.SerializeObject(prioritySet);
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                bool result = await _providerSceduleManager.UpdatePriority(prioritySet);
+                elapsed = timerElapsed.StopTimer();
+                if (result)
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(new { Success = true });
+                }
+                else
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        #endregion
+    }
+}

@@ -1,0 +1,26 @@
+﻿using HMIS.Application.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HMIS.Application.Implementations
+{
+    public interface IProviderScheduleManager
+    {
+        Task<DataSet> GetProviderFacilityDB(long ProviderId);
+        Task<DataSet> GetProviderSiteDB(int FacilityId);
+        Task<DataSet> GetProviderScheduleListDB(long? ProviderId, int? SiteId, int? FacilityId, int? UsageId, bool? Sunday, bool? Monday, bool? Tuesday, bool? Wednesday, bool? Thursday, bool? Friday, bool? Saturday, string? StartTime, string? EndTime, int? Priority, int? OffsetValue, int? PagingSize);
+        Task<DataSet> GetProviderScheduleDB(long ProviderId, int SiteId, int FacilityId, int UsageId);
+        Task<DataSet> GetProviderSingleScheduleDB(long PSId);
+        Task<bool> InsertProviderScheduleDB(ProviderSchedule ps);
+        Task<bool> UpdateProviderScheduleDB(ProviderSchedule ps);
+        Task<bool> DeleteProviderSchedule(long PSId);
+        Task<bool> UpdatePriority(List<PrioritySet> prioritySet);
+       // Task<DataSet> GetViewPatientDB(int? MRNo, string? PatientName, DateTime? AppDate, string? AppType, int? PatientStatus);
+        Task<DataSet> GetViewPatientStatusDB(int? MRNo);
+
+    }
+}
