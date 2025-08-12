@@ -40,4 +40,18 @@
 =======
 >>>>>>> origin/main
 >>>>>>> origin/hassan_dev
-/Web/.vs/Web/FileContentIndex
+/Server/HMIS.Persistence/obj
+/Server/HMIS.Domain/bin/Debug/net8.0
+/Server/HMIS.Domain/obj
+/Server/HMIS.Application/obj
+/Server/HMIS/obj
+/Server/HMIS/bin/Debug/net8.0
+/Server/.vs
+/Server/HMIS.Application/bin/Debug/net8.0
+/Server/HMIS.Core/bin/Debug/net8.0
+/Server/HMIS.Core/obj
+/Server/HMIS.Infrastructure/bin/Debug/net8.0
+/Server/HMIS.Infrastructure/obj
+/Server/HMIS.Service/obj/Debug/net8.0
+/Server/HMIS.Web.API/bin/Debug/net8.0
+/Server/HMIS.Web.API/obj

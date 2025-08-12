@@ -1,0 +1,168 @@
+﻿
+using HMIS.Application.DTOs.AuthenticateDTOs;
+using HMIS.Application.DTOs;
+using HMIS.Application.Implementations;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System.Configuration;
+using System.IO;
+using HMIS.Application.DTOs.PermissionDTOs;
+using HMIS.Core.Entities;
+
+namespace HMIS.API.Controllers.UserAuthentication
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AuthenticateTokenController : BaseApiController
+    {
+        #region feilds
+        private readonly IAuthenticateUserToken _authenticateUserToken;
+        private readonly IPermissionService _permissionService;
+        private readonly ILoginHistoryService _loginHistoryService;
+        TimerElapsed timerElapsed = new TimerElapsed();
+        #endregion
+
+        #region ctor
+        public AuthenticateTokenController(IAuthenticateUserToken authenticateUserToken, IPermissionService permissionService, ILoginHistoryService loginHistoryService)
+        {
+            _authenticateUserToken = authenticateUserToken;
+            _permissionService = permissionService;
+            _loginHistoryService = loginHistoryService;
+        }
+        #endregion
+        
+        #region methods
+
+        #region Login
+        [Route("Login")]
+        //[RequireHttps]
+        [HttpPost]
+        public async Task<IActionResult> Login([FromBody] AuthernticateUserToken user)
+            {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            var requestMessage = user.Name;
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress;
+                var result = await _authenticateUserToken.ValidarUser(user);
+                if (result.User != null)
+                {
+                    string username = result.User.UserName;
+                    long empId = result.User.EmployeeId;
+                    var permissions = await _permissionService.GetPermissionByEmpIdandUserId(empId, username);
+                    var tokenString = _authenticateUserToken.GenerateTokenJWT(user.Name, result.User.EmployeeId.ToString(), permissions?.Roles == null ? new List<Roles>() : permissions?.Roles);
+                    LoginUserHistory userlogin = new LoginUserHistory()
+                    {
+
+                        Token = tokenString,
+                        LoginUserName = user.Name,
+                        LogoffTime = null,
+                        Ipaddress = remoteIpAddress.ToString(),
+                        UpdatedOn = DateTime.Now,
+                        UpdatedBy = "system",
+                        LoginTime = DateTime.Now,
+                        LastActivityTime = null,
+                        UserLogOut = false,
+                        CreatedOn = DateTime.Now,
+                        CreatedBy = "system"
+                    };
+                    _loginHistoryService.LogHistory(userlogin);
+                    elapsed = timerElapsed.StopTimer();
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = tokenString + "\n allowscreens:" + permissions?.Permissions + "\n userId:" + user.Name + "\n success:" + true;
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(new { token = tokenString, allowscreens = permissions?.Permissions, userId = empId, userName = user.Name, empId = permissions?.employeeType, success = true, facilities = permissions?.Facility });
+                }
+                else
+                {
+                    elapsed = timerElapsed.StopTimer();
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = "User name or Password is Invalid!";
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                elapsed = timerElapsed.StopTimer();
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = "Exception Accurd: " + ex.Message;
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+                return StatusCode(500);
+            }
+
+        }
+        #endregion
+
+        #region Logout
+        [Route("Logout")]
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> LogOff()
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            var requestMessage = "No parameter";
+            try
+            {
+                Request.Headers.TryGetValue("Authorization", out var _token);
+                var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress;
+                string username = User.Claims.First(c => c.Type == "UserName").Value;
+
+                LoginUserHistory userlogin = new LoginUserHistory()
+                {
+
+                    Token = _token,
+                    LoginUserName = username,
+                    LogoffTime = DateTime.Now,
+                    Ipaddress = remoteIpAddress.ToString(),
+                    UpdatedOn = DateTime.Now,
+                    UpdatedBy = "system",
+                    LoginTime = null,
+                    LastActivityTime = null,
+                    UserLogOut = true,
+                    CreatedOn = null,
+                    CreatedBy = ""
+                };
+                _loginHistoryService.LogHistory(userlogin);
+                elapsed = timerElapsed.StopTimer();
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = _token + "\n allowscreens:" + "\n userId:" + username + "\n success:" + true;
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+                return Ok(new { token = _token, name = username, success = true });
+
+            }
+            catch (Exception ex)
+            {
+                elapsed = timerElapsed.StopTimer();
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = "Exception Accurd: " + ex.Message;
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+                return StatusCode(500);
+            }
+        }
+        #endregion
+        
+        #endregion
+    }
+}

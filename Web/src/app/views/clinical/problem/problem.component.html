@@ -46,7 +46,7 @@
                 <div class="col-12" style="margin-top: -20px;">
                   <div class="form-check">
                     <input type="checkbox" class="form-check-input" formControlName="isProviderCheck"
-                      id="isProviderCheck" (change)="onCheckboxChange()" style="height: 20px; width: 20px;" />
+                      id="isProviderCheck"  style="height: 20px; width: 20px;" />
                     <label class="form-check-label fw-semibold" for="isProviderCheck"
                       style="margin-left: 5px; margin-top: 3px;">
                       Provider Outside Clinic
@@ -70,21 +70,21 @@
 
                 <div class="col-lg-3">
                   <div class="mb-3">
-                    <label class="form-label">Problem</label>
+                    <label class="form-label" >Problem</label>
 
-                    <!-- <div class="input-group">
+                    <div class="input-group">
                       <input type="text" class="form-control" formControlName="problem" placeholder="Enter problem" />
                       <button class="btn btn-success" type="button" (click)="ClickFilter(standardModal)">
                         <i class="fa fa-search"></i>
                       </button>
-                    </div> -->
+                    </div>
                     <!-- Problem input with search button -->
-                    <div class="input-group">
-                      <input type="text" formControlName="problem" class="form-control" />
+                    <!-- <div class="input-group">
+                      <input type="text" formControlName="problem" class="form-control"  placeholder="Problem" />
                       <button type="button" class="btn btn-outline-primary" (click)="ClickFilter(standardModal)">
                         <i class="bi bi-search"></i>
                       </button>
-                    </div>
+                    </div> -->
 
 
                   </div>
@@ -117,7 +117,7 @@
                 <div class="col-lg-3">
                   <div class="mb-3">
                     <label class="form-label">Status</label>
-                    <select class="form-select" formControlName="status">
+                    <select class="form-select" formControlName="status" >
                       <option value="" disabled selected>Select Status</option>
                       <option value="Active">Active</option>
                       <option value="Inactive">Inactive</option>
@@ -237,17 +237,18 @@
 
   </div>
 
-  <div class="table-responsive">
+  <!-- <div class="table-responsive">
     <table class="table table-bordered table-striped">
       <thead>
         <tr class="text-center">
-          <th>Provider5</th>
+          <th>Provider</th>
           <th>Problem</th>
           <th>Comments</th>
           <th>Confidential</th>
           <th>Status</th>
           <th>Start Date</th>
           <th>End Date</th>
+          <th class="text-center">Action</th>
         </tr>
       </thead>
       <tbody class="table-group-divider">
@@ -261,10 +262,74 @@
           <td>{{ record.status }}</td>
           <td>{{ record.startDate }}</td>
           <td>{{ record.endDate }}</td>
+        
+           <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
+                  <ng-icon name="tablerEdit" class="me-1" (click)="editproblem(record)">
+                  </ng-icon>
+                  <ng-icon name="tablerTrash" class="text-danger me-1" (click)="
+                                           deleteproblem(record.id) ">
+                  </ng-icon>
+                </div>
+          
+
         </tr>
       </tbody>
     </table>
   </div>
+  <app-generic-pagination
+  [totalItems]="problemTotalItems"
+  [pageSize]="problemPageSize"
+  [currentPage]="problemCurrentPage"
+  (pageChanged)="onProblemPageChanged($event)">
+</app-generic-pagination> -->
+<div class="card mt-3">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="align-middle thead-sm">
+          <tr>
+            <th class="text-center">Provider</th>
+            <th class="text-center">Problem</th>
+            <th class="text-center">Comments</th>
+            <th class="text-center">Confidential</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Start Date</th>
+            <th class="text-center">End Date</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          <tr *ngFor="let record of medicalHistoryData">
+            <td class="text-center">{{ record.provider }}</td>
+            <td class="text-center">{{ record.problem }}</td>
+            <td class="text-center">{{ record.comments }}</td>
+            <td class="text-center">
+              <ng-icon [name]="record.confidential ? 'tablerCheck' : 'tablerX'"></ng-icon>
+            </td>
+            <td class="text-center">{{ record.status }}</td>
+            <td class="text-center">{{ record.startDate }}</td>
+            <td class="text-center">{{ record.endDate }}</td>
+            <td class="text-center">
+              <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
+                <ng-icon name="tablerEdit" class="me-1" (click)="editproblem(record)"></ng-icon>
+                <ng-icon name="tablerTrash" class="text-danger me-1" (click)="deleteproblem(record.id)"></ng-icon>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-generic-pagination
+      [totalItems]="problemTotalItems"
+      [pageSize]="problemPageSize"
+      [currentPage]="problemCurrentPage"
+      (pageChanged)="onProblemPageChanged($event)">
+    </app-generic-pagination>
+  </div>
+</div>
+
+
 
 </div>
 

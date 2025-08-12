@@ -8,6 +8,7 @@ import { Component } from 'lucide-angular';
 import { AppointmentsComponent } from '../Scheduling/appointments/appointments.component';
 import { modulePermissionGuard } from '@core/guards/module-permission.guard';
 import { VitalSignsComponent } from './vital-signs/vital-signs.component';
+import { ImmunizationsComponent } from './immunizations/immunizations.component';
 
 export const CLINICAL_ROUTES: Routes = [
   {
@@ -36,16 +37,20 @@ export const CLINICAL_ROUTES: Routes = [
         path: 'allergies',
         canActivate: [modulePermissionGuard],
         component: AllergiesComponent,
-        data: { title: 'Allergies' }
+        data: { module: 'Clinical', component: 'Allergies', title: 'Allergies' }
       },
 
       {
         path: 'vital signs',
         canActivate: [modulePermissionGuard],
         component: VitalSignsComponent,
-
-        data: {  title: 'Vital Signs' }
+        data: { module: 'Clinical', component: 'Vital Signs', title: 'Vital Signs' }
       },
+      {
+        path:'immunization',
+        canActivate:[modulePermissionGuard],
+        component:ImmunizationsComponent
+      }
     ]
   }
 ];

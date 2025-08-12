@@ -1,0 +1,190 @@
+﻿using Dapper;
+using HMIS.Infrastructure.ORM;
+using HMIS.Core.Entities;
+using HMIS.Application.Implementations;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static HMIS.Application.DTOs.SpLocalModel.DemographicListModel;
+
+namespace HMIS.Application.ServiceLogics
+{
+    public class CommonManager : ICommonManager
+    {
+        private readonly HMIS.Core.Entities.HMISDBContext _context;
+        public CommonManager(HMISDBContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<DataSet> GetFamilyByMRNoDB(string MRNo)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@MRNo", MRNo, DbType.String);
+
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("REG_GetPatientFamilyMembers", param);
+                if (ds.Tables[0].Rows.Count == 0)
+                {
+                    throw new Exception("No data found");
+                }
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<DataSet> GetCoverageAndRegPatientDBByMrNo(string MRNo)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@MRNo", MRNo, DbType.String);
+
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("Common_CoverageAndRegPatientGet", param);
+                if (ds.Tables[0].Rows.Count == 0)
+                {
+                    return new DataSet();
+                }
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                return new DataSet();
+            }
+        } 
+        public async Task<DataSet> GetCoverageAndRegPatientDB(FilterDemographicList req)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                string MRNo = req.DemographicList.Mrno;
+                MRNo = MRNo == "-1" ? string.Empty : MRNo;
+                param.Add("@MRNo", MRNo, DbType.String);
+                param.Add("@GenderId", req.DemographicList.GenderId, DbType.Int32);
+                param.Add("@Phone", req.DemographicList.Phone, DbType.String);
+                param.Add("@Name", req.DemographicList.Name, DbType.String);
+                param.Add("@Page", req.PaginationInfo.Page, DbType.String);
+                param.Add("@@PageSize", req.PaginationInfo.RowsPerPage, DbType.String);
+
+
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("Common_CoverageAndRegPatientGet", param);
+                if (ds.Tables[1].Rows.Count == 0)
+                {
+                    return new DataSet();
+                }
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                return new DataSet();
+            }
+        }      
+        public async Task<DataSet> GetRegPatientDB()
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                //param.Add("@MRNo", MRNo, DbType.String);
+
+                //DataSet ds = await DapperHelper.GetDataSetBySPWithParams("Common_CoverageAndRegPatientGet", param);
+                DataSet ds = await DapperHelper.GetDataSetBySP("REG_GetDemographicList");
+                if (ds.Tables[0].Rows.Count == 0)
+                {
+                    return new DataSet();
+                }
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                return new DataSet();
+            }
+        }
+
+
+        public async Task<DataSet> GetAppointmentDetailsByMRNo(string MRNo)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                 param.Add("@MRNo", MRNo, DbType.String);
+
+                //DataSet ds = await DapperHelper.GetDataSetBySPWithParams("Common_CoverageAndRegPatientGet", param);
+                DataSet ds = await DapperHelper.GetAppointmentDetails("GetAppointmentDetailByMRNo", param);
+                if (ds.Tables[0].Rows.Count == 0)
+                {
+                    return new DataSet();
+                }
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                return new DataSet();
+            }
+        }
+
+
+
+
+        public async Task<DataSet> GetInsurrancePayerInfo(long MRNo)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@MRNo", MRNo, DbType.Int64);
+
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("SCH_GETPAYERINFOBYMR", param);
+                if (ds.Tables[0].Rows.Count == 0)
+                {
+                    return new DataSet();
+                }
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                return new DataSet();
+            }
+        }
+
+        public async Task<DataSet> GetDemographicDB(string VisitAccountDisplay)
+        {
+            try
+            {
+
+                //var visitAcc=  _context.BlpatientVisits.Where(x=>x.AppointmentId== Convert.ToInt64(VisitAccountDisplay)).
+                //    Select(x=>x.VisitAccDisplay).FirstOrDefault();
+
+
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@VisitAccountDisplay", VisitAccountDisplay);
+
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("Common_GetDemographicByVisitAccountDisplay", param);
+                if (ds.Tables[0].Rows.Count == 0)
+                {
+                    return new DataSet();
+                }
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                return new DataSet();
+            }
+        }
+
+
+
+    }
+}

@@ -1,23 +1,25 @@
-import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, TemplateRef, ViewChild, OnDestroy } from '@angular/core';
 import { MenuItemType } from '@/app/types/layout';
 import { CommonModule } from '@angular/common';
 import { NgIcon } from '@ng-icons/core';
 import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
-import { filter } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { scrollToElement } from '@/app/utils/layout-utils';
 import { menuItems } from '@layouts/components/data';
 import { LayoutStoreService } from '@core/services/layout-store.service';
+import { PermissionService } from '@core/services/permission.service';
 
 @Component({
   selector: 'app-menu',
   imports: [NgIcon, NgbCollapse, RouterLink, CommonModule],
   templateUrl: './app-menu.component.html'
 })
-export class AppMenuComponent implements OnInit {
+export class AppMenuComponent implements OnInit, OnDestroy {
 
   router = inject(Router)
   layout = inject(LayoutStoreService)
+  permissionService = inject(PermissionService)
 
   @ViewChild('MenuItemWithChildren', { static: true })
   menuItemWithChildren!: TemplateRef<{ item: MenuItemType }>;
@@ -26,7 +28,7 @@ export class AppMenuComponent implements OnInit {
   menuItem!: TemplateRef<{ item: MenuItemType }>;
 
   menuItems = menuItems;
-
+  private subscription = new Subscription();
 
   ngOnInit(): void {
 
@@ -35,6 +37,16 @@ export class AppMenuComponent implements OnInit {
     if (allowedScreens?.length) {
       this.menuItems = this.buildMenuItemsFromScreens(allowedScreens, menuItems);
     }
+
+    // Subscribe to permission changes
+    this.subscription.add(
+      this.permissionService.onPermissionsRefreshed().subscribe(() => {
+        const updatedScreens = JSON.parse(sessionStorage.getItem('allowscreens') || '[]');
+        if (updatedScreens?.length) {
+          this.menuItems = this.buildMenuItemsFromScreens(updatedScreens, menuItems);
+        }
+      })
+    );
 
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -45,6 +57,10 @@ export class AppMenuComponent implements OnInit {
 
     this.expandActivePaths(this.menuItems);
     setTimeout(() => this.scrollToActiveLink(), 100);
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   hasSubMenu(item: MenuItemType): boolean {
@@ -61,7 +77,6 @@ export class AppMenuComponent implements OnInit {
   }
 
   isChildActive(item: MenuItemType): boolean {
-    debugger
     if (item.url && this.router.url === item.url) return true;
     if (!item.children) return false;
     return item.children.some((child: MenuItemType) => this.isChildActive(child));
@@ -87,7 +102,6 @@ export class AppMenuComponent implements OnInit {
 
 
   buildMenuItemsFromScreens(screens: string[], staticMenu: MenuItemType[]): MenuItemType[] {
-    debugger
     const menuMap = new Map<string, MenuItemType>();
     const validModules = new Set<string>();
     const validComponentsPerModule = new Map<string, Set<string>>();

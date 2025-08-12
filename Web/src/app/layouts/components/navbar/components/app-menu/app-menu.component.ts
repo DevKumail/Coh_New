@@ -23,6 +23,7 @@ import { DemographicApiServices } from '@/app/shared/Services/Demographic/demogr
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ModalTriggerService } from '@core/services/modal-trigger.service';
+import { PermissionService } from '@core/services/permission.service';
 
 @Component({
   selector: 'app-menu-navbar',
@@ -39,12 +40,13 @@ import { ModalTriggerService } from '@core/services/modal-trigger.service';
   ],
   templateUrl: './app-menu.component.html'
 })
-export class AppMenuComponent implements OnInit {
+export class AppMenuComponent implements OnInit, OnDestroy {
 
   router = inject(Router);
   patientBannerService = inject(PatientBannerService);
   modalTriggerService = inject(ModalTriggerService)
   isPatientAvailable = false;
+  permissionService = inject(PermissionService);
 
   @ViewChild('MenuItemWithChildren', { static: true })
   menuItemWithChildren!: TemplateRef<{
@@ -57,18 +59,26 @@ export class AppMenuComponent implements OnInit {
   menuItem!: TemplateRef<{ item: MenuItemType; linkClass?: string }>;
 
   menuItems: MenuItemType[] = horizontalMenuItems;
+  private subscription = new Subscription();
 
   ngOnInit() {
     // Dynamic menu filtering based on allowed screens
 
-
-    debugger
     const allowedScreens = JSON.parse(sessionStorage.getItem('allowscreens') || '[]');
 
     if (allowedScreens?.length) {
       this.menuItems = this.buildMenuItemsFromScreens(allowedScreens, horizontalMenuItems);
     }
 
+    // Subscribe to permission changes
+    this.subscription.add(
+      this.permissionService.onPermissionsRefreshed().subscribe(() => {
+        const updatedScreens = JSON.parse(sessionStorage.getItem('allowscreens') || '[]');
+        if (updatedScreens?.length) {
+          this.menuItems = this.buildMenuItemsFromScreens(updatedScreens, horizontalMenuItems);
+        }
+      })
+    );
 
     // Watch for navigation changes
     this.router.events
@@ -79,10 +89,10 @@ export class AppMenuComponent implements OnInit {
 
     this.expandActivePaths(this.menuItems);
 
-    this.patientBannerService.patientData$.subscribe(data => {
-      this.isPatientAvailable = data;
-    });
+  }
 
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   hasSubMenu(item: MenuItemType): boolean {
@@ -109,7 +119,6 @@ export class AppMenuComponent implements OnInit {
   }
 
   buildMenuItemsFromScreens(screens: string[], staticMenu: MenuItemType[]): MenuItemType[] {
-    debugger
     const menuMap = new Map<string, MenuItemType>();
     const validModules = new Set<string>();
     const validComponentsPerModule = new Map<string, Set<string>>();

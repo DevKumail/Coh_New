@@ -28,7 +28,8 @@ export interface PatientProblemModel {
   caseId?: null; // Guid in .NET → string in Angular
   errorReason: string;
   oldMrno: string;
-  icdversionId: number;
+//   icdversionId: number;
+icdversionId:string;
   isDeleted: boolean;
   patientId?: number;
   startstrdate: string;
