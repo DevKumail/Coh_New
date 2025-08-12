@@ -2,7 +2,6 @@ import { Component, OnInit,inject, TemplateRef, ViewChild } from '@angular/core'
 import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import listPlugin from '@fullcalendar/list';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import moment from 'moment';
 import { Router } from '@angular/router';
@@ -75,11 +74,11 @@ export class AppointmentDashboardComponent implements OnInit {
 
 
   calendarOptions: CalendarOptions = {
-    plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
+    plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin],
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
     initialView: 'dayGridMonth',
     weekends: true,
