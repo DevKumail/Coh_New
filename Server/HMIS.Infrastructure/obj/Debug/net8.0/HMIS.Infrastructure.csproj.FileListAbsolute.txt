@@ -1,5 +1,0 @@
-C:\Users\DELL\Desktop\Health Care Proj\HMIS\HMIS.Infrastructure\obj\Debug\net8.0\HMIS.Infrastructure.csproj.AssemblyReference.cache
-C:\Users\DELL\Desktop\Health Care Proj\HMIS\HMIS.Infrastructure\obj\Debug\net8.0\HMIS.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\DELL\Desktop\Health Care Proj\HMIS\HMIS.Infrastructure\obj\Debug\net8.0\HMIS.Infrastructure.AssemblyInfoInputs.cache
-C:\Users\DELL\Desktop\Health Care Proj\HMIS\HMIS.Infrastructure\obj\Debug\net8.0\HMIS.Infrastructure.AssemblyInfo.cs
-C:\Users\DELL\Desktop\Health Care Proj\HMIS\HMIS.Infrastructure\obj\Debug\net8.0\HMIS.Infrastructure.csproj.CoreCompileInputs.cache
