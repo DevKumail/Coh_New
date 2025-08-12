@@ -15,19 +15,20 @@
     </ol>
 </nav>
 
-<div class="card mt-3">
-    <div class="card-body">
-        <!-- Header section -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3 style="font-weight: bold" class="m-0">Demographics List</h3>
-            <button
-                class="btn btn-success btn-sm w-150"
-                type="button"
-                (click)="router.navigate(['/registration/demographic-create'])"
-            >
-                <i class="pi pi-user-plus"></i> New Patient
-            </button>
-        </div>
+<div class="container-fluid w-100">
+  <div class="card p-3 shadow mt-2">
+    <!-- Header section -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="m-0 fw-bold">Demographics List</h3>
+      <button
+      *hasPermission="'Registration:Demographics:Add'"
+        class="btn btn-success btn-sm w-150"
+        type="button"
+        (click)="router.navigate(['/registration/demographic-create'])"
+      >
+        <i class="pi pi-user-plus"></i> New Patient
+      </button>
+    </div>
 
         <!-- Table -->
         <div class="table-responsive">

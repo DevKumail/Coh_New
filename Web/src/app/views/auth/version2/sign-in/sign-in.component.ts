@@ -6,6 +6,7 @@ import { NgIcon } from '@ng-icons/core';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { CommonModule } from '@angular/common';
 
 
 
@@ -13,7 +14,7 @@ import { AuthService } from '../../../../core/services/auth.service';
     selector: 'app-sign-in',
     host: { 'data-component-id': 'auth2-sign-in' },
     standalone : true,
-    imports: [RouterLink,NgIcon,HttpClientModule ],
+    imports: [RouterLink,NgIcon,HttpClientModule ,CommonModule],
     templateUrl: './sign-in.component.html',
     styles: ``,
 

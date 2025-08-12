@@ -4,6 +4,8 @@ import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { ApiService } from './api.service';
+import { PermissionService } from './permission.service';
 
 
 interface Facility {
@@ -27,22 +29,21 @@ interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private tokenKey = 'access_token';
-  private readonly baseUrl = environment.apiUrl;
 
-
-
-  constructor(private http: HttpClient,private router: Router) {}
+  constructor(
+    private api: ApiService,
+    private router: Router,
+    private permissionService: PermissionService
+  ) {}
 
    login(username: string, password: string): Observable<void> {
 
-     // debugger
      const headers = new HttpHeaders({
   'Content-Type': 'application/json-patch+json'
 });
-    return this.http
-      .post<LoginResponse>(`${this.baseUrl}/AuthenticateToken/Login`, { name: username,
-  password: password },
- { headers })
+    return this.api
+      .post<LoginResponse>(`AuthenticateToken/Login`, { name: username,
+  password: password })
       .pipe(
         tap((res) => {
           localStorage.setItem(this.tokenKey, res.token);
@@ -51,6 +52,9 @@ export class AuthService {
           sessionStorage.setItem('empId', res.empId.toString());
           sessionStorage.setItem('facilities', JSON.stringify(res.facilities));
           sessionStorage.setItem('allowscreens', JSON.stringify(res.allowscreens));
+          
+          // Refresh permissions after storing them
+          this.permissionService.refreshPermissions();
         }),
         map(() => void 0)
       );
@@ -68,7 +72,7 @@ logout(): Observable<any> {
         'accept': '*/*'
     });
 
-    return this.http.post(`${this.baseUrl}/AuthenticateToken/Logout`, {}, { headers }).pipe(
+    return this.api.post(`AuthenticateToken/Logout`, {}).pipe(
         tap({
             next: () => {
                 console.log('Logout API call successful');

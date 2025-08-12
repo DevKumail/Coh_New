@@ -37,15 +37,14 @@ export const CLINICAL_ROUTES: Routes = [
         path: 'allergies',
         canActivate: [modulePermissionGuard],
         component: AllergiesComponent,
-        data: { title: 'Allergies' }
+        data: { module: 'Clinical', component: 'Allergies', title: 'Allergies' }
       },
 
       {
         path: 'vital signs',
         canActivate: [modulePermissionGuard],
         component: VitalSignsComponent,
-
-        data: {  title: 'Vital Signs' }
+        data: { module: 'Clinical', component: 'Vital Signs', title: 'Vital Signs' }
       },
       {
         path:'immunization',

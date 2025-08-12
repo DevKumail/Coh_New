@@ -20,6 +20,7 @@ import { NgIcon } from '@ng-icons/core';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { HasPermissionDirective } from '@/app/shared/directives/has-permission.directive';
 
 
 
@@ -31,6 +32,8 @@ import Swal from 'sweetalert2';
         FormsModule,
         RouterModule,
         NgIconComponent,
+        NgIcon,
+        HasPermissionDirective,
     ],
     templateUrl: './demographic-list.component.html',
     styleUrl: './demographic-list.component.scss',
