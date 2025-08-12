@@ -4,13 +4,13 @@
       <li class="breadcrumb-item">
         <a href="javascript:void(0);">
           <ng-icon name="tablerSmartHome"></ng-icon>
-          Clinical
+          Billing
         </a>
       </li>
       <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
         <ng-icon name="tablerChevronRight"></ng-icon>
       </li>
-      <li class="breadcrumb-item active" aria-current="page">Medical History</li>
+      <li class="breadcrumb-item active" aria-current="page">Charge Capture</li>
     </ol>
   </nav>
 
@@ -18,7 +18,6 @@
   <div class="card shadow rounded">
     <div class="card-body">
      <div class="col-lg-3">
-        <div class="mb-3">
           <label class="form-label">Provider / Nurse Name:</label>
           <select class="form-select" [(ngModel)]="ProviderId" name="ProviderId" (change)="provider($event)">
             <option value="">Select Provider</option>
@@ -29,34 +28,32 @@
       </div>
       <hr>
 
-       <div class="col-12 mt-2 d-flex justify-content-between">
+       <div class="col-12 d-flex justify-content-between" style="margin-bottom: -20px; margin-top: -8px;">
         <div class="col-md-4">
-          <h2 style="font-weight: bold">Diagnosis</h2>
+          <h3 style="font-weight: bold">Diagnosis</h3>
         </div>
         <div class="col-md-2 col-sm-4 col-12 d-flex">
           <div class="col-md-1"></div>
 
-           <button (click)="DGridHide()" *ngIf=" DHide == true" type="button" class="btn btn-info" style="width: 180px; height: 50px; margin-left: 10px;">
+           <button (click)="DGridHide()" *ngIf=" DHide == true" type="button" class="btn btn-info" style="width: 150px; height: 35px; margin-left: 10px;">
               <ng-icon 
+              style="margin-bottom: 5px;"
               name="tablerChevronDown"
               class="avatar-xxs me-1"/>
               Add Diagnosis
           </button>
 
-          <button (click)="DGridShow()" *ngIf="Dshow == true" type="button" class="btn btn-info" style="width: 180px; height: 50px; margin-left: 10px;">
+          <button (click)="DGridShow()" *ngIf="Dshow == true" type="button" class="btn btn-info" style="width: 150px; height: 35px; margin-left: 10px;">
               <ng-icon 
+              style="margin-bottom: 5px;"
               name="tablerChevronRight"
               class="avatar-xxs me-1"/>
               Add Diagnosis
           </button>
         </div>
       </div>
-      <hr>
-
-      
-
   <ng-container *ngIf="Diagnosis">
-      <ul ngbNav  #nav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs mb-3">
+      <ul ngbNav  #nav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs">
         <!-- My Diagnosis Code -->
         <li [ngbNavItem]="1">
           <a ngbNavLink href="javascript:void(0)">My Diagnosis Code</a>
@@ -111,8 +108,8 @@
 <!-- *ngxPermissionsOnly="['Control Panel:Human Resources:View']" -->
           <div>
               <div class="table-responsive">
-                <table class="table table-sm table-striped table-bordered">
-                  <thead class="thead-light">
+                <table class="table align-middle mb-0">
+                  <thead class="align-middle thead-sm">
                     <tr>
                       <th></th>
                       <th>Code</th>
@@ -120,7 +117,7 @@
                       <th>Description</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody class="table-group-divider">
                     <tr *ngFor="let diagnosis of pagedMyDiagnosisCode ">
                       <td>
                         <input
@@ -379,8 +376,8 @@
 
 
             <div class="table-responsive">
-              <table class="table table-sm table-striped table-bordered">
-                <thead class="thead-light">
+              <table class="table align-middle mb-0">
+                <thead class="align-middle thead-sm">
                   <tr>
                     <th></th>
                     <th>Code</th>
@@ -388,7 +385,7 @@
                     <th>Description</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody class="table-group-divider">
                   <tr *ngFor="let item of pagedDiagnosisCode; trackBy: trackByCode">
                     <td>
                       <input
@@ -475,11 +472,9 @@
         </ng-template>
           </li>
       </ul>
-
       <!-- Tab Content -->
       <div [ngbNavOutlet]="nav"></div>
   </ng-container>
-    </div>
   </div>
 
   <!-- Always Diagnosis show  -->
@@ -584,31 +579,30 @@
     <div class="card-body">
 
       <!-- Button For hide and show grid -->
-       <div class="col-12 mt-2 d-flex justify-content-between">
+       <div class="col-12 d-flex justify-content-between" style="margin-bottom: -20px; margin-top: -8px;">
         <div class="col-md-4">
-          <h2 style="font-weight: bold">Service</h2>
+          <h3 style="font-weight: bold">Service</h3>
         </div>
         <div class="col-md-2 col-sm-4 col-12 d-flex">
           <div class="col-md-1"></div>
 
-           <button (click)="SGridHide()" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; height: 50px; margin-left: 10px;">
-              <ng-icon 
+           <button (click)="SGridHide()" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 150px; height: 35px; margin-left: 20px;">
+              <ng-icon
+              style="margin-bottom: 5px;" 
               name="tablerChevronDown"
               class="avatar-xxs me-1"/>
               Add Service
           </button>
 
-          <button (click)="SGridShow()" *ngIf="SShow == true" type="button" class="btn btn-info" style="width: 180px; height: 50px; margin-left: 10px;">
+          <button (click)="SGridShow()" *ngIf="SShow == true" type="button" class="btn btn-info" style="width: 150px; height: 35px; margin-left: 20px;">
               <ng-icon 
+              style="margin-bottom: 5px;"
               name="tablerChevronRight"
               class="avatar-xxs me-1"/>
               Add Service
           </button>
         </div>
       </div>
-      <hr>
-
-      
     <!-- hide Service gride -->
       <ng-container *ngIf="Services">
           <ul ngbNav  #nav="ngbNav" [(activeId)]="activeServiceTabId" class="nav nav-tabs mb-3">
@@ -1641,6 +1635,9 @@ Enter comment here...</textarea
     </div>
     </div>
 
-
-
-    
+       <div class="row col-12">
+        <div class="col-12 mb-2">
+          <button style="float: right" (click)="submit()" type="button" class="btn btn-info">Save</button>
+           <button style="float: right; margin-right: 5px;" (click)="delete()" type="button" class="btn btn-danger">Delete</button>
+        </div>
+       </div>

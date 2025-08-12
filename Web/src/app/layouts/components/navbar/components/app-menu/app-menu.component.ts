@@ -22,6 +22,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ModalTriggerService } from '@core/services/modal-trigger.service';
 import { PermissionService } from '@core/services/permission.service';
 
 @Component({
@@ -42,6 +43,9 @@ import { PermissionService } from '@core/services/permission.service';
 export class AppMenuComponent implements OnInit, OnDestroy {
 
   router = inject(Router);
+  patientBannerService = inject(PatientBannerService);
+  modalTriggerService = inject(ModalTriggerService)
+  isPatientAvailable = false;
   permissionService = inject(PermissionService);
 
   @ViewChild('MenuItemWithChildren', { static: true })
@@ -101,7 +105,7 @@ export class AppMenuComponent implements OnInit, OnDestroy {
     return item.children.some(child => this.isChildActive(child));
   }
 
-  isActive(item: MenuItemType): boolean {
+  isActive(item: any): boolean {
     return item.url === this.router.url;
   }
 
@@ -174,6 +178,18 @@ export class AppMenuComponent implements OnInit, OnDestroy {
     }
 
     return Array.from(menuMap.values());
+  }
+
+  onPatientSummaryClick() {
+    if (this.isPatientAvailable) {
+      this.router.navigate(['/patient-summary']);
+    } else {
+      this.openAdvancedSearchModal();
+    }
+  }
+
+  openAdvancedSearchModal() {
+    this.modalTriggerService.openModal('advance-filter-modal', 'patient-summary');
   }
 
 }

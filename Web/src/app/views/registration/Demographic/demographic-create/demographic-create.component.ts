@@ -1,7 +1,8 @@
+import { title } from 'process';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { EmailItemType } from '@/app/views/apps/email/types';
 import { DemographicApiServices } from './../../../../shared/Services/Demographic/demographic.api.serviec';
-import { Component,AfterViewInit  } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import {
     FormBuilder,
     FormGroup,
@@ -23,14 +24,15 @@ import { OnInit } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
 import { RegistrationApiService } from '@/app/shared/Services/Registration/registration.api.service';
 import { DemographicDTO } from '@/app/shared/Models/registration/Demographics/Demographic.type.model';
-import   Swal from 'sweetalert2';
+import Swal from 'sweetalert2';
 import { NgxDaterangepickerBootstrapModule } from 'ngx-daterangepicker-bootstrap';
 import { ViewChild } from '@angular/core';
-import { NgxDaterangepickerBootstrapDirective} from "ngx-daterangepicker-bootstrap";
-import {NgxMaskDirective, provideNgxMask} from 'ngx-mask'
+import { NgxDaterangepickerBootstrapDirective } from 'ngx-daterangepicker-bootstrap';
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { LoaderService } from '@core/services/loader.service';
+import { e } from 'node_modules/@angular/cdk/scrolling-module.d-ud2XrbF8';
 
 declare var flatpickr: any;
-
 
 @Component({
     selector: 'app-demographic-create',
@@ -41,26 +43,22 @@ declare var flatpickr: any;
         RouterModule,
         NgIconComponent,
         FilePondModule,
-        NgbNavModule,NgxMaskDirective,
+        NgbNavModule,
+        NgxMaskDirective,
         //NgxDaterangepickerootstrapModule,
-
     ],
-      providers: [
-    provideNgxMask()
-  ],
+    providers: [provideNgxMask()],
 
     standalone: true,
     templateUrl: './demographic-create.component.html',
     styleUrl: './demographic-create.component.scss',
-
 })
-export class DemographicCreateComponent implements OnInit,AfterViewInit   {
-
+export class DemographicCreateComponent implements OnInit, AfterViewInit {
     @ViewChild('picker') picker!: NgxDaterangepickerBootstrapDirective;
 
     demographicForm!: FormGroup;
     contactForm!: FormGroup;
-    nextForm! : FormGroup;
+    nextForm!: FormGroup;
     spouseForm!: FormGroup;
     emergencyContactForm!: FormGroup;
     assignmentForm!: FormGroup;
@@ -70,11 +68,13 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
     titles: any[] = [];
     gender: any[] = [];
     genderIdentity: any[] = [];
-    preferredName:[]=[];
+    preferredName: [] = [];
     maritalstatus: any[] = [];
     bloodgroup: any[] = [];
+    laborCardNo: any[] = [];
     religion: any[] = [];
     ethinic: any[] = [];
+    billingNote: any[] = [];
     nationality: any[] = [];
     language: any[] = [];
     MediaChannel: any[] = [];
@@ -82,8 +82,8 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
     Emirates: any[] = [];
     FeeSchedule: any[] = [];
     FinancialClass: any[] = [];
-    Site: any []=[];
-    location: any []=[];
+    Site: any[] = [];
+    location: any[] = [];
     EntityTypes: any[] = [];
     referred: any[] = [];
     state: any[] = [];
@@ -92,12 +92,11 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
     genders: any[] = [];
     states: any[] = [];
     city: any[] = [];
-    relationships: any[]=[];
+    relationships: any[] = [];
 
-    qid:any;
+    qid: any;
 
-
-
+    isLoading: boolean = false;
 
     CarrierId: any;
     ShowAccordian: boolean = true;
@@ -114,36 +113,39 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
         private fb: FormBuilder,
         private router: Router,
         private DemographicApiServices: DemographicApiServices,
-        private registrationApi: RegistrationApiService
+        private registrationApi: RegistrationApiService,
+        public Loader: LoaderService
     ) {}
 
     ngOnInit(): void {
         this.initializeForm();
         this.fillDropdown();
         this.FillCache();
-        this.getDemographicsByMRNo();
-
+        const patient = history.state.patient;
+        debugger
+        if (patient != null) {
+            this.getDemographicsByMRNo(patient.mrNo);
+        }
     }
 
+    ngAfterViewInit(): void {
+        flatpickr('#deathDate', {
+            dateFormat: 'Y-m-d',
+            maxDate: 'today', // prevent future dates
+            onChange: (selectedDates: any, dateStr: string) => {
+                this.demographicForm.get('DeathDate')?.setValue(dateStr);
+            },
+        });
 
-  ngAfterViewInit(): void {
-    flatpickr('#deathDate', {
-      dateFormat: 'Y-m-d',
-      maxDate: 'today', // prevent future dates
-      onChange: (selectedDates: any, dateStr: string) => {
-        this.demographicForm.get('DeathDate')?.setValue(dateStr);
-      },
-    });
-
-    flatpickr('#birthDate', {
-    dateFormat: 'Y-m-d',
-    maxDate: 'today', // typically DOB should not be in the future
-    onChange: (selectedDates: any, dateStr: string) => {
-      this.demographicForm.get('PatientBirthDate')?.setValue(dateStr);
-      this.calculateAgeOnChangeDOB(); // call your age calculation
-    },
-  });
-  }
+        flatpickr('#birthDate', {
+            dateFormat: 'Y-m-d',
+            maxDate: 'today', // typically DOB should not be in the future
+            onChange: (selectedDates: any, dateStr: string) => {
+                this.demographicForm.get('PatientBirthDate')?.setValue(dateStr);
+                this.calculateAgeOnChangeDOB(); // call your age calculation
+            },
+        });
+    }
 
     initializeForm() {
         this.demographicForm = this.fb.group({
@@ -202,19 +204,19 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
             workPhone: [''],
             email: ['', [Validators.required, Validators.email]],
         });
-      this.nextForm = this.fb.group({
-          relationshipId: [''],
-          dwellingNumber: [''],
-          faxNo: [''],
-          postalCode: [''],
-          streetName: [''],
-          CountryId: [''],
-          StateId: [''],
-          CityId: [''],
-          cellPhone: [''],
-          homePhone: [''],
-          workPhone: [''],
-          email: [''],
+        this.nextForm = this.fb.group({
+            relationshipId: [''],
+            dwellingNumber: [''],
+            faxNo: [''],
+            postalCode: [''],
+            streetName: [''],
+            CountryId: [''],
+            StateId: [''],
+            CityId: [''],
+            cellPhone: [''],
+            homePhone: [''],
+            workPhone: [''],
+            email: [''],
         });
 
         this.spouseForm = this.fb.group({
@@ -267,16 +269,15 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
             expiryDate: [''],
             entityTypeId: [''],
             entityNameId: [''],
-            providerReferredId: ['']
+            providerReferredId: [''],
         });
 
         this.familyForm = this.fb.group({
-        mrNo: [''],
-        accountType: ['Master'], // Default to Master
-        masterMrNo: [''],
-        relationshipId: ['']
-});
-
+            mrNo: [''],
+            accountType: ['Master'], // Default to Master
+            masterMrNo: [''],
+            relationshipId: [''],
+        });
     }
 
     calculateAgeOnChangeDOB() {
@@ -346,7 +347,6 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
     }
 
     getEmiratesType() {
-        ;
         this.DemographicApiServices.getAllEmirates().subscribe((res) => {
             this.Emirates = res as any[];
         });
@@ -463,7 +463,6 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
         let relationships = JSON.parse(jParse).RegRelationShip;
         let site = JSON.parse(jParse).RegLocationTypes;
 
-
         if (regcountries) {
             regcountries = regcountries.map(
                 (item: { CountryId: any; Name: any }) => {
@@ -489,31 +488,25 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
             this.genders = reggender;
         }
 
-    if (site) {
-
-        this.Site = site.map((item: { TypeId: any; Name: any }) => ({
-            id: item.TypeId,
-            name: item.Name
-        }));
-    }
-
-    if (relationships) {
-      relationships = relationships.map(
-        (item: { RelationshipId: any; Relationship: any }) => {
-          return {
-            name: item.Relationship,
-            code: item.RelationshipId,
-          };
+        if (site) {
+            this.Site = site.map((item: { TypeId: any; Name: any }) => ({
+                id: item.TypeId,
+                name: item.Name,
+            }));
         }
-      );
-      this.relationships = relationships;
+
+        if (relationships) {
+            relationships = relationships.map(
+                (item: { RelationshipId: any; Relationship: any }) => {
+                    return {
+                        name: item.Relationship,
+                        code: item.RelationshipId,
+                    };
+                }
+            );
+            this.relationships = relationships;
+        }
     }
-
-
-
-    }
-
-
 
     mapToDropdown(
         source: any[],
@@ -531,8 +524,39 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
         this.DemographicApiServices.getDemographicsByMRNo(MrNo)
             .then((demographics: any) => {
                 if (demographics?.table1?.length > 0) {
+                    console.log('responce', demographics.table1[0]);
+
                     const data: DemographicDTO = demographics.table1[0];
+
                     this.demographicForm.patchValue(data);
+                    const gender =  this.gender.find((e: any) => e.name == demographics?.table1[0]?.gender)?.code;
+                    const title =  this.titles.find((e: any) => e.name == demographics?.table1[0]?.title)?.code;
+                    const maritalstatus = this.maritalstatus.find((e:any) => e.name == demographics?.table1[0]?.maritalStatus)?.code;
+                    const bloodGroup = this.bloodgroup.find((e:any) => e.name == demographics?.table1[0]?.bloodGroup)?.code;
+                    const billingNote = this.billingNote.find((e:any) => e.name == demographics?.table1[0]?.billingNote)?.code;
+                    const ethinic = this.ethinic.find((e:any) => e.name == demographics?.table1[0]?.ethinic)?.code;
+                    //const LaborCardNo = this.laborCardNo.find((e: any) => e.name == demographics?.table1[0]?.LaborCardNo)?.code;
+                    const DOB = demographics?.table1[0]?.patientBirthDate;
+                    const emiratesIDN = this.Emirates.find((e:any) => e.name == demographics?.table1[0]?.emiratesIDN)?.code;
+                    this.demographicForm.patchValue({
+                    PersonFirstName: demographics?.table1[0]?.personFirstName,
+                    PersonMiddleName: demographics?.table1[0]?.personMiddleName,
+                    PersonLastName: demographics?.table1[0]?.personLastName,
+                    PersonSexId: gender,
+                    PersonTitleId:title,
+                    BillingNote: billingNote,
+
+                    PersonMaritalStatus:  maritalstatus,
+                    emails: demographics?.table1[0]?.email,
+                    PersonEthnicityType: demographics?.table1[0]?.PersonEthnicityType,
+
+                    PatientBloodGroupId: bloodGroup,
+                    PatientBirthDate: DOB.split('T')[0] || null,
+                    LaborCardNo: demographics?.table1[0]?.LaborCardNo,
+                    personSocialSecurityNo: demographics?.table1[0]?.personSocialSecurityNo,
+
+
+                });
                     this.imageSrc = data.PatientPicture ?? '';
                 }
             })
@@ -545,12 +569,11 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
             });
     }
 
-     ngAfterViewIniti(): void {
-    this.FillDropDown(this.qid);
-  }
+    ngAfterViewIniti(): void {
+        this.FillDropDown(this.qid);
+    }
 
     onSubmit() {
-
         const formData: DemographicDTO = this.demographicForm.getRawValue();
 
         if (
@@ -573,7 +596,7 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
         formData.Nationality = formData.Nationality || 0;
         formData.EmiratesIDN = formData.EmiratesIDN || 0;
         formData.primarycarephysicianPcp =
-        formData.primarycarephysicianPcp || 0;
+            formData.primarycarephysicianPcp || 0;
         formData.BillingNote = formData.BillingNote || '';
 
         const demographic: DemographicDTO = {
@@ -585,9 +608,9 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
             isDrugHist: this.demographicForm.get('isDrugHist')?.value ?? false,
             isExpReporting:
                 this.demographicForm.get('isExpReporting')?.value ?? false,
-                Contact: this.contactForm.get('homePhone')?.value ?? '123'
+            Contact: this.contactForm.get('homePhone')?.value ?? '123',
         };
-                debugger
+
         this.DemographicApiServices.submitDemographic(demographic).subscribe({
             next: (res: any) => {
                 Swal.fire({
@@ -640,18 +663,12 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
         }
     }
 
-
-
-
-
     onCountryChange() {
-        ;
         const countryId = this.contactForm.get('CountryId')?.value;
         if (countryId) {
             this.registrationApi
                 .getStateByCountry(countryId)
                 .then((res: any) => {
-                    ;
                     this.states = res;
                     this.contactForm.get('StateId')?.setValue(null); // Reset State
                     this.city = [];
@@ -667,7 +684,6 @@ export class DemographicCreateComponent implements OnInit,AfterViewInit   {
 
     onStateChange() {
         const stateId = this.contactForm.get('StateId')?.value;
-        ;
         if (stateId) {
             this.registrationApi.getCityByState(stateId).then((res: any) => {
                 this.city = res;

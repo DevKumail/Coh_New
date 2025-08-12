@@ -1,3 +1,4 @@
+import { ProblemComponent } from './../../views/clinical/problem/problem.component';
 import { MenuItemType } from '@/app/types/layout';
 
 type UserDropdownItemType = {
@@ -111,7 +112,27 @@ export const menuItems: ExtendedMenuItemType[] = [
             //     icon: 'tablerStackFront',
             //     url: '/landing',
             // },
+            { label: 'Menu', isTitle: true },
+            // {
+            //     label: 'Dashboards',
+            //     icon: 'tablerLayoutDashboard',
+            //     isCollapsed: true,
+            //     badge: {variant: 'success', text: '5'},
+            //     children: [
+            //         {label: 'Dashboard v.1', url: '/dashboards/dashboard-1'},
+            //         {label: 'Dashboard v.2', url: '/dashboards/dashboard-2'},
+            //         {label: 'Dashboard v.3', url: '/dashboards/dashboard-3'},
+            //         {label: 'Dashboard v.4', url: '#!', isDisabled: true, badge: {variant: 'light', text: 'Soon'}},
+            //         {label: 'Dashboard v.5', url: '#!', isDisabled: true, badge: {variant: 'light', text: 'Soon'}},
+            //     ]
+            // },
+            // {
+            //     label: 'Landing Page',
+            //     icon: 'tablerStackFront',
+            //     url: '/landing',
+            // },
 
+            { label: 'Menu', isTitle: true },
             { label: 'Menu', isTitle: true },
 
             // ✅ Clinical Module Section (permission based)
@@ -135,6 +156,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 ],
             },
 
+            { label: 'Menu', isTitle: true },
             { label: 'Menu', isTitle: true },
 
             // ✅ Clinical Module Section (permission based)
@@ -435,6 +457,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             },
         ],
     },
+
     {
         label: 'Error Pages',
         icon: 'tablerAlertHexagon',
@@ -462,6 +485,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Preloader', url: '/layouts/preloader' },
         ],
     },
+
     {
         label: 'Sidebars',
         icon: 'tablerLayoutSidebar',
@@ -813,6 +837,54 @@ export const horizontalMenuItems: MenuItemType[] = [
             },
         ],
     },
+
+    {
+        label: 'Billing',
+        icon: 'tablerHeartbeat',
+        module: 'Billing',
+        isCollapsed: true,
+        children: [
+            {
+                label: 'Charge Capture',
+                icon: 'tablerBell',
+                url: '/billing/charge capture',
+            },
+        ],
+    },
+
+
+
+    {
+        label: 'Scheduling',
+        icon: 'tablerCalendarEvent',
+        module: 'Scheduling',
+        isCollapsed: true,
+        children: [
+            {
+                label: 'View Appointments',
+                icon: 'tablerCalendar',
+                url: '/scheduling/View Appointments',
+            },
+            {
+            label: 'Appointment Dashboard',
+            icon: 'tablerLayoutDashboard',
+            url: '/scheduling/appointment-dashboard',
+            },
+            // {
+            //     label: 'Create Appointment',
+            //     icon: 'tablerPlus',
+            //     url: '/scheduling/create appointment',
+            // },
+            // {
+            //     label: 'Filter Appointments',
+            //     icon: 'tablerFilter',
+            //     url: '/scheduling/Filter',
+            // },
+        ],
+    },
+
+
+
     {
         label: 'Apps',
         icon: 'tablerApps',

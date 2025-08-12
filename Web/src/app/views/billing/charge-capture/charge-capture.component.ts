@@ -11,6 +11,7 @@ import { ChargeCaptureService } from '@/app/shared/Services/Charge-Capture/charg
 import { EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { log } from 'console';
+import { LoaderService } from '@core/services/loader.service';
 // import { NgxPermissionsDirective } from 'ngx-permissions';
 
 @Component({
@@ -147,6 +148,7 @@ MyDentalGroups:any[]=[];
   constructor(
     private service: ChargeCaptureService,
     private router: Router,
+    private loader: LoaderService
   ) {  }
   SearchCPTby: any = [
     { code: 1, name: 'All' },
@@ -179,41 +181,22 @@ MyDentalGroups:any[]=[];
   selectedId: any;
   ProceduresData:any = [];
 
-  ngOnInit(): void {
-    // this.chargecapture = this.fb.group({
-    //   provider: [''],
-    //   providerName: [''],
-    //   code: [''],
-    //   problem: [''],
-    //   icdVersion: [''],
-    //   confidential: [''],
-    //   startDate: [''],
-    //   endDate: [''],
-    //   comments: [''],
-    //   status: ['']
-    // });
+  async ngOnInit() {
+    // var visitAccountDetail=localStorage.getItem("LoadvisitDetail");  
+    // if(!(visitAccountDetail==undefined)  && !(visitAccountDetail=="") && !(visitAccountDetail==null))
+    // {
+    //   this.visitDetail=JSON.parse(localStorage.getItem("LoadvisitDetail") || "");
+    //   console.log(this.visitDetail);
+    //   this.VisitAccountNO=  this.visitDetail.visitAccountNo;
+    //   this.MrNo=  this.visitDetail.mrNo;
+    // }
 
-
-    var visitAccountDetail=localStorage.getItem("LoadvisitDetail");
-     
-    if(!(visitAccountDetail==undefined)  && !(visitAccountDetail=="") && !(visitAccountDetail==null))
-    {
-      this.visitDetail=JSON.parse(localStorage.getItem("LoadvisitDetail") || "");
-      console.log(this.visitDetail);
-      this.VisitAccountNO=  this.visitDetail.visitAccountNo;
-      this.MrNo=  this.visitDetail.mrNo;
-
-      //alert( this.visitDetail.visitAccountNo)
-    }
-
-
-     
-    this.FillCache();
-    this.populateYearDropdown();
+    await this.FillCache();
+    await this.populateYearDropdown();
   }
 
-  loadICD9Gropu(){
-    this.service.GetICD9CMGroupByProvider(this.ProviderId).then((response: any) => {
+  async loadICD9Gropu(){
+    await this.service.GetICD9CMGroupByProvider(this.ProviderId).then((response: any) => {
       console.log(response , 'Group');
       this.ICT9Group=response || [];
 
@@ -238,8 +221,8 @@ MyDentalGroups:any[]=[];
             text: error?.message
           }));
           }
-  loadCPTGroup(){
-    this.service.GetCPTByProvider(this.ProviderId).then((response: any) => {
+  async loadCPTGroup(){
+    await this.service.GetCPTByProvider(this.ProviderId).then((response: any) => {
       console.log(response , 'Group');
       this.CPTGroups=response || [];
     if(this.CPTGroups.length != 0){
@@ -266,10 +249,10 @@ MyDentalGroups:any[]=[];
           }));
   }
 
-loadHCPCSGroup() {
+async loadHCPCSGroup() {
   debugger
   
-  this.service.GetHCPCSByProvider(this.ProviderId)
+  await this.service.GetHCPCSByProvider(this.ProviderId)
     .then((response: any) => {
       // Map the response directly and include the 'ALL' group.
       if(Object.keys(response).length != 0){
@@ -462,8 +445,8 @@ async filterMyDental(e: any){
       this.MyDentalCodeSetPagedData();
 }
 
-  FillCache() {
-    this.service.getCacheItem({ entities: this.cacheItems }).then((response: any) => {
+  async FillCache() {
+     await this.service.getCacheItem({ entities: this.cacheItems }).then((response: any) => {
       if (response.cache != null) {
         this.FillDropDown(response);
       }
@@ -551,14 +534,15 @@ async filterMyDental(e: any){
     this.loadDentalGroupGroup();
   }
 
-  provider(event:any) {
-     
-    this.AllServicesApis();
-    this.AllDignosisApis();
-    this.loadICD9Gropu();
-    this.loadCPTGroup();
-    this.loadHCPCSGroup();
-    this.loadDentalGroupGroup();
+  async provider(event:any) {
+    this.loader.show();
+    await this.AllServicesApis();
+    await this.AllDignosisApis();
+    await this.loadICD9Gropu();
+    await this.loadCPTGroup();
+    await this.loadHCPCSGroup();
+    await this.loadDentalGroupGroup();
+    this.loader.hide();
   }
 
 
@@ -656,7 +640,7 @@ selectedgrid:any=[]
       return;
     }
      
-    this.currentUser = JSON.parse(localStorage.getItem("currentUser") || "");
+    this.currentUser = JSON.parse(sessionStorage.getItem("userId") || "");
     const currentDate = new Date();
     let ChargCaptureModel = {
       VisitAccountNo:parseInt(this.VisitAccountNO),
@@ -666,9 +650,7 @@ selectedgrid:any=[]
     let data:any=[];
     for(let i=0;i<this.MyDiagnosisData.length;i++)
     {
-
       let Array={
-
         DiagnosisId : 0,
         VisitAccountNo : parseInt(this.VisitAccountNO),
         Icd9code: this.MyDiagnosisData[i].ICDCode,
@@ -678,19 +660,12 @@ selectedgrid:any=[]
         DiagnosisPriority: 'Primary',
         DiagnosisType :'Final',
         Confidential : false,
-
         IsHl7msgCreated :false,
-
         Icdorder :Number( i+1 ),
-
         Type :this.MyDiagnosisData[i].typeofDiagnosis,
-
         Descriptionshort :this.MyDiagnosisData[i].description,
-
         IcdversionId :this.MyDiagnosisData[i].versionId,
-
         YearofOnset :this.MyDiagnosisData[i].yearofOnset
-
     };
       data.push(Array);
     }
@@ -1002,90 +977,6 @@ onMyhcpcsCheckboxChange(event: any, item: any): void {
     console.log(this.MyServicesData, "Processed Selected Services");
   }
 
-
-  // CPTRows(){
-     
-  //   let data:any=[];
-  //   for(let i=0;i<this.selectedServices.length;i++)
-  //   {
-  //     let oldData={
-  //       type: "",
-  //       cptCode:undefined,
-  //       description:undefined
-  //     };
-
-  //     if(this.selectedServices[i].procedureType == "Dental"){
-
-  //       oldData.type=this.selectedServices[i].procedureType;
-  //       oldData.cptCode=this.selectedServices[i].dentalCode;
-  //       oldData.description=this.selectedServices[i].providerDescription;
-  //       this.Dental = true;
-  //       this.cpt = false;
-  //       this.HCPCS = false;
-  //       data.push(oldData);
-
-  //     }
-  //     if(this.selectedServices[i].procedureType == "ALLDental"){
-
-  //       oldData.type="Dental";
-  //       oldData.cptCode=this.selectedServices[i].dentalCode;
-  //       oldData.description=this.selectedServices[i].descriptionFull;
-  //       this.Dental = true;
-  //       this.cpt = false;
-  //       this.HCPCS = false;
-  //       data.push(oldData);
-
-  //     }
-  //     //this.MyServicesData = data;
-
-  //     if(this.selectedServices[i].procedureType == "CPT"){
-  //       oldData.type=this.selectedServices[i].procedureType;
-  //       oldData.cptCode=this.selectedServices[i].cptCode;
-  //       oldData.description=this.selectedServices[i].providerDescription;
-  //       this.cpt = true;
-  //       this.Dental = false;
-  //       this.HCPCS = false;
-  //       data.push(oldData);
-
-  //     }
-  //     if(this.selectedServices[i].procedureType == "ALLCPT"){
-  //       oldData.type= "CPT";
-  //       oldData.cptCode=this.selectedServices[i].cptCode;
-  //       oldData.description=this.selectedServices[i].descriptionFull;
-  //       this.cpt = true;
-  //       this.Dental = false;
-  //       this.HCPCS = false;
-  //       data.push(oldData);
-
-  //     }
-
-  //     if(this.selectedServices[i].procedureType == "HCPCS"){
-  //       oldData.type=this.selectedServices[i].procedureType;
-  //       oldData.cptCode=this.selectedServices[i].hcpcsCode;
-  //       oldData.description=this.selectedServices[i].providerDescription;
-  //       this.HCPCS = true;
-  //       this.cpt = false;
-  //       this.Dental = false;
-  //       data.push(oldData);
-
-  //     }
-
-  //     if(this.selectedServices[i].procedureType == "ALLHCPCS"){
-  //       oldData.type= "HCPCS";
-  //       oldData.cptCode=this.selectedServices[i].cptCode;
-  //       oldData.description=this.selectedServices[i].descriptionFull;
-  //       this.cpt = true;
-  //       this.Dental = false;
-  //       this.HCPCS = false;
-  //       data.push(oldData);
-
-  //     }
-  //   }
-
-  //   this.MyServicesData = data;
-  //   console.log(this.MyServicesData,"kun");
-  // }
-
   editingValues: any = {};
 
   toggleEditMode(rowIndex: number, column: string): void {
@@ -1209,7 +1100,10 @@ pagedDiagnosisCode: any[] = [];
 diagnosisCodeCurrentPage = 1;
 diagnosisCodePageSize = 10;
 diagnosisCodeTotalItems = 0;
+    
 
+
+ 
 get diagnosisCodeTotalPages(): number {
   return Math.ceil(this.diagnosisCodeTotalItems / this.diagnosisCodePageSize);
 }

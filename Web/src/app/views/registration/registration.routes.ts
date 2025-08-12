@@ -4,7 +4,7 @@ import { AlertComponent } from './alert/alert.component';
 import { CovrageCreateComponent } from './Covrage/covrage-create/covrage-create.component';
 import { CoverageListComponent } from './Covrage/coverage-list/coverage-list.component';
 import { DemographicCreateComponent } from './Demographic/demographic-create/demographic-create.component';
-import { DemographicsListComponent } from './Demographic/demographic-list/demographic-list.component';
+import { DemographicListComponent } from './Demographic/demographic-list/demographic-list.component';
 import { Contact } from 'lucide-angular';
 import { title } from 'process';
 import { TemporaryPatientDemographicListComponent } from './Temporary Patient Demographics/temporary-patient-demographic-list/temporary-patient-demographic-list.component';
@@ -19,12 +19,14 @@ export const Registration_ROUTES: Routes = [
     data: { permissions: ['Registration:Alerts'] },
     children: [
       {
+        path: 'alerts',
 
         path: 'alerts',
         canActivate: [modulePermissionGuard],
         component: AlertComponent,
         data: { title: 'Alerts' }
       },
+
       {
         path: 'coverages',
         canActivate: [modulePermissionGuard],

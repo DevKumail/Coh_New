@@ -13,21 +13,22 @@
         </div>
 
         <!-- 📝 Reactive Form Starts -->
-        <form [formGroup]="subscriberForm" (ngSubmit)="insertsubscriber()">
+        <form [formGroup]="subscriberForm">
             <div class="row">
                 <!-- Type -->
                 <div class="col-3">
                     <label>Type</label><span class="danger"> *</span>
-                    <select
+                   <select
                         class="form-select"
                         formControlName="CompanyOrIndividual"
                         (change)="showRelation()"
                     >
                         <option value="">-- Select Type --</option>
-                        <option *ngFor="let t of type" [value]="t.value">
+                        <option *ngFor="let t of type" [value]="t.value" >
                             {{ t.label }}
                         </option>
                     </select>
+
                 </div>
 
                 <!-- Relationship Dropdown (Show only if isRelation == true) -->
@@ -96,27 +97,16 @@
                 <!-- Phone -->
                 <div class="col-3">
                     <label>Cell Phone</label><span class="danger"> *</span>
+
                     <input
                         type="text"
                         class="form-control"
                         formControlName="InsuredPhone"
-                        placeholder="03XXXXXXXXXX"
+                        placeholder="(00) 0000-0000"
+                        [mask]="'(00) 0000-0000'"
                     />
                 </div>
 
-                <!-- DOB using ngxDaterangepickerBootstrap -->
-                <!-- <div class="col-3">
-                    <label>Date of Birth</label><span class="danger"> *</span>
-                   <input
-                       type="text"
-                       ngxDaterangepickerMd
-                       [singleDatePicker]="true"
-                       [showCancel]="true"
-                       formControlName="BirthDate"
-                    class="form-control"
-                    />
-
-                </div> -->
                 <div class="col-3">
                     <label>Date of Birth</label><span class="danger"> *</span>
                     <input
@@ -124,7 +114,7 @@
                         class="form-control date"
                         formControlName="BirthDate"
                         data-provider="flatpickr"
-                        id="birthDate"
+                        id="BirthDate"
                         placeholder="Select date"
                     />
                 </div>
@@ -187,7 +177,14 @@
                         type="text"
                         class="form-control"
                         formControlName="ZipCode"
+                        placeholder="Zip Code"
+                        [mask]="'00000'"
                     />
+                    <!-- <input
+                        type="text"
+                        class="form-control"
+                        formControlName="ZipCode"
+                    /> -->
                 </div>
 
                 <!-- Insurance Carrier -->
@@ -205,16 +202,16 @@
                     </select>
                 </div>
 
-                <!-- Policy Plan -->
                 <div class="col-3">
                     <label>Policy Plan</label><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select policy-select"
                         formControlName="selectedBLPayerPlan"
                     >
                         <option
                             *ngFor="let plan of BLPayerPlan"
                             [value]="plan.code"
+                            [title]="plan.name"
                         >
                             {{ plan.name }}
                         </option>
@@ -269,18 +266,384 @@
                     <label class="form-check-label ms-2">Active</label>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mt-4">
+                        <b>
+                            <a
+                                class="nav-item nav-link active mt-2"
+                                style="color: rgb(8, 8, 167); margin-left: 20px"
+                            >
+                                Copay Flat Rate (%)
+                            </a>
+                        </b>
+                        <div class="row mt-2 mb-2 mx-2">
+                            <div class="col-6">
+                                <input
+                                    type="number"
+                                    class="form-control w-100"
+                                    placeholder="OP"
+                                    formControlName="OpCopay"
+                                />
+                            </div>
+                            <div class="col-6">
+                                <input
+                                    type="number"
+                                    class="form-control w-100"
+                                    placeholder="IP"
+                                    formControlName="Deductibles"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card mt-4">
+                        <b>
+                            <a
+                                class="nav-item nav-link active mt-2"
+                                style="color: rgb(8, 8, 167); margin-left: 20px"
+                            >
+                                Deductable (Amount)
+                            </a>
+                        </b>
+                        <div class="row mt-2 mb-2 mx-2">
+                            <div class="col-6">
+                                <input
+                                    type="number"
+                                    class="form-control w-100"
+                                    placeholder="PC"
+                                    formControlName="Copay"
+                                />
+                            </div>
+                            <div class="col-6">
+                                <input
+                                    type="number"
+                                    class="form-control w-100"
+                                    placeholder="DN"
+                                    formControlName="DNDeductible"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul
+                        ngbNav
+                        #nav="ngbNav"
+                        [(activeId)]="activeTabId"
+                        class="nav nav-tabs mb-3"
+                    >
+                        <li [ngbNavItem]="1">
+                            <a ngbNavLink>Policy Info</a>
+                            <ng-template ngbNavContent>
+                                <!-- ✅ Add Policy Button -->
+                                <button
+                                    class="btn btn-sm btn-primary mb-2"
+                                    (click)="openPolicyModal(modalLg)"
+                                >
+                                    + Add Policy
+                                </button>
+
+                                <!-- ✅ Table -->
+                                <div class="table-responsive">
+                                    <table class="table align-middle mb-0">
+                                        <thead class="thead-sm">
+                                            <tr
+                                                class="text-uppercase text-center"
+                                            >
+                                                <th>Effective Date</th>
+                                                <th>Termination Date</th>
+                                                <th>Group No</th>
+                                                <th>No of Visits</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-center">
+                                            <tr
+                                                *ngFor="
+                                                    let policy of patient?.policyList
+                                                "
+                                            >
+                                                <td>
+                                                    {{
+                                                        policy.effectiveDate
+                                                            | date
+                                                                : "MM/dd/yyyy"
+                                                    }}
+                                                </td>
+                                                <td>
+                                                    {{
+                                                        policy.terminationDate
+                                                            | date
+                                                                : "MM/dd/yyyy"
+                                                    }}
+                                                </td>
+                                                <td>
+                                                    {{
+                                                        policy.groupNo || "N/A"
+                                                    }}
+                                                </td>
+                                                <td>
+                                                    {{
+                                                        policy.noOfVisits ||
+                                                            "N/A"
+                                                    }}
+                                                </td>
+                                                <td>
+                                                    {{
+                                                        policy.amount | currency
+                                                    }}
+                                                </td>
+                                                <td>
+                                                    {{ policy.status || "N/A" }}
+                                                </td>
+                                            </tr>
+                                            <tr
+                                                *ngIf="
+                                                    patient?.policyList
+                                                        ?.length === 0
+                                                "
+                                            >
+                                                <td colspan="6">
+                                                    No policy data available.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- ✅ Modal Template -->
+                                <ng-template #modalLg let-modal>
+                                    <form
+                                        [formGroup]="policyForm1"
+                                        (ngSubmit)="onSavePolicy(modal)"
+                                    >
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">
+                                                Add Policy
+                                            </h5>
+                                            <button
+                                                type="button"
+                                                class="btn-close"
+                                                aria-label="Close"
+                                                (click)="modal.dismiss()"
+                                            ></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <label
+                                                        >Effective Date</label
+                                                    >
+                                                    <input
+                                                        type="date"
+                                                        class="form-control"
+                                                        formControlName="effectiveDate"
+                                                    />
+                                                </div>
+                                                <div class="col-4">
+                                                    <label
+                                                        >Termination Date</label
+                                                    >
+                                                    <input
+                                                        type="date"
+                                                        class="form-control"
+                                                        formControlName="terminationDate"
+                                                    />
+                                                </div>
+                                                <div class="col-4">
+                                                    <label>Group No</label>
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        formControlName="groupNo"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-2">
+                                                <div class="col-4">
+                                                    <label>No of Visits</label>
+                                                    <input
+                                                        type="number"
+                                                        class="form-control"
+                                                        formControlName="noOfVisits"
+                                                    />
+                                                </div>
+                                                <div class="col-4">
+                                                    <label>Amount</label>
+                                                    <input
+                                                        type="number"
+                                                        class="form-control"
+                                                        formControlName="amount"
+                                                    />
+                                                </div>
+                                                <div class="col-4">
+                                                    <label>Status</label>
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        formControlName="status"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- <div class="modal-footer">
+                                            <button
+                                                class="btn btn-secondary"
+                                                type="button"
+                                                (click)="modal.dismiss()"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                class="btn btn-primary"
+                                                type="submit"
+                                                [disabled]="policyForm1.invalid"
+                                            >
+                                                Save
+                                            </button>
+                                        </div> -->
+                                        <div
+                                            class="modal-footer justify-content-end"
+                                        >
+                                            <button
+                                                class="btn btn-secondary"
+                                                type="button"
+                                                (click)="modal.dismiss()"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                class="btn btn-primary"
+                                                type="submit"
+                                                [disabled]="policyForm1.invalid"
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
+                                    </form>
+                                </ng-template>
+                            </ng-template>
+                        </li>
+
+                        <!-- 🟠 Tab 2: Copay Info -->
+                        <li [ngbNavItem]="2">
+                            <a ngbNavLink>Copay Info</a>
+                            <ng-template ngbNavContent>
+                                <form [formGroup]="copayForm" class="row g-3">
+                                    <div class="col-6">
+                                        <label>Type of Service</label>
+                                        <input
+                                            type="number"
+                                            class="form-control w-100"
+                                            placeholder=""
+                                            formControlName="serviceType"
+                                        />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Copay (%)</label>
+                                        <input
+                                            type="number"
+                                            class="form-control"
+                                            formControlName="copayPercentage"
+                                        />
+                                    </div>
+                                </form>
+                            </ng-template>
+                        </li>
+                    </ul>
+
+                    <div [ngbNavOutlet]="nav"></div>
+                </div>
+            </div>
 
             <!-- Buttons -->
-            <div class="d-flex justify-content-end mt-4">
-                <button type="submit" class="btn btn-success">Save</button>
-                <button
-                    type="button"
-                    class="btn btn-secondary ms-2"
-                    (click)="cancel()"
-                >
-                    Cancel
-                </button>
+            <div class="d-flex justify-content-between mt-4">
+                <!-- Left buttons: Save & Cancel -->
+                <div>
+                    <button
+                        type="button"
+                        class="btn btn-info"
+                        (click)="openLargeModal(modalLg)"
+                    >
+                        Add Card
+                    </button>
+                </div>
+
+                <!-- Right button: Add Card -->
+                <div>
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                        (click)="insertsubscriber()"
+                    >
+                        Save
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary ms-2"
+                        (click)="cancel()"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
             </div>
+            <ng-template #modalLg let-modal>
+                <div class="modal-header">
+                    <h4 class="modal-title">Upload Image</h4>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        aria-label="Close"
+                        (click)="modal.dismiss('Cross click')"
+                    ></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="d-flex flex-column align-items-start">
+                        <label class="form-label mb-2">Select Image</label>
+
+                        <div class="avatar-xxl">
+                            <file-pond
+                                name="filepond"
+                                [options]="userFilePondConfig"
+                                className="filepond-input-circle"
+                            >
+                            </file-pond>
+                        </div>
+
+                        <!-- 👇 Left-aligned Read Image Button -->
+                        <button
+                            pButton
+                            type="button"
+                            class="btn btn-primary mt-3"
+                        >
+                            Read Image
+                        </button>
+                    </div>
+
+                    <!-- Close button aligned to right -->
+                    <div
+                        class="d-flex justify-content-end align-items-center mt-4"
+                    >
+                        <button
+                            pButton
+                            type="button"
+                            class="btn btn-primary"
+                            (click)="modal.close()"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
         </form>
     </div>
 </div>

@@ -13,7 +13,7 @@
   </ol>
 </nav>
 
-<form [formGroup]="alertForm">
+<form  *ngIf="alertForm" [formGroup]="alertForm">
   <div class="card p-3 shadow rounded">
     <h5 class="card-title mb-3 fw-bold">Alerts</h5>
     <input type="hidden" formControlName="mrno" />
@@ -96,7 +96,7 @@
     <div class="card">
       <div class="card-body">
         <div class="table-responsive">
-          <table class="table table-bordered table-striped mb-0">
+          <table class="table align-middle mb-0">
             <thead>
               <tr>
                 <th class="text-center">Alert Type</th>
@@ -109,8 +109,8 @@
                 <th class="text-center">Entered Date</th>
               </tr>
             </thead>
-            <tbody>
-              <tr *ngFor="let item of MyAlertsData.slice(start, end)">
+            <tbody  class="table-group-divider">
+              <tr *ngFor="let item of MyAlertsData">
                 <!-- <td class="text-center">{{ getAlertTypeName(item.alertType) }}</td> -->
                  <td class="text-center">{{ getAlertTypeName(item.alertTypeId) }}</td>
 

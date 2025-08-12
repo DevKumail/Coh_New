@@ -28,7 +28,6 @@
                     id="entryDate"
                     placeholder="Select date"
                     data-provider="flatpickr"
-                    
                 />
             </div>
 
@@ -44,145 +43,158 @@
                 />
             </div>
 
- <!-- Systolic -->
-<div class="col-sm-3">
-  <label>Systolic (mmHg) <span class="text-danger">*</span></label>
-  <div class="mt-2">
-    <input
-      type="number"
-      class="form-control form-control-sm"
-      [value]="bpSystolic"
-      min="0"
-      max="300"
-    />
-  </div>
-</div>
+            <!-- Systolic -->
+            <div class="col-sm-3">
+                <label
+                    >Systolic (mmHg) <span class="text-danger">*</span></label
+                >
+                <div class="mt-2">
+                    <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        formControlName="bpSystolic"
+                        min="0"
+                        max="300"
+                    />
+                </div>
+            </div>
 
-<!-- Diastolic -->
-<div class="col-sm-3">
-  <label>Diastolic (mmHg) <span class="text-danger">*</span></label>
-  <div class="mt-2">
-    <input
-      type="number"
-      class="form-control form-control-sm"
-      [value]="bpDiastolic"
-      min="0"
-      max="200"
-    />
-  </div>
-</div>
+            <!-- Diastolic -->
+            <div class="col-sm-3">
+                <label
+                    >Diastolic (mmHg) <span class="text-danger">*</span></label
+                >
+                <div class="mt-2">
+                    <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        formControlName="bpDiastolic"
+                        min="0"
+                        max="200"
+                    />
+                </div>
+            </div>
 
-<!-- Heart Rate -->
-<div class="col-sm-3">
-  <label>Heart Rate (Beats/minute) <span class="text-danger">*</span></label>
-  <div class="mt-2">
-    <input
-      type="number"
-      class="form-control form-control-sm"
-      [value]="heartRate"
-      min="0"
-      max="200"
-    />
-  </div>
-</div>
+            <!-- Heart Rate -->
+            <div class="col-sm-3">
+                <label
+                    >Heart Rate (Beats/minute)
+                    <span class="text-danger">*</span></label
+                >
+                <div class="mt-2">
+                    <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        formControlName="heartRate"
+                        min="0"
+                        max="200"
+                    />
+                </div>
+            </div>
 
-<!-- Respiration Rate -->
-<div class="col-sm-3">
-  <label>Respiration Rate <span class="text-danger">*</span></label>
-  <div class="mt-2">
-    <input
-      type="number"
-      class="form-control form-control-sm"
-      [value]="respirationRate"
-      min="0"
-      max="100"
-    />
-  </div>
-</div>
+            <!-- Respiration Rate -->
+            <div class="col-sm-3">
+                <label
+                    >Respiration Rate <span class="text-danger">*</span></label
+                >
+                <div class="mt-2">
+                    <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        formControlName="respirationRate"
+                        min="0"
+                        max="100"
+                    />
+                </div>
+            </div>
 
-<!-- Temperature -->
-<div class="col-sm-3">
-  <label>Temperature (°F) <span class="text-danger">*</span></label>
-  <div class="mt-2">
-    <input
-      type="number"
-      class="form-control form-control-sm"
-      [value]="temperature"
-      min="0"
-      max="150"
-    />
-  </div>
-</div>
+            <!-- Temperature -->
+            <div class="col-sm-3">
+                <label
+                    >Temperature (°F) <span class="text-danger">*</span></label
+                >
+                <div class="mt-2">
+                    <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        formControlName="temperature"
+                        min="0"
+                        max="150"
+                    />
+                </div>
+            </div>
 
-<!-- Weight -->
-<div class="col-sm-3">
-  <label>Weight (kgs) <span class="text-danger">*</span></label>
-  <div class="mt-2">
-    <input
-      type="number"
-      class="form-control form-control-sm"
-      [value]="weight"
-      min="0"
-      max="300"
-    />
-  </div>
-</div>
+            <!-- Weight -->
+            <div class="col-sm-3">
+                <label>Weight (kgs) <span class="text-danger">*</span></label>
+                <div class="mt-2">
+                    <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        formControlName="weight"
+                        min="0"
+                        max="300"
+                    />
+                </div>
+            </div>
 
-<!-- Height -->
-<div class="col-sm-3">
-  <label>Height (cms) <span class="text-danger">*</span></label>
-  <div class="mt-2">
-    <input
-      type="number"
-      class="form-control form-control-sm"
-      [value]="height"
-      min="0"
-      max="300"
-    />
-  </div>
-</div>
+            <!-- Height -->
+            <div class="col-sm-3">
+                <label>Height (cms) <span class="text-danger">*</span></label>
+                <div class="mt-2">
+                    <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        formControlName="height"
+                        min="0"
+                        max="300"
+                    />
+                </div>
+            </div>
 
-<!-- BMI -->
-<div class="col-sm-3">
-  <label>BMI <span class="text-danger">*</span></label>
-  <div class="mt-2">
-    <input
-      type="number"
-      class="form-control form-control-sm"
-      [value]="bmi"
-      min="0"
-      max="100"
-    />
-  </div>
-</div>
+            <!-- BMI -->
+            <div class="col-sm-3">
+                <label>BMI <span class="text-danger">*</span></label>
+                <div class="mt-2">
+                    <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        formControlName="bmi"
+                        min="0"
+                        max="100"
+                    />
+                </div>
+            </div>
 
-<!-- SPO2 -->
-<div class="col-sm-3">
-  <label>SPO2 (%) <span class="text-danger">*</span></label>
-  <div class="mt-2">
-    <input
-      type="number"
-      class="form-control form-control-sm"
-      [value]="spo2"
-      min="0"
-      max="100"
-    />
-  </div>
-</div>
+            <!-- SPO2 -->
+            <div class="col-sm-3">
+                <label>SPO2 (%) <span class="text-danger">*</span></label>
+                <div class="mt-2">
+                    <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        formControlName="spo2"
+                        min="0"
+                        max="100"
+                    />
+                </div>
+            </div>
 
-<!-- Glucose -->
-<div class="col-sm-3">
-  <label>Glucose (mg/dl) <span class="text-danger">*</span></label>
-  <div class="mt-2">
-    <input
-      type="number"
-      class="form-control form-control-sm"
-      [value]="glucose"
-      min="0"
-      max="400"
-    />
-  </div>
-</div>
+            <!-- Glucose -->
+            <div class="col-sm-3">
+                <label
+                    >Glucose (mg/dl) <span class="text-danger">*</span></label
+                >
+                <div class="mt-2">
+                    <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        formControlName="glucose"
+                        min="0"
+                        max="400"
+                    />
+                </div>
+            </div>
 
             <!-- Comment -->
             <div class="col-sm-3 mb-3">
@@ -196,6 +208,92 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        <button
+            class="btn btn-primary mt-3"
+            type="submit"
+            [disabled]="isSubmitting"
+        >
+            <span *ngIf="isSubmitting">
+                <span
+                    class="spinner-border spinner-border-sm me-1"
+                    role="status"
+                    aria-hidden="true"
+                ></span>
+                Submitting...
+            </span>
+            <span *ngIf="!isSubmitting">Submit</span>
+        </button>
     </form>
 </div>
+<!-- 👇 Grid/Card Starts -->
+<div class="card p-3 mt-4 shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">Vital Signs List</h5>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <!-- <th>Time</th> -->
+                        <th>Temp (°F)</th>
+                        <th>Pulse</th>
+                        <th>Resp. Rate</th>
+                        <th>BP (Sys/Dia)</th>
+                        <th>O2 Sat (%)</th>
+                        <th>Height (cm)</th>
+                        <th>Weight (kg)</th>
+                        <!-- <th>BMI</th>
+                         <th>Glucose</th> -->
+                        <!-- <th>Comment</th> -->
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let vital of pagedvital; let i = index">
+                        <td>{{ vital.entryDate }}</td>
+                        <!-- <td>{{ vital.dailyStartTime }}</td> -->
+                        <td>{{ vital.temperature || "N/A" }}</td>
+                        <td>{{ vital.heartRate || "N/A" }}</td>
+                        <td>{{ vital.respirationRate || "N/A" }}</td>
+                        <td>
+                            {{ vital.bpSystolic || "N/A" }}/{{
+                                vital.bpDiastolic || "N/A"
+                            }}
+                        </td>
+                        <td>{{ vital.spo2 || "N/A" }}</td>
+                        <td>{{ vital.height || "N/A" }}</td>
+                        <td>{{ vital.weight || "N/A" }}</td>
+                        <td>
+                            <ng-icon
+                                name="tablerEdit"
+                                class="me-1"
+                                (click)="editVital(vital)"
+                            ></ng-icon>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div
+            *ngIf="vitalSignsPagedData.length > 0"
+            class="d-flex flex-column align-items-center mt-3 gap-2"
+        >
+            <div
+                class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap"
+            >
+                <app-generic-pagination
+                    [totalItems]="vitalTotalItems"
+                    [pageSize]="vitalPageSize"
+                    [currentPage]="vitalCurrentPage"
+                    (pageChanged)="onvitalPageChanged($event)"
+                >
+                </app-generic-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 👆 Grid/Card Ends -->

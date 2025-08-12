@@ -7,9 +7,10 @@ import { NgIconComponent } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Injectable } from '@angular/core';
-import { AlertDTO } from '@/app/shared/models/alert.model';
-import { AlertType } from '@/app/shared/models/alert-type.model';
-
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { filter,distinctUntilChanged  } from 'rxjs/operators';
+import { AlertDTO } from '@/app/shared/Models/Clinical/alert.model';
+import { AlertType } from '@/app/shared/Models/Clinical/alert-type.model';
 
 
 @Component({
@@ -35,8 +36,6 @@ export class AlertComponent implements OnInit {
   buttontext = 'save'
   Eentereddate: any;
   enteredby: any;
-
-  Mrno: any;
   appID: any;
   PatientId: any;
   userid: any;
@@ -44,15 +43,16 @@ export class AlertComponent implements OnInit {
 
   Alert: any;
   AlertRow: any;
-  mrno: any
   currentPage: number = 1;
   pageSize: number = 10;
   pageSizes = [5, 10, 25, 50];
   totalPages = 0;
   pageNumbers: number[] = [];
+  SearchPatientData: any
 
   constructor(private fb: FormBuilder, private router: Router,
-  private registrationApiService: RegistrationApiService
+  private registrationApiService: RegistrationApiService,
+  private patientBannerService: PatientBannerService,
 
 
   ) { }
@@ -60,20 +60,25 @@ export class AlertComponent implements OnInit {
 
 
 
-  ngOnInit(): void {
-    this.alertForm = this.fb.group({
-      alertType: [null, Validators.required],
-      repeatDate: [null, Validators.required],
-      startDate: [null, Validators.required],
-      message: ['', Validators.required],
-      status: [null],
-      updatedBy: [''],
-      enteredBy: [''],
-      enteredDate: [null],
-    });
-this.  GetPatientAlertsData() ;
-    this.GetAlertType();
+  async ngOnInit() {
+         this.patientBannerService.patientData$
+          .pipe(
+            filter((data: any) => !!data?.table2?.[0]?.mrNo),
+            distinctUntilChanged((prev, curr) =>
+              prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+            )
+          )
+          .subscribe((data: any) => {
+            console.log('✅ Subscription triggered with MRNO in Alert Component:', data?.table2?.[0]?.mrNo);
+            this.SearchPatientData = data;
+            if (this.SearchPatientData) {
+               this.GetPatientAlertsData()
+            }
+          });
 
+
+    await this.GetPatientAlertsData();
+    await this.GetAlertType();
     this.alertForm = this.fb.group({
       alertType: [0, Validators.required],
       startDate: ['', Validators.required],
@@ -86,14 +91,8 @@ this.  GetPatientAlertsData() ;
       mrno: ['']
     });
 
-    this.calculatePagination();
-    const demographicsInfo = localStorage.getItem('Demographics');
-    if (demographicsInfo) {
-      const demographics = JSON.parse(demographicsInfo);
-      this.Mrno = demographics.table2[0].mrNo;      // ✅ Mrno
-      this.PatientId = demographics.table2[0].patientId;
-      this.alertForm.patchValue({ mrno: this.Mrno }); // Optional if needed
-    }
+     this.calculatePagination();
+
   }
 
   goBackToList() {
@@ -106,34 +105,22 @@ this.  GetPatientAlertsData() ;
     }
     return false;
   }
-  // GetPatientAlertsData() {
-  //   // debugger
-  //   this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
-  //     // debugger;
-
 
   alertsTable: any
   GetPatientAlertsData() {
+    if(this.SearchPatientData == undefined){
+      Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+      // this.loader.hide();
+      return;
+    }
 
-    this.registrationApiService.GetAlertDetailsDb('1023').then((res: any) => {
-      ;
-
+    this.registrationApiService.GetAlertDetailsDb(this.SearchPatientData.table2[0].mrNo).then((res: any) => {
+      this.MyAlertsData = [];
       this.alertsTable = res?.alert?.table1 || [];
       if (Array.isArray(this.alertsTable) && this.alertsTable.length > 0) {
-        this.MyAlertsData = this.alertsTable;
+        this.MyAlertsData = this.alertsTable || [];
         this.filteredAlertsData = this.alertsTable;
         console.log(this.MyAlertsData, "alerts")
-      const alertsTable = [] = res?.alert?.table1;
-      if (Array.isArray(alertsTable) && alertsTable.length > 0) {
-        this.MyAlertsData = alertsTable;
-        this.filteredAlertsData = alertsTable;
-        console.log(this.MyAlertsData, "alerts")
-
-      } else {
-        console.warn("No alert data returned from API.");
-        this.MyAlertsData = [];
-        this.filteredAlertsData = [];
-      };
     }}).catch((error: any) => {
       console.error("Failed to fetch alert data", error);
     });
@@ -158,7 +145,7 @@ this.  GetPatientAlertsData() ;
 
     const alert = {
       AlertId: 0,
-      Mrno: '1023',
+      Mrno: this.SearchPatientData?.table2[0]?.mrNo || null,
       AlertMessage: formValue.message,
       RepeatDate: new Date(formValue.repeatDate),
       StartDate: new Date(formValue.startDate),
@@ -174,9 +161,11 @@ this.  GetPatientAlertsData() ;
       OldMrno: null
     };
 
+    console.log( 'this.SearchPatientData?.table2[0]?.mrNo =>' ,this.SearchPatientData?.table2[0]?.mrNo);
+
     const alert2: AlertDTO = {
   alertId: 0,
-  mrno: this.Mrno,
+  mrno: this.SearchPatientData?.table2[0]?.mrNo || null,
   alertMessage: formValue.message,
   repeatDate: new Date(formValue.repeatDate),
   startDate: new Date(formValue.startDate),
@@ -201,12 +190,12 @@ this.  GetPatientAlertsData() ;
           icon: "success",
           title: "Your work has been saved",
           showConfirmButton: false,
-          timer: 2000
+          timer: 1500
         });
         this.alertForm.reset(); // clear form
         this.GetPatientAlertsData();
       },
-      error: (error) => {
+      error: (error: any) => {
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -218,11 +207,7 @@ this.  GetPatientAlertsData() ;
 
 
 
-  // getAlertTypeName(typeId: number): string {
-  //   const match = this.getAlert.find((a: any) => a.typeId === typeId);
-  //   return match ? match.name : typeId.toString();
-  // }
-  //add waleed
+
   getAlertTypeName(typeId: number): string {
   if (typeof typeId !== 'number') {
     console.warn('⚠️ Invalid typeId:', typeId);

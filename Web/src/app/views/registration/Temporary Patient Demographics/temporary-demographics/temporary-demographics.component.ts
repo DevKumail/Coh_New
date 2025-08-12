@@ -91,12 +91,10 @@ export class TemporaryDemographicsComponent implements OnInit {
 
      this.FillCache();
 
-    // this.router.queryParams.subscribe(async (queryparam) => {
-    //   this.tempid = queryparam['id'];
-    //   if (this.tempid) {
-    //     await this.FillDropDown(this.tempid);
-    //   }
-    // });
+   debugger
+        if (this.tempid != null) {
+            //this.GetTempDemographicsByTempId(this.tempid);
+        }
   }
 
 
@@ -285,6 +283,12 @@ export class TemporaryDemographicsComponent implements OnInit {
 //         });
 //       });
 //   }
+
+
+
+
+
+
 onSubmit() {
   if (this.temporaryForm.invalid) {
     this.temporaryForm.markAllAsTouched();
@@ -316,31 +320,10 @@ onSubmit() {
       });
     });
 }
-// onSubmit(): void {
-//     if (this.temporaryForm.valid) {
-//       const demographicData: TempdemographicDto = this.temporaryForm.value;
 
-//       this.api.post('https://your-api-url/api/TemporaryDemographic', demographicData)
-//         .subscribe({
-//           next: (response:any) => {
-//             console.log('✅ Data saved successfully:', response);
-//             alert('Data saved successfully!');
-//             this.temporaryForm.reset();  // Optional: reset form after save
-//           },
-//           error: (error) => {
-//             console.error('❌ Error saving data:', error);
-//             alert('Failed to save data. Please try again.');
-//           }
-//         });
-
-//     } else {
-//       console.warn('❗ Form is invalid');
-//       alert('Please fill all required fields.');
-//     }
-//   }
 
   onCancel() {
-    this.router.navigate(['registration/temporary-patient-demographics']);
+    this.router.navigate(['registration/temporary patient demographics']);
   }
 
     ngAfterViewInit(): void {
