@@ -55,3 +55,5 @@
 /Server/HMIS.Service/obj/Debug/net8.0
 /Server/HMIS.Web.API/bin/Debug/net8.0
 /Server/HMIS.Web.API/obj
+/Server/HMIS.Web.API/bin/Release/net8.0
+/Server/HMIS.Web.API/Properties/PublishProfiles

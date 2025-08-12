@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HMIS.Web.API", "HMIS.Web.API\HMIS.Web.API.csproj", "{3D006167-5836-4BB2-A588-6934ED57AB66}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HMIS.Web", "HMIS.Web.API\HMIS.Web.csproj", "{3D006167-5836-4BB2-A588-6934ED57AB66}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HMIS.Core", "HMIS.Core\HMIS.Core.csproj", "{888B7610-8C45-4554-BF4B-D54333BD7462}"
 EndProject
