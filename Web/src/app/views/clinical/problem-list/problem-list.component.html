@@ -1,11 +1,9 @@
-<form [formGroup]="medicalForm">
+<!-- <form [formGroup]="medicalForm">
   <div class="card p-3 shadow rounded">
     <div class="row">
       <div class="row">
         <div class="col-12" style="margin-top: -20px;">
           <div class="form-check">
-            <input type="checkbox" class="form-check-input" formControlName="isProviderCheck" id="isProviderCheck"
-              (change)="onCheckboxChange()" style="height: 20px; width: 20px;" />
             <label class="form-check-label" for="isProviderCheck" style="margin-bottom: -22px;">
               Provider Outside Clinic
             </label>
@@ -29,7 +27,7 @@
           <label class="form-label">Problem</label>
 
           <div class="input-group">
-            <input type="text" class="form-control" formControlName="problem" placeholder="Enter problem" />
+            <input type="text" class="form-control" formControlName="problem" placeholder="Problem" />
             <button class="btn btn-success" type="button" (click)="ClickFilter(standardModal)">
               <i class="fa fa-search"></i>
             </button>
@@ -85,7 +83,6 @@
       </div>
     </div>
 
-    <!-- TABLE SECTION -->
     <div class="mt-4">
       <div class="table-responsive">
         <table class="table table-bordered table-striped">
@@ -116,10 +113,8 @@
         </table>
       </div>
 
-      <!-- PAGINATION -->
       <div class="d-flex flex-column align-items-center mt-3 gap-2">
         <div class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap">
-          <!-- Showing entries + dropdown -->
           <div class="d-flex align-items-center gap-2 flex-wrap">
             <div class="me-2">
               Showing {{ start + 1 }} to {{ end }} of {{ medicalHistoryData.length }} entries
@@ -132,7 +127,6 @@
             </div>
           </div>
 
-          <!-- Pagination Controls -->
           <nav>
             <ul class="pagination pagination-sm mb-0">
               <li class="page-item" [class.disabled]="currentPage === 1">
@@ -189,20 +183,17 @@
                 <input type="text" class="form-control" formControlName="startingCode" id="startingCode"
                   placeholder="Enter Starting Code" />
               </div>
-              <!-- Ending Code (visible only when SearchById == 2) -->
               <div class="col-md-2 col-sm-12 col-12" *ngIf="FilterForm.value.searchById == 2">
                 <label for="">Ending Code</label>
                 <input class="form-control w-100" type="text" formControlName="diagnosisEndCode"
                   placeholder="Ending Code" />
               </div>
 
-              <!-- Description (visible only when SearchById == 3) -->
               <div class="col-md-2 col-sm-12 col-12" *ngIf="FilterForm.value.searchById == 3">
                 <label for="">Description</label>
                 <input class="form-control w-100" type="text" formControlName="descriptionFilter"
                   placeholder="Description" />
               </div>
-              <!-- <form [formGroup]="diagnosisForm"> -->
               <div class="row col-12">
 
                 <div class="col-md-2 col-sm-12 col-12 mt-3">
@@ -210,8 +201,6 @@
                 </div>
               </div>
               
-              <!-- </form> -->
-
 
             </div>
           </div>
@@ -225,52 +214,10 @@
      
     </div>
   </form>
-  <!-- waleed -->
-    <!-- <ng-template pTemplate="header">
-    <tr>
-      <th>
-        <div class="flex align-items-center" style="font-size: 14px">
-          Code
-        </div>
-      </th>
-      <th>
-        <div class="flex align-items-center" style="font-size: 14px">
-          ICD Version
-        </div>
-      </th>
-      <th>
-        <div class="flex align-items-center" style="font-size: 14px">
-          Description
-        </div>
-      </th>
-    </tr>
-  </ng-template> -->
-  <!-- <ng-template pTemplate="body" let-DiagnosisCode [activeIndex]="active_Index">
-    <tr [pSelectableRow]="DiagnosisCode">
-    
-      <td style="font-size: 12px">
-        <span class="ml-1 vertical-align-middle">{{
-          DiagnosisCode.icD9Code
-          }}</span>
-      </td>
-
-      <td style="font-size: 12px">
-        <span class="ml-1 vertical-align-middle">{{
-          DiagnosisCode.icdVersion
-          }}</span>
-      </td>
-
-      <td style="font-size: 12px">
-        <span class="ml-1 vertical-align-middle">{{
-          DiagnosisCode.descriptionFull
-          }}</span>
-      </td>
-    </tr>
-  </ng-template> -->
   <ng-template pTemplate="emptymessage">
     <tr>
       <td colspan="7">No Diagnosis Code found.</td>
     </tr>
   </ng-template>
    
-</ng-template>
+</ng-template> -->

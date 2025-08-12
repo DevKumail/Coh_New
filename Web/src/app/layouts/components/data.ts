@@ -837,6 +837,11 @@ export const horizontalMenuItems: MenuItemType[] = [
                 url: 'clinical/vital signs',
                 // url: '/clinical/vital-signs'
             },
+            {
+                label:'immunizations',
+                url:'/clinical/immunizations'
+
+            }
         ],
     },
 

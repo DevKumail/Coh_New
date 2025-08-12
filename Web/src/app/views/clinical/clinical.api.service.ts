@@ -58,6 +58,10 @@ export class ClinicalApiService {
   GetRowDataOfPatientProblem(mrno: string, userId: number) {
     return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}`).toPromise();
   }
+ GetPatientProblemData(mrno: String) {
+    return this.api.get(`Problem/GetProblemDetailsDB?mrno=${mrno}`).toPromise();
+}
+
   MyDiagnosisCodebyProvider(ProviderId: number, GroupId: number | null, ICDVersionId: number | null) {
     debugger
     return this.api.get(`ChargeCapture/MyDiagnosisCode?ProviderId=${ProviderId}&GroupId=${GroupId}&ICDVersionId=${ICDVersionId}`).toPromise();
@@ -158,9 +162,15 @@ export class ClinicalApiService {
   UpdatePatientProblem(id: string, data: any): Observable<any> {
     return this.api.put(`/PatientProblem/UpdatePatientProblem/${id}`, data);
   }
-  DeletePatientProblem(id: string): Observable<any> {
-    return this.api.delete(`/PatientProblem/DeletePatientProblem/${id}`);
-  }
+ 
+//   DeletePatientProblem(Id: number): Observable<any> {
+//   return this.api.delete(`PatientProblem/DeletePatientProblem/${Id}`);
+// }
+DeletePatientProblem(Id: number): Observable<any> {
+  return this.api.delete(`PatientProblem/DeletePatientProblem?Id=${Id}`);
+}
+
+
   GetAlertType() {
     return this.api.get('Alert/GetAlertType').toPromise();
   }

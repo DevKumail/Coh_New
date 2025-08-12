@@ -10,6 +10,10 @@ import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FavoritesComponent } from '../favorites/favorites.component';
 import Swal from 'sweetalert2';
 import {PatientProblemModel} from '@/app/shared/models/clinical/problemlist.model';
+import { LoaderService } from '@core/services/loader.service';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { filter,distinctUntilChanged  } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -71,6 +75,8 @@ export class ProblemListComponent implements OnInit {
   HCPCSCode: any;
   MyHCPSGroupId: any;
   MyHCPCSCode: any;
+  SearchPatientData:any;
+  MyProblemsData:any;
 
 problemForm:any;
   AllCPTCode: any = 0;
@@ -93,6 +99,11 @@ problemForm:any;
   ICT9Group: any;
 PatientId:any;
   ICDVersions: any[] = [];
+  problemTotalItems:any;
+  filteredProblemData:any;
+  problemCurrentPage:any;
+  problemPageSize:any;
+  pagedProblems:any;
 
   MyDentalGroups: any[] = [];
   Searchby: any = [{ code: 1, name: 'Diagnosis Code' }, { code: 2, name: 'Diagnosis Code Range' }, { code: 3, name: 'Description' }]
@@ -103,36 +114,45 @@ isConfidentential:any;
 isProviderCheck:any;
 appId:any;
   userId: number | undefined;
+
+  private patientDataSubscription!: Subscription;
+
+
+
   constructor(
     private fb: FormBuilder,
-    private clinicalApiService: ClinicalApiService, // Assuming you have a ClinicalService to handle API calls
+    private clinicalApiService: ClinicalApiService, 
+    private loader: LoaderService,
+    private PatientData: PatientBannerService,
   ) { }
 
   async ngOnInit() {
+    debugger
+    this.GetPatientProblemData();
+     this.patientDataSubscription = this.PatientData.patientData$
+      .pipe(
+        filter((data: any) => !!data?.table2?.[0]?.mrNo),
+        distinctUntilChanged((prev, curr) => 
+          prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+        )
+      )
+      .subscribe((data: any) => {
+        this.GetPatientProblemData();
+        this.SearchPatientData = data;
+        const mrno = this.SearchPatientData?.table2[0]?.mrno;
+
+
+      });
 
     
-    var app =JSON.parse(localStorage.getItem('LoadvisitDetail') || '');
-    this.appId=app.appointmentId
+    // var app =JSON.parse(localStorage.getItem('LoadvisitDetail') || '');
+    // this.appId=app.appointmentId
     this.FillDropDown
 
-    // this.medicalForm = this.fb.group({
-    //   // provider: [''],
-    //   providerId: [''],
-    //   providerName: [''],
-      
-    //   code: [''],
-    //   problem: [''],
-    //   icdVersion: [''],
-    //   confidential: [false],
-    //   startDate: [''],
-    //   endDate: [''],
-    //   comments: [''],
-    //   status: [''],
-    //   isProviderCheck: [false]
-    // });
+    
  this.medicalForm = this.fb.group({
   providerId: ['', Validators.required],
-  providerName: [''], // Auto-filled from dropdown or modal
+  providerName: [''], 
   code: ['', Validators.required],
   problem: ['', Validators.required],
   icdVersion: ['', Validators.required],
@@ -140,9 +160,9 @@ appId:any;
   startDate: ['', Validators.required],
   endDate: [''],
   comments: ['', Validators.required],
-  status: ['', Validators.required],  // "Active"/"Inactive"
-  mrno: ['', Validators.required],     // From user input
-  patientId: ['', Validators.required] // From user input
+  status: ['', Validators.required],  
+  mrno: ['', Validators.required],     
+  patientId: ['', Validators.required] 
 });
 
 
@@ -161,12 +181,55 @@ appId:any;
     this.getRowdatapatientproblem()
     this.Problems.ActiveStatus = 1
     // this.loadData();
-
+   
     this.getRowData();
     this.fetchProviders();
     await this.FillCache();
 
   }
+  async GetPatientProblemData() {
+  this.loader.show();
+
+  if (!this.SearchPatientData.table2[0].mrNo) {
+    Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+    this.loader.hide();
+    return;
+  }
+
+  this.loader.show();
+  debugger;
+  console.log('mrNo =>', this.SearchPatientData.table2[0].mrNo);
+
+  await this.clinicalApiService.GetPatientProblemData(
+    this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0
+  ).then((res: any) => {
+    console.log('res', res);
+    this.loader.hide();
+
+    this.medicalHistoryData = res.problems?.table1 || [];
+    this.problemTotalItems = this.medicalHistoryData.length;
+    this.onProblemPageChanged(1); 
+    this.filteredProblemData = this.medicalHistoryData || [];
+
+    console.log('this.medicalHistoryData', this.medicalHistoryData);
+  });
+
+  this.loader.hide();
+}
+
+async onProblemPageChanged(page: number) {
+  this.problemCurrentPage = page;
+  this.setPagedProblemData();
+  // await this.GetPatientProblemData(); // Agar tum data API se reload karna chahte ho
+}
+
+setPagedProblemData() {
+  const startIndex = (this.problemCurrentPage - 1) * this.problemPageSize;
+  const endIndex = startIndex + this.problemPageSize;
+  this.pagedProblems = this.MyProblemsData.slice(startIndex, endIndex);
+}
+
+
 
   get start(): number {
     return (this.currentPage - 1) * this.pageSize;
@@ -331,7 +394,9 @@ onSubmit() {
     status: status || 0,
     createdBy: 2,
     updatedBy: 2,
-    mrno: '1006',                            
+    // mrno: '1006', 
+    
+    mrno: this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 1234,                           
     patientId: 6,
     activeStatus: 1,
     active: true,
@@ -424,10 +489,11 @@ onSubmit() {
 
 
 
-  // ✅ Load patient problem data
+  
   getRowData() {
-    const mrno = '1006'; // Replace with actual
-    const userId = 1;     // Replace with actual
+    // const mrno = '1006'; 
+    const mrno=this.Mrno;
+    const userId = 1;     
 
     this.clinicalApiService.GetRowDataOfPatientProblem(mrno, userId).then((res: any) => {
       const problems = res?.patientProblems?.table1 || [];
