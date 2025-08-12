@@ -252,26 +252,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        *ngFor="let vital of pagedvital; let i = index"
-                    >
+                    <tr *ngFor="let vital of pagedvital; let i = index">
                         <td>{{ vital.entryDate }}</td>
                         <!-- <td>{{ vital.dailyStartTime }}</td> -->
-                        <td>{{ vital.temperature || "N/A"}}</td>
-                        <td>{{ vital.heartRate || "N/A"}}</td>
-                        <td>{{ vital.respirationRate || "N/A"}}</td>
-                        <td>{{ vital.bpSystolic || "N/A"}}/{{ vital.bpDiastolic || "N/A"}}</td>
-                        <td>{{ vital.spo2 || "N/A"}}</td>
-                        <td>{{ vital.height || "N/A"}}</td>
-                        <td>{{ vital.weight || "N/A"}}</td>
-                        <!-- <td>
+                        <td>{{ vital.temperature || "N/A" }}</td>
+                        <td>{{ vital.heartRate || "N/A" }}</td>
+                        <td>{{ vital.respirationRate || "N/A" }}</td>
+                        <td>
+                            {{ vital.bpSystolic || "N/A" }}/{{
+                                vital.bpDiastolic || "N/A"
+                            }}
+                        </td>
+                        <td>{{ vital.spo2 || "N/A" }}</td>
+                        <td>{{ vital.height || "N/A" }}</td>
+                        <td>{{ vital.weight || "N/A" }}</td>
+                        <td>
                             <ng-icon
-                                name="tablerTrash"
-                                class="text-danger me-1 cursor-pointer"
-                                (click)="deleteVital(i)"
-                            >
-                            </ng-icon>
-                        </td> -->
+                                name="tablerEdit"
+                                class="me-1"
+                                (click)="editVital(vital)"
+                            ></ng-icon>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -283,10 +284,13 @@
             <div
                 class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap"
             >
-        <app-generic-pagination [totalItems]="vitalTotalItems" [pageSize]="vitalPageSize"
-        [currentPage]="vitalCurrentPage" (pageChanged)="onvitalPageChanged($event)">
-        </app-generic-pagination>
-
+                <app-generic-pagination
+                    [totalItems]="vitalTotalItems"
+                    [pageSize]="vitalPageSize"
+                    [currentPage]="vitalCurrentPage"
+                    (pageChanged)="onvitalPageChanged($event)"
+                >
+                </app-generic-pagination>
             </div>
         </div>
     </div>

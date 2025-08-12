@@ -1,28 +1,27 @@
-option span {
-  color: green;
-  font-weight: bold;
+::ng-deep .choices__list--dropdown {
+  max-height: 150px !important;
+  overflow-y: auto !important;
 }
-.scrollable-select {
-  overflow-y: auto;
+
+::ng-deep .choices__item--selectable {
+  padding: 6px 10px;
+  font-size: 14px;
+  line-height: 1.5;
 }
+
+::ng-deep .choices__item--selectable.is-highlighted {
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+::ng-deep .choices__inner {
+  border: 1px solid #ced4da;
+  min-height: 38px;
+  border-radius: 4px;
+}
+
+/* Add this CSS to your component stylesheet or global styles */
 .custom-scroll-select {
-  max-height: 150px; /* Approx height for 5 items */
-  overflow-y: auto;
-}
-
-.custom-scroll-select option {
-  height: 30px;
-}
-.custom-dropdown-wrapper {
-  position: relative;
-
-  select {
-    max-height: 38px; // default height
-    overflow: hidden;
-  }
-
-  // Force dropdown menu to scroll when opened
-  select option {
-    height: 40px;
-  }
+  max-height: 50px !important;         /* Approx 3-4 options height */
+  overflow-y: auto !important;
 }

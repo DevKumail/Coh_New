@@ -13,7 +13,7 @@ export class DemographicApiServices {
 
     getDemographicsByMRNo(MRNo: string) {
         return this.api
-            .get(`Demographic/GetDemographics?MRNo=${MRNo}`)
+            .get(`Demographic/GetDemographicsById?PatientId=${MRNo}`)
             .toPromise();
     }
 

@@ -21,7 +21,7 @@
     <div class="card p-3 shadow mt-2">
         <h3 class="card-title mb-3 fw-bold">Demographic Create</h3>
         <!-- Form Starts -->
-        <form [formGroup]="demographicForm" (ngSubmit)="onSubmit()">
+        <form *ngIf="demographicForm" [formGroup]="demographicForm" (ngSubmit)="onSubmit()">
             <div class="row">
                 <div class="col-md-3">
                     <img
@@ -427,17 +427,6 @@
                     />
                 </div>
 
-                <!-- Date of Death -->
-                <!-- <div class="col-md-3 col-sm-4 col-12">
-                    <label>Date of Death</label>
-                    <input type="date" class="form-control date" formControlName="DeathDate" />
-                </div> -->
-
-                <!-- <div class="col-md-3 col-sm-4 col-12">
-                    <label>Date of Death</label>
-                    <input type="text" class="form-control date" data-provider="flatpickr" formControlName="DeathDate"
-                        id="deathDate" />
-                </div> -->
                 <div class="col-md-3 col-sm-4 col-12">
                     <label>Date of Death</label>
                     <input

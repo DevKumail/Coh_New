@@ -91,12 +91,10 @@ export class TemporaryDemographicsComponent implements OnInit {
 
      this.FillCache();
 
-    // this.router.queryParams.subscribe(async (queryparam) => {
-    //   this.tempid = queryparam['id'];
-    //   if (this.tempid) {
-    //     await this.FillDropDown(this.tempid);
-    //   }
-    // });
+   debugger
+        if (this.tempid != null) {
+            //this.GetTempDemographicsByTempId(this.tempid);
+        }
   }
 
 
@@ -285,6 +283,10 @@ export class TemporaryDemographicsComponent implements OnInit {
 //         });
 //       });
 //   }
+
+
+
+
 
 
 onSubmit() {

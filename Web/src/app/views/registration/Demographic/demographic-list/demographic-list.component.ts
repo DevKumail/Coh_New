@@ -36,7 +36,7 @@ import Swal from 'sweetalert2';
     styleUrl: './demographic-list.component.scss',
 })
 
-export class DemographicsListComponent {
+export class DemographicListComponent {
   constructor(
     public router: Router,
     public DemographicApiServices: DemographicApiServices,
@@ -73,7 +73,7 @@ export class DemographicsListComponent {
   };
 
   PaginationInfo: any = {
-    RowsPerPage: 10,
+    RowsPerPage: 5,
     Page: 1,
   };
 
@@ -197,9 +197,10 @@ export class DemographicsListComponent {
   }
 
   editPatient(patient: any) {
-    this.router.navigate(['/registration/demographic-create'], {
-      queryParams: { id: patient.mrNo },
-    });
+    this.router.navigate(['/registration/demographic-create'], //{
+    {
+    state: { patient },
+  });
   }
 
   Remove(e: Event, Id: number, position: string) {
