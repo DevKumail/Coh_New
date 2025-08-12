@@ -609,7 +609,7 @@ async filterMyDental(e: any){
       return;
     }
 
-    if (this.MyDiagnosisData.length <= 0 && this.pagedAllService.length <= 0) {
+    if (this.MyDiagnosisData.length <= 0 || this.pagedAllService.length <= 0) {
       this.loader.hide();
       Swal.fire({
         icon: 'error',
@@ -703,6 +703,8 @@ async filterMyDental(e: any){
       });
       return; // Function stop ho jayega
     }
+
+    debugger
  
         this.service.SaveChargeCapture(ChargCaptureModel).then((response: any) => {
           if (response.success) {
