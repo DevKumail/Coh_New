@@ -22,6 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { AdvanceSearchModalComponent } from "./components/advance-search-modal/advance-search-modal.component";
+import { LoaderService } from '@core/services/loader.service';
 
 
 @Component({
@@ -60,7 +61,8 @@ export class TopbarComponent implements OnInit {
     public layout: LayoutStoreService,
     private modalService: NgbModal,
     private patientBannerService: PatientBannerService,
-    private router: Router
+    private loader: LoaderService,
+    private router: Router,
   ) { }
 
   SearchIcon = Search;
@@ -125,8 +127,10 @@ export class TopbarComponent implements OnInit {
   onSearchClick() {
     if (this.mrNo && this.mrNo.length >= 3) {
       this.searchPatient(this.mrNo);
+      this.searchAppointment(this.mrNo);
     } else {
       this.patientBannerService.setPatientData(null);
+      this.patientBannerService.setVisitAppointments(null);
       console.log("data becomes null")
     }
   }
@@ -152,6 +156,7 @@ export class TopbarComponent implements OnInit {
         if (res?.table2?.length > 0) {
           this.patientBannerService.setPatientData(res);
           this.showPatientBanner = true;
+    this.demographicapi
         } else {
           this.patientBannerService.setPatientData(null);
           this.showPatientBanner = false;
@@ -162,6 +167,32 @@ export class TopbarComponent implements OnInit {
         this.patientBannerService.setPatientData(null);
       }
     });
+  }
+
+  async searchAppointment(mrNo: any){
+    this.loader.show();
+      await this.demographicapi.GetAppointmentByMRNO(mrNo).subscribe((Response: any)=>{
+      console.log("Load Visit new work =>", Response);
+      if (Object.keys(Response).length > 0){
+        this.patientBannerService.setVisitAppointments(Response);
+        this.patientBannerService.setSelectedVisit(Response?.table[0]);
+        this.loader.hide();
+      } else{
+        this.patientBannerService.setVisitAppointments(null);
+        this.patientBannerService.setSelectedVisit(null);
+        this.loader.hide();
+      }
+      // this.dropdownOptions =  Response.table.map((item: any) => {
+      // this.dateOfBirth =  Response.table[0].age.slice(0,8)
+      // const formattedDate = this.datePipe.transform(item.appDateTime, 'dd-MM-yyyy');
+      // const providerName = formattedDate + ' - ' + item.fullName ;
+      // return { label: providerName, value: item.appointmentId }
+      // });
+      // if (this.dropdownOptions.length > 0){
+      //   this.selectedAppointmentId = this.dropdownOptions[0].value;
+      //   this.AppointmentDetail();
+      // }
+    })
   }
 
 }

@@ -122,8 +122,8 @@
                             </button>
 
                             <button class="btn btn-outline-primary btn-sm" type="submit" [disabled]="isLoading">
-                                <app-loader *ngIf="isLoading" [size]="'16px'" class="me-1"></app-loader>
-                                <lucide-icon *ngIf="!isLoading" name="Search" class="me-1"></lucide-icon>
+                                 <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"
+                                    aria-hidden="true"></span>
                                 <span>{{ isLoading ? 'Searching' : 'Search' }}</span>
                             </button>
                         </div>
