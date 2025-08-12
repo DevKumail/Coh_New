@@ -6,8 +6,9 @@ import { PageTitleComponent} from '@app/components/page-title.component';
 import { UiCardComponent} from '@app/components/ui-card.component';
 import { NgIcon} from '@ng-icons/core';
 import { NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
-import { ProblemListComponent } from '../problem-list/problem-list.component';
+// import { ProblemListComponent } from '../problem-list/problem-list.component';
 import { FavoritesComponent } from '../favorites/favorites.component';
+import { ProblemListComponent } from '../problem-list/problem-list.component';
 
 @Component({
   selector: 'app-medical-history',

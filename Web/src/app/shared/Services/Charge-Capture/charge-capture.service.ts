@@ -35,6 +35,8 @@ export class ChargeCaptureService {
       return this.api.get(`ChargeCapture/MyCptCode?ProviderId=${ProviderId}&GroupId=${GroupId}`).toPromise();
   }
 
+
+
   MyHCPCSCodebyProvider(ProviderId:number ,GroupId:number, HCPCSCode:string, DescriptionFilter:string ,PairId:number) {
     //debugger
     return this.api.get(`ChargeCapture/MyHCPCSCode?ProviderId=${ProviderId}&GroupId=${GroupId}&HCPCSCode=${HCPCSCode}&DescriptionFilter=${DescriptionFilter}&PayerId=${PairId}` ).toPromise();
@@ -54,26 +56,26 @@ export class ChargeCaptureService {
     return this.api.post('ChargeCapture/SaveChargeCapture', values).toPromise();
   }
 
-  ServiceItemsbyProvider(AllCode:number ,ServiceStartCode:string, DescriptionFilter:string ) {
+  GetAllServiceItems(AllCode:number ,ServiceStartCode:string, DescriptionFilter:string ) {
     //debugger
     return this.api.get(`ChargeCapture/ServiceItems?AllCode=${AllCode}&ServiceStartCode=${ServiceStartCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
   }
 
-    UnclassifiedServicebyProvider (AllCode:number ,UCStartCode:string, DescriptionFilter:string ) {
+    GetAllUnclassifiedService (AllCode:number ,UCStartCode:string, DescriptionFilter:string ) {
     //debugger
     return this.api.get(`ChargeCapture/UnclassifiedService?AllCode=${AllCode}&UCStartCode=${UCStartCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
   }
-  DentalCodebyProvider(AllDentalCode:number ,DentalStartCode:string, DentalEndCode:string, DescriptionFilter:string ) {
+  GetAllDentalCode(AllDentalCode:number ,DentalStartCode:string, DentalEndCode:string, DescriptionFilter:string ) {
     //debugger
     return this.api.get(`ChargeCapture/DentalCode?AllDentalCode=${AllDentalCode}&DentalStartCode=${DentalStartCode}&DentalEndCode=${DentalEndCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
   }
 
-  HCPCSCodebyProvider(AllHCPCSCode:number ,HCPCStartCode:string, HCPCSEndCode:string, DescriptionFilter:string ) {
+  GetAllHCPCSCode(AllHCPCSCode:number ,HCPCStartCode:string, HCPCSEndCode:string, DescriptionFilter:string ) {
     //debugger
     return this.api.get(`ChargeCapture/HCPCSCode?AllHCPCSCode=${AllHCPCSCode}&HCPCStartCode=${HCPCStartCode}&HCPCSEndCode=${HCPCSEndCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
   }
 
-    CPTCodebyProvider(AllCPTCode:number ,CPTStartCode:string ,CPTEndCode:string, Description:string ) {
+    GetAllCPTCode(AllCPTCode:any ,CPTStartCode:any ,CPTEndCode:any, Description:any ) {
       //debugger
       return this.api.get(`ChargeCapture/CPTCode?AllCPTCode=${AllCPTCode}&CPTStartCode=${CPTStartCode}&CPTEndCode=${CPTEndCode}&Description=${Description}`).toPromise();
     }

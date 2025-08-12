@@ -5,8 +5,6 @@ import { CommonModule } from '@angular/common';
 import { NgIconComponent, NgIcon } from '@ng-icons/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
-// import { ClinicalApiService } from 'src/app/services/clinical-api.service';
-// import { ClinicalApiService } from '../clinical.api.service';
 import { Injectable } from '@angular/core';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { Subscription, switchMap } from 'rxjs';
@@ -14,7 +12,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
-import { AllergyDto } from '@/app/shared/Models/Clinical/allergy.model';
+import { AllergyDto} from '@/app/shared/models/clinical/allergy.model'
 
 @Component({
   selector: 'app-allergies',
@@ -155,7 +153,7 @@ export class AllergiesComponent implements OnInit {
     )
   )
   .subscribe((data: any) => {
-    console.log('✅ Subscription triggered with MRNO:', data?.table2?.[0]?.mrNo);
+    console.log(' Subscription triggered with MRNO:', data?.table2?.[0]?.mrNo);
     this.SearchPatientData = data;
     this.GetPatientAllergyData();
   });
@@ -176,21 +174,12 @@ export class AllergiesComponent implements OnInit {
       this.Mrno = Demographics.table2[0].mrNo;
       this.PatientId = Demographics.table2[0].patientId;
     }
-
-
-
-
-
-
     var currentUser = sessionStorage.getItem('userId');
     console.log('this.userId', currentUser);
 
     if (currentUser) {
       this.userid = currentUser || 0;
     }
-
-
-
     this.GetPatientAllergyData();
     this.Allergy.ActiveStatus = 1
   }
@@ -319,7 +308,7 @@ submit() {
     createdDate: new Date().toISOString().split('T')[0],
     appointmentId: this.userid
   };
-debugger
+
   this.ClinicalApiService.SubmitPatientAllergies(payload).then(() => {
     this.DropFilled();
     this.GetPatientAllergyData();

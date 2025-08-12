@@ -12,6 +12,10 @@ import { EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { log } from 'console';
 import { LoaderService } from '@core/services/loader.service';
+import { filter,distinctUntilChanged  } from 'rxjs/operators';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { Subscription } from 'rxjs';
+
 // import { NgxPermissionsDirective } from 'ngx-permissions';
 
 @Component({
@@ -32,7 +36,10 @@ import { LoaderService } from '@core/services/loader.service';
 })
 export class ChargeCaptureComponent {
   @Output() yearFilterChange = new EventEmitter<any>();
+  private patientDataSubscription: Subscription | undefined;
+  private AppoinmentDataSubscription: Subscription | undefined;
   selectedYear: any;
+  SearchPatientData: any
   activeServiceTabId = 1;
   activeTabId = 1;
   Demographic: any = {};
@@ -47,7 +54,10 @@ export class ChargeCaptureComponent {
   @ViewChild('MyCPT')  MyCPT: any;
   @ViewChild('MYHCPCS')  MYHCPCS: any;
   @ViewChild('MyDental')  MyDental: any;
-
+  AllMyDiagnosisCode: any [] = [];
+  AllMyHCPCSCode: any [] = [];
+  selectedgrid:any=[]
+  comment: any;
   ICT9Group:any[]=[];
   ICT9GroupId:number=0;
   DescriptionFilter: any = '';
@@ -62,9 +72,9 @@ export class ChargeCaptureComponent {
 
   //CPTCode parameter
   AllCPTCode: any = 0;
-  CPTStartCode: any = '2';
-  CPTEndCode: any = '0';
-  Description: any = '0';
+  CPTStartCode: any = '';
+  CPTEndCode: any = '';
+  Description: any = '';
   ProcedureEndCode: any = '';
   ProcedureStartCode: any = '';
 
@@ -148,7 +158,8 @@ MyDentalGroups:any[]=[];
   constructor(
     private service: ChargeCaptureService,
     private router: Router,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private PatientData: PatientBannerService
   ) {  }
   SearchCPTby: any = [
     { code: 1, name: 'All' },
@@ -182,6 +193,33 @@ MyDentalGroups:any[]=[];
   ProceduresData:any = [];
 
   async ngOnInit() {
+
+        this.patientDataSubscription = this.PatientData.patientData$
+      .pipe(
+        filter((data: any) => !!data?.table2?.[0]?.mrNo),
+        distinctUntilChanged((prev, curr) =>
+          prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+        )
+      )
+      .subscribe((data: any) => {
+        if(data){
+          this.SearchPatientData = data;
+          console.log('✅ Subscription triggered with MRNO:', data);
+        }
+      });
+
+      this.AppoinmentDataSubscription = this.PatientData.selectedVisit$
+      .pipe(
+        distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+      )
+      .subscribe((visitdata: any) => {
+          if (visitdata) {
+            this.visitDetail = visitdata;
+            this.VisitAccountNO = visitdata.appointmentId
+            console.log('✅ Subscription triggered with visit:', this.visitDetail);
+          }
+      });
+      
     // var visitAccountDetail=localStorage.getItem("LoadvisitDetail");  
     // if(!(visitAccountDetail==undefined)  && !(visitAccountDetail=="") && !(visitAccountDetail==null))
     // {
@@ -250,10 +288,7 @@ MyDentalGroups:any[]=[];
   }
 
 async loadHCPCSGroup() {
-  debugger
-  
-  await this.service.GetHCPCSByProvider(this.ProviderId)
-    .then((response: any) => {
+  await this.service.GetHCPCSByProvider(this.ProviderId).then((response: any) => {
       // Map the response directly and include the 'ALL' group.
       if(Object.keys(response).length != 0){
         
@@ -305,34 +340,27 @@ async loadHCPCSGroup() {
   //         }));
   }
 
-  AllMyDiagnosisCode: any [] = []
-
     async filter(e: any) {
-    debugger
-    // await this.AllDignosisApis();
-  const input = e.target.value?.toLowerCase().trim();
+    const input = e.target.value?.toLowerCase().trim();
 
-  if (!input) {
-    this.MyDiagnosisCode = [...this.AllMyDiagnosisCode];
-    return;
-  }
-
-  var data = this.AllMyDiagnosisCode.filter((item: any) => {
-    return (
-      item.icD9Code?.toLowerCase().includes(input) ||
-      item.providerDescription?.toLowerCase().includes(input)
-    );
-  });
+    if (!input) {
+      this.MyDiagnosisCode = [...this.AllMyDiagnosisCode];
+      return;
+    }
+    var data = this.AllMyDiagnosisCode.filter((item: any) => {
+      return (
+        item.icD9Code?.toLowerCase().includes(input) ||
+        item.providerDescription?.toLowerCase().includes(input)
+      );
+    });
     this.MyDiagnosisCode = [...data];
-
-  this.MyDiagnosisCodeTotalItems = this.MyDiagnosisCode.length;
-  this.MyDiagnosisCodeCurrentPage = 1;
-  this.MyDiagnosisCodeSetPagedData();
-
+    this.MyDiagnosisCodeTotalItems = this.MyDiagnosisCode.length;
+    this.MyDiagnosisCodeCurrentPage = 1;
+    this.MyDiagnosisCodeSetPagedData();
 }
 
   async filteVersion(e: any) {
-     debugger
+      
       const response: any = await this.service.MyDiagnosisCodebyProvider(this.ProviderId, this.ICT9GroupId, this.ICDVersionId);
       this.AllMyDiagnosisCode = response?.table1 || [];
 
@@ -356,7 +384,7 @@ async loadHCPCSGroup() {
 AllMyCPTCode: any [] = [];
 
   async filterCPT(e: any) {
-    debugger
+     
   const input = e.target.value?.toLowerCase().trim();
 
   if (!input) {
@@ -396,7 +424,7 @@ AllMyCPTCode: any [] = [];
   }
 
   async filterMyHCPS(e: any) {
-    debugger
+     
     // await this.MyHCPCSCodebyProvider()
   const input = e.target.value?.toLowerCase().trim();
 
@@ -422,7 +450,7 @@ AllMyCPTCode: any [] = [];
 }
 
 async filterMyDental(e: any){
-      debugger
+       
   const input = e.target.value?.toLowerCase().trim();
 
   if (!input) {
@@ -460,17 +488,12 @@ async filterMyDental(e: any){
   }
 
   FillDropDown(response: any) {
-     ;
     let jParse = JSON.parse(JSON.stringify(response)).cache;
     let hremploeevar = JSON.parse(jParse).Provider;
     let universaltoothcode= JSON.parse(jParse).BLUniversalToothCodes;
     let iCDVersion=JSON.parse(jParse).BLICDVersion;
 
-
-
-
     if (hremploeevar) {
-       ;
       hremploeevar = hremploeevar.map(
         (item: { EmployeeId: any; FullName: any }) => {
           return {
@@ -494,10 +517,7 @@ async filterMyDental(e: any){
       console.log(this.Provider, 'Provider');
     }
 
-
-
     if (universaltoothcode) {
-       ;
       universaltoothcode = universaltoothcode.map(
         (item: { ToothCode: any; Tooth: any }) => {
           return {
@@ -528,10 +548,12 @@ async filterMyDental(e: any){
       this.ICDVersions = iCDVersion;
     }
 
+    this.loader.show();
     this.loadICD9Gropu();
     this.loadCPTGroup();
     this.loadHCPCSGroup();
     this.loadDentalGroupGroup();
+    this.loader.hide();
   }
 
   async provider(event:any) {
@@ -544,30 +566,6 @@ async filterMyDental(e: any){
     await this.loadDentalGroupGroup();
     this.loader.hide();
   }
-
-
-
-  // async AllDignosisApis() {
-      
-  //   await this.service.MyDiagnosisCodebyProvider(this.ProviderId, this.ICT9GroupId, this.ICDVersionId).then((response: any) => {
-  //     this.MyDiagnosisCode = response?.table1 || [];
-  //     console.log(this.MyDiagnosisCode, 'MyDiagnosisCode');
-  //   })
-  // }
-
-  // SearchDiagnosis()
-  // {
-  //   this.showSpinner = true
-  //   this.DiagnosisCode=[];
-  //   this.service.DiagnosisCodebyProvider(this.ICDVersionId, this.DiagnosisStartCode, this.DiagnosisEndCode, this.DescriptionFilter).then((response: any) => {
-  //     this.DiagnosisCode = response.table1;
-  //     console.log(this.DiagnosisCode, 'this.DiagnosisCode');
-  //   this.showSpinner = false
-  //   })
-  //   this.showSpinner = false
-  // }
-
-
   async MyCptCodebyProvider(){
       await this.service.MyCptCodebyProvider(this.ProviderId, this.CPTGroupId).then((response: any) => {
       console.log('response =>',response);
@@ -581,57 +579,28 @@ async filterMyDental(e: any){
       }
     })
   }
-  AllMyHCPCSCode: any [] = [];
+
   async AllServicesApis() {
-    await this.MyCptCodebyProvider()
-    await this.MyHCPCSCodebyProvider()
+    this.loader.show();
+    await this.MyCptCodebyProvider();
+    await this.MyHCPCSCodebyProvider();
     await this.MyDentalCodebyProvider();
-
-    this.service.CPTCodebyProvider(this.AllCPTCode, this.CPTStartCode, this.CPTEndCode, this.Description).then((response: any) => {
-      if(response){
-      this.CPTCode = response?.table1 || [];
-      console.log(this.CPTCode, 'this.CPTCode');
-      }
-    })
-
-    this.service.HCPCSCodebyProvider(this.AllHCPCSCode, this.HCPCStartCode, this.HCPCSEndCode, this.DescriptionFilter).then((response: any) => {
-      if(response){
-      this.HCPCSCodeGrid = response?.table1 || [];
-      console.log(this.HCPCSCodeGrid, 'this.HCPCSCodeGrid');
-      }
-    })
-
-    this.service.DentalCodebyProvider(this.AllDentalCode, this.DentalStartCode, this.DentalEndCode, this.DescriptionFilter).then((response: any) => {
-      if(response){
-      this.DentalCodeGridData = response?.table1 || []
-      console.log(this.DentalCodeGridData, 'this.DentalCodeGridData');
-      }
-    })
-
-
-
-    this.service.UnclassifiedServicebyProvider(this.AllCode, this.UCStartCode, this.DescriptionFilter).then((response: any) => {
-      if(response){
-      this.UnclassifiedService = response?.table1 || [];
-      console.log(this.UnclassifiedService, 'this.UnclassifiedService');
-      }
-    })
-
-    this.service.ServiceItemsbyProvider(this.AllCode, this.ServiceStartCode, this.DescriptionFilter).then((response:any) => {
-      if(response){
-      this.ServiceItems = response?.table1 || []
-      console.log(this.ServiceItems, 'this.ServiceItems');
-      }
-    })
-
+    await this.GetAllCPT();
+    await this.GetAllHCPCS();
+    await this.GetAllDental();
+    await this.GetAllUnclassifiedService();
+    await this.GetAllServiceItem();
+    this.loader.hide();
   }
 
-selectedgrid:any=[]
+  
+  validation : boolean = false;
   submit() {
-   
+    this.loader.show();
+    this.validation = false; 
     if(!(this.VisitAccountNO>0))
     {
-
+      this.loader.hide();
       Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -639,25 +608,50 @@ selectedgrid:any=[]
           });
       return;
     }
-     
+
+    if (this.MyDiagnosisData.length <= 0 || this.pagedAllService.length <= 0) {
+      this.loader.hide();
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Please Select Diagnosis and Service'
+      });
+      return;
+    }
+
     this.currentUser = JSON.parse(sessionStorage.getItem("userId") || "");
     const currentDate = new Date();
     let ChargCaptureModel = {
-      VisitAccountNo:parseInt(this.VisitAccountNO),
+      VisitAccountNo:parseInt(this.VisitAccountNO) || null,
+      MrNo: this.SearchPatientData?.table2?.[0]?.mrNo || null,
+      Comment: this.comment || null,
+      PayerId: this.visitDetail.payerId || null,
+      EmployeeId: this.currentUser || null,
+      AppointmentId: parseInt(this.VisitAccountNO) || null,
       BLSupperBillDiagnosisModel: [],
       BlSuperBillProcedureModel:[]
   }
     let data:any=[];
     for(let i=0;i<this.MyDiagnosisData.length;i++)
     {
+        if (!this.MyDiagnosisData[i].typeofDiagnosis) {
+          this.validation = true;
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Type is required and at least one type must be Primary'
+                });
+                this.loader.hide();
+        return;
+        }
       let Array={
         DiagnosisId : 0,
         VisitAccountNo : parseInt(this.VisitAccountNO),
         Icd9code: this.MyDiagnosisData[i].ICDCode,
-        LastUpdatedBy:this.currentUser.userId,
-        CreatedBy: this.currentUser.userId,
+        LastUpdatedBy:this.currentUser,
+        CreatedBy: this.currentUser,
         CreatedDate : currentDate,
-        DiagnosisPriority: 'Primary',
+        DiagnosisPriority: this.MyDiagnosisData[i].typeofDiagnosis,
         DiagnosisType :'Final',
         Confidential : false,
         IsHl7msgCreated :false,
@@ -673,21 +667,22 @@ selectedgrid:any=[]
     ChargCaptureModel.BLSupperBillDiagnosisModel=data;
    
     let procedureData: any = [];
-    for (let i = 0; i < this.selectedServices.length; i++) {
+    for (let i = 0; i < this.pagedAllService.length; i++) {
       let procedure = {
         ProcedureId: 0,
         VisitAccountNo: parseInt(this.VisitAccountNO),
         DateOfServiceFrom: currentDate,
         DateOfServiceTo: currentDate,
-        ProcedureCode: this.selectedServices[i].code,
-        Description: this.selectedServices[i].descriptionFull,
-        ProcedureType: this.selectedServices[i].itemType,
-        Units: this.selectedServices[i].units,
-        Modifier1: this.selectedServices[i].M1,
-        Modifier2: this.selectedServices[i].M2,
-        Modifier3: this.selectedServices[i].M3,
-        Modifier4: this.selectedServices[i].M4,
-        CreatedBy: this.currentUser.userId,
+        CreatedBy: this.currentUser,
+        ProcedureCode: this.pagedAllService[i].cptCode,
+        Description: this.pagedAllService[i].description,
+        UnclassifiedId: this.pagedAllService[i].UnclassifiedId || null,
+        ProcedureType: this.pagedAllService[i].type,
+        Units: this.pagedAllService[i].Unit || '1',
+        Modifier1: this.pagedAllService[i].M1,
+        Modifier2: this.pagedAllService[i].M2,
+        Modifier3: this.pagedAllService[i].M3,
+        Modifier4: this.pagedAllService[i].M4,
         CreatedDate: currentDate
       };
       procedureData.push(procedure);
@@ -695,8 +690,25 @@ selectedgrid:any=[]
 
     ChargCaptureModel.BlSuperBillProcedureModel = procedureData;
 
+    let hasPrimary = ChargCaptureModel.BLSupperBillDiagnosisModel.some(
+      (item: any) => item.DiagnosisPriority?.toLowerCase() === 'primary'
+    );
+
+    if (!hasPrimary) {
+      this.loader.hide();
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'At least one diagnosis must be Primary'
+      });
+      return; // Function stop ho jayega
+    }
+
+    debugger
+ 
         this.service.SaveChargeCapture(ChargCaptureModel).then((response: any) => {
           if (response.success) {
+            this.loader.hide();
              Swal.fire({
                     icon: 'success',
                     title: 'Success',
@@ -704,25 +716,23 @@ selectedgrid:any=[]
                     timer: 1500,
                     showConfirmButton: false
                   });
+           this.pagedAllService = []; 
+           this.MyDiagnosisData = [];
+           this.router.navigate(['/billing/bill generator']);
           }
         })
       }
 
-
       delete(){
-
       }
 
-
   DGridShow() {
-     
     this.Dshow = false;
     this.DHide = true;
     this.Diagnosis = true;
   }
 
   DGridHide() {
-     
     this.DHide = false;
     this.Dshow = true;
     this.Diagnosis = false;
@@ -753,55 +763,47 @@ selectedgrid:any=[]
   HCPCS= false;
 
   Rows()
-  {
-    debugger
-    let data:any=[];
-
-
-    for(let i=0;i<this.selectedDiagnosis.length;i++)
     {
-      let oldData={
-        // Sno:0,
-        ICDCode:undefined,
-        version:undefined,
-        description:undefined,
-        typeofDiagnosis:'',
-        yearofOnset:'',
-        versionId:0,
-
-      };
-      oldData.ICDCode=this.selectedDiagnosis[i].icD9Code;
-      oldData.version=this.selectedDiagnosis[i].icdVersion;
-      oldData.versionId=this.selectedDiagnosis[i].icdVersionId;
-      oldData.description=this.selectedDiagnosis[i].providerDescription;
-      oldData.typeofDiagnosis='';
-      oldData.yearofOnset='';
-      data.push(oldData);
-    }
-    this.MyDiagnosisData = data;
-    if(this.selectedallDiagnosis.length>0)
-    {
-      for(let i=0;i<this.selectedallDiagnosis.length;i++)
-    {
-      let oldData={
-        // Sno:0,
-        ICDCode:undefined,
-        version:undefined,
-        description:undefined,
-        typeofDiagnosis:'',
-        yearofOnset:'',
-        versionId:0,
-
-      };
-      oldData.ICDCode=this.selectedallDiagnosis[i].icD9Code;
-      oldData.version=this.selectedallDiagnosis[i].icdVersion;
-      oldData.versionId=this.selectedallDiagnosis[i].icdVersionId;
-      oldData.description=this.selectedallDiagnosis[i].descriptionFull;
-      oldData.typeofDiagnosis='';
-      oldData.yearofOnset='';
-      this.MyDiagnosisData.push(oldData);
-
-    }
+      let data:any=[];
+      for(let i=0;i<this.selectedDiagnosis.length;i++)
+      {
+        let oldData={
+          ICDCode:undefined,
+          version:undefined,
+          description:undefined,
+          typeofDiagnosis:'',
+          yearofOnset:'',
+          versionId:0,
+        };
+        oldData.ICDCode=this.selectedDiagnosis[i].icD9Code;
+        oldData.version=this.selectedDiagnosis[i].icdVersion;
+        oldData.versionId=this.selectedDiagnosis[i].icdVersionId;
+        oldData.description=this.selectedDiagnosis[i].providerDescription;
+        oldData.typeofDiagnosis='';
+        oldData.yearofOnset='';
+        data.push(oldData);
+      }
+      this.MyDiagnosisData = data;
+      if(this.selectedallDiagnosis.length>0)
+      {
+        for(let i=0;i<this.selectedallDiagnosis.length;i++)
+      {
+        let oldData={
+          ICDCode:undefined,
+          version:undefined,
+          description:undefined,
+          typeofDiagnosis:'',
+          yearofOnset:'',
+          versionId:0,
+        };
+        oldData.ICDCode=this.selectedallDiagnosis[i].icD9Code;
+        oldData.version=this.selectedallDiagnosis[i].icdVersion;
+        oldData.versionId=this.selectedallDiagnosis[i].icdVersionId;
+        oldData.description=this.selectedallDiagnosis[i].descriptionFull;
+        oldData.typeofDiagnosis='';
+        oldData.yearofOnset='';
+        this.MyDiagnosisData.push(oldData);
+      }
     }
     console.log(this.MyDiagnosisData,"kun");
   }
@@ -828,7 +830,6 @@ selectedgrid:any=[]
     // Remove from array if unchecked
     this.MyDiagnosisData = this.MyDiagnosisData.filter((d: any) => d.ICDCode !== item.icD9Code);
   }
-
   this.allDiagnosisUpdatePagination();
 }
 
@@ -879,7 +880,59 @@ onCPTCheckboxChange(event: any, item: any): void {
   }
 
 onDentalCheckboxChange(event: any, item: any): void {
-  item.procedureType = item.procedureType || 'Dental'; // Fallback agar type missing ho
+  item.procedureType = item.procedureType; // Fallback agar type missing ho
+  if (item.selected) {
+    if (!this.selectedServices.includes(item)) {
+      this.selectedServices.push(item);
+    }
+  } else {
+    this.selectedServices = this.selectedServices.filter(s => s !== item);
+  }
+  this.CPTRows(); // Reuse same logic
+}
+
+onServiceItemCheckboxChange(event: any, item: any): void {
+   
+  item.procedureType = "Service"; // Fallback agar type missing ho
+  if (item.selected) {
+    if (!this.selectedServices.includes(item)) {
+      this.selectedServices.push(item);
+    }
+  } else {
+    this.selectedServices = this.selectedServices.filter(s => s !== item);
+  }
+  this.CPTRows(); // Reuse same logic
+}
+
+
+onUnclassifiedServiceCheckboxChange(event: any, item: any): void {
+   
+  item.procedureType =  "UnclassifiedService";
+  if (item.selected) {
+    if (!this.selectedServices.includes(item)) {
+      this.selectedServices.push(item);
+    }
+  } else {
+    this.selectedServices = this.selectedServices.filter(s => s !== item);
+  }
+  this.CPTRows(); // Reuse same logic
+}
+
+
+onCPTCODECheckboxChange(event: any, item: any): void {
+  item.procedureType = item.procedureType; // Fallback agar type missing ho
+  if (item.selected) {
+    if (!this.selectedServices.includes(item)) {
+      this.selectedServices.push(item);
+    }
+  } else {
+    this.selectedServices = this.selectedServices.filter(s => s !== item);
+  }
+  this.CPTRows(); // Reuse same logic
+}
+
+onHCPCSCheckboxChange(event: any, item: any): void {
+  item.procedureType = item.procedureType; // Fallback agar type missing ho
   if (item.selected) {
     if (!this.selectedServices.includes(item)) {
       this.selectedServices.push(item);
@@ -912,7 +965,8 @@ onMyhcpcsCheckboxChange(event: any, item: any): void {
       let oldData = {
         type: "",
         cptCode: undefined,
-        description: undefined
+        description: undefined,
+        UnclassifiedId: undefined
       };
 
       let svc = this.selectedServices[i];
@@ -928,7 +982,7 @@ onMyhcpcsCheckboxChange(event: any, item: any): void {
       } 
       else if (svc.procedureType === "ALLDental") {
         oldData.type = "Dental";
-        oldData.cptCode = svc.dentalCode;
+        oldData.cptCode = svc.code;
         oldData.description = svc.descriptionFull;
         this.Dental = true;
         this.cpt = false;
@@ -946,7 +1000,7 @@ onMyhcpcsCheckboxChange(event: any, item: any): void {
       } 
       else if (svc.procedureType === "ALLCPT") {
         oldData.type = "CPT";
-        oldData.cptCode = svc.cptCode;
+        oldData.cptCode = svc.code;
         oldData.description = svc.descriptionFull;
         this.cpt = true;
         this.Dental = false;
@@ -964,8 +1018,28 @@ onMyhcpcsCheckboxChange(event: any, item: any): void {
       } 
       else if (svc.procedureType === "ALLHCPCS") {
         oldData.type = "HCPCS";
-        oldData.cptCode = svc.cptCode;
+        oldData.cptCode = svc.code;
         oldData.description = svc.descriptionFull;
+        this.HCPCS = true;
+        this.cpt = false;
+        this.Dental = false;
+        data.push(oldData);
+      }
+      else if (svc.procedureType === "Service") {
+        oldData.type = "Service";
+        oldData.cptCode = svc.code;
+        oldData.description = svc.description;
+        oldData.UnclassifiedId = svc.unclassifiedID
+        this.HCPCS = true;
+        this.cpt = false;
+        this.Dental = false;
+        data.push(oldData);
+      }
+      else if(svc.procedureType === "UnclassifiedService"){
+        oldData.type = "Service";
+        oldData.cptCode = svc.code;
+        oldData.description = svc.description;
+        oldData.UnclassifiedId = svc.unclassifiedID
         this.HCPCS = true;
         this.cpt = false;
         this.Dental = false;
@@ -974,6 +1048,7 @@ onMyhcpcsCheckboxChange(event: any, item: any): void {
     }
 
     this.MyServicesData = data;
+    this.GetAllService(this.MyServicesData);
     console.log(this.MyServicesData, "Processed Selected Services");
   }
 
@@ -1089,20 +1164,14 @@ searchingName:string='Starting Code';
 
   myData: any = [];
   visibleData: any = [];
-onPageChange(event: { start: number, end: number, currentPage: number }) {
-  this.visibleData = this.myData.slice(event.start, event.end);
-}
 
 
-// DiagnosisCode Pagination Start
+//#region DiagnosisCode Pagination Start
+
 pagedDiagnosisCode: any[] = [];
-
 diagnosisCodeCurrentPage = 1;
-diagnosisCodePageSize = 10;
+diagnosisCodePageSize = 5;
 diagnosisCodeTotalItems = 0;
-    
-
-
  
 get diagnosisCodeTotalPages(): number {
   return Math.ceil(this.diagnosisCodeTotalItems / this.diagnosisCodePageSize);
@@ -1197,14 +1266,12 @@ diagnosisCodePrevPage() {
 trackByCode(index: number, item: any) {
   return item.icD9Code;
 }
-// DiagnosisCode Pagination End
+//#endregion
 
-
-// MyDiagnosisCode Pagination Start
+//#region MyDiagnosisCode Pagination Start
 pagedMyDiagnosisCode: any[] = [];
-
 MyDiagnosisCodeCurrentPage = 1;
-MyDiagnosisCodePageSize = 10;
+MyDiagnosisCodePageSize = 5;
 MyDiagnosisCodeTotalItems = 0;
 
 get MyDiagnosisCodeTotalPages(): number {
@@ -1272,16 +1339,13 @@ MyDiagnosisCodePrevPage() {
     this.MyDiagnosisCodeSetPagedData();
   }
 }
+//#endregion
 
-// MyDiagnosisCode Pagination End
-
+//#region AllDiagnosis Pagination Start 
 
 // AllDiagnosis Pagination Start
-  // Paginated data from allDiagnosisList
   allDiagnosisPaginatedItems: any[] = [];
-
-  // Pagination settings
-  allDiagnosisItemsPerPage: number = 10;
+  allDiagnosisItemsPerPage: number = 5;
   allDiagnosisCurrentPage: number = 1;
   allDiagnosisTotalPages: number = 0;
   allDiagnosisPageNumbers: number[] = [];
@@ -1328,15 +1392,13 @@ MyDiagnosisCodePrevPage() {
     }
   }
   // AllDiagnosis Pagination End
+//#endregion
 
-
-
+//#region MyCPTCode Pagination Start
 // MyCPTCode Pagination Start
-
 pagedMyCptCode: any[] = [];
-
 MyCptCodeCurrentPage = 1;
-MyCptCodePageSize = 10;
+MyCptCodePageSize = 5;
 MyCptCodeTotalItems = 0;
 
 get MyCptCodeTotalPages(): number {
@@ -1395,15 +1457,13 @@ MyCptCodePrevPage() {
     this.MyCptCodeSetPagedData();
   }
 }
-
 // MyCPTCode Pagination End
+//#endregion
 
-
-// MyHCPCSCode Pagination Start
+//#region MyHCPCSCode Pagination Start
 pagedMyHCPCSCode: any[] = [];
-
 MyHCPCSCodeCurrentPage = 1;
-MyHCPCSCodePageSize = 10;
+MyHCPCSCodePageSize = 5;
 MyHCPCSCodeTotalItems = 0;
 
 get MyHCPCSCodeTotalPages(): number {
@@ -1417,7 +1477,6 @@ get MyHCPCSCodeStart(): number {
 get MyHCPCSCodeEnd(): number {
   return Math.min(this.MyHCPCSCodeStart + this.MyHCPCSCodePageSize, this.MyHCPCSCodeTotalItems);
 }
-
 get MyHCPCSCodePageNumbers(): (number | string)[] {
   const total = this.MyHCPCSCodeTotalPages;
   const current = this.MyHCPCSCodeCurrentPage;
@@ -1476,14 +1535,12 @@ async MyHCPCSCodebyProvider() {
     }
   });
 }
+//#endregion
 
-
-// MyDentalCode Pagination start
-
+//#region MyDentalCode Pagination start
 pagedMyDentalCode: any[] = [];
-
 MyDentalCodeCurrentPage = 1;
-MyDentalCodePageSize = 10;
+MyDentalCodePageSize = 5;
 MyDentalCodeTotalItems = 0;
 
 get MyDentalCodeTotalPages(): number {
@@ -1556,8 +1613,458 @@ async MyDentalCodebyProvider() {
     }
   });
 }
+//#endregion
 
-// MyDentalCode Pagination start
+//#region CPTCode Pagination start
+pagedCPT: any[] = [];
+CPTCurrentPage = 1;
+CPTPageSize = 5;
+CPTTotalItems = 0;
 
+get CPTTotalPages(): number {
+  return Math.ceil(this.CPTTotalItems / this.CPTPageSize);
+}
+
+get CPTStart(): number {
+  return (this.CPTCurrentPage - 1) * this.CPTPageSize;
+}
+
+get CPTEnd(): number {
+  return Math.min(this.CPTStart + this.CPTPageSize, this.CPTTotalItems);
+}
+
+get CPTPageNumbers(): (number | string)[] {
+  const total = this.CPTTotalPages;
+  const current = this.CPTCurrentPage;
+  const delta = 2;
+
+  const range: (number | string)[] = [];
+  const left = Math.max(2, current - delta);
+  const right = Math.min(total - 1, current + delta);
+
+  range.push(1); // always show first page
+
+  if (left > 2) range.push('...');
+  for (let i = left; i <= right; i++) range.push(i);
+  if (right < total - 1) range.push('...');
+  if (total > 1) range.push(total); // always show last page
+
+  return range;
+}
+
+CPTSetPagedData() {
+  const startIndex = (this.CPTCurrentPage - 1) * this.CPTPageSize;
+  const endIndex = startIndex + this.CPTPageSize;
+  this.pagedCPT = this.CPTCode.slice(startIndex, endIndex);
+}
+
+CPTGoToPage(page: number) {
+  if (typeof page !== 'number' || page < 1 || page > this.CPTTotalPages) return;
+  this.CPTCurrentPage = page;
+  this.CPTSetPagedData();
+}
+
+CPTNextPage() {
+  if (this.CPTCurrentPage < this.CPTTotalPages) {
+    this.CPTCurrentPage++;
+    this.CPTSetPagedData();
+  }
+}
+
+CPTPrevPage() {
+  if (this.MyDentalCodeCurrentPage > 1) {
+    this.MyDentalCodeCurrentPage--;
+    this.CPTSetPagedData();
+  }
+}
+
+// API Call
+async GetAllCPT() {
+
+   await this.service.GetAllCPTCode(this.AllCPTCode, this.CPTStartCode, this.CPTEndCode, this.Description).then((response: any) => {
+      this.CPTCode = response.table1;
+      this.CPTTotalItems = this.CPTCode.length;      
+      this.CPTCurrentPage = 1;
+      this.CPTSetPagedData();
+      console.log(this.CPTCode, 'this.CPTCode');
+
+    })
+}
+//#endregion
+
+//#region HCPCSCode Pagination start
+pagedHCPCS: any[] = [];
+HCPCSCurrentPage = 1;
+HCPCSPageSize = 5;
+HCPCSTotalItems = 0;
+
+get HCPCSTotalPages(): number {
+  return Math.ceil(this.HCPCSTotalItems / this.HCPCSPageSize);
+}
+
+get HCPCSStart(): number {
+  return (this.HCPCSCurrentPage - 1) * this.HCPCSPageSize;
+}
+
+get HCPCSEnd(): number {
+  return Math.min(this.HCPCSStart + this.HCPCSPageSize, this.HCPCSTotalItems);
+}
+
+get HCPCSPageNumbers(): (number | string)[] {
+  const total = this.HCPCSTotalPages;
+  const current = this.HCPCSCurrentPage;
+  const delta = 2;
+
+  const range: (number | string)[] = [];
+  const left = Math.max(2, current - delta);
+  const right = Math.min(total - 1, current + delta);
+
+  range.push(1); // always show first page
+
+  if (left > 2) range.push('...');
+  for (let i = left; i <= right; i++) range.push(i);
+  if (right < total - 1) range.push('...');
+  if (total > 1) range.push(total); // always show last page
+
+  return range;
+}
+
+HCPCSSetPagedData() {
+  const startIndex = (this.HCPCSCurrentPage - 1) * this.HCPCSPageSize;
+  const endIndex = startIndex + this.HCPCSPageSize;
+  this.pagedHCPCS = this.HCPCSCodeGrid.slice(startIndex, endIndex);
+}
+
+HCPCSGoToPage(page: number) {
+  if (typeof page !== 'number' || page < 1 || page > this.HCPCSTotalPages) return;
+  this.HCPCSCurrentPage = page;
+  this.HCPCSSetPagedData();
+}
+
+HCPCSNextPage() {
+  if (this.HCPCSCurrentPage < this.HCPCSTotalPages) {
+    this.HCPCSCurrentPage++;
+    this.HCPCSSetPagedData();
+  }
+}
+
+HCPCSPrevPage() {
+  if (this.HCPCSCurrentPage > 1) {
+    this.HCPCSCurrentPage--;
+    this.HCPCSSetPagedData();
+  }
+}
+
+// API Call
+async GetAllHCPCS() {
+   await this.service.GetAllHCPCSCode(this.AllCPTCode, this.CPTStartCode, this.CPTEndCode, this.Description).then((response: any) => {
+      this.HCPCSCodeGrid = response?.table1 || [];
+      this.HCPCSTotalItems = this.HCPCSCodeGrid?.length;      
+      this.HCPCSCurrentPage = 1;
+      this.HCPCSSetPagedData();
+      console.log(this.HCPCSCodeGrid, 'this.HCPCSCode');
+
+    })
+}
+//#endregion
+
+//#region DentalCode Pagination start
+pagedDental: any[] = [];
+DentalCurrentPage = 1;
+DentalPageSize = 5;
+DentalTotalItems = 0;
+
+get DentalTotalPages(): number {
+  return Math.ceil(this.DentalTotalItems / this.DentalPageSize);
+}
+
+get DentalStart(): number {
+  return (this.DentalCurrentPage - 1) * this.DentalPageSize;
+}
+
+get DentalEnd(): number {
+  return Math.min(this.DentalStart + this.DentalPageSize, this.DentalTotalItems);
+}
+
+get DentalPageNumbers(): (number | string)[] {
+  const total = this.DentalTotalPages;
+  const current = this.DentalCurrentPage;
+  const delta = 2;
+
+  const range: (number | string)[] = [];
+  const left = Math.max(2, current - delta);
+  const right = Math.min(total - 1, current + delta);
+
+  range.push(1); // always show first page
+
+  if (left > 2) range.push('...');
+  for (let i = left; i <= right; i++) range.push(i);
+  if (right < total - 1) range.push('...');
+  if (total > 1) range.push(total); // always show last page
+
+  return range;
+}
+
+DentalSetPagedData() {
+  const startIndex = (this.DentalCurrentPage - 1) * this.DentalPageSize;
+  const endIndex = startIndex + this.DentalPageSize;
+  this.pagedDental = this.DentalCodeGridData.slice(startIndex, endIndex);
+}
+
+DentalGoToPage(page: number) {
+  if (typeof page !== 'number' || page < 1 || page > this.DentalTotalPages) return;
+  this.DentalCurrentPage = page;
+  this.DentalSetPagedData();
+}
+
+DentalNextPage() {
+  if (this.DentalCurrentPage < this.DentalTotalPages) {
+    this.DentalCurrentPage++;
+    this.DentalSetPagedData();
+  }
+}
+
+DentalPrevPage() {
+  if (this.DentalCurrentPage > 1) {
+    this.DentalCurrentPage--;
+    this.DentalSetPagedData();
+  }
+}
+
+async GetAllDental() {
+   await this.service.GetAllDentalCode(this.AllCPTCode, this.CPTStartCode, this.CPTEndCode, this.Description).then((response: any) => {
+      this.DentalCodeGridData = response?.table1 || [];
+      this.DentalTotalItems = this.DentalCodeGridData?.length;      
+      this.DentalCurrentPage = 1;
+      this.DentalSetPagedData();
+      console.log(this.DentalCodeGridData, 'this.DentalCode');
+
+    })
+}
+//#endregion
+
+//#region UnclassifiedService Pagination start
+pagedUnclassifiedService: any[] = [];
+UnclassifiedServiceCurrentPage = 1;
+UnclassifiedServicePageSize = 5;
+UnclassifiedServiceTotalItems = 0;
+
+get UnclassifiedServiceTotalPages(): number {
+  return Math.ceil(this.UnclassifiedServiceTotalItems / this.UnclassifiedServicePageSize);
+}
+
+get UnclassifiedServiceStart(): number {
+  return (this.UnclassifiedServiceCurrentPage - 1) * this.UnclassifiedServicePageSize;
+}
+
+get UnclassifiedServiceEnd(): number {
+  return Math.min(this.UnclassifiedServiceStart + this.UnclassifiedServicePageSize, this.UnclassifiedServiceTotalItems);
+}
+
+get UnclassifiedServicePageNumbers(): (number | string)[] {
+  const total = this.UnclassifiedServiceTotalPages;
+  const current = this.UnclassifiedServiceCurrentPage;
+  const delta = 2;
+
+  const range: (number | string)[] = [];
+  const left = Math.max(2, current - delta);
+  const right = Math.min(total - 1, current + delta);
+
+  range.push(1); // always show first page
+
+  if (left > 2) range.push('...');
+  for (let i = left; i <= right; i++) range.push(i);
+  if (right < total - 1) range.push('...');
+  if (total > 1) range.push(total); // always show last page
+
+  return range;
+}
+
+UnclassifiedServiceSetPagedData() {
+  const startIndex = (this.UnclassifiedServiceCurrentPage - 1) * this.UnclassifiedServicePageSize;
+  const endIndex = startIndex + this.UnclassifiedServicePageSize;
+  this.pagedUnclassifiedService = this.UnclassifiedService.slice(startIndex, endIndex);
+}
+
+UnclassifiedServiceGoToPage(page: number) {
+  if (typeof page !== 'number' || page < 1 || page > this.UnclassifiedServiceTotalPages) return;
+  this.UnclassifiedServiceCurrentPage = page;
+  this.UnclassifiedServiceSetPagedData();
+}
+
+UnclassifiedServiceNextPage() {
+  if (this.UnclassifiedServiceCurrentPage < this.UnclassifiedServiceTotalPages) {
+    this.UnclassifiedServiceCurrentPage++;
+    this.UnclassifiedServiceSetPagedData();
+  }
+}
+
+UnclassifiedServicePrevPage() {
+  if (this.UnclassifiedServiceCurrentPage > 1) {
+    this.UnclassifiedServiceCurrentPage--;
+    this.UnclassifiedServiceSetPagedData();
+  }
+}
+
+// API Call
+async GetAllUnclassifiedService() {
+   await this.service.GetAllUnclassifiedService(this.AllCode, this.UCStartCode, this.DescriptionFilter).then((response: any) => {
+      this.UnclassifiedService = response?.table1 || [];
+      this.UnclassifiedServiceTotalItems = this.UnclassifiedService?.length;
+      this.UnclassifiedServiceCurrentPage = 1;
+      this.UnclassifiedServiceSetPagedData();
+      console.log(this.UnclassifiedService, 'this.UnclassifiedService');
+    })
+}
+//#endregion
+
+//#region Service Item
+
+pagedServiceItem: any[] = [];
+ServiceItemCurrentPage = 1;
+ServiceItemPageSize = 5;
+ServiceItemTotalItems = 0;
+
+get ServiceItemTotalPages(): number {
+  return Math.ceil(this.ServiceItemTotalItems / this.ServiceItemPageSize);
+}
+
+get ServiceItemStart(): number {
+  return (this.ServiceItemCurrentPage - 1) * this.ServiceItemPageSize;
+}
+
+get ServiceItemEnd(): number {
+  return Math.min(this.ServiceItemStart + this.ServiceItemPageSize, this.ServiceItemTotalItems);
+}
+
+get ServiceItemPageNumbers(): (number | string)[] {
+  const total = this.ServiceItemTotalPages;
+  const current = this.ServiceItemCurrentPage;
+  const delta = 2;
+
+  const range: (number | string)[] = [];
+  const left = Math.max(2, current - delta);
+  const right = Math.min(total - 1, current + delta);
+
+  range.push(1); // always show first page
+
+  if (left > 2) range.push('...');
+  for (let i = left; i <= right; i++) range.push(i);
+  if (right < total - 1) range.push('...');
+  if (total > 1) range.push(total); // always show last page
+
+  return range;
+}
+
+ServiceItemSetPagedData() {
+  const startIndex = (this.ServiceItemCurrentPage - 1) * this.ServiceItemPageSize;
+  const endIndex = startIndex + this.ServiceItemPageSize;
+  this.pagedServiceItem = this.ServiceItems.slice(startIndex, endIndex);
+}
+
+ServiceItemGoToPage(page: number) {
+  if (typeof page !== 'number' || page < 1 || page > this.ServiceItemTotalPages) return;
+  this.ServiceItemCurrentPage = page;
+  this.ServiceItemSetPagedData();
+}
+
+ServiceItemNextPage() {
+  if (this.ServiceItemCurrentPage < this.ServiceItemTotalPages) {
+    this.ServiceItemCurrentPage++;
+    this.ServiceItemSetPagedData();
+  }
+}
+
+ServiceItemPrevPage() {
+  if (this.ServiceItemCurrentPage > 1) {
+    this.ServiceItemCurrentPage--;
+    this.ServiceItemSetPagedData();
+  }
+}
+
+// API Call
+async GetAllServiceItem() {
+   await this.service.GetAllServiceItems(this.AllCode, this.ServiceStartCode, this.DescriptionFilter).then((response: any) => {
+      this.ServiceItems = response?.table1 || [];
+      this.ServiceItemTotalItems = this.ServiceItems?.length;
+      this.ServiceItemCurrentPage = 1;
+      this.ServiceItemSetPagedData();
+      console.log(this.ServiceItems, 'this.ServiceItem');
+    })
+}
+//#endregion
+
+//#region All Service
+pagedAllService: any[] = [];
+AllServiceCurrentPage = 1;
+AllServicePageSize = 5;
+AllServiceTotalItems = 0;
+
+get AllServiceTotalPages(): number {
+  return Math.ceil(this.AllServiceTotalItems / this.AllServicePageSize);
+}
+
+get AllServiceStart(): number {
+  return (this.AllServiceCurrentPage - 1) * this.AllServicePageSize;
+}
+
+get AllServiceEnd(): number {
+  return Math.min(this.AllServiceStart + this.AllServicePageSize, this.AllServiceTotalItems);
+}
+
+get AllServicePageNumbers(): (number | string)[] {
+  const total = this.AllServiceTotalPages;
+  const current = this.AllServiceCurrentPage;
+  const delta = 2;
+
+  const range: (number | string)[] = [];
+  const left = Math.max(2, current - delta);
+  const right = Math.min(total - 1, current + delta);
+
+  range.push(1); // always show first page
+
+  if (left > 2) range.push('...');
+  for (let i = left; i <= right; i++) range.push(i);
+  if (right < total - 1) range.push('...');
+  if (total > 1) range.push(total); // always show last page
+
+  return range;
+}
+
+AllServiceSetPagedData() {
+  const startIndex = (this.AllServiceCurrentPage - 1) * this.AllServicePageSize;
+  const endIndex = startIndex + this.AllServicePageSize;
+  this.pagedAllService = this.MyServicesData.slice(startIndex, endIndex);
+}
+
+AllServiceGoToPage(page: number) {
+  if (typeof page !== 'number' || page < 1 || page > this.AllServiceTotalPages) return;
+  this.AllServiceCurrentPage = page;
+  this.AllServiceSetPagedData();
+}
+
+AllServiceNextPage() {
+  if (this.AllServiceCurrentPage < this.AllServiceTotalPages) {
+    this.AllServiceCurrentPage++;
+    this.AllServiceSetPagedData();
+  }
+}
+
+AllServicePrevPage() {
+  if (this.ServiceItemCurrentPage > 1) {
+    this.AllServiceCurrentPage--;
+    this.AllServiceSetPagedData();
+  }
+}
+
+// API Call
+async GetAllService(Data: any) {
+      this.ServiceItems = Data || [];
+      this.AllServiceTotalItems = this.ServiceItems?.length;
+      this.AllServiceCurrentPage = 1;
+      this.AllServiceSetPagedData();
+      console.log(this.ServiceItems, 'this.ServiceItem');
+}
+//#endregion
 
 }

@@ -6,69 +6,64 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { SchedulingApiService } from './scheduling.api.service';
 import { FilterModalComponent } from './filter.modal/filter.modal.component';
 import { AppointmentDashboardComponent } from './appointment-dashboard/appointment-dashboard.component';
+import { modulePermissionGuard } from '@core/guards/module-permission.guard';
 
 export const Scheduling_ROUTES: Routes = [
+    // {
+    //     path: '',
+    //     canActivate: [authGuard],
+
+    //     data: { permissions: ['Scheduling:View Appointments'] },
+    //     children: [
+    //         {
+    //             path: 'view appointments',
+    //             component: AppointmentsComponent,
+    //             data: { title: 'View Appointments' },
+    //         },
+
+
+    //         {
+    //             path: 'create-appointment',
+    //             component: CreateAppointmentComponent,
+    //             data: { title: 'Create Appointment' },
+    //         },
+    //         {
+    //             path: 'Filter',
+    //             component: FilterModalComponent,
+    //             data: { title: 'Filter Appointments' },
+    //         },
+    //     ],
+    // },
+
+
     {
         path: '',
         canActivate: [authGuard],
-
-        data: { permissions: ['Scheduling:View Appointments'] },
         children: [
-            {
-                path: 'view appointments',
-                component: AppointmentsComponent,
-                data: { title: 'View Appointments' },
-            },
-
-            {
-                path: 'view appointments',
-                component: AppointmentDashboardComponent,
-                data: { title: 'View Appointments' },
-            },
-
-            {
-                path: 'create-appointment',
-                component: CreateAppointmentComponent,
-                data: { title: 'Create Appointment' },
-            },
-            {
-                path: 'Filter',
-                component: FilterModalComponent,
-                data: { title: 'Filter Appointments' },
-            },
-        ],
-    },
+          {
+            path: 'Filter',
+            component: FilterModalComponent,
+            canActivate: [modulePermissionGuard],
+            data: { module: 'Scheduling', component: 'Filter', title: 'Filter Appointments' }
+          },
+          {
+            path: 'view appointments',
+            component: AppointmentsComponent,
+            canActivate: [modulePermissionGuard],
+            data: { module: 'Scheduling', component: 'View Appointments', title: 'View Appointments' }
+          },
+          {
+          path: 'appointment dashboard',
+          component: AppointmentDashboardComponent,
+          canActivate: [modulePermissionGuard],
+          data: { module: 'Scheduling', component: 'Appointment Dashboard', title: 'Appointment Dashboard' }
+        },
+        {
+            path: 'create-appointment',
+            component: CreateAppointmentComponent,
+            canActivate: [modulePermissionGuard],
+            data: { module: 'Scheduling', component: 'Create Appointment', title: 'Create Appointment' }
+        },
+        ]
+      }
 ];
-
-
-// export const Scheduling_ROUTES: Routes = [
-//     {
-//         path: '',
-//         canActivate: [authGuard],
-//         data: { permissions: ['Scheduling:View Appointments'] },
-//         children: [
-//             {
-//                 path: 'View Appointments',
-//                 component: AppointmentsComponent,
-//                 data: { title: 'View Appointments' },
-//             },
-//             {
-//                 path: 'create-appointment',
-//                 component: CreateAppointmentComponent,
-//                 data: { title: 'Create Appointment' },
-//             },
-//             {
-//                 path: 'Filter',
-//                 component: FilterModalComponent,
-//                 data: { title: 'Filter Appointments' },
-//             },
-      
-//         ],
-//     },
-//        // 🔓 Unprotected route for dashboard (no permission check)
-//     {
-//         path: 'appointment-dashboard',
-//         component: AppointmentDashboardComponent,
-//         data: { title: 'Appointment Dashboard' },
-//     },
-// ];

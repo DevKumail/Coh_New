@@ -835,6 +835,11 @@ export const horizontalMenuItems: MenuItemType[] = [
                 url: 'clinical/vital signs',
                 // url: '/clinical/vital-signs'
             },
+            {
+                label:'immunizations',
+                url:'/clinical/immunizations'
+
+            }
         ],
     },
 
@@ -849,6 +854,11 @@ export const horizontalMenuItems: MenuItemType[] = [
                 icon: 'tablerBell',
                 url: '/billing/charge capture',
             },
+            // {
+            //     label: 'Bill Generator',
+            //     icon: 'tablerBell',
+            //     url: '/billing/bill generator',
+            // },
         ],
     },
 
@@ -863,12 +873,12 @@ export const horizontalMenuItems: MenuItemType[] = [
             {
                 label: 'View Appointments',
                 icon: 'tablerCalendar',
-                url: '/scheduling/View Appointments',
+                url: '/scheduling/view appointments',
             },
             {
-            label: 'Appointment Dashboard',
-            icon: 'tablerLayoutDashboard',
-            url: '/scheduling/appointment-dashboard',
+                label: 'Appointment Dashboard',
+                icon: 'tablerLayoutDashboard',
+                url: '/scheduling/appointment dashboard',
             },
             // {
             //     label: 'Create Appointment',
