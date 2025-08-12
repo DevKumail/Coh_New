@@ -854,11 +854,11 @@ export const horizontalMenuItems: MenuItemType[] = [
                 icon: 'tablerBell',
                 url: '/billing/charge capture',
             },
-            {
-                label: 'Bill Generator',
-                icon: 'tablerBell',
-                url: '/billing/bill generator',
-            },
+            // {
+            //     label: 'Bill Generator',
+            //     icon: 'tablerBell',
+            //     url: '/billing/bill generator',
+            // },
         ],
     },
 
