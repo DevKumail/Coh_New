@@ -55,3 +55,10 @@
 /Server/HMIS.Service/obj/Debug/net8.0
 /Server/HMIS.Web.API/bin/Debug/net8.0
 /Server/HMIS.Web.API/obj
+*.json
+/Server/HMIS.Application/bin/Release/net8.0
+/Server/HMIS.Core/bin/Release/net8.0
+/Server/HMIS.Infrastructure/bin/Release/net8.0
+/Server/HMIS.Web.API/bin/Release/net8.0
+/Server/HMIS.Web.API/Properties/PublishProfiles
+/Server/HMIS.Web.API/appsettings.json

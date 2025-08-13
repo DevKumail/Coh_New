@@ -69,6 +69,8 @@ export class CoverageListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
+    console.log('coverage start');
+    
 
     this.patientSubscription = this.patientBannerService.patientData$
     .pipe(
@@ -78,11 +80,13 @@ export class CoverageListComponent implements OnInit, OnDestroy {
     )
       )
       .subscribe((data: any) => {
-        this.SearchPatientData = data;
+         this.SearchPatientData = data;
         this.GetCoverageData();
       });
 
       this.GetCoverageData();
+
+      console.log('coverage end');
 
   }
 
@@ -119,44 +123,9 @@ GetCoverage(MrNo: string) {
     );
 }
 
-
-//     GetCoverageData() {
-
-//     if (!this.SearchPatientData) {
-//       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
-//       return;
-//     }
-
-//     const paginationInfo = {
-//       page: this.currentPage,
-//       RowsPerPage: this.pageSize
-//     };
-
-//     const coverageListReq = {
-//         mrno: this.SearchPatientData?.table2[0]?.mrNo || 0
-//     }
-
-
-
-//     this.CoveragesApiService.GetCoverageList(coverageListReq, paginationInfo).then((res: any) => {
-
-//       this.coverages = res?.table1 || [];
-
-//     //   if (this.coverages.length === 1) {
-//     //     Swal.fire('No Data', 'No coverage records found for this patient.', 'info');
-//     //   } else {
-//     //     Swal.fire('Success', `${this.coverages.length} record(s) loaded.`, 'success');
-//     //   }
-
-//       this.updatePagination();
-//     }).catch((error) => {
-
-//       Swal.fire('Error', 'Failed to load coverage data.', 'error');
-//     });
-//   }
-
 GetCoverageData() {
-  if (!this.SearchPatientData) {
+  debugger
+  if (!this.SearchPatientData?.table2[0]?.mrNo) {
     Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
     return;
   }

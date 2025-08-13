@@ -96,22 +96,22 @@ export class DemographicListComponent {
     'RegFacility',
   ];
 
-  ngOnInit(): void {
-    this.reloadData();
+  async ngOnInit() {
+    // this.reloadData();
+     await this.DemographicsFetchData(this.FilterData);
     this.FillCache();
     // this.GetCoverageAndRegPatient(this.FilterData);
-    this.DemographicsFetchData(this.FilterData);
   }
 
-  reloadData() {
-    const Demographicsinfo = localStorage.getItem('Demographics');
-    if (Demographicsinfo) {
-      const Demographics = JSON.parse(Demographicsinfo);
-      this.mrNo = Demographics.table2[0]?.mrNo || '';
-    }
-    this.GetAllRegPatient(this.mrNo);
-    this.clearFilter();
-  }
+  // reloadData() {
+  //   const Demographicsinfo = localStorage.getItem('Demographics');
+  //   if (Demographicsinfo) {
+  //     const Demographics = JSON.parse(Demographicsinfo);
+  //     this.mrNo = Demographics.table2[0]?.mrNo || '';
+  //   }
+  //   this.GetAllRegPatient(this.mrNo);
+  //   this.clearFilter();
+  // }
 
   GetAllRegPatient(MRNo: string) {
     this.DemographicApiServices.GetRegPatientList()
@@ -295,7 +295,7 @@ DemographicsPrevPage() {
   }
 }
 
-DemographicsFetchData(req: any) {
+async DemographicsFetchData(req: any) {
     debugger
   this.Loader.show();
   const paginationInfo = {
@@ -303,7 +303,7 @@ DemographicsFetchData(req: any) {
     RowsPerPage: this.DemographicsPageSize
   };
 
-  this.DemographicApiServices.GetAllDemographicsData(req, paginationInfo).subscribe({
+  await this.DemographicApiServices.GetAllDemographicsData(req, paginationInfo).subscribe({
     next: (response: any) => {
       this.DemographicsPagedData = response?.table1 || [];
       console.log( 'this.DemographicsPagedData =>',this.DemographicsPagedData);
