@@ -71,6 +71,8 @@ namespace HMIS.Application.DTOs.ChargeCaptureDTOs
         public long? PrimaryAnestheticId { get; set; }
 
         public string TypeOfAnesthesia { get; set; }
+        public long? UnclassifiedId { get; set; }
+
 
         public DateTime? AnesthesiaStartDateTime { get; set; }
 

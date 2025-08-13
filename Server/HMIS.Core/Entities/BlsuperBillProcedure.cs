@@ -26,7 +26,7 @@ public partial class BlsuperBillProcedure
     [Unicode(false)]
     public string? TypeOfService { get; set; }
 
-    [StringLength(6)]
+    [StringLength(50)]
     [Unicode(false)]
     public string ProcedureType { get; set; } = null!;
 

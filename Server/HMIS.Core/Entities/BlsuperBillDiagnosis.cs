@@ -19,22 +19,22 @@ public partial class BlsuperBillDiagnosis
     [Column(TypeName = "datetime")]
     public DateTime? LastUpdatedDate { get; set; }
 
-    [StringLength(25)]
+    [StringLength(50)]
     [Unicode(false)]
     public string LastUpdatedBy { get; set; } = null!;
 
-    [StringLength(25)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? CreatedBy { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedDate { get; set; }
 
-    [StringLength(25)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? DiagnosisPriority { get; set; }
 
-    [StringLength(25)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? DiagnosisType { get; set; }
 
@@ -46,7 +46,7 @@ public partial class BlsuperBillDiagnosis
     [Column("ICDOrder")]
     public int? Icdorder { get; set; }
 
-    [StringLength(25)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? Type { get; set; }
 
