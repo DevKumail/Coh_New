@@ -53,10 +53,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // CORS
 builder.Services.AddCors(options =>
 {
-    var reactUrl = builder.Configuration.GetValue<string>("reactUrl");
+    var angularAppUrl = builder.Configuration.GetValue<string>("angularAppUrl");
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(reactUrl).AllowAnyHeader().AllowAnyMethod();
+        policy.WithOrigins(angularAppUrl).AllowAnyHeader().AllowAnyMethod();
     });
 });
 
