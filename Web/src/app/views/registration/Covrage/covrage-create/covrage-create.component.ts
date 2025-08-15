@@ -39,6 +39,7 @@ declare var flatpickr: any;
         CommonModule,
         FormsModule,
         NgbNavModule,
+        NgIconComponent,
         FilePondModule,NgxMaskDirective,
     ],
     providers: [provideNgxMask()],
@@ -647,7 +648,7 @@ export class CovrageCreateComponent implements OnInit {
                         timer: 2000,
                     });
                     this.subscriberForm.reset();
-                    this.router.navigate(['coverages']);
+                    this.router.navigate(['/registration/coverages']);
                 } else {
                     Swal.fire({
                         icon: 'error',

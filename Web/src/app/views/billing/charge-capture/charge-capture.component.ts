@@ -193,7 +193,7 @@ MyDentalGroups:any[]=[];
   ProceduresData:any = [];
 
   async ngOnInit() {
-
+ 
         this.patientDataSubscription = this.PatientData.patientData$
       .pipe(
         filter((data: any) => !!data?.table2?.[0]?.mrNo),
@@ -218,7 +218,7 @@ MyDentalGroups:any[]=[];
             this.VisitAccountNO = visitdata.appointmentId
             console.log('✅ Subscription triggered with visit:', this.visitDetail);
           }
-      });
+      }); 
       
     // var visitAccountDetail=localStorage.getItem("LoadvisitDetail");  
     // if(!(visitAccountDetail==undefined)  && !(visitAccountDetail=="") && !(visitAccountDetail==null))

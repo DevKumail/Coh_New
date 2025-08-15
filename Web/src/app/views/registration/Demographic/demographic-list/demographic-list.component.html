@@ -1,5 +1,5 @@
 <nav aria-label="breadcrumb">
-    <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2">
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
                 <ng-icon name="tablerSmartHome"></ng-icon>
@@ -15,14 +15,14 @@
     </ol>
 </nav>
 
-<div class="container-fluid w-100">
-  <div class="card p-3 shadow mt-2">
+<div class="card shadow rounded" *hasPermission="'Registration:Demographics:View'">
+  <!-- <div class="card p-3 shadow mt-2"> -->
     <!-- Header section -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center p-2">
       <h3 class="m-0 fw-bold">Demographics List</h3>
       <button
       *hasPermission="'Registration:Demographics:Add'"
-        class="btn btn-success btn-sm w-150"
+        class="btn btn-success btn-sm w-150 "
         type="button"
         (click)="router.navigate(['/registration/demographic-create'])"
       >
@@ -32,8 +32,8 @@
 
         <!-- Table -->
         <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead class="text-center">
+            <table class="table align-middle mb-0">
+                  <thead class="align-middle thead-sm">
                     <tr>
                         <th>Mr No</th>
                         <th>Name</th>
@@ -46,7 +46,7 @@
                         <th style="width: 1%">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="text-center">
+                <tbody class="table-group-divider">
                     <tr *ngFor="let patient of DemographicsPagedData">
                         <td>{{ patient.mrNo || "N/A" }}</td>
                         <td>{{ patient.personFirstName || "N/A" }}</td>
@@ -63,11 +63,13 @@
                                     class="dropdown-menu-end d-flex gap-2 px-2 py-1"
                                 >
                                     <ng-icon
+                                    *hasPermission="'Registration:Demographics:Edit'"
                                         name="tablerEdit"
                                         class="me-1"
                                         (click)="editPatient(patient)"
                                     ></ng-icon>
                                     <ng-icon
+                                    *hasPermission="'Registration:Demographics:Delete'"
                                         name="tablerTrash"
                                         class="text-danger me-1"
                                         (click)="Remove($event, patient.patientId, 'center')"
@@ -133,4 +135,4 @@
             </div>
         </div>
     </div>
-</div>
+<!-- </div> -->
