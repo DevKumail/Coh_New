@@ -41,15 +41,15 @@ namespace HMIS.Application.DTOs.Registration
         public int? PrimaryLanguage { get; set; }
         [Required(ErrorMessage = "Nationality is required.")]
         public int? Nationality { get; set; }
-        public string EMPI { get; set; }
-        public string UpdatedBy { get; set; }
+        public string? EMPI { get; set; }
+        public string? UpdatedBy { get; set; }
        
         public long? MediaChannelId { get; set; }
         
         public long? MediaItemId { get; set; }
         
         public string EmiratesIDN { get; set; }
-        public string PersonNameArabic { get; set; }
+        public string? PersonNameArabic { get; set; }
         public int? TabsTypeId { get; set; }
         public string BillingNote { get; set; }
         public bool? AdvDirective { get; set; }
@@ -67,26 +67,26 @@ namespace HMIS.Application.DTOs.Registration
        
        
       
-        public List<RegPatientEmployer> regPatientEmployer { get; set; }
+        public List<RegPatientEmployer>? regPatientEmployer { get; set; }
 
-        public List<RegAccount> regAccount { get; set; }
+        public List<RegAccount>? regAccount { get; set; }
 
         //public List<RegPatientDetails> regPatientDetails { get; set; }
 
-        public Contact Contact { get; set; }
+        public Contact? Contact { get; set; }
 
-        public Employment Employment { get; set; }
+        public Employment? Employment { get; set; }
 
-        public EmergencyContact EmergencyContact { get; set; }
+        public EmergencyContact? EmergencyContact { get; set; }
 
-        public NextOfKin NextOfKin { get; set; }
+        public NextOfKin? NextOfKin { get; set; }
 
-        public Spouse Spouse { get; set; }
+        public Spouse? Spouse { get; set; }
 
-        public Parent Parent { get; set; }
+        public Parent? Parent { get; set; }
 
-        public Assignments Assignments { get; set; }
+        public Assignments? Assignments { get; set; }
 
-        public FamilyMembers FamilyMembers { get; set; }
+        public FamilyMembers? FamilyMembers { get; set; }
     }
 }
