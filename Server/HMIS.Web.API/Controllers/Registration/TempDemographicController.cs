@@ -9,7 +9,7 @@ using System.Data;
 using System.IO;
 using HMIS.Application.DTOs.SpLocalModel;
 
-namespace HMIS.API.Controllers.Registration
+namespace HMIS.Web.Controllers.Registration
 {
     [Route("api/[controller]")]
     [ApiController]

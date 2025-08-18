@@ -15,7 +15,7 @@ using System.Linq.Dynamic.Core;
 using Task = System.Threading.Tasks.Task;
 using Newtonsoft.Json;
 
-namespace HMIS.API.Controllers.Eligibility
+namespace HMIS.Web.Controllers.Eligibility
 {
     [Route("api/[controller]")]
     [ApiController]

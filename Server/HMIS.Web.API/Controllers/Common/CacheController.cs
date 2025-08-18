@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace HMIS.API.Controllers.Common
+namespace HMIS.Web.Controllers.Common
 {
     [ApiController]
     [Authorize]

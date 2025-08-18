@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Drawing;
 
-namespace HMIS.API.Controllers.ControllerPanel
+namespace HMIS.Web.Controllers.ControllerPanel
 {
     [Route("api/[controller]")]
     [ApiController]

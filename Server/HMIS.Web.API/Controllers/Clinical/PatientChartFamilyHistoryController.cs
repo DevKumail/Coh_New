@@ -4,7 +4,7 @@ using HMIS.Application.Implementations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.SqlServer.Management.Smo.Agent;
 
-namespace HMIS.API.Controllers.Clinical
+namespace HMIS.Web.Controllers.Clinical
 {
     [Route("api/[controller]")]
     [ApiController]

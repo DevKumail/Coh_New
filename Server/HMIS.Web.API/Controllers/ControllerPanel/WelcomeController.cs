@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
-namespace HMIS.API.Controllers.ControllerPanel
+namespace HMIS.Web.Controllers.ControllerPanel
 {
     [Route("api/[controller]")]
     [ApiController]

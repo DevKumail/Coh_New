@@ -13,7 +13,7 @@ using System.IO.Compression;
 using Confluent.Kafka;
 using Deepgram;
 using Deepgram.Models.Listen.v1.REST;
-namespace HMIS.API.Controllers
+namespace HMIS.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

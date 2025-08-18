@@ -22,7 +22,7 @@ namespace HMIS
      .WriteTo.Console(new RenderedCompactJsonFormatter())
      .WriteTo.Seq(configuration["SeqUrl"]) // Read Seq URL from appsettings.json
      .Enrich.WithMachineName()
-     .Enrich.WithProperty("Application", "HMIS.API")
+     .Enrich.WithProperty("Application", "HMIS.Web")
      .Enrich.FromLogContext()
      .Enrich.With(new RequestMessageEnricher(requestMessage))
      .Enrich.With(new ResponseMessageEnricher(responseMessage));

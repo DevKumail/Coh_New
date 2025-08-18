@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using static HMIS.Application.DTOs.SpLocalModel.UserListModel;
 
-namespace HMIS.API.Controllers.ControllerPanel
+namespace HMIS.Web.Controllers.ControllerPanel
 {
     [Route("api/[controller]")]
     [ApiController]

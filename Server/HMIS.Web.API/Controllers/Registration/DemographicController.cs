@@ -11,7 +11,7 @@ using System.Reflection.Emit;
 using System.Security.Policy;
 using static HMIS.Application.DTOs.SpLocalModel.DemographicListModel;
 
-namespace HMIS.API.Controllers.Registration
+namespace HMIS.Web.Controllers.Registration
 {
     [Route("api/[controller]")]
     [ApiController]

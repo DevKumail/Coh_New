@@ -11,7 +11,7 @@ using System.Reflection.Emit;
 using System.Security.Policy;
 using static HMIS.Application.DTOs.SpLocalModel.ProviderScheduleModel;
 
-namespace HMIS.API.Controllers.ControllerPanel
+namespace HMIS.Web.Controllers.ControllerPanel
 {
     [Route("api/[controller]")]
     [ApiController]

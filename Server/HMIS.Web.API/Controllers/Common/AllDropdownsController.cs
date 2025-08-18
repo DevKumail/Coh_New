@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using HMIS.ApplicationImplementations;
 
-namespace HMIS.API.Controllers.Common
+namespace HMIS.Web.Controllers.Common
 {
     [Route("api/[controller]")]
     [ApiController]

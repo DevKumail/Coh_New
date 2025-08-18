@@ -5,7 +5,7 @@ using HMIS.Application.Implementations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HMIS.API.Controllers.Clinical
+namespace HMIS.Web.Controllers.Clinical
 {
     [Route("api/[controller]")]
     [ApiController]

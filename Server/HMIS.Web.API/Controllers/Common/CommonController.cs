@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using HMIS.Application.DTOs.SpLocalModel;
 using static HMIS.Application.DTOs.SpLocalModel.DemographicListModel;
 
-namespace HMIS.API.Controllers.Common
+namespace HMIS.Web.Controllers.Common
 {
     [Route("api/[controller]")]
     [ApiController]

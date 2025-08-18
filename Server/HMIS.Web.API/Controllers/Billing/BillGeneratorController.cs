@@ -11,7 +11,7 @@ using NuGet.Protocol;
 using System.Data;
 using Task = System.Threading.Tasks.Task;
 
-namespace HMIS.API.Controllers.Billing
+namespace HMIS.Web.Controllers.Billing
 {
     [Route("api/[controller]")]
     [ApiController]

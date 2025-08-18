@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using HMIS.Application.ServiceLogics;
 using Microsoft.EntityFrameworkCore;
 
-namespace HMIS.API.Controllers.Dashboard
+namespace HMIS.Web.Controllers.Dashboard
 {
     [Route("api/[controller]")]
     [ApiController]

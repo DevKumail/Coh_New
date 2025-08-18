@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
-namespace HMIS.API.Controllers.Registration
+namespace HMIS.Web.Controllers.Registration
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using NuGet.ContentModel;
 using System.Data;
 
-namespace HMIS.API.Controllers.Clinical
+namespace HMIS.Web.Controllers.Clinical
 {
     [Route("api/[controller]")]
     [ApiController]

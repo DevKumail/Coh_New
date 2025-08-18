@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
-namespace HMIS.API.Controllers.Clinical
+namespace HMIS.Web.Controllers.Clinical
 {
     [Route("api/[controller]")]
     [ApiController]

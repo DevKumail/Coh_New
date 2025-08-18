@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace HMIS.API.Controllers
+namespace HMIS.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using System.Data;
 using System.Text.RegularExpressions;
 
-namespace HMIS.API.Controllers.Billing
+namespace HMIS.Web.Controllers.Billing
 {
     [Route("api/[controller]")]
     [ApiController]

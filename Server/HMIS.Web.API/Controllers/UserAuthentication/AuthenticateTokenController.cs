@@ -10,7 +10,7 @@ using System.IO;
 using HMIS.Application.DTOs.PermissionDTOs;
 using HMIS.Core.Entities;
 
-namespace HMIS.API.Controllers.UserAuthentication
+namespace HMIS.Web.Controllers.UserAuthentication
 {
     [ApiController]
     [Route("api/[controller]")]

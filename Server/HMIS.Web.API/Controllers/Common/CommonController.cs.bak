@@ -8,7 +8,7 @@ using HMIS.Application.Implementations;
 using HMIS.Application.DTOs.CommonDTOs;
 using Microsoft.AspNetCore.Authorization;
 
-namespace HMIS.API.Controllers.Common
+namespace HMIS.Web.Controllers.Common
 {
     [Route("api/[controller]")]
     [ApiController]

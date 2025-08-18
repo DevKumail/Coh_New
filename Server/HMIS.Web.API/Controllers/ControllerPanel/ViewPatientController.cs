@@ -14,7 +14,7 @@ using System.Security.Policy;
 
 
 
-namespace HMIS.API.Controllers.ControllerPanel
+namespace HMIS.Web.Controllers.ControllerPanel
 {
     public class ViewPatientController : BaseApiController
     {
