@@ -24,8 +24,8 @@ namespace HMIS.Application.ServiceLogics
 {
     public class BillGeneratorManager : GenericRepositoryAsync<BlsuperBillDiagnosis>, IBillGeneratorManager
     {
-        private readonly HmisContext _dbContext;
-        public BillGeneratorManager(HmisContext dbContext) : base(dbContext)
+        private readonly HMISDbContext _dbContext;
+        public BillGeneratorManager(HMISDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
         }

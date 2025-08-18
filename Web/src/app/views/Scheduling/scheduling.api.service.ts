@@ -124,6 +124,9 @@ export class SchedulingApiService {
     
 
     cancelBooking(AppId:number,AppStatusId:number ,ByProvider:boolean,RescheduledId:number) {
+      if(!RescheduledId){
+        return this.api.get(`Appointment/CancelOrRescheduleAppointment?AppId=${AppId}&AppStatusId=${AppStatusId}&ByProvider=${ByProvider}`).toPromise();
+      }
         return this.api.get(`Appointment/CancelOrRescheduleAppointment?AppId=${AppId}&AppStatusId=${AppStatusId}&ByProvider=${ByProvider}&RescheduledId=${RescheduledId}`).toPromise();
     }
 

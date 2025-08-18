@@ -29,11 +29,11 @@ namespace HMIS.Application.ServiceLogics
 {
     public class AppointmentManager : IAppointmentManager
     {
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
         private readonly IUnitOfWork _unitOfWork;
         public IConfiguration Configuration { get; }
 
-        public AppointmentManager(HmisContext context, IUnitOfWork unitOfWork, IConfiguration configuration)
+        public AppointmentManager(HMISDbContext context, IUnitOfWork unitOfWork, IConfiguration configuration)
         {
             _context = context;
             _unitOfWork = unitOfWork;
@@ -563,7 +563,7 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<bool> CancelOrRescheduleAppointmentDB(long AppId, int AppStatusId, bool ByProvider, int RescheduledId)
+        public async Task<bool> CancelOrRescheduleAppointmentDB(long AppId, int AppStatusId, bool ByProvider, int? RescheduledId)
         {
             try
             {

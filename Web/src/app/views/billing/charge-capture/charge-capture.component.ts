@@ -1524,7 +1524,7 @@ MyHCPCSCodePrevPage() {
 
 // MyHCPCSCode API Call
 async MyHCPCSCodebyProvider() {
-  await this.service.MyHCPCSCodebyProvider(this.ProviderId, this.MyHCPSGroupId, this.HCPCSCode, this.DescriptionFilter, this.PairId).then((response: any) => {
+  await this.service.MyHCPCSCodebyProvider(this.ProviderId || 0, this.MyHCPSGroupId || 0, this.HCPCSCode || 0 , this.DescriptionFilter || '', this.PairId || 0).then((response: any) => {
     if (response) {
       this.MyHCPCSCode = response?.table1 || [];
       this.AllMyHCPCSCode = response?.table1 || [];
@@ -1532,6 +1532,7 @@ async MyHCPCSCodebyProvider() {
       this.MyHCPCSCodeCurrentPage = 1;
       this.MyHCPCSCodeSetPagedData();
       console.log(this.MyHCPCSCode, 'MyHCPCSCode');
+      this.loader.hide();
     }
   });
 }

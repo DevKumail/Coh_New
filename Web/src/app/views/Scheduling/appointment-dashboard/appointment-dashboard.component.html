@@ -149,13 +149,13 @@
           <label style="font-size: 12px;">{{ appId }}</label>
         </div>
         <div class="col-md-5">
-          <label style="font-size: 12px;">{{ fullName }}</label>
+          <label style="font-size: 12px;">{{ fullName || 'N/A' }}</label>
         </div>
       </div>
 
       <!-- Radio Buttons for Appointments -->
       <div class="row mb-2" *ngIf="appId == 0">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="form-check">
             <input
               class="form-check-input"
@@ -168,10 +168,8 @@
             <label class="form-check-label" for="newAppointment">New Appointment</label>
           </div>
         </div>
-      </div>
 
-      <div class="row mb-2" *ngIf="appId == 0">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="form-check">
             <input
               class="form-check-input"
@@ -262,51 +260,48 @@
   </div>
 
   <div class="modal-body">
-    <div class="container-fluid">
+    <!-- <div class="container-fluid"> -->
       <div class="row mb-3">
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="providerSelect" class="form-label">Select Provider</label>
           <select class="form-select" id="providerSelect" [(ngModel)]="selectedProviders">
             <option *ngFor="let item of provider" [ngValue]="item">{{ item.name }}</option>
           </select>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="locationSelect" class="form-label">Select Location</label>
           <select class="form-select" id="locationSelect" [(ngModel)]="selectedLocations">
             <option *ngFor="let item of locations" [ngValue]="item">{{ item.name }}</option>
           </select>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="facilitySelect" class="form-label">Select Facility</label>
           <select class="form-select" id="facilitySelect" [(ngModel)]="selectedFacility">
             <option *ngFor="let item of facilities" [ngValue]="item">{{ item.name }}</option>
           </select>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="siteSelect" class="form-label">Select Site</label>
           <select class="form-select" id="siteSelect" [(ngModel)]="selectedSites">
             <option *ngFor="let item of sites" [ngValue]="item">{{ item.name }}</option>
           </select>
         </div>
-      </div>
-
-      <div class="row mb-3">
-        <div class="col-md-3">
+      
+        <div class="col-md-4">
           <label for="rescheduleReasonInput" class="form-label">Reason</label>
           <input type="text" id="rescheduleReasonInput" class="form-control"/>
         </div>
-      </div>
 
-      <div class="row mb-3">
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="rescheduleDate" class="form-label">Date</label>
           <input type="date" id="rescheduleDate" class="form-control" [(ngModel)]="date" />
         </div>
       </div>
-    </div>
+
+    <!-- </div> -->
   </div>
 
   <div class="modal-footer">

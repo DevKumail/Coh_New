@@ -10,9 +10,9 @@ namespace HMIS.Application.ServiceLogics
     /// </summary>
     public class OptimizedQueryService
     {
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
-        public OptimizedQueryService(HmisContext context)
+        public OptimizedQueryService(HMISDbContext context)
         {
             _context = context;
         }
@@ -136,8 +136,8 @@ namespace HMIS.Application.ServiceLogics
         /// 🚀 Compiled Query - Pre-compiled for better performance
         /// Roman Urdu: Query ko pehle se compile kar ke speed badhana
         /// </summary>
-        private static readonly Func<HmisContext, string, Task<RegPatient?>> GetPatientByMRNo =
-            EF.CompileAsyncQuery((HmisContext context, string mrno) =>
+        private static readonly Func<HMISDbContext, string, Task<RegPatient?>> GetPatientByMRNo =
+            EF.CompileAsyncQuery((HMISDbContext context, string mrno) =>
                 context.RegPatients
                     .Include(p => p.SchAppointments.Take(5))
                     .AsNoTracking()
@@ -205,9 +205,9 @@ namespace HMIS.Application.ServiceLogics
     /// </summary>
     public class OptimizedPatientRepository
     {
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
-        public OptimizedPatientRepository(HmisContext context)
+        public OptimizedPatientRepository(HMISDbContext context)
         {
             _context = context;
         }

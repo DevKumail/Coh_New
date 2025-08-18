@@ -19,10 +19,10 @@ namespace HMIS.Application.ServiceLogics
 {
     public class PermissionService : IPermissionService
     {
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
 
-        public PermissionService(HmisContext context)
+        public PermissionService(HMISDbContext context)
         {
             _context = context;
 

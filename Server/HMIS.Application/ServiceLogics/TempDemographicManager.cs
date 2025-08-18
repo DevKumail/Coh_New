@@ -20,8 +20,8 @@ namespace HMIS.Application.ServiceLogics
 {
     public class TempDemographicManager : ITempDemographicManager
     {
-        private readonly HmisContext _context;
-        public TempDemographicManager(HmisContext context)
+        private readonly HMISDbContext _context;
+        public TempDemographicManager(HMISDbContext context)
         {
             _context = context;
         }

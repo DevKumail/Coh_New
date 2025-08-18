@@ -18,8 +18,6 @@ public partial class BldentalGroup
 
     public long ProviderId { get; set; }
 
-    public bool? IsDeleted { get; set; }
-
     [InverseProperty("Group")]
     public virtual ICollection<BldentalGroupCode> BldentalGroupCodes { get; set; } = new List<BldentalGroupCode>();
 }

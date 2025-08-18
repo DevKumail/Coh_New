@@ -18,7 +18,7 @@ namespace HMIS.Application.Implementations
         Task<bool> InsertAppointmentDB(HMIS.Application.DTOs.AppointmentDTOs.SchAppointmentModel schApp);
         Task<bool> UpdateAppointmentDB(HMIS.Application.DTOs.AppointmentDTOs.SchAppointmentModel schApp);
         Task<DataSet> SearchAppointmentHistoryDB(string MRNo, int? ProviderId, int? PatientStatusId, int? AppStatusId, int? Page, int? Size, string SortColumn, string SortOrder);
-        Task<bool> CancelOrRescheduleAppointmentDB(long AppId, int AppStatusId, bool ByProvider, int RescheduledId);
+        Task<bool> CancelOrRescheduleAppointmentDB(long AppId, int AppStatusId, bool ByProvider, int? RescheduledId);
         Task<DataSet> ValidateAppointmentDB(HMIS.Application.DTOs.AppointmentDTOs.SchAppointmentModel sa);
         Task<DataSet> ValidateCheckInDB(long AppId);
         Task<bool> AppointmentStatus(long appId, int appStatusId, int appVisitId);

@@ -21,8 +21,8 @@ namespace HMIS.Application.ServiceLogics
 {
     public class DemographicManager : IDemographicManager
     {
-        private readonly HmisContext _context;
-        public DemographicManager(HmisContext context)
+        private readonly HMISDbContext _context;
+        public DemographicManager(HMISDbContext context)
         {
             _context = context;
         }

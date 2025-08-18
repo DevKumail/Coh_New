@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 
 
 
@@ -30,6 +31,7 @@ export class SignInComponent {
     constructor(
     private http: HttpClient,
     private authService: AuthService,
+    private patientBanner: PatientBannerService,
     private router: Router
   ) {}
 
@@ -42,7 +44,6 @@ export class SignInComponent {
   this.authService.login(username, password).subscribe({
     next: () => {
       this.isLoading = false;
-
       Swal.fire({
         icon: 'success',
         title: 'Login successful',
@@ -50,6 +51,8 @@ export class SignInComponent {
         timer: 1500,
         showConfirmButton: false
       });
+
+      this.patientBanner.setPatientData(null);
 
       this.router.navigate(['/dashboards/dashboard-2']);
     },

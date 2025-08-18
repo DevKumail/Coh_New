@@ -15,9 +15,9 @@ namespace HMIS.Application
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private HmisContext _context;
+        private HMISDbContext _context;
         public UnitOfWork(
-            HmisContext context
+            HMISDbContext context
             )
         {
             _context = context;

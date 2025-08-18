@@ -14,8 +14,8 @@ namespace HMIS.Application.ServiceLogics
 {
     public class CommonManager : ICommonManager
     {
-        private readonly HmisContext _context;
-        public CommonManager(HmisContext context)
+        private readonly HMISDbContext _context;
+        public CommonManager(HMISDbContext context)
         {
             _context = context;
         }

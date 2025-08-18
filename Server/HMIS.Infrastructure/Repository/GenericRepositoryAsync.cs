@@ -11,9 +11,9 @@ namespace HMIS.Infrastructure.Repository
 {
     public class GenericRepositoryAsync<T> : IGenericRepositoryAsync<T> where T : class
     {
-        private readonly HmisContext _dbContext;
+        private readonly HMISDbContext _dbContext;
 
-        public GenericRepositoryAsync(HmisContext dbContext)
+        public GenericRepositoryAsync(HMISDbContext dbContext)
         {
             _dbContext = dbContext;
         }

@@ -19,8 +19,8 @@ namespace HMIS.Application.ServiceLogics
     public class ChargeCaptureManager : GenericRepositoryAsync<BlsuperBillDiagnosis>, IChargeCaptureManager
     {
         private readonly IMapper _mapper;
-        private readonly HmisContext _dbContext;
-        public ChargeCaptureManager(IMapper mapper, HmisContext dbContext) : base(dbContext)
+        private readonly HMISDbContext _dbContext;
+        public ChargeCaptureManager(IMapper mapper, HMISDbContext dbContext) : base(dbContext)
         {
             this._mapper = mapper;
             _dbContext = dbContext;
@@ -84,7 +84,7 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<DataSet> CC_DiagnosisCodeDB(int ICDVersionId, string DiagnosisStartCode, string DiagnosisEndCode, string DescriptionFilter)
+        public async Task<DataSet> CC_DiagnosisCodeDB(int? ICDVersionId, string? DiagnosisStartCode, string DiagnosisEndCode, string DescriptionFilter)
         {
             try
             {
@@ -110,7 +110,7 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<DataSet> CC_CPTCodeDB(int? AllCPTCode, string CPTStartCode, string CPTEndCode, string Description)
+        public async Task<DataSet> CC_CPTCodeDB(int? AllCPTCode, string? CPTStartCode, string? CPTEndCode, string? Description)
         {
             try
             {
@@ -143,7 +143,7 @@ namespace HMIS.Application.ServiceLogics
             }
         }
 
-        public async Task<DataSet> CC_MyDentalCodeDB(long ProviderId, long? GroupId, string ProviderDescription, string DentalCode, long? PayerId)
+        public async Task<DataSet> CC_MyDentalCodeDB(long ProviderId, long? GroupId, string? ProviderDescription, string? DentalCode, long? PayerId)
         {
             try
             {
@@ -175,7 +175,7 @@ namespace HMIS.Application.ServiceLogics
             }
 
         }
-        public async Task<DataSet> CC_DentalCodeDB(int? AllDentalCode, string DentalStartCode, string DentalEndCode, string DescriptionFilter)
+        public async Task<DataSet> CC_DentalCodeDB(int? AllDentalCode, string? DentalStartCode, string? DentalEndCode, string? DescriptionFilter)
         {
             try
             {
@@ -208,7 +208,7 @@ namespace HMIS.Application.ServiceLogics
             }
         }
 
-        public async Task<DataSet> CC_MyHCPCSCodeDB(long ProviderId, long? GroupId, string HCPCSCode, string DescriptionFilter, long? PayerId)
+        public async Task<DataSet> CC_MyHCPCSCodeDB(long ProviderId, long? GroupId, string? HCPCSCode, string? DescriptionFilter, long? PayerId)
         {
             try
             {
@@ -241,7 +241,7 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<DataSet> CC_HCPCSCodeDB(int? AllHCPCSCode, string HCPCStartCode, string HCPCSEndCode, string DescriptionFilter)
+        public async Task<DataSet> CC_HCPCSCodeDB(int? AllHCPCSCode, string? HCPCStartCode, string? HCPCSEndCode, string? DescriptionFilter)
         {
             try
             {
@@ -274,7 +274,7 @@ namespace HMIS.Application.ServiceLogics
             }
         }
 
-        public async Task<DataSet> CC_UnclassifiedServiceDB(int? AllCode, string UCStartCode, string DescriptionFilter)
+        public async Task<DataSet> CC_UnclassifiedServiceDB(int? AllCode, string? UCStartCode, string? DescriptionFilter)
         {
             try
             {
@@ -306,7 +306,7 @@ namespace HMIS.Application.ServiceLogics
             }
         }
 
-        public async Task<DataSet> CC_ServiceItemsDB(int? AllCode, string ServiceStartCode, string DescriptionFilter)
+        public async Task<DataSet> CC_ServiceItemsDB(int? AllCode, string? ServiceStartCode, string? DescriptionFilter)
         {
             try
             {
@@ -725,7 +725,7 @@ namespace HMIS.Application.ServiceLogics
         //    return price;
 
         //}
-        private async Task<decimal> GetProcedureUnitPrice(int procedureType, string procedureCode, long providerId, long payerId, long UnclassifiedId)
+        private async Task<decimal> GetProcedureUnitPrice(int procedureType, string? procedureCode, long providerId, long payerId, long UnclassifiedId)
         {
             double price = 0.00;
 

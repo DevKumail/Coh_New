@@ -19,9 +19,9 @@ namespace HMIS.Application.ServiceLogics
     public class AlertManager : IAlertManager
     {
         public IConfiguration Configuration { get; }
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
-        public AlertManager(HmisContext context, IConfiguration configuration)
+        public AlertManager(HMISDbContext context, IConfiguration configuration)
         {
             _context = context;
             Configuration = configuration;
@@ -68,9 +68,9 @@ namespace HMIS.Application.ServiceLogics
                     newPatientAlert.AlertMessage = alertModel.AlertMessage;
                     newPatientAlert.Active = alertModel.Active;
 
-                    newPatientAlert.EnteredDate = string.IsNullOrWhiteSpace(alertModel.EnteredDate)? null : DateTime.Parse(alertModel.EnteredDate);
+                    newPatientAlert.EnteredDate = alertModel.EnteredDate;
 
-                    newPatientAlert.RepeatDate = string.IsNullOrWhiteSpace(alertModel.RepeatDate) ? null : DateTime.Parse(alertModel.RepeatDate);
+                    newPatientAlert.RepeatDate = alertModel.RepeatDate;
 
                     //newPatientAlert.RepeatDate = alertModel.RepeatDate;
                     newPatientAlert.IsFinished = alertModel.IsFinished;

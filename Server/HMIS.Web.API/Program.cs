@@ -1,5 +1,4 @@
 using System.Text;
-using HMIS.Core.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -30,7 +29,7 @@ builder.Services.AddAutoMapper(typeof(GeneralProfile).Assembly);
 
 
 // Add DB Context
-builder.Services.AddDbContext<HmisContext>(options =>
+builder.Services.AddDbContext<HMISDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // JWT Authentication
