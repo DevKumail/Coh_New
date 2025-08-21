@@ -16,9 +16,9 @@ namespace HMIS.Application.ServiceLogics
     public class AlergyManager : IAlergyManager
     {
         public IConfiguration Configuration { get; }
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
-        public AlergyManager(HmisContext context, IConfiguration configuration)
+        public AlergyManager(HMISDbContext context, IConfiguration configuration)
         {
             _context = context;
             Configuration = configuration;

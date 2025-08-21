@@ -197,7 +197,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_AllCPTCode
         [HttpGet("CPTCode")]
-        public async Task<IActionResult> CC_CPTCode(int? AllCPTCode, string CPTStartCode, string CPTEndCode, string Description)
+        public async Task<IActionResult> CC_CPTCode(int? AllCPTCode, string? CPTStartCode, string? CPTEndCode, string? Description)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -246,7 +246,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_UserDentalCode
         [HttpGet("MyDentalCode")]
-        public async Task<IActionResult> CC_MyDentalCode(long ProviderId, long? GroupId, string ProviderDescription, string DentalCode, long? PayerId)
+        public async Task<IActionResult> CC_MyDentalCode(long ProviderId, long? GroupId, string? ProviderDescription, string? DentalCode, long? PayerId)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -300,7 +300,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_AllDentalCode
         [HttpGet("DentalCode")]
-        public async Task<IActionResult> CC_DentalCode(int? AllDentalCode, string DentalStartCode, string DentalEndCode, string DescriptionFilter)
+        public async Task<IActionResult> CC_DentalCode(int? AllDentalCode, string? DentalStartCode, string? DentalEndCode, string? DescriptionFilter)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -349,7 +349,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_UserHCPCSCode
         [HttpGet("MyHCPCSCode")]
-        public async Task<IActionResult> CC_MyHCPCSCode(long ProviderId, long? GroupId, string HCPCSCode, string DescriptionFilter, long? PayerId)
+        public async Task<IActionResult> CC_MyHCPCSCode(long ProviderId, long? GroupId, string HCPCSCode, string? DescriptionFilter, long? PayerId)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -403,7 +403,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_AllHCPSCode
         [HttpGet("HCPCSCode")]
-        public async Task<IActionResult> CC_HCPCSCode(int? AllHCPCSCode, string HCPCStartCode, string HCPCSEndCode, string DescriptionFilter)
+        public async Task<IActionResult> CC_HCPCSCode(int? AllHCPCSCode, string? HCPCStartCode, string? HCPCSEndCode, string? DescriptionFilter)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -452,7 +452,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_UnclassifiedService
         [HttpGet("UnclassifiedService")]
-        public async Task<IActionResult> CC_UnclassifiedService(int? AllCode, string UCStartCode, string DescriptionFilter)
+        public async Task<IActionResult> CC_UnclassifiedService(int? AllCode, string? UCStartCode, string? DescriptionFilter)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -501,7 +501,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_ServiceItems
         [HttpGet("ServiceItems")]
-        public async Task<IActionResult> CC_ServiceItems(int? AllCode, string ServiceStartCode, string DescriptionFilter)
+        public async Task<IActionResult> CC_ServiceItems(int? AllCode, string? ServiceStartCode, string? DescriptionFilter)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;

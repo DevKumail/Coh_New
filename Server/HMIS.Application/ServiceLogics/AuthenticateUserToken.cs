@@ -16,14 +16,14 @@ namespace HMIS.Application.ServiceLogics
     public class AuthenticateUserToken : IAuthenticateUserToken
     {
         #region Fields
-        private readonly HmisContext _HMISdbContext;
+        private readonly HMISDbContext _HMISdbContext;
         private IConfiguration _config;
         #endregion
         #region ctor
         public AuthenticateUserToken
             (
             IConfiguration Configuration,
-            HmisContext HMISdbContext
+            HMISDbContext HMISdbContext
             )
         {
             _HMISdbContext = HMISdbContext;

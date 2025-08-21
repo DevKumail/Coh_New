@@ -18,10 +18,10 @@ namespace HMIS.Application.ServiceLogics
 {
     public class RoleManager : IRoleManager
     {
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
 
-        public RoleManager( HmisContext context)
+        public RoleManager( HMISDbContext context)
         {
             _context = context;
 

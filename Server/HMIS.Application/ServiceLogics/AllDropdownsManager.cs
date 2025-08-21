@@ -13,8 +13,8 @@ namespace HMIS.Application.ServiceLogics
     public class AllDropdownsManager : GenericRepositoryAsync<BlsuperBillDiagnosis>, IAllDropdownsManager
     {
         private readonly IMapper _mapper;
-        private readonly HmisContext _dbContext;
-        public AllDropdownsManager(IMapper mapper, HmisContext dbContext) : base(dbContext)
+        private readonly HMISDbContext _dbContext;
+        public AllDropdownsManager(IMapper mapper, HMISDbContext dbContext) : base(dbContext)
         {
             this._mapper = mapper;
             _dbContext = dbContext;

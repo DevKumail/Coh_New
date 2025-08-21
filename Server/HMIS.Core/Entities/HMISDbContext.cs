@@ -4,9 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-public partial class HmisContext : DbContext
+public partial class HMISDbContext : DbContext
 {
-    public HmisContext(DbContextOptions<HmisContext> options)
+    public HMISDbContext()
+    {
+    }
+
+    public HMISDbContext(DbContextOptions<HMISDbContext> options)
         : base(options)
     {
     }
@@ -91,8 +95,6 @@ public partial class HmisContext : DbContext
 
     public virtual DbSet<Case> Cases { get; set; }
 
-    public virtual DbSet<City> Cities { get; set; }
-
     public virtual DbSet<ClinicalUsage> ClinicalUsages { get; set; }
 
     public virtual DbSet<Consultationcategory> Consultationcategories { get; set; }
@@ -100,8 +102,6 @@ public partial class HmisContext : DbContext
     public virtual DbSet<CptbyAppType> CptbyAppTypes { get; set; }
 
     public virtual DbSet<CptsInCptbyAppType> CptsInCptbyAppTypes { get; set; }
-
-    public virtual DbSet<Customer> Customers { get; set; }
 
     public virtual DbSet<DeductiblePercent> DeductiblePercents { get; set; }
 
@@ -317,7 +317,15 @@ public partial class HmisContext : DbContext
 
     public virtual DbSet<SpeechToText> SpeechToTexts { get; set; }
 
+    public virtual DbSet<StudentCourse> StudentCourses { get; set; }
+
+    public virtual DbSet<StudentInfo> StudentInfos { get; set; }
+
+    public virtual DbSet<StudentPortal> StudentPortals { get; set; }
+
     public virtual DbSet<TabDrugsName> TabDrugsNames { get; set; }
+
+    public virtual DbSet<TabDrugsNameBackup> TabDrugsNameBackups { get; set; }
 
     public virtual DbSet<Task> Tasks { get; set; }
 
@@ -330,6 +338,8 @@ public partial class HmisContext : DbContext
     public virtual DbSet<TestTableType> TestTableTypes { get; set; }
 
     public virtual DbSet<TypeOfServiceMaster> TypeOfServiceMasters { get; set; }
+
+    public virtual DbSet<UppInsuranceClaim> UppInsuranceClaims { get; set; }
 
     public virtual DbSet<VisitStatus> VisitStatuses { get; set; }
 
@@ -356,6 +366,10 @@ public partial class HmisContext : DbContext
     public virtual DbSet<VwSpecialitybyFacilityid> VwSpecialitybyFacilityids { get; set; }
 
     public virtual DbSet<Vwprovider> Vwproviders { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-6OPUFI2;Initial Catalog=HIMS; user id=abbas; password=123qwe;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -429,11 +443,6 @@ public partial class HmisContext : DbContext
             entity.HasOne(d => d.ServiceType).WithMany(p => p.BlcptmasterRanges)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BLCPTMasterRanges_TypeOfServiceMaster");
-        });
-
-        modelBuilder.Entity<BldentalGroup>(entity =>
-        {
-            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
         modelBuilder.Entity<BldentalGroupCode>(entity =>
@@ -627,9 +636,7 @@ public partial class HmisContext : DbContext
 
             entity.HasOne(d => d.Appointment).WithMany(p => p.BlsuperBillDiagnoses).HasConstraintName("FK_BLSuperBillDiagnosis_SchAppointment");
 
-            entity.HasOne(d => d.Icd9codeNavigation).WithMany(p => p.BlsuperBillDiagnoses)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_BLSuperBillDiagnosis_BLMasterICD9CM");
+            entity.HasOne(d => d.Icd9codeNavigation).WithMany(p => p.BlsuperBillDiagnoses).HasConstraintName("FK_BLSuperBillDiagnosis_BLMasterICD9CM");
 
             entity.HasOne(d => d.Icdversion).WithMany(p => p.BlsuperBillDiagnoses).HasConstraintName("FK_BLSuperBillDiagnosis_BLICDVersion");
         });
@@ -654,11 +661,6 @@ public partial class HmisContext : DbContext
         });
 
         modelBuilder.Entity<BlunclassifiedCode>(entity =>
-        {
-            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
-        });
-
-        modelBuilder.Entity<BluniversalToothCode>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -706,14 +708,6 @@ public partial class HmisContext : DbContext
             entity.HasOne(d => d.Group).WithMany(p => p.CptsInCptbyAppTypes)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CPTsInCPTByAppType_CPTByAppType");
-        });
-
-        modelBuilder.Entity<Customer>(entity =>
-        {
-            entity.HasKey(e => e.CustomerId).HasName("PK__Customer__A4AE64B834EC4D62");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<DeductiblePercent>(entity =>
@@ -938,6 +932,7 @@ public partial class HmisContext : DbContext
 
         modelBuilder.Entity<PatientAlert>(entity =>
         {
+            entity.Property(e => e.AlertId).ValueGeneratedNever();
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
@@ -1585,8 +1580,11 @@ public partial class HmisContext : DbContext
         modelBuilder.Entity<TabDrugsName>(entity =>
         {
             entity.HasKey(e => e.DrugId).HasName("PK_TabsDrugName_DrugId");
+        });
 
-            entity.Property(e => e.DrugId).ValueGeneratedNever();
+        modelBuilder.Entity<TabDrugsNameBackup>(entity =>
+        {
+            entity.Property(e => e.NewDrugId).ValueGeneratedOnAdd();
         });
 
         modelBuilder.Entity<Task>(entity =>
@@ -1622,6 +1620,14 @@ public partial class HmisContext : DbContext
         {
             entity.Property(e => e.ServiceTypeId).ValueGeneratedNever();
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+        });
+
+        modelBuilder.Entity<UppInsuranceClaim>(entity =>
+        {
+            entity.HasKey(e => e.InsuranceId).HasName("PK__UPP_Insu__74231A24A45695B6");
+
+            entity.Property(e => e.Active).HasDefaultValue(true);
+            entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<VisitStatus>(entity =>

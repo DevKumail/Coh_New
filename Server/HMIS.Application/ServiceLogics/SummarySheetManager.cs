@@ -13,9 +13,9 @@ namespace HMIS.Application.ServiceLogics
 {
     public class SummarySheetManager : ISummarySheetManager
     {
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
-        public SummarySheetManager(HmisContext context)
+        public SummarySheetManager(HMISDbContext context)
         {
             this._context = context;
         }

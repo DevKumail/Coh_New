@@ -226,7 +226,7 @@
                 >
                     <input
                         type="checkbox"
-                        formControlName="isVIP"
+                        formControlName="VIPPatient"
                         id="vipCheck"
                         class="mt-2"
                     />
@@ -556,7 +556,7 @@
                                         </option>
                                         <option
                                             *ngFor="let c of city"
-                                            [value]="c.code"
+                                            [value]="c.cityId"
                                         >
                                             {{ c.name }}
                                         </option>
@@ -840,7 +840,7 @@
                                     <label>First Name</label>
                                     <input
                                         class="form-control"
-                                        formControlName="dwellingNumber"
+                                        formControlName="firstName"
                                         type="text"
                                     />
                                 </div>
@@ -850,7 +850,7 @@
                                     <label>Middle Name</label>
                                     <input
                                         class="form-control"
-                                        formControlName="faxNo"
+                                        formControlName="middleName"
                                         type="text"
                                     />
                                 </div>
@@ -860,7 +860,7 @@
                                     <label>Last Name</label>
                                     <input
                                         class="form-control"
-                                        formControlName="postalCode"
+                                        formControlName="lastName"
                                         type="text"
                                     />
                                 </div>
@@ -1047,7 +1047,7 @@
                             <!-- FATHER SECTION -->
                             <h5>Father</h5>
 
-                            <form [formGroup]="spouseForm" class="row g-3">
+                            <form [formGroup]="parentsInfo" class="row g-3">
                                 <div class="col-md-3">
                                     <label>First Name</label>
                                     <input
@@ -1103,7 +1103,7 @@
                             <!-- MOTHER SECTION -->
 
                             <h5>Mother</h5>
-                            <form [formGroup]="spouseForm" class="row g-3">
+                            <form [formGroup]="parentsInfo" class="row g-3">
                                 <div class="col-md-3">
                                     <label>First Name</label>
                                     <input
@@ -1422,12 +1422,12 @@
                                         <label class="form-label"
                                             >Account Type</label
                                         >
-                                        <div class="d-flex gap-3">
+                                        <div class="d-flex gap-3"> 
                                             <div class="form-check">
                                                 <input
                                                     type="radio"
                                                     class="form-check-input"
-                                                    value="Master"
+                                                    value="1"
                                                     formControlName="accountType"
                                                     id="masterRadio"
                                                 />
@@ -1441,7 +1441,7 @@
                                                 <input
                                                     type="radio"
                                                     class="form-check-input"
-                                                    value="Secondary"
+                                                    value="2"
                                                     formControlName="accountType"
                                                     id="secondaryRadio"
                                                 />
@@ -1456,9 +1456,7 @@
 
                                     <!-- Master Mr No -->
                                     <div class="mb-3">
-                                        <label class="form-label"
-                                            >Master Mr No</label
-                                        >
+                                        <label class="form-label">Master Mr No</label>
                                         <input
                                             type="text"
                                             class="form-control"
@@ -1548,7 +1546,7 @@
                     <button
                         type="submit"
                         class="btn btn-primary"
-                        [disabled]="spouseForm.invalid || isLoading"
+                        [disabled]="parentsInfo.invalid || isLoading"
                     >
                         <span
                             *ngIf="isLoading"

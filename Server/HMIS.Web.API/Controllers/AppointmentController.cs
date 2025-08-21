@@ -216,7 +216,7 @@ namespace HMIS.Web.Controllers
 
 
         [HttpGet("CancelOrRescheduleAppointment")]
-        public async Task<IActionResult> CancelOrRescheduleAppointment(long AppId, int AppStatusId, bool ByProvider, int RescheduledId)
+        public async Task<IActionResult> CancelOrRescheduleAppointment(long AppId, int AppStatusId, bool ByProvider, int? RescheduledId)
         {
 
             // NLogHelper.WriteLog(new LogParameter() { Message = "CancelOrRescheduleAppointment", ActionDetails = $"CancelOrRescheduleAppointment", ActionId = 1, ActionTime = DateTime.Now, FormName = "SchAppointment table", ModuleName = "AppointmentController.cs", UserName = "System", TablesReadOrModified = 0, UserLoginHistoryId = 17 }, (short)NLog.LogLevel.Info.Ordinal, $"SearchAppointment > param  = {AppId},{RescheduledId}");

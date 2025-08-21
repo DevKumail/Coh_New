@@ -16,7 +16,7 @@ namespace HMIS.Application.Implementations
 
         Task<bool> DeleteDemographicDB(int PatientId);
         Task<bool> UpdateDemographicDB(RegInsert regUpdate);
-        Task<bool> InsertDemographicDB(RegInsert regInsert);
+        Task<dynamic> InsertDemographicDB(RegInsert regInsert);
         Task<DataSet> GetDemoByPatientId(string PatientId);
         Task<DataSet> GetAllDemographicsData(FilterDemographicList req);
     }

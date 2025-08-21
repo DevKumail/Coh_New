@@ -21,10 +21,10 @@ namespace HMIS.Application.ServiceLogics
     public class PrescriptionManager : IPrescription
     {
         public IConfiguration Configuration { get; }
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
 
-        public PrescriptionManager(HmisContext context, IConfiguration configuration)
+        public PrescriptionManager(HMISDbContext context, IConfiguration configuration)
         {
             _context = context;
             Configuration = configuration;

@@ -18,9 +18,9 @@ namespace HMIS.Web.Controllers.Dashboard
     [Authorize]
     public class dashboardController: BaseApiController
     {
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
-        public dashboardController(HmisContext context)
+        public dashboardController(HMISDbContext context)
         {
             _context = context;
         }

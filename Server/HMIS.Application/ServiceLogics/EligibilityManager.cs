@@ -27,11 +27,11 @@ namespace HMIS.Application.ServiceLogics
 {
     public class EligibilityManager : IEligibilityManager
     {
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
         private readonly IConfiguration _configuration;
        
-        public EligibilityManager(HmisContext context, IConfiguration configuration)
+        public EligibilityManager(HMISDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;

@@ -18,8 +18,8 @@ namespace HMIS.Application.ServiceLogics
 {
     public class UserManager : IUserManager
     {
-        private readonly HmisContext _context;
-        public UserManager(HmisContext context)
+        private readonly HMISDbContext _context;
+        public UserManager(HMISDbContext context)
         {
             _context = context;
         }

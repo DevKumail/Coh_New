@@ -39,12 +39,12 @@ namespace HMIS.Application.ServiceLogics
     public class CoveragesManager : ICoveragesManager
     {
         public IConfiguration Configuration { get; }
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
         //public CoveragesManager(IConfiguration configuration)
         //{
         //    Configuration = configuration;
         //}
-        public CoveragesManager(HmisContext context, IConfiguration configuration)
+        public CoveragesManager(HMISDbContext context, IConfiguration configuration)
         {
             _context = context;
             Configuration = configuration;

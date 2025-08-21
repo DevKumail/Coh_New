@@ -20,8 +20,8 @@ namespace HMIS.Application.ServiceLogics
 {
     public class ProviderScheduleManager : IProviderScheduleManager
     {
-        private readonly HmisContext _context;
-        public ProviderScheduleManager(HmisContext context)
+        private readonly HMISDbContext _context;
+        public ProviderScheduleManager(HMISDbContext context)
         {
             _context = context;
         }

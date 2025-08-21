@@ -22,13 +22,13 @@ namespace HMIS.Web.Controllers.Eligibility
     [Authorize]
     public class EligibilityController : BaseApiController
     {
-        private readonly HmisContext _context;
+        private readonly HMISDbContext _context;
 
         private readonly IEligibilityManager _eligibilityManager;
         private readonly IConfiguration _configuration;
         TimerElapsed timerElapsed = new TimerElapsed();
 
-        public EligibilityController(IEligibilityManager eligibilityManager, IConfiguration configuration, HmisContext context)
+        public EligibilityController(IEligibilityManager eligibilityManager, IConfiguration configuration, HMISDbContext context)
         {
             _eligibilityManager = eligibilityManager;
             _configuration = configuration;

@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("TabDrugsName")]
-public partial class TabDrugsName
+[Keyless]
+[Table("TabDrugsName_Backup")]
+public partial class TabDrugsNameBackup
 {
-    [Key]
     public long DrugId { get; set; }
 
     [StringLength(255)]
@@ -218,6 +218,5 @@ public partial class TabDrugsName
     [Column("UPPExpiryDate", TypeName = "datetime")]
     public DateTime? UppexpiryDate { get; set; }
 
-    [InverseProperty("Drug")]
-    public virtual ICollection<Prescription> Prescriptions { get; set; } = new List<Prescription>();
+    public long NewDrugId { get; set; }
 }

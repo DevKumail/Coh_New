@@ -8,30 +8,30 @@ namespace HMIS.Application.DTOs.ChargeCaptureDTOs
 {
     public class BlSuperBillProcedureModel
     {
-        public long ProcedureId { get; set; }
+        public long? ProcedureId { get; set; }
         public long? VisitAccountNo { get; set; }
 
         public DateTime? DateOfServiceFrom { get; set; }
 
         public DateTime? DateOfServiceTo { get; set; }
 
-        public string PlaceOfService { get; set; }
+        public string? PlaceOfService { get; set; }
 
-        public string TypeOfService { get; set; }
+        public string? TypeOfService { get; set; }
 
-        public string ProcedureType { get; set; } = null!;
+        public string? ProcedureType { get; set; } = null!;
 
-        public string ProcedureCode { get; set; }
+        public string? ProcedureCode { get; set; }
 
-        public string Modifier1 { get; set; }
+        public string? Modifier1 { get; set; }
 
-        public string Modifier2 { get; set; }
+        public string? Modifier2 { get; set; }
 
-        public string Modifier3 { get; set; }
+        public string? Modifier3 { get; set; }
 
-        public string Modifier4 { get; set; }
+        public string? Modifier4 { get; set; }
 
-        public string DiagnosisCode { get; set; }
+        public string? DiagnosisCode { get; set; }
 
         public decimal? UnitPrice { get; set; }
 
@@ -39,38 +39,38 @@ namespace HMIS.Application.DTOs.ChargeCaptureDTOs
 
         public decimal? Charges { get; set; }
 
-        public string EpsdtfamilyPlan { get; set; }
+        public string? EpsdtfamilyPlan { get; set; }
 
-        public string Emg { get; set; }
+        public string? Emg { get; set; }
 
-        public string Cob { get; set; }
+        public string? Cob { get; set; }
 
-        public string ReservedForLocalUse { get; set; }
+        public string? ReservedForLocalUse { get; set; }
 
         public DateTime? LastUpdatedDate { get; set; }
 
-        public string LastUpdatedBy { get; set; }
+        public string? LastUpdatedBy { get; set; }
 
-        public string PerformedOnFacility { get; set; }
+        public string? PerformedOnFacility { get; set; }
         public bool? IsLabTest { get; set; }
 
         public decimal? Discount { get; set; }
         public bool? Confidential { get; set; }
 
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
 
         public DateTime? CreatedDate { get; set; }
 
 
-        public string Hl7procedureType { get; set; }
+        public string? Hl7procedureType { get; set; }
 
-        public string ProcedurePriority { get; set; }
+        public string? ProcedurePriority { get; set; }
 
-        public string AssociatedDiagnosisCode { get; set; }
+        public string? AssociatedDiagnosisCode { get; set; }
 
         public long? PrimaryAnestheticId { get; set; }
 
-        public string TypeOfAnesthesia { get; set; }
+        public string? TypeOfAnesthesia { get; set; }
         public long? UnclassifiedId { get; set; }
 
 
@@ -82,22 +82,22 @@ namespace HMIS.Application.DTOs.ChargeCaptureDTOs
 
         public Guid? ItemId { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public long? OrderSetDetailId { get; set; }
         public Guid? DrugAdminId { get; set; }
         public bool? Covered { get; set; }
 
         public decimal? ProviderDiscount { get; set; }
 
-        public string LotNo { get; set; }
+        public string? LotNo { get; set; }
         public long? DrugId { get; set; }
 
-        public string ToothCode { get; set; }
+        public string? ToothCode { get; set; }
         public bool? ToothCodeRequired { get; set; }
 
         public decimal? Patientshare { get; set; }
 
-        public string PatientShareCategory { get; set; }
+        public string? PatientShareCategory { get; set; }
 
         public decimal? ChargesWithVat { get; set; }
 
@@ -109,6 +109,6 @@ namespace HMIS.Application.DTOs.ChargeCaptureDTOs
 
         public decimal? ChargeswithoutVat { get; set; }
 
-        public string IsIvfbundle { get; set; }
+        public string? IsIvfbundle { get; set; }
     }
 }

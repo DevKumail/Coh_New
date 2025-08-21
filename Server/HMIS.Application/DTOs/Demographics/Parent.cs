@@ -30,7 +30,7 @@ namespace HMIS.Application.DTOs.Demographics
 
         public int? motherCellPhone { get;}
 
-        public int? motherEmail { get; set;}
+        public string? motherEmail { get; set;}
 
         public int? TabsTypeId { get; set; }
 

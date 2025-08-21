@@ -23,7 +23,7 @@ import { FilePondModule } from 'ngx-filepond';
 import { OnInit } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
 import { RegistrationApiService } from '@/app/shared/Services/Registration/registration.api.service';
-import { DemographicDTO } from '@/app/shared/Models/registration/Demographics/Demographic.type.model';
+import { AssignmentsDTO, ContactDTO, DemographicDTO, FamilyMembersDTO, NextOfKinDTO, ParentDTO } from '@/app/shared/Models/registration/Demographics/Demographic.type.model';
 import Swal from 'sweetalert2';
 import { NgxDaterangepickerBootstrapModule } from 'ngx-daterangepicker-bootstrap';
 import { ViewChild } from '@angular/core';
@@ -59,7 +59,7 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
     demographicForm!: FormGroup;
     contactForm!: FormGroup;
     nextForm!: FormGroup;
-    spouseForm!: FormGroup;
+    parentsInfo!: FormGroup;
     emergencyContactForm!: FormGroup;
     assignmentForm!: FormGroup;
     familyForm!: FormGroup;
@@ -148,54 +148,92 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
     }
 
     initializeForm() {
+        // this.demographicForm = this.fb.group({
+        //     PatientPicture: [''],
+        //     practice: [{ value: '', disabled: true }],
+        //     MrNo: [{ value: '', disabled: true }],
+        //     PersonTitleId: ['', Validators.required],
+        //     PersonFirstName: ['', Validators.required],
+        //     PersonMiddleName: [''],
+        //     PersonLastName: ['', Validators.required],
+        //     PersonSexId: ['', Validators.required],
+        //     preferredName: [''],
+        //     genderIdentity: [0, Validators.required],
+        //     PersonMaritalStatus: [0, Validators.required],
+        //     PatientBloodGroupId: [0, Validators.required],
+        //     PatientBirthDate: ['', Validators.required],
+        //     Age: [{ value: '', disabled: true }],
+        //     personSocialSecurityNo: ['', Validators.required],
+        //     LaborCardNo: [''],
+        //     Religion: [''],
+        //     PersonEthnicityTypeId: [''],
+        //     Nationality: [0, Validators.required],
+        //     PrimaryLanguage: [''],
+        //     PersonPassportNo: [''],
+        //     PersonDriversLicenseNo: [''],
+        //     MediaChannelId: [''],
+        //     MediaItemId: [''],
+        //     ResidenceVisaNo: [''],
+        //     EmiratesIDN: [null, Validators.required],
+        //     primarycarephysicianPcp: [0, Validators.required],
+        //     causeofDeath: [''],
+        //     DeathDate: [null],
+
+        //     BillingNote: ['', Validators.required],
+        //     VIPPatient: [false],
+        //     Pregnant: [false],
+        //     AdvDirective: [false],
+        //     DrugHistConsent: [false],
+        //     ExemptReporting: [false],
+        // }); 
+
         this.demographicForm = this.fb.group({
             PatientPicture: [''],
             practice: [{ value: '', disabled: true }],
             MrNo: [{ value: '', disabled: true }],
-            PersonTitleId: ['', Validators.required],
+            PersonTitleId: [0, Validators.required],
             PersonFirstName: ['', Validators.required],
             PersonMiddleName: [''],
             PersonLastName: ['', Validators.required],
-            PersonSexId: ['', Validators.required],
+            PersonSexId: [0, Validators.required],
             preferredName: [''],
-            genderIdentity: ['', Validators.required],
-            PersonMaritalStatus: ['', Validators.required],
-            PatientBloodGroupId: ['', Validators.required],
+            genderIdentity: [0, Validators.required],
+            PersonMaritalStatus: [0, Validators.required],
+            PatientBloodGroupId: [0, Validators.required],
             PatientBirthDate: ['', Validators.required],
             Age: [{ value: '', disabled: true }],
             personSocialSecurityNo: ['', Validators.required],
             LaborCardNo: [''],
-            Religion: [''],
-            PersonEthnicityTypeId: [''],
-            Nationality: ['', Validators.required],
-            PrimaryLanguage: [''],
+            Religion: [0],  // ✅ fixed
+            PersonEthnicityTypeId: [0],  // ✅ fixed
+            Nationality: [0, Validators.required],
+            PrimaryLanguage: [0],  // ✅ fixed
             PersonPassportNo: [''],
             PersonDriversLicenseNo: [''],
-            MediaChannelId: [''],
-            MediaItemId: [''],
+            MediaChannelId: [0],  // ✅ fixed
+            MediaItemId: [0],  // ✅ fixed
             ResidenceVisaNo: [''],
             EmiratesIDN: [null, Validators.required],
-            primarycarephysicianPcp: [null, Validators.required],
+            primarycarephysicianPcp: [0, Validators.required],
             causeofDeath: [''],
             DeathDate: [null],
-
             BillingNote: ['', Validators.required],
-            isVIP: [false],
-            isPregnant: [false],
-            isDirective: [false],
-            isDrugHist: [false],
-            isExpReporting: [false],
-        });
+            VIPPatient: [false],
+            Pregnant: [false],
+            AdvDirective: [false],
+            DrugHistConsent: [false],
+            ExemptReporting: [false],
+          });
 
+          
         this.contactForm = this.fb.group({
             streetName: ['', Validators.required],
             dwellingNumber: ['', Validators.required],
-            CountryId: ['', Validators.required],
-            StateId: ['', Validators.required],
-            CityId: ['', Validators.required],
+            CountryId: [Validators.required],
+            StateId: [Validators.required],
+            CityId: [Validators.required],
             faxNo: [''],
             postalCode: ['', Validators.required],
-            Sex: ['', Validators.required],
             homePhone: [''],
             cellPhone: [
                 '',
@@ -206,10 +244,11 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
         });
         this.nextForm = this.fb.group({
             relationshipId: [''],
-            dwellingNumber: [''],
-            faxNo: [''],
-            postalCode: [''],
+            firstName: [''],
+            middleName: [''],
+            lastName: [''],
             streetName: [''],
+            postalCode: [''],
             CountryId: [''],
             StateId: [''],
             CityId: [''],
@@ -219,8 +258,8 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
             email: [''],
         });
 
-        this.spouseForm = this.fb.group({
-            father: [''],
+        this.parentsInfo = this.fb.group({
+
             fatherFirstName: [''],
             fatherMiddleName: [''],
             fatherLastName: [''],
@@ -229,7 +268,6 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
             fatherPhoneNo: [''],
             fatherEmail: [''],
 
-            mother: [''],
             motherFirstName: [''],
             motherMiddleName: [''],
             motherLastName: [''],
@@ -238,6 +276,7 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
             motherPhoneNo: [''],
             motherEmail: [''],
         });
+
         this.emergencyContactForm = this.fb.group({
             relationship: [''],
             firstName: [''],
@@ -594,22 +633,102 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
         formData.PatientBirthDate = formData.PatientBirthDate || new Date();
         formData.personSocialSecurityNo = formData.personSocialSecurityNo || '';
         formData.Nationality = formData.Nationality || 0;
-        formData.EmiratesIDN = formData.EmiratesIDN || 0;
+        formData.EmiratesIDN = formData.EmiratesIDN || '';
         formData.primarycarephysicianPcp =
-            formData.primarycarephysicianPcp || 0;
+        formData.primarycarephysicianPcp || 0;
         formData.BillingNote = formData.BillingNote || '';
+        
+        const Contact: ContactDTO = {
+            streetName : this.contactForm.get('streetName')?.value,
+            dwellingNumber : this.contactForm.get('dwellingNumber')?.value,
+            countryId : this.contactForm.get('CountryId')?.value,
+            stateId : this.contactForm.get('StateId')?.value,
+            cityId : this.contactForm.get('CityId')?.value,
+            fax : this.contactForm.get('faxNo')?.value,
+            postalCode : this.contactForm.get('postalCode')?.value,
+            cellPhone : this.contactForm.get('cellPhone')?.value,
+            homePhone : this.contactForm.get('homePhone')?.value,
+            workPhone : this.contactForm.get('workPhone')?.value,
+            email : this.contactForm.get('email')?.value,
+        };
+
+        const NextOfKin: NextOfKinDTO = {
+            relationshipId: this.nextForm.get('relationshipId')?.value,
+            firstName: this.nextForm.get('firstName')?.value,
+            middleName: this.nextForm.get('middleName')?.value,
+            lastName: this.nextForm.get('lastName')?.value,
+            streetName: this.nextForm.get('streetName')?.value,
+            countryId: this.nextForm.get('CountryId')?.value,
+            stateId: this.nextForm.get('StateId')?.value,
+            cityId: this.nextForm.get('CityId')?.value,
+            postalCode: this.nextForm.get('postalCode')?.value,
+            cellPhone: this.nextForm.get('cellPhone')?.value,
+            homePhone: this.nextForm.get('homePhone')?.value,
+            workPhone: this.nextForm.get('workPhone')?.value,
+            email: this.nextForm.get('email')?.value,
+        };
+
+        
+
+        const Parent: ParentDTO = {
+            firstName: this.parentsInfo.get('fatherFirstName')?.value,
+            middleName: this.parentsInfo.get('fatherMiddleName')?.value,
+            lastName: this.parentsInfo.get('fatherLastName')?.value,
+            homePhone: this.parentsInfo.get('fatherHomePhone')?.value,
+            cellPhone: this.parentsInfo.get('fatherCellPhone')?.value,
+            email: this.parentsInfo.get('fatherEmail')?.value,
+            motherFirstName: this.parentsInfo.get('motherFirstName')?.value,
+            mothermiddleName: this.parentsInfo.get('motherMiddleName')?.value,
+            motherLastName: this.parentsInfo.get('motherLastName')?.value,
+            motherHomePhone: this.parentsInfo.get('motherHomePhone')?.value,
+            motherCellPhone: this.parentsInfo.get('motherCellPhone')?.value,
+            motherEmail: this.parentsInfo.get('motherEmail')?.value,
+        };
+
+        const Assignments: AssignmentsDTO = {
+            proofOfIncome: this.assignmentForm.get('proofOfIncome')?.value,
+            providerId: this.assignmentForm.get('providerId')?.value,
+            feeScheduleId: this.assignmentForm.get('feeScheduleId')?.value,
+            financialClassId: this.assignmentForm.get('financialClassId')?.value,
+            locationId: this.assignmentForm.get('locationId')?.value,
+            siteId: this.assignmentForm.get('siteId')?.value,
+            signedDate: this.assignmentForm.get('signedDate')?.value,
+            unsignedDate: this.assignmentForm.get('expiryDate')?.value,
+            entityTypeId: this.assignmentForm.get('entityTypeId')?.value,
+            entityNameId: this.assignmentForm.get('entityNameId')?.value,
+            referredById: this.assignmentForm.get('referredById')?.value,
+        };
+
+        const FamilyMembers: FamilyMembersDTO = {
+            mrNo: this.familyForm.get('mrNo')?.value,
+            accountTypeId: 0, 
+            // this.familyForm.get('accountType')?.value,
+            masterMrNo: this.familyForm.get('masterMrNo')?.value,
+            relationshipId: this.familyForm.get('relationshipId')?.value,
+        }; 
 
         const demographic: DemographicDTO = {
             ...formData,
-            isVIP: this.demographicForm.get('isVIP')?.value ?? false,
-            isPregnant: this.demographicForm.get('isPregnant')?.value ?? false,
-            isDirective:
-                this.demographicForm.get('isDirective')?.value ?? false,
-            isDrugHist: this.demographicForm.get('isDrugHist')?.value ?? false,
-            isExpReporting:
-                this.demographicForm.get('isExpReporting')?.value ?? false,
-            Contact: this.contactForm.get('homePhone')?.value ?? '123',
-        };
+            // VIPPatient: this.demographicForm.get('isVIP')?.value ?? false,
+            // Pregnant: this.demographicForm.get('isPregnant')?.value ?? false,
+            // AdvDirective: this.demographicForm.get('isDirective')?.value ?? false,
+            // DrugHistConsent: this.demographicForm.get('isDrugHist')?.value ?? false,
+            // ExemptReporting: this.demographicForm.get('isExpReporting')?.value ?? false,
+            Contact: Contact,
+            NextOfKin: null,
+            // NextOfKin,
+            Parent: null,
+            // Parent,
+            Assignments: null,
+            // Assignments,
+            FamilyMembers: null,
+            // FamilyMembers,
+            Employment: null,
+            EmergencyContact: null,
+            Spouse: null,
+            regPatientEmployer: null,
+            regAccount: null
+            };
 
         this.DemographicApiServices.submitDemographic(demographic).subscribe({
             next: (res: any) => {

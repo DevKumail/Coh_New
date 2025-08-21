@@ -10,8 +10,8 @@ namespace HMIS.Application.ServiceLogics
 {
     public class PatientChartFamilyHistoryManager : IPatientChartFamilyHistoryManager
     {
-        private readonly HmisContext _context;
-        public PatientChartFamilyHistoryManager(HmisContext context)
+        private readonly HMISDbContext _context;
+        public PatientChartFamilyHistoryManager(HMISDbContext context)
         {
             _context = context;
         }

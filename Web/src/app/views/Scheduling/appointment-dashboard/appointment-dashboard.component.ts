@@ -138,15 +138,20 @@ export class AppointmentDashboardComponent implements OnInit {
   }
 
   handleDateClick(clickInfo: DateClickArg) {
+    debugger
     this.appId = 0;
+    this.fullName = 'N/A'
+    this.appointment = ''
     this.action = true;
     this.modalService.open(this.appointmentModal, { size: 'lg' });
     this.dateSelected = clickInfo.dateStr;
   }
 
   handleEventClick(clickInfo: EventClickArg) {
+    debugger
     const extProp: any = clickInfo.event.extendedProps;
-    this.appId = extProp.appId;
+    this.appointment = ''
+    this.appId = extProp.appId || 0;
     this.fullName = extProp.fullName;
     this.action = true;
     this.modalService.open(this.appointmentModal, { size: 'lg' });
@@ -249,15 +254,19 @@ export class AppointmentDashboardComponent implements OnInit {
   }
 
   SubmitAction() {
+    debugger
     switch (+this.appointment) {
       case 0:
         this.router.navigateByUrl(`/scheduling/appointment/create?date=${this.dateSelected}`);
+        this.modalService.dismissAll();
         break;
       case 1:
         this.router.navigate(['/scheduling/appointment/list']);
+        this.modalService.dismissAll();
         break;
       case 2:
         this.confirmCancel();
+        // this.modalService.dismissAll();
         break;
       case 3:
         this.reschpopup = true;
@@ -265,7 +274,6 @@ export class AppointmentDashboardComponent implements OnInit {
         break;
     }
     this.action = false;
-    this.modalService.dismissAll();
   }
 
   // confirmCancel(position: string) {
@@ -314,10 +322,11 @@ export class AppointmentDashboardComponent implements OnInit {
   }
 
   rescheduleApp() {
-    this.changeAppointmentStatus(this.appId, 2, false, this.selectedReschedulingReasons.code, false);
+    this.changeAppointmentStatus(this.appId, 2, false, this.selectedReschedulingReasons?.code || 0, false);
   }
 
   changeAppointmentStatus(AppId: number, AppStatusId: number, ByProvider: boolean, RescheduledId: number, isCancel: boolean = true) {
+    debugger
     this.cancelpopup = false;
     this.modalService.dismissAll();
     this.reschpopup = false;
@@ -340,7 +349,10 @@ export class AppointmentDashboardComponent implements OnInit {
   }
 
   openModal(content: TemplateRef<HTMLElement>, options: NgbModalOptions) {
+    debugger
     this.modalService.open(content, options);
+    this.appId = 0;
+    this.fullName = 'N/A';
   }
 }
 
