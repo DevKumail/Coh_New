@@ -25,25 +25,90 @@ export interface Demographic {
   MediaChannelId?: number;
   MediaItemId?: number;
   ResidenceVisaNo?: string;
-  EmiratesIDN: number;
+  EmiratesIDN: string;
   primarycarephysicianPcp: number;
   causeofDeath?: string;
   DeathDate?: Date;
   BillingNote: string;
-  isVIP: boolean;
-  isPregnant?: boolean;
-  isDirective?: boolean;
-  isDrugHist?: boolean;
-  isExpReporting?: boolean;
+  VIPPatient: boolean;
+  Pregnant: boolean;
+  AdvDirective: boolean;
+  DrugHistConsent: boolean;
+  ExemptReporting: boolean;
 }
 
 
 export interface Contact {
-  CellPhone?: string;
-  HomePhone?: string;
+  streetName?: string;
+  dwellingNumber?: string;
+  countryId?: number;
+  stateId?: number;
+  cityId?: number;
+  postalCode?: string;
+  cellPhone?: string;
+  homePhone?: string;
+  workPhone?: string;
+  fax?: string;
+  email?: string;
+  tabsTypeId?: number
   
 }
 
 
+export interface NextOfKin {
+  relationshipId?: number,
+  firstName?: string,
+  middleName?: string,
+  lastName?: string,
+  streetName?: string,
+  NokdwellingNumber?: number,
+  countryId?:number,
+  stateId?:number,
+  cityId?:number,
+  postalCode?:number,
+  cellPhone?:number,
+  homePhone?:number,
+  workPhone?:number,
+  TabsTypeId?:number,
+}
 
 
+export interface Parent {
+  firstName?: string,
+  middleName?: string,
+  lastName?: string,
+  homePhone?: number,
+  cellPhone?: number,
+  email?: string,
+  motherFirstName?: string,
+  mothermiddleName?: string,
+  motherLastName?: string,
+  motherHomePhone?: number,
+  motherCellPhone?: number,
+  motherEmail?: string,
+  TabsTypeId?: number,
+}
+
+export interface Assignments {
+  proofOfIncome?: string;
+  providerId?: number;
+  feeScheduleId?: number;
+  financialClassId?: number;
+  locationId?: number;
+  siteId?: number;
+  signedDate?: Date;
+  unsignedDate?: Date;
+  entityTypeId?: number;
+  entityNameId?: number;
+  referredById?: number;
+  TabsTypeId?: number;
+}
+
+
+export interface FamilyMembers {
+  mrNo?: number;
+  accountTypeId?: number;
+  masterMrNo?: number;
+  relationshipId?: number;
+  TabsTypeId?: number;
+}
