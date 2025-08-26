@@ -31,7 +31,7 @@ namespace HMIS.Application.ServiceLogics
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@MRNo", mrno);
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetAllergies",param);
-                if (ds.Tables[1].Rows.Count == 0)
+                if (ds == null)
                 {
 
                     return new DataSet();

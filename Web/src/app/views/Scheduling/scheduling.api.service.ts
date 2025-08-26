@@ -122,6 +122,11 @@ export class SchedulingApiService {
         return this.api.get('Common/GetEmployeeFacilityFromCache').toPromise();
     }
     
+    UpdateAppointmentStatus(appId: number, PatientStatusId: number, appVisitId: number) {
+    
+      const body={appId:appId, patientStatusId:PatientStatusId, appVisitId:appVisitId}
+      return this.api.put(`Appointment/UpdateAppointmentStatus?appId=${appId}&patientStatusId=${PatientStatusId}&appVisitid=${appVisitId}`,body).toPromise();
+    }
 
     cancelBooking(AppId:number,AppStatusId:number ,ByProvider:boolean,RescheduledId:number) {
       if(!RescheduledId){
@@ -129,5 +134,22 @@ export class SchedulingApiService {
       }
         return this.api.get(`Appointment/CancelOrRescheduleAppointment?AppId=${AppId}&AppStatusId=${AppStatusId}&ByProvider=${ByProvider}&RescheduledId=${RescheduledId}`).toPromise();
     }
+
+    UpdateRescheduleById( schReschedule: any) {
+      
+      return this.api.put(`Appointment/UpdateRescheduleById`, schReschedule).toPromise();
+    }
+
+    submitappointmentbooking(schApp: any) {
+      return this.api.post('Appointment/InsertAppointment', schApp).toPromise();
+    }
+
+    UpdateByAppId(schApp: any) {
+      return this.api.put(`Appointment/UpdateAppointment`,schApp).toPromise();
+    }
+
+      getEligibilitydata(mrno:any) {
+    return this.api.get(`Eligibility/getEligibilityLog?mrno=${mrno}`).toPromise();
+  }
 
 }

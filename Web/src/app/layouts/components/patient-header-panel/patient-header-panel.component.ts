@@ -14,6 +14,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
+import { NgIconComponent } from '@ng-icons/core';
 
 @Component({
   selector: 'app-patient-header-panel',
@@ -24,6 +25,7 @@ import { filter,distinctUntilChanged  } from 'rxjs/operators';
     ReactiveFormsModule,
     NgbNavModule,
     FormsModule,
+    NgIconComponent,
   ],
   animations: [
     trigger('slideToggle', [

@@ -94,14 +94,14 @@ namespace HMIS.Web.Controllers
 
 
 
-            schApp.EnteredBy = User.Claims.Where(c => c.Type == "UserName").First().Value;
+           // schApp.EnteredBy = User.Claims.Where(c => c.Type == "UserName").First().Value;
 
-            DataSet result1 = await _appointmentManager.ValidateAppointmentDB(schApp);
-            if (result1.Tables[0].Rows.Count > 0)
-            {
-                string res = result1.Tables[0].Rows[0]["ErrorMessage"].ToString();
-                if (res == "SUCCESS")
-                {
+            //DataSet result1 = await _appointmentManager.ValidateAppointmentDB(schApp);
+            //if (result1.Tables[0].Rows.Count > 0)
+            //{
+               // string res = result1.Tables[0].Rows[0]["ErrorMessage"].ToString();
+              //  if (res == "SUCCESS")
+            //    {
                     var result = await _appointmentManager.InsertAppointmentDB(schApp);
 
 
@@ -116,11 +116,11 @@ namespace HMIS.Web.Controllers
                     return BadRequest(result);
 
 
-                }
+              //  }
 
 
-            }
-            return BadRequest(result1);
+           // }
+          //  return BadRequest(result1);
 
         }
 

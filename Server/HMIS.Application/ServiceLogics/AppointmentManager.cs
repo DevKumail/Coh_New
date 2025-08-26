@@ -164,7 +164,7 @@ namespace HMIS.Application.ServiceLogics
 
                     long? getPlanId = null;
                     var getpurposeofvisit = _context.ProblemLists.Where(x => x.ProblemId == schApp.PurposeOfVisitId).FirstOrDefault().ProblemName;
-                    var EmployeeId = _context.Hremployees.Where(x => x.UserName == schApp.EmployeeId).FirstOrDefault();
+                    var EmployeeId = _context.Hremployees.Where(x => x.EmployeeId == schApp.EmployeeId).FirstOrDefault();
                     if (schApp.PlanId != null)
                     {
                         getPlanId = _context.BlpayerPlans.Where(x => x.PlanId == schApp.PlanId.ToString()).FirstOrDefault().Id;
@@ -176,7 +176,13 @@ namespace HMIS.Application.ServiceLogics
                     schAppointment.Mrno = schApp.MRNo;
                     schAppointment.VisitTypeId = schApp.VisitTypeId;
                     schAppointment.AppId = (long)schApp.AppId;
-                    schAppointment.AppDateTime = Convert.ToDateTime(schApp.date + " " + schApp.time); //schApp.AppDateTime,
+                    schAppointment.AppDateTime = schApp.AppDateTime; // Convert.ToDateTime(schApp.date + " " + schApp.time);  
+                    //string dateTimeString = schApp.date + " " + schApp.time;
+                    //schAppointment.AppDateTime = DateTime.ParseExact(
+                    //    dateTimeString,
+                    //    "yyyy-MM-dd hh:mm:ss tt",
+                    //    CultureInfo.InvariantCulture
+                    //);
                     schAppointment.Duration = schApp.Duration;
                     schAppointment.AppNote = schApp.AppNote;
                     schAppointment.SiteId = schApp.SiteId;
@@ -218,7 +224,7 @@ namespace HMIS.Application.ServiceLogics
                     schAppointment.PatientBalance = schApp.PatientBalance;
                     schAppointment.PlanBalance = schApp.PlanBalance;
                     schAppointment.PlanCopay = schApp.PlanCopay;
-                    schAppointment.EmployeeId = EmployeeId.EmployeeId;
+                    schAppointment.EmployeeId = schApp.EmployeeId;
                     schAppointment.PlanId = getPlanId;
                     schAppointment.PatientId = schApp.PatientId;
                     schAppointment.PayerId = schApp.PayerId;
@@ -414,7 +420,7 @@ namespace HMIS.Application.ServiceLogics
                 DateTime Dt = Convert.ToDateTime(schApp.date).Date;
                 string Date = Dt.ToShortDateString();
                 var chkResult = await Task.Run(() => _context.SchAppointments.Where(x => x.AppId.Equals(schApp.AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
-                var EmployeeId = _context.Hremployees.Where(x => x.UserName == schApp.EmployeeId).FirstOrDefault();
+                var EmployeeId = _context.Hremployees.Where(x => x.EmployeeId == schApp.EmployeeId).FirstOrDefault();
                 if (chkResult != null && chkResult.AppId > 0)
                 {
                     //chkResult.AppId = schApp.AppId;
@@ -473,6 +479,7 @@ namespace HMIS.Application.ServiceLogics
                     await _context.SaveChangesAsync();
                     return true;
                 }
+           
                 //DynamicParameters parameters = new DynamicParameters();
                 //parameters.Add("AppId", schApp.AppId, DbType.Int64);
                 //parameters.Add("ProviderId", schApp.ProviderId, DbType.Int64);
@@ -1114,10 +1121,17 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 var Data = await System.Threading.Tasks.Task.Run(() => _context.VwRegPatientAndAppointmentdetails.Where(x => x.IsDeleted == false).ToList());
-                if (!string.IsNullOrEmpty(Date))
+                if (!(string.IsNullOrEmpty(Date)))
                 {
-                    Data = Data.Where(x => x.AppDateTime.Date == Convert.ToDateTime(Date).Date).ToList();
+                    var dt = Convert.ToDateTime(Date).Date;
+                    Data = Data.Where(x => x.AppDateTime.Date == dt).ToList();
                 }
+                //if (!string.IsNullOrEmpty(Date))
+                //{
+                //    var dt = Convert.ToDateTime(Date).Date;
+                //    Data = Data.Where(x => x.AppDateTime.Date == dt);
+                //}
+
                 if (SiteId != 0)
                 {
                     Data = Data.Where(x => x.SiteId == SiteId).ToList();
@@ -1131,12 +1145,18 @@ namespace HMIS.Application.ServiceLogics
                     Data = Data.Where(x => x.SpecialtyId == SpecialityId).ToList();
                 }
                 return Data;
+
+                //return new List<VwRegPatientAndAppointmentdetails>();
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
+
+
+
+
 
         //public async Task<string> AddBLPatientVisit(string Mrno,string Date,string user)
         //{
