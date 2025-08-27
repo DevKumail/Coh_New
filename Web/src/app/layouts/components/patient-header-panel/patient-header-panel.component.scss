@@ -89,3 +89,17 @@
 @media (prefers-reduced-motion: reduce) {
   .kda-blink { animation: none; }
 }
+
+/* Custom tooltip styling for allergies */
+:host ::ng-deep .tooltip-allergy .tooltip-inner {
+  text-align: left;
+  max-width: 260px;
+  white-space: normal;
+  font-size: 12px;
+  line-height: 1.2;
+  padding: 8px 10px;
+}
+
+:host ::ng-deep .tooltip-allergy .tooltip-inner hr {
+  border-top: 1px dashed rgba(0,0,0,.25);
+}

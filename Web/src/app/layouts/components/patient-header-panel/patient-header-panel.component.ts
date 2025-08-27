@@ -12,6 +12,7 @@ import { DataStorageService } from '@/app/shared/data-storage.service';
 import { SharedApiService } from '@/app/shared/shared.api.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { NgIconComponent } from '@ng-icons/core';
@@ -24,6 +25,7 @@ import { NgIconComponent } from '@ng-icons/core';
   imports: [CommonModule, IconsModule,
     ReactiveFormsModule,
     NgbNavModule,
+    NgbTooltip,
     FormsModule,
     NgIconComponent,
   ],
@@ -72,6 +74,8 @@ export class PatientHeaderPanelComponent implements OnInit {
         if (this.patientData) {
         this.patientInfo = this.patientData?.table2?.[0] || null;
         this.insuranceInfo = this.patientData?.table1 || [];
+        console.log('✅ Subscription triggered with MRNO in Header Component:', this.patientData);
+
         this.visible = true;
         }
       });
