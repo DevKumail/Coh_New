@@ -187,7 +187,6 @@ namespace HMIS.Web.Controllers.Registration
 
             DataSet result = await _tempDemographicManager.TempDemoDB_with_pagination(req);
 
-
             if (result != null)
             {
                 return Ok(result);

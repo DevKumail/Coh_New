@@ -187,9 +187,11 @@ namespace HMIS.Web.Controllers.Registration
                     //reg.CreatedBy = User.Claims.Where(c => c.Type == "UserName").First().Value;
                     var result = await _demographicManager.InsertDemographicDB(reg);
                     elapsed = timerElapsed.StopTimer();
-                    if (result)
-                    {
-                        var statusCode = HttpContext.Response.StatusCode;
+                   // if (result)
+                        if (!string.IsNullOrEmpty(result) && result.ToLower().Contains("success"))
+
+                        {
+                            var statusCode = HttpContext.Response.StatusCode;
                         var responseMessage = JsonConvert.SerializeObject(result);
                         var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
                         logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",

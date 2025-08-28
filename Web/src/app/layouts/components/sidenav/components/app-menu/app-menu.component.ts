@@ -105,6 +105,8 @@ export class AppMenuComponent implements OnInit, OnDestroy {
     const menuMap = new Map<string, MenuItemType>();
     const validModules = new Set<string>();
     const validComponentsPerModule = new Map<string, Set<string>>();
+    // Map of module -> (component label -> url) pulled from static menu config
+    const childUrlLookup = new Map<string, Map<string, string>>();
     const iconLookup = new Map<string, string>();
 
     for (const item of staticMenu) {
@@ -118,9 +120,15 @@ export class AppMenuComponent implements OnInit, OnDestroy {
       }
 
       if (item.children) {
+        // Build lookup of child label -> url for each module
+        const childMap = childUrlLookup.get(module) || new Map<string, string>();
         for (const child of item.children) {
           validComponentsPerModule.get(module)?.add(child.label);
+          if (child.label && child.url) {
+            childMap.set(child.label, child.url);
+          }
         }
+        childUrlLookup.set(module, childMap);
       }
 
       if (item.icon) {
@@ -152,9 +160,15 @@ export class AppMenuComponent implements OnInit, OnDestroy {
       if (componentName && componentName !== moduleName) {
         const alreadyExists = parent.children!.some(child => child.label === componentName);
         if (!alreadyExists) {
+          // Prefer the exact url from static menu if available, else slugify the label
+          const staticUrl = childUrlLookup.get(moduleName)?.get(componentName);
+          const safeSlug = componentName
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-');
           parent.children!.push({
             label: componentName,
-            url: `/${moduleName.toLowerCase()}/${componentName.toLowerCase()}`
+            url: staticUrl || `/${moduleName.toLowerCase()}/${safeSlug}`
           });
         }
       }

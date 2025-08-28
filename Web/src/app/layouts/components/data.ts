@@ -167,7 +167,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 isCollapsed: true,
                 children: [
                     { label: 'Alerts', url: '/registration/alerts' },
-                    { label: 'Coverages', url: '/registration/coverage-list' },
+                    { label: 'Coverages', url: '/registration/coverages' },
                     {
                         label: 'Coverage Create',
                         url: '/registration/covrage-create',
@@ -182,7 +182,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 isCollapsed: true,
                 children: [
                     { label: 'Alerts', url: '/registration/alerts' },
-                    { label: 'Coverages', url: '/registration/coverage-list' },
+                    { label: 'Coverages', url: '/registration/coverages' },
                     {
                         label: 'Coverage Create',
                         url: '/registration/covrage-create',
@@ -198,7 +198,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 ],
             },
             { label: 'Alerts', url: '/registration/alerts' },
-            { label: 'Coverages', url: '/registration/coverage-list' },
+            { label: 'Coverages', url: '/registration/coverages' },
             { label: 'Coverage Create', url: '/registration/covrage-create' },
             { label: 'Demographics', url: '/registration/demographics' },
             {
@@ -207,7 +207,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             },
             {
                 label: 'Demographic List',
-                url: '/registration/demographic-list',
+                url: '/registration/demographics',
             },
             {
                 label: 'Temporary Patient Demographics',
@@ -778,7 +778,7 @@ export const horizontalMenuItems: MenuItemType[] = [
             {
                 label: 'Coverages',
                 icon: 'tablerBell',
-                url: '/registration/coverage-list',
+                url: '/registration/coverages',
             },
             {
                 label: 'Demographics',
@@ -794,7 +794,7 @@ export const horizontalMenuItems: MenuItemType[] = [
             {
                 label: 'Temporary Patient Demographics',
                 icon: 'tablerUserPlus', // 👈 icon optional — koi bhi use kar sakte ho
-                url: '/registration/temporary patient demographics',
+                url: '/registration/temporary-patient-demographics',
             },
         ],
     },

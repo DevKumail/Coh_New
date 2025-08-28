@@ -13,7 +13,7 @@
 import {NgxDaterangepickerBootstrapDirective} from "ngx-daterangepicker-bootstrap";
 
   //import { User, Hospital, HeartPulse } from 'lucide-angular';
-   import { User, Hospital, HeartPulse, ClipboardEdit  } from 'lucide-angular';
+   import { User, Hospital, HeartPulse, ClipboardEdit, AlertCircle, CheckCircle  } from 'lucide-angular';
 import { AuthInterceptor } from '@core/interceptors/auth.interceptor';
 
     bootstrapApplication(AppComponent, {
@@ -26,7 +26,9 @@ import { AuthInterceptor } from '@core/interceptors/auth.interceptor';
         User,
         Hospital,
         HeartPulse,
-        ClipboardEdit 
+        ClipboardEdit,
+        AlertCircle,
+        CheckCircle
       })),
           provideHttpClient(
       withInterceptors([AuthInterceptor])

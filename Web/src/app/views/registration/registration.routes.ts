@@ -5,12 +5,9 @@ import { CovrageCreateComponent } from './Covrage/covrage-create/covrage-create.
 import { CoverageListComponent } from './Covrage/coverage-list/coverage-list.component';
 import { DemographicCreateComponent } from './Demographic/demographic-create/demographic-create.component';
 import { DemographicListComponent } from './Demographic/demographic-list/demographic-list.component';
-import { Contact } from 'lucide-angular';
-import { title } from 'process';
-import { TemporaryPatientDemographicListComponent } from './Temporary Patient Demographics/temporary-patient-demographic-list/temporary-patient-demographic-list.component';
-import { TemporaryDemographicsComponent } from './Temporary Patient Demographics/temporary-demographics/temporary-demographics.component';
 import { modulePermissionGuard } from '@core/guards/module-permission.guard';
-
+import { TemporaryPatientDemographicListComponent } from './Demographic/temporary-patient-demographic-list/temporary-patient-demographic-list.component';
+import { TemporaryDemographicsComponent } from './Demographic/temporary-demographics/temporary-demographics.component';
 
 export const Registration_ROUTES: Routes = [
   {
@@ -54,18 +51,18 @@ export const Registration_ROUTES: Routes = [
       },
 
       {
-        path: 'temporary patient demographics',
+        path: 'temporary-patient-demographics',
         canActivate: [modulePermissionGuard],
         component: TemporaryPatientDemographicListComponent,
-        data: { title: 'Temporary Patient Demographic List' },
+        data: { title: 'Temporary Demographic List' },
       },
 
 
       {
-        path: 'temporary-demographics',
+        path: 'temporary-patient-demographics-create',
         canActivate: [modulePermissionGuard],
         component: TemporaryDemographicsComponent,
-        data: { title: 'Temporary Demographics' },
+        data: { title: 'Temporary Patient Demographics' },
       },
 
 
