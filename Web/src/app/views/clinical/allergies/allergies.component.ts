@@ -12,7 +12,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
-import { AllergyDto} from '@/app/shared/models/clinical/allergy.model'
+import { AllergyDto} from '@/app/shared/Models/Clinical/allergy.model'
 
 @Component({
   selector: 'app-allergies',
@@ -299,11 +299,12 @@ submit() {
     startDate: formValue.startDate,
     endDate: formValue.endDate,
     status: formValue.status,
+    // OldMrno: this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0,
     active: true,
     updatedBy: this.userid,
     updatedDate: new Date().toISOString().split('T')[0],
     providerId: formValue.providerId,
-    mrno: this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 1234,
+    mrno: this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0,
     createdBy: this.userid,
     createdDate: new Date().toISOString().split('T')[0],
     appointmentId: this.userid

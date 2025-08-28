@@ -1,0 +1,16 @@
+/* Steps label text */
+.p-steps .p-steps-item .p-menuitem-link .p-steps-title {
+    color: black !important;
+  }
+  
+  /* Circle (step number/dot) */
+  .p-steps .p-steps-item .p-menuitem-link .p-steps-number {
+    color: black !important;
+    border-color: black !important;
+  }
+  
+  /* Active step circle background */
+  .p-steps .p-steps-item.p-highlight .p-steps-number {
+    background: black !important;
+    color: white !important;
+  }

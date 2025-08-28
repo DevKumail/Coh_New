@@ -1,116 +1,111 @@
-<div class="container mt-4">
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2">
+        <li class="breadcrumb-item">
+            <a href="javascript:void(0);">
+                <ng-icon name="tablerSmartHome"></ng-icon>
+                Scheduling
+            </a>
+        </li>
+        <li
+            class="d-flex align-items-center text-muted mx-1"
+            aria-current="page"
+        >
+            <ng-icon name="tablerChevronRight"></ng-icon>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            Create Appointment
+        </li>
+    </ol>
+</nav>
+ 
+<div class="">
+    <div class="row align-items-stretch">
+        <div [ngClass]="{ 'col-12': true, 'col-lg-8': (AppointmentData.length || 0) > 0 }" class="d-flex flex-column">
     <!-- Book Appointment Form Card -->
-    <div class="card shadow-lg mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Book an Appointment</h5>
+    <div class="card shadow-lg mb-2">
+        <div class="card-header" style="background-color: #f6f7fb;">
+            <h5 class="mb-0">Appointment Booking</h5>
         </div>
 
         <div class="card-body">
             <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
-                <div class="row">
-                    <div class="col-sm-3 mb-3">
-                        <label
-                            >Facility <span class="text-danger">*</span></label
-                        >
+                <div class="row col-12">
+                    <div class="col-sm-3 mb-2">
+                        <label>Facility <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
                             formControlName="facility"
-                            (onChange)="
-                                GetSpecialitybyFacilityId(selectedFacility)
-                            "
-                        >
+                            (change)="GetSpecialitybyFacilityId(this.appointmentForm.get('facility')?.value)">
                             <option value="">Select Facility</option>
-                            <option
-                                *ngFor="let f of facilities"
-                                [value]="f.code"
-                            >
+                            <option *ngFor="let f of facilities"[value]="f.code">
                                 {{ f.name }}
-                            </option>
+                            </option> 
                         </select>
                     </div>
 
-                    <div class="col-sm-3 mb-3">
-                        <label
-                            >Speciality
-                            <span class="text-danger">*</span></label
-                        >
+                    <div class="col-sm-3 mb-2">
+                        <label>Speciality <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
                             formControlName="speciality"
-                            (onChange)="
-                                GetSitebySpecialityId(selectedSpeciality)
-                            "
-                        >
+                            (change)="GetSitebySpecialityId(this.appointmentForm.get('speciality')?.value)">
                             <option value="">Select Speciality</option>
-                            <option
-                                *ngFor="let s of specialities"
-                                [value]="s.specialtyId"
-                            >
+                            <option *ngFor="let s of specialities" [value]="s.specialtyId">
                                 {{ s.specialtyName }}
                             </option>
                         </select>
                     </div>
 
-                    <div class="col-sm-3 mb-3">
-                        <label
-                            >Provider <span class="text-danger">*</span></label
-                        >
+                    <div class="col-sm-3 mb-2">
+                        <label>Provider <span class="text-danger">*</span></label>
                         <select
-                            class="form-control form-select"
-                            fromControlName="provider"
-                            (onChange)="
-                                GetSpecialityByEmployeeId(selectedProviders)
-                            "
-                        >
-                            <option value="">Select Provider</option>
-                            <option
-                                *ngFor="let p of providers"
-                                [value]="p.employeeId"
-                            >
-                                {{ p.fullName }}
-                            </option>
+                        class="form-control form-select"
+                        formControlName="provider"
+                        (change)="GetSpecialityByEmployeeId(appointmentForm.get('provider')?.value)">
+                        <option value="">Select Provider</option>
+                        <option *ngFor="let p of providers" [value]="p.employeeId">
+                            {{ p.fullName }}
+                        </option>
                         </select>
+
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label>Sites <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
                             formControlName="site"
+                            (change)="GetProviderbySiteId(this.appointmentForm.get('site')?.value)"
                         >
                             <option value="">Select Site</option>
-                            <option
-                                *ngFor="let site of siteArray"
-                                [value]="site.siteId"
-                            >
+                            <option *ngFor="let site of siteArray" [value]="site.siteId">
                                 {{ site.siteName }}
                             </option>
                         </select>
                     </div>
-                </div>
-
-                <!-- Row 2 -->
-                <div class="row">
-                    <div class="col-sm-3 mb-3">
+                
+                    <div class="col-sm-3 mb-2">
                         <label>Date <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             class="form-control date"
-                            formControlName="appointmentDate"
+                            formControlName="date"
                             data-provider="flatpickr"
                             id="entryDate"
                             placeholder="Select date"
+                            (change)="GetAppointmentByTime(this.appointmentForm.get('date')?.value)"
                         />
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label>Time <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select scrollable-select"
                             formControlName="time"
-                            style="max-height: 50px !important;         /* Approx 3-4 options height */
-  overflow-y: auto !important;"
-                        >
+                            style="max-height: 50px !important;
+                            /* Approx 3-4 options height */ 
+                            overflow-y: auto !important;"
+                            (onClick)="GetTime()">
                             <option value="" disabled selected hidden>
                                 Select Time
                             </option>
@@ -156,14 +151,14 @@
                         </div>
                     </div> -->
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label
                             >Purpose of Visit
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
-                            formControlName="purpose"
+                            formControlName="selectedPurpose"
                         >
                             <option value="">Select Purpose</option>
                             <option *ngFor="let p of purpose" [value]="p.code">
@@ -172,14 +167,14 @@
                         </select>
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label
                             >Visit Type
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
-                            formControlName="visitType"
+                            formControlName="selectedVisitType"
                         >
                             <option value="">Select Visit Type</option>
                             <option
@@ -190,125 +185,119 @@
                             </option>
                         </select>
                     </div>
-                </div>
-
-                <!-- Row 3 -->
-                <div class="row">
-                    <div class="col-sm-3 mb-3">
+                
+                    <div class="col-sm-3 mb-2">
                         <label
-                            >Referred By
+                            >Referred By 
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
-                            formControlName="referredBy"
+                            formControlName="selectedReferredBy"
                         >
                             <option value="">Referred By</option>
-                            <option *ngFor="let r of referred" [value]="r.name">
+                            <option *ngFor="let r of referred" [value]="r.code">
                                 {{ r.name }}
                             </option>
                         </select>
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label>Type <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
-                            formControlName="type"
+                            formControlName="selectedType"
                         >
                             <option value="">Select Type</option>
-                            <option *ngFor="let t of type" [value]="t.name">
+                            <option *ngFor="let t of type" [value]="t.code">
                                 {{ t.name }}
                             </option>
                         </select>
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label
                             >Duration <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
-                            formControlName="duration"
+                            formControlName="selectedDuration"
                         >
                             <option value="">Select Duration</option>
-                            <option *ngFor="let d of duration" [value]="d.name">
+                            <option *ngFor="let d of duration" [value]="d.value">
                                 {{ d.name }}
                             </option>
                         </select>
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label
                             >Location <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
-                            formControlName="location"
+                            formControlName="selectedLocation"
                         >
                             <option value="">Select Location</option>
-                            <option *ngFor="let l of location" [value]="l.name">
+                            <option *ngFor="let l of location" [value]="l.code">
                                 {{ l.name }}
                             </option>
                         </select>
                     </div>
-                </div>
 
-                <!-- Row 4 -->
-                <div class="row">
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label>Appointment Criteria</label>
                         <select
                             class="form-control form-select"
-                            formControlName="criteria"
+                            formControlName="selectedCriteria"
                         >
                             <option value="">Select Criteria</option>
-                            <option *ngFor="let c of criteria" [value]="c.name">
+                            <option *ngFor="let c of criteria" [value]="c.code">
                                 {{ c.name }}
                             </option>
                         </select>
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label
                             >Patient Notified
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
-                            formControlName="notified"
+                            formControlName="selectedNotified"
                         >
                             <option value="">Select</option>
-                            <option *ngFor="let n of notified" [value]="n.name">
+                            <option *ngFor="let n of notified" [value]="n.code">
                                 {{ n.name }}
                             </option>
                         </select>
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label
                             >Appointment Status
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
-                            formControlName="status"
+                            formControlName="selectedStatus"
                         >
                             <option value="">Select</option>
-                            <option *ngFor="let s of status" [value]="s.name">
+                            <option *ngFor="let s of status" [value]="s.code">
                                 {{ s.name }}
                             </option>
                         </select>
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2"> 
                         <label
                             >Payer Info
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
-                            formControlName="payer"
+                            formControlName="selectedPayer"
                         >
                             <option value="">Select</option>
                             <option *ngFor="let p of payer" [value]="p.code">
@@ -316,45 +305,52 @@
                             </option>
                         </select>
                     </div>
-                </div>
 
-                <!-- Row 5 -->
-                <div class="row">
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
+                        <label>Appointment Note</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            formControlName="AppointmentNote"
+                            placeholder=" Appointment Note"
+                        />
+                    </div>
+
+                    <div class="col-sm-3 mb-2">
                         <label>Patient Balance</label>
                         <input
                             type="text"
                             class="form-control"
-                            formControlName="patientBalance"
+                            formControlName="PatientBalance"
                             placeholder=" Patient Balance"
                         />
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label>Plan Balance</label>
                         <input
                             type="text"
                             class="form-control"
-                            formControlName="planBalance"
+                            formControlName="PlanBalance"
                             placeholder=" Plan Balance"
                         />
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3 mb-2">
                         <label>Plan Copay</label>
                         <input
                             type="text"
                             class="form-control"
-                            formControlName="planCopay"
+                            formControlName="PlanCopay"
                             placeholder=" Plan Copay"
                         />
                     </div>
 
-                    <div class="col-sm-3 mb-3">
+                    <div class="col-sm-3">
                         <label>Payer Plan</label>
                         <select
                             class="form-control form-select"
-                            formControlName="payerPlan"
+                            formControlName="selectedPayerplan"
                             placeholder=" Payer Plan"
                         >
                             <option value="">Select</option>
@@ -366,17 +362,16 @@
                             </option>
                         </select>
                     </div>
-                </div>
+                <!-- </div>
 
-                <!-- Row 6 -->
-                <div class="row mt-3">
-                    <div class="col-sm-12">
+                <div class="row mt-2"> -->
+                    <div class="col-sm-6 mt-4">
                         <label><b>Insurance No:</b> {{ insurranceNo }}</label>
                         <div class="form-check form-check-inline ms-3">
                             <input
                                 type="radio"
                                 class="form-check-input"
-                                formControlName="appointmentType"
+                                formControlName="appointment"
                                 value="0"
                             />
                             <label class="form-check-label">Consultation</label>
@@ -385,7 +380,7 @@
                             <input
                                 type="radio"
                                 class="form-check-input"
-                                formControlName="appointmentType"
+                                formControlName="appointment"
                                 value="1"
                             />
                             <label class="form-check-label"
@@ -393,55 +388,67 @@
                             >
                         </div>
                     </div>
+                    <!-- Action Buttons -->
+                    <div class="col-sm-3 text-end mt-2">
+                        <button class="btn btn-danger me-2" (click)="cancel()">Cancel</button>
+                        <button class="btn btn-primary me-2" (click)="submitAppointment()">
+                            Submit
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Timeslots Card -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-info text-white">
-            <h5 class="mb-0">Available Timeslots</h5>
+    
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table
-                    class="table table-bordered table-hover table-sm text-center"
-                >
-                    <thead class="table-light">
-                        <tr>
-                            <th>Time</th>
-                            <th>Patient</th>
-                            <th>MR No.</th>
-                            <th>Duration</th>
-                            <th>Purpose</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            *ngFor="let a of AppointmentData"
-                            [ngClass]="{ 'table-warning': RowColor(a) }"
+        <div *ngIf="(AppointmentData.length || 0) > 0" class="col-12 col-lg-4 timeslots-panel d-flex flex-column">
+            <!-- Normal Timeslots Card (no accordion) -->
+            <div class="card shadow-sm">
+                <div class="card-header" style="background-color: #f6f7fb;">
+                    <h5 class="mb-0">Available Timeslots</h5>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="table-responsive timeslots-scroll">
+                        <table
+                            class="table table-bordered table-hover table-sm text-center"
                         >
-                            <td>{{ a.Time }}</td>
-                            <td>{{ a.personName }}</td>
-                            <td>{{ a.mrno }}</td>
-                            <td>{{ a.duration }}</td>
-                            <td>{{ a.purposeOfVisit }}</td>
-                        </tr>
-                        <tr *ngIf="AppointmentData.length === 0">
-                            <td colspan="5" class="text-center">
-                                No appointment found.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 30%">Time</th>
+                                    <th style="width: 70%">MR No / Patient</th>
+                                    <!-- <th>MR No.</th> -->
+                                    <!-- <th>Duration</th>
+                                    <th>Purpose</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let a of AppointmentData"
+                                    [ngClass]="{ 'high-rated': RowColor(a) }"
+                                >
+                                    <td style="width: 30%">{{ a.Time }}</td>
+                                    <td style="width: 70%"><b> {{ a.mrno }} </b> 
+                                        <span *ngIf="a.mrno"> | </span> {{ a.personName }}</td>
+                                    <!-- <td>{{ a.mrno }}</td> -->
+                                    <!-- <td>{{ a.duration }}</td>
+                                    <td>{{ a.purposeOfVisit }}</td> -->
+                                </tr>
+                                <tr *ngIf="AppointmentData.length === 0">
+                                    <td colspan="5" class="text-center">
+                                        No appointment found.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
     <!-- Eligibility Card -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-success text-white">
+    <div class="card shadow-sm mb-2">
+        <div class="card-header">
             <h5 class="mb-0">Eligibility Info</h5>
         </div>
         <div class="card-body">
@@ -469,10 +476,7 @@
                             <td>{{ e.facility }}</td>
                             <td>{{ e.eligiblityDate }}</td>
                             <td>
-                                <button
-                                    class="btn btn-outline-primary btn-sm"
-                                    (click)="showDetailsDialog(e)"
-                                >
+                                <button class="btn btn-outline-primary btn-sm" (click)="showDetailsDialog(e)">
                                     View
                                 </button>
                             </td>
@@ -484,29 +488,17 @@
                         </tr>
                     </tbody>
                 </table>
+                <!-- Action Buttons -->
+                <div class="text-end">
+                    <button class="btn btn-secondary me-2" (click)="checkEligibility()">
+                        Eligibility
+                    </button>
+                </div>
             </div>
         </div>
+
+
     </div>
 
-    <!-- Action Buttons -->
-    <div class="text-end mb-5">
-        <button class="btn btn-secondary me-2" (click)="checkEligibility()">
-            Eligibility
-        </button>
-        <button class="btn btn-primary me-2" (click)="submitAppointment()">
-            Submit
-        </button>
-        <button class="btn btn-danger" (click)="cancel()">Cancel</button>
-    </div>
+    
 </div>
-
-<!-- </div> -->
-
-<!-- <div class="row mt-4">
-      <div class="col-12 text-end">
-        <button type="submit" class="btn btn-primary me-2">Submit</button>
-        <button type="button" class="btn btn-danger" (click)="onCancel()">Cancel</button>
-      </div>
-    </div> -->
-<!-- </form> -->
-<!-- </div> -->

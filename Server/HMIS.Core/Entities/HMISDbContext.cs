@@ -355,7 +355,7 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<VwProviderbySiteid> VwProviderbySiteids { get; set; }
 
-    public virtual DbSet<VwRegPatientAndAppointmentdetail> VwRegPatientAndAppointmentdetails { get; set; }
+    public virtual DbSet<VwRegPatientAndAppointmentdetails> VwRegPatientAndAppointmentdetails { get; set; }
 
     public virtual DbSet<VwSiteByproviderId> VwSiteByproviderIds { get; set; }
 
@@ -1671,7 +1671,7 @@ public partial class HMISDbContext : DbContext
             entity.ToView("VwProviderbySiteid");
         });
 
-        modelBuilder.Entity<VwRegPatientAndAppointmentdetail>(entity =>
+        modelBuilder.Entity<VwRegPatientAndAppointmentdetails>(entity =>
         {
             entity.ToView("VwRegPatientAndAppointmentdetails");
         });

@@ -33,15 +33,15 @@ namespace HMIS.Application.DTOs.Clinical
       
         public DateTime? ReviewedDate { get; set; }
        
-        public string ReviewedBy { get; set; }
+        public string? ReviewedBy { get; set; }
    
-        public string ErrorReason { get; set; }
+        public string? ErrorReason { get; set; }
     
-        public string OldMrno { get; set; }
+        public string? OldMrno { get; set; }
         public bool? IsDeleted { get; set; }
         public long? AppointmentId { get; set; }
 
-        public string providerDescription { get; set; }
+        public string? providerDescription { get; set; }
 
     }
 }

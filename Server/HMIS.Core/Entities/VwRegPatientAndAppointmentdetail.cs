@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Keyless]
-public partial class VwRegPatientAndAppointmentdetail
+public partial class VwRegPatientAndAppointmentdetails
 {
     [Column(TypeName = "datetime")]
     public DateTime AppDateTime { get; set; }

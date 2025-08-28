@@ -7,15 +7,15 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SchedulingApiService } from '../scheduling.api.service';
-
+import { NgIconComponent } from '@ng-icons/core';
 import moment from 'moment';
 import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
-
-
 import { HttpClient } from '@angular/common/http';
-
 import { DatePipe } from '@angular/common';
 import { D } from 'node_modules/@angular/cdk/bidi-module.d-D-fEBKdS';
+import { LoaderService } from '@core/services/loader.service';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { filter,distinctUntilChanged  } from 'rxjs/operators';
 
 declare var flatpickr: any;
 
@@ -27,7 +27,8 @@ declare var flatpickr: any;
             ReactiveFormsModule,
             CommonModule,
             RouterModule,
-        NgbTimepickerModule],
+        NgbTimepickerModule,
+        NgIconComponent],
 
   templateUrl: './create-appointment.component.html',
   styleUrl: './create-appointment.component.scss'
@@ -95,6 +96,8 @@ Times = [
     private fb: FormBuilder,
     private SchedulingApiService: SchedulingApiService,
     private http: HttpClient,
+    private loader : LoaderService,
+    private patientBannerService: PatientBannerService,
   ) {}
 
 
@@ -165,12 +168,12 @@ Times = [
   showTable: boolean = false;
   TimeSlotGridTime: any;
   qid: any;
-
+  AppoinmentBooking: any = {};
   Time: any[] = [];
   TimeSlot: any[] = [];
   TimeSlotGrid: any[] = [];
-
-
+  SearchPatientData: any;
+  visitAppointments: any;
   TimeSlotGridTimeArray: any[] = [];
   TimeSlotGridTimeArray1: any[] = [];
   TimeSlotGridTimeArray2: any[] = [];
@@ -209,56 +212,60 @@ Times = [
   ];
 
   ngOnInit(): void {
+
+
     this.appointmentForm = this.fb.group({
-      facility: ['', Validators.required],
-  time: [{ hour: 10, minute: 30 }],
-      speciality: ['', Validators.required],
-      provider: ['', Validators.required],
-      site: ['', Validators.required],
+      facility: [0, Validators.required],
+      speciality: [0, Validators.required],
+      provider: [0, Validators.required],
+      site: [0, Validators.required],
       date: ['', Validators.required],
-      //time: ['', Validators.required],
-      purpose: ['', Validators.required],
-      visitType: ['', Validators.required],
-    type: ['', Validators.required],
-    duration: ['', Validators.required],
-    location: ['', Validators.required],
-    criteria: [''],
-    notified: ['', Validators.required],
-    status: ['', Validators.required],
-    payer: ['', Validators.required],
-    payerPlan: [''],
-    insurranceNo: [''],
-    referred: [''],
-    appointmentId: [''],
-    appointmentDate: [''],
-    appointmentTime: [''],
-    referredBy: [''],
-    appointmentPurpose: [''],
-    appointmentVisitType: [''],
-    appointmentStatus: [''],
-    appointmentPriority: [''],
-    appointmentMode: [''],
-    appointmentReason: [''],
-    appointmentNotes: [''],
-    appointmentDuration: [''],
-    appointmentCriteria: [''],
-    appointmentNotified: [''],
-    appointmentPayer: [''],
-    appointmentPayerPlan: [''],
-    appointmentInsurranceNo: [''],
-    appointmentReferred: [''],
-    appointmentIdFromRoute: [''],
-    siteArray: [''],
-    selectedFacility: [''],
-    selectedSpeciality: [''],
-    selectedProvider: [''],
-    selectedSite: [''],
-    selectedDate: [''],
-    planCopay: [''],
-    planBalance: [''],
-    patientBalance: [''],
-    DurationData: [''],
-    appointmentType: [''],
+      time: [{ hour: 10, minute: 30 },Validators.required],
+      selectedPurpose: ['', Validators.required],
+      selectedVisitType: ['', Validators.required],
+      selectedType: ['', Validators.required],
+      selectedReferredBy: ['', Validators.required],
+      selectedDuration: ['', Validators.required],
+      selectedLocation: ['', Validators.required],
+      selectedCriteria: [''],
+      selectedNotified: ['', Validators.required],
+      selectedStatus: ['', Validators.required],
+      selectedPayer: ['', Validators.required],
+      AppointmentNote: [''],
+      selectedPayerplan: [''],
+      PlanCopay: [''],
+      PlanBalance: [''],
+      PatientBalance: [''],
+      appointment: [''],
+
+
+      // insurranceNo: [''],
+      // referred: [''],
+      // appointmentId: [''],
+      // appointmentDate: [''],
+      // appointmentTime: [''],
+      // appointmentPurpose: [''],
+      // appointmentVisitType: [''],
+      // appointmentStatus: [''],
+      // appointmentPriority: [''],
+      // appointmentMode: [''],
+      // appointmentReason: [''],
+      // appointmentNotes: [''],
+      // appointmentDuration: [''],
+      // appointmentCriteria: [''],
+      // appointmentNotified: [''],
+      // appointmentPayer: [''],
+      // appointmentPayerPlan: [''],
+      // appointmentInsurranceNo: [''],
+      // appointmentReferred: [''],
+      // appointmentIdFromRoute: [''],
+      // siteArray: [''],
+      // selectedFacility: [''],
+      // selectedSpeciality: [''],
+      // selectedProvider: [''],
+      // selectedSite: [''],
+      // selectedDate: [''],
+      // DurationData: [''],
   });
 
 
@@ -277,17 +284,62 @@ Times = [
       this.siteArray = [];
     }
     });
-
-
-  this.FillCache();
+    this.FillCache();
 
     flatpickr('#entryDate', {
       dateFormat: 'Y-m-d',
-      maxDate: 'today',
+      // maxDate: 'today',
       onChange: (selectedDates: any, dateStr: string) => {
         this.appointmentForm.get('entryDate')?.setValue(dateStr);
       },
     });
+
+
+
+     this.patientBannerService.patientData$
+              .pipe(
+                filter((data: any) => !!data?.table2?.[0]?.mrNo),
+                distinctUntilChanged((prev, curr) =>
+                  prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+                )
+              )
+              .subscribe((data: any) => {
+                console.log('✅ Subscription triggered with MRNO in Alert Component:', data?.table2?.[0]?.mrNo);
+                this.SearchPatientData = data;
+                if (this.SearchPatientData) {
+                  console.log('mr Data',this.SearchPatientData);
+                  this.getEligibilityList();
+
+                }
+      });
+debugger
+
+this.patientBannerService.visitAppointments$.subscribe((data: any) => {
+  console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
+  this.visitAppointments = data;
+  if (this.visitAppointments) {
+    console.log('Visit Appointments',this.visitAppointments);
+    this.getEligibilityList();
+
+    
+  }
+});
+      // this.patientBannerService.visitAppointments$
+      // .pipe(
+      //   filter((data: any) => !!data?.table1?.length),
+      //   distinctUntilChanged((prev, curr) =>
+      //     prev?.table1?.length === curr?.table1?.length
+      //   )
+      // )
+      // .subscribe((data: any) => {
+      //   console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
+      //   this.visitAppointments = data;
+      //   if (this.visitAppointments) {
+      //     console.log('Visit Appointments',this.visitAppointments);
+          
+      //   }
+      // });
+
   }
 
 
@@ -327,9 +379,11 @@ Times = [
   }
 
  GetSitebySpecialityId(SpecialtyId: any) {
+   // debugger
     if(SpecialtyId==null||SpecialtyId==undefined){
       SpecialtyId=0
     }
+    this.selectedSpeciality=SpecialtyId;
       this.SchedulingApiService.GetSitebySpecialityId(SpecialtyId).then((res: any) => {
         this.siteArray=res
 
@@ -340,71 +394,42 @@ Times = [
       text: 'Error'
     }));
       // this.messageService.add({severity: 'error',summary: 'error',detail: 'Error'}))
-      let provider=this.selectedProviders||0
-      let facility=this.selectedFacility||0
-      let site=this.selectedSites||0
-      let speciality=this.selectedSpeciality||0
-      let Currentdate:any;
-      if(this.date==undefined)
-      {
-        Currentdate= this.datePipe.transform(
-          new Date(),
-          'yyyy-MM-dd'
-        );
-      }
-      else
-      {
-        Currentdate= this.datePipe.transform(
-          this.date,
-          'yyyy-MM-dd'
-        );
-      }
-        this.SchedulingApiService.GetSchAppointmentList(site,provider,facility,speciality,Currentdate).then((ress: any) => {
-          if(ress.length>0)
-          {
-            this.DurationData=ress
-          }
-          else
-          {
-            this.DurationData=[]
-          }
-        })
-        this.Times=this.AppointmentData;
+      // let provider=this.selectedProviders||0
+      // let facility=this.selectedFacility||0
+      // let site=this.selectedSites||0
+      // let speciality=this.selectedSpeciality||0
+      // let Currentdate:any;
+      // if(this.date==undefined)
+      // {
+      //   Currentdate= this.datePipe.transform(
+      //     new Date(),
+      //     'yyyy-MM-dd'
+      //   );
+      // }
+      // else
+      // {
+      //   Currentdate= this.datePipe.transform(
+      //     this.date,
+      //     'yyyy-MM-dd'
+      //   );
+      // }
 
-  }
+      const facility = this.appointmentForm?.get('facility')?.value || 0;
+      const speciality = SpecialtyId || 0;
+      const provider = this.appointmentForm?.get('provider')?.value || 0;
+      const site = this.appointmentForm?.get('site')?.value || 0;
 
+      const selectedDate: string = this.appointmentForm?.get('date')?.value;
+      const currentDate: string = this.datePipe.transform(selectedDate ? new Date(selectedDate) : new Date(), 'yyyy-MM-dd') || '';
 
-
-GetSpecialitybyFacilityId(FacilityId: any) {
-  debugger
-  if (!FacilityId) {
-    FacilityId = 0;
-  }
-  this.SchedulingApiService.GetSpecialitybyFacilityId(FacilityId).subscribe((res:any) => {
-    this.specialities = res;
-  this.SchedulingApiService.GetProviderByFacilityId(FacilityId).subscribe({
-    next: (providerRes: any) => {
-    this.providers = providerRes;
-
-
-    const provider: number = this.filterForm.get('provider')?.value || 0;
-    const facility: number = this.filterForm.get('facility')?.value || 0;
-    const site: number = this.filterForm.get('site')?.value || 0;
-    const speciality: number = this.filterForm.get('speciality')?.value || 0;
-
-    const selectedDate: string = this.filterForm.get('date')?.value;
-    const currentDate: string = this.datePipe.transform(
-      selectedDate ? new Date(selectedDate) : new Date(),
-      'yyyy-MM-dd'
-    ) || '';
-
-
-    this.SchedulingApiService.GetSchAppointmentList(site, provider, facility, speciality, currentDate)
+      this.SchedulingApiService.GetSchAppointmentList(site, provider, facility, speciality, currentDate)
       .then((appointmentRes: any) => {
         if (Array.isArray(appointmentRes)) {
           this.DurationData = appointmentRes;
+          this.loader.hide();
         } else {
           this.DurationData = [];
+          this.loader.hide();
           Swal.fire({
             icon: 'warning',
             title: 'No Appointments Found',
@@ -413,6 +438,7 @@ GetSpecialitybyFacilityId(FacilityId: any) {
         }
       })
       .catch((error:any) => {
+        this.loader.hide();
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -420,11 +446,42 @@ GetSpecialitybyFacilityId(FacilityId: any) {
         });
       });
 
+        // this.SchedulingApiService.GetSchAppointmentList(site,provider,facility,speciality,Currentdate).then((ress: any) => {
+        //   if(ress.length>0)
+        //   {
+        //     this.DurationData=ress
+        //   }
+        //   else
+        //   {
+        //     this.DurationData=[]
+        //   }
+        // })
+        this.Times=this.AppointmentData;
+
+  }
+
+
+
+async GetSpecialitybyFacilityId(FacilityId: any) {
+   // debugger
+  this.loader.show();
+  if (!FacilityId) {
+    FacilityId = 0;
+  }
+  this.selectedFacility=FacilityId;
+   await this.SchedulingApiService.GetSpecialitybyFacilityId(FacilityId).subscribe((res:any) => {
+    this.specialities = res;
+  })
+   // debugger
+  this.SchedulingApiService.GetProviderByFacilityId(FacilityId).subscribe({
+    next: (providerRes: any) => {
+    this.providers = providerRes;
     // ✅ Step 5: Update Times (if needed)
     this.Times = this.AppointmentData;
-
+      this.loader.hide();
   },
   error: (err) => {
+    this.loader.hide();
     Swal.fire({
       icon: 'error',
       title: 'Error',
@@ -433,8 +490,6 @@ GetSpecialitybyFacilityId(FacilityId: any) {
   }
 });
 
-
-  })
   // .catch((error:any) => {
   //   Swal.fire({
   //     icon: 'error',
@@ -444,30 +499,32 @@ GetSpecialitybyFacilityId(FacilityId: any) {
   // });
 }
   GetSpecialityByEmployeeId(EmployeeId: any) {
-    if(EmployeeId==null||EmployeeId==undefined){
+ // debugger
+    if(!EmployeeId){
       EmployeeId=0
     }
-      this.SchedulingApiService.GetSpecialityByEmployeeId(EmployeeId).then((res:any) => {
-        this.specialities=res
+    this.selectedProviders=EmployeeId;
+      // this.SchedulingApiService.GetSpecialityByEmployeeId(EmployeeId).then((res:any) => {
+      //   this.specialities=res
 
         this.SchedulingApiService.GetSiteByProviderId(EmployeeId).then((res:any) => {
         this.siteArray=res
       })
         this.SchedulingApiService.GetProviderScheduleData(EmployeeId).then((res:any) => {
       })
-      }).catch((error: { message: any }) =>
-        Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: error.message || 'Something went wrong while fetching specialities.',
-    }))
-      let provider=this.selectedProviders||0
-      let facility=this.selectedFacility||0
-      let site=this.selectedSites||0
-      let speciality=this.selectedSpeciality||0
+    //   }).catch((error: { message: any }) =>
+    //     Swal.fire({
+    //   icon: 'error',
+    //   title: 'Error',
+    //   text: error.message || 'Something went wrong while fetching specialities.',
+    // }))
+      let provider=this.selectedProviders = this.appointmentForm?.get('provider')?.value||0
+      let facility=this.selectedFacility = this.appointmentForm?.get('facility')?.value||0
+      let site=this.selectedSites = this.appointmentForm?.get('site')?.value||0
+      let speciality=this.selectedSpeciality = this.appointmentForm?.get('speciality')?.value||0
       let date:any
-
-      if(this.date==undefined)
+      this.date = this.appointmentForm?.get('date')?.value;
+      if(!this.date)
       {
         date=new Date();
       }
@@ -476,10 +533,11 @@ GetSpecialitybyFacilityId(FacilityId: any) {
         date=this.date
       }
   const dateString = date;
+  const formatted = new Date(dateString).toISOString().split('T')[0];
   const dates = new Date(dateString);
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const dayName = days[dates.getDay()];
-      this.SchedulingApiService.GetSchAppointmentList(site,provider,facility,speciality,days).then((ress:any) => {
+      this.SchedulingApiService.GetSchAppointmentList(site,provider,facility,speciality,formatted).then((ress:any) => {
         if(ress.length>0)
         {
           this.DurationData=ress
@@ -498,87 +556,93 @@ GetSpecialitybyFacilityId(FacilityId: any) {
   }
 
   GetProviderbySiteId(SiteId: any) {
-
+     // debugger
     if(SiteId==null||SiteId==undefined){
       SiteId=0
       this.AppointmentData.length=0
       this.showTable=false
       return
     }
+    this.selectedSites=SiteId;
     let Data:any
     let DataDuration:any
     let Duration:any
     let date:any
-    if(this.date==undefined)
+    this.date = this.appointmentForm?.get('date')?.value;
+    if(!this.date)
     {
       date=new Date();
     }
     else
     {
-      date=this.date
+      date=this.date 
     }
 
-const dateString = date;
-const dates = new Date(dateString);
-const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const dayName = days[dates.getDay()];
-let provider=this.selectedProviders||0
-let facility=this.selectedFacility||0
-    this.SchedulingApiService.GetTimeSlots(SiteId,provider,facility,dayName).then((res) => {
-      if(res!=null)
+      const dateString = date;
+      const formatted = new Date(dateString).toISOString().split('T')[0];
+      const dates = new Date(dateString);
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const dayName = days[dates.getDay()];
+      let provider=this.selectedProviders = this.appointmentForm?.get('provider')?.value||0
+      let facility=this.selectedFacility = this.appointmentForm?.get('facility')?.value||0
+        this.SchedulingApiService.GetTimeSlots(SiteId,provider,facility,dayName).then((res) => {
+          if(res)
+          {
+            Data=res
+
+          this.SchedulingApiService.GetDurationOfTimeSlot(SiteId,provider,facility,dayName).then((ress) => {
+          DataDuration=ress
+          if(DataDuration.duration==null)
+          {
+            Duration =60/DataDuration.appPerHour
+          }
+          else
+          {
+            Duration=DataDuration.duration
+          }
+
+          // this.AppointmentData = [];
+          const StartTime = moment(Data.startTime, 'HH:mm:ss a')
+            const EndTime = moment(Data.endTime, 'HH:mm:ss a')
+            let currentTime = new Date(StartTime.toISOString());
+            let endTime = new Date(EndTime.toISOString());
+            while (currentTime <= endTime) {
+              let timeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+              currentTime.setMinutes(currentTime.getMinutes() + Duration);
+              // this.AppointmentData.push({ Time:timeString })
+            }
+
+        })
+
+          }else
+          {
+            this.AppointmentData.length=0
+          }
+        })
+
+        let site=this.selectedSites = this.appointmentForm?.get('site')?.value||0
+        let speciality=this.selectedSpeciality = this.appointmentForm?.get('speciality')?.value||0
+        let Currentdate:any = this.datePipe.transform(this.date,'yyyy-MM-dd');
+        if(!Currentdate)
+        {
+          Currentdate = formatted
+        }
+         // debugger
+        this.SchedulingApiService.GetSchAppointmentList(site,provider,facility,speciality,Currentdate).then((ress:any) => {
+        this.DurationData=ress
+      })
+       // debugger
+      if(this.qid!=null)
       {
-    this.SchedulingApiService.GetDurationOfTimeSlot(SiteId,provider,facility,dayName).then((ress) => {
-      DataDuration=ress
-      if(DataDuration.duration==null)
-      {
-        Duration=60/DataDuration.appPerHour
+        // this.Times=this.AppointmentData;
+        // this.time = this.Times.filter((a) => a.code == this.time)
+        this.Times = [{ Time: this.TimeSlotGridTime }];
+
       }
       else
       {
-        Duration=DataDuration.duration
+        this.Times=this.AppointmentData;
       }
-
-          Data=res
-          const StartTime = moment(Data.startTime, 'HH:mm:ss a')
-          const EndTime = moment(Data.endTime, 'HH:mm:ss a')
-          let currentTime = new Date(StartTime.toISOString());
-          let endTime = new Date(EndTime.toISOString());
-          while (currentTime <= endTime) {
-            let timeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-            currentTime.setMinutes(currentTime.getMinutes() + Duration);
-            this.AppointmentData.push({ Time:timeString })
-          }
-          this.showTable=true
-
-    })
-
-      }else
-      {
-        this.AppointmentData.length=0
-      }
-    })
-
-    let site=this.selectedSites||0
-    let speciality=this.selectedSpeciality||0
-    let Currentdate:any= this.datePipe.transform(
-      this.date,
-      'yyyy-MM-dd'
-    );
-    this.SchedulingApiService.GetSchAppointmentList(site,provider,facility,speciality,Currentdate).then((ress:any) => {
-    this.DurationData=ress
-  })
-  debugger
-  if(this.qid!=null)
-  {
-    // this.Times=this.AppointmentData;
-    // this.time = this.Times.filter((a) => a.code == this.time)
-    this.Times = [{ Time: this.TimeSlotGridTime }];
-
-  }
-  else
-  {
-    this.Times=this.AppointmentData;
-  }
 
   }
   GetProviderByFacilityId(FacilityId: any) {
@@ -614,23 +678,142 @@ let facility=this.selectedFacility||0
   checkEligibility(){
 
   }
-  submitAppointment(){
+  
+  mrNo: any;
+  submitAppointment() {
 
+    // this.AppoinmentBooking.AppDateTime = this.combineDateTime();
+
+    var userId = sessionStorage.getItem('userId');
+    // var currentUser = JSON.parse(sessionStorage.getItem('userName') || '');
+    
+    this.mrNo = this.SearchPatientData?.table2[0]?.mrNo;;
+    this.AppoinmentBooking.EmployeeId = userId;
+    this.AppoinmentBooking.PatientId = this.SearchPatientData?.table2[0]?.patientId;;
+   console.log('submitAppointment hit');
+    if (!this.mrNo) {
+      Swal.fire(
+        'Validation Error', 
+        'MrNo is a required field. Please load a patient.', 
+        'warning');
+        console.log('MrNo is a required field. Please load a patient line no 688.');
+        return;
+    }
+
+    if (this.appointmentForm.invalid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Please fill all required fields',
+      });
+      this.appointmentForm.markAllAsTouched(); // saare errors dikhane k liye
+      return;
+    }
+
+
+    if (this.qid != null || this.qid != undefined) {
+      this.AppoinmentBooking.AppId = this.qid;
+    } else {
+      this.AppoinmentBooking.AppId = 0;
+    }
+
+    const formdata = this.appointmentForm.value;
+    this.AppoinmentBooking.ProviderId = this.appointmentForm.get('provider')?.value;
+    this.AppoinmentBooking.MRNo = this.mrNo;
+    this.AppoinmentBooking.date = this.appointmentForm.get('date')?.value;
+    this.AppoinmentBooking.time = this.appointmentForm.get('time')?.value;
+    this.AppoinmentBooking.AppDateTime = this.appointmentForm.get('date')?.value;
+    this.AppoinmentBooking.Duration = this.appointmentForm.get('selectedDuration')?.value;
+    this.AppoinmentBooking.AppNote = 'This is Appointment Note';
+    this.AppoinmentBooking.SiteId = this.appointmentForm.get('site')?.value;
+    this.AppoinmentBooking.FacilityId = this.appointmentForm.get('facility')?.value;
+    this.AppoinmentBooking.LocationId = this.appointmentForm.get('selectedLocation')?.value;
+    this.AppoinmentBooking.AppTypeId = this.appointmentForm.get('selectedType')?.value;
+    this.AppoinmentBooking.AppCriteriaId = this.appointmentForm.get('selectedCriteria')?.value;
+    this.AppoinmentBooking.AppStatusId = this.appointmentForm.get('selectedStatus')?.value; //1;
+    this.AppoinmentBooking.PatientStatusId = 1;
+    this.AppoinmentBooking.ReferredProviderId = this.appointmentForm.get('selectedReferredBy')?.value;
+    this.AppoinmentBooking.IsPatientNotified = true;
+    this.AppoinmentBooking.IsActive = true;
+    this.AppoinmentBooking.EnteredBy = 'JohnDoe';
+    this.AppoinmentBooking.VisitTypeId = this.appointmentForm.get('selectedVisitType')?.value;
+    this.AppoinmentBooking.EntryDateTime = new Date();
+    this.AppoinmentBooking.PurposeOfVisitId = this.appointmentForm.get('selectedPurpose')?.value;
+    this.AppoinmentBooking.PurposeOfVisit = this.appointmentForm.get('selectedPurpose')?.value;
+    this.AppoinmentBooking.PatientNotifiedID = this.appointmentForm.get('selectedNotified')?.value; //17;
+    this.AppoinmentBooking.RescheduledID = 4;
+    this.AppoinmentBooking.ByProvider = true;
+    this.AppoinmentBooking.SpecialtyID = this.appointmentForm.get('speciality')?.value;
+    this.AppoinmentBooking.PayerId = this.appointmentForm.get('selectedPayer')?.value;
+    this.AppoinmentBooking.PatientBalance = this.appointmentForm.get('PatientBalance')?.value;;
+    this.AppoinmentBooking.PlanBalance = this.appointmentForm.get('PlanBalance')?.value;;
+    this.AppoinmentBooking.PlanCopay = this.appointmentForm.get('PlanCopay')?.value;;
+    this.AppoinmentBooking.planId = this.appointmentForm.get('selectedPayerplan')?.value;
+    this.AppoinmentBooking.VisitStatusEnabled = false;
+    this.AppoinmentBooking.CPTGroupId = 101;
+    this.AppoinmentBooking.AppointmentClassification = 1;
+    this.AppoinmentBooking.OrderReferralId = 1
+    this.AppoinmentBooking.TelemedicineURL = 'https://example.com/telemedicine';
+
+    const schApp = this.AppoinmentBooking;
+    if (this.AppoinmentBooking.AppId <= 0) {
+      this.SchedulingApiService.submitappointmentbooking(schApp)
+        .then((response: any) => {
+          debugger
+          response
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Appointment has been Create',
+          })
+          
+          this.router.navigate(['scheduling/view appointments']);
+        }).catch((error: { message: any }) => {
+          return Swal.fire({
+            icon: 'error' ,
+            title: 'Error',
+            text: error.message,
+          })
+        }
+        );
+    } else if (this.AppoinmentBooking.AppId > 0) {
+      ;
+      this.SchedulingApiService.UpdateByAppId(this.AppoinmentBooking).then((response: any) => {
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Appointment has been Updated',
+        })
+        this.router.navigate(['scheduling/view appointments']);
+      }).catch((error: { message: any }) => {
+        return Swal.fire({
+          icon: 'error' ,
+          title: 'Error',
+          text: error.message,
+        })
+      }
+      );
+    }
+
+    // console.log('Selected Purpose:', this.AppoinmentBooking);
   }
   cancel(){
 
   }
-   GetAppointmentByTime(date:any)
+   async GetAppointmentByTime(date:any)
   {
-
+     // debugger
+    //  this.AppointmentData = [];
     let Data:any
     let DataDuration:any
     let Duration:any
-    let provider=this.selectedProviders||0
-    let facility=this.selectedFacility||0
-    let SiteId=this.selectedSites||0
-    let speciality=this.selectedSpeciality||0
-    if(this.date==undefined)
+    let provider=this.selectedProviders = this.appointmentForm?.get('provider')?.value||0
+    let facility=this.selectedFacility = this.appointmentForm?.get('facility')?.value||0
+    let SiteId=this.selectedSites = this.appointmentForm?.get('site')?.value||0
+    let speciality=this.selectedSpeciality = this.appointmentForm?.get('speciality')?.value||0
+    this.date = this.appointmentForm?.get('date')?.value;
+    if(!this.date)
     {
       date=new Date();
     }
@@ -642,10 +825,16 @@ const dateString = date;
 const dates = new Date(dateString);
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const dayName = days[dates.getDay()];
-    this.SchedulingApiService.GetTimeSlots(SiteId,provider,facility,dayName).then((res) => {
+    await this.SchedulingApiService.GetTimeSlots(SiteId,provider,facility,dayName).then((res) => {
       if(res!=null)
       {
-    this.SchedulingApiService.GetDurationOfTimeSlot(SiteId,provider,facility,dayName).then((ress) => {
+        Data=res
+      }else
+      {
+        this.AppointmentData.length=0
+      }
+    })
+    await this.SchedulingApiService.GetDurationOfTimeSlot(SiteId,provider,facility,dayName).then((ress) => {
       DataDuration=ress
       if(DataDuration.duration==null)
       {
@@ -656,7 +845,7 @@ const dayName = days[dates.getDay()];
       {
         Duration=DataDuration.duration
       }
-          Data=res
+          
           const StartTime = moment(Data.startTime, 'HH:mm:ss a')
           const EndTime = moment(Data.endTime, 'HH:mm:ss a')
           let currentTime = new Date(StartTime.toISOString());
@@ -666,27 +855,31 @@ const dayName = days[dates.getDay()];
             let timeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
             currentTime.setMinutes(currentTime.getMinutes() + Duration);
             this.AppointmentData.push({ Time:timeString })
+            console.log('GetAppointmentByTime',this.AppointmentData)
           }
           this.showTable=true
+    
+      
     })
-      }else
+    var Currentdate
+      if(!this.appointmentForm?.get('date')?.value)
       {
-        this.AppointmentData.length=0
+         Currentdate = new Date();
+      }else{
+         Currentdate = this.datePipe.transform(this.appointmentForm?.get('date')?.value,'yyyy-MM-dd');
       }
-    })
-      if(date==undefined)
-      {
-        date=new Date();
-      }
-      let Currentdate:any= this.datePipe.transform(
-        date,
-        'yyyy-MM-dd'
-      );
-      this.SchedulingApiService.GetSchAppointmentList(SiteId,provider,facility,speciality,Currentdate).then((ress:any) => {
-      if(ress.length>0)
+      await this.SchedulingApiService.GetSchAppointmentList(SiteId,provider,facility,speciality,Currentdate).then((ress:any) => {
+      
+       // debugger
+        if(ress.length>0)
       {
         let mappedArray = this.AppointmentData.map((item: any) => {
-          const { mrno, personName,duration,purposeOfVisit, ...rest } = item;
+          const { 
+            mrno, 
+            personName,
+            duration,
+            purposeOfVisit, 
+            ...rest } = item;
           return rest;
         });
         this.AppointmentData=mappedArray
@@ -695,7 +888,12 @@ const dayName = days[dates.getDay()];
       else
       {
         let mappedArray = this.AppointmentData.map((item: any) => {
-          const { mrno, personName,duration,purposeOfVisit, ...rest } = item;
+          const { 
+            mrno, 
+            personName,
+            duration,
+            purposeOfVisit, 
+            ...rest } = item;
           return rest;
         });
         this.AppointmentData=mappedArray
@@ -709,10 +907,39 @@ const dayName = days[dates.getDay()];
 //   return timeToCompare >= targetTime;
 // });
   }
- RowColor(appointment: any): boolean {
-  // Example logic to highlight consultation appointments
-  return appointment?.purposeOfVisit === 'Consultation';
-}
+  RowColor(rowData: any) {
+    const TotalTime = moment(rowData.Time, 'HH:mm:ss a')
+    if (this.DurationData.length > 0) {
+      for (const timeSlot of this.DurationData) {
+        let time: any = this.datePipe.transform( 
+          timeSlot.appDateTime, 'hh:mm:ss a'
+        )
+        const StartTime = moment(time, 'HH:mm:ss a')
+        let endTime: any;
+        endTime = Number(timeSlot.duration)
+        let endDate = new Date(StartTime.toISOString());
+        let futureDate = new Date(endDate.setMinutes(endDate.getMinutes() + endTime));
+        if (endTime == 0) { return false; }
+        else {
+          while (rowData.Time == time) {
+            rowData.personName = timeSlot.personName;
+            rowData.mrno = timeSlot.mrno;
+            rowData.duration = timeSlot.duration;
+            rowData.purposeOfVisit = timeSlot.purposeOfVisit;
+            return 'true';
+          }
+        }
+      }
+      return '';
+
+    } else {
+      rowData.personName = '';
+      rowData.mrno = '';
+      rowData.duration = '';
+      rowData.purposeOfVisit = '';
+      return '';
+    }
+  }
 eligibility(){
 
 }
@@ -779,14 +1006,16 @@ showDetailsDialog(element: any) {
     }
 
     if (provider) {
-      provider = provider.map((item: { EmployeeId: any; FullName: any }) => {
+      this.referred = provider.map((item: { EmployeeId: any; FullName: any }) => {
         return {
           name: item.FullName,
           code: item.EmployeeId,
         };
       });
-      this.provider = provider;
+      this.referred = this.referred;
     }
+
+
 
     if (speciality) {
       speciality = speciality.map(
@@ -814,16 +1043,13 @@ showDetailsDialog(element: any) {
       this.type = SchAppointmentType;
     }
 
-    if (provider) {
-      this.referred = provider;
-    }
 
     if (visitType) {
       visitType = visitType.map(
         (item: { VisitTypeId: any; VisitTypeName: any }) => {
           return {
             name: item.VisitTypeName,
-            visittypeid: item.VisitTypeId,
+            code: item.VisitTypeId,
           };
         }
       );
@@ -859,7 +1085,7 @@ showDetailsDialog(element: any) {
         (item: { LocationId: any; Name: any }) => {
           return {
             name: item.Name,
-            locationid: item.LocationId,
+            code: item.LocationId,
           };
         }
       );
@@ -871,7 +1097,7 @@ showDetailsDialog(element: any) {
         (item: { CriteriaId: any; CriteriaName: any }) => {
           return {
             name: item.CriteriaName,
-            criteriaid: item.CriteriaId,
+            code: item.CriteriaId,
           };
         }
       );
@@ -895,7 +1121,7 @@ showDetailsDialog(element: any) {
         (item: { NotifiedId: any; NotifiedOptions: any }) => {
           return {
             name: item.NotifiedOptions,
-            notifiedid: item.NotifiedId,
+            code: item.NotifiedId,
           };
         }
       );
@@ -907,7 +1133,7 @@ showDetailsDialog(element: any) {
         (item: { AppStatusId: any; AppStatus: any }) => {
           return {
             name: item.AppStatus,
-            appstatusid: item.AppStatusId,
+            code: item.AppStatusId,
           };
         }
       );
@@ -920,7 +1146,7 @@ showDetailsDialog(element: any) {
         (item: { ProblemId: any; ProblemName: any }) => {
           return {
             name: item.ProblemName,
-            problemid: item.ProblemId,
+            code: item.ProblemId,
           };
         }
       );
@@ -962,6 +1188,39 @@ showDetailsDialog(element: any) {
 //   });
 //   }
 
-
+getEligibilityList() {
+  this.mrNo = this.SearchPatientData?.table2?.[0]?.mrNo;
+  if(!this.mrNo){
+    Swal.fire(
+      'Validation Error', 
+      'MrNo is a required field. Please load a patient.',
+      'warning');
+    console.log('MrNo is a required field. Please load a patient line no 1183.');
+    return;
+  }
+  if (this.mrNo) {
+    this.SchedulingApiService.getEligibilitydata(this.mrNo)
+      .then((res: any) => {
+        if (res.table1) {
+          let eligibilities = [];
+          for (let i = 0; i < res.table1.length; i++) {
+            eligibilities.push({
+              mrno: res.table1[i].mrno,
+              status: res.table1[i].status,
+              payerName: res.table1[i].payerName,
+              planName: res.table1[i].planName,
+              eligiblityDate: res.table1[i].eligiblityDate,
+              facility: res.table1[i].facility,
+              responseDetails: res.table1[i].responseDetails
+            });
+          }
+          this.eligibty = eligibilities;
+        }
+      })
+      .catch((error: any) => {
+        console.error('Error fetching eligibility data:', error);
+      });
+  }
+}
 
 }

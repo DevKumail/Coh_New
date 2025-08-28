@@ -1,4 +1,23 @@
-<!-- <div class="container-fluid"> -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2">
+        <li class="breadcrumb-item">
+            <a href="javascript:void(0);">
+                <ng-icon name="tablerSmartHome"></ng-icon>
+                Scheduling
+            </a>
+        </li>
+        <li
+            class="d-flex align-items-center text-muted mx-1"
+            aria-current="page"
+        >
+            <ng-icon name="tablerChevronRight"></ng-icon>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            Appointments
+        </li>
+    </ol>
+</nav>
+ <!-- <div class="container-fluid"> -->
     <div class="card">
         <div
             class="card-header d-flex justify-content-between align-items-center"
@@ -22,7 +41,7 @@
 
                     <button
                         class="btn btn-success flex-fill"
-                        (click)="buttonRoute('/scheduling/create-appointment')"
+                        (click)="buttonRoute('/scheduling/appointment booking')"
                     >
                         Create
                     </button>
@@ -61,62 +80,50 @@
                         <td>{{ appointment.appointment_PatientStatus }}</td>
                         <td class="d-flex flex-nowrap align-items-center">
                             <button
-                                class="btn btn-outline-info p-0 px-1 me-1"
+                                class="btn btn-outline-info p-0 px-1 py-1 me-1"
                                 style="font-size: 0.75rem"
-                                [routerLink]="[
-                                    '/scheduling/appointment/create'
-                                ]"
-                                [queryParams]="{
-                                    id: appointment.appointment_Id
-                                }"
-                                title="Edit"
-                            >
-                                <i class="bi bi-pencil-square"></i>
+                                [routerLink]="['/scheduling/appointment/create']"
+                                [queryParams]="{ id: appointment.appointment_Id }"
+                                title="Edit Appointment"
+                                >
+                                <ng-icon name="tablerEdit"></ng-icon>
                             </button>
 
                             <button
-                                class="btn btn-outline-success p-0 px-1 me-1"
-                                style="font-size: 0.75rem"
-                                (click)="
-                                    PatientStatus($event, appointment, 'bottom')
-                                "
-                                title="Status"
+                            class="btn btn-outline-success p-0 px-1 py-1 me-1"
+                            style="font-size: 0.75rem"
+                            (click)="PatientStatus(appointment.appointment_Id,appointment.patient_FName,appointment.mrNo, patientStatusModal)"
+                            title="Patient Status"
                             >
-                                <i class="bi bi-person-lines-fill"></i>
+                            <ng-icon name="tablerSearch"></ng-icon>
                             </button>
 
                             <button
-                                class="btn btn-outline-danger p-0 px-1 me-1"
+                                class="btn btn-outline-danger p-0 px-1 py-1 me-1"
                                 style="font-size: 0.75rem"
-                                (click)="
-                                    confirmCancel($event, appointment, 'bottom')
-                                "
+                                (click)="confirmCancel(cancelAppointmentModal, appointment.appointment_Id)"
                                 title="Cancel"
                             >
-                                <i class="bi bi-x-circle"></i>
+                                <ng-icon name="tablerX"></ng-icon>
                             </button>
 
                             <button
-                                class="btn btn-outline-warning p-0 px-1 me-1"
+                                class="btn btn-outline-warning p-0 px-1 py-1 me-1"
                                 style="font-size: 0.75rem"
-                                (click)="
-                                    Reschedule($event, appointment, 'bottom')
-                                "
-                                title="Reschedule"
+                                (click)="Reschedule(rescheduleAppointmentModal,appointment)"
+                                title="Reschedule Appointment"
                             >
-                                <i class="bi bi-arrow-repeat"></i>
+                                <ng-icon name="tablerRefresh"></ng-icon>
                             </button>
 
                             <button
-                                class="btn btn-outline-secondary p-0 px-1"
+                                class="btn btn-outline-secondary p-0 py-1 px-1"
                                 style="font-size: 0.75rem"
-                                [routerLink]="[
-                                    '/scheduling/appointment/history'
-                                ]"
+                                [routerLink]="['/scheduling/appointment/history']"
                                 [queryParams]="{ mrNo: appointment.mrNo }"
                                 title="History"
-                            >
-                                <i class="bi bi-clock-history"></i>
+                                >
+                                <ng-icon name="tablerHistory"></ng-icon>
                             </button>
                         </td>
                     </tr>
@@ -127,10 +134,17 @@
             </table>
         </div>
     </div>
+    <app-generic-pagination
+                    [totalItems]="totalRecord"
+                    [pageSize]="PaginationInfo.RowsPerPage"
+                    [currentPage]="PaginationInfo.Page"
+                    (pageChanged)="onappointmentsPageChanged($event)"
+                >
+                </app-generic-pagination>
 <!-- </div> -->
 
 <ng-template #standardModal let-modal>
-    <form [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
+    <form *ngIf="FilterForm" [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
         <div class="modal-header">
             <h5 class="modal-title">Filter Appointments</h5>
             <button
@@ -143,7 +157,7 @@
         <div class="modal-body">
             <div class="card shadow-sm rounded-3">
                 <div class="card-body">
-                    <div class="container-fluid">
+                    <!-- <div class="container-fluid"> -->
                         <!-- Row 1 -->
                         <div class="row">
                             <div class="col-md-4 mb-3">
@@ -177,10 +191,7 @@
                                     </option>
                                 </select>
                             </div>
-                        </div>
-
-                        <!-- Row 2 -->
-                        <div class="row">
+                      
                             <div class="col-md-4 mb-3">
                                 <label>Facility</label>
                                 <select
@@ -226,10 +237,7 @@
                                     </option>
                                 </select>
                             </div>
-                        </div>
-
-                        <!-- Row 3 -->
-                        <div class="row">
+                  
                             <div class="col-md-4 mb-3">
                                 <label>Criteria</label>
                                 <select
@@ -295,9 +303,7 @@
                                     </option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="row">
+                    
                             <div class="col-md-4 mb-3">
                                 <label>Appointment Type</label>
                                 <select
@@ -316,7 +322,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    <!-- </div> -->
                 </div>
                 <!-- <div class="mb-3">
       <label for="message-text" class="col-form-label">Message:</label>
@@ -337,3 +343,153 @@
         </div>
     </form>
 </ng-template>
+
+
+
+<!-- Bootstrap Modal with p-steps -->
+<ng-template #patientStatusModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">Patient Status</h5>
+      <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+  
+    <div class="modal-body">
+      <!-- Patient Info -->
+      <div class="row justify-content-center mb-2">
+        <div class="col-md-3"><b><u>MR No:</u></b></div>
+        <div class="col-md-4"><b><u>Appointment No:</u></b></div>
+        <div class="col-md-4"><b><u>Patient Name:</u></b></div>
+      </div>
+      <div class="row justify-content-center mb-3">
+        <div class="col-md-3">{{ mrNO }}</div>
+        <div class="col-md-4">{{ appId }}</div>
+        <div class="col-md-4">{{ patient_FName }}</div>
+      </div>
+  
+      <!-- PrimeNG Steps -->
+      <p-steps
+        [model]="items"
+        [readonly]="false"
+        [activeIndex]="activeIndex"
+        (activeIndexChange)="onActiveIndexChange($event)">
+      </p-steps>
+  
+      <!-- Child Steps -->
+      <div class="mt-3" *ngIf="showDiv">
+        <p-steps
+          [model]="itemsChild"
+          [readonly]="false"
+          [activeIndex]="ChildactiveIndex"
+          (activeIndexChange)="onActiveChildIndexChange($event)">
+        </p-steps>
+      </div>
+    </div>
+  
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
+    </div>
+  </ng-template>
+
+
+  <!-- Cancel Appointment Modal -->
+    <ng-template #cancelAppointmentModal let-modal>
+        <div class="modal-header">
+          <h5 class="modal-title" id="cancelAppointmentLabel">Cancel Appointment</h5>
+          <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+        </div>
+  
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Facility</label>
+                    <select class="form-control form-select" [(ngModel)]="selectedReschedulingReasons">
+                        <option value="">Select Facility</option>
+                        <option *ngFor="let f of ReschedulingReasons" [value]="f.code">
+                            {{ f.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+          <button type="button" class="btn btn-danger" (click)="cancelApp()">Cancel Appointment</button>
+        </div>
+  </ng-template>
+  
+
+  <!-- Reschedule Appointment Modal -->
+<ng-template #rescheduleAppointmentModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title" id="rescheduleAppointmentLabel">Reschedule Appointment</h5>
+      <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+  
+    <div class="modal-body">
+      <div class="row g-3">
+        <!-- Provider -->
+        <div class="col-md-3">
+          <label class="form-label">Provider</label>
+          <select class="form-control form-select" [(ngModel)]="selectedProviders">
+            <option value="">Select Provider</option>
+            <option *ngFor="let p of providers" [value]="p.code">{{ p.name }}</option>
+          </select>
+        </div>
+  
+        <!-- Location -->
+        <div class="col-md-3">
+          <label class="form-label">Location</label>
+          <select class="form-control form-select" [(ngModel)]="selectedLocations">
+            <option value="">Select Location</option>
+            <option *ngFor="let l of locations" [value]="l.code">{{ l.name }}</option>
+          </select>
+        </div>
+  
+        <!-- Facility -->
+        <div class="col-md-3">
+          <label class="form-label">Facility</label>
+          <select class="form-control form-select" [(ngModel)]="selectedFacility">
+            <option value="">Select Facility</option>
+            <option *ngFor="let f of facilities" [value]="f.code">{{ f.name }}</option>
+          </select>
+        </div>
+  
+        <!-- Sites -->
+        <div class="col-md-3">
+          <label class="form-label">Sites</label>
+          <select class="form-control form-select" [(ngModel)]="selectedSites">
+            <option value="">Select Site</option>
+            <option *ngFor="let s of sites" [value]="s.code">{{ s.name }}</option>
+          </select>
+        </div>
+  
+        <!-- Date -->
+        <div class="col-md-3">
+          <label class="form-label">Date</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="date"
+            placeholder="Select Date"
+            [min]="minDate" />
+        </div>
+  
+        <!-- Reason -->
+        <div class="col-md-6">
+          <label class="form-label">Reason</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="reason"
+            placeholder="Reason" />
+        </div>
+      </div>
+    </div>
+  
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+      <button type="button" class="btn btn-success" (click)="ReScheduleApp(appointments)">Reschedule Appointment</button>
+    </div>
+  </ng-template>
+  
