@@ -220,7 +220,7 @@ Times = [
       provider: [0, Validators.required],
       site: [0, Validators.required],
       date: ['', Validators.required],
-      time: [{ hour: 10, minute: 30 }],
+      time: [{ hour: 10, minute: 30 },Validators.required],
       selectedPurpose: ['', Validators.required],
       selectedVisitType: ['', Validators.required],
       selectedType: ['', Validators.required],
@@ -231,6 +231,7 @@ Times = [
       selectedNotified: ['', Validators.required],
       selectedStatus: ['', Validators.required],
       selectedPayer: ['', Validators.required],
+      AppointmentNote: [''],
       selectedPayerplan: [''],
       PlanCopay: [''],
       PlanBalance: [''],
@@ -311,24 +312,34 @@ Times = [
 
                 }
       });
+debugger
 
-      this.patientBannerService.visitAppointments$
-      .pipe(
-        filter((data: any) => !!data?.length),
-        distinctUntilChanged((prev, curr) =>
-          prev?.length === curr?.length
-        )
-      )
-      .subscribe((data: any) => {
-        console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
-        this.visitAppointments = data;
-        if (this.visitAppointments) {
-          console.log('Visit Appointments',this.visitAppointments);
+this.patientBannerService.visitAppointments$.subscribe((data: any) => {
+  console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
+  this.visitAppointments = data;
+  if (this.visitAppointments) {
+    console.log('Visit Appointments',this.visitAppointments);
+    this.getEligibilityList();
+
+    
+  }
+});
+      // this.patientBannerService.visitAppointments$
+      // .pipe(
+      //   filter((data: any) => !!data?.table1?.length),
+      //   distinctUntilChanged((prev, curr) =>
+      //     prev?.table1?.length === curr?.table1?.length
+      //   )
+      // )
+      // .subscribe((data: any) => {
+      //   console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
+      //   this.visitAppointments = data;
+      //   if (this.visitAppointments) {
+      //     console.log('Visit Appointments',this.visitAppointments);
           
-        }
-      });
+      //   }
+      // });
 
-      this.getEligibilityList();
   }
 
 

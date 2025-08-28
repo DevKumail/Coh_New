@@ -30,3 +30,9 @@ tr.high-rated{
   background-color: bisque; 
   color: black; 
 }
+
+/* Fixed-height scroll area for timeslots table */
+.timeslots-scroll {
+  max-height: 51vh; /* adjust as needed: e.g., 400px or 70vh */
+  overflow-y: auto;
+}
