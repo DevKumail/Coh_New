@@ -21,3 +21,8 @@
 @use 'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css';
 
 @use "./assets/scss/app.scss";
+
+/* Remove default accordion caret so custom filter icon can align at far right */
+.accordion-button.no-accordion-caret::after {
+  display: none !important;
+}

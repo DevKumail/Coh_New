@@ -11,7 +11,7 @@ export const DASHBOARDS_ROUTES: Routes = [
     // },
     
     {
-        path: 'dashboards/dashboard-2',
+        path: 'dashboards/dashboard',
         component: Dashboard2Component,
         // data: {title: "Dashboard 2"},
          data: { 

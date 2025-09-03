@@ -6,12 +6,12 @@ import {NgIcon} from '@ng-icons/core';
     selector: 'app-page-title',
     imports: [RouterLink, NgIcon],
     template: `
-        <div class="page-title-head d-flex align-items-center">
+        <div class="mt-2 mb-2 ms-1 d-flex align-items-center">
             <div class="flex-grow-1">
                 <h4 class="fs-sm text-uppercase fw-bold m-0">{{ title }}</h4>
             </div>
 
-            <div class="text-end">
+            <!-- <div class="text-end">
                 <ol class="breadcrumb m-0 py-0">
                     <li class="breadcrumb-item"><a routerLink="/">Inspinia</a></li>
                     <li class="d-flex justify-content-center align-items-center">
@@ -25,7 +25,7 @@ import {NgIcon} from '@ng-icons/core';
                         }
                     <li class="breadcrumb-item active">{{ title }}</li>
                 </ol>
-            </div>
+            </div> -->
         </div>
     `
 })

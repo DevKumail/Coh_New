@@ -188,6 +188,10 @@ export class AppMenuComponent implements OnInit, OnDestroy {
     }
   }
 
+  onDashboardClick() {
+    this.router.navigate(['/dashboards/dashboard']);
+  }
+
   openAdvancedSearchModal() {
     this.modalTriggerService.openModal('advance-filter-modal', 'patient-summary');
   }

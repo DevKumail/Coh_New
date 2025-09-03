@@ -54,7 +54,7 @@ export class SignInComponent {
 
       this.patientBanner.setPatientData(null);
 
-      this.router.navigate(['/dashboards/dashboard-2']);
+      this.router.navigate(['/dashboards/dashboard']);
     },
     error: (err) => {
       this.isLoading = false;

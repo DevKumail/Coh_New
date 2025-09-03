@@ -1,99 +1,349 @@
-<div class="card">
-    <div class="card-header border-dashed card-tabs d-flex align-items-center">
-        <div class="flex-grow-1">
-            <h4 class="card-title">Orders Statistics</h4>
-        </div>
-        <ul ngbNav #nav="ngbNav" class="nav nav-tabs nav-justified card-header-tabs nav-bordered">
-            <li ngbNavItem class="nav-item">
-                <a ngbNavLink class="nav-link">
-                    <ng-icon name="tablerHome" class="d-md-none d-block"/>
-                    <span class="d-none d-md-block">Today</span>
-                </a>
-                <ng-template ngbNavContent></ng-template> <!--tab content goes here-->
-            </li>
-            <li ngbNavItem class="nav-item">
-                <a ngbNavLink class="nav-link">
-                    <ng-icon name="tablerUserCircle" class="d-md-none d-block"/>
-                    <span class="d-none d-md-block">Monthly</span>
-                </a>
-                <ng-template ngbNavContent></ng-template> <!--tab content goes here-->
-            </li>
-            <li ngbNavItem class="nav-item">
-                <a ngbNavLink class="nav-link">
-                    <ng-icon name="tablerSettings" class="d-md-none d-block"/>
-                    <span class="d-none d-md-block">Annual</span>
-                </a>
-                <ng-template ngbNavContent></ng-template> <!--tab content goes here-->
-            </li>
-        </ul>
-    </div>
-    <div class="card-body p-0">
-        <div class="row g-0">
-            <div class="col-xxl-8 border-end border-dashed">
-                <app-echart [getOptions]="orderStatisticsChartOptions" height="405px"/>
-            </div>
-            <div class="col-xxl-4">
-
-                <div [ngbNavOutlet]="nav"></div>
-
-                <div class="p-3 bg-light-subtle border-bottom border-dashed">
-                    <div class="row">
-                        <div class="col">
-                            <h4 class="fs-sm mb-1">Would you like the full report?</h4>
-                            <small class="text-muted fs-xs mb-0">
-                                All 120 orders have been successfully delivered
-                            </small>
-                        </div>
-                        <div class="col-auto align-self-center">
-                            <button type="button" class="btn btn-sm btn-default rounded-circle btn-icon" placement="top"
-                                    ngbTooltip="Download">
-                                <ng-icon name="tablerDownload" class="fs-xl"/>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="row row-cols-xxl-2 row-cols-md-2 row-cols-1 g-1 p-1">
-
-                    @for (item of orderStatistics; track $index) {
-                        <div class="col">
-                            <div class="card rounded-0 border shadow-none border-dashed mb-0">
-                                <div class="card-body">
-                                    <div class="mb-3 d-flex justify-content-between align-items-center">
-                                        <h5 class="fs-xl mb-0">{{ item.prefix }}{{ item.value }}{{ item.suffix }}</h5>
-                                        <span>{{ item.growth }}%
-                                            @if (item.growth > 20) {
-                                                <ng-icon name="tablerBolt"
-                                                         class="text-success"/>
-                                            }
-                                            @if (item.growth > 0 && item.growth < 20) {
-                                                <ng-icon name="tablerArrowUp"
-                                                         class="text-success"/>
-                                            }
-                                            @if (item.growth < 0) {
-                                                <ng-icon name="tablerArrowDown"
-                                                         class="text-danger"/>
-                                            }
-                                    </span>
-                                    </div>
-                                    <p class="text-muted mb-2"><span>{{ item.description }}</span></p>
-
-                                    <ngb-progressbar height="5px" type="secondary" [value]="Math.abs(item.growth)"
-                                                     class="mb-0"/>
-                                </div>
+<!-- <div class="card"> -->
+<div class="row d-flex">
+    <div class="col-6">
+        <div class="card">
+            <div class="accordion" id="Notificationaccordion">
+                <div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button #notificationToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotification" aria-expanded="false" aria-controls="collapseNotification">
+                            Notification
+                            <ng-icon style="color: orange;" class="ms-auto mb-1" name="tablerFilter" [ngClass]="{ 'blink': isNotificationFiltered }"></ng-icon>
+                          </button>
+                        </h2>
+                        <div id="collapseNotification" class="accordion-collapse collapse" data-bs-parent="#Notificationaccordion">
+                          <div class="accordion-body">
+                        <form [formGroup]="NotificationFilterForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>From Date</label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    formControlName="fromDate"
+                                />
+                            </div>
+                      
+                            <div class="col-md-6">
+                                <label>To Date</label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    formControlName="toDate"
+                                />
+                            </div>
+                            <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearNotification()">Clear</button>
+                                <button type="button" class="btn btn-primary btn-sm" (click)="onSearchNotification()">Search</button>
                             </div>
                         </div>
-                    }
+                        </form>
+                          </div>
+                        </div>
+                      </div>
                 </div>
-
-                <div class="text-center my-3">
-                    <a routerLink="/apps/chat"
-                       class="link-reset text-decoration-underline fw-semibold link-offset-3 d-flex align-items-center gap-1 justify-content-center">
-                        View all Reports
-                        <ng-icon name="tablerSend2"/>
-                    </a>
+                </div> 
+        <div class="table-responsive">
+            <table class="table table-custom align-middle mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Patient Name (MR No)</th>
+                        <th>Sender</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let appointment of other">
+                        <td>
+                            {{ appointment.appDateTime | date : "MM/dd/yyyy" }}
+                        </td>
+                        <td>{{ appointment.subject }}</td>
+                        <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
+                        <td>{{ appointment.sender }}</td>
+                    </tr>
+                    <tr *ngIf="appointments.length === 0">
+                        <td colspan="9">No appointment found.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- <hr class="table-group-divider"> -->
+    <div class="card mt-2">
+        <div class="accordion" id="Notesaccordion">
+            <div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button #notesToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotes" aria-expanded="false" aria-controls="collapseNotes">
+                        Notes
+                        <ng-icon style="color: orange;" class="ms-auto mb-1" name="tablerFilter" [ngClass]="{ 'blink': isNotesFiltered }"></ng-icon>
+                      </button>
+                    </h2>
+                    <div id="collapseNotes" class="accordion-collapse collapse" data-bs-parent="#Notesaccordion">
+                      <div class="accordion-body">
+                    <form [formGroup]="NotesFilterForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>From Date</label>
+                            <input type="date" class="form-control" formControlName="fromDate"/>
+                        </div>
+                  
+                        <div class="col-md-6">
+                            <label>To Date</label>
+                            <input type="date" class="form-control" formControlName="toDate"/>
+                        </div>
+                        <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearNotes()">Clear</button>
+                            <button type="button" class="btn btn-primary btn-sm" (click)="onSearchNotes()">Search</button>
+                        </div>
+                    </div>
+                    </form>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            </div> 
+        <div class="table-responsive">
+            <table class="table table-custom align-middle mb-0">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Patient Name (MR No)</th>
+                        <th>Sender</th>
+                    </tr>
+                </thead>
+                <tbody >
+                    <tr *ngFor="let appointment of other">
+                        <td>
+                            {{ appointment.appDateTime | date : "MM/dd/yyyy" }}
+                        </td>
+                        <td>{{ appointment.subject }}</td>
+                        <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
+                        <td>{{ appointment.sender }}</td>
+                    </tr>
+                    <tr *ngIf="appointments.length === 0">
+                        <td colspan="9">No appointment found.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        </div>  
+        <!-- <hr class="table-group-divider"> -->
+        <div class="card mt-2">
+            <div class="accordion" id="Billedaccordion">
+                <div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button #billedToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBilled" aria-expanded="false" aria-controls="collapseBilled">
+                            Billed
+                            <ng-icon style="color: orange;" class="ms-auto mb-1" name="tablerFilter" [ngClass]="{ 'blink': isBilledFiltered }"></ng-icon>
+    
+                          </button>
+                        </h2>
+                        <div id="collapseBilled" class="accordion-collapse collapse" data-bs-parent="#Billedaccordion">
+                          <div class="accordion-body">
+                        <form [formGroup]="BilledFilterForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>From Date</label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    formControlName="fromDate"
+                                />
+                            </div>
+                      
+                            <div class="col-md-6">
+                                <label>To Date</label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    formControlName="toDate"
+                                />
+                            </div>
+                            <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearBilled()">Clear</button>
+                                <button type="button" class="btn btn-primary btn-sm" (click)="onSearchBilled()">Search</button>
+                            </div>
+                        </div>
+                        </form>
+                          </div>
+                        </div>
+                      </div>
                 </div>
+                </div> 
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>Date</th>
+                            <th>Subject</th>
+                            <th>Patient Name (MR No)</th>
+                            <th>Sender</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let appointment of other">
+                            <td>
+                                {{ appointment.appDateTime | date : "MM/dd/yyyy" }}
+                            </td>
+                            <td>{{ appointment.subject }}</td>
+                            <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
+                            <td>{{ appointment.sender }}</td>
+                        </tr>
+                        <tr *ngIf="appointments.length === 0">
+                            <td colspan="9">No appointment found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
+    </div>
+    <div class="col-6">
+        <div class="card">
+        <div class="accordion" id="Appointmentaccordion">
+            <div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button #appointmentToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAppointment" aria-expanded="false" aria-controls="collapseAppointment">
+                        Appointment
+                        <ng-icon style="color: orange;" class="ms-auto mb-1" name="tablerFilter" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
+                      </button>
+                    </h2>
+                    <div id="collapseAppointment" class="accordion-collapse collapse" data-bs-parent="#Appointmentaccordion">
+                      <div class="accordion-body">
+                          <form [formGroup]="AppointmentFilterForm">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Provider</label>
+                            <select class="form-control" formControlName="providerId">
+                                <option value="">Select Provider</option>
+                                <option *ngFor="let item of providers" [value]="item.code">
+                                    {{ item.name }}
+                                </option>
+                            </select>
+                        </div>
+                  
+                        <div class="col-md-4">
+                            <label>Facility</label>
+                            <select class="form-control form-select" formControlName="facility">
+                                <option value="">Select Facility</option>
+                                <option *ngFor="let f of facilities" [value]="f.code">
+                                    {{ f.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Site</label>
+                            <select class="form-control" formControlName="sitesId">
+                                <option value="">Select Site</option>
+                                <option *ngFor="let item of sites" [value]="item.code">
+                                    {{ item.name }}
+                                </option>
+                            </select>
+                        </div>
 
+                        
+                        <div class="col-md-4">
+                            <label>Appointment Date</label>
+                            <input type="date" class="form-control" formControlName="appDate">
+                        </div>
+
+
+                        <div class="col-md-4">
+                            <label>Status</label>
+                            <select #statusesSel class="form-select" choicesSelect [options]="{ removeItemButton: true, placeholder: true, placeholderValue: 'Select Status' }"
+                                 formControlName="statuses" name="choices-multiple-remove-button" multiple>
+                                <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" style="margin-top: 16px;">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="chkScheduledOnly" formControlName="showScheduledAppointmentOnly">
+                                <label class="form-check-label" for="chkScheduledOnly">
+                                    Scheduled Appoinment
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="chkChargePending" formControlName="showChargeCapturePending">
+                                <label class="form-check-label" for="chkChargePending">
+                                    Charge Capture Pending
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-md-4">
+                        </div> -->
+
+                        <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearAppointment()">Clear</button>
+                            <button type="button" class="btn btn-primary btn-sm" (click)="onSearchAppointment()">Search</button>
+                        </div>
+                    </div>
+                    </form>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            </div>
+
+
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>App Date</th>
+                            <th>Patient Name (MR No)</th>
+                            <th>Patient Status</th>
+                            <th>Site</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        <tr *ngFor="let appointment of appointments">
+                            <td>
+                                {{ appointment.appDateTime | date : "MM/dd/yyyy" }}
+                            </td>
+                            <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
+                            <td>{{ appointment.appointment_PatientStatus }}</td>
+                            <td>{{ appointment.appointment_SiteName }}</td>
+                            <td class="d-flex flex-nowrap align-items-center">
+                                <button 
+                                    class="btn p-0 px-1 py-1 me-1"
+                                    style="font-size: 0.75rem; color: orange;"
+                                    [routerLink]="['/scheduling/appointment/create']"
+                                    [queryParams]="{ id: appointment.appointment_Id }"
+                                    title="Edit Appointment"
+                                    >
+                                    <ng-icon name="tablerEdit"></ng-icon>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="appointments.length === 0">
+                            <td colspan="9">No appointment found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <app-generic-pagination
+                    [totalItems]="appointments.length"
+                    [pageSize]="PaginationInfo.RowsPerPage"
+                    [currentPage]="PaginationInfo.Page"
+                    (pageChanged)="onappointmentsPageChanged($event)"
+                >
+                </app-generic-pagination>
             </div>
         </div>
     </div>
 </div>
+<!-- </div> -->
+
+<style>
+  .blink {
+    animation: blink-animation 1s steps(2, start) infinite;
+  }
+  @keyframes blink-animation {
+    to { visibility: hidden; }
+  }
+</style>
