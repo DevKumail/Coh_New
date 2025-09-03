@@ -48,11 +48,11 @@ public partial class RegPatientTemp
     [Unicode(false)]
     public string? PersonZipCode { get; set; }
 
-    [StringLength(15)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? PersonHomePhone1 { get; set; }
 
-    [StringLength(15)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? PersonWorkPhone1 { get; set; }
 
@@ -69,17 +69,17 @@ public partial class RegPatientTemp
     public byte? NokrelationshipId { get; set; }
 
     [Column("NOKHomePhone")]
-    [StringLength(15)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? NokhomePhone { get; set; }
 
     [Column("NOKWorkPhone")]
-    [StringLength(15)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? NokworkPhone { get; set; }
 
     [Column("NOKCellNo")]
-    [StringLength(15)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? NokcellNo { get; set; }
 

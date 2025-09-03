@@ -33,7 +33,7 @@ namespace HMIS.Application.ServiceLogics
             {
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@MRNo", Convert.ToInt16(mrno));
-                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("", param);
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetPatientAlertsByMRNO", param);
                 if (ds.Tables[0].Rows.Count == 0)
                 {
                     return new DataSet();
@@ -54,7 +54,7 @@ namespace HMIS.Application.ServiceLogics
             return Alert != null;
         }
         public async Task<bool> InsertOrUpdateAlert(Alerts_Model alertModel)
-       {
+        {
             try
             {
                 bool exit = Exist(alertModel.AlertId);
@@ -62,20 +62,23 @@ namespace HMIS.Application.ServiceLogics
                 {
                     var newPatientAlert = new PatientAlert();
 
-                    newPatientAlert.AlertId = alertModel.AlertId;
+                    //newPatientAlert.AlertId = alertModel.AlertId;  
                     newPatientAlert.RuleId = alertModel.RuleId;
                     newPatientAlert.Mrno = alertModel.Mrno;
                     newPatientAlert.AlertMessage = alertModel.AlertMessage;
                     newPatientAlert.Active = alertModel.Active;
 
-                    newPatientAlert.EnteredDate = alertModel.EnteredDate;
+                    // Fix for CS0029: Convert string to DateTime?  
+                    newPatientAlert.EnteredDate = string.IsNullOrWhiteSpace(alertModel.EnteredDate)
+                        ? null
+                        : DateTime.Parse(alertModel.EnteredDate);
 
-                    newPatientAlert.RepeatDate = alertModel.RepeatDate;
+                    newPatientAlert.RepeatDate = string.IsNullOrWhiteSpace(alertModel.RepeatDate)
+                        ? null
+                        : DateTime.Parse(alertModel.RepeatDate);
 
-                    //newPatientAlert.RepeatDate = alertModel.RepeatDate;
                     newPatientAlert.IsFinished = alertModel.IsFinished;
                     newPatientAlert.EnteredBy = alertModel.EnteredBy;
-                    //newPatientAlert.EnteredDate = alertModel.EnteredDate;
                     newPatientAlert.UpdatedBy = alertModel.UpdatedBy;
                     newPatientAlert.AppointmentId = alertModel.AppointmentId;
                     newPatientAlert.AlertTypeId = alertModel.AlertTypeId;
@@ -97,17 +100,17 @@ namespace HMIS.Application.ServiceLogics
                     if (patient != null)
                     {
                         patient.AlertId = alertModel.AlertId;
-                        //patient.RuleId = alertModel.RuleId;
-                        //patient.Mrno = alertModel.Mrno;
-                        //patient.AlertMessage = alertModel.AlertMessage;
-                        //patient.Active = alertModel.Active;
-                        //patient.RepeatDate = alertModel.RepeatDate;
-                        //patient.IsFinished = alertModel.IsFinished;
-                        //patient.EnteredBy = alertModel.EnteredBy;
-                        //patient.EnteredDate = alertModel.EnteredDate;
-                        //patient.UpdatedBy = alertModel.UpdatedBy;
-                        //patient.AppointmentId = alertModel.AppointmentId;
-                        //patient.AlertTypeId = alertModel.AlertTypeId;
+                        //patient.RuleId = alertModel.RuleId;  
+                        //patient.Mrno = alertModel.Mrno;  
+                        //patient.AlertMessage = alertModel.AlertMessage;  
+                        //patient.Active = alertModel.Active;  
+                        //patient.RepeatDate = alertModel.RepeatDate;  
+                        //patient.IsFinished = alertModel.IsFinished;  
+                        //patient.EnteredBy = alertModel.EnteredBy;  
+                        //patient.EnteredDate = alertModel.EnteredDate;  
+                        //patient.UpdatedBy = alertModel.UpdatedBy;  
+                        //patient.AppointmentId = alertModel.AppointmentId;  
+                        //patient.AlertTypeId = alertModel.AlertTypeId;  
                         patient.Comments = alertModel.Comments;
                         patient.HasChild = alertModel.HasChild;
                         patient.OldMrno = alertModel.OldMrno;

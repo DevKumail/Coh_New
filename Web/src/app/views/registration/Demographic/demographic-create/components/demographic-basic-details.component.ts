@@ -7,81 +7,116 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title mb-3">
-            <i class="fa fa-id-card me-2"></i>Basic Details
-          </h5>
-          <div class="row g-3" [formGroup]="demographicForm">
-            <!-- Gender -->
-            <div class="col-md-3">
-              <label class="form-label">Gender <span class="text-danger">*</span></label>
-              <select class="form-select" formControlName="PersonSexId">
-                <option [ngValue]="null" disabled>-- Select Gender --</option>
-                <option *ngFor="let g of gender" [ngValue]="g.code">{{ g.name }}</option>
-              </select>
-            </div>
+  <div class="ibox">
+    <div class="ibox-title">
+      <h5><i class="fa fa-id-card m-r-xs"></i> Basic Details</h5>
+    </div>
+    <div class="ibox-content">
+      <div class="form-horizontal" [formGroup]="demographicForm">
+        <div class="form-grid">
+          <!-- Gender -->
+          <div class="form-group form-item"
+               [ngClass]="{ 'has-error': demographicForm.get('PersonSexId')?.invalid && (demographicForm.get('PersonSexId')?.touched || isFormSubmitted) }">
+            <label class="control-label required">Gender</label>
+            <select class="form-control" formControlName="PersonSexId">
+              <option [ngValue]="null" disabled>-- Select Gender --</option>
+              <option *ngFor="let g of gender" [ngValue]="g.code">{{ g.name }}</option>
+            </select>
+          </div>
 
-            <!-- Preferred Name -->
-            <div class="col-md-3">
-              <label class="form-label">Preferred Name</label>
-              <input type="text" class="form-control" formControlName="preferredName" placeholder="Enter preferred name" />
-            </div>
+          <!-- Preferred Name -->
+          <div class="form-group form-item">
+            <label class="control-label">Preferred Name</label>
+            <input type="text" class="form-control" formControlName="preferredName" placeholder="Enter preferred name"/>
+          </div>
 
-            <!-- Gender Identity -->
-            <div class="col-md-3">
-              <label class="form-label">Gender Identity <span class="text-danger">*</span></label>
-              <select class="form-select" formControlName="genderIdentity">
-                <option [ngValue]="null" disabled>-- Select Gender Identity --</option>
-                <option *ngFor="let g of genderIdentity" [ngValue]="g.genderId">{{ g.genderText }}</option>
-              </select>
-            </div>
+          <!-- Gender Identity -->
+          <div class="form-group form-item"
+               [ngClass]="{ 'has-error': demographicForm.get('genderIdentity')?.invalid && (demographicForm.get('genderIdentity')?.touched || isFormSubmitted) }">
+            <label class="control-label required">Gender Identity</label>
+            <select class="form-control" formControlName="genderIdentity">
+              <option [ngValue]="null" disabled>-- Select Gender Identity --</option>
+              <option *ngFor="let g of genderIdentity" [ngValue]="g.genderId">{{ g.genderText }}</option>
+            </select>
+          </div>
 
-            <!-- Marital Status -->
-            <div class="col-md-3">
-              <label class="form-label">Marital Status <span class="text-danger">*</span></label>
-              <select class="form-select" formControlName="PersonMaritalStatus">
-                <option [ngValue]="null" disabled>-- Select Marital Status --</option>
-                <option *ngFor="let m of maritalstatus" [ngValue]="m.code">{{ m.name }}</option>
-              </select>
-            </div>
+          <!-- Marital Status -->
+          <div class="form-group form-item"
+               [ngClass]="{ 'has-error': demographicForm.get('PersonMaritalStatus')?.invalid && (demographicForm.get('PersonMaritalStatus')?.touched || isFormSubmitted) }">
+            <label class="control-label required">Marital Status</label>
+            <select class="form-control" formControlName="PersonMaritalStatus">
+              <option [ngValue]="null" disabled>-- Select Marital Status --</option>
+              <option *ngFor="let m of maritalstatus" [ngValue]="m.code">{{ m.name }}</option>
+            </select>
+          </div>
 
-            <!-- Blood Group -->
-            <div class="col-md-3">
-              <label class="form-label">Blood Group <span class="text-danger">*</span></label>
-              <select class="form-select" formControlName="PatientBloodGroupId">
-                <option [ngValue]="null" disabled>-- Select Blood Group --</option>
-                <option *ngFor="let b of bloodgroup" [ngValue]="b.code">{{ b.name }}</option>
-              </select>
-            </div>
+          <!-- Blood Group -->
+          <div class="form-group form-item"
+               [ngClass]="{ 'has-error': demographicForm.get('PatientBloodGroupId')?.invalid && (demographicForm.get('PatientBloodGroupId')?.touched || isFormSubmitted) }">
+            <label class="control-label required">Blood Group</label>
+            <select class="form-control" formControlName="PatientBloodGroupId">
+              <option [ngValue]="null" disabled>-- Select Blood Group --</option>
+              <option *ngFor="let b of bloodgroup" [ngValue]="b.code">{{ b.name }}</option>
+            </select>
+          </div>
 
-            <!-- Date of Birth -->
-            <div class="col-md-3">
-              <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" formControlName="PatientBirthDate" data-provider="flatpickr" id="birthDate" placeholder="Select date" (change)="onDobChange()" />
-            </div>
+          <!-- Date of Birth -->
+          <div class="form-group form-item"
+               [ngClass]="{ 'has-error': demographicForm.get('PatientBirthDate')?.invalid && (demographicForm.get('PatientBirthDate')?.touched || isFormSubmitted) }">
+            <label class="control-label required">Date of Birth</label>
+            <input type="text" class="form-control" formControlName="PatientBirthDate" data-provider="flatpickr" id="birthDate" placeholder="Select date" (change)="onDobChange()"/>
+          </div>
 
-            <!-- Age -->
-            <div class="col-md-2">
-              <label class="form-label">Age</label>
-              <input type="text" class="form-control" formControlName="Age" placeholder="Age" readonly />
-            </div>
+          <!-- Age (small) -->
+          <div class="form-group form-item small">
+            <label class="control-label">Age</label>
+            <input type="text" class="form-control" formControlName="Age" placeholder="Age" readonly />
+          </div>
 
-            <!-- VIP Checkbox -->
-            <div class="col-md-1 d-flex align-items-end">
-              <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" formControlName="VIPPatient" id="vipCheck" />
-                <label class="form-check-label" for="vipCheck">VIP</label>
-              </div>
+          <!-- VIP Checkbox -->
+          <div class="form-group form-item">
+            <label class="control-label">&nbsp;</label>
+            <div class="i-checks">
+              <label>
+                <input type="checkbox" formControlName="VIPPatient" id="vipCheck" /> <i></i> VIP
+              </label>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  `
+  `,
+  styles: [
+    `
+    .ibox { margin-bottom: 15px; }
+    .ibox-title { padding: 12px 15px; border-bottom: 1px solid #e7eaec; }
+    .ibox-content { padding: 15px; }
+
+    /* Responsive grid without Bootstrap */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px 16px;
+      align-items: start;
+    }
+    .form-item { min-width: 0; }
+    .form-item.small { max-width: 200px; }
+
+    .control-label { display: block; font-weight: 600; margin-bottom: 6px; }
+    .required::after { content: ' *'; color: #e74c3c; font-weight: 700; }
+
+    .i-checks > label { cursor: pointer; user-select: none; }
+    .i-checks input { margin-right: 6px; }
+
+    /* Improve input height spacing to match Inspinia look */
+    .form-control { height: 36px; }
+
+    @media (max-width: 480px) {
+      .form-item.small { max-width: unset; }
+    }
+    `
+  ]
 })
 export class DemographicBasicDetailsComponent {
   @Input() demographicForm!: FormGroup;
@@ -89,6 +124,7 @@ export class DemographicBasicDetailsComponent {
   @Input() genderIdentity: any[] = [];
   @Input() maritalstatus: any[] = [];
   @Input() bloodgroup: any[] = [];
+  @Input() isFormSubmitted: boolean = false;
 
   onDobChange() {
     // NO-OP: parent initializes flatpickr and listens, but keep handler to mirror original

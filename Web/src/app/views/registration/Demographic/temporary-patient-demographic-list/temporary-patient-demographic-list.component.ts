@@ -79,6 +79,29 @@ export class TemporaryPatientDemographicListComponent {
     this.getTempDemographics(this.FilterData);
   }
 
+
+  // Map gender code to human-readable label
+  genderLabel(value: any): string {
+    if (value === null || value === undefined || value === '') return 'N/A';
+
+    // Accept strings like '0', '1', '2', 'M', 'F', 'O', and already text like 'Male'
+    const str = String(value).trim().toLowerCase();
+    if (str === '0' || str === 'm' || str === 'male') return 'Male';
+    if (str === '1' || str === 'f' || str === 'female') return 'Female';
+    if (str === '2' || str === 'o' || str === 'other') return 'Other';
+
+    // Try numeric fallback
+    const num = Number(value);
+    if (!Number.isNaN(num)) {
+      if (num === 0) return 'Male';
+      if (num === 1) return 'Female';
+      if (num === 2) return 'Other';
+    }
+
+    // If it's some other text, return as is
+    return String(value);
+  }
+
   buttonRoute(url: string) {
     this.router.navigate([url]);
   }

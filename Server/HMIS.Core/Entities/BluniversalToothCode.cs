@@ -21,4 +21,6 @@ public partial class BluniversalToothCode
     [StringLength(50)]
     [Unicode(false)]
     public string? Dentition { get; set; }
+
+    public bool? IsDeleted { get; set; }
 }

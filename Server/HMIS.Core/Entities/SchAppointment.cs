@@ -7,6 +7,15 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Table("SchAppointment")]
+[Index("AppDateTime", Name = "IX_SchAppointment_AppDateTime")]
+[Index("AppStatusId", Name = "IX_SchAppointment_AppStatusId")]
+[Index("IsDeleted", "AppDateTime", "ProviderId", "FacilityId", "SiteId", "SpecialtyId", "LocationId", "AppStatusId", "AppCriteriaId", "VisitTypeId", Name = "IX_SchAppointment_Filters")]
+[Index("Mrno", Name = "IX_SchAppointment_MRNo")]
+[Index("Mrno", "AppDateTime", Name = "IX_SchAppointment_MRNo_Date")]
+[Index("ProviderId", Name = "IX_SchAppointment_ProviderId")]
+[Index("ProviderId", "AppDateTime", Name = "IX_SchAppointment_Provider_Date")]
+[Index("SiteId", Name = "IX_SchAppointment_SiteId")]
+[Index("AppStatusId", "AppDateTime", Name = "IX_SchAppointment_Status_Date")]
 public partial class SchAppointment
 {
     [Key]

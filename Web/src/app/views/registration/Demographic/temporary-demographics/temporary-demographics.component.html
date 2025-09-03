@@ -36,7 +36,7 @@
 
                 <!-- Title -->
                 <div class="col-md-3">
-                    <label>Title <span class="text-danger">*</span></label>
+                    <label>Title</label>
                     <select class="form-select" formControlName="personTitleId">
                         <option [ngValue]="null" disabled>
                             -- Select Title --
@@ -48,7 +48,7 @@
                 </div>
 
                 <!-- First Name -->
-                <div class="col-md-3">
+                <div class="col-md-3" [ngClass]="{ 'has-error': temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched || temporaryForm.touched) }">
                     <label>First Name <span class="text-danger">*</span></label>
                     <input
                         type="text"
@@ -60,9 +60,7 @@
 
                 <!-- Middle Name -->
                 <div class="col-md-3">
-                    <label
-                        >Middle Name <span class="text-danger">*</span></label
-                    >
+                    <label>Middle Name</label>
                     <input
                         type="text"
                         class="form-control"
@@ -83,8 +81,8 @@
                 </div>
 
                 <!-- Gender -->
-                <div class="col-md-3">
-                    <label>Gender</label><span class="danger"> *</span>
+                <div class="col-md-3" [ngClass]="{ 'has-error': temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched || temporaryForm.touched) }">
+                    <label>Gender <span class="text-danger">*</span></label>
                     <select class="form-select" formControlName="personSex">
                         <option *ngFor="let g of personSexId" [value]="g.code">
                             {{ g.name }}
@@ -92,10 +90,8 @@
                     </select>
                 </div>
 
-                <div class="col-md-3">
-                    <label
-                        >Date of Birth <span class="text-danger">*</span></label
-                    >
+                <div class="col-md-3" [ngClass]="{ 'has-error': temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched || temporaryForm.touched) }">
+                    <label>Date of Birth <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control date"
@@ -126,6 +122,7 @@
                         formControlName="personHomePhone1"
                         placeholder="(00) 0000-0000"
                         [mask]="'(00) 0000-0000'"
+                        [validation]="false"
                     />
                 </div>
 
@@ -138,6 +135,7 @@
                         formControlName="personWorkPhone1"
                         placeholder="(00) 0000-0000"
                         [mask]="'(00) 0000-0000'"
+                        [validation]="false"
                     />
                 </div>
 
@@ -150,6 +148,7 @@
                         formControlName="streetNumber"
                         placeholder="Street Number"
                         [mask]="'0000'"
+                        [validation]="false"
                     />
                 </div>
 
@@ -173,6 +172,7 @@
                         formControlName="personZipCode"
                         placeholder="Zip Code"
                         [mask]="'00000'"
+                        [validation]="false"
                     />
                 </div>
 
@@ -240,7 +240,7 @@
                 </div>
 
                 <!-- Cell Phone -->
-                <div class="col-md-3">
+                <div class="col-md-3" [ngClass]="{ 'has-error': temporaryForm.get('personCellPhone')?.invalid && (temporaryForm.get('personCellPhone')?.touched || temporaryForm.touched) }">
                     <label>Cell Phone <span class="text-danger">*</span></label>
                     <input
                         type="text"

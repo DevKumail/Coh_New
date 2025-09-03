@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Table("ProviderSchedule")]
+[Index("ProviderId", Name = "IX_ProviderSchedule_ProviderId")]
 public partial class ProviderSchedule
 {
     [Key]

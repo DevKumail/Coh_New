@@ -159,65 +159,6 @@ public partial class TabDrugsName
     [Unicode(false)]
     public string? DhaRoaCode { get; set; }
 
-    [StringLength(100)]
-    public string? DrugCode { get; set; }
-
-    [StringLength(100)]
-    public string? GenericCode { get; set; }
-
-    [StringLength(100)]
-    [Unicode(false)]
-    public string? Strength { get; set; }
-
-    [StringLength(100)]
-    [Unicode(false)]
-    public string? DosageForm { get; set; }
-
-    [StringLength(100)]
-    [Unicode(false)]
-    public string? DispenseMode { get; set; }
-
-    [Column(TypeName = "datetime")]
-    public DateTime? LastChangeDate { get; set; }
-
-    [Column("UPPScope")]
-    public bool? Uppscope { get; set; }
-
-    [Column("IncludedInThiqaABMFormulary")]
-    public bool? IncludedInThiqaAbmformulary { get; set; }
-
-    public bool? IncludedInBasicFormulary { get; set; }
-
-    [Column("IncludedInABM1Formulary")]
-    public bool? IncludedInAbm1formulary { get; set; }
-
-    [Column("IncludedInABM7Formulary")]
-    public bool? IncludedInAbm7formulary { get; set; }
-
-    [Column(TypeName = "decimal(10, 2)")]
-    public decimal? UnitMarkup { get; set; }
-
-    [Column(TypeName = "decimal(10, 2)")]
-    public decimal? PackageMarkup { get; set; }
-
-    [Column(TypeName = "decimal(18, 2)")]
-    public decimal? ThiqaPackageRefPrice { get; set; }
-
-    [Column(TypeName = "decimal(18, 2)")]
-    public decimal? ThiqaRefCoPayAmount { get; set; }
-
-    [Column(TypeName = "decimal(18, 2)")]
-    public decimal? BasicCoPayAmount { get; set; }
-
-    [Column("UPPEffectiveDate", TypeName = "datetime")]
-    public DateTime? UppeffectiveDate { get; set; }
-
-    [Column("UPPUpdatedDate", TypeName = "datetime")]
-    public DateTime? UppupdatedDate { get; set; }
-
-    [Column("UPPExpiryDate", TypeName = "datetime")]
-    public DateTime? UppexpiryDate { get; set; }
-
     [InverseProperty("Drug")]
     public virtual ICollection<Prescription> Prescriptions { get; set; } = new List<Prescription>();
 }

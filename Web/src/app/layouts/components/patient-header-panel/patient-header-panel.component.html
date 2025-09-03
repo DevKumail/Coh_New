@@ -150,7 +150,7 @@
  <!-- Appointment Modal -->
  <ng-template #appointmentModal let-modal>
   <div class="modal-header  bg-light">
-    <h5 class="modal-title" id="cancelAppointmentLabel">Appointments</h5>
+    <h5 class="modal-title" id="cancelAppointmentLabel">Visits</h5>
     <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
   </div>
  
@@ -171,10 +171,10 @@
           </tr>
         </thead>
         <tbody class="table-group-divider">
-          <tr *ngFor="let Data of AppoinmentData ; let i = index" [ngClass]="{ 'high-rated': Data?.appointmentId === ActiveAppoinment }">
+          <tr *ngFor="let Data of paginatedAppointments ; let i = index" [ngClass]="{ 'high-rated': Data?.appointmentId === ActiveAppoinment }">
 
             <td>
-              {{i+1}}
+              {{ ((currentPage - 1) * pageSize) + i + 1 }}
             </td>
             <td>
               <span class="ml-1 vertical-align-middle">{{Data.visitAccDisplay || 'N/A'}}</span>
@@ -203,10 +203,26 @@
           </tr>
 
           <tr *ngIf="AppoinmentData.length === 0">
-            <td colspan="6">No Data found.</td>
+            <td colspan="8">No Data found.</td>
           </tr>
         </tbody>
       </table>
+    </div>
+    <!-- Pagination -->
+    <div class="d-flex justify-content-end mt-2">
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
+          </li>
+          <li class="page-item" *ngFor="let page of pageNumbers" [class.active]="page === currentPage">
+            <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 

@@ -52,8 +52,6 @@ public partial class SpeechToText
     [Unicode(false)]
     public string? UpdatedBy { get; set; }
 
-    public string? NotePath { get; set; }
-
     [ForeignKey("PatientId")]
     [InverseProperty("SpeechToTexts")]
     public virtual RegPatient Patient { get; set; } = null!;

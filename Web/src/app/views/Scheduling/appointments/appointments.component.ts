@@ -842,6 +842,7 @@ FillDropDown(response: any) {
         this.activeIndex = event;
       }
 
+
       cancelApp() {
         debugger;
         this.changeAppointmentStatus(this.appId,3,false,this.selectedReschedulingReasons.code);

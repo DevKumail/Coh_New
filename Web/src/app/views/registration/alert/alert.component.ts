@@ -51,8 +51,8 @@ export class AlertComponent implements OnInit {
   SearchPatientData: any
 
   constructor(private fb: FormBuilder, private router: Router,
-  private registrationApiService: RegistrationApiService,
-  private patientBannerService: PatientBannerService,
+    private registrationApiService: RegistrationApiService,
+    private patientBannerService: PatientBannerService,
 
 
   ) { }
@@ -61,37 +61,79 @@ export class AlertComponent implements OnInit {
 
 
   async ngOnInit() {
-         this.patientBannerService.patientData$
-          .pipe(
-            filter((data: any) => !!data?.table2?.[0]?.mrNo),
-            distinctUntilChanged((prev, curr) =>
-              prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
-            )
-          )
-          .subscribe((data: any) => {
-            console.log('✅ Subscription triggered with MRNO in Alert Component:', data?.table2?.[0]?.mrNo);
-            this.SearchPatientData = data;
-            if (this.SearchPatientData) {
-               this.GetPatientAlertsData()
-            }
-          });
+    this.patientBannerService.patientData$
+      .pipe(
+        filter((data: any) => !!data?.table2?.[0]?.mrNo),
+        distinctUntilChanged((prev, curr) =>
+          prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+        )
+      )
+      .subscribe((data: any) => {
+        console.log('✅ Subscription triggered with MRNO in Alert Component:', data?.table2?.[0]?.mrNo);
+        this.SearchPatientData = data;
+        if (this.SearchPatientData) {
+          try {
+            const mrno = this.SearchPatientData?.table2?.[0]?.mrNo || null;
+            this.alertForm?.patchValue({ mrno });
+          } catch { }
+          this.GetPatientAlertsData()
+        }
+      });
+
+    // Capture selected appointmentId if user switches visits
+    try {
+      this.patientBannerService.selectedVisit$?.subscribe((visit: any) => {
+        this.appID = visit?.appointmentId || 0;
+      });
+    } catch { }
 
 
     await this.GetPatientAlertsData();
     await this.GetAlertType();
     this.alertForm = this.fb.group({
-      alertType: [0, Validators.required],
+      alertType: [null, Validators.required],
       startDate: ['', Validators.required],
       repeatDate: ['', Validators.required],
       message: ['', Validators.required],
-      status: [0, Validators.required],
-      updatedBy: ['', Validators.required],
-      enteredBy: ['', Validators.required],
-      enteredDate: ['', Validators.required],
+      status: [null, Validators.required],
+      // System-decided fields must not be required in the form
+      updatedBy: [''],
+      enteredBy: [''],
+      enteredDate: [''],
       mrno: ['']
     });
 
-     this.calculatePagination();
+    // If patient data already present, patch mrno on form
+    try {
+      const mrnoInit = this.SearchPatientData?.table2?.[0]?.mrNo || null;
+      if (mrnoInit) {
+        this.alertForm.patchValue({ mrno: mrnoInit });
+      }
+    } catch { }
+
+    // Auto-fill updatedBy and enteredBy from localStorage if available
+    try {
+      const lsUserName = (typeof window !== 'undefined' && window?.localStorage)
+        ? (localStorage.getItem('userName') || '')
+        : '';
+      if (lsUserName) {
+        this.alertForm.patchValue({ updatedBy: lsUserName, enteredBy: lsUserName });
+      }
+    } catch (e) {
+      console.warn('Could not access localStorage.userName', e);
+    }
+
+    // Auto-fill enteredDate with today's date in yyyy-MM-dd
+    const today = new Date();
+    const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 10);
+    if (!this.alertForm.get('enteredDate')?.value) {
+      this.alertForm.patchValue({ enteredDate: todayStr });
+    }
+    this.alertForm.updateValueAndValidity({ emitEvent: false });
+
+    this.calculatePagination();
 
   }
 
@@ -108,7 +150,7 @@ export class AlertComponent implements OnInit {
 
   alertsTable: any
   GetPatientAlertsData() {
-    if(this.SearchPatientData == undefined){
+    if (this.SearchPatientData == undefined) {
       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       // this.loader.hide();
       return;
@@ -118,10 +160,15 @@ export class AlertComponent implements OnInit {
       this.MyAlertsData = [];
       this.alertsTable = res?.alert?.table1 || [];
       if (Array.isArray(this.alertsTable) && this.alertsTable.length > 0) {
-        this.MyAlertsData = this.alertsTable || [];
-        this.filteredAlertsData = this.alertsTable;
-        console.log(this.MyAlertsData, "alerts")
-    }}).catch((error: any) => {
+        // Normalize to match AlertDTO types (active: boolean)
+        this.MyAlertsData = this.alertsTable.map((it: any) => ({
+          ...it,
+          active: it?.active === true || it?.active === 1,
+        }));
+        this.filteredAlertsData = this.MyAlertsData;
+        console.log(this.MyAlertsData, "alerts");
+      }
+    }).catch((error: any) => {
       console.error("Failed to fetch alert data", error);
     });
 
@@ -136,73 +183,129 @@ export class AlertComponent implements OnInit {
   Alerts: any = {}
 
   onSubmit() {
+    // Guard: Patient MRNO must be present
+    if (!this.SearchPatientData?.table2?.[0]?.mrNo) {
+      Swal.fire('Validation Error', 'MRNO is required. Please load/select a patient first.', 'warning');
+      return;
+    }
+
     if (this.alertForm.invalid) {
+      try {
+        console.group('Form Validation Debug');
+        console.log('SearchPatientData.mrNo:', this.SearchPatientData?.table2?.[0]?.mrNo);
+        console.log('Form Value:', this.alertForm.value);
+        console.log('Form Status:', this.alertForm.status);
+        const controls: any = this.alertForm.controls;
+        Object.keys(controls).forEach(key => {
+          const ctrl = controls[key];
+          if (ctrl?.invalid) {
+            console.warn(`Invalid control -> ${key}`, {
+              value: ctrl.value,
+              errors: ctrl.errors
+            });
+          } else {
+            console.log(`Valid control -> ${key}`, { value: ctrl.value });
+          }
+        });
+        console.groupEnd();
+      } catch (e) {
+        console.error('Error while logging validation debug info', e);
+      }
+      this.alertForm.markAllAsTouched();
+      // Scroll to first invalid control if present
+      try {
+        const firstInvalidKey = Object.keys(this.alertForm.controls).find(k => this.alertForm.get(k)?.invalid);
+        if (firstInvalidKey) {
+          const el = document.querySelector(`[formControlName="${firstInvalidKey}"]`) as HTMLElement | null;
+          el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } catch { }
       Swal.fire('Error', 'Please fill all required fields', 'error');
       return;
     }
 
     const formValue = this.alertForm.value;
+    const lsUserName = (typeof window !== 'undefined' && window?.localStorage)
+      ? (localStorage.getItem('userName') || '')
+      : '';
+    const effectiveUpdatedBy = formValue.updatedBy || lsUserName;
+    const effectiveEnteredBy = formValue.enteredBy || lsUserName;
+    const today = new Date();
+    const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 10);
+    const effectiveEnteredDateStr = formValue.enteredDate || todayStr;
+
+    // Additional validation: repeatDate >= startDate
+    try {
+      const sd = new Date(formValue.startDate);
+      const rd = new Date(formValue.repeatDate);
+      if (isFinite(sd.getTime()) && isFinite(rd.getTime()) && rd < sd) {
+        Swal.fire('Validation Error', 'Repeat Date cannot be earlier than Start Date.', 'warning');
+        return;
+      }
+    } catch { }
 
     const alert = {
-      AlertId: 0,
-      Mrno: this.SearchPatientData?.table2[0]?.mrNo || null,
-      AlertMessage: formValue.message,
-      RepeatDate: new Date(formValue.repeatDate),
-      StartDate: new Date(formValue.startDate),
-      EnteredBy: formValue.enteredBy,
-      EnteredDate: new Date(formValue.enteredDate),
-      UpdatedBy: formValue.updatedBy,
-      AlertTypeId: parseInt(formValue.alertType),
-      Active: parseInt(formValue.status),
+      alertId: 0,
+      ruleId: 0,
+      mrno: this.SearchPatientData?.table2[0]?.mrNo || null,
+      alertMessage: formValue.message,
+      active: String(formValue.status) === '1',
+      repeatDate: new Date(formValue.repeatDate),
+      startDate: new Date(formValue.startDate),
+      isFinished: true,
+      enteredBy: effectiveEnteredBy,
+      enteredDate: new Date(effectiveEnteredDateStr),
+      updatedBy: effectiveUpdatedBy,
+      appointmentId: Number(this.appID) || 0,
+      alertTypeId: parseInt(formValue.alertType),
+      comments: formValue.message,
+      hasChild: false,
+      oldMrno: this.SearchPatientData?.table2[0]?.mrNo || null,
+      isDeleted: false,
+    } as AlertDTO;
 
-      IsDeleted: false,
-      Comments: formValue.message,
-      HasChild: false,
-      OldMrno: null
-    };
+    console.log('this.SearchPatientData?.table2[0]?.mrNo =>', this.SearchPatientData?.table2[0]?.mrNo);
 
-    console.log( 'this.SearchPatientData?.table2[0]?.mrNo =>' ,this.SearchPatientData?.table2[0]?.mrNo);
-
-    const alert2: AlertDTO = {
-  alertId: 0,
-  mrno: this.SearchPatientData?.table2[0]?.mrNo || null,
-  alertMessage: formValue.message,
-  repeatDate: new Date(formValue.repeatDate),
-  startDate: new Date(formValue.startDate),
-  enteredBy: formValue.enteredBy,
-  enteredDate: new Date(formValue.enteredDate),
-  updatedBy: formValue.updatedBy,
-  alertTypeId: parseInt(formValue.alertType),
-  active: parseInt(formValue.status),
-  isDeleted: false,
-  comments: formValue.message,
-  hasChild: false,
-  oldMrno: null,
-};
+    // Final payload strictly aligned with working POST sample
+    const alert2: AlertDTO = alert;
 
 
-    console.log("🚀 Final Alert Payload:", alert);
+    console.log("🚀 Final Alert Payload:", alert2);
 
     this.registrationApiService.SubmitAlertType(alert2).subscribe({
-      next: (res) => {
+      next: (res: any) => {
+        const msg = res?.message || 'Patient information created or updated successfully.';
         Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Your work has been saved",
+          position: 'center',
+          icon: 'success',
+          title: msg,
           showConfirmButton: false,
           timer: 1500
         });
-        this.alertForm.reset(); // clear form
+        this.alertForm.reset();
         this.GetPatientAlertsData();
       },
       error: (error: any) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: error.message || 'Something went wrong'
-        });
+        let text = error?.error?.message || error?.message || 'Something went wrong';
+        // Network error
+        if (error?.status === 0) {
+          text = 'Cannot reach server. Please check your connection or certificate.';
+        }
+        // Validation warning
+        if (error?.status === 400) {
+          Swal.fire('Validation Error', text, 'warning');
+          return;
+        }
+        // Conflict or duplicate
+        if (error?.status === 409) {
+          Swal.fire('Warning', text, 'warning');
+          return;
+        }
+        Swal.fire({ icon: 'error', title: 'Error', text });
       }
-    });
+   });
   }
 
 

@@ -94,7 +94,7 @@ export class TemporaryDemographicsComponent implements OnInit {
   initializeForm() {
     this.temporaryForm = this.fb.group({
       tempId: [{ value: '', disabled: true }],
-      personTitleId: [null, Validators.required],
+      personTitleId: [null],
       personFirstName: ['', Validators.required],
       personMiddleName: [''],
       personLastName: ['', Validators.required],
@@ -255,17 +255,26 @@ export class TemporaryDemographicsComponent implements OnInit {
   }
 
   onSubmit() {
+    this.temporaryForm.updateValueAndValidity({ onlySelf: false, emitEvent: true });
     if (this.temporaryForm.invalid) {
       this.temporaryForm.markAllAsTouched();
       const missing = this.getMissingRequiredFields();
+      const allInvalid = this.getAllInvalidControls();
+      console.warn('Temporary form invalid controls:', allInvalid);
+      const requiredList = missing.length
+        ? `<div>Please fill required fields:</div><ul style="text-align:left;">${missing
+            .map(f => `<li>${f}</li>`)
+            .join('')}</ul>`
+        : '';
+      const invalidList = allInvalid.length
+        ? `<div>Other invalid fields:</div><ul style="text-align:left;">${allInvalid
+            .map(f => `<li>${f}</li>`)
+            .join('')}</ul>`
+        : '';
       Swal.fire({
         icon: 'warning',
         title: 'Form Incomplete',
-        html: missing.length
-          ? `<div>Please fill required fields:</div><ul style="text-align:left;">${missing
-              .map(f => `<li>${f}</li>`)
-              .join('')}</ul>`
-          : 'Please fill all required fields.',
+        html: `${requiredList}${invalidList}` || 'Please fill all required fields.',
       });
       return;
     }
@@ -341,9 +350,7 @@ export class TemporaryDemographicsComponent implements OnInit {
 
   private getMissingRequiredFields(): string[] {
     const fieldMap: { key: string; label: string }[] = [
-      { key: 'personTitleId', label: 'Title' },
       { key: 'personFirstName', label: 'First Name' },
-      { key: 'personLastName', label: 'Last Name' },
       { key: 'personSex', label: 'Gender' },
       { key: 'personCellPhone', label: 'Cell Phone' },
       { key: 'patientBirthDate', label: 'Date of Birth' },
@@ -356,6 +363,39 @@ export class TemporaryDemographicsComponent implements OnInit {
       }
     }
     return missing;
+  }
+
+  private getAllInvalidControls(): string[] {
+    const labels: Record<string, string> = {
+      tempId: 'Temporary Patient Id',
+      personTitleId: 'Title',
+      personFirstName: 'First Name',
+      personMiddleName: 'Middle Name',
+      personLastName: 'Last Name',
+      personSex: 'Gender',
+      patientBirthDate: 'Date of Birth',
+      personAge: 'Age',
+      personHomePhone1: 'Home Phone',
+      personWorkPhone1: 'Work Phone',
+      streetNumber: 'Street Number',
+      dwellingNumber: 'Dwelling Number',
+      personZipCode: 'Zip/Postal Code',
+      selectedCountry: 'Country',
+      selectedState: 'State',
+      selectedCity: 'City',
+      nationality: 'Nationality',
+      personCellPhone: 'Cell Phone',
+      personEmail: 'Email',
+      comments: 'Comment',
+    };
+    const invalid: string[] = [];
+    Object.keys(this.temporaryForm.controls).forEach(key => {
+      const ctrl = this.temporaryForm.get(key);
+      if (ctrl && ctrl.invalid) {
+        invalid.push(labels[key] || key);
+      }
+    });
+    return invalid;
   }
 
   ngAfterViewInit(): void {

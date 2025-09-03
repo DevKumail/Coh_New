@@ -14,27 +14,27 @@ public partial class BlsuperBillDiagnosis
 
     [Column("ICD9Code")]
     [StringLength(11)]
-    public string? Icd9code { get; set; }
+    public string Icd9code { get; set; } = null!;
 
     [Column(TypeName = "datetime")]
     public DateTime? LastUpdatedDate { get; set; }
 
-    [StringLength(50)]
+    [StringLength(25)]
     [Unicode(false)]
-    public string? LastUpdatedBy { get; set; }
+    public string LastUpdatedBy { get; set; } = null!;
 
-    [StringLength(50)]
+    [StringLength(25)]
     [Unicode(false)]
     public string? CreatedBy { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedDate { get; set; }
 
-    [StringLength(50)]
+    [StringLength(25)]
     [Unicode(false)]
     public string? DiagnosisPriority { get; set; }
 
-    [StringLength(50)]
+    [StringLength(25)]
     [Unicode(false)]
     public string? DiagnosisType { get; set; }
 
@@ -46,7 +46,7 @@ public partial class BlsuperBillDiagnosis
     [Column("ICDOrder")]
     public int? Icdorder { get; set; }
 
-    [StringLength(50)]
+    [StringLength(25)]
     [Unicode(false)]
     public string? Type { get; set; }
 
@@ -70,7 +70,7 @@ public partial class BlsuperBillDiagnosis
 
     [ForeignKey("Icd9code")]
     [InverseProperty("BlsuperBillDiagnoses")]
-    public virtual BlmasterIcd9cm? Icd9codeNavigation { get; set; }
+    public virtual BlmasterIcd9cm Icd9codeNavigation { get; set; } = null!;
 
     [ForeignKey("IcdversionId")]
     [InverseProperty("BlsuperBillDiagnoses")]

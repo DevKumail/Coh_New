@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Table("Insured")]
+[Index("PatientId", Name = "IX_Insured_PatientId")]
 public partial class Insured
 {
     [Key]

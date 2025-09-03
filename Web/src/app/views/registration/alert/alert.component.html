@@ -13,7 +13,7 @@
   </ol>
 </nav>
 
-<form  *ngIf="alertForm" [formGroup]="alertForm">
+<form  *ngIf="alertForm" [formGroup]="alertForm" (ngSubmit)="onSubmit()">
   <div class="card p-3 shadow rounded">
     <h5 class="card-title mb-3 fw-bold">Alerts</h5>
     <input type="hidden" formControlName="mrno" />
@@ -23,9 +23,12 @@
         <div class="mb-3">
           <label class="form-label">Alert Type</label>
           <select class="form-select" formControlName="alertType">
-            <option value="" disabled selected>Select Alert Type</option>
+            <option [ngValue]="null" disabled>Select Alert Type</option>
             <option *ngFor="let alert of getAlert" [value]="alert.typeId">{{ alert.name }}</option>
           </select>
+          <div class="text-danger small" *ngIf="alertForm.get('alertType')?.touched && alertForm.get('alertType')?.invalid">
+            Alert Type is required.
+          </div>
         </div>
       </div>
 
@@ -33,6 +36,9 @@
         <div class="mb-3">
           <label class="form-label">Start Date</label>
           <input type="date" class="form-control" formControlName="startDate" />
+          <div class="text-danger small" *ngIf="alertForm.get('startDate')?.touched && alertForm.get('startDate')?.invalid">
+            Start Date is required.
+          </div>
         </div>
       </div>
 
@@ -40,18 +46,12 @@
         <div class="mb-3">
           <label class="form-label">Repeat Date</label>
           <input type="date" class="form-control" formControlName="repeatDate" />
+          <div class="text-danger small" *ngIf="alertForm.get('repeatDate')?.touched && alertForm.get('repeatDate')?.invalid">
+            Repeat Date is required.
+          </div>
         </div>
       </div>
 
-      <div class="col-lg-3">
-        <div class="mb-3">
-          <label class="form-label">Message</label>
-          <input type="text" class="form-control" formControlName="message" placeholder="Enter message" />
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
       <div class="col-lg-3">
         <div class="mb-3">
           <label class="form-label">Status</label>
@@ -61,34 +61,31 @@
               {{ status.name }}
             </option>
           </select>
+          <div class="text-danger small" *ngIf="alertForm.get('status')?.touched && alertForm.get('status')?.invalid">
+            Status is required.
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="col-lg-3">
+    <div class="row">
+      <div class="col-12">
         <div class="mb-3">
-          <label class="form-label">Updated By</label>
-          <input type="text" class="form-control" formControlName="updatedBy" placeholder="Updated by" />
-        </div>
-      </div>
-
-      <div class="col-lg-3">
-        <div class="mb-3">
-          <label class="form-label">Entered By</label>
-          <input type="text" class="form-control" formControlName="enteredBy" placeholder="Entered by" />
-        </div>
-      </div>
-
-      <div class="col-lg-3">
-        <div class="mb-3">
-          <label class="form-label">Entered Date</label>
-          <input type="date" class="form-control" formControlName="enteredDate" />
+          <label class="form-label">Message</label>
+          <input type="text" class="form-control" formControlName="message" placeholder="Enter message" />
+          <div class="text-danger small" *ngIf="alertForm.get('message')?.touched && alertForm.get('message')?.invalid">
+            Message is required.
+          </div>
         </div>
       </div>
     </div>
 
     <div class="d-flex justify-content-end">
       <button type="button" class="btn btn-primary" (click)="goBackToList()">Back</button>
-      <button type="button" class="btn btn-danger ms-2" (click)="onSubmit()">Submit</button>
+      <button type="submit" class="btn btn-danger ms-2"
+        [title]="!SearchPatientData?.table2?.[0]?.mrNo ? 'Please load/select a patient (MRNO required)' : (alertForm.invalid ? 'Please fill all required fields' : '')">
+        Submit
+      </button>
     </div>
   </div>
 

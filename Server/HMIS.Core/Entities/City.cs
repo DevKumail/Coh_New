@@ -6,14 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("Student_courses")]
-public partial class StudentCourse
+[Table("City")]
+public partial class City
 {
     [Key]
-    [Column("id")]
-    public long Id { get; set; }
+    public int Id { get; set; }
 
-    [StringLength(50)]
-    [Unicode(false)]
-    public string? Courses { get; set; }
+    [StringLength(100)]
+    public string CityName { get; set; } = null!;
 }
