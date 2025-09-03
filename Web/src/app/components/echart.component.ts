@@ -18,8 +18,8 @@ import {Subscription} from 'rxjs';
 })
 export class EchartComponent implements OnInit, OnDestroy {
     @Input() getOptions!: () => EChartsOption;
-    @Input() height: string = '300px';
-    @Input() width: string = 'auto';
+    @Input() height: string = '600px';
+    @Input() width: string = '600px';
     @Output() chartInit = new EventEmitter<EChartsType>();
 
     options!: EChartsOption;

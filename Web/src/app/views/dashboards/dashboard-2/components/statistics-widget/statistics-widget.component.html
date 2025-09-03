@@ -1,22 +1,57 @@
-<div class="card">
+<div class="card" *ngIf="item.showpie">
     <div class="card-header d-flex border-dashed justify-content-between align-items-center">
         <h5 class="card-title">{{ item.title }}</h5>
-        @if (item.badge) {
-        <span [class]="`badge badge-soft-${item.badge.variant}`"> {{ item.badge.text }}</span>
-        } 
+        <div class="d-flex align-items-center gap-2">
+            @if (item.badge) {
+            <span [class]="`badge badge-soft-${item.badge.variant}`"> {{ item.badge.text }}</span>
+            }
+        </div>
     </div>
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
             @if (item.chartOptions) {
-            <app-echart [getOptions]="item.chartOptions" class="donut-chart" height="60px"
-                        width="60px"/>
+            <app-echart [getOptions]="item.chartOptions" class="donut-chart" height="80px"
+                        width="80px"/>
             }
             <div class="text-end">
-                <h3 class="mb-2 fw-normal">{{ item.prefix }}<span [countUp]="item.value"
-                                                                 >0</span>{{ item.suffix }}
+                <h3 class="mb-2 fw-normal">{{ item.prefix }}<span [countUp]="item.value">0</span>{{ item.suffix }}
                 </h3>
                 <p class="mb-0 text-muted"><span>{{ item.description }}</span></p>
             </div>
         </div>
     </div>
 </div>
+
+
+<div class="card" *ngIf="!item.showpie">
+    <div class="card-header d-flex border-dashed justify-content-between align-items-center">
+        <h5 class="card-title">{{ item.title }}</h5>
+        <div class="d-flex align-items-center gap-2">
+            @if (item.badge) {
+            <span [class]="`badge badge-soft-${item.badge.variant}`"> {{ item.badge.text }}</span>
+            }
+            <a [routerLink]="[]" class="text-muted fs-xl">
+                <ng-icon name="tablerExternalLink"/>
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="d-flex align-items-center gap-2 my-2">
+            <div class="avatar-md flex-shrink-0">
+               <span class="avatar-title text-bg-{{ item.variant }} rounded-circle fs-22">
+                      <ng-icon [name]="item.icon" class="d-flex align-items-center"/>
+               </span>
+            </div>
+            <h3 class="mb-0">{{ item.count?.prefix }}
+                <span [countUp]="item.count?.value ?? 0">0</span>{{ item.count?.suffix }}</h3>
+            <span class="badge badge-soft-{{ item.variant }} fw-medium ms-2 fs-xs ms-auto">{{ item.label }}</span>
+        </div>
+        <p class="d-flex align-items-center gap-1 mb-0">
+            <ng-icon class="text-{{ item.variant }}" name="tablerPointFill"/>
+            <span class="text-nowrap text-muted"> {{ item.description }}</span>
+            <span class="ms-auto"><b>{{ item.totalCount?.prefix }}{{ item.totalCount?.value }}{{ item.totalCount?.suffix }}</b></span>
+        </p>
+    </div>
+</div>
+
+

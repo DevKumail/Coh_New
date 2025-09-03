@@ -84,7 +84,8 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<DataSet> CC_DiagnosisCodeDB(int? ICDVersionId, string? DiagnosisStartCode, string DiagnosisEndCode, string DescriptionFilter)
+        public async Task<DataSet> CC_DiagnosisCodeDB(
+            int? ICDVersionId, string? DiagnosisStartCode, string? DiagnosisEndCode, string? DescriptionFilter);
         {
             try
             {

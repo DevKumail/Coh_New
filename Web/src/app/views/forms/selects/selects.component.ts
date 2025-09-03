@@ -10,7 +10,14 @@ import {Select2Data, Select2} from 'ng-select2-component';
 
 @Component({
     selector: 'app-selects',
-    imports: [PageTitleComponent, UiCardComponent, ChoiceSelectInputDirective, NgIcon, TagifyModule, FormsModule,Select2],
+    imports: [
+      PageTitleComponent, 
+      UiCardComponent, 
+      ChoiceSelectInputDirective, 
+      NgIcon, 
+      TagifyModule, 
+      FormsModule,
+      Select2],
     templateUrl: './selects.component.html',
     styles: ``
 })

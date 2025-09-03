@@ -148,7 +148,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_AllDiagnosisCode
         [HttpGet("DiagnosisCode")]
-        public async Task<IActionResult> CC_DiagnosisCode(int ICDVersionId, string DiagnosisStartCode, string DiagnosisEndCode, string DescriptionFilter)
+        public async Task<IActionResult> CC_DiagnosisCode(int? ICDVersionId, string? DiagnosisStartCode, string? DiagnosisEndCode, string? DescriptionFilter)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;

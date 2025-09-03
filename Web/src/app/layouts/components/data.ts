@@ -753,11 +753,7 @@ export const horizontalMenuItems: MenuItemType[] = [
     //     label: 'Dashboards',
     //     icon: 'tablerLayoutDashboard',
     //     children: [
-    //         { label: 'Dashboard v.1', url: '/dashboards/dashboard-1' },
-    //         { label: 'Dashboard v.2', url: '/dashboards/dashboard-2' },
-    //         { label: 'Dashboard v.3', url: '/dashboards/dashboard-3' },
-    //         { label: 'Dashboard v.4', url: '#!' },
-    //         { label: 'Dashboard v.5', url: '#!' },
+    //         { label: 'Dashboard', url: '/dashboards/dashboard-2' },
     //     ]
     // },
     {

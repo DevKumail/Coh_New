@@ -40,9 +40,10 @@ export const statistics: StatisticsWidgetType[] = [
                     type: 'pie',
                     radius: ['65%', '100%'],
                     hoverAnimation: false,
-                    label: {show: false},
-                    labelLine: {show: false},
+                    label: {show: true, position: 'outside', formatter: '{b}: {c}%', fontSize: 8},
+                    labelLine: {show: true, length: 4, length2: 4},
                     data: generateRandomData().map((item, index) => ({
+                        name: item.name,
                         value: item.value,
                         itemStyle: {
                             color: index === 0
@@ -68,9 +69,10 @@ export const statistics: StatisticsWidgetType[] = [
                     type: 'pie',
                     radius: ['65%', '100%'],
                     hoverAnimation: false,
-                    label: {show: false},
-                    labelLine: {show: false},
+                    label: {show: true, position: 'outside', formatter: '{b}: {c}%', fontSize: 8},
+                    labelLine: {show: true, length: 4, length2: 4},
                     data: generateRandomData().map((item, index) => ({
+                        name: item.name,
                         value: item.value,
                         itemStyle: {
                             color: index === 0
@@ -96,9 +98,10 @@ export const statistics: StatisticsWidgetType[] = [
                     type: 'pie',
                     radius: ['65%', '100%'],
                     hoverAnimation: false,
-                    label: {show: false},
-                    labelLine: {show: false},
+                    label: {show: true, position: 'outside', formatter: '{b}: {c}%', fontSize: 8},
+                    labelLine: {show: true, length: 4, length2: 4},
                     data: generateRandomData().map((item, index) => ({
+                        name: item.name,
                         value: item.value,
                         itemStyle: {
                             color: index === 0
@@ -126,9 +129,10 @@ export const statistics: StatisticsWidgetType[] = [
                     type: 'pie',
                     radius: ['65%', '100%'],
                     hoverAnimation: false,
-                    label: {show: false},
-                    labelLine: {show: false},
+                    label: {show: true, position: 'outside', formatter: '{b}: {c}%', fontSize: 8},
+                    labelLine: {show: true, length: 4, length2: 4},
                     data: generateRandomData().map((item, index) => ({
+                        name: item.name,
                         value: item.value,
                         itemStyle: {
                             color: index === 0
