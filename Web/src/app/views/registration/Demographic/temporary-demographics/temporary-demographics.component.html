@@ -21,19 +21,8 @@
 <!-- <div class="container-fluid w-100"> -->
     <div class="card p-3 shadow mt-2">
         <h3 class="card-title mb-3 fw-bold">Temporary Demographic Create</h3>
-        <form [formGroup]="temporaryForm" (ngSubmit)="onSubmit()">
+        <form [formGroup]="temporaryForm" (ngSubmit)="onSubmit()" novalidate class="no-invalid-icon">
             <div class="row">
-                <!-- Temporary Patient ID -->
-                <div class="col-md-3">
-                    <label>Temporary Patient Id</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        formControlName="tempId"
-                        [disabled]="true"
-                    />
-                </div>
-
                 <!-- Title -->
                 <div class="col-md-3">
                     <label>Title</label>
@@ -48,14 +37,18 @@
                 </div>
 
                 <!-- First Name -->
-                <div class="col-md-3" [ngClass]="{ 'has-error': temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched || temporaryForm.touched) }">
+                <div class="col-md-3">
                     <label>First Name <span class="text-danger">*</span></label>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
+                        [class.is-invalid]="temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched || temporaryForm.touched)"
                         formControlName="personFirstName"
                         placeholder="First Name"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched || temporaryForm.touched)">
+                        First name is required.
+                    </div>
                 </div>
 
                 <!-- Middle Name -->
@@ -75,31 +68,43 @@
                     <input
                         type="text"
                         class="form-control"
+                        [class.is-invalid]="temporaryForm.get('personLastName')?.invalid && (temporaryForm.get('personLastName')?.touched || temporaryForm.touched)"
                         formControlName="personLastName"
                         placeholder="Last Name"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personLastName')?.invalid && (temporaryForm.get('personLastName')?.touched || temporaryForm.touched)">
+                        Last name is required.
+                    </div>
                 </div>
 
                 <!-- Gender -->
-                <div class="col-md-3" [ngClass]="{ 'has-error': temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched || temporaryForm.touched) }">
+                <div class="col-md-3">
                     <label>Gender <span class="text-danger">*</span></label>
-                    <select class="form-select" formControlName="personSex">
+                    <select class="form-select" formControlName="personSex"
+                            [class.is-invalid]="temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched || temporaryForm.touched)">
                         <option *ngFor="let g of personSexId" [value]="g.code">
                             {{ g.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched || temporaryForm.touched)">
+                        Gender is required.
+                    </div>
                 </div>
 
-                <div class="col-md-3" [ngClass]="{ 'has-error': temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched || temporaryForm.touched) }">
+                <div class="col-md-3">
                     <label>Date of Birth <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control date"
+                        [class.is-invalid]="temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched || temporaryForm.touched)"
                         formControlName="patientBirthDate"
                         data-provider="flatpickr"
                         id="birthDate"
                         placeholder="Select date"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched || temporaryForm.touched)">
+                        Date of birth is required.
+                    </div>
                 </div>
 
                 <!-- Age -->
@@ -240,15 +245,19 @@
                 </div>
 
                 <!-- Cell Phone -->
-                <div class="col-md-3" [ngClass]="{ 'has-error': temporaryForm.get('personCellPhone')?.invalid && (temporaryForm.get('personCellPhone')?.touched || temporaryForm.touched) }">
+                <div class="col-md-3">
                     <label>Cell Phone <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control"
+                        [class.is-invalid]="temporaryForm.get('personCellPhone')?.invalid && (temporaryForm.get('personCellPhone')?.touched || temporaryForm.touched)"
                         formControlName="personCellPhone"
                         placeholder="(00) 0000-0000"
                         [mask]="'(00) 0000-0000'"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personCellPhone')?.invalid && (temporaryForm.get('personCellPhone')?.touched || temporaryForm.touched)">
+                        Cell phone is required.
+                    </div>
                 </div>
 
                 <!-- Email -->
@@ -369,12 +378,16 @@
             </div>
 
             <div class="text-end mt-4">
-                <button type="submit" class="btn btn-info me-2">Submit</button>
+                <button type="submit" class="btn btn-info me-2">
+                    <ng-icon name="tablerDeviceFloppy" class="me-1"></ng-icon>
+                    Submit
+                </button>
                 <button
                     type="button"
                     class="btn btn-danger"
                     (click)="onCancel()"
                 >
+                    <ng-icon name="tablerX" class="me-1"></ng-icon>
                     Cancel
                 </button>
             </div>

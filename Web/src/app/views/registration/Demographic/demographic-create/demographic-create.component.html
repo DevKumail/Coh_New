@@ -23,7 +23,7 @@
             Demographic Create
         </h3>
         <!-- Form Starts -->
-        <form *ngIf="demographicForm" [formGroup]="demographicForm" (ngSubmit)="onSubmit()">
+        <form *ngIf="demographicForm" class="no-invalid-icon" [formGroup]="demographicForm" (ngSubmit)="onSubmit()">
             <!-- Combined Section: Photo + Personal Information (Child Component) -->
             <app-demographic-photo-personal
                 [demographicForm]="demographicForm"
@@ -31,6 +31,7 @@
                 [imageSrc]="imageSrc"
                 [defaultImage]="defaultImage"
                 [fileName]="fileName"
+                [isFormSubmitted]="isFormSubmitted"
                 (fileSelected)="onFileSelected($event)"
                 (remove)="removePhoto()"
             ></app-demographic-photo-personal>
@@ -56,6 +57,7 @@
                 [referred]="referred"
                 [MediaChannel]="MediaChannel"
                 [MediaItem]="MediaItem"
+                [isFormSubmitted]="isFormSubmitted"
             ></app-demographic-identification>
 
             <!-- .............................Contact tab....................................... -->
@@ -77,6 +79,7 @@
                     [Country]="Country"
                     [states]="states"
                     [city]="city"
+                    [isFormSubmitted]="isFormSubmitted"
                     (countryChange)="onCountryChange()"
                     (stateChange)="onStateChange()"
                 ></app-demographic-contact>

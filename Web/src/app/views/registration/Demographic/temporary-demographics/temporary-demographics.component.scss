@@ -1,0 +1,18 @@
+/* Hide Bootstrap invalid background icon inside inputs while keeping borders and feedback */
+.no-invalid-icon .form-control.is-invalid,
+.no-invalid-icon.was-validated .form-control:invalid {
+  background-image: none !important;
+  padding-right: .75rem !important; /* remove extra space reserved for the icon */
+}
+
+/* Preserve the default select arrow but remove invalid overlay icon */
+.no-invalid-icon .form-select.is-invalid,
+.no-invalid-icon.was-validated .form-select:invalid {
+  background-image: var(--bs-form-select-bg-img) !important;
+}
+
+/* Ensure date inputs (e.g., flatpickr bound fields) also hide the icon */
+.no-invalid-icon .form-control.date.is-invalid,
+.no-invalid-icon.was-validated .form-control.date:invalid {
+  background-image: none !important;
+}

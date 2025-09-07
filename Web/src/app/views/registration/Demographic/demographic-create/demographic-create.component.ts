@@ -128,7 +128,7 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
     byteImage: string = '';
     imageSrc: string = '';
     fileName: string = '';
-    defaultImage: string = 'assets/images/default-avatar.png';
+    defaultImage: string = 'assets/images/patient.jpg';
     familyMembers: any;
 
     constructor(
@@ -152,6 +152,19 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
         if (mrNo) {
             this.getDemographicsByMRNo(mrNo);
         }
+    }
+
+    private focusFirstInvalidControl(): void {
+        // Defer to allow template to update validation classes
+        setTimeout(() => {
+            // Search across all forms for the first invalid control
+            const selector = 'form .ng-invalid.ng-touched, form .ng-invalid[formcontrolname]';
+            const firstInvalid = document.querySelector(selector) as HTMLElement | null;
+            if (firstInvalid) {
+                try { firstInvalid.focus({ preventScroll: true } as any); } catch {}
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
     }
 
     onEmergencyCountryChange() {
@@ -733,6 +746,7 @@ onSubmit() {
         this.parentsInfo.markAllAsTouched();
         this.assignmentForm.markAllAsTouched();
         this.familyForm.markAllAsTouched();
+        this.focusFirstInvalidControl();
         return;
     }
 

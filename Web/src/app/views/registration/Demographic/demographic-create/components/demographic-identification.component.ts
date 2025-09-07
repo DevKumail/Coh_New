@@ -17,8 +17,14 @@ import { NgxMaskDirective } from 'ngx-mask';
           </h5>
           <div class="row g-3" [formGroup]="demographicForm">
             <div class="col-md-3 col-sm-4 col-12">
-              <label>Social Security Number (SSN) <span style="color: red">*</span></label>
-              <input type="text" class="form-control" formControlName="personSocialSecurityNo" placeholder="999-99-9999" [mask]="'000-00-0000'" />
+              <label>Social Security Number (SSN) <span class="text-danger">*</span></label>
+              <input type="text" class="form-control"
+                     [class.is-invalid]="demographicForm.get('personSocialSecurityNo')?.invalid && (demographicForm.get('personSocialSecurityNo')?.touched || isFormSubmitted)"
+                     formControlName="personSocialSecurityNo" placeholder="999-99-9999" [mask]="'000-00-0000'" />
+              <div class="invalid-feedback d-block"
+                   *ngIf="demographicForm.get('personSocialSecurityNo')?.invalid && (demographicForm.get('personSocialSecurityNo')?.touched || isFormSubmitted)">
+                SSN is required.
+              </div>
             </div>
 
             <div class="col-md-3 col-sm-4 col-12">
@@ -27,11 +33,17 @@ import { NgxMaskDirective } from 'ngx-mask';
             </div>
 
             <div class="col-md-3 col-sm-4 col-12">
-              <label>Nationality <span style="color: red">*</span></label>
-              <select class="form-select" formControlName="Nationality">
+              <label>Nationality <span class="text-danger">*</span></label>
+              <select class="form-select"
+                      [class.is-invalid]="demographicForm.get('Nationality')?.invalid && (demographicForm.get('Nationality')?.touched || isFormSubmitted)"
+                      formControlName="Nationality">
                 <option [ngValue]="null" disabled>-- Select Nationality --</option>
                 <option *ngFor="let n of nationality" [ngValue]="n.code">{{ n.name }}</option>
               </select>
+              <div class="invalid-feedback d-block"
+                   *ngIf="demographicForm.get('Nationality')?.invalid && (demographicForm.get('Nationality')?.touched || isFormSubmitted)">
+                Nationality is required.
+              </div>
             </div>
 
             <div class="col-md-3 col-sm-4 col-12">
@@ -74,19 +86,31 @@ import { NgxMaskDirective } from 'ngx-mask';
             </div>
 
             <div class="col-md-3 col-sm-4 col-12">
-              <label>Emirates ID Type <span style="color: red">*</span></label>
-              <select class="form-select" formControlName="EmiratesIDN">
+              <label>Emirates ID Type <span class="text-danger">*</span></label>
+              <select class="form-select"
+                      [class.is-invalid]="demographicForm.get('EmiratesIDN')?.invalid && (demographicForm.get('EmiratesIDN')?.touched || isFormSubmitted)"
+                      formControlName="EmiratesIDN">
                 <option [ngValue]="null" disabled>-- Select Emirates ID Type --</option>
                 <option *ngFor="let e of Emirates" [ngValue]="e.code">{{ e.name }}</option>
               </select>
+              <div class="invalid-feedback d-block"
+                   *ngIf="demographicForm.get('EmiratesIDN')?.invalid && (demographicForm.get('EmiratesIDN')?.touched || isFormSubmitted)">
+                Emirates ID Type is required.
+              </div>
             </div>
 
             <div class="col-md-3 col-sm-4 col-12">
-              <label>Primary Care Physician (PCP) <span style="color: red">*</span></label>
-              <select class="form-select" formControlName="primarycarephysicianPcp">
+              <label>Primary Care Physician (PCP) <span class="text-danger">*</span></label>
+              <select class="form-select"
+                      [class.is-invalid]="demographicForm.get('primarycarephysicianPcp')?.invalid && (demographicForm.get('primarycarephysicianPcp')?.touched || isFormSubmitted)"
+                      formControlName="primarycarephysicianPcp">
                 <option [ngValue]="null" disabled>-- Select PCP --</option>
                 <option *ngFor="let p of referred" [ngValue]="p.code">{{ p.name }}</option>
               </select>
+              <div class="invalid-feedback d-block"
+                   *ngIf="demographicForm.get('primarycarephysicianPcp')?.invalid && (demographicForm.get('primarycarephysicianPcp')?.touched || isFormSubmitted)">
+                Primary Care Physician is required.
+              </div>
             </div>
 
             <div class="col-md-3 col-sm-4 col-12">
@@ -116,8 +140,14 @@ import { NgxMaskDirective } from 'ngx-mask';
             </div>
 
             <div class="col-md-3 col-sm-4 col-12">
-              <label>Billing Note <span style="color: red">*</span></label>
-              <input type="text" class="form-control" formControlName="BillingNote" placeholder="Billing Note" />
+              <label>Billing Note <span class="text-danger">*</span></label>
+              <input type="text" class="form-control"
+                     [class.is-invalid]="demographicForm.get('BillingNote')?.invalid && (demographicForm.get('BillingNote')?.touched || isFormSubmitted)"
+                     formControlName="BillingNote" placeholder="Billing Note" />
+              <div class="invalid-feedback d-block"
+                   *ngIf="demographicForm.get('BillingNote')?.invalid && (demographicForm.get('BillingNote')?.touched || isFormSubmitted)">
+                Billing Note is required.
+              </div>
             </div>
           </div>
         </div>
@@ -136,4 +166,5 @@ export class DemographicIdentificationComponent {
   @Input() referred: any[] = [];
   @Input() MediaChannel: any[] = [];
   @Input() MediaItem: any[] = [];
+  @Input() isFormSubmitted: boolean = false;
 }

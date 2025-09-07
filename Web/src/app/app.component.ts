@@ -29,7 +29,10 @@ export class AppComponent implements OnInit {
     isLoading = this.loadingService.loading$;
 
     constructor() {
-        this.healthCheck.startMonitoring();
+        // Start periodic health monitoring only in production
+        if (environment.production) {
+            this.healthCheck.startMonitoring();
+        }
 
     }
     ngOnInit(): void {

@@ -15,7 +15,9 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import moment from 'moment';
 import { LoaderService } from '@core/services/loader.service';
+import { SecureStorageService } from '@core/services/secure-storage.service';
 import { HasPermissionDirective } from '@/app/shared/directives/has-permission.directive';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-temporary-patient-demographic-list',
@@ -26,7 +28,19 @@ import { HasPermissionDirective } from '@/app/shared/directives/has-permission.d
         NgIconComponent,
       HasPermissionDirective],
   templateUrl: './temporary-patient-demographic-list.component.html',
-  styleUrls: ['./temporary-patient-demographic-list.component.scss']
+  styleUrls: ['./temporary-patient-demographic-list.component.scss'],
+  animations: [
+    trigger('slideFade', [
+      transition(':enter', [
+        style({ height: 0, opacity: 0, overflow: 'hidden' }),
+        animate('250ms ease-out', style({ height: '*', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        style({ height: '*', opacity: 1, overflow: 'hidden' }),
+        animate('200ms ease-in', style({ height: 0, opacity: 0 }))
+      ])
+    ])
+  ]
 })
 
 export class TemporaryPatientDemographicListComponent {
@@ -53,6 +67,7 @@ export class TemporaryPatientDemographicListComponent {
     public router: Router,
     public TemporaryPatientDemographicApiServices: TemporaryPatientDemographicApiServices,
     public Loader : LoaderService,
+    private secureStorage: SecureStorageService,
 
   ) {}
 
@@ -73,10 +88,31 @@ export class TemporaryPatientDemographicListComponent {
 
   submitFilter() {
     this.filter = false;
-    if (this.FilterData.dOB) {
-      this.FilterData.dOB = moment(this.FilterData.dOB).format('yyyy-MM-DD');
+    // Build a clean filter object with only the allowed keys and provided values
+    const clean: any = {};
+    const tempId = this.FilterData?.tempId ?? this.FilterData?.TempId;
+    const name = this.FilterData?.name ?? this.FilterData?.Name;
+    let dob = this.FilterData?.dob ?? this.FilterData?.DOB ?? this.FilterData?.dOB;
+    const gender = this.FilterData?.gender ?? this.FilterData?.Gender;
+
+    if (tempId !== undefined && tempId !== null && String(tempId) !== '') clean.TempId = tempId;
+    if (name !== undefined && name !== null && String(name).trim() !== '') clean.Name = String(name).trim();
+    if (dob) {
+      // Normalize date to yyyy-MM-DD expected by API
+      dob = moment(dob).format('YYYY-MM-DD');
+      clean.DOB = dob;
     }
-    this.getTempDemographics(this.FilterData);
+    if (gender !== undefined && gender !== null && String(gender) !== '') clean.Gender = gender;
+
+    this.getTempDemographics(clean);
+  }
+
+  clearFilter() {
+    // Reset filter model and reload with empty filter
+    this.FilterData = {};
+    this.currentPage = 1;
+    this.PaginationInfo.Page = 1;
+    this.getTempDemographics({});
   }
 
 
@@ -119,13 +155,11 @@ getTempDemographics(data: any) {
 
   // Build TempListReq with only allowed fields and omit empty values
   const tempReq: any = {};
-  const mrno = data?.Mrno ?? data?.mrno;
   const tempId = data?.TempId ?? data?.tempId;
   const name = data?.Name ?? data?.name;
   const dob = data?.DOB ?? data?.dob ?? data?.dOB; // accept common variants
   const gender = data?.Gender ?? data?.gender;
 
-  if (mrno !== undefined && mrno !== null && mrno !== '') tempReq.Mrno = mrno;
   if (tempId !== undefined && tempId !== null && tempId !== '') tempReq.TempId = tempId;
   if (name !== undefined && name !== null && name !== '') tempReq.Name = name;
   if (dob !== undefined && dob !== null && dob !== '') tempReq.DOB = dob;
@@ -136,13 +170,8 @@ getTempDemographics(data: any) {
   this.TemporaryPatientDemographicApiServices.getTempDemographics_pagination(tempReq, this.PaginationInfo)
     .then((res: any) => {
       if (res.table2) {
-        this.pagedTemps = res.table2.map((item: any) => ({
-          mrno: item.mrno,
-          personFullName: item.personFullName,
-          patientBirthDate: item.patientBirthDate,
-          personSex: item.personSex,
-          tempId: item.tempId,
-        }));
+        // Keep the full API row object so downstream pages can use all fields
+        this.pagedTemps = res.table2.map((item: any) => ({ ...item }));
 
         this.totalRecord = res.table1[0]?.totalCount || 0;
         const rowsPerPage = this.PaginationInfo.RowsPerPage;
@@ -226,9 +255,18 @@ getTempDemographics(data: any) {
   }
 
 
-  editTemp(tempId: number) {
-    this.router.navigate(['/registration/temporary-demographics'], {
-      queryParams: { id: tempId },
+  editTemp(tempOrId: any) {
+    debugger;
+    const isObj = typeof tempOrId === 'object' && tempOrId !== null;
+    const tempObj = isObj ? tempOrId : this.pagedTemps.find(t => t.tempId === tempOrId);
+    const tempId = isObj ? tempOrId.tempId : tempOrId;
+
+    // Store as a fallback in case user refreshes the edit page (obfuscated)
+    if (tempId != null) this.secureStorage.setItem('tempEditId', String(tempId));
+
+    // Navigate using Router state so the ID isn't visible in the URL, include full object for convenience
+    this.router.navigate(['/registration/temporary-patient-demographics-create'], {
+      state: { tempId, temp: tempObj },
     });
   }
 

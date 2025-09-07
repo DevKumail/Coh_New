@@ -11,7 +11,7 @@
       <ng-icon name="tablerChevronRight"></ng-icon>
     </li>
     <li class="breadcrumb-item active" aria-current="page">
-      Temporary Patient Demographics
+      Temporary Demographics
     </li>
   </ol>
 </nav>
@@ -20,76 +20,74 @@
   <div class="card p-3 shadow">
     <!-- Header section -->
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <h4 class="m-0 fw-bold">Temporary Demographics List</h4>
-      <button
-        class="btn btn-success btn-sm w-150"
-        *hasPermission="'Registration:Temporary Patient Demographics:Add'"
-        type="button"
-        (click)="router.navigate(['/registration/temporary-patient-demographics-create'])"
+      <h4 class="m-0 fw-bold">Temporary Demographics</h4>
+      <div class="d-flex gap-2">
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          type="button"
+          (click)="filter = !filter"
+        >
+          <ng-icon [name]="filter ? 'tablerFilterOff' : 'tablerFilter'" class="me-1"></ng-icon>
+          {{ filter ? 'Hide Filters' : 'Show Filters' }}
+        </button>
+        <button
+          class="btn btn-success btn-sm w-150"
+          *hasPermission="'Registration:Temporary Patient Demographics:Add'"
+          type="button"
+          (click)="router.navigate(['/registration/temporary-patient-demographics-create'])"
 
-      >
-        <ng-icon name="tablerUserPlus" class="me-1 text-white"></ng-icon>
-        Add Patient
-      </button>
+        >
+          <ng-icon name="tablerUserPlus" class="me-1 text-white"></ng-icon>
+          Add Patient
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card card-body mb-3 border-0 bg-light" *ngIf="filter" [@slideFade]="filter">
+      <form (ngSubmit)="submitFilter()" class="row g-3 align-items-end">
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label class="form-label">MR NO</label>
+          <input type="number" class="form-control" [(ngModel)]="FilterData.tempId" name="tempId" placeholder="e.g. 1023" />
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-control" [(ngModel)]="FilterData.name" name="name" placeholder="Patient name" />
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label class="form-label">Date of Birth</label>
+          <input type="date" class="form-control" [(ngModel)]="FilterData.dob" name="dob" />
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label class="form-label">Gender</label>
+          <select class="form-select" [(ngModel)]="FilterData.gender" name="gender">
+            <option [ngValue]="null">Any</option>
+            <option [ngValue]="0">Male</option>
+            <option [ngValue]="1">Female</option>
+            <option [ngValue]="2">Other</option>
+          </select>
+        </div>
+        <div class="col-12 d-flex gap-2 justify-content-end">
+          <button type="button" class="btn btn-light" (click)="clearFilter()">
+            Clear
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Apply
+          </button>
+        </div>
+      </form>
     </div>
 
     <!-- Table -->
-    <!-- <div class="table-responsive">
-      <table class="table table-bordered table-striped">
-        <thead>
-          <tr class="text-center">
-            <th>Temp ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>DOB</th>
-            <th>Nationality</th>
-            <th>Country</th>
-            <th>Sex</th>
-            <th>Edit</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let temp of pagedTemps">
-            <td>{{ temp.tempId || 'N/A' }}</td>
-            <td>{{ temp.personFullName || 'N/A'}}</td>
-            <td>{{ temp.personEmail || 'N/A' }}</td>
-            <td>{{ temp.patientBirthDate || 'N/A' | date: 'MM/dd/yyyy' }}</td>
-            <td>{{ temp.nationalityName || 'N/A' }}</td>
-            <td>{{ temp.countryName || 'N/A'}}</td>
-            <td>{{ genderLabel(temp.personSex) }}</td>
-            <td class="text-center">
-              <button
-                class="btn btn-sm btn-primary me-1"
-                [routerLink]="['/registration/temporary-demographics']"
-                [queryParams]="{ id: temp.tempId }"
-              >
-                Edit
-              </button>
-            </td>
-            <td class="text-center">
-              <button
-                class="btn btn-sm btn-danger"
-                (click)="Remove(temp.tempId)"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-          <tr *ngIf="pagedTemps?.length === 0">
-            <td colspan="9" class="text-center">No temporary patient found.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div> -->
-<div class="table-responsive">
+    <div class="table-responsive">
   <table class="table align-middle mb-0 table-striped">
                 <thead class="thead-sm">
                     <tr class="text-uppercase text-center">
-        <th>MRNO</th>
+        <th>MR No</th>
         <th>Name</th>
         <th>Date of Birth</th>
         <th>Gender</th>
+        <th class="text-center" style="width: 100px;">Actions</th>
       </tr>
     </thead>
     <tbody class="table-group-divider text-center">
@@ -98,13 +96,35 @@
         <td>{{ temp.personFullName || 'N/A'}}</td>
         <td>{{ temp.patientBirthDate || 'N/A' | date: 'MM/dd/yyyy' }}</td>
         <td>{{ genderLabel(temp.personSex) }}</td>
+        <td class="text-center align-middle actions-cell">
+          <div class="d-inline-flex justify-content-center align-items-center gap-2 text-nowrap actions-wrap">
+            <ng-icon
+              *hasPermission="'Registration:Temporary Patient Demographics:Edit'"
+              name="tablerEdit"
+              title="Update"
+              aria-label="Update"
+              class="text-primary fs-5 action-icon"
+              style="cursor: pointer;"
+              (click)="editTemp(temp)"
+            ></ng-icon>
+            <ng-icon
+              *hasPermission="'Registration:Temporary Patient Demographics:Delete'"
+              name="tablerTrash"
+              title="Delete"
+              aria-label="Delete"
+              class="text-danger fs-5 action-icon"
+              style="cursor: pointer;"
+              (click)="Remove(temp.tempId)"
+            ></ng-icon>
+          </div>
+        </td>
       </tr>
       <tr *ngIf="pagedTemps?.length === 0">
         <td colspan="5" class="text-center">No temporary patient found.</td>
       </tr>
     </tbody>
   </table>
-</div>
+    </div>
 
     <!-- Pagination Section -->
     <div class="d-flex flex-column align-items-center mt-3 gap-2">

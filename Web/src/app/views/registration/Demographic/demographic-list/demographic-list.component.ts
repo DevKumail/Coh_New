@@ -3,6 +3,7 @@ import { LoaderComponent } from './../../../../components/loader/loader.componen
 import { Demographic } from './../../../../shared/Models/registration/Demographics/Demographic.model';
 import { DemographicApiServices } from './../../../../shared/Services/Demographic/demographic.api.serviec';
 import { Component } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 import {
     FormBuilder,
     FormGroup,
@@ -37,6 +38,18 @@ import { HasPermissionDirective } from '@/app/shared/directives/has-permission.d
     ],
     templateUrl: './demographic-list.component.html',
     styleUrl: './demographic-list.component.scss',
+    animations: [
+      trigger('slideFade', [
+        transition(':enter', [
+          style({ height: 0, opacity: 0, overflow: 'hidden' }),
+          animate('250ms ease-out', style({ height: '*', opacity: 1 }))
+        ]),
+        transition(':leave', [
+          style({ height: '*', opacity: 1, overflow: 'hidden' }),
+          animate('200ms ease-in', style({ height: 0, opacity: 0 }))
+        ])
+      ])
+    ]
 })
 
 export class DemographicListComponent {

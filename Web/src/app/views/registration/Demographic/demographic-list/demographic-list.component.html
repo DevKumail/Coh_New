@@ -10,78 +10,121 @@
             <ng-icon name="tablerChevronRight"></ng-icon>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-            Demographics List
+            Demographics
         </li>
     </ol>
 </nav>
 
-<div class="card shadow rounded" *hasPermission="'Registration:Demographics:View'">
+<div class="card p-3 shadow" *hasPermission="'Registration:Demographics:View'">
   <!-- <div class="card p-3 shadow mt-2"> -->
     <!-- Header section -->
-    <div class="d-flex justify-content-between align-items-center p-2">
-      <h3 class="m-0 fw-bold">Demographics List</h3>
-      <button
-      *hasPermission="'Registration:Demographics:Add'"
-        class="btn btn-success btn-sm w-150 "
-        type="button"
-        (click)="router.navigate(['/registration/demographic-create'])"
-      >
-        <i class="pi pi-user-plus"></i> New Patient
-      </button>
+    <div class="d-flex justify-content-between align-items-center mb-2 p-2">
+      <h4 class="m-0 fw-bold">Demographics</h4>
+      <div class="d-flex gap-2">
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          type="button"
+          (click)="filter = !filter"
+        >
+          <ng-icon [name]="filter ? 'tablerFilterOff' : 'tablerFilter'" class="me-1"></ng-icon>
+          {{ filter ? 'Hide Filters' : 'Show Filters' }}
+        </button>
+        <button
+          class="btn btn-success btn-sm w-150"
+          *hasPermission="'Registration:Demographics:Add'"
+          type="button"
+          (click)="router.navigate(['/registration/demographic-create'])"
+        >
+          <ng-icon name="tablerUserPlus" class="me-1 text-white"></ng-icon>
+          Add Patient
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card card-body mb-3 border-0 bg-light" *ngIf="filter" [@slideFade]="filter">
+      <form (ngSubmit)="submitFilter()" class="row g-3 align-items-end">
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label class="form-label">MR NO</label>
+          <input type="text" class="form-control" [(ngModel)]="FilterData.mrNo" name="mrNo" placeholder="e.g. 1023" />
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-control" [(ngModel)]="FilterData.name" name="name" placeholder="Patient name" />
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label class="form-label">Phone</label>
+          <input type="text" class="form-control" [(ngModel)]="FilterData.phone" name="phone" placeholder="Phone" />
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label class="form-label">Gender</label>
+          <select class="form-select" [(ngModel)]="FilterData.genderId" name="genderId">
+            <option value="">Any</option>
+            <option *ngFor="let g of genders" [ngValue]="g.code">{{ g.name }}</option>
+          </select>
+        </div>
+        <div class="col-12 d-flex gap-2 justify-content-end">
+          <button type="button" class="btn btn-light" (click)="clearFilter()">
+            Clear
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Apply
+          </button>
+        </div>
+      </form>
     </div>
 
         <!-- Table -->
         <div class="table-responsive">
             <table class="table align-middle mb-0 table-striped">
-                  <thead class="align-middle thead-sm">
-                    <tr>
-                        <th>Mr No</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Sex</th>
-                        <th>SSN</th>
-                        <th>Zip</th>
-                        <th>DOB</th>
-                        <th style="width: 1%">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                    <tr *ngFor="let patient of DemographicsPagedData">
-                        <td>{{ patient.mrNo || "N/A" }}</td>
-                        <td>{{ patient.personFirstName || "N/A" }}</td>
-                        <td>{{ patient.personEmail || "N/A" }}</td>
-                        <td>{{ patient.personCellPhone || "N/A" }}</td>
-                        <td>{{ patient.personSex || "N/A" }}</td>
-                        <td>{{ patient.personSocialSecurityNo || "N/A" }}</td>
-                        <td>{{ patient.personZipCode || "N/A" }}</td>
-                        <td>{{ patient.patientBirthDate | date: "MM/dd/yyyy" }}</td>
-                        <td>
-                            <div ngbDropdown placement="left-top" class="text-muted">
-                                <div
-                                    ngbDropdownMenu
-                                    class="dropdown-menu-end d-flex gap-2 px-2 py-1"
-                                >
-                                    <ng-icon
-                                    *hasPermission="'Registration:Demographics:Edit'"
-                                        name="tablerEdit"
-                                        class="me-1"
-                                        (click)="editPatient(patient)"
-                                    ></ng-icon>
-                                    <ng-icon
-                                    *hasPermission="'Registration:Demographics:Delete'"
-                                        name="tablerTrash"
-                                        class="text-danger me-1"
-                                        (click)="Remove($event, patient.patientId, 'center')"
-                                    ></ng-icon>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr *ngIf="DemographicsPagedData?.length === 0">
-                        <td colspan="9" class="text-center">No patient found.</td>
-                    </tr>
-                </tbody>
+              <thead class="thead-sm">
+                <tr class="text-uppercase text-center">
+                  <th>MR No</th>
+                  <th>Name</th>
+                  <th>Date of Birth</th>
+                  <th>SSN</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Gender</th>
+                  <th class="text-center" style="width: 100px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="table-group-divider text-center">
+                <tr *ngFor="let patient of DemographicsPagedData">
+                  <td>{{ patient.mrNo || 'N/A' }}</td>
+                  <td>{{ patient.personFirstName || 'N/A' }}</td>
+                  <td>{{ patient.patientBirthDate | date: 'MM/dd/yyyy' }}</td>
+                  <td>{{ patient.personSocialSecurityNo || 'N/A' }}</td>
+                  <td>{{ patient.personEmail || 'N/A' }}</td>
+                  <td>{{ patient.personCellPhone || 'N/A' }}</td>
+                  <td>{{ patient.personSex || 'N/A' }}</td>
+                  <td class="text-center align-middle actions-cell">
+                    <div class="d-inline-flex justify-content-center align-items-center gap-2 text-nowrap actions-wrap">
+                      <ng-icon
+                        *hasPermission="'Registration:Demographics:Edit'"
+                        name="tablerEdit"
+                        title="Update"
+                        aria-label="Update"
+                        class="text-primary fs-5 action-icon"
+                        style="cursor: pointer;"
+                        (click)="editPatient(patient)"
+                      ></ng-icon>
+                      <ng-icon
+                        *hasPermission="'Registration:Demographics:Delete'"
+                        name="tablerTrash"
+                        title="Delete"
+                        aria-label="Delete"
+                        class="text-danger fs-5 action-icon"
+                        style="cursor: pointer;"
+                        (click)="Remove($event, patient.patientId, 'center')"
+                      ></ng-icon>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="DemographicsPagedData?.length === 0">
+                  <td colspan="8" class="text-center">No patient found.</td>
+                </tr>
+              </tbody>
             </table>
         </div>
 
@@ -100,7 +143,7 @@
                         <select
                             class="form-select form-select-sm"
                             style="width: auto"
-                            [(ngModel)]="pageSize"
+                            [(ngModel)]="DemographicsPageSize"
                             [ngModelOptions]="{ standalone: true }"
                             (change)="onDemographicsPageSizeChange($event)"
                         >

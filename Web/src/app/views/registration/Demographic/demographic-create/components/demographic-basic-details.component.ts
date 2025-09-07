@@ -15,13 +15,18 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
       <div class="form-horizontal" [formGroup]="demographicForm">
         <div class="form-grid">
           <!-- Gender -->
-          <div class="form-group form-item"
-               [ngClass]="{ 'has-error': demographicForm.get('PersonSexId')?.invalid && (demographicForm.get('PersonSexId')?.touched || isFormSubmitted) }">
+          <div class="form-group form-item">
             <label class="control-label required">Gender</label>
-            <select class="form-control" formControlName="PersonSexId">
+            <select class="form-control"
+                    [class.is-invalid]="demographicForm.get('PersonSexId')?.invalid && (demographicForm.get('PersonSexId')?.touched || isFormSubmitted)"
+                    formControlName="PersonSexId">
               <option [ngValue]="null" disabled>-- Select Gender --</option>
               <option *ngFor="let g of gender" [ngValue]="g.code">{{ g.name }}</option>
             </select>
+            <div class="invalid-feedback d-block"
+                 *ngIf="demographicForm.get('PersonSexId')?.invalid && (demographicForm.get('PersonSexId')?.touched || isFormSubmitted)">
+              Gender is required.
+            </div>
           </div>
 
           <!-- Preferred Name -->
@@ -31,40 +36,60 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
           </div>
 
           <!-- Gender Identity -->
-          <div class="form-group form-item"
-               [ngClass]="{ 'has-error': demographicForm.get('genderIdentity')?.invalid && (demographicForm.get('genderIdentity')?.touched || isFormSubmitted) }">
+          <div class="form-group form-item">
             <label class="control-label required">Gender Identity</label>
-            <select class="form-control" formControlName="genderIdentity">
+            <select class="form-control"
+                    [class.is-invalid]="demographicForm.get('genderIdentity')?.invalid && (demographicForm.get('genderIdentity')?.touched || isFormSubmitted)"
+                    formControlName="genderIdentity">
               <option [ngValue]="null" disabled>-- Select Gender Identity --</option>
               <option *ngFor="let g of genderIdentity" [ngValue]="g.genderId">{{ g.genderText }}</option>
             </select>
+            <div class="invalid-feedback d-block"
+                 *ngIf="demographicForm.get('genderIdentity')?.invalid && (demographicForm.get('genderIdentity')?.touched || isFormSubmitted)">
+              Gender Identity is required.
+            </div>
           </div>
 
           <!-- Marital Status -->
-          <div class="form-group form-item"
-               [ngClass]="{ 'has-error': demographicForm.get('PersonMaritalStatus')?.invalid && (demographicForm.get('PersonMaritalStatus')?.touched || isFormSubmitted) }">
+          <div class="form-group form-item">
             <label class="control-label required">Marital Status</label>
-            <select class="form-control" formControlName="PersonMaritalStatus">
+            <select class="form-control"
+                    [class.is-invalid]="demographicForm.get('PersonMaritalStatus')?.invalid && (demographicForm.get('PersonMaritalStatus')?.touched || isFormSubmitted)"
+                    formControlName="PersonMaritalStatus">
               <option [ngValue]="null" disabled>-- Select Marital Status --</option>
               <option *ngFor="let m of maritalstatus" [ngValue]="m.code">{{ m.name }}</option>
             </select>
+            <div class="invalid-feedback d-block"
+                 *ngIf="demographicForm.get('PersonMaritalStatus')?.invalid && (demographicForm.get('PersonMaritalStatus')?.touched || isFormSubmitted)">
+              Marital Status is required.
+            </div>
           </div>
 
           <!-- Blood Group -->
-          <div class="form-group form-item"
-               [ngClass]="{ 'has-error': demographicForm.get('PatientBloodGroupId')?.invalid && (demographicForm.get('PatientBloodGroupId')?.touched || isFormSubmitted) }">
+          <div class="form-group form-item">
             <label class="control-label required">Blood Group</label>
-            <select class="form-control" formControlName="PatientBloodGroupId">
+            <select class="form-control"
+                    [class.is-invalid]="demographicForm.get('PatientBloodGroupId')?.invalid && (demographicForm.get('PatientBloodGroupId')?.touched || isFormSubmitted)"
+                    formControlName="PatientBloodGroupId">
               <option [ngValue]="null" disabled>-- Select Blood Group --</option>
               <option *ngFor="let b of bloodgroup" [ngValue]="b.code">{{ b.name }}</option>
             </select>
+            <div class="invalid-feedback d-block"
+                 *ngIf="demographicForm.get('PatientBloodGroupId')?.invalid && (demographicForm.get('PatientBloodGroupId')?.touched || isFormSubmitted)">
+              Blood Group is required.
+            </div>
           </div>
 
           <!-- Date of Birth -->
-          <div class="form-group form-item"
-               [ngClass]="{ 'has-error': demographicForm.get('PatientBirthDate')?.invalid && (demographicForm.get('PatientBirthDate')?.touched || isFormSubmitted) }">
+          <div class="form-group form-item">
             <label class="control-label required">Date of Birth</label>
-            <input type="text" class="form-control" formControlName="PatientBirthDate" data-provider="flatpickr" id="birthDate" placeholder="Select date" (change)="onDobChange()"/>
+            <input type="text" class="form-control"
+                   [class.is-invalid]="demographicForm.get('PatientBirthDate')?.invalid && (demographicForm.get('PatientBirthDate')?.touched || isFormSubmitted)"
+                   formControlName="PatientBirthDate" data-provider="flatpickr" id="birthDate" placeholder="Select date" (change)="onDobChange()"/>
+            <div class="invalid-feedback d-block"
+                 *ngIf="demographicForm.get('PatientBirthDate')?.invalid && (demographicForm.get('PatientBirthDate')?.touched || isFormSubmitted)">
+              Date of Birth is required.
+            </div>
           </div>
 
           <!-- Age (small) -->
