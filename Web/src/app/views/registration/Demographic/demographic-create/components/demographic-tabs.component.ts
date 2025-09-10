@@ -18,7 +18,7 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
         <a ngbNavLink>
           Contact
           <lucide-icon *ngIf="isFormSubmitted && !contactTabValid" name="AlertCircle" class="text-danger ms-1" size="16"></lucide-icon>
-          <lucide-icon *ngIf="isFormSubmitted && contactTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon>
+          <!-- <lucide-icon *ngIf="isFormSubmitted && contactTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon> -->
         </a>
         <ng-template ngbNavContent>
           <ng-content select="[contactTab]"></ng-content>
@@ -30,7 +30,7 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
         <a ngbNavLink>
           Emergency Contact
           <lucide-icon *ngIf="!emergencyContactTabValid" name="AlertCircle" class="text-danger ms-1" size="16"></lucide-icon>
-          <lucide-icon *ngIf="emergencyContactTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon>
+          <!-- <lucide-icon *ngIf="emergencyContactTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon> -->
         </a>
         <ng-template ngbNavContent>
           <ng-content select="[emergencyTab]"></ng-content>
@@ -42,7 +42,7 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
         <a ngbNavLink>
           Next Of Kin
           <lucide-icon *ngIf="!nextOfKinTabValid" name="AlertCircle" class="text-danger ms-1" size="16"></lucide-icon>
-          <lucide-icon *ngIf="nextOfKinTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon>
+          <!-- <lucide-icon *ngIf="nextOfKinTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon> -->
         </a>
         <ng-template ngbNavContent>
           <ng-content select="[nextOfKinTab]"></ng-content>
@@ -54,7 +54,7 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
         <a ngbNavLink>
           Spouse
           <lucide-icon *ngIf="!spouseTabValid" name="AlertCircle" class="text-danger ms-1" size="16"></lucide-icon>
-          <lucide-icon *ngIf="spouseTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon>
+          <!-- <lucide-icon *ngIf="spouseTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon> -->
         </a>
         <ng-template ngbNavContent>
           <ng-content select="[spouseTab]"></ng-content>
@@ -66,7 +66,7 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
         <a ngbNavLink>
           Parents info
           <lucide-icon *ngIf="!parentsTabValid" name="AlertCircle" class="text-danger ms-1" size="16"></lucide-icon>
-          <lucide-icon *ngIf="parentsTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon>
+          <!-- <lucide-icon *ngIf="parentsTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon> -->
         </a>
         <ng-template ngbNavContent>
           <ng-content select="[parentsTab]"></ng-content>
@@ -78,7 +78,7 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
         <a ngbNavLink>
           Assignments
           <lucide-icon *ngIf="!assignmentTabValid" name="AlertCircle" class="text-danger ms-1" size="16"></lucide-icon>
-          <lucide-icon *ngIf="assignmentTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon>
+          <!-- <lucide-icon *ngIf="assignmentTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon> -->
         </a>
         <ng-template ngbNavContent>
           <ng-content select="[assignmentsTab]"></ng-content>
@@ -90,7 +90,7 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
         <a ngbNavLink>
           Family Members
           <lucide-icon *ngIf="!familyTabValid" name="AlertCircle" class="text-danger ms-1" size="16"></lucide-icon>
-          <lucide-icon *ngIf="familyTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon>
+          <!-- <lucide-icon *ngIf="familyTabValid" name="CheckCircle" class="text-success ms-1" size="16"></lucide-icon> -->
         </a>
         <ng-template ngbNavContent>
           <ng-content select="[familyTab]"></ng-content>

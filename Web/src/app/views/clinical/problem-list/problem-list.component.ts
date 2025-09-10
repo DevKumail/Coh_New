@@ -130,7 +130,7 @@ appId:any;
 
   async ngOnInit() {
     debugger
-    this.GetPatientProblemData();
+    // Wait for patient banner to provide MRNO before loading data
      this.patientDataSubscription = this.PatientData.patientData$
       .pipe(
         filter((data: any) => !!data?.table2?.[0]?.mrNo),
@@ -139,9 +139,12 @@ appId:any;
         )
       )
       .subscribe((data: any) => {
-        this.GetPatientProblemData();
         this.SearchPatientData = data;
-        const mrno = this.SearchPatientData?.table2[0]?.mrno;
+        // Set MRNO from banner
+        this.Mrno = this.SearchPatientData?.table2?.[0]?.mrNo || '';
+        // After assigning, load problems
+        this.GetPatientProblemData();
+        const mrno = this.Mrno;
 
 
       });
@@ -151,23 +154,21 @@ appId:any;
     // this.appId=app.appointmentId
     this.FillDropDown
 
-    
- this.medicalForm = this.fb.group({
-  providerId: ['', Validators.required],
-  providerName: [''], 
-  code: ['', Validators.required],
-  problem: ['', Validators.required],
-  icdVersion: ['', Validators.required],
-  confidential: [false],
-  startDate: ['', Validators.required],
-  endDate: [''],
-  comments: ['', Validators.required],
-  status: ['', Validators.required],  
-  mrno: ['', Validators.required],     
-  patientId: ['', Validators.required] 
-});
-
-
+    this.medicalForm = this.fb.group({
+      providerId: ['', Validators.required],
+      providerName: [''], 
+      code: ['', Validators.required],
+      problem: ['', Validators.required],
+      icdVersion: ['', Validators.required],
+      confidential: [false],
+      isProviderCheck: [false],
+      startDate: ['', Validators.required],
+      endDate: [''],
+      comments: ['', Validators.required],
+      status: ['', Validators.required],  
+      mrno: ['', Validators.required],     
+      patientId: ['', Validators.required] 
+    });
 
     this.FilterForm = this.fb.group({
       icdVersionId: [''],
@@ -179,6 +180,11 @@ appId:any;
     });
     console.log(this.FilterForm)
     this.FillDropDown
+
+    // Load user id from session storage
+    const currentUser = sessionStorage.getItem('userId');
+    const parsedUserId = currentUser ? Number(currentUser) : NaN;
+    this.userid = Number.isFinite(parsedUserId) ? parsedUserId : 0;
 
     this.getRowdatapatientproblem()
     this.Problems.ActiveStatus = 1
@@ -192,7 +198,10 @@ appId:any;
   async GetPatientProblemData() {
   this.loader.show();
 
-  if (!this.SearchPatientData.table2[0].mrNo) {
+  const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo;
+  const userIdStr = sessionStorage.getItem('userId');
+  const userId = userIdStr ? Number(userIdStr) : 0;
+  if (!mrNo || !userId) {
     Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
     this.loader.hide();
     return;
@@ -200,10 +209,11 @@ appId:any;
 
   this.loader.show();
   debugger;
-  console.log('mrNo =>', this.SearchPatientData.table2[0].mrNo);
+  console.log('mrNo =>', mrNo);
 
   await this.clinicalApiService.GetPatientProblemData(
-    this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0
+    mrNo,
+    userId
   ).then((res: any) => {
     console.log('res', res);
     this.loader.hide();
@@ -394,11 +404,11 @@ onSubmit() {
     endDate: formData.endDate,
     comments: formData.comments,
     status: status || 0,
-    createdBy: 2,
-    updatedBy: 2,
+    createdBy: this.userid || 0,
+    updatedBy: this.userid || 0,
     // mrno: '1006', 
     
-    mrno: this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0,                           
+    mrno: this.Mrno || (this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0),                           
     patientId: 6,
     activeStatus: 1,
     active: true,
@@ -495,7 +505,9 @@ onSubmit() {
   getRowData() {
     // const mrno = '1006'; 
     const mrno=this.Mrno;
-    const userId = 1;     
+    const userIdStr = sessionStorage.getItem('userId');
+    const userId = userIdStr ? Number(userIdStr) : 0;     
+    if (!mrno || !userId) { return; }
 
     this.clinicalApiService.GetRowDataOfPatientProblem(mrno, userId).then((res: any) => {
       const problems = res?.patientProblems?.table1 || [];
@@ -732,7 +744,9 @@ onSubmit() {
   getRowdatapatientproblem() {
 
     let mrno = this.Mrno
-    let UserId = this.userid
+    let UserIdStr = sessionStorage.getItem('userId')
+    let UserId = UserIdStr ? Number(UserIdStr) : 0;
+    if (!mrno || !UserId) { return; }
     this.ProblemGrid = []
     var flag = 1;
     this.clinicalApiService.GetRowDataOfPatientProblem(mrno, UserId).then((res: any) => {

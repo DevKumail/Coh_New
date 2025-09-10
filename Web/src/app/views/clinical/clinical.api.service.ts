@@ -58,8 +58,9 @@ export class ClinicalApiService {
   GetRowDataOfPatientProblem(mrno: string, userId: number) {
     return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}`).toPromise();
   }
- GetPatientProblemData(mrno: String) {
-    return this.api.get(`Problem/GetProblemDetailsDB?mrno=${mrno}`).toPromise();
+ GetPatientProblemData(mrno: string, userId: number) {
+    // Unified to PatientProblem endpoint (Problem/GetProblemDetailsDB does not exist)
+    return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}`).toPromise();
 }
 
   MyDiagnosisCodebyProvider(ProviderId: number, GroupId: number | null, ICDVersionId: number | null) {

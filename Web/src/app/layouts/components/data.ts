@@ -81,8 +81,8 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Alerts', url: '/clinical/alerts' },
             { label: 'Allergies', url: '/clinical/allergies' },
             { label: 'Problem List', url: '/clinical/problem' },
-            { label: 'Medical History', url: '/clinical/medical history' },
-            { label: 'Problem', url: '/clinical/problem list' },
+            { label: 'Medical History', url: '/clinical/medical-history' },
+            { label: 'Problem', url: '/clinical/problem' },
         ],
     },
 
@@ -144,13 +144,8 @@ export const menuItems: ExtendedMenuItemType[] = [
                 children: [
                     { label: 'Alerts', url: '/clinical/alerts' },
                     { label: 'Allergies', url: '/clinical/allergies' },
-                    //   { label: 'Problem List', url: '/clinical/problem-list'},
                     { label: 'Problem List', url: '/clinical/problem' },
-                    {
-                        label: 'Medical History',
-                        url: '/clinical/medical-history',
-                    },
-                    //{ label: 'Favorites', url: '/clinical/favorites'}
+                    { label: 'Medical History', url: '/clinical/medical-history' },
                     { label: 'Problem', url: '/clinical/problem' },
                     { label: 'Vital Signs', url: '/clinical/vital-signs' },
                 ],
@@ -828,7 +823,7 @@ export const horizontalMenuItems: MenuItemType[] = [
             {
                 label: 'Vital Signs',
                 icon: 'tablerClipboardText',
-                url: 'clinical/vital signs',
+                url: '/clinical/vital-signs',
                 // url: '/clinical/vital-signs'
             },
             {
@@ -848,7 +843,7 @@ export const horizontalMenuItems: MenuItemType[] = [
             {
                 label: 'Charge Capture',
                 icon: 'tablerBell',
-                url: '/billing/charge capture',
+                url: '/billing/charge-capture',
             },
             // {
             //     label: 'Bill Generator',

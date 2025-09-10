@@ -229,18 +229,22 @@ pagedProblems: any[] = [];
     async GetPatientProblemData() {
     // this.loader.show();
   
-    if (!this.SearchPatientData.table2[0].mrNo) {
+    const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo;
+    const userIdStr = sessionStorage.getItem('userId');
+    const userId = userIdStr ? Number(userIdStr) : 0;
+    if (!mrNo || !userId) {
       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       this.loader.hide();
       return;
     }
-  
+
     this.loader.show();
     debugger;
-    console.log('mrNo =>', this.SearchPatientData.table2[0].mrNo);
-  
+    console.log('mrNo =>', mrNo);
+
     await this.clinicalApiService.GetPatientProblemData(
-      this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0
+      mrNo,
+      userId
     ).then((res: any) => {
       console.log('res', res);
       this.loader.hide();
@@ -447,8 +451,10 @@ const problemPayload: Partial<PatientProblemModel> = {
   }
 
   getRowData() {
-    const mrno = '1004'; 
-    const userId = 1;
+    const mrno = this.SearchPatientData?.table2?.[0]?.mrNo || this.Mrno; 
+    const userIdStr = sessionStorage.getItem('userId');
+    const userId = userIdStr ? Number(userIdStr) : 0;
+    if (!mrno || !userId) { return; }
 
     this.clinicalApiService.GetRowDataOfPatientProblem(mrno, userId).then((res: any) => {
       debugger
