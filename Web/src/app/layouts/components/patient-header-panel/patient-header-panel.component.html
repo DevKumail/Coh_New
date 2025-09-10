@@ -59,15 +59,16 @@
             </div>
 
              <!-- Right-aligned info badge -->
-          <div class="px-2 border-start d-none d-lg-block" *ngIf="visitAppointments?.appointmentId">
+             <!-- *ngIf="visitAppointments?.appointmentId" -->
+          <div class="px-2 border-start d-none d-lg-block" >
             <div class="info-badge info-badge-wide">
               <div class="badge-title text-uppercase"> Visit Info </div>
               <div class="d-flex align-items-start justify-content-between gap-2">
                 <div class="me-2">
-                  <div class="badge-value small"><strong>{{ visitAppointments?.fullName }}</strong></div>
-                  <div class="badge-date small"><strong>{{ visitAppointments?.appDateTime | date:'MMM d, y h:mm a' }}</strong></div>
+                  <div class="badge-value small"><strong>{{ visitAppointments?.fullName || 'Provider: N/A' }}</strong></div>
+                  <div class="badge-date small"><strong>{{ visitAppointments?.appDateTime || 'Date: N/A' | date:'MMM d, y h:mm a' }}</strong></div>
                 </div>
-                <button type="button" class="btn btn-link p-0 m-0 mt-1" (click)="searchAppointment(patientInfo?.mrNo, appointmentModal)" aria-label="Search appointment">
+                <button type="button" class="btn btn-link p-0 m-0 mt-1" (click)="searchAppointment(patientInfo?.mrNo, appointmentModal)" aria-label="Search appointment" *ngIf="visitAppointments?.appointmentId">
                   <ng-icon ngbTooltip="Switch Visit" tooltipClass="tooltip-allergy" placement="bottom" style="color: orange; height: 16px; width: 16px;" name="tablerUser-search"></ng-icon>
                 </button>
               </div>
@@ -165,6 +166,8 @@
             <th >Name</th>
             <th >Provider</th>
             <th >Site</th>
+            <th >Purpose</th>
+            <th >Status</th>
             <th >Duration</th>
             <th >Date Time</th>
             <th>Actions</th>
@@ -187,6 +190,12 @@
             </td>
             <td>
               <span>{{Data.siteName || 'N/A'}}</span>
+            </td>
+            <td>
+              <span>{{Data.purposeOfVisit || 'N/A'}}</span>
+            </td>
+            <td>
+              <span>{{Data.appStatus || 'N/A'}}</span>
             </td>
             <td>
               <span>{{Data.duration || 'N/A'}}</span>

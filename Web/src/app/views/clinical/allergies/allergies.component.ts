@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -14,6 +14,8 @@ import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { AllergyDto} from '@/app/shared/Models/Clinical/allergy.model'
 
+declare var flatpickr: any;
+
 @Component({
   selector: 'app-allergies',
   imports: [CommonModule,
@@ -24,11 +26,83 @@ import { AllergyDto} from '@/app/shared/Models/Clinical/allergy.model'
   styleUrl: './allergies.component.scss'
 })
 
-export class AllergiesComponent implements OnInit {
+export class AllergiesComponent implements OnInit, AfterViewInit {
   buttonText: string | undefined;
 
   resetForm() {
     throw new Error('Method not implemented.');
+  }
+
+  ngAfterViewInit(): void {
+    // Initialize date pickers after view is ready
+    this.initDatePickers();
+  }
+
+  private initDatePickers() {
+    const startEl = document.querySelector('#allergyStartDate') as HTMLInputElement | null;
+    const endEl = document.querySelector('#allergyEndDate') as HTMLInputElement | null;
+    if (!startEl && !endEl) {
+      setTimeout(() => this.initDatePickers(), 100);
+      return;
+    }
+    this.ensureFlatpickr().then(() => {
+      try {
+        if (startEl && !startEl.getAttribute('data-fp-applied')) {
+          flatpickr(startEl, {
+            dateFormat: 'd/m/Y',
+            allowInput: true,
+            onChange: (_sd: any, dateStr: string) => {
+              this.allergyForm?.patchValue({ startDate: dateStr });
+            },
+          });
+          startEl.setAttribute('data-fp-applied', '1');
+        }
+        if (endEl && !endEl.getAttribute('data-fp-applied')) {
+          flatpickr(endEl, {
+            dateFormat: 'd/m/Y',
+            allowInput: true,
+            onChange: (_sd: any, dateStr: string) => {
+              this.allergyForm?.patchValue({ endDate: dateStr });
+            },
+          });
+          endEl.setAttribute('data-fp-applied', '1');
+        }
+      } catch (e) {
+        console.warn('Flatpickr init failed (Allergy):', e);
+      }
+    });
+  }
+
+  private ensureFlatpickr(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      const w = window as any;
+      if (typeof w.flatpickr === 'function') {
+        resolve();
+        return;
+      }
+      if (document.getElementById('fp-script')) {
+        const check = setInterval(() => {
+          if (typeof (window as any).flatpickr === 'function') {
+            clearInterval(check);
+            resolve();
+          }
+        }, 50);
+        setTimeout(() => clearInterval(check), 5000);
+        return;
+      }
+      const link = document.createElement('link');
+      link.id = 'fp-style';
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css';
+      document.head.appendChild(link);
+
+      const script = document.createElement('script');
+      script.id = 'fp-script';
+      script.src = 'https://cdn.jsdelivr.net/npm/flatpickr';
+      script.onload = () => resolve();
+      script.onerror = () => resolve();
+      document.body.appendChild(script);
+    });
   }
 
 
@@ -182,6 +256,9 @@ export class AllergiesComponent implements OnInit {
     }
     this.GetPatientAllergyData();
     this.Allergy.ActiveStatus = 1
+
+    // Defer picker initialization until the form and template are in the DOM
+    setTimeout(() => this.initDatePickers(), 0);
   }
 
 
@@ -290,14 +367,51 @@ submit() {
 
   const formValue = this.allergyForm.value;
 
+  // Parse dd/MM/yyyy to Date and then to yyyy-MM-dd string for backend
+  const parseDMYToDate = (input: any): Date | null => {
+    if (!input) return null;
+    try {
+      if (typeof input === 'string') {
+        const m = input.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (m) {
+          const dd = parseInt(m[1], 10);
+          const mm = parseInt(m[2], 10) - 1;
+          const yyyy = parseInt(m[3], 10);
+          const d = new Date(yyyy, mm, dd);
+          return isFinite(d.getTime()) ? d : null;
+        }
+      }
+      const d2 = new Date(input);
+      return isFinite(d2.getTime()) ? d2 : null;
+    } catch { return null; }
+  };
+  const toYMD = (d: Date | null): string => {
+    if (!d) return '';
+    const adj = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    return adj.toISOString().slice(0, 10);
+  };
+
+  const sd = parseDMYToDate(formValue.startDate);
+  const ed = parseDMYToDate(formValue.endDate);
+  if (!sd || !ed) {
+    Swal.fire('Validation Error', 'Please enter valid dates in dd/MM/yyyy format.', 'warning');
+    this.isSubmitting = false;
+    return;
+  }
+  if (ed < sd) {
+    Swal.fire('Validation Error', 'End Date cannot be earlier than Start Date.', 'warning');
+    this.isSubmitting = false;
+    return;
+  }
+
   const payload: AllergyDto = {
     allergyid: this.id || 0,
     typeId: formValue.allergyType,
     allergen: formValue.allergen,
     severityCode: formValue.severity,
     reaction: formValue.reaction,
-    startDate: formValue.startDate,
-    endDate: formValue.endDate,
+    startDate: toYMD(sd),
+    endDate: toYMD(ed),
     status: formValue.status,
     // OldMrno: this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0,
     active: true,
@@ -328,6 +442,17 @@ submit() {
 
   formatDate(date: string): string {
     return date ? date.split('T')[0] : '';
+  }
+
+  private formatDateDMY(value: any): string {
+    try {
+      const d = new Date(value);
+      if (!isFinite(d.getTime())) return '';
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    } catch { return ''; }
   }
 
 
@@ -412,8 +537,8 @@ editAllergy(allergy: any) {
     allergen: allergy.allergen,
     severity: allergy.severity,
     reaction: allergy.reaction,
-    startDate: this.formatDate(allergy.startDate),
-    endDate: this.formatDate(allergy.endDate),
+    startDate: this.formatDateDMY(allergy.startDate),
+    endDate: this.formatDateDMY(allergy.endDate),
     status: allergy.status === 'Active' ? 1 : 2
   });
 }

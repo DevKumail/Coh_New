@@ -25,21 +25,25 @@
         </div>
 
         <!-- 📝 Reactive Form Starts -->
-        <form [formGroup]="subscriberForm">
+        <form [formGroup]="subscriberForm" novalidate class="no-invalid-icon">
             <div class="row p-2">
                 <!-- Type -->
                 <div class="col-3">
                     <label>Type</label><span class="danger"> *</span>
                    <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="CompanyOrIndividual"
                         (change)="showRelation()"
+                        [class.is-invalid]="subscriberForm.get('CompanyOrIndividual')?.invalid && (subscriberForm.get('CompanyOrIndividual')?.touched || subscriberForm.touched)"
                     >
                         <option value="">-- Select Type --</option>
                         <option *ngFor="let t of type" [value]="t.value" >
                             {{ t.label }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CompanyOrIndividual')?.invalid && (subscriberForm.get('CompanyOrIndividual')?.touched || subscriberForm.touched)">
+                        Type is required.
+                    </div>
 
                 </div>
 
@@ -47,10 +51,11 @@
                 <div class="col-3">
                     <label>Relation</label><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="InsuranceRel"
                         id="InsuranceRel"
                         [disabled]="!isRelation"
+                        [class.is-invalid]="subscriberForm.get('InsuranceRel')?.invalid && (subscriberForm.get('InsuranceRel')?.touched || subscriberForm.touched)"
                     >
                         <option value="">-- Select Relation --</option>
                         <option
@@ -60,17 +65,24 @@
                             {{ t.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('InsuranceRel')?.invalid && (subscriberForm.get('InsuranceRel')?.touched || subscriberForm.touched)">
+                        Relation is required.
+                    </div>
                 </div>
 
                 <!-- Title -->
                 <div class="col-3">
                     <label>Title</label><span class="danger"> *</span>
-                    <select class="form-select" formControlName="Suffix">
+                    <select class="form-select no-invalid-icon" formControlName="Suffix"
+                        [class.is-invalid]="subscriberForm.get('Suffix')?.invalid && (subscriberForm.get('Suffix')?.touched || subscriberForm.touched)">
                         <option value="">-- Select Title --</option>
                         <option *ngFor="let t of titles" [value]="t.code">
                             {{ t.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('Suffix')?.invalid && (subscriberForm.get('Suffix')?.touched || subscriberForm.touched)">
+                        Title is required.
+                    </div>
                 </div>
 
                 <!-- First Name -->
@@ -78,10 +90,14 @@
                     <label>First Name</label><span class="danger"> *</span>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="FirstName"
                         placeholder="First Name"
+                        [class.is-invalid]="subscriberForm.get('FirstName')?.invalid && (subscriberForm.get('FirstName')?.touched || subscriberForm.touched)"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('FirstName')?.invalid && (subscriberForm.get('FirstName')?.touched || subscriberForm.touched)">
+                        First name is required.
+                    </div>
                 </div>
 
                 <!-- Middle Name -->
@@ -89,7 +105,7 @@
                     <label>Middle Name</label>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="MiddleName"
                         placeholder="Middle Name"
                     />
@@ -100,10 +116,14 @@
                     <label>Last Name</label><span class="danger"> *</span>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="LastName"
                         placeholder="Last Name"
+                        [class.is-invalid]="subscriberForm.get('LastName')?.invalid && (subscriberForm.get('LastName')?.touched || subscriberForm.touched)"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('LastName')?.invalid && (subscriberForm.get('LastName')?.touched || subscriberForm.touched)">
+                        Last name is required.
+                    </div>
                 </div>
 
                 <!-- Phone -->
@@ -112,74 +132,98 @@
 
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="InsuredPhone"
                         placeholder="(00) 0000-0000"
                         [mask]="'(00) 0000-0000'"
+                        [class.is-invalid]="subscriberForm.get('InsuredPhone')?.invalid && (subscriberForm.get('InsuredPhone')?.touched || subscriberForm.touched)"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('InsuredPhone')?.invalid && (subscriberForm.get('InsuredPhone')?.touched || subscriberForm.touched)">
+                        Cell phone is required.
+                    </div>
                 </div>
 
                 <div class="col-3">
                     <label>Date of Birth</label><span class="danger"> *</span>
                     <input
                         type="text"
-                        class="form-control date"
+                        class="form-control date no-invalid-icon"
                         formControlName="BirthDate"
                         data-provider="flatpickr"
                         id="BirthDate"
                         placeholder="Select date"
+                        [class.is-invalid]="subscriberForm.get('BirthDate')?.invalid && (subscriberForm.get('BirthDate')?.touched || subscriberForm.touched)"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('BirthDate')?.invalid && (subscriberForm.get('BirthDate')?.touched || subscriberForm.touched)">
+                        Date of birth is required.
+                    </div>
                 </div>
 
                 <!-- Address -->
                 <div class="col-3">
                     <label>Address</label><span class="danger"> *</span>
                     <textarea
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="Address1"
                         placeholder="Address"
+                        [class.is-invalid]="subscriberForm.get('Address1')?.invalid && (subscriberForm.get('Address1')?.touched || subscriberForm.touched)"
                     ></textarea>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('Address1')?.invalid && (subscriberForm.get('Address1')?.touched || subscriberForm.touched)">
+                        Address is required.
+                    </div>
                 </div>
 
                 <!-- Country -->
                 <div class="col-3">
                     <label>Country</label><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="CountryId"
                         (change)="onCountryChange()"
+                        [class.is-invalid]="subscriberForm.get('CountryId')?.invalid && (subscriberForm.get('CountryId')?.touched || subscriberForm.touched)"
                     >
                         <option value="">-- Select Country --</option>
                         <option *ngFor="let c of Country" [value]="c.code">
                             {{ c.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CountryId')?.invalid && (subscriberForm.get('CountryId')?.touched || subscriberForm.touched)">
+                        Country is required.
+                    </div>
                 </div>
 
                 <!-- State -->
                 <div class="col-3">
                     <label>State</label><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="StateId"
                         (change)="onStateChange()"
+                        [class.is-invalid]="subscriberForm.get('StateId')?.invalid && (subscriberForm.get('StateId')?.touched || subscriberForm.touched)"
                     >
                         <option value="">-- Select State --</option>
                         <option *ngFor="let s of states" [value]="s.stateId">
                             {{ s.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('StateId')?.invalid && (subscriberForm.get('StateId')?.touched || subscriberForm.touched)">
+                        State is required.
+                    </div>
                 </div>
 
                 <!-- City -->
                 <div class="col-3">
                     <label>City</label><span class="danger"> *</span>
-                    <select class="form-select" formControlName="CityId">
+                    <select class="form-select no-invalid-icon" formControlName="CityId"
+                        [class.is-invalid]="subscriberForm.get('CityId')?.invalid && (subscriberForm.get('CityId')?.touched || subscriberForm.touched)">
                         <option value="">-- Select City --</option>
                         <option *ngFor="let c of city" [value]="c.cityId">
                             {{ c.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CityId')?.invalid && (subscriberForm.get('CityId')?.touched || subscriberForm.touched)">
+                        City is required.
+                    </div>
                 </div>
 
                 <!-- Zip -->
@@ -187,16 +231,15 @@
                     <label>Zip Code</label><span class="danger"> *</span>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="ZipCode"
                         placeholder="Zip Code"
                         [mask]="'00000'"
+                        [class.is-invalid]="subscriberForm.get('ZipCode')?.invalid && (subscriberForm.get('ZipCode')?.touched || subscriberForm.touched)"
                     />
-                    <!-- <input
-                        type="text"
-                        class="form-control"
-                        formControlName="ZipCode"
-                    /> -->
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('ZipCode')?.invalid && (subscriberForm.get('ZipCode')?.touched || subscriberForm.touched)">
+                        Zip code is required.
+                    </div>
                 </div>
 
                 <!-- Insurance Carrier -->
@@ -204,21 +247,26 @@
                     <label>Insurance Carrier</label
                     ><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="CarrierId"
                         (change)="onCarrierChange()"
+                        [class.is-invalid]="subscriberForm.get('CarrierId')?.invalid && (subscriberForm.get('CarrierId')?.touched || subscriberForm.touched)"
                     >
                         <option *ngFor="let p of BLPayer" [value]="p.code">
                             {{ p.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CarrierId')?.invalid && (subscriberForm.get('CarrierId')?.touched || subscriberForm.touched)">
+                        Insurance Carrier is required.
+                    </div>
                 </div>
 
                 <div class="col-3">
                     <label>Policy Plan</label><span class="danger"> *</span>
                     <select
-                        class="form-select policy-select"
+                        class="form-select policy-select no-invalid-icon"
                         formControlName="selectedBLPayerPlan"
+                        [class.is-invalid]="subscriberForm.get('selectedBLPayerPlan')?.invalid && (subscriberForm.get('selectedBLPayerPlan')?.touched || subscriberForm.touched)"
                     >
                         <option
                             *ngFor="let plan of BLPayerPlan"
@@ -228,14 +276,18 @@
                             {{ plan.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('selectedBLPayerPlan')?.invalid && (subscriberForm.get('selectedBLPayerPlan')?.touched || subscriberForm.touched)">
+                        Policy Plan is required.
+                    </div>
                 </div>
 
                 <!-- Package -->
                 <div class="col-3">
                     <label>Package</label><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="selectedBLPayerPackage"
+                        [class.is-invalid]="subscriberForm.get('selectedBLPayerPackage')?.invalid && (subscriberForm.get('selectedBLPayerPackage')?.touched || subscriberForm.touched)"
                     >
                         <option
                             *ngFor="let pack of BLPayerPackage"
@@ -244,16 +296,23 @@
                             {{ pack.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('selectedBLPayerPackage')?.invalid && (subscriberForm.get('selectedBLPayerPackage')?.touched || subscriberForm.touched)">
+                        Package is required.
+                    </div>
                 </div>
 
                 <!-- Gender -->
                 <div class="col-3">
                     <label>Gender</label><span class="danger"> *</span>
-                    <select class="form-select" formControlName="Sex">
+                    <select class="form-select no-invalid-icon" formControlName="Sex"
+                        [class.is-invalid]="subscriberForm.get('Sex')?.invalid && (subscriberForm.get('Sex')?.touched || subscriberForm.touched)">
                         <option *ngFor="let g of genders" [value]="g.code">
                             {{ g.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('Sex')?.invalid && (subscriberForm.get('Sex')?.touched || subscriberForm.touched)">
+                        Gender is required.
+                    </div>
                 </div>
 
                 <!-- Insured ID -->
@@ -262,10 +321,14 @@
                     ><span class="danger"> *</span>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="InsuredIdNo"
                         placeholder="Member Id / Emp Id"
+                        [class.is-invalid]="subscriberForm.get('InsuredIdNo')?.invalid && (subscriberForm.get('InsuredIdNo')?.touched || subscriberForm.touched)"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('InsuredIdNo')?.invalid && (subscriberForm.get('InsuredIdNo')?.touched || subscriberForm.touched)">
+                        Member ID / Emp ID is required.
+                    </div>
                 </div>
 
                 <!-- Active -->
@@ -293,7 +356,7 @@
                             <div class="col-6">
                                 <input
                                     type="number"
-                                    class="form-control w-100"
+                                    class="form-control w-100 no-invalid-icon"
                                     placeholder="OP"
                                     formControlName="OpCopay"
                                 />
@@ -301,7 +364,7 @@
                             <div class="col-6">
                                 <input
                                     type="number"
-                                    class="form-control w-100"
+                                    class="form-control w-100 no-invalid-icon"
                                     placeholder="IP"
                                     formControlName="Deductibles"
                                 />
@@ -324,7 +387,7 @@
                             <div class="col-6">
                                 <input
                                     type="number"
-                                    class="form-control w-100"
+                                    class="form-control w-100 no-invalid-icon"
                                     placeholder="PC"
                                     formControlName="Copay"
                                 />
@@ -332,7 +395,7 @@
                             <div class="col-6">
                                 <input
                                     type="number"
-                                    class="form-control w-100"
+                                    class="form-control w-100 no-invalid-icon"
                                     placeholder="DN"
                                     formControlName="DNDeductible"
                                 />
@@ -562,7 +625,7 @@
                                         <label>Copay (%)</label>
                                         <input
                                             type="number"
-                                            class="form-control"
+                                            class="form-control no-invalid-icon"
                                             formControlName="copayPercentage"
                                         />
                                     </div>

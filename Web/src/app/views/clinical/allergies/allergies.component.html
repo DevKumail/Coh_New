@@ -87,13 +87,13 @@
         <!-- Start Date -->
         <div class="col-md-6 col-lg-3">
           <label class="form-label fw-semibold">Start Date</label>
-          <input type="date" class="form-control" formControlName="startDate" />
+          <input id="allergyStartDate" type="text" class="form-control" formControlName="startDate" placeholder="dd/MM/yyyy" data-provider="flatpickr" />
         </div>
 
         <!-- End Date -->
         <div class="col-md-6 col-lg-3">
           <label class="form-label fw-semibold">End Date</label>
-          <input type="date" class="form-control" formControlName="endDate" />
+          <input id="allergyEndDate" type="text" class="form-control" formControlName="endDate" placeholder="dd/MM/yyyy" data-provider="flatpickr" />
         </div>
 
         <!-- Status -->
@@ -147,8 +147,8 @@
               <td class="text-center">{{ allergy.allergen }}</td>
               <td class="text-center">{{ allergy.severityName }}</td>
               <td class="text-center">{{ allergy.reaction }}</td>
-              <td class="text-center">{{ allergy.startDate | date:'yyyy-MM-dd' }}</td>
-              <td class="text-center">{{ allergy.endDate | date:'yyyy-MM-dd' }}</td>
+              <td class="text-center">{{ allergy.startDate | date:'dd/MM/yyyy' }}</td>
+              <td class="text-center">{{ allergy.endDate | date:'dd/MM/yyyy' }}</td>
               <td class="text-center">{{ allergy.status }}</td>
               <td class="text-center" style="text-align: center;">
 

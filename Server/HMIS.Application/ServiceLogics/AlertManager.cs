@@ -86,7 +86,7 @@ namespace HMIS.Application.ServiceLogics
                     newPatientAlert.HasChild = alertModel.HasChild;
                     newPatientAlert.OldMrno = alertModel.OldMrno;
                     newPatientAlert.IsDeleted = alertModel.IsDeleted;
-
+                    newPatientAlert.StartDate = alertModel.StartDate;
                     _context.PatientAlerts.Add(newPatientAlert);
                     await _context.SaveChangesAsync();
                     return true;
@@ -99,22 +99,28 @@ namespace HMIS.Application.ServiceLogics
 
                     if (patient != null)
                     {
-                        patient.AlertId = alertModel.AlertId;
-                        //patient.RuleId = alertModel.RuleId;  
-                        //patient.Mrno = alertModel.Mrno;  
-                        //patient.AlertMessage = alertModel.AlertMessage;  
-                        //patient.Active = alertModel.Active;  
-                        //patient.RepeatDate = alertModel.RepeatDate;  
-                        //patient.IsFinished = alertModel.IsFinished;  
-                        //patient.EnteredBy = alertModel.EnteredBy;  
-                        //patient.EnteredDate = alertModel.EnteredDate;  
-                        //patient.UpdatedBy = alertModel.UpdatedBy;  
-                        //patient.AppointmentId = alertModel.AppointmentId;  
-                        //patient.AlertTypeId = alertModel.AlertTypeId;  
+                        patient.RuleId = alertModel.RuleId;
+                        patient.Mrno = alertModel.Mrno;
+                        patient.AlertMessage = alertModel.AlertMessage;
+                        patient.Active = alertModel.Active;
+                        patient.EnteredDate = string.IsNullOrWhiteSpace(alertModel.EnteredDate)
+                                                ? null
+                                                : DateTime.Parse(alertModel.EnteredDate);
+                        patient.RepeatDate = string.IsNullOrWhiteSpace(alertModel.RepeatDate)
+                                                ? null
+                                                : DateTime.Parse(alertModel.RepeatDate);
+                        patient.IsFinished = alertModel.IsFinished;
+                        patient.EnteredBy = alertModel.EnteredBy;
+                        patient.UpdatedBy = alertModel.UpdatedBy;
+                        patient.AppointmentId = alertModel.AppointmentId;
+                        patient.AlertTypeId = alertModel.AlertTypeId;
                         patient.Comments = alertModel.Comments;
                         patient.HasChild = alertModel.HasChild;
                         patient.OldMrno = alertModel.OldMrno;
                         patient.IsDeleted = alertModel.IsDeleted;
+                        patient.StartDate = alertModel.StartDate;
+
+                        _context.PatientAlerts.Update(patient);
 
                         await _context.SaveChangesAsync();
                         return true;

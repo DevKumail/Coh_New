@@ -302,7 +302,8 @@ export class TemporaryDemographicsComponent implements OnInit {
     }
 
     const form = this.temporaryForm.getRawValue();
-    const patientBirthDateISO = form.patientBirthDate ? new Date(form.patientBirthDate).toISOString() : null;
+    const parsedDob = this.parseDMYToDate(form.patientBirthDate);
+    const patientBirthDateISO = parsedDob ? parsedDob.toISOString() : null;
 
     const textOrEmpty = (v: any) => (v === undefined || v === null ? '' : String(v));
     const idOrZero = (v: any) => (v === undefined || v === null || v === '' ? 0 : v);
@@ -477,18 +478,16 @@ export class TemporaryDemographicsComponent implements OnInit {
       form.get('personSex')?.setValue(temp.gender);
     }
 
-    // DOB normalization; accept ISO strings or yyyy-MM-dd
+    // DOB normalization; accept ISO strings or yyyy-MM-dd and display as dd/MM/yyyy
     const dob = temp.patientBirthDate || temp.dob || temp.DOB;
     if (dob) {
       try {
         const d = new Date(dob);
         if (!isNaN(d.getTime())) {
-          // Use yyyy-MM-dd for flatpickr input
-          const yyyy = d.getFullYear();
-          const mm = String(d.getMonth() + 1).padStart(2, '0');
-          const dd = String(d.getDate()).padStart(2, '0');
-          form.get('patientBirthDate')?.setValue(`${yyyy}-${mm}-${dd}`);
+          // Use dd/MM/yyyy for UI
+          form.get('patientBirthDate')?.setValue(this.formatDateDMY(d));
         } else if (typeof dob === 'string') {
+          // Keep as-is; user may have dd/MM/yyyy already
           form.get('patientBirthDate')?.setValue(dob);
         }
       } catch {
@@ -613,7 +612,7 @@ export class TemporaryDemographicsComponent implements OnInit {
   ngAfterViewInit(): void {
     // Initialize birth date picker and bind to correct control name
     flatpickr('#birthDate', {
-      dateFormat: 'Y-m-d',
+      dateFormat: 'd/m/Y',
       maxDate: 'today',
       onChange: (_selectedDates: any, dateStr: string) => {
         const ctrl = this.temporaryForm.get('patientBirthDate');
@@ -624,12 +623,13 @@ export class TemporaryDemographicsComponent implements OnInit {
           ageCtrl.setValue(isNaN(age) ? '' : age, { emitEvent: false });
         }
       },
+      allowInput: true,
     });
   }
 
   private calculateAge(dob: any): number {
     if (!dob) return NaN;
-    const birth = new Date(dob);
+    const birth = this.parseDMYToDate(dob) || new Date(dob);
     if (isNaN(birth.getTime())) return NaN;
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
@@ -638,6 +638,36 @@ export class TemporaryDemographicsComponent implements OnInit {
       age--;
     }
     return age;
+  }
+
+  // Helpers for dd/MM/yyyy
+  private parseDMYToDate(input: any): Date | null {
+    if (!input) return null;
+    try {
+      if (typeof input === 'string') {
+        const m = input.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (m) {
+          const dd = parseInt(m[1], 10);
+          const mm = parseInt(m[2], 10) - 1;
+          const yyyy = parseInt(m[3], 10);
+          const d = new Date(yyyy, mm, dd);
+          return isFinite(d.getTime()) ? d : null;
+        }
+      }
+      const d2 = new Date(input);
+      return isFinite(d2.getTime()) ? d2 : null;
+    } catch { return null; }
+  }
+
+  private formatDateDMY(value: any): string {
+    try {
+      const d = new Date(value);
+      if (!isFinite(d.getTime())) return '';
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    } catch { return ''; }
   }
 
 }

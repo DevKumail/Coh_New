@@ -32,19 +32,13 @@
                 [defaultImage]="defaultImage"
                 [fileName]="fileName"
                 [isFormSubmitted]="isFormSubmitted"
-                (fileSelected)="onFileSelected($event)"
-                (remove)="removePhoto()"
-            ></app-demographic-photo-personal>
-
-            <!-- Basic Details Section (Child Component) -->
-            <app-demographic-basic-details
-                [demographicForm]="demographicForm"
                 [gender]="gender"
                 [genderIdentity]="genderIdentity"
                 [maritalstatus]="maritalstatus"
                 [bloodgroup]="bloodgroup"
-                [isFormSubmitted]="isFormSubmitted"
-            ></app-demographic-basic-details>
+                (fileSelected)="onFileSelected($event)"
+                (remove)="removePhoto()"
+            ></app-demographic-photo-personal>
 
             <!-- Identification Section (Child Component) -->
             <app-demographic-identification

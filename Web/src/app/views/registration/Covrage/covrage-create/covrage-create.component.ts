@@ -174,24 +174,24 @@ export class CovrageCreateComponent implements OnInit {
 
     initForm() {
         this.subscriberForm = this.fb.group({
-            CompanyOrIndividual: ['2'],
-            InsuranceRel: [''],
-            Address1: [''],
-            Suffix: [''],
-            FirstName: [''],
+            CompanyOrIndividual: ['2', Validators.required],
+            InsuranceRel: [''], // will set required conditionally in showRelation()
+            Address1: ['', Validators.required],
+            Suffix: ['', Validators.required],
+            FirstName: ['', Validators.required],
             MiddleName: [''],
-            LastName: [''],
-            InsuredPhone: [''],
-            BirthDate: [''],
-            Sex: [''],
-            InsuredIdNo: [''],
-            CountryId: [''],
-            StateId: [''],
-            CityId: [''],
-            ZipCode: [''],
-            CarrierId: [''],
-            selectedBLPayerPlan: [''],
-            selectedBLPayerPackage: [''],
+            LastName: ['', Validators.required],
+            InsuredPhone: ['', Validators.required],
+            BirthDate: ['', Validators.required],
+            Sex: ['', Validators.required],
+            InsuredIdNo: ['', Validators.required],
+            CountryId: ['', Validators.required],
+            StateId: ['', Validators.required],
+            CityId: ['', Validators.required],
+            ZipCode: ['', Validators.required],
+            CarrierId: ['', Validators.required],
+            selectedBLPayerPlan: ['', Validators.required],
+            selectedBLPayerPackage: ['', Validators.required],
             Inactive: [false],
             EnteredBy: [''],
             Deductibles: [''],
@@ -216,8 +216,8 @@ export class CovrageCreateComponent implements OnInit {
         });
 
         this.policyForm1 = this.fb.group({
-            effectiveDate: [''],
-            terminationDate: [''],
+            effectiveDate: ['', Validators.required],
+            terminationDate: ['', Validators.required],
             groupNo: [''],
             noOfVisits: [''],
             amount: [''],
@@ -226,6 +226,13 @@ export class CovrageCreateComponent implements OnInit {
     }
 
     openPolicyModal(content: any) {
+        // Ensure patient and policy list are initialized so table updates immediately
+        if (!this.patient) {
+            this.patient = { policyList: [] };
+        } else if (!this.patient.policyList) {
+            this.patient.policyList = [];
+        }
+
         this.policyForm1.reset();
         this.modalService.open(content, { size: 'lg' });
     }
@@ -457,14 +464,185 @@ export class CovrageCreateComponent implements OnInit {
             'CompanyOrIndividual'
         )?.value;
 
-        this.isRelation = selectedType === '';
+        this.isRelation = selectedType === '' || selectedType === '2';
 
+        const relControl = this.subscriberForm.get('InsuranceRel');
         if (selectedType === '1') {
-            this.subscriberForm.get('InsuranceRel')?.disable();
-            this.subscriberForm.get('InsuranceRel')?.reset();
+            // Self: relation not applicable
+            relControl?.clearValidators();
+            relControl?.setValue('');
+            relControl?.updateValueAndValidity();
+            relControl?.disable();
+            // When self selected, try to populate from banner data
+            this.populateFromBannerSelf();
         } else {
-            this.subscriberForm.get('InsuranceRel')?.enable();
+            // Relationship: make it required
+            relControl?.enable();
+            relControl?.setValidators([Validators.required]);
+            relControl?.updateValueAndValidity();
         }
+    }
+
+    /**
+     * Populate key form fields from patient banner data when Type = Self
+     */
+    async populateFromBannerSelf() {
+        try {
+            // Prefer subscription data; fallback to sessionStorage copy used by PatientBannerService
+            let p = this.SearchPatientData?.table2?.[0];
+            if (!p) {
+                try {
+                    const raw = sessionStorage.getItem('pb_patientData');
+                    const parsed = raw ? JSON.parse(raw) : null;
+                    p = parsed?.table2?.[0] || parsed?.table1?.[0] || null;
+                } catch {}
+            }
+            if (!p) return; // No banner loaded
+
+            // Attempt to map common banner fields with fallbacks
+            let firstName = p.firstName || p.personFirstName || p.PatientFirstName || '';
+            let middleName = p.middleName || p.personMiddleName || '';
+            let lastName = p.lastName || p.personLastName || p.PatientLastName || '';
+            // If individual parts are missing, try splitting a full name
+            const fullName = p.subscriberName || p.patientName || p.PatientName || p.fullName || p.FullName || '';
+            if ((!firstName || !lastName) && fullName) {
+                const parsed = this.parseName(fullName);
+                firstName = firstName || parsed.firstName;
+                lastName = lastName || parsed.lastName;
+                // Only set middle if not already provided
+                if (!middleName && parsed.middleName) {
+                    middleName = parsed.middleName;
+                }
+            }
+            const phone = p.cellPhone || p.personCellPhone || p.phone || '';
+            const sexCode = p.sex || p.personSex || p.genderId || p.GenderId || '';
+            const birthDateRaw = p.birthDate || p.patientBirthDate || p.DOB || '';
+            const address1 = p.address1 || p.Address1 || '';
+            const address2 = p.address2 || p.Address2 || '';
+            const zip = p.zipCode || p.personZipCode || p.ZipCode || '';
+            // Member Id fallbacks across possible shapes/tables
+            let memberId = p.memberId || p.MemberId || p.memberID || p.memberNo || p.MemberNo || p.member || '';
+            if (!memberId) {
+                const t1 = (this.SearchPatientData as any)?.table1?.[0] || {};
+                memberId = t1.memberId || t1.MemberId || t1.memberID || t1.memberNo || t1.MemberNo || '';
+            }
+            if (!memberId) {
+                memberId = p.InsuredIDNo || p.insuredIDNo || p.insuredIdNo || '';
+            }
+            if (typeof memberId === 'string') {
+                // Remove common label prefixes like 'Member ID:' and trim
+                memberId = memberId.includes(':') ? memberId.split(':').pop() as string : memberId;
+                memberId = (memberId || '').trim();
+                // Strip any non-alphanumeric characters while preserving leading zeros
+                memberId = memberId.replace(/[^0-9A-Za-z]/g, '');
+            }
+            let countryId = p.countryId || p.CountryId || null;
+            let stateId = p.stateId || p.StateId || null;
+            let cityId = p.cityId || p.CityId || null;
+            const countryName = p.countryName || p.CountryName || '';
+            const stateName = p.stateName || p.StateName || '';
+            const cityName = p.cityName || p.CityName || '';
+            const otherPhone = p.otherPhone || p.OtherPhone || '';
+            const titleCode = p.personTitleId || p.titleId || p.TitleId || null;
+            const titleName = p.title || p.Title || '';
+
+            // Set basic text fields immediately
+            this.subscriberForm.patchValue({
+                FirstName: firstName,
+                MiddleName: middleName,
+                LastName: lastName,
+                InsuredPhone: phone,
+                Sex: sexCode || this.subscriberForm.get('Sex')?.value,
+                BirthDate: birthDateRaw ? new Date(birthDateRaw).toISOString().slice(0, 10) : this.subscriberForm.get('BirthDate')?.value,
+                Address1: address1,
+                Address2: address2,
+                ZipCode: zip,
+                InsuredIdNo: memberId || this.subscriberForm.get('InsuredIdNo')?.value,
+                OtherPhone: otherPhone,
+                InsuranceRel: '',
+            });
+
+            // Handle country -> state -> city cascading selection
+            // Try to resolve CountryId by name if id missing
+            if (!countryId && countryName && this.Country?.length) {
+                const foundCountry = this.Country.find((c: any) => (c.name || '').toLowerCase() === (countryName || '').toLowerCase());
+                countryId = foundCountry?.code || null;
+            }
+
+            if (countryId) {
+                this.subscriberForm.get('CountryId')?.setValue(countryId);
+                await this.registrationApi
+                    .getStateByCountry(countryId)
+                    .then((res: any) => {
+                        this.states = res || [];
+                        this.subscriberForm.get('StateId')?.setValue(null);
+                        this.city = [];
+                        this.subscriberForm.get('CityId')?.setValue(null);
+                    });
+            }
+
+            // Try to resolve StateId by name if id missing
+            if (!stateId && stateName && this.states?.length) {
+                const foundState = this.states.find((s: any) => (s.name || '').toLowerCase() === (stateName || '').toLowerCase());
+                stateId = foundState?.stateId || null;
+            }
+
+            if (stateId) {
+                this.subscriberForm.get('StateId')?.setValue(stateId);
+                await this.registrationApi.getCityByState(stateId).then((res: any) => {
+                    this.city = res || [];
+                    this.subscriberForm.get('CityId')?.setValue(null);
+                });
+            }
+
+            // Try to resolve CityId by name if id missing
+            if (!cityId && cityName && this.city?.length) {
+                const foundCity = this.city.find((c: any) => (c.name || '').toLowerCase() === (cityName || '').toLowerCase());
+                cityId = foundCity?.cityId || null;
+            }
+
+            if (cityId) {
+                this.subscriberForm.get('CityId')?.setValue(cityId);
+            }
+
+            // Set Suffix (Title) by code or name
+            let suffix = this.subscriberForm.get('Suffix')?.value;
+            if (!suffix) {
+                if (titleCode && this.titles?.length) {
+                    const foundByCode = this.titles.find((t: any) => t.code == titleCode);
+                    suffix = foundByCode?.code || suffix;
+                }
+                if (!suffix && titleName && this.titles?.length) {
+                    const foundByName = this.titles.find((t: any) => (t.name || '').toLowerCase() === (titleName || '').toLowerCase());
+                    suffix = foundByName?.code || suffix;
+                }
+                if (suffix) {
+                    this.subscriberForm.patchValue({ Suffix: suffix });
+                }
+            }
+        } catch (e) {
+            // Swallow – best-effort populate only
+        }
+    }
+
+    // Split a full name string into first, middle, last parts
+    private parseName(name: string): { firstName: string; middleName: string; lastName: string } {
+        const cleaned = (name || '').trim().replace(/\s+/g, ' ');
+        if (!cleaned) {
+            return { firstName: '', middleName: '', lastName: '' };
+        }
+        const parts = cleaned.split(' ');
+        if (parts.length === 1) {
+            return { firstName: parts[0], middleName: '', lastName: '' };
+        }
+        if (parts.length === 2) {
+            return { firstName: parts[0], middleName: '', lastName: parts[1] };
+        }
+        // 3 or more parts: first, middle(s), last
+        const first = parts[0];
+        const last = parts[parts.length - 1];
+        const middle = parts.slice(1, -1).join(' ');
+        return { firstName: first, middleName: middle, lastName: last };
     }
 
     get policyTable(): FormArray {
@@ -623,16 +801,51 @@ export class CovrageCreateComponent implements OnInit {
         });
 
         const IGPN = this.BLPayerPlan.find((e: any) => e.code == this.subscriberForm.value.selectedBLPayerPlan);
-        const dto: InsuranceSubscriberDTO = {
-            ...this.subscriberForm.value,
-            BirthDate: this.subscriberForm.value.BirthDate
-                ? new Date(this.subscriberForm.value.BirthDate).toISOString()
-                : '',
-            policyList: this.patient?.policyList || [],
-            MRNo: this.SearchPatientData?.table2[0]?.mrNo || 0,
-            InsuredGroupOrPolicyName: IGPN?.name || null,
+        const f = this.subscriberForm.value;
+        const regInsert = (this.patient?.policyList || []).map((p: any) => ({
+            effectiveDate: p.effectiveDate,
+            terminationDate: p.terminationDate,
+            groupNo: p.groupNo || '',
+            noOfVisits: Number(p.noOfVisits) || 0,
+            amount: Number(p.amount) || 0,
+            status: p.status || ''
+        }));
+
+        const dto: any = {
+            SubscriberID: Number(f.SubscriberID) || 0,
+            CarrierId: Number(f.CarrierId) || 0,
+            InsuredIDNo: f.InsuredIdNo || '',
+            InsuranceTypeCode: f.InsuranceTypeCode || '',
             InsuredGroupOrPolicyNo: IGPN?.code || null,
-            PayerPackageId : this.subscriberForm.value.selectedBLPayerPackage || null
+            InsuredGroupOrPolicyName: IGPN?.name || null,
+            CompanyOrIndividual: Number(f.CompanyOrIndividual) || 0,
+            Copay: Number(f.Copay) || 0,
+            Suffix: f.Suffix || '',
+            FirstName: f.FirstName || '',
+            MiddleName: f.MiddleName || '',
+            LastName: f.LastName || '',
+            BirthDate: f.BirthDate ? new Date(f.BirthDate).toISOString() : '',
+            Sex: f.Sex || '',
+            InsuredPhone: f.InsuredPhone || '',
+            OtherPhone: f.OtherPhone || '',
+            Address1: f.Address1 || '',
+            Address2: f.Address2 || '',
+            ZipCode: f.ZipCode || '',
+            CityId: Number(f.CityId) || 0,
+            StateId: Number(f.StateId) || 0,
+            CountryId: Number(f.CountryId) || 0,
+            Inactive: !!f.Inactive,
+            EnteredBy: f.EnteredBy || username || '',
+            Verified: !!f.Verified,
+            ChkDeductible: !!f.ChkDeductible,
+            Deductibles: Number(f.Deductibles) || 0,
+            DNDeductible: Number(f.DNDeductible) || 0,
+            OpCopay: Number(f.OpCopay) || 0,
+            MRNo: this.SearchPatientData?.table2[0]?.mrNo || 0,
+            CoverageOrder: Number(f.CoverageOrder) || 0,
+            IsSelected: !!f.IsSelected,
+            PayerPackageId: Number(f.selectedBLPayerPackage) || null,
+            regInsert,
         };
         debugger
 

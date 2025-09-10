@@ -152,6 +152,7 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
         if (mrNo) {
             this.getDemographicsByMRNo(mrNo);
         }
+
     }
 
     private focusFirstInvalidControl(): void {
@@ -201,7 +202,7 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit(): void {
         flatpickr('#deathDate', {
-            dateFormat: 'Y-m-d',
+            dateFormat: 'd/m/Y',
             maxDate: 'today', // prevent future dates
             onChange: (selectedDates: any, dateStr: string) => {
                 this.demographicForm.get('DeathDate')?.setValue(dateStr);
@@ -209,13 +210,40 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
         });
 
         flatpickr('#birthDate', {
-            dateFormat: 'Y-m-d',
+            dateFormat: 'd/m/Y',
             maxDate: 'today', // typically DOB should not be in the future
             onChange: (selectedDates: any, dateStr: string) => {
                 this.demographicForm.get('PatientBirthDate')?.setValue(dateStr);
                 this.calculateAgeOnChangeDOB(); // call your age calculation
             },
         });
+    }
+
+    // Format incoming date (ISO string or date-like) to dd/MM/yyyy for the UI pickers
+    private formatToDMY(input: any): string | null {
+        if (!input) return null;
+        try {
+            // If string with T, split
+            let s = typeof input === 'string' ? input : '';
+            if (s.includes('T')) s = s.split('T')[0]; // yyyy-MM-dd
+            // If already dd/MM/yyyy, return as-is
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
+            // If yyyy-MM-dd, convert
+            const isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (isoMatch) {
+                const [, y, m, d] = isoMatch;
+                return `${d}/${m}/${y}`;
+            }
+            // Fallback: try Date
+            const d = new Date(input);
+            if (!isFinite(d.getTime())) return null;
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            return `${dd}/${mm}/${yyyy}`;
+        } catch {
+            return null;
+        }
     }
 
     initializeForm() {
@@ -448,9 +476,10 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
             this.fileName = file.name;
             this.convertFile(file).subscribe((base64) => {
                 this.byteImage = base64;
-                this.imageSrc = 'data:' + file.type + ';base64,' + base64;
+                this.imageSrc = 'data:' + file.type + ';base64,' + base64; // for preview only
+                // Store only raw base64 in the form to match backend expectations
                 this.demographicForm.patchValue({
-                    PatientPicture: this.imageSrc,
+                    PatientPicture: this.byteImage,
                 });
                 
                 Swal.fire({
@@ -710,7 +739,7 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
                         emails: demographics?.table1[0]?.email,
                         PersonEthnicityType: demographics?.table1[0]?.PersonEthnicityType,
                         PatientBloodGroupId: bloodGroup,
-                        PatientBirthDate: DOB.split('T')[0] || null,
+                        PatientBirthDate: this.formatToDMY(DOB) || null,
                         LaborCardNo: demographics?.table1[0]?.LaborCardNo,
                 });
                 this.imageSrc = data.PatientPicture ?? '';
@@ -755,7 +784,8 @@ onSubmit() {
 
     // Collect main form data and normalize image before building payload
     const formData: any = this.demographicForm?.value || {};
-    const normalizedPicture: string = (this.imageSrc as string) || '';
+    // Use raw base64 for submission; do not send data URL
+    const normalizedPicture: string = (this.byteImage as string) || '';
 
     // Contact (use RegPatientTabsType: 1 = Contact Residence)
     const Contact: ContactModel = {

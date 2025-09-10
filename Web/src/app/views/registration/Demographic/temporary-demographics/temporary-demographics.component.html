@@ -100,7 +100,7 @@
                         formControlName="patientBirthDate"
                         data-provider="flatpickr"
                         id="birthDate"
-                        placeholder="Select date"
+                        placeholder="dd/MM/yyyy"
                     />
                     <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched || temporaryForm.touched)">
                         Date of birth is required.

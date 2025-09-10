@@ -62,7 +62,7 @@ namespace HMIS.Application.ServiceLogics
                 //param.Add("@Name", string.IsNullOrEmpty(name) ? null : name, DbType.String);
                 //param.Add("@InsuranceID", string.IsNullOrEmpty(insuranceId) ? null : insuranceId, DbType.String);
 
-                DataSet ds = await DapperHelper.GetDataSetBySP("CoverageListGetAll", parameters);
+                DataSet ds = await DapperHelper.GetDataSetBySP("GetCoverageList", parameters);
                 if (ds.Tables[0].Rows.Count == 0)
                 {
                     throw new Exception("No data found");

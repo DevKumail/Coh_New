@@ -30,7 +30,7 @@ namespace HMIS.Application.DTOs.Clinical
         public string UpdatedBy { get; set; }
         public long? AppointmentId { get; set; }
         public int AlertTypeId { get; set; }
-     
+        public DateTime? StartDate { get; set; }
         public string Comments { get; set; }
         public bool? HasChild { get; set; }
         

@@ -1,5 +1,5 @@
 import { RegistrationApiService } from '@/app/shared/Services/Registration/registration.api.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -10,6 +10,8 @@ import { Injectable } from '@angular/core';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { AlertDTO } from '@/app/shared/Models/Clinical/alert.model';
+
+declare var flatpickr: any;
 import { AlertType } from '@/app/shared/Models/Clinical/alert-type.model';
 
 
@@ -27,9 +29,10 @@ import { AlertType } from '@/app/shared/Models/Clinical/alert-type.model';
 @Injectable({
   providedIn: 'root'
 })
-export class AlertComponent implements OnInit {
+export class AlertComponent implements OnInit, AfterViewInit {
  MyAlertsData: AlertDTO[] = [];
   filteredAlertsData: any[] = [];
+  pagedAlerts: AlertDTO[] = [];
   alertForm!: FormGroup;
   getAlert: AlertType[] = [];
   isLoading: boolean = false;
@@ -40,6 +43,8 @@ export class AlertComponent implements OnInit {
   PatientId: any;
   userid: any;
   id: any;
+  // Track which alert is being edited (null means create mode)
+  editingAlertId: number | null = null;
 
   Alert: any;
   AlertRow: any;
@@ -47,7 +52,8 @@ export class AlertComponent implements OnInit {
   pageSize: number = 10;
   pageSizes = [5, 10, 25, 50];
   totalPages = 0;
-  pageNumbers: number[] = [];
+  totalItems = 0;
+  pageNumbers: (number | string)[] = [];
   SearchPatientData: any
 
   constructor(private fb: FormBuilder, private router: Router,
@@ -91,6 +97,8 @@ export class AlertComponent implements OnInit {
     await this.GetPatientAlertsData();
     await this.GetAlertType();
     this.alertForm = this.fb.group({
+      // Carry the record id to support update
+      alertId: [0],
       alertType: [null, Validators.required],
       startDate: ['', Validators.required],
       repeatDate: ['', Validators.required],
@@ -111,16 +119,16 @@ export class AlertComponent implements OnInit {
       }
     } catch { }
 
-    // Auto-fill updatedBy and enteredBy from localStorage if available
+    // Auto-fill updatedBy and enteredBy from sessionStorage if available (AuthService writes here)
     try {
-      const lsUserName = (typeof window !== 'undefined' && window?.localStorage)
-        ? (localStorage.getItem('userName') || '')
+      const ssUserName = (typeof window !== 'undefined' && window?.sessionStorage)
+        ? (sessionStorage.getItem('userName') || '')
         : '';
-      if (lsUserName) {
-        this.alertForm.patchValue({ updatedBy: lsUserName, enteredBy: lsUserName });
+      if (ssUserName) {
+        this.alertForm.patchValue({ updatedBy: ssUserName, enteredBy: ssUserName });
       }
     } catch (e) {
-      console.warn('Could not access localStorage.userName', e);
+      console.warn('Could not access sessionStorage.userName', e);
     }
 
     // Auto-fill enteredDate with today's date in yyyy-MM-dd
@@ -135,6 +143,83 @@ export class AlertComponent implements OnInit {
 
     this.calculatePagination();
 
+    // Defer picker initialization until the form is in the DOM
+    setTimeout(() => this.initDatePickers(), 0);
+  }
+
+  ngAfterViewInit(): void {
+    // Fallback: in case form was already rendered, initialize pickers
+    this.initDatePickers();
+  }
+
+  private initDatePickers() {
+    const startEl = document.querySelector('#alertStartDate') as HTMLInputElement | null;
+    const repeatEl = document.querySelector('#alertRepeatDate') as HTMLInputElement | null;
+    if (!startEl && !repeatEl) {
+      // Form not yet in DOM; try again shortly
+      setTimeout(() => this.initDatePickers(), 100);
+      return;
+    }
+    this.ensureFlatpickr().then(() => {
+      try {
+        if (startEl && !startEl.getAttribute('data-fp-applied')) {
+          flatpickr(startEl, {
+            dateFormat: 'd/m/Y',
+            allowInput: true,
+            onChange: (_sd: any, dateStr: string) => {
+              this.alertForm?.patchValue({ startDate: dateStr });
+            },
+          });
+          startEl.setAttribute('data-fp-applied', '1');
+        }
+        if (repeatEl && !repeatEl.getAttribute('data-fp-applied')) {
+          flatpickr(repeatEl, {
+            dateFormat: 'd/m/Y',
+            allowInput: true,
+            onChange: (_sd: any, dateStr: string) => {
+              this.alertForm?.patchValue({ repeatDate: dateStr });
+            },
+          });
+          repeatEl.setAttribute('data-fp-applied', '1');
+        }
+      } catch (e) {
+        console.warn('Flatpickr init failed:', e);
+      }
+    });
+  }
+
+  // Dynamically load flatpickr if not already available
+  private ensureFlatpickr(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      const w = window as any;
+      if (typeof w.flatpickr === 'function') {
+        resolve();
+        return;
+      }
+      // Avoid injecting twice
+      if (document.getElementById('fp-script')) {
+        const check = setInterval(() => {
+          if (typeof (window as any).flatpickr === 'function') {
+            clearInterval(check);
+            resolve();
+          }
+        }, 50);
+        setTimeout(() => clearInterval(check), 5000);
+        return;
+      }
+      const link = document.createElement('link');
+      link.id = 'fp-style';
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css';
+      document.head.appendChild(link);
+
+      const script = document.createElement('script');
+      script.id = 'fp-script';
+      script.src = 'https://cdn.jsdelivr.net/npm/flatpickr';
+      script.onload = () => resolve();
+      script.onerror = () => resolve(); // Resolve anyway to avoid blocking
+      document.body.appendChild(script);
+    });
   }
 
   goBackToList() {
@@ -160,12 +245,21 @@ export class AlertComponent implements OnInit {
       this.MyAlertsData = [];
       this.alertsTable = res?.alert?.table1 || [];
       if (Array.isArray(this.alertsTable) && this.alertsTable.length > 0) {
-        // Normalize to match AlertDTO types (active: boolean)
-        this.MyAlertsData = this.alertsTable.map((it: any) => ({
-          ...it,
-          active: it?.active === true || it?.active === 1,
-        }));
+        // Normalize to match AlertDTO types and ensure alertId exists as number
+        this.MyAlertsData = this.alertsTable.map((it: any) => {
+          const normalized: any = { ...it };
+          // Normalize boolean
+          normalized.active = it?.active === true || it?.active === 1;
+          // Normalize alertId from multiple possible back-end keys
+          const idCandidate = it?.alertId ?? it?.AlertId ?? it?.AlertID ?? it?.ALERTID ?? it?.id ?? it?.ID ?? 0;
+          normalized.alertId = Number(idCandidate) || 0;
+          return normalized as AlertDTO;
+        });
         this.filteredAlertsData = this.MyAlertsData;
+        this.totalItems = this.MyAlertsData.length;
+        this.currentPage = 1; // reset to first page when data reloads
+        this.calculatePagination();
+        this.updatePagedData();
         console.log(this.MyAlertsData, "alerts");
       }
     }).catch((error: any) => {
@@ -225,35 +319,43 @@ export class AlertComponent implements OnInit {
     }
 
     const formValue = this.alertForm.value;
-    const lsUserName = (typeof window !== 'undefined' && window?.localStorage)
-      ? (localStorage.getItem('userName') || '')
+    const ssUserName = (typeof window !== 'undefined' && window?.sessionStorage)
+      ? (sessionStorage.getItem('userName') || '')
       : '';
-    const effectiveUpdatedBy = formValue.updatedBy || lsUserName;
-    const effectiveEnteredBy = formValue.enteredBy || lsUserName;
+    const effectiveUpdatedBy = formValue.updatedBy || ssUserName;
+    const effectiveEnteredBy = formValue.enteredBy || ssUserName;
     const today = new Date();
     const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
       .toISOString()
       .slice(0, 10);
     const effectiveEnteredDateStr = formValue.enteredDate || todayStr;
 
-    // Additional validation: repeatDate >= startDate
-    try {
-      const sd = new Date(formValue.startDate);
-      const rd = new Date(formValue.repeatDate);
-      if (isFinite(sd.getTime()) && isFinite(rd.getTime()) && rd < sd) {
-        Swal.fire('Validation Error', 'Repeat Date cannot be earlier than Start Date.', 'warning');
-        return;
-      }
-    } catch { }
+    // Additional validation: parse and ensure repeatDate >= startDate
+    let sd = this.parseDMYToDate(formValue.startDate);
+    let rd = this.parseDMYToDate(formValue.repeatDate);
+    if (!sd || !rd) {
+      Swal.fire('Validation Error', 'Please enter valid dates in dd/MM/yyyy format.', 'warning');
+      return;
+    }
+    if (rd < sd) {
+      Swal.fire('Validation Error', 'Repeat Date cannot be earlier than Start Date.', 'warning');
+      return;
+    }
+
+    // Determine the id to send for update
+    const selectedId = Number(this.editingAlertId || this.alertForm?.get('alertId')?.value || 0) || 0;
+    console.log('Submitting Alert. editingAlertId=', this.editingAlertId, 'form.alertId=', this.alertForm?.get('alertId')?.value, 'selectedId=', selectedId);
 
     const alert = {
-      alertId: 0,
+      // Ensure backend receives the correct identifier for update
+      alertId: selectedId,
+
       ruleId: 0,
-      mrno: this.SearchPatientData?.table2[0]?.mrNo || null,
+      mrno: this.SearchPatientData?.table2?.[0]?.mrNo || null,
       alertMessage: formValue.message,
       active: String(formValue.status) === '1',
-      repeatDate: new Date(formValue.repeatDate),
-      startDate: new Date(formValue.startDate),
+      repeatDate: rd,
+      startDate: sd,
       isFinished: true,
       enteredBy: effectiveEnteredBy,
       enteredDate: new Date(effectiveEnteredDateStr),
@@ -262,9 +364,20 @@ export class AlertComponent implements OnInit {
       alertTypeId: parseInt(formValue.alertType),
       comments: formValue.message,
       hasChild: false,
-      oldMrno: this.SearchPatientData?.table2[0]?.mrNo || null,
+      oldMrno: this.SearchPatientData?.table2?.[0]?.mrNo || null,
       isDeleted: false,
-    } as AlertDTO;
+    } as AlertDTO & { AlertId?: number };
+
+    // Some backends expect PascalCase for IDs (e.g., AlertId). Send both just in case.
+    if (alert.alertId && alert.alertId > 0) {
+      (alert as any).AlertId = alert.alertId;
+    }
+
+    // Guard: If user is updating but alertId is 0, stop and inform
+    if (this.buttontext === 'update' && (!alert.alertId || alert.alertId === 0)) {
+      Swal.fire('Validation Error', 'Cannot update: missing Alert ID. Please reselect the alert to edit.', 'warning');
+      return;
+    }
 
     console.log('this.SearchPatientData?.table2[0]?.mrNo =>', this.SearchPatientData?.table2[0]?.mrNo);
 
@@ -285,6 +398,23 @@ export class AlertComponent implements OnInit {
           timer: 1500
         });
         this.alertForm.reset();
+        // Reset editing state and button text after successful save/update
+        this.editingAlertId = null;
+        this.buttontext = 'save';
+        // Rehydrate auto fields after reset
+        try {
+          const ssUserName = (typeof window !== 'undefined' && window?.sessionStorage)
+            ? (sessionStorage.getItem('userName') || '')
+            : '';
+          if (ssUserName) {
+            this.alertForm.patchValue({ updatedBy: ssUserName, enteredBy: ssUserName });
+          }
+        } catch {}
+        const today = new Date();
+        const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
+          .toISOString()
+          .slice(0, 10);
+        this.alertForm.patchValue({ enteredDate: todayStr, mrno: this.SearchPatientData?.table2?.[0]?.mrNo || null });
         this.GetPatientAlertsData();
       },
       error: (error: any) => {
@@ -308,6 +438,102 @@ export class AlertComponent implements OnInit {
    });
   }
 
+  // Helper to format date values for input[type=date]
+  private formatDateForInputDMY(value: any): string {
+    try {
+      const d = new Date(value);
+      if (!isFinite(d.getTime())) return '';
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    } catch { return ''; }
+  }
+
+  private parseDMYToDate(input: any): Date | null {
+    if (!input) return null;
+    try {
+      if (typeof input === 'string') {
+        const m = input.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (m) {
+          const dd = parseInt(m[1], 10);
+          const mm = parseInt(m[2], 10) - 1;
+          const yyyy = parseInt(m[3], 10);
+          const d = new Date(yyyy, mm, dd);
+          return isFinite(d.getTime()) ? d : null;
+        }
+      }
+      const d2 = new Date(input);
+      return isFinite(d2.getTime()) ? d2 : null;
+    } catch { return null; }
+  }
+
+  // Load a row into the form for editing
+  editAlert(item: any) {
+    debugger;
+    if (!item) return;
+    const pickedId = Number(item?.alertID ?? item?.AlertId ?? item?.AlertID ?? item?.ALERTID ?? item?.id ?? item?.ID ?? 0) || 0;
+    this.editingAlertId = pickedId;
+    // Patch the form with item data
+    const patch = {
+      alertId: pickedId,
+      alertType: item.alertTypeId ?? null,
+      startDate: this.formatDateForInputDMY(item.startDate),
+      repeatDate: this.formatDateForInputDMY(item.repeatDate),
+      message: item.alertMessage ?? item.comments ?? '',
+      status: (item.active === true || item.active === 1) ? 1 : 0,
+      mrno: this.SearchPatientData?.table2?.[0]?.mrNo || null,
+    } as any;
+    this.alertForm.patchValue(patch);
+
+    // Ensure updatedBy is set to current user for the eventual update
+    try {
+      const ssUserName = (typeof window !== 'undefined' && window?.sessionStorage)
+        ? (sessionStorage.getItem('userName') || '')
+        : '';
+      if (ssUserName) {
+        this.alertForm.patchValue({ updatedBy: ssUserName });
+      }
+    } catch {}
+
+    // Switch submit button to Update
+    this.buttontext = 'update';
+
+    // Scroll to the form for user convenience
+    try { window?.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+  }
+
+  // Clear form and reset to create mode
+  clearForm() {
+    try {
+      const ssUserName = (typeof window !== 'undefined' && window?.sessionStorage)
+        ? (sessionStorage.getItem('userName') || '')
+        : '';
+      const today = new Date();
+      const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 10);
+
+      this.alertForm.reset({
+        alertId: 0,
+        alertType: null,
+        startDate: '',
+        repeatDate: '',
+        message: '',
+        status: null,
+        updatedBy: ssUserName,
+        enteredBy: ssUserName,
+        enteredDate: todayStr,
+        mrno: this.SearchPatientData?.table2?.[0]?.mrNo || null,
+      });
+    } catch {
+      // Fallback minimal reset
+      this.alertForm.reset();
+    }
+    this.editingAlertId = null;
+    this.buttontext = 'save';
+  }
+
 
 
 
@@ -327,34 +553,63 @@ export class AlertComponent implements OnInit {
   }
 
   get end(): number {
-    return Math.min(this.start + this.pageSize, this.MyAlertsData.length);
+    return Math.min(this.start + this.pageSize, this.totalItems);
   }
 
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
+      this.updatePagedData();
+      this.calculatePagination();
     }
   }
 
   prevPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
+      this.updatePagedData();
+      this.calculatePagination();
     }
   }
 
   goToPage(page: number) {
+    if (typeof page !== 'number') return;
+    if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
+    this.updatePagedData();
+    this.calculatePagination();
   }
 
   onPageSizeChange(event: any) {
     this.pageSize = +event.target.value;
     this.currentPage = 1;
     this.calculatePagination();
+    this.updatePagedData();
   }
 
   calculatePagination() {
-    this.totalPages = Math.ceil(this.MyAlertsData.length / this.pageSize);
-    this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    this.totalItems = this.MyAlertsData.length;
+    this.totalPages = Math.ceil(this.totalItems / this.pageSize) || 1;
+
+    // Generate page numbers with ellipses like in Demographics
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const delta = 2;
+    const range: (number | string)[] = [];
+    const left = Math.max(2, current - delta);
+    const right = Math.min(total - 1, current + delta);
+
+    range.push(1);
+    if (left > 2) range.push('...');
+    for (let i = left; i <= right; i++) range.push(i);
+    if (right < total - 1) range.push('...');
+    if (total > 1) range.push(total);
+
+    this.pageNumbers = range;
+  }
+
+  private updatePagedData() {
+    this.pagedAlerts = this.MyAlertsData.slice(this.start, this.end);
   }
 }
 
