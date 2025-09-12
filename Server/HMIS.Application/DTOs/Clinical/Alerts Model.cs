@@ -19,7 +19,7 @@ namespace HMIS.Application.DTOs.Clinical
         public string AlertMessage { get; set; }
         public bool Active { get; set; }
        
-        public string RepeatDate { get; set; }
+        public string? RepeatDate { get; set; }
        
         public bool IsFinished { get; set; }
         

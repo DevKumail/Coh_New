@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <div class="col-lg-3">
+      <div class="col-lg-3" *ngIf="buttontext === 'update'">
         <div class="mb-3">
           <label class="form-label">Repeat Date</label>
           <input id="alertRepeatDate" type="text" class="form-control" formControlName="repeatDate" placeholder="dd/MM/yyyy" data-provider="flatpickr" />
@@ -57,11 +57,13 @@
           <label class="form-label">Status</label>
           <select class="form-select" formControlName="status">
             <option [ngValue]="null" disabled>Select Status</option>
-            <option *ngFor="let status of Active" [value]="status.id">
-              {{ status.name }}
-            </option>
+            <ng-container *ngFor="let status of Active">
+              <option *ngIf="buttontext === 'update' || status.id !== 2" [ngValue]="status.id">
+                {{ status.name }}
+              </option>
+            </ng-container>
           </select>
-          <div class="text-danger small" *ngIf="alertForm.get('status')?.touched && alertForm.get('status')?.invalid">
+          <div class="text-danger small" *ngIf="alertForm.get('status')?.touched && alertForm.get('status')?.value == null">
             Status is required.
           </div>
         </div>
@@ -100,10 +102,10 @@
                 <th>Start Date</th>
                 <th>Repeat Date</th>
                 <th>Message</th>
-                <th>Status</th>
-                <th>Updated By</th>
                 <th>Entered By</th>
                 <th>Entered Date</th>
+                <th>Status</th>
+                <th>Updated By</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -114,19 +116,21 @@
                 <td class="text-center">{{ item.startDate|date:'dd/MM/yyyy' }}</td>
                 <td class="text-center">{{ item.repeatDate|date:'dd/MM/yyyy' }}</td>
                 <td class="text-center">{{ item.alertMessage }}</td>
-                <td class="text-center">{{ item.active ? 'Active' : 'Inactive' }}</td>
-                <td class="text-center">{{ item.updatedBy }}</td>
                 <td class="text-center">{{ item.enteredBy }}</td>
                 <td class="text-center">{{ item.enteredDate|date:'dd/MM/yyyy' }}</td>
+                <td class="text-center">{{ item.isFinished ? 'Completed' : (item.active ? 'Active' : 'Inactive') }}</td>
+                <td class="text-center">{{ item.updatedBy }}</td>
                 <td class="text-center align-middle actions-cell">
                   <div class="d-inline-flex justify-content-center align-items-center gap-2 text-nowrap actions-wrap">
                     <ng-icon
                       name="tablerEdit"
-                      title="Edit"
+                      [title]="item.isFinished ? 'Completed alerts cannot be edited' : 'Edit'"
                       aria-label="Edit"
                       class="text-primary fs-5 action-icon"
+                      [class.opacity-50]="item.isFinished"
+                      [style.pointer-events]="item.isFinished ? 'none' : 'auto'"
                       style="cursor: pointer;"
-                      (click)="editAlert(item)"
+                      (click)="!item.isFinished && editAlert(item)"
                     ></ng-icon>
                   </div>
                 </td>

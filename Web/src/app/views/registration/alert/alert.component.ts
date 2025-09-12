@@ -62,7 +62,11 @@ export class AlertComponent implements OnInit, AfterViewInit {
 
 
   ) { }
-  Active = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
+  Active = [
+    { id: 1, name: "Active" },
+    { id: 0, name: "InActive" },
+    { id: 2, name: "Completed" }
+  ];
 
 
 
@@ -119,13 +123,13 @@ export class AlertComponent implements OnInit, AfterViewInit {
       }
     } catch { }
 
-    // Auto-fill updatedBy and enteredBy from sessionStorage if available (AuthService writes here)
+    // Auto-fill enteredBy from sessionStorage if available (AuthService writes here)
     try {
       const ssUserName = (typeof window !== 'undefined' && window?.sessionStorage)
         ? (sessionStorage.getItem('userName') || '')
         : '';
       if (ssUserName) {
-        this.alertForm.patchValue({ updatedBy: ssUserName, enteredBy: ssUserName });
+        this.alertForm.patchValue({ enteredBy: ssUserName, updatedBy: null });
       }
     } catch (e) {
       console.warn('Could not access sessionStorage.userName', e);
@@ -145,6 +149,9 @@ export class AlertComponent implements OnInit, AfterViewInit {
 
     // Defer picker initialization until the form is in the DOM
     setTimeout(() => this.initDatePickers(), 0);
+
+    // Ensure Repeat Date validation reflects current mode (default: save => not required)
+    this.updateRepeatDateValidator();
   }
 
   ngAfterViewInit(): void {
@@ -330,16 +337,26 @@ export class AlertComponent implements OnInit, AfterViewInit {
       .slice(0, 10);
     const effectiveEnteredDateStr = formValue.enteredDate || todayStr;
 
-    // Additional validation: parse and ensure repeatDate >= startDate
+    // Additional validation: Start Date is always required; Repeat Date only required in update mode
     let sd = this.parseDMYToDate(formValue.startDate);
-    let rd = this.parseDMYToDate(formValue.repeatDate);
-    if (!sd || !rd) {
-      Swal.fire('Validation Error', 'Please enter valid dates in dd/MM/yyyy format.', 'warning');
+    if (!sd) {
+      Swal.fire('Validation Error', 'Please enter a valid Start Date in dd/MM/yyyy format.', 'warning');
       return;
     }
-    if (rd < sd) {
-      Swal.fire('Validation Error', 'Repeat Date cannot be earlier than Start Date.', 'warning');
-      return;
+    let rd: Date | null = null;
+    if (this.buttontext === 'update') {
+      rd = this.parseDMYToDate(formValue.repeatDate);
+      if (!rd) {
+        Swal.fire('Validation Error', 'Please enter a valid Repeat Date in dd/MM/yyyy format.', 'warning');
+        return;
+      }
+      if (rd < sd) {
+        Swal.fire('Validation Error', 'Repeat Date cannot be earlier than Start Date.', 'warning');
+        return;
+      }
+    } else {
+      // In create mode, send repeatDate as null
+      rd = null;
     }
 
     // Determine the id to send for update
@@ -356,10 +373,11 @@ export class AlertComponent implements OnInit, AfterViewInit {
       active: String(formValue.status) === '1',
       repeatDate: rd,
       startDate: sd,
-      isFinished: true,
+      isFinished: String(formValue.status) === '2',
       enteredBy: effectiveEnteredBy,
       enteredDate: new Date(effectiveEnteredDateStr),
-      updatedBy: effectiveUpdatedBy,
+      // For new insert (no id), send empty string for UpdatedBy per requirement; for updates, use updatedBy/current user
+      updatedBy: selectedId > 0 ? effectiveUpdatedBy : '',
       appointmentId: Number(this.appID) || 0,
       alertTypeId: parseInt(formValue.alertType),
       comments: formValue.message,
@@ -372,6 +390,8 @@ export class AlertComponent implements OnInit, AfterViewInit {
     if (alert.alertId && alert.alertId > 0) {
       (alert as any).AlertId = alert.alertId;
     }
+    // Also mirror UpdatedBy in PascalCase to satisfy strict backends
+    (alert as any).UpdatedBy = alert.updatedBy;
 
     // Guard: If user is updating but alertId is 0, stop and inform
     if (this.buttontext === 'update' && (!alert.alertId || alert.alertId === 0)) {
@@ -401,13 +421,13 @@ export class AlertComponent implements OnInit, AfterViewInit {
         // Reset editing state and button text after successful save/update
         this.editingAlertId = null;
         this.buttontext = 'save';
-        // Rehydrate auto fields after reset
+        // Rehydrate auto fields after reset: enteredBy only; updatedBy stays null for next insert
         try {
           const ssUserName = (typeof window !== 'undefined' && window?.sessionStorage)
             ? (sessionStorage.getItem('userName') || '')
             : '';
           if (ssUserName) {
-            this.alertForm.patchValue({ updatedBy: ssUserName, enteredBy: ssUserName });
+            this.alertForm.patchValue({ enteredBy: ssUserName, updatedBy: null });
           }
         } catch {}
         const today = new Date();
@@ -472,6 +492,11 @@ export class AlertComponent implements OnInit, AfterViewInit {
   editAlert(item: any) {
     debugger;
     if (!item) return;
+    // Prevent editing of completed alerts
+    if (item?.isFinished) {
+      try { Swal.fire('Info', 'Completed alerts cannot be edited.', 'info'); } catch {}
+      return;
+    }
     const pickedId = Number(item?.alertID ?? item?.AlertId ?? item?.AlertID ?? item?.ALERTID ?? item?.id ?? item?.ID ?? 0) || 0;
     this.editingAlertId = pickedId;
     // Patch the form with item data
@@ -499,6 +524,9 @@ export class AlertComponent implements OnInit, AfterViewInit {
     // Switch submit button to Update
     this.buttontext = 'update';
 
+    // Repeat Date should be required in update mode
+    this.updateRepeatDateValidator();
+
     // Scroll to the form for user convenience
     try { window?.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
   }
@@ -521,7 +549,7 @@ export class AlertComponent implements OnInit, AfterViewInit {
         repeatDate: '',
         message: '',
         status: null,
-        updatedBy: ssUserName,
+        updatedBy: null,
         enteredBy: ssUserName,
         enteredDate: todayStr,
         mrno: this.SearchPatientData?.table2?.[0]?.mrNo || null,
@@ -532,6 +560,8 @@ export class AlertComponent implements OnInit, AfterViewInit {
     }
     this.editingAlertId = null;
     this.buttontext = 'save';
+    // Repeat Date not required in create mode
+    this.updateRepeatDateValidator();
   }
 
 
@@ -610,6 +640,18 @@ export class AlertComponent implements OnInit, AfterViewInit {
 
   private updatePagedData() {
     this.pagedAlerts = this.MyAlertsData.slice(this.start, this.end);
+  }
+  
+  // Toggle Repeat Date validator based on mode
+  private updateRepeatDateValidator() {
+    const ctrl = this.alertForm?.get('repeatDate');
+    if (!ctrl) return;
+    if (this.buttontext === 'update') {
+      ctrl.setValidators([Validators.required]);
+    } else {
+      ctrl.clearValidators();
+    }
+    ctrl.updateValueAndValidity({ emitEvent: false });
   }
 }
 
