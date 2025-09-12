@@ -19,6 +19,7 @@ import Swal from 'sweetalert2';
 import { SchedulingApiService } from '@/app/views/Scheduling/scheduling.api.service';
 import { LoaderService } from '@core/services/loader.service';
 import { ChoiceSelectInputDirective } from '@core/directive/choices-select.directive';
+import { Roles } from '@/app/shared/enum/roles.enum';
 
 @Component({
     selector: 'app-order-statistics',
@@ -53,123 +54,31 @@ export class OrderStatisticsComponent {
     providers: any[] = [];
     facilities: any[] = [];
     sites: any[] = [];
+    appointmentstotaldata: any;
     // Status filter options
-    statusOptions: string[] = [
-        'Not Yet Arrived',
-        'Check-In',
-        'Ready',
-        'Seen',
-        'Billed',
-        'Check-Out',
+    statusOptions: any[] = [
+        {id: 1 , name: 'Not Yet Arrived'},
+        {id: 2 , name: 'Check-In'},
+        {id: 3 , name: 'Ready'},
+        {id: 4 , name: 'Seen'},
+        {id: 5 , name: 'Billed'},
+        {id: 6 , name: 'Check-Out'},
     ]; 
     PaginationInfo: any = {
         Page: 1,
         RowsPerPage: 10,
     }
     
-    appointments: any = [
-        {
-            appDateTime: '2022-01-01',
-            patient_FName: 'John',
-            mrNo: '1006',
-            appointment_PatientStatus: 'Check-up',
-            purposeOfVisit: 'N/A',
-            appointment_SiteName: 'Womens Health Center',
-            subject: 'Normal Report',
-            sender: 'Application Admin',
-        },
-        {
-            appDateTime: '2022-01-01',
-            patient_FName: 'Doe',
-            mrNo: '1007',
-            appointment_PatientStatus: 'Check-Out',
-            purposeOfVisit: 'N/A',
-            appointment_SiteName: 'Womens Health Center',
-            subject: 'Insurance related query',
-            sender: 'Application Admin',
-        },
-        {
-            appDateTime: '2022-01-01',
-            patient_FName: 'John',
-            mrNo: '1006',
-            appointment_PatientStatus: 'Check-up',
-            purposeOfVisit: 'N/A',
-            appointment_SiteName: 'Womens Health Center',
-            subject: 'Normal Report',
-            sender: 'Application Admin',
-        },
-        {
-            appDateTime: '2022-01-01',
-            patient_FName: 'Doe',
-            mrNo: '1007',
-            appointment_PatientStatus: 'Check-Out',
-            purposeOfVisit: 'N/A',
-            appointment_SiteName: 'Womens Health Center',
-            subject: 'Insurance related query',
-            sender: 'Application Admin',
-        },
-        {
-            appDateTime: '2022-01-01',
-            patient_FName: 'John',
-            mrNo: '1006',
-            appointment_PatientStatus: 'Check-up',
-            purposeOfVisit: 'N/A',
-            appointment_SiteName: 'Womens Health Center',
-            subject: 'Normal Report',
-            sender: 'Application Admin',
-        },
-        {
-            appDateTime: '2022-01-01',
-            patient_FName: 'Doe',
-            mrNo: '1007',
-            appointment_PatientStatus: 'Check-Out',
-            purposeOfVisit: 'N/A',
-            appointment_SiteName: 'Womens Health Center',
-            subject: 'Insurance related query',
-            sender: 'Application Admin',
-        },
-        {
-            appDateTime: '2022-01-01',
-            patient_FName: 'John',
-            mrNo: '1006',
-            appointment_PatientStatus: 'Check-up',
-            purposeOfVisit: 'N/A',
-            appointment_SiteName: 'Womens Health Center',
-            subject: 'Normal Report',
-            sender: 'Application Admin',
-        },
-        {
-            appDateTime: '2022-01-01',
-            patient_FName: 'Doe',
-            mrNo: '1007',
-            appointment_PatientStatus: 'Check-Out',
-            purposeOfVisit: 'N/A',
-            appointment_SiteName: 'Womens Health Center',
-            subject: 'Insurance related query',
-            sender: 'Application Admin',
-        },
-        {
-            appDateTime: '2022-01-01',
-            patient_FName: 'John',
-            mrNo: '1006',
-            appointment_PatientStatus: 'Check-up',
-            purposeOfVisit: 'N/A',
-            appointment_SiteName: 'Womens Health Center',
-            subject: 'Normal Report',
-            sender: 'Application Admin',
-        },
-        {
-            appDateTime: '2022-01-01',
-            patient_FName: 'Doe',
-            mrNo: '1007',
-            appointment_PatientStatus: 'Check-Out',
-            purposeOfVisit: 'N/A',
-            appointment_SiteName: 'Womens Health Center',
-            subject: 'Insurance related query',
-            sender: 'Application Admin',
-        },
-
-    ];
+    tableStatus: any [] = [
+       {id: 33 , name: 'Awaiting Nurse'},
+       {id: 34 , name: 'With Nurse'},
+       {id: 35 , name: 'Awaiting Doctor'},
+       {id: 36 , name: 'With Doctor'},
+       {id: 37 , name: 'Left Without Seen'},
+       {id: 38 , name: 'Investigations to do'},
+       {id: 39 , name: 'Seen Completed'},
+    ]
+   
 
     other: any = [
         {
@@ -224,6 +133,8 @@ export class OrderStatisticsComponent {
         },
     ];
 
+    appointments: any = [];
+
 
     cacheItems: string[] = [
         'Provider',
@@ -255,6 +166,17 @@ export class OrderStatisticsComponent {
     @ViewChild('appointmentToggler') appointmentToggler?: ElementRef<HTMLButtonElement>;
     @ViewChild('statusesSel') statusesSel?: ElementRef<HTMLSelectElement>;
 
+    // Current role id from session storage
+    currentRoleId: number = Number(sessionStorage.getItem('empId') || 0);
+
+    // Role-based visibility helpers
+    get canShowNotes(): boolean {
+        return this.currentRoleId === Roles.Provider || this.currentRoleId === Roles.Nurse;
+    }
+    get canShowBilled(): boolean {
+        return this.currentRoleId === Roles.Biller;
+    }
+
     constructor(
         private router: Router,
         private fb: FormBuilder,
@@ -262,8 +184,8 @@ export class OrderStatisticsComponent {
         private loader: LoaderService
     ) {}
 
-    ngOnInit(): void {
-        this.FillCache();
+    async ngOnInit() {
+
         // Initialize backups
         this.appointmentsAll = [...this.appointments];
         this.otherAll = [...this.other];
@@ -278,6 +200,9 @@ export class OrderStatisticsComponent {
             showChargeCapturePending: [false]
         });
 
+        // Set default appDate to today's date in YYYY-MM-DD format (for date input)
+        this.AppointmentFilterForm.patchValue({ appDate: this.toDateInputValue(new Date()) });
+
         this.NotificationFilterForm = this.fb.group({
             fromDate: [''],
             toDate: [''],
@@ -290,6 +215,18 @@ export class OrderStatisticsComponent {
             fromDate: [''],
             toDate: [''],
         });
+
+        this.FillCache();
+        let UserId = sessionStorage.getItem('userId');
+        let EmpId = sessionStorage.getItem('empId');
+        console.log('UserId =>',UserId);
+        console.log('EmpId =>',EmpId);
+        
+        if(EmpId != null && EmpId != "" && EmpId != undefined && EmpId != "0" && EmpId == "1"){
+            this.AppointmentFilterForm.patchValue({ providerId: UserId });
+        }
+        await this.getAllDashboardData();
+        
     }
 
 
@@ -299,12 +236,12 @@ export class OrderStatisticsComponent {
         let provider = JSON.parse(jParse).Provider;
         let sites = JSON.parse(jParse).RegLocationTypes;
         let regFacility = JSON.parse(jParse).RegFacility;
-        let visitType = JSON.parse(jParse).VisitType;
-        let regLocations = JSON.parse(jParse).RegLocations;
-        let schAppointmentCriteria = JSON.parse(jParse).SchAppointmentCriteria;
-        let SchAppointmentType = JSON.parse(jParse).SchAppointmentType;
-        let speciality = JSON.parse(jParse).providerspecialty;
-        let ReschedulingReasons = JSON.parse(jParse).ReschedulingReasons;
+        // let visitType = JSON.parse(jParse).VisitType;
+        // let regLocations = JSON.parse(jParse).RegLocations;
+        // let schAppointmentCriteria = JSON.parse(jParse).SchAppointmentCriteria;
+        // let SchAppointmentType = JSON.parse(jParse).SchAppointmentType;
+        // let speciality = JSON.parse(jParse).providerspecialty;
+        // let ReschedulingReasons = JSON.parse(jParse).ReschedulingReasons;
     
         // ✅ Provider
         if (provider) {
@@ -359,6 +296,8 @@ export class OrderStatisticsComponent {
 
       async onappointmentsPageChanged(page: number) {
         this.PaginationInfo.Page = page;
+
+        this.onSearchAppointment();
         }
 
     // Helpers
@@ -416,36 +355,39 @@ export class OrderStatisticsComponent {
     }
 
     // Appointment filters (provider/facility/site) - sample local filtering
-    onSearchAppointment() {
+    async onSearchAppointment() {
+        this.loader.show();
         const { providerId, facility, sitesId, appDate, statuses, showScheduledAppointmentOnly, showChargeCapturePending } = this.AppointmentFilterForm.value;
         const selStatuses: string[] = Array.isArray(statuses) ? statuses : [];
 
-        // this.appointments = this.appointmentsAll
-        //     .filter((a: any) => {
-        //         // Provider/facility/site not in demo data; passthrough for now
-        //         return true;
-        //     })
-        //     .filter((a: any) => {
-        //         // Statuses filter (case-insensitive match against appointment_PatientStatus)
-        //         if (!selStatuses.length) return true;
-        //         const st = (a.appointment_PatientStatus || '').toLowerCase();
-        //         return selStatuses.some(s => String(s).toLowerCase() === st);
-        //     })
-        //     .filter((a: any) => {
-        //         // Date filter: compare YYYY-MM-DD part
-        //         if (!appDate) return true;
-        //         const d = String(a.appDateTime || '').slice(0, 10);
-        //         return d === appDate;
-        //     })
-            // Hooks for future data-backed filters
-            // .filter((a: any) => !showScheduledAppointmentOnly || a.isScheduled === true)
-            // .filter((a: any) => !showChargeCapturePending || a.chargeCapturePending === true)
-        ;
+        console.log( 'AppointmentFilterForm',this.AppointmentFilterForm.value);
+        const body = {
+            ToDate: this.AppointmentFilterForm.value.appDate,
+            FromDate: this.AppointmentFilterForm.value.appDate,
+            ProviderID : this.AppointmentFilterForm.value.providerId,
+            FacilityID : this.AppointmentFilterForm.value.facility,
+            SiteID : this.AppointmentFilterForm.value.sitesId,
+            AppStatusIds : this.AppointmentFilterForm.value.statuses,
+            showScheduledAppointmentOnly : this.AppointmentFilterForm.value.showScheduledAppointmentOnly,
+            Page: this.PaginationInfo.Page,
+            Size: this.PaginationInfo.RowsPerPage,
+        }
+        await this.Service.SearchDashboardAppointment(body).then((res:any)=>{
+            this.appointments = res.table1 || [];
+            // this.appointmentstotaldata = res.table2;
 
+            if (res && res.table2) {
+                this.appointmentstotaldata = res.table2[0].totalCount;  // total count
+              }
+
+            console.log(this.appointments,'this.appointments response');
+            this.loader.hide();
+        })
+        this.loader.hide();
         this.isAppointmentFiltered = !!(providerId || facility || sitesId || appDate || selStatuses.length || showScheduledAppointmentOnly || showChargeCapturePending);
         this.collapseIfOpen(this.appointmentToggler);
     }
-    onClearAppointment() {
+    async onClearAppointment() {
         this.AppointmentFilterForm.reset({ 
             providerId: '', 
             facility: '', 
@@ -470,9 +412,88 @@ export class OrderStatisticsComponent {
                 }
             }
         });
-        this.appointments = [...this.appointmentsAll];
+        await this.getAllDashboardData();
         this.isAppointmentFiltered = false;
         this.collapseIfOpen(this.appointmentToggler);
     }
+
+
+    async getAllDashboardData() {
+        debugger
+        this.loader.show();
+        const { providerId, facility, sitesId, appDate, statuses, showScheduledAppointmentOnly, showChargeCapturePending } = this.AppointmentFilterForm.value;
+        const selStatuses: string[] = Array.isArray(statuses) ? statuses : [];
+
+        const body = {
+            ToDate: this.AppointmentFilterForm.value?.appDate,
+            FromDate: this.AppointmentFilterForm.value?.appDate,
+            ProviderID : this.AppointmentFilterForm.value?.providerId,
+            FacilityID : this.AppointmentFilterForm.value?.facility,
+            SiteID : this.AppointmentFilterForm.value?.sitesId,
+            AppStatusIds : this.AppointmentFilterForm.value?.statuses,
+            showScheduledAppointmentOnly : this.AppointmentFilterForm.value?.showScheduledAppointmentOnly,
+            Page: this.PaginationInfo.Page,
+            Size: this.PaginationInfo.RowsPerPage,
+        }
+        await this.Service.SearchDashboardAppointment(body).then((res:any)=>{
+            this.appointments = res?.table1 || [];
+            if (res && res?.table2) {
+                this.appointmentstotaldata = res?.table2?.[0]?.totalCount;  // total count
+            }
+            this.loader.hide();
+        })
+        this.isAppointmentFiltered = !!(providerId || facility || sitesId || appDate || selStatuses.length || showScheduledAppointmentOnly || showChargeCapturePending);
+
+        this.loader.hide();
+    }
+
+    // Helper: format a Date to YYYY-MM-DD for input[type="date"]
+    private toDateInputValue(d: Date): string {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // Change appointment status from action menu
+    async onChangeAppointmentStatus(appointment: any, appVisitId: number) {
+        try {
+            const appId: number = Number(appointment?.appointment_Id ?? appointment?.appId ?? 0);
+            // Try common visit id property names, fallback to 0 if not available
+
+            if (!appId) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Invalid appointment id.' });
+                return;
+            }
+
+            const confirmRes = await Swal.fire({
+                icon: 'question',
+                title: 'Change Status',
+                text: 'Do you want to change the status of this appointment?',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, change',
+            });
+            if (!confirmRes.isConfirmed) return;
+
+            this.loader.show();
+            await this.Service.UpdateAppointmentStatus(appId, 3, appVisitId);
+            this.loader.hide();
+            Swal.fire({ icon: 'success', title: 'Updated', text: 'Appointment status updated successfully.' });
+
+            // Refresh current list with same filters
+            await this.onSearchAppointment();
+        } catch (error: any) {
+            this.loader.hide();
+            Swal.fire({ icon: 'error', title: 'Error', text: error?.message || 'Failed to update status.' });
+        }
+    }
+
+    onEditAppointment(appointment: any) {
+        debugger
+        this.router.navigate(['/scheduling/appointment booking'],
+        {
+        state: { appId: appointment },
+      });
+      }
 
 }

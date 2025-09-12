@@ -114,7 +114,8 @@ namespace HMIS.Application.ServiceLogics
                     var dto = new HMIS.Application.DTOs.ControlPanel.Hremployee
                     {
                         EmployeeId = user.EmployeeId,
-                        UserName = user.UserName
+                        UserName = user.UserName,
+                        EmployeeType=user.EmployeeType
                         // map other fields as needed
                     };
 

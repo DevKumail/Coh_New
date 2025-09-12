@@ -40,65 +40,99 @@ namespace HMIS.Application.ServiceLogics
             Configuration = configuration;
         }
 
-        public async Task<DataSet> SearchAppointmentDB(DateTime FromDate, DateTime ToDate, int? ProviderID, int? LocationID, int? SpecialityID, int? SiteID, int? FacilityID, int? ReferredProviderId, long? PurposeOfVisitId, int? AppTypeId, int? VisitTypeId, string? LastUpdatedBy, List<int> AppStatusId, int? Page, int? Size)
+        public async Task<DataSet> SearchAppointmentDB(
+             DateTime? FromDate,
+             DateTime? ToDate,
+             int? ProviderID,
+             int? LocationID,
+             int? SpecialityID,
+             int? SiteID,
+             int? FacilityID,
+             int? ReferredProviderId,
+             long? PurposeOfVisitId,
+             int? AppTypeId,
+             int? VisitTypeId,
+             string? LastUpdatedBy,
+             //[FromQuery(Name = "ids")] 
+             [FromQuery] List<int>? AppStatusIds,
+             bool? ShowScheduledAppointmentOnly,
+             int? Page, int? Size)
         {
             try
             {
-                ProviderID = -1;
-                LocationID = -1;
-                SpecialityID = -1;
-                SiteID = -1;
-                FacilityID = -1;
-                ReferredProviderId = -1;
-                PurposeOfVisitId = -1;
-                AppTypeId = -1;
-                Page = 0;
-                Size = 200;
+                // ✅ Handle Null/Numeric Params (default = -1)
+                ProviderID ??= -1;
+                LocationID ??= -1;
+                SpecialityID ??= -1;
+                SiteID ??= -1;
+                FacilityID ??= -1;
+                ReferredProviderId ??= -1;
+                PurposeOfVisitId ??= -1;
+                AppTypeId ??= -1;
+                VisitTypeId ??= -1;
 
+                // ✅ Handle Paging
+                Page ??= 1;
+                Size ??= 10;
 
-
-                //DataTable AppStatusIdDT = new DataTable();
-                //AppStatusIdDT.Columns.Add("ID", typeof(int));
-
-                //// Populate the DataTable with the list values
-                //foreach (int id in AppStatusId)
-                //{
-                //    AppStatusIdDT.Rows.Add(id);
-                //}
-
+                // ✅ Convert Status IDs to comma separated string
+                string? statusIdsCsv = (AppStatusIds != null && AppStatusIds.Any())
+                    ? string.Join(",", AppStatusIds)
+                    : null;
 
                 DynamicParameters param = new DynamicParameters();
-                //param.Add("@FromDate", FromDate, DbType.DateTime);
-                //param.Add("@ToDate", ToDate, DbType.DateTime);
+
+                string FROMD = FromDate?.ToString("yyyy-MM-dd");
+                
+                DateTime CFROMD = Convert.ToDateTime(FROMD);
+
+                // ✅ Date Handling
+                if (FromDate == DateTime.MinValue || FromDate == null)
+                    param.Add("@FromDate", DBNull.Value, DbType.DateTime);
+                else
+                    param.Add("@FromDate", FromDate, DbType.DateTime);
+
+                if (ToDate == DateTime.MinValue || ToDate == null)
+
+                    param.Add("@ToDate", DBNull.Value, DbType.DateTime);
+                else
+                ToDate = ToDate.Value.Date.AddDays(1).AddSeconds(-1); // 23:59:59
+                param.Add("@ToDate", ToDate, DbType.DateTime);
+
+                // ✅ Normal Params
                 param.Add("@ProviderId", ProviderID, DbType.Int64);
                 param.Add("@LocationId", LocationID, DbType.Int64);
                 param.Add("@SpecialityId", SpecialityID, DbType.Int64);
                 param.Add("@SiteId", SiteID, DbType.Int64);
                 param.Add("@FacilityID", FacilityID, DbType.Int64);
-
                 param.Add("@ReferredProviderId", ReferredProviderId, DbType.Int64);
                 param.Add("@PurposeOfVisitId", PurposeOfVisitId, DbType.Int64);
                 param.Add("@AppTypeId", AppTypeId, DbType.Int64);
                 param.Add("@VisitTypeId", VisitTypeId, DbType.Int64);
-                param.Add("@AppTypeId", AppTypeId, DbType.Int64);
                 param.Add("@LastUpdatedBy", LastUpdatedBy, DbType.String);
-                //param.Add("@AppStatusIdTypeVar", AppStatusIdDT.AsTableValuedParameter("dbo.AppStatusIdTableType"));
-                param.Add("@PagingSize", Size, DbType.Int64);
-                param.Add("@OffsetValue", Page, DbType.Int64);
+
+                // ✅ New Params (IDs as string & ShowScheduled flag)
+                param.Add("@AppStatusIds", statusIdsCsv, DbType.String);
+                param.Add("@ShowScheduledAppointmentOnly", ShowScheduledAppointmentOnly ?? false, DbType.Boolean);
+
+                // ✅ Paging
+                param.Add("@PagingSize", Size, DbType.Int32);
+                param.Add("@OffsetValue", (Page - 1) * Size, DbType.Int32);
+
+                // ✅ Call SP
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("SchAppointmentsLoad", param);
+
                 if (ds.Tables[0].Rows.Count == 0)
-                {
                     throw new Exception("No data found");
-                }
 
                 return ds;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new DataSet();
             }
-
         }
+
 
         public async Task<DataSet> GetAppointmentDetailsDB(long VisitAccountNo)
         {
@@ -176,13 +210,13 @@ namespace HMIS.Application.ServiceLogics
                     schAppointment.Mrno = schApp.MRNo;
                     schAppointment.VisitTypeId = schApp.VisitTypeId;
                     schAppointment.AppId = (long)schApp.AppId;
-                    schAppointment.AppDateTime = schApp.AppDateTime; // Convert.ToDateTime(schApp.date + " " + schApp.time);  
-                    //string dateTimeString = schApp.date + " " + schApp.time;
-                    //schAppointment.AppDateTime = DateTime.ParseExact(
-                    //    dateTimeString,
-                    //    "yyyy-MM-dd hh:mm:ss tt",
-                    //    CultureInfo.InvariantCulture
-                    //);
+                    //schAppointment.AppDateTime = schApp.AppDateTime; // Convert.ToDateTime(schApp.date + " " + schApp.time);  
+                    string dateTimeString = schApp.date + " " + schApp.time;
+                    schAppointment.AppDateTime = DateTime.ParseExact(
+                        dateTimeString,
+                        "yyyy-MM-dd hh:mm tt",
+                        CultureInfo.InvariantCulture
+                    );
                     schAppointment.Duration = schApp.Duration;
                     schAppointment.AppNote = schApp.AppNote;
                     schAppointment.SiteId = schApp.SiteId;
@@ -211,7 +245,6 @@ namespace HMIS.Application.ServiceLogics
                     schAppointment.UserCheckOut = schApp.UserCheckOut;
                     schAppointment.PurposeOfVisitId = schApp.PurposeOfVisitId;
                     schAppointment.PurposeOfVisit = getpurposeofvisit;
-
                     schAppointment.PatientNotifiedId = schApp.PatientNotifiedId;
                     schAppointment.RescheduledId = schApp.RescheduledID;
                     schAppointment.ByProvider = schApp.ByProvider;
@@ -228,6 +261,12 @@ namespace HMIS.Application.ServiceLogics
                     schAppointment.PlanId = getPlanId;
                     schAppointment.PatientId = schApp.PatientId;
                     schAppointment.PayerId = schApp.PayerId;
+                    schAppointment.AppDate = schApp.AppDateTime;
+                    //    DateTime.ParseExact(
+                    //    "yyyy-MM-dd hh:mm:ss tt",
+                    //    CultureInfo.InvariantCulture
+                    //);
+                    
 
 
 
@@ -1316,6 +1355,89 @@ namespace HMIS.Application.ServiceLogics
                 return rows > 0;
             }
 
+        }
+
+        public async Task<DataSet> DashboardSearchAppointmentDB(
+               DateTime? FromDate,
+               DateTime? ToDate,
+               int? ProviderID,
+               int? LocationID,
+               int? SpecialityID,
+               int? SiteID,
+               int? FacilityID,
+               int? ReferredProviderId,
+               long? PurposeOfVisitId,
+               int? AppTypeId,
+               int? VisitTypeId,
+               string? LastUpdatedBy,
+               //[FromQuery(Name = "ids")] 
+               [FromQuery] List<int>? AppStatusIds,
+               bool? ShowScheduledAppointmentOnly,
+               int? Page, int? Size)
+        {
+            try
+            {
+                // ✅ Handle Null/Numeric Params (default = -1)
+                ProviderID ??= -1;
+                LocationID ??= -1;
+                SpecialityID ??= -1;
+                SiteID ??= -1;
+                FacilityID ??= -1;
+                ReferredProviderId ??= -1;
+                PurposeOfVisitId ??= -1;
+                AppTypeId ??= -1;
+                VisitTypeId ??= -1;
+
+                // ✅ Handle Paging
+                Page ??= 1;
+                Size ??= 10;
+
+                // ✅ Convert Status IDs to comma separated string
+                string? statusIdsCsv = (AppStatusIds != null && AppStatusIds.Any())
+                    ? string.Join(",", AppStatusIds)
+                    : null;
+
+                DynamicParameters param = new DynamicParameters();
+
+
+                // ✅ Date Handling
+                if (FromDate == DateTime.MinValue || FromDate == null)
+                    param.Add("@AppDate", DBNull.Value, DbType.DateTime);
+                else
+                    param.Add("@AppDate", FromDate, DbType.DateTime);
+
+                // ✅ Normal Params
+                param.Add("@ProviderId", ProviderID, DbType.Int64);
+                param.Add("@LocationId", LocationID, DbType.Int64);
+                param.Add("@SpecialityId", SpecialityID, DbType.Int64);
+                param.Add("@SiteId", SiteID, DbType.Int64);
+                param.Add("@FacilityID", FacilityID, DbType.Int64);
+                param.Add("@ReferredProviderId", ReferredProviderId, DbType.Int64);
+                param.Add("@PurposeOfVisitId", PurposeOfVisitId, DbType.Int64);
+                param.Add("@AppTypeId", AppTypeId, DbType.Int64);
+                param.Add("@VisitTypeId", VisitTypeId, DbType.Int64);
+                param.Add("@LastUpdatedBy", LastUpdatedBy, DbType.String);
+
+                // ✅ New Params (IDs as string & ShowScheduled flag)
+                param.Add("@AppStatusIds", statusIdsCsv, DbType.String);
+                param.Add("@ShowScheduledAppointmentOnly", ShowScheduledAppointmentOnly ?? false, DbType.Boolean);
+
+                // ✅ Paging
+                param.Add("@PagingSize", Size, DbType.Int32);
+                param.Add("@OffsetValue", (Page - 1) * Size, DbType.Int32);
+
+                // ✅ Call SP
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("DashboardSchAppointmentsLoad", param);
+
+                if (ds.Tables[0].Rows.Count == 0)
+                    throw new Exception("No data found");
+
+                return ds;
+            }
+            catch (Exception)
+            {
+                return new DataSet();
+            }
         }
 
     }

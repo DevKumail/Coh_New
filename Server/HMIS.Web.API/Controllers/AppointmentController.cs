@@ -32,9 +32,42 @@ namespace HMIS.Web.Controllers
 
 
         [HttpGet("SearchAppointment")]
-        public async Task<IActionResult> SearchAppointment(DateTime FromDate, DateTime ToDate, int? ProviderID, int? LocationID, int? SpecialityID, int? SiteID, int? FacilityID, int? ReferredProviderId, long? PurposeOfVisitId, int? AppTypeId, int? VisitTypeId, string? LastUpdatedBy, [FromQuery(Name = "ids")] List<int> AppStatusId, int? Page, int? Size)
+        public async Task<IActionResult> SearchAppointment(
+            DateTime? FromDate,
+             DateTime? ToDate,
+             int? ProviderID,
+             int? LocationID,
+             int? SpecialityID,
+             int? SiteID,
+             int? FacilityID,
+             int? ReferredProviderId,
+             long? PurposeOfVisitId,
+             int? AppTypeId,
+             int? VisitTypeId,
+             string? LastUpdatedBy,
+             //[FromQuery(Name = "ids")]
+             [FromQuery] List<int>? AppStatusIds,
+             bool? ShowScheduledAppointmentOnly,
+             int? Page, int? Size)
         {
-            DataSet result = await _appointmentManager.SearchAppointmentDB(FromDate, ToDate, ProviderID, LocationID, SpecialityID, SiteID, FacilityID, ReferredProviderId, PurposeOfVisitId, AppTypeId, VisitTypeId, LastUpdatedBy, AppStatusId, Page, Size);
+            DataSet result = await _appointmentManager.SearchAppointmentDB(
+                    FromDate,
+                    ToDate,
+                    ProviderID,
+                    LocationID,
+                    SpecialityID,
+                    SiteID,
+                    FacilityID,
+                    ReferredProviderId,
+                    PurposeOfVisitId,
+                    AppTypeId,
+                    VisitTypeId,
+                    LastUpdatedBy,
+                    AppStatusIds,   // ✅ yahan bhi plural use hoga
+                    ShowScheduledAppointmentOnly,
+                    Page,
+                    Size
+                );
 
             if (result != null)
             {
@@ -43,6 +76,53 @@ namespace HMIS.Web.Controllers
 
             return BadRequest(result);
         }
+
+        [HttpGet("DashboardSearchAppointmentDB")]
+        public async Task<IActionResult> DashboardSearchAppointmentDB(
+           DateTime? FromDate,
+            DateTime? ToDate,
+            int? ProviderID,
+            int? LocationID,
+            int? SpecialityID,
+            int? SiteID,
+            int? FacilityID,
+            int? ReferredProviderId,
+            long? PurposeOfVisitId,
+            int? AppTypeId,
+            int? VisitTypeId,
+            string? LastUpdatedBy,
+            //[FromQuery(Name = "ids")]
+            [FromQuery] List<int>? AppStatusIds,
+            bool? ShowScheduledAppointmentOnly,
+            int? Page, int? Size)
+        {
+            DataSet result = await _appointmentManager.DashboardSearchAppointmentDB(
+                    FromDate,
+                    ToDate,
+                    ProviderID,
+                    LocationID,
+                    SpecialityID,
+                    SiteID,
+                    FacilityID,
+                    ReferredProviderId,
+                    PurposeOfVisitId,
+                    AppTypeId,
+                    VisitTypeId,
+                    LastUpdatedBy,
+                    AppStatusIds,   // ✅ yahan bhi plural use hoga
+                    ShowScheduledAppointmentOnly,
+                    Page,
+                    Size
+                );
+
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
+        }
+
 
         [HttpPost("GetViewAppointments")]
         public async Task<IActionResult> GetViewAppointmentsDetails(ViewAppointments view)

@@ -21,15 +21,14 @@ namespace HMIS.Application.ServiceLogics
         }
 
         #region Vital Signs
-        public async Task<bool> VitalSignsInsert(VitalSign vs)
+        public async Task<bool> VitalSignsInsert(VitalSigns vs)
         {
             try
             {
                 Core.Entities.VitalSign vital = new Core.Entities.VitalSign()
                 {
                     EntryDate = vs.EntryDate,
-                    Bpdiastolic = vs.Bpdiastolic,
-                    Pain = vs.Pain,
+                    Bpdiastolic = vs.BPDiastolic,
                     PulseRate = vs.PulseRate,
                     RespirationRate = vs.RespirationRate,
                     Temperature = vs.Temperature,
@@ -38,8 +37,8 @@ namespace HMIS.Application.ServiceLogics
                     UpdateBy = vs.UpdateBy,
                     UpdateDate = vs.UpdateDate,
                     //VisitAccountNo = vs.VisitAccountNo,
-                    Mrno = vs.Mrno,
-                    Bpsystolic = vs.Bpsystolic,
+                    Mrno = vs.MRNo,
+                    Bpsystolic = vs.BPSystolic,
 
                 };
                 await _context.VitalSigns.AddAsync(vital);
@@ -74,7 +73,7 @@ namespace HMIS.Application.ServiceLogics
                 return new DataSet();
             }
         }
-        public async Task<DataSet>  GetVitalSigns(long Id, long AppointmentId)
+        public async Task<DataSet> GetVitalSigns(long Id, long AppointmentId)
         {
             try
             {
@@ -143,7 +142,7 @@ namespace HMIS.Application.ServiceLogics
                 vital.HipCircumference = null;
                 vital.UmbilicusCircumference = null;
                 vital.Bparm = vitalSigns.BPArm;
-                
+
                 await _context.VitalSigns.AddAsync(vital);
                 await _context.SaveChangesAsync();
                 return true;
@@ -220,7 +219,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 DynamicParameters param = new DynamicParameters();
-              
+
                 param.Add("@MRNo", MRNo);
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("SS_GetMedication", param);
                 if (ds.Tables[0].Rows.Count == 0)

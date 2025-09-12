@@ -1,4 +1,4 @@
-<div class="card" *ngIf="item.showpie">
+<div class="card" *ngIf="canShowItem(item) && item.showpie">
     <div class="card-header d-flex border-dashed justify-content-between align-items-center">
         <h5 class="card-title">{{ item.title }}</h5>
         <div class="d-flex align-items-center gap-2">
@@ -23,7 +23,7 @@
 </div>
 
 
-<div class="card" *ngIf="!item.showpie">
+<div class="card" *ngIf="canShowItem(item) && !item.showpie">
     <div class="card-header d-flex border-dashed justify-content-between align-items-center">
         <h5 class="card-title">{{ item.title }}</h5>
         <div class="d-flex align-items-center gap-2">

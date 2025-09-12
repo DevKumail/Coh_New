@@ -15,6 +15,7 @@ import {
 import {TransactionsComponent} from '@/app/views/dashboards/dashboard-2/components/transactions/transactions.component';
 import { StatisticsWidgetType } from './types';
 import { StatisticWidget1Type } from '@/app/types';
+import { Roles } from '@/app/shared/enum/roles.enum';
  
 
 @Component({
@@ -162,31 +163,37 @@ export class Dashboard2Component {
                 ]
             })
         },
-        // {
-        //     showpie: true,
-        //     title: this.Result?.title,
-        //     badge: {text: 'Monthly', variant: 'info'},
-        //     value: this.Result?.value,
-        //     description: 'Monthly Total Result',
-        //     chartOptions: () => ({
-        //         tooltip: {show: true},
-        //         series: [
-        //             {
-        //                 type: 'pie',
-        //                 radius: ['65%', '100%'],
-        //                 hoverAnimation: false,
-        //                 label: {show: true},
-        //                 labelLine: {show: false},
-        //                 data: this.Result.Data.map((item, index) => ({
-        //                     value: item.value,
-        //                     itemStyle: {
-        //                         color: this.resultColors[index % this.resultColors.length]
-        //                     }
-        //                 }))
-        //             }
-        //         ]
-        //     })
-        // },
+        {
+            showpie: true,
+            title: this.Billing?.title,
+            badge: {text: 'Monthly', variant: 'primary'},
+            value: this.Billing?.value,
+            description: 'Monthly Total Billed',
+            chartOptions: () => ({
+                tooltip: {
+                    show: true,
+                    // trigger: 'item',
+                    confine: true,
+                    // position: 'right'
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        radius: ['65%', '100%'],
+                        hoverAnimation: false,
+                        label: {show: false, position: 'outside', formatter: '{b}: {c}%', fontSize: 8},
+                        labelLine: {show: true, length: 4, length2: 4},
+                        data: this.Billing.Data.map((item, index) => ({
+                            name: item.name,
+                            value: item.value,
+                            itemStyle: {
+                                color: this.notesColors[index % this.notesColors.length]
+                            }
+                        }))
+                    }
+                ]
+            })
+        },
         // {
         //     showpie: true,
         //     title: this.Billing?.title,
@@ -235,7 +242,30 @@ export class Dashboard2Component {
             totalCount: {value: 32.1, suffix: 'M'}
         }
     ]
-    ;
+
+
+    getappoinmentdashboardcount(){
+
+    }    
+
+    // Role-based filtering: compute current role and helper to decide visibility
+    currentRoleId: number = Number(sessionStorage.getItem('empId') || 0);
+    private canShow(item: any): boolean {
+        const title = (item?.title || '').toString().toLowerCase();
+        // Notes visible only to Provider or Nurse
+        if (title.includes('notes')) {
+            return this.currentRoleId === Roles.Provider || this.currentRoleId === Roles.Nurse;
+        }
+        // Billed visible only to Biller (if enabled in list in the future)
+        if (title.includes('billed')) {
+            return this.currentRoleId === Roles.Biller;
+        }
+        // Appointment, My Tasks, Messages -> visible to all by default
+        return true;
+    }
+    get visibleStatistics() {
+        return (this.statistics || []).filter(i => this.canShow(i));
+    }
 
     // defaultStatisticWidgets: StatisticWidget1Type[] = [
     //     {
