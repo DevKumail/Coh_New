@@ -63,7 +63,7 @@ namespace HMIS.Web.Controllers.UserAuthentication
 
                         Token = tokenString,
                         LoginUserName = user.Name,
-                        EmployeeTypeId= result.User.EmployeeType,
+                        //EmployeeTypeId= result.User.EmployeeType,
                         LogoffTime = null,
                         Ipaddress = remoteIpAddress.ToString(),
                         UpdatedOn = DateTime.Now,

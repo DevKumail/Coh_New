@@ -242,12 +242,12 @@ Times = [
   });
   
       
-  const appId: any = this.route.snapshot.paramMap.get('appId');
-  console.log( 'on route appId',appId.appId);
-  if (appId.appId) {
-    this.qid = appId.appId;
-    // this.getAppointmentData(appId);
-  }
+  // const appId: any = this.route.snapshot.paramMap.get('appId');
+  // console.log( 'on route appId',appId.appId);
+  // if (appId.appId) {
+  //   this.qid = appId.appId;
+  //   // this.getAppointmentData(appId);
+  // }
 
   this.appointmentForm.get('facility')?.valueChanges.subscribe((facilityId) => {
     if (facilityId) {

@@ -69,8 +69,15 @@ namespace HMIS.Application.ServiceLogics
                     newPatientAlert.Active = alertModel.Active;
 
                     // Fix for CS0029: Convert string to DateTime?  
-                    newPatientAlert.EnteredDate = alertModel.EnteredDate;
-                    newPatientAlert.RepeatDate = alertModel.RepeatDate;
+
+                    // Fix for CS0029: Convert string to DateTime?  
+                    newPatientAlert.EnteredDate = string.IsNullOrWhiteSpace(alertModel.EnteredDate)
+                                                ? null
+                                                : DateTime.Parse(alertModel.EnteredDate);
+                    newPatientAlert.RepeatDate = string.IsNullOrWhiteSpace(alertModel.RepeatDate)
+                                                ? null
+                                                : DateTime.Parse(alertModel.RepeatDate);
+                   
 
                     newPatientAlert.IsFinished = alertModel.IsFinished;
                     newPatientAlert.EnteredBy = alertModel.EnteredBy;

@@ -25,7 +25,7 @@ namespace HMIS.Application.DTOs.Clinical
         
         public string EnteredBy { get; set; }
       
-        public string EnteredDate { get; set; }
+        public string? EnteredDate { get; set; }
         
         public string UpdatedBy { get; set; }
         public long? AppointmentId { get; set; }
