@@ -18,38 +18,38 @@ public partial class BlsuperBillProcedure
     [Column(TypeName = "datetime")]
     public DateTime? DateOfServiceTo { get; set; }
 
-    [StringLength(2)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? PlaceOfService { get; set; }
 
-    [StringLength(2)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? TypeOfService { get; set; }
 
-    [StringLength(6)]
+    [StringLength(50)]
     [Unicode(false)]
     public string ProcedureType { get; set; } = null!;
 
     [StringLength(50)]
     public string? ProcedureCode { get; set; }
 
-    [StringLength(2)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? Modifier1 { get; set; }
 
-    [StringLength(2)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? Modifier2 { get; set; }
 
-    [StringLength(2)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? Modifier3 { get; set; }
 
-    [StringLength(2)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? Modifier4 { get; set; }
 
-    [StringLength(8)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? DiagnosisCode { get; set; }
 
@@ -63,17 +63,17 @@ public partial class BlsuperBillProcedure
     public decimal? Charges { get; set; }
 
     [Column("EPSDTFamilyPlan")]
-    [StringLength(1)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? EpsdtfamilyPlan { get; set; }
 
     [Column("EMG")]
-    [StringLength(1)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? Emg { get; set; }
 
     [Column("COB")]
-    [StringLength(1)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? Cob { get; set; }
 
@@ -88,7 +88,7 @@ public partial class BlsuperBillProcedure
     [Unicode(false)]
     public string? LastUpdatedBy { get; set; }
 
-    [StringLength(1)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? PerformedOnFacility { get; set; }
 
@@ -107,7 +107,7 @@ public partial class BlsuperBillProcedure
     public DateTime? CreatedDate { get; set; }
 
     [Column("HL7ProcedureType")]
-    [StringLength(10)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? Hl7procedureType { get; set; }
 
@@ -115,7 +115,7 @@ public partial class BlsuperBillProcedure
     [Unicode(false)]
     public string? ProcedurePriority { get; set; }
 
-    [StringLength(11)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? AssociatedDiagnosisCode { get; set; }
 
@@ -185,7 +185,7 @@ public partial class BlsuperBillProcedure
     public decimal? ChargeswithoutVat { get; set; }
 
     [Column("IsIVFBundle")]
-    [StringLength(1)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? IsIvfbundle { get; set; }
 

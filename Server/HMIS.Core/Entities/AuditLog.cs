@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Table("AuditLog")]
-[Index("ActionTime", Name = "IX_AuditLog_ActionTime")]
 public partial class AuditLog
 {
     [Key]

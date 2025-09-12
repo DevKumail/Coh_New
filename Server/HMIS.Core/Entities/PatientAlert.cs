@@ -8,6 +8,10 @@ namespace HMIS.Core.Entities;
 
 public partial class PatientAlert
 {
+    [Key]
+    [Column("AlertID")]
+    public long AlertId { get; set; }
+
     public long? RuleId { get; set; }
 
     [Column("MRNO")]
@@ -21,8 +25,9 @@ public partial class PatientAlert
 
     public bool Active { get; set; }
 
-    [Column(TypeName = "datetime")]
-    public DateTime? RepeatDate { get; set; }
+    [StringLength(14)]
+    [Unicode(false)]
+    public string? RepeatDate { get; set; }
 
     [Column("isFinished")]
     public bool IsFinished { get; set; }
@@ -31,8 +36,9 @@ public partial class PatientAlert
     [Unicode(false)]
     public string? EnteredBy { get; set; }
 
-    [Column(TypeName = "datetime")]
-    public DateTime? EnteredDate { get; set; }
+    [StringLength(14)]
+    [Unicode(false)]
+    public string? EnteredDate { get; set; }
 
     [StringLength(25)]
     [Unicode(false)]
@@ -54,11 +60,4 @@ public partial class PatientAlert
     public string? OldMrno { get; set; }
 
     public bool? IsDeleted { get; set; }
-
-    [Column(TypeName = "datetime")]
-    public DateTime? StartDate { get; set; }
-
-    [Key]
-    [Column("AlertID")]
-    public long AlertId { get; set; }
 }

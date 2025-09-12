@@ -28,7 +28,7 @@
         <span class="me-1" style="font-size: 12px;"><b>MRN {{ patientInfo?.mrNo || 'n/a' }} </b></span>
         <span class="d-flex align-items-center me-1" style="font-size: 12px;">
           <!-- <i class="bi bi-calendar-date me-1"></i> -->
-          <span class="me-1"> | </span> {{ patientInfo?.patientBirthDate ? (patientInfo.patientBirthDate | date:'MM/dd/yyyy') : 'n/a' }}
+          <span class="me-1"> | </span> {{ patientInfo?.patientBirthDate ? (patientInfo.patientBirthDate | date: "dd/MM/yyyy h:mm a") : 'n/a' }}
           <span class="mx-1 sep">({{ ((patientInfo?.age || '').split(' ')[0]) || 'n/a' }} y)</span>
           <span>{{ patientInfo?.personSex || 'n/a' }}</span>
         </span>
@@ -65,7 +65,7 @@
               <div class="d-flex align-items-start justify-content-between gap-2">
                 <div class="me-2">
                   <div class="badge-value small"><strong>{{ visitAppointments?.fullName }}</strong></div>
-                  <div class="badge-date small"><strong>{{ visitAppointments?.appDateTime | date:'MMM d, y h:mm a' }}</strong></div>
+                  <div class="badge-date small"><strong>{{ visitAppointments?.appDateTime | date: "dd/MM/yyyy h:mm a" }}</strong></div>
                 </div>
                 <button type="button" class="btn btn-link p-0 m-0 mt-1" (click)="searchAppointment(patientInfo?.mrNo, appointmentModal)" aria-label="Search appointment">
                   <ng-icon ngbTooltip="Switch Visit" tooltipClass="tooltip-allergy" placement="bottom" style="color: orange; height: 16px; width: 16px;" name="tablerUser-search"></ng-icon>
@@ -189,10 +189,10 @@
               <span>{{Data.siteName || 'N/A'}}</span>
             </td>
             <td>
-              <span>{{Data.duration || 'N/A'}}</span>
+              <span>{{Data.duration || 'N/A'}} Min</span>
             </td>
             <td>
-              <span>{{Data.appDateTime | date:'MMM d, y h:mm a'}}</span>
+              <span>{{Data.appDateTime | date: "dd/MM/yyyy h:mm a"}}</span>
             </td>
             <td class="text-center">
               <ng-icon 

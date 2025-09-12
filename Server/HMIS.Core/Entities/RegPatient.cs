@@ -7,10 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Table("RegPatient")]
-[Index("CreatedDate", Name = "IX_RegPatient_CreatedDate")]
-[Index("PatientBirthDate", Name = "IX_RegPatient_PatientBirthDate")]
-[Index("PersonFirstName", Name = "IX_RegPatient_PersonFirstName")]
-[Index("PersonLastName", Name = "IX_RegPatient_PersonLastName")]
 [Index("Mrno", Name = "unique_mrno", IsUnique = true)]
 public partial class RegPatient
 {

@@ -215,28 +215,49 @@ export class PatientHeaderPanelComponent implements OnInit {
         this.secureStorage.setJson(this.STORAGE_KEYS.selectedVisit, this.visitAppointments);
       }
     });
-    
-    this.loader.show();
-    await this.demographicapi.GetAppointmentByMRNO(mrNo).subscribe((Response: any)=>{
-      console.log("Load Visit new work =>", Response);
-      if (Object.keys(Response).length > 0){
-        this.AppoinmentData = Response?.table;
-        // reset and build pagination
-        this.currentPage = 1;
-        this.updatePagination();
-        this.modalRef = this.modalService.open(modalContent, { size: 'xl', backdrop: 'static' });
-        // this.patientBannerService.setVisitAppointments(Response);
-        // this.patientBannerService.setSelectedVisit(Response?.table[0]);
-        this.loader.hide();
-      } else{
-        // this.patientBannerService.setVisitAppointments(null);
-        // this.patientBannerService.setSelectedVisit(null);
-        this.AppoinmentData = [];
-        this.currentPage = 1;
-        this.updatePagination();
-        this.loader.hide();
+
+
+    this.patientBannerService.visitAppointments$.subscribe((data: any) => {
+      console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
+      if (data) {
+        this.AppoinmentData = data?.table;
+        // this.ActiveAppoinment = this.visitAppointments?.appointmentId; 
+        // Persist currently selected visit
+        // this.secureStorage.setJson(this.STORAGE_KEYS.selectedVisit, this.visitAppointments);
       }
-    })
+    });
+    
+    
+    // this.AppoinmentData = this.AppoinmentData = this.secureStorage.getItem(this.STORAGE_KEYS.visitAppointments);
+    
+    
+    // const storedAllVisitAppts = this.secureStorage.getJson<any>(this.STORAGE_KEYS.visitAppointments);
+    // if (storedAllVisitAppts?.table?.[0]) {
+    //   this.AppoinmentData = storedAllVisitAppts?.table;
+    //   console.log('Visit All Appointments',this.AppoinmentData);
+    //  }
+
+    this.modalRef = this.modalService.open(modalContent, { size: 'xl', backdrop: 'static' });
+    // this.loader.show();
+    // await this.demographicapi.GetAppointmentByMRNO(mrNo).subscribe((Response: any)=>{
+    //   console.log("Load Visit new work =>", Response);
+    //   if (Object.keys(Response).length > 0){
+    //     this.AppoinmentData = Response?.table;
+    //     // reset and build pagination
+    //     this.currentPage = 1;
+    //     this.updatePagination();
+    //     // this.patientBannerService.setVisitAppointments(Response);
+    //     // this.patientBannerService.setSelectedVisit(Response?.table[0]);
+    //     this.loader.hide();
+    //   } else{
+    //     // this.patientBannerService.setVisitAppointments(null);
+    //     // this.patientBannerService.setSelectedVisit(null);
+    //     this.AppoinmentData = [];
+    //     this.currentPage = 1;
+    //     this.updatePagination();
+    //     this.loader.hide();
+    //   }
+    // })
   }
 
   appointmentLoad(data: any){

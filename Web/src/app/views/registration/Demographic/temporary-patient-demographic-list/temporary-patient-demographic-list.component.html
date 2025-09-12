@@ -96,7 +96,7 @@
       <tr *ngFor="let temp of pagedTemps">
         <td>{{ temp.tempId || 'N/A' }}</td>
         <td>{{ temp.personFullName || 'N/A'}}</td>
-        <td>{{ temp.patientBirthDate || 'N/A' | date: 'MM/dd/yyyy' }}</td>
+        <td>{{ temp.patientBirthDate || 'N/A' | date: "dd/MM/yyyy h:mm a" }}</td>
         <td>{{ genderLabel(temp.personSex) }}</td>
       </tr>
       <tr *ngIf="pagedTemps?.length === 0">

@@ -65,7 +65,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
               <td>{{ member.mrNo }}</td>
               <td>{{ member.name }}</td>
               <td>{{ member.gender }}</td>
-              <td>{{ member.birthDate | date: 'yyyy-MM-dd' }}</td>
+              <td>{{ member.birthDate | date: "dd/MM/yyyy h:mm a" }}</td>
               <td>{{ member.masterMrNo }}</td>
               <td>{{ member.relationship }}</td>
             </tr>

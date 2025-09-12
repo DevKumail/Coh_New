@@ -19,35 +19,191 @@
 </nav>
  <!-- <div class="container-fluid"> -->
     <div class="card">
-        <div
-            class="card-header d-flex justify-content-between align-items-center"
-        >
-            <h4>Appointments</h4>
+        <div class="accordion" id="Appointmentaccordion">
             <div>
-                <div class="d-flex gap-2">
-                    <button
-                        class="btn btn-secondary flex-fill"
-                        (click)="ClearFilter()"
-                    >
-                        Clear
-                    </button>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <div class="d-flex w-100 align-items-center">
+                        <button #appointmentToggler class="accordion-button collapsed d-flex no-accordion-caret flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAppointment" aria-expanded="false" aria-controls="collapseAppointment">
+                          Appointment
+                          <ng-icon style="color: orange;" class="ms-auto mb-1" [name]="isAppointmentFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
+                        </button>
+                        <button class="btn btn-success ms-2 me-2" (click)="buttonRoute('/scheduling/appointment booking')">Create</button>
+                      </div>
+                    </h2>
+                    <div id="collapseAppointment" class="accordion-collapse collapse" data-bs-parent="#Appointmentaccordion">
+                      <div class="accordion-body">
+                        <div class="card shadow-sm rounded-3">
+                            <form *ngIf="FilterForm" [formGroup]="FilterForm">
+                            <div class="card-body">
+                                <!-- <div class="container-fluid"> -->
+                                    <!-- Row 1 -->
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label>From Date</label>
+                                            <input
+                                                type="date"
+                                                class="form-control"
+                                                formControlName="fromDate"
+                                            />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>To Date</label>
+                                            <input
+                                                type="date"
+                                                class="form-control"
+                                                formControlName="toDate"
+                                            />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>Provider</label>
+                                            <select
+                                                class="form-control form-select"
+                                                formControlName="providerId"
+                                            >
+                                                <option value="" disabled selected>-- Select Provider --</option>
+                                                <option
+                                                    *ngFor="let item of providers"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                  
+                                        <div class="col-md-4 mb-3">
+                                            <label>Facility</label>
+                                            <select
+                                                class="form-control form-select"
+                                                formControlName="facilityId"
+                                            >
+                                                <option value="" disabled selected>-- Select Facility --</option>
+                                                <option
+                                                    *ngFor="let f of facilities"
+                                                    [value]="f.code"
+                                                >
+                                                    {{ f.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>Site</label>
+                                            <select
+                                                class="form-control form-select"
+                                                formControlName="sitesId"
+                                            >
+                                                <option value="" disabled selected>-- Select Site --</option>
+                                                <option
+                                                    *ngFor="let item of sites"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>Speciality</label>
+                                            <select
+                                                class="form-control form-select"
+                                                formControlName="specialityId"
+                                            >
+                                                <option value="" disabled selected>-- Select Speciality --</option>
+                                                <option
+                                                    *ngFor="let item of speciality"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                              
+                                        <div class="col-md-4 mb-3">
+                                            <label>Criteria</label>
+                                            <select
+                                                class="form-control form-select"
+                                                formControlName="criteriaId"
+                                            >
+                                                <option value="" disabled selected>-- Select Criteria --</option>
+                                                <option
+                                                    *ngFor="let item of appointmentcriteria"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>Visit Type</label>
+            
+                                            <div class="row g-4 align-items-end">
+                                                <div class="input-group">
+                                                    <select
+                                                        class="form-select"
+                                                        formControlName="visitTypeId"
+                                                        id="visitTypeId"
+                                                    >
+                                                        <option value="" disabled selected>-- Select Visit Type --</option>
+                                                        <option
+                                                            *ngFor="let item of visitType"
+                                                            [value]="item.code"
+                                                        >
+                                                            {{ item.name }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>Location</label>
+                                            <select
+                                                class="form-control form-select"
+                                                formControlName="locationId"
+                                            >
+                                                <option value="" disabled selected>-- Select Location --</option>
+                                                <option
+                                                    *ngFor="let l of locations"
+                                                    [value]="l.code"
+                                                >
+                                                    {{ l.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                
+                                        <div class="col-md-4 mb-3">
+                                            <label>Appointment Type</label>
+                                            <select
+                                                class="form-control form-select"
+                                                formControlName="appointmentId"
+                                            >
+                                                <option value="" disabled selected>-- Select Appointment Type --</option>
+                                                <option
+                                                    *ngFor="let item of appointmentType"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3"> 
 
-                    <button
-                        class="btn btn-primary flex-fill"
-                        (click)="ClickFilter(standardModal)"
-                    >
-                        <i class="bi bi-filter"></i> Filter
-                    </button>
+                                        </div>
 
-                    <button
-                        class="btn btn-success flex-fill"
-                        (click)="buttonRoute('/scheduling/appointment booking')"
-                    >
-                        Create
-                    </button>
-                </div>
+                                        <div class="col-md-4 px-2" style="margin-top: 20px; text-align: right;">
+                                            <button type="button" class="btn btn-light me-2" (click)="ClearFilter()">Clear</button>
+                                            <button type="submit" (click)="FilterAppoinment()" class="btn btn-primary">Search</button>
+                                        </div>
+                                    </div>
+                                <!-- </div> -->
+                            </div>
+                            </form>
+
+                           
+                        </div>
+                      </div>
+                    </div>
+                  </div>
             </div>
-        </div>
+            </div>
 
         <div class="card-body">
             <table class="table table-bordered table-striped table-sm">
@@ -66,10 +222,10 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let appointment of appointments">
-                        <td>{{ appointment.visitAccDisplay }}</td>
+                        <td>{{ appointment.visitAccDisplay || 'N/A' }}</td>
                         <td>{{ appointment.patient_FName }}</td>
                         <td>
-                            {{ appointment.appDateTime | date : "MM/dd/yyyy" }}
+                            {{ appointment.appDateTime | date : "dd/MM/yyyy h:mm a" }}
                         </td>
                         <td>{{ appointment.appointment_SiteName }}</td>
                         <td>{{ appointment.appType }}</td>
@@ -134,217 +290,13 @@
             </table>
         </div>
     </div>
-    <app-generic-pagination
+                <app-generic-pagination
                     [totalItems]="totalRecord"
                     [pageSize]="PaginationInfo.RowsPerPage"
                     [currentPage]="PaginationInfo.Page"
                     (pageChanged)="onappointmentsPageChanged($event)"
                 >
                 </app-generic-pagination>
-<!-- </div> -->
-
-<ng-template #standardModal let-modal>
-    <form *ngIf="FilterForm" [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
-        <div class="modal-header">
-            <h5 class="modal-title">Filter Appointments</h5>
-            <button
-                type="button"
-                class="btn-close"
-                (click)="modal.dismiss()"
-            ></button>
-        </div>
-
-        <div class="modal-body">
-            <div class="card shadow-sm rounded-3">
-                <div class="card-body">
-                    <!-- <div class="container-fluid"> -->
-                        <!-- Row 1 -->
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label>From Date</label>
-                                <input
-                                    type="date"
-                                    class="form-control"
-                                    formControlName="fromDate"
-                                />
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>To Date</label>
-                                <input
-                                    type="date"
-                                    class="form-control"
-                                    formControlName="toDate"
-                                />
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>Provider</label>
-                                <select
-                                    class="form-control"
-                                    formControlName="providerId"
-                                >
-                                    <option value="">Select Provider</option>
-                                    <option
-                                        *ngFor="let item of providers"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-                      
-                            <div class="col-md-4 mb-3">
-                                <label>Facility</label>
-                                <select
-                                    class="form-control form-select"
-                                    formControlName="facility"
-                                >
-                                    <option value="">Select Facility</option>
-                                    <option
-                                        *ngFor="let f of facilities"
-                                        [value]="f.code"
-                                    >
-                                        {{ f.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>Site</label>
-                                <select
-                                    class="form-control"
-                                    formControlName="sitesId"
-                                >
-                                    <option value="">Select Site</option>
-                                    <option
-                                        *ngFor="let item of sites"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>Speciality</label>
-                                <select
-                                    class="form-control"
-                                    formControlName="specialityId"
-                                >
-                                    <option value="">Select Speciality</option>
-                                    <option
-                                        *ngFor="let item of speciality"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-                  
-                            <div class="col-md-4 mb-3">
-                                <label>Criteria</label>
-                                <select
-                                    class="form-control"
-                                    formControlName="criteriaId"
-                                >
-                                    <option value="">Select Criteria</option>
-                                    <option
-                                        *ngFor="let item of appointmentcriteria"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>Visit Type</label>
-
-                                <div class="row g-4 align-items-end">
-                                    <div class="input-group">
-                                        <select
-                                            class="form-select"
-                                            formControlName="visitTypeId"
-                                            id="visitTypeId"
-                                        >
-                                            <option value="">
-                                                Select Visit Type
-                                            </option>
-                                            <option
-                                                *ngFor="let item of visitType"
-                                                [value]="item.code"
-                                            >
-                                                {{ item.name }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>Location</label>
-                                <!-- <select
-                                    class="form-control"
-                                    formControlName="locationId"
-                                >
-                                    <option value="">Select Location</option>
-                                    <option
-                                        *ngFor="let item of locations"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select> -->
-                                <select
-                                    class="form-control form-select"
-                                    formControlName="location"
-                                >
-                                    <option value="">Select Location</option>
-                                    <option
-                                        *ngFor="let l of locations"
-                                        [value]="l.code"
-                                    >
-                                        {{ l.name }}
-                                    </option>
-                                </select>
-                            </div>
-                    
-                            <div class="col-md-4 mb-3">
-                                <label>Appointment Type</label>
-                                <select
-                                    class="form-control"
-                                    formControlName="appointmentId"
-                                >
-                                    <option value="">
-                                        Select Appointment Type
-                                    </option>
-                                    <option
-                                        *ngFor="let item of appointmentType"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                    <!-- </div> -->
-                </div>
-                <!-- <div class="mb-3">
-      <label for="message-text" class="col-form-label">Message:</label>
-      <textarea class="form-control" id="message-text"></textarea>
-    </div> -->
-            </div>
-
-            <div class="modal-footer">
-                <button
-                    type="button"
-                    class="btn btn-light"
-                    (click)="modal.dismiss()"
-                >
-                    Close
-                </button>
-                <button type="submit" class="btn btn-primary">Search</button>
-            </div>
-        </div>
-    </form>
-</ng-template>
-
-
 
 <!-- Bootstrap Modal with p-steps -->
 <ng-template #patientStatusModal let-modal>
@@ -403,7 +355,7 @@
                 <div class="col-md-4">
                     <label>Facility</label>
                     <select class="form-control form-select" [(ngModel)]="selectedReschedulingReasons">
-                        <option value="">Select Facility</option>
+                        <option value="" disabled selected>-- Select Facility --</option>
                         <option *ngFor="let f of ReschedulingReasons" [value]="f.code">
                             {{ f.name }}
                         </option>
@@ -432,7 +384,7 @@
         <div class="col-md-3">
           <label class="form-label">Provider</label>
           <select class="form-control form-select" [(ngModel)]="selectedProviders">
-            <option value="">Select Provider</option>
+            <option value="" disabled selected>-- Select Provider --</option>
             <option *ngFor="let p of providers" [value]="p.code">{{ p.name }}</option>
           </select>
         </div>
@@ -441,7 +393,7 @@
         <div class="col-md-3">
           <label class="form-label">Location</label>
           <select class="form-control form-select" [(ngModel)]="selectedLocations">
-            <option value="">Select Location</option>
+            <option value="" disabled selected>-- Select Location --</option>
             <option *ngFor="let l of locations" [value]="l.code">{{ l.name }}</option>
           </select>
         </div>
@@ -450,7 +402,7 @@
         <div class="col-md-3">
           <label class="form-label">Facility</label>
           <select class="form-control form-select" [(ngModel)]="selectedFacility">
-            <option value="">Select Facility</option>
+            <option value="" disabled selected>-- Select Facility --</option>
             <option *ngFor="let f of facilities" [value]="f.code">{{ f.name }}</option>
           </select>
         </div>
@@ -459,7 +411,7 @@
         <div class="col-md-3">
           <label class="form-label">Sites</label>
           <select class="form-control form-select" [(ngModel)]="selectedSites">
-            <option value="">Select Site</option>
+            <option value="" disabled selected>-- Select Site --</option>
             <option *ngFor="let s of sites" [value]="s.code">{{ s.name }}</option>
           </select>
         </div>

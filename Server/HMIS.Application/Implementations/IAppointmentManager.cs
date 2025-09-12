@@ -7,12 +7,47 @@ using System.Threading.Tasks;
 using HMIS.Application;
 using HMIS.Application.DTOs.Clinical;
 using static HMIS.Application.DTOs.AppointmentDTOs.SpLocalModel.SchAppointmentIWithFilter;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HMIS.Application.Implementations
 {
     public interface IAppointmentManager
     {
-        Task<DataSet> SearchAppointmentDB(DateTime FromDate, DateTime ToDate, int? ProviderID, int? LocationID, int? SpecialityID, int? SiteID, int? FacilityID, int? ReferredProviderId, long? PurposeOfVisitId, int? AppTypeId, int? VisitTypeId, string? LastUpdatedBy, List<int> AppStatusId, int? Page, int? Size);
+        Task<DataSet> SearchAppointmentDB(
+            DateTime? FromDate,
+             DateTime? ToDate,
+             int? ProviderID,
+             int? LocationID,
+             int? SpecialityID,
+             int? SiteID,
+             int? FacilityID,
+             int? ReferredProviderId,
+             long? PurposeOfVisitId,
+             int? AppTypeId,
+             int? VisitTypeId,
+             string? LastUpdatedBy,
+             //[FromQuery(Name = "ids")] 
+             [FromQuery] List<int>? AppStatusIds,
+             bool? ShowScheduledAppointmentOnly,
+             int? Page, int? Size);
+
+        Task<DataSet> DashboardSearchAppointmentDB(
+           DateTime? FromDate,
+            DateTime? ToDate,
+            int? ProviderID,
+            int? LocationID,
+            int? SpecialityID,
+            int? SiteID,
+            int? FacilityID,
+            int? ReferredProviderId,
+            long? PurposeOfVisitId,
+            int? AppTypeId,
+            int? VisitTypeId,
+            string? LastUpdatedBy,
+            //[FromQuery(Name = "ids")] 
+            [FromQuery] List<int>? AppStatusIds,
+            bool? ShowScheduledAppointmentOnly,
+            int? Page, int? Size);
         Task<DataSet> GetAppointmentDetailsDB(long VisitAccountNo);
         Task<DataSet> GetViewAppointmentDetailsDB(ViewAppointments view);
         Task<bool> InsertAppointmentDB(HMIS.Application.DTOs.AppointmentDTOs.SchAppointmentModel schApp);

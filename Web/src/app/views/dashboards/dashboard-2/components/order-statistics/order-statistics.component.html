@@ -8,12 +8,12 @@
                         <h2 class="accordion-header">
                           <button #notificationToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotification" aria-expanded="false" aria-controls="collapseNotification">
                             Notification
-                            <ng-icon style="color: orange;" class="ms-auto mb-1" name="tablerFilter" [ngClass]="{ 'blink': isNotificationFiltered }"></ng-icon>
+                            <ng-icon style="color: orange;" class="ms-auto mb-1" [name]="isNotificationFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isNotificationFiltered }"></ng-icon>
                           </button>
                         </h2>
                         <div id="collapseNotification" class="accordion-collapse collapse" data-bs-parent="#Notificationaccordion">
                           <div class="accordion-body">
-                        <form [formGroup]="NotificationFilterForm">
+                        <form *ngIf="NotificationFilterForm" [formGroup]="NotificationFilterForm">
                         <div class="row">
                             <div class="col-md-6">
                                 <label>From Date</label>
@@ -56,7 +56,7 @@
                 <tbody>
                     <tr *ngFor="let appointment of other">
                         <td>
-                            {{ appointment.appDateTime | date : "MM/dd/yyyy" }}
+                            {{ appointment.appDateTime | date : "dd/MM/yyyy h:mm a" }}
                         </td>
                         <td>{{ appointment.subject }}</td>
                         <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
@@ -70,19 +70,19 @@
         </div>
     </div>
     <!-- <hr class="table-group-divider"> -->
-    <div class="card mt-2">
+    <div class="card mt-2" *ngIf="canShowNotes">
         <div class="accordion" id="Notesaccordion">
             <div>
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                       <button #notesToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotes" aria-expanded="false" aria-controls="collapseNotes">
                         Notes
-                        <ng-icon style="color: orange;" class="ms-auto mb-1" name="tablerFilter" [ngClass]="{ 'blink': isNotesFiltered }"></ng-icon>
+                        <ng-icon style="color: orange;" class="ms-auto mb-1" [name]="isNotesFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isNotesFiltered }"></ng-icon>
                       </button>
                     </h2>
                     <div id="collapseNotes" class="accordion-collapse collapse" data-bs-parent="#Notesaccordion">
                       <div class="accordion-body">
-                    <form [formGroup]="NotesFilterForm">
+                    <form *ngIf="NotesFilterForm" [formGroup]="NotesFilterForm">
                     <div class="row">
                         <div class="col-md-6">
                             <label>From Date</label>
@@ -117,7 +117,7 @@
                 <tbody >
                     <tr *ngFor="let appointment of other">
                         <td>
-                            {{ appointment.appDateTime | date : "MM/dd/yyyy" }}
+                            {{ appointment.appDateTime | date : "dd/MM/yyyy h:mm a" }}
                         </td>
                         <td>{{ appointment.subject }}</td>
                         <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
@@ -131,20 +131,20 @@
         </div>
         </div>  
         <!-- <hr class="table-group-divider"> -->
-        <div class="card mt-2">
+        <div class="card mt-2" *ngIf="canShowBilled">
             <div class="accordion" id="Billedaccordion">
                 <div>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                           <button #billedToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBilled" aria-expanded="false" aria-controls="collapseBilled">
                             Billed
-                            <ng-icon style="color: orange;" class="ms-auto mb-1" name="tablerFilter" [ngClass]="{ 'blink': isBilledFiltered }"></ng-icon>
+                            <ng-icon style="color: orange;" class="ms-auto mb-1" [name]="isBilledFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isBilledFiltered }"></ng-icon>
     
                           </button>
                         </h2>
                         <div id="collapseBilled" class="accordion-collapse collapse" data-bs-parent="#Billedaccordion">
                           <div class="accordion-body">
-                        <form [formGroup]="BilledFilterForm">
+                        <form *ngIf="BilledFilterForm" [formGroup]="BilledFilterForm">
                         <div class="row">
                             <div class="col-md-6">
                                 <label>From Date</label>
@@ -187,7 +187,7 @@
                     <tbody>
                         <tr *ngFor="let appointment of other">
                             <td>
-                                {{ appointment.appDateTime | date : "MM/dd/yyyy" }}
+                                {{ appointment.appDateTime | date : "dd/MM/yyyy h:mm a" }}
                             </td>
                             <td>{{ appointment.subject }}</td>
                             <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
@@ -209,17 +209,17 @@
                     <h2 class="accordion-header">
                       <button #appointmentToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAppointment" aria-expanded="false" aria-controls="collapseAppointment">
                         Appointment
-                        <ng-icon style="color: orange;" class="ms-auto mb-1" name="tablerFilter" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
+                        <ng-icon style="color: orange;" class="ms-auto mb-1" [name]="isAppointmentFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
                       </button>
                     </h2>
                     <div id="collapseAppointment" class="accordion-collapse collapse" data-bs-parent="#Appointmentaccordion">
                       <div class="accordion-body">
-                          <form [formGroup]="AppointmentFilterForm">
+                          <form *ngIf="AppointmentFilterForm" [formGroup]="AppointmentFilterForm">
                     <div class="row">
                         <div class="col-md-4">
                             <label>Provider</label>
                             <select class="form-control" formControlName="providerId">
-                                <option value="">Select Provider</option>
+                                <option value="">-- Select Provider --</option>
                                 <option *ngFor="let item of providers" [value]="item.code">
                                     {{ item.name }}
                                 </option>
@@ -229,7 +229,7 @@
                         <div class="col-md-4">
                             <label>Facility</label>
                             <select class="form-control form-select" formControlName="facility">
-                                <option value="">Select Facility</option>
+                                <option value="">-- Select Facility --</option>
                                 <option *ngFor="let f of facilities" [value]="f.code">
                                     {{ f.name }}
                                 </option>
@@ -238,7 +238,7 @@
                         <div class="col-md-4">
                             <label>Site</label>
                             <select class="form-control" formControlName="sitesId">
-                                <option value="">Select Site</option>
+                                <option value="">-- Select Site --</option>
                                 <option *ngFor="let item of sites" [value]="item.code">
                                     {{ item.name }}
                                 </option>
@@ -256,7 +256,7 @@
                             <label>Status</label>
                             <select #statusesSel class="form-select" choicesSelect [options]="{ removeItemButton: true, placeholder: true, placeholderValue: 'Select Status' }"
                                  formControlName="statuses" name="choices-multiple-remove-button" multiple>
-                                <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+                                <option *ngFor="let s of statusOptions" [value]="s.id">{{ s.name }}</option>
                             </select>
                         </div>
                         <div class="col-md-4" style="margin-top: 16px;">
@@ -295,30 +295,47 @@
                     <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                         <tr class="text-uppercase fs-xxs">
                             <th>App Date</th>
-                            <th>Patient Name (MR No)</th>
-                            <th>Patient Status</th>
+                            <th>Name</th>
+                            <th>Status</th>
                             <th>Site</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody >
-                        <tr *ngFor="let appointment of appointments">
+                        <tr class="text-nowrap" *ngFor="let appointment of appointments">
                             <td>
-                                {{ appointment.appDateTime | date : "MM/dd/yyyy" }}
+                                {{ appointment.appDateTime | date : "dd/MM/yyyy h:mm a"}}
                             </td>
-                            <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
-                            <td>{{ appointment.appointment_PatientStatus }}</td>
+                            <td>{{ appointment.patient_FName }} <br> ({{ appointment.mrNo }})</td>
+                            <td>{{ appointment.appointment_PatientStatus }} <br> 
+                                <span *ngIf="appointment.patientStatusId == 3">({{ appointment.visitStatusName }})</span></td>
                             <td>{{ appointment.appointment_SiteName }}</td>
                             <td class="d-flex flex-nowrap align-items-center">
-                                <button 
-                                    class="btn p-0 px-1 py-1 me-1"
-                                    style="font-size: 0.75rem; color: orange;"
-                                    [routerLink]="['/scheduling/appointment/create']"
-                                    [queryParams]="{ id: appointment.appointment_Id }"
-                                    title="Edit Appointment"
-                                    >
-                                    <ng-icon name="tablerEdit"></ng-icon>
-                                </button>
+                                <div class="dropdown">
+                                  <button class="btn p-0 px-1 py-1 me-1" style="font-size: 0.75rem; color: orange;" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Actions">
+                                    <ng-icon name="tablerDotsVertical"></ng-icon>
+                                  </button>
+                                  <ul class="dropdown-menu dropdown-menu-end">
+                                    <li style="cursor: pointer;">
+                                      <a class="dropdown-item" (click)="onEditAppointment(appointment)">
+                                        Edit Appointment
+                                      </a>
+                                    </li>
+                                    <!-- *ngIf="appointment.appStatusId == 2" -->
+                                    <li class="dropdown-submenu" >
+                                      <button class="dropdown-item dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Change Status
+                                      </button>
+                                      <ul class="dropdown-menu">
+                                        <li *ngFor="let s of tableStatus">
+                                          <button class="dropdown-item" type="button" (click)="onChangeAppointmentStatus(appointment, s.id)">
+                                            {{ s.name }}
+                                          </button>
+                                        </li>
+                                      </ul>
+                                    </li>
+                                  </ul>
+                                </div>
                             </td>
                         </tr>
                         <tr *ngIf="appointments.length === 0">
@@ -327,7 +344,7 @@
                     </tbody>
                 </table>
                 <app-generic-pagination
-                    [totalItems]="appointments.length"
+                    [totalItems]="appointmentstotaldata"
                     [pageSize]="PaginationInfo.RowsPerPage"
                     [currentPage]="PaginationInfo.Page"
                     (pageChanged)="onappointmentsPageChanged($event)"
@@ -340,10 +357,18 @@
 <!-- </div> -->
 
 <style>
-  .blink {
-    animation: blink-animation 1s steps(2, start) infinite;
-  }
-  @keyframes blink-animation {
-    to { visibility: hidden; }
-  }
-</style>
+    .blink {
+      /* No blink; emphasize with darker color and bold weight */
+      color: #d97706 !important; /* darker orange */
+      font-weight: 900;
+    }
+    /* Nested dropdown positioning */
+    .dropdown-submenu { position: relative; }
+    .dropdown-submenu > .dropdown-menu {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      margin-left: .1rem;
+      margin-right: .1rem;
+    }
+  </style>

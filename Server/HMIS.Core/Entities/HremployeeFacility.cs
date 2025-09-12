@@ -7,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Table("HREmployeeFacility")]
-[Index("EmployeeId", Name = "IX_HREmployeeFacility_EmployeeId")]
-[Index("FacilityId", Name = "IX_HREmployeeFacility_FacilityID")]
 public partial class HremployeeFacility
 {
     [Key]

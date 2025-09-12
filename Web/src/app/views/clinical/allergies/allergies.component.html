@@ -147,8 +147,8 @@
               <td class="text-center">{{ allergy.allergen }}</td>
               <td class="text-center">{{ allergy.severityName }}</td>
               <td class="text-center">{{ allergy.reaction }}</td>
-              <td class="text-center">{{ allergy.startDate | date:'yyyy-MM-dd' }}</td>
-              <td class="text-center">{{ allergy.endDate | date:'yyyy-MM-dd' }}</td>
+              <td class="text-center">{{ allergy.startDate | date: "dd/MM/yyyy h:mm a" }}</td>
+              <td class="text-center">{{ allergy.endDate | date: "dd/MM/yyyy h:mm a" }}</td>
               <td class="text-center">{{ allergy.status }}</td>
               <td class="text-center" style="text-align: center;">
 

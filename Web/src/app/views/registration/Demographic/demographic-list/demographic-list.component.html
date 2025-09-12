@@ -55,7 +55,7 @@
                         <td>{{ patient.personSex || "N/A" }}</td>
                         <td>{{ patient.personSocialSecurityNo || "N/A" }}</td>
                         <td>{{ patient.personZipCode || "N/A" }}</td>
-                        <td>{{ patient.patientBirthDate | date: "MM/dd/yyyy" }}</td>
+                        <td>{{ patient.patientBirthDate | date: "dd/MM/yyyy h:mm a" }}</td>
                         <td>
                             <div ngbDropdown placement="left-top" class="text-muted">
                                 <div
