@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("HolidaySchedule")]
 public partial class HolidaySchedule
 {
     [Key]

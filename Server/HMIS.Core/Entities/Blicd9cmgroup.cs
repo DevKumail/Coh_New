@@ -21,5 +21,5 @@ public partial class Blicd9cmgroup
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("Group")]
-    public virtual ICollection<Blicd9cmgroupCode> Blicd9cmgroupCodes { get; set; } = new List<Blicd9cmgroupCode>();
+    public virtual ICollection<Blicd9cmgroupCode> Blicd9cmgroupCode { get; set; } = new List<Blicd9cmgroupCode>();
 }

@@ -6,10 +6,11 @@ import {EchartComponent} from '@app/components/echart.component';
 import { NgIcon } from '@ng-icons/core';
 import { RouterLink } from '@angular/router';
 import { Roles } from '../../../../../shared/enum/roles.enum';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 @Component({
     selector: 'app-statistics-widget',
-    imports: [CommonModule, CountUpModule, EchartComponent, NgIcon, RouterLink],
+    imports: [CommonModule, CountUpModule, EchartComponent, NgIcon, RouterLink, TranslatePipe],
     templateUrl: './statistics-widget.component.html',
 })
 export class StatisticsWidgetComponent {

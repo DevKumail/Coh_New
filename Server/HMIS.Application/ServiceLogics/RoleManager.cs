@@ -74,9 +74,9 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var assignedRole = _context.SecPrivilegesAssignedRoles.Where(x => x.RoleId == role.RoleId).ToList();
+                var assignedRole = _context.SecPrivilegesAssignedRole.Where(x => x.RoleId == role.RoleId).ToList();
 
-                var SecRoleForm = _context.SecRoleForms.Where(x => x.RoleId == role.RoleId).ToList();
+                var SecRoleForm = _context.SecRoleForm.Where(x => x.RoleId == role.RoleId).ToList();
                  
                 if (assignedRole.Count!=0)
                 {
@@ -84,7 +84,7 @@ namespace HMIS.Application.ServiceLogics
                     {
                         itemPrivilige.IsDeleted = true;
 
-                        _context.SecPrivilegesAssignedRoles.Update(itemPrivilige);
+                        _context.SecPrivilegesAssignedRole.Update(itemPrivilige);
                     }
                     await _context.SaveChangesAsync();
 
@@ -95,7 +95,7 @@ namespace HMIS.Application.ServiceLogics
                     foreach (var itemRole in SecRoleForm)
                     {
                         itemRole.IsDeleted = true;
-                        _context.SecRoleForms.Update(itemRole);
+                        _context.SecRoleForm.Update(itemRole);
 
                     }
 
@@ -115,14 +115,14 @@ namespace HMIS.Application.ServiceLogics
 
                 foreach (int formId in uniqueFormIds)
                 {
-                    if (!_context.SecRoleForms.Any(rf => rf.RoleId == role.RoleId.Value && rf.FormId == formId))
+                    if (!_context.SecRoleForm.Any(rf => rf.RoleId == role.RoleId.Value && rf.FormId == formId))
                     {
                         HMIS.Core.Entities.SecRoleForm secRole = new Core.Entities.SecRoleForm();
                         secRole.FormId = formId;
                         secRole.RoleId = role.RoleId.Value;
                         secRole.CreatedOn = DateTime.Now;
 
-                        _context.SecRoleForms.Add(secRole);
+                        _context.SecRoleForm.Add(secRole);
                     }
                 }
 
@@ -133,7 +133,7 @@ namespace HMIS.Application.ServiceLogics
 
                     //var formPriviligeId = _context.SecPrivilegesAvailableForms
                     //    .Where(x=>x.FormId==item.FormId && x.PrivilegeId==item.PrivilegeId && x.IsDeleted==false).Select(x=>x.FormPrivilegeId).FirstOrDefault(); 
-                    var formPrivilige = _context.SecPrivilegesAvailableForms.FirstOrDefault(x => x.FormId == item.FormId &&
+                    var formPrivilige = _context.SecPrivilegesAvailableForm.FirstOrDefault(x => x.FormId == item.FormId &&
                          x.PrivilegeId == item.PrivilegeId);
                     HMIS.Core.Entities.SecPrivilegesAssignedRole assignRole = new Core.Entities.SecPrivilegesAssignedRole();
 
@@ -146,7 +146,7 @@ namespace HMIS.Application.ServiceLogics
                         assignRole.CreatedOn = DateTime.Now;
                         assignRole.IsDeleted = false;
 
-                        _context.SecPrivilegesAssignedRoles.Add(assignRole);
+                        _context.SecPrivilegesAssignedRole.Add(assignRole);
 
 
                     }
@@ -206,7 +206,7 @@ namespace HMIS.Application.ServiceLogics
             {
                 DynamicParameters parameters = new DynamicParameters();
 
-                var isAdmin = _context.HremployeeTypes.Where(x => x.TypeDescription == "Administrator").Select(x => x.TypeId).FirstOrDefault();
+                var isAdmin = _context.HremployeeType.Where(x => x.TypeDescription == "Administrator").Select(x => x.TypeId).FirstOrDefault();
 
 
                 if (isAdmin == userId)
@@ -239,7 +239,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var modules = _context.SecModules.Where(x=>x.IsDeleted==false)
+                var modules = _context.SecModule.Where(x=>x.IsDeleted==false)
                                   .Select(x => new { x.ModuleId, x.ModuleName }).ToList();
 
                 DataTable table = new DataTable();
@@ -294,7 +294,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var roles = _context.SecRoles.Where(x => x.IsDeleted == false)
+                var roles = _context.SecRole.Where(x => x.IsDeleted == false)
                        .Select(x => new { RoleId = x.RoleId, RoleName = x.RoleName })
                        .ToList();
  

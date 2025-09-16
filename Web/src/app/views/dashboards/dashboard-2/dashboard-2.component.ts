@@ -16,6 +16,7 @@ import {TransactionsComponent} from '@/app/views/dashboards/dashboard-2/componen
 import { StatisticsWidgetType } from './types';
 import { StatisticWidget1Type } from '@/app/types';
 import { Roles } from '@/app/shared/enum/roles.enum';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
  
 
 @Component({
@@ -24,6 +25,7 @@ import { Roles } from '@/app/shared/enum/roles.enum';
         PageTitleComponent,
         StatisticsWidgetComponent,
         OrderStatisticsComponent,
+        TranslatePipe,
         // ProductInventoryComponent,
         // RecentOrdersComponent,
         // TransactionsComponent
@@ -68,7 +70,7 @@ export class Dashboard2Component {
             { name: 'Billed', value: 15 },
             { name: 'Check Out', value: 20 },
         ],
-        title : 'Appoinment',
+        title : 'Appointment',
         value: 95,
     }
 
@@ -223,7 +225,7 @@ export class Dashboard2Component {
         // },
         {
             showpie: false,
-            title: 'My Tasks',
+            title: 'My_Tasks',
             description: 'Total Tasks',
             label: '+3 New',
             icon: 'tablerChecklist',

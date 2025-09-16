@@ -44,5 +44,5 @@ public partial class Blicdversion
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("Icdversion")]
-    public virtual ICollection<BlsuperBillDiagnosis> BlsuperBillDiagnoses { get; set; } = new List<BlsuperBillDiagnosis>();
+    public virtual ICollection<BlsuperBillDiagnosis> BlsuperBillDiagnosis { get; set; } = new List<BlsuperBillDiagnosis>();
 }

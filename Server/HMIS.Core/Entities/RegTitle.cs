@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("RegTitle")]
 public partial class RegTitle
 {
     [Key]
@@ -18,5 +17,5 @@ public partial class RegTitle
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("PersonTitle")]
-    public virtual ICollection<RegPatientTemp> RegPatientTemps { get; set; } = new List<RegPatientTemp>();
+    public virtual ICollection<RegPatientTemp> RegPatientTemp { get; set; } = new List<RegPatientTemp>();
 }

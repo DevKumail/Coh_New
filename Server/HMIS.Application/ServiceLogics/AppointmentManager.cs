@@ -197,11 +197,11 @@ namespace HMIS.Application.ServiceLogics
                 {
 
                     long? getPlanId = null;
-                    var getpurposeofvisit = _context.ProblemLists.Where(x => x.ProblemId == schApp.PurposeOfVisitId).FirstOrDefault().ProblemName;
-                    var EmployeeId = _context.Hremployees.Where(x => x.EmployeeId == schApp.EmployeeId).FirstOrDefault();
+                    var getpurposeofvisit = _context.ProblemList.Where(x => x.ProblemId == schApp.PurposeOfVisitId).FirstOrDefault().ProblemName;
+                    var EmployeeId = _context.Hremployee.Where(x => x.EmployeeId == schApp.EmployeeId).FirstOrDefault();
                     if (schApp.PlanId != null)
                     {
-                        getPlanId = _context.BlpayerPlans.Where(x => x.PlanId == schApp.PlanId.ToString()).FirstOrDefault().Id;
+                        getPlanId = _context.BlpayerPlan.Where(x => x.PlanId == schApp.PlanId.ToString()).FirstOrDefault().Id;
                     }
 
                     Core.Entities.SchAppointment schAppointment = new Core.Entities.SchAppointment();
@@ -262,17 +262,19 @@ namespace HMIS.Application.ServiceLogics
                     schAppointment.PatientId = schApp.PatientId;
                     schAppointment.PayerId = schApp.PayerId;
                     schAppointment.AppDate = schApp.AppDateTime;
+                    schAppointment.IsConsultationVisit = schApp.IsConsultationVisit;
+
                     //    DateTime.ParseExact(
                     //    "yyyy-MM-dd hh:mm:ss tt",
                     //    CultureInfo.InvariantCulture
                     //);
-                    
+
 
 
 
                     string visitAcc = "";
                     string visitAccCode = "";
-                    var chkAppointmentCount = await Task.Run(() => _context.SchAppointments.Where(x => x.Mrno == schApp.MRNo && x.AppDateTime.Date.ToString() == schApp.date && x.IsDeleted == false).Count());
+                    var chkAppointmentCount = await Task.Run(() => _context.SchAppointment.Where(x => x.Mrno == schApp.MRNo && x.AppDateTime.Date.ToString() == schApp.date && x.IsDeleted == false).Count());
                     if (schApp.VisitTypeId == 2)
                     {
                         visitAccCode = "IP";
@@ -364,7 +366,7 @@ namespace HMIS.Application.ServiceLogics
                     //    IsDeleted = false,
                     //};
                     //blpatientVisit.PatientVisitStatuses.Add(patientVisitStatus);
-                    var result = await _context.SchAppointments.AddAsync(schAppointment);
+                    var result = await _context.SchAppointment.AddAsync(schAppointment);
                     //this.AddBLPatientVisit();
 
                     await _context.SaveChangesAsync();
@@ -445,8 +447,11 @@ namespace HMIS.Application.ServiceLogics
                 if (schApp.PlanId==null) 
                 {
                     planId = "0";
+                } else
+                {
+                    planId = Convert.ToString(schApp.PlanId);
                 }
-                var getPlanId = _context.BlpayerPlans.Where(x => x.PlanId == planId).FirstOrDefault();
+                    var getPlanId = _context.BlpayerPlan.Where(x => x.PlanId == planId).FirstOrDefault().Id;
                 long? pId = null;
                 if (getPlanId == null)
                 {
@@ -454,12 +459,12 @@ namespace HMIS.Application.ServiceLogics
                 }
                 else
                 {
-                    pId = getPlanId.Id;
+                    pId = getPlanId;
                 }
                 DateTime Dt = Convert.ToDateTime(schApp.date).Date;
                 string Date = Dt.ToShortDateString();
-                var chkResult = await Task.Run(() => _context.SchAppointments.Where(x => x.AppId.Equals(schApp.AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
-                var EmployeeId = _context.Hremployees.Where(x => x.EmployeeId == schApp.EmployeeId).FirstOrDefault();
+                var chkResult = await Task.Run(() => _context.SchAppointment.Where(x => x.AppId.Equals(schApp.AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
+                var EmployeeId = _context.Hremployee.Where(x => x.EmployeeId == schApp.EmployeeId).FirstOrDefault();
                 if (chkResult != null && chkResult.AppId > 0)
                 {
                     //chkResult.AppId = schApp.AppId;
@@ -467,9 +472,17 @@ namespace HMIS.Application.ServiceLogics
                     //chkResult.Mrno = schApp.MRNo;
                     //chkResult.VisitTypeId = schApp.VisitTypeId;
                     chkResult.AppId = (long)schApp.AppId;
-                    string dateString = Date + schApp.time;
-                    DateTime parsedDateTime = DateTime.ParseExact(dateString, "M/d/yyyyh:mm:ss tt", CultureInfo.InvariantCulture);
-                    chkResult.AppDateTime = parsedDateTime; //schApp.AppDateTime;
+                    //string dateString = Date + schApp.time;
+                    //DateTime parsedDateTime = DateTime.ParseExact(dateString, "M/d/yyyyh:mm:ss tt", CultureInfo.InvariantCulture);
+                    //chkResult.AppDateTime = parsedDateTime; //schApp.AppDateTime;
+
+                    string dateTimeString = schApp.date + " " + schApp.time;
+                    chkResult.AppDateTime = DateTime.ParseExact(
+                        dateTimeString,
+                        "yyyy-MM-dd hh:mm tt",
+                        CultureInfo.InvariantCulture
+                    );
+                    chkResult.AppDate = schApp.AppDateTime;
                     chkResult.Duration = schApp.Duration;
                     chkResult.AppNote = schApp.AppNote;
                     chkResult.SiteId = schApp.SiteId;
@@ -513,8 +526,9 @@ namespace HMIS.Application.ServiceLogics
                     chkResult.EmployeeId = EmployeeId.EmployeeId;
                     chkResult.PlanId = pId;
                     chkResult.PatientId = schApp.PatientId;
+                    chkResult.IsConsultationVisit = schApp.IsConsultationVisit;
                     chkResult.PayerId = schApp.PayerId;
-                    _context.SchAppointments.Update(chkResult);
+                    _context.SchAppointment.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return true;
                 }
@@ -613,7 +627,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var chkResult = await Task.Run(() => _context.SchAppointments.Where(x => x.AppId.Equals(AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
+                var chkResult = await Task.Run(() => _context.SchAppointment.Where(x => x.AppId.Equals(AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
                 if (chkResult != null && chkResult.AppId > 0)
                 {
                     chkResult.AppStatusId = AppStatusId;
@@ -623,7 +637,7 @@ namespace HMIS.Application.ServiceLogics
                     chkResult.RescheduledId = RescheduledId;
 
                     //await _context.SchAppointments.AddAsync(chkResult);
-                     _context.SchAppointments.Update(chkResult);
+                     _context.SchAppointment.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return true;
                 }
@@ -713,7 +727,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var chkResult = await Task.Run(() => _context.SchAppointments.Where(x => x.AppId.Equals(appId) && x.IsDeleted == false).FirstOrDefaultAsync());
+                var chkResult = await Task.Run(() => _context.SchAppointment.Where(x => x.AppId.Equals(appId) && x.IsDeleted == false).FirstOrDefaultAsync());
                 if (chkResult != null && chkResult.AppId > 0)
                 {
                     chkResult.PatientStatusId = patientStatusId;
@@ -749,9 +763,9 @@ namespace HMIS.Application.ServiceLogics
                         patientVisitStatus.StatusId = patientStatusId;
                         patientVisitStatus.VisitStatusId = null;
                         patientVisitStatus.IsDeleted = false;
-                        _context.PatientVisitStatuses.Add(patientVisitStatus);
+                        _context.PatientVisitStatus.Add(patientVisitStatus);
                     }
-                    _context.SchAppointments.Update(chkResult);
+                    _context.SchAppointment.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return true;
                 }
@@ -822,7 +836,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 //var chkResult = await Task.Run(() => _context.SchAppointments.Where(x => x.AppId == (schApp.AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
-                var chkResult = await _context.SchAppointments.Where(x => x.AppId == schReschedule.AppId && (x.IsDeleted == false)).FirstOrDefaultAsync();
+                var chkResult = await _context.SchAppointment.Where(x => x.AppId == schReschedule.AppId && (x.IsDeleted == false)).FirstOrDefaultAsync();
                 if (chkResult != null && chkResult.AppId > 0)
                 {
                     chkResult.AppId = schReschedule.AppId;
@@ -834,7 +848,7 @@ namespace HMIS.Application.ServiceLogics
                     chkResult.LocationId = schReschedule.LocationId;
                     chkResult.AppStatusId = schReschedule.AppStatusId;
                     //chkResult.Reason = schReschedule.Reason;
-                    _context.SchAppointments.Update(chkResult);
+                    _context.SchAppointment.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return true;
                 }
@@ -876,7 +890,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 //regPatient.PatientId = (long)sp.PatientId;
-                var patid = await _context.RegPatients.Where(x => x.Mrno == sp.Mrno).Select(x => x.PatientId).FirstOrDefaultAsync();
+                var patid = await _context.RegPatient.Where(x => x.Mrno == sp.Mrno).Select(x => x.PatientId).FirstOrDefaultAsync();
                 RegPatient regPatient = new RegPatient();
                 regPatient.PatientId = patid; regPatient.Mrno = sp.Mrno;
                 Core.Entities.SpeechToText speech = new Core.Entities.SpeechToText()
@@ -896,7 +910,7 @@ namespace HMIS.Application.ServiceLogics
 
                 };
                 //Problem is here
-                await _context.SpeechToTexts.AddAsync(speech);
+                await _context.SpeechToText.AddAsync(speech);
                 await _context.SaveChangesAsync();
                 return true;
 
@@ -933,7 +947,7 @@ namespace HMIS.Application.ServiceLogics
                 //    AppointmentClassification = sc.AppointmentClassification,
                 //});
 
-                IQueryable<Core.Entities.SchAppointment> appointment1 = (IQueryable<Core.Entities.SchAppointment>)_context.SchAppointments.Where(x => x.AppId == appId);
+                IQueryable<Core.Entities.SchAppointment> appointment1 = (IQueryable<Core.Entities.SchAppointment>)_context.SchAppointment.Where(x => x.AppId == appId);
 
                 Core.Entities.SchAppointment result = appointment1.FirstOrDefault();
 
@@ -970,6 +984,9 @@ namespace HMIS.Application.ServiceLogics
                     appointment.PatientBalance = result.PatientBalance;
                     appointment.PlanBalance = result.PlanBalance;
                     appointment.PlanCopay = result.PlanCopay;
+                    appointment.AppNote = result.AppNote;
+                    appointment.PlanId = result.PlanId;
+                    appointment.IsConsultationVisit = result.IsConsultationVisit;
 
                 }
                 return appointment;
@@ -988,7 +1005,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSpecialitybyFacilityids.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSpecialitybyFacilityid.ToList());
                 if (FacilityId != 0)
                 {
                     list = list.Where(x => x.FacilityId == FacilityId).ToList();
@@ -1004,7 +1021,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSitebySpecialityids.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSitebySpecialityid.ToList());
                 if (SpecialtyId != 0)
                 {
                     list = list.Where(x => x.SpecialtyId == SpecialtyId).ToList();
@@ -1020,7 +1037,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwProviderbySiteids.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwProviderbySiteid.ToList());
                 if (SiteId != 0)
                 {
                     list = list.Where(x => x.TypeId == SiteId).ToList();
@@ -1036,7 +1053,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwProviderByFacilityIds.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwProviderByFacilityId.ToList());
                 if (FacilityId != 0)
                 {
                     list = list.Where(x => x.FacilityId == FacilityId).ToList();
@@ -1052,7 +1069,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSpecialityByEmployeeIds.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSpecialityByEmployeeId.ToList());
                 if (EmployeeId != 0)
                 {
                     list = list.Where(x => x.EmployeeId == EmployeeId).ToList();
@@ -1068,7 +1085,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSiteByproviderIds.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSiteByproviderId.ToList());
                 if (providerId != 0)
                 {
                     list = list.Where(x => x.EmployeeId == providerId).ToList();
@@ -1101,7 +1118,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
 
-                var Data = await System.Threading.Tasks.Task.Run(() => _context.ProviderSchedules.Where(x =>
+                var Data = await System.Threading.Tasks.Task.Run(() => _context.ProviderSchedule.Where(x =>
                 x.FacilityId == FacilityId &&
                 x.SiteId == SiteId && x.ProviderId == ProviderId && x.IsDeleted==false).ToList());
                 switch (Days)
@@ -1315,7 +1332,7 @@ namespace HMIS.Application.ServiceLogics
         public async Task<bool> InsertSpeech(ClinicalNoteObj note)
         {
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
-            var patid = await _context.RegPatients.Where(x => x.Mrno == note.Mrno).Select(x => x.PatientId).FirstOrDefaultAsync();
+            var patid = await _context.RegPatient.Where(x => x.Mrno == note.Mrno).Select(x => x.PatientId).FirstOrDefaultAsync();
             RegPatient regPatient = new RegPatient();
             regPatient.PatientId = patid; regPatient.Mrno = note.Mrno;
             var query = @"

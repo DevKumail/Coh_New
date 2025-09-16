@@ -32,6 +32,6 @@ public partial class HrlicenseInfo
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("EmployeeId")]
-    [InverseProperty("HrlicenseInfos")]
+    [InverseProperty("HrlicenseInfo")]
     public virtual Hremployee Employee { get; set; } = null!;
 }

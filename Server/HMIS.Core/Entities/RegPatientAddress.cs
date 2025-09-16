@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("RegPatientAddress")]
 public partial class RegPatientAddress
 {
     [Key]

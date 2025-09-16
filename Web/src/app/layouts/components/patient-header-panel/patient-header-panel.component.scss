@@ -19,6 +19,19 @@
     //   color: black;
     // }
   }
+
+  // Close button should be on the side opposite to layout start
+  .banner-close {
+    top: .25rem !important;      // match m-1
+    right: .25rem !important;    // default LTR places it on the right
+    left: auto !important;
+  }
+}
+
+// Flip to left when app is RTL
+:host-context([dir='rtl']) .patient-banner .banner-close {
+  right: auto !important;
+  left: .25rem !important;
 }
 
 tr.high-rated{ 

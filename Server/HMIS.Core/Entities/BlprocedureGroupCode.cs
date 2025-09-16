@@ -32,18 +32,18 @@ public partial class BlprocedureGroupCode
     public long? PayerId { get; set; }
 
     [ForeignKey("PayerId")]
-    [InverseProperty("BlprocedureGroupCodes")]
+    [InverseProperty("BlprocedureGroupCode")]
     public virtual Blpayer? Payer { get; set; }
 
     [ForeignKey("ProcedureGroupId")]
-    [InverseProperty("BlprocedureGroupCodes")]
+    [InverseProperty("BlprocedureGroupCode")]
     public virtual BlProceduresGroup? ProcedureGroup { get; set; }
 
     [ForeignKey("ProcedureMasterId")]
-    [InverseProperty("BlprocedureGroupCodes")]
-    public virtual BlmasterProcedure? ProcedureMaster { get; set; }
+    [InverseProperty("BlprocedureGroupCode")]
+    public virtual BlmasterProcedures? ProcedureMaster { get; set; }
 
     [ForeignKey("ProcedureTypeId")]
-    [InverseProperty("BlprocedureGroupCodes")]
+    [InverseProperty("BlprocedureGroupCode")]
     public virtual ProcedureType? ProcedureType { get; set; }
 }

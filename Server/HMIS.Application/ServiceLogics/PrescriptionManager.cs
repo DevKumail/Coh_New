@@ -57,7 +57,7 @@ namespace HMIS.Application.ServiceLogics
         private bool Exist(long id)
         {
 
-            var prescription = _context?.Prescriptions?.FirstOrDefault(x=>x.MedicationId == id);
+            var prescription = _context?.Prescription?.FirstOrDefault(x=>x.MedicationId == id);
             if(prescription == null)
             {
                 return false;
@@ -126,14 +126,14 @@ namespace HMIS.Application.ServiceLogics
                    // OutsideClinic=prescriptionModel.providerDescription
                 };
 
-                 _context.Prescriptions.Add(newPrescription);
+                 _context.Prescription.Add(newPrescription);
                 await _context.SaveChangesAsync();
                 return true;
 
         }
             else if(exist)
             {
-                var prescription = _context.Prescriptions.Find(prescriptionModel.MedicationId);
+                var prescription = _context.Prescription.Find(prescriptionModel.MedicationId);
 
                 prescription.MedicationId = prescriptionModel.MedicationId;
                 if (prescriptionModel.ProviderId != null)
@@ -204,7 +204,7 @@ namespace HMIS.Application.ServiceLogics
 
             try
             {
-                var data = _context.Prescriptions.Where(x => x.MedicationId == Id).FirstOrDefault();
+                var data = _context.Prescription.Where(x => x.MedicationId == Id).FirstOrDefault();
                 if (data != null)
                 {
                     data.IsDeleted = true;

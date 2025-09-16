@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [PrimaryKey("ProviderId", "SpecialtyId")]
-[Table("ProviderSpecialtyAssign")]
 public partial class ProviderSpecialtyAssign
 {
     [Key]

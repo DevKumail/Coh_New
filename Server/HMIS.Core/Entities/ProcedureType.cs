@@ -16,11 +16,11 @@ public partial class ProcedureType
     public string? Type { get; set; }
 
     [InverseProperty("ProcedureType")]
-    public virtual ICollection<BlProceduresGroup> BlProceduresGroups { get; set; } = new List<BlProceduresGroup>();
+    public virtual ICollection<BlProceduresGroup> BlProceduresGroup { get; set; } = new List<BlProceduresGroup>();
 
     [InverseProperty("ProcedureType")]
-    public virtual ICollection<BlmasterProcedure> BlmasterProcedures { get; set; } = new List<BlmasterProcedure>();
+    public virtual ICollection<BlmasterProcedures> BlmasterProcedures { get; set; } = new List<BlmasterProcedures>();
 
     [InverseProperty("ProcedureType")]
-    public virtual ICollection<BlprocedureGroupCode> BlprocedureGroupCodes { get; set; } = new List<BlprocedureGroupCode>();
+    public virtual ICollection<BlprocedureGroupCode> BlprocedureGroupCode { get; set; } = new List<BlprocedureGroupCode>();
 }

@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("InsuranceCompanyFieldMapping")]
 public partial class InsuranceCompanyFieldMapping
 {
     [Key]

@@ -39,7 +39,7 @@ namespace HMIS.Web.Controllers.Eligibility
         public async Task<IActionResult> InsertEligibilityLogDetails(long mrno)
         {
 
-            var getappid = _context.SchAppointments.Where(x=>x.Mrno == mrno.ToString()).OrderByDescending(x=>x.AppId).FirstOrDefault().AppId;
+            var getappid = _context.SchAppointment.Where(x=>x.Mrno == mrno.ToString()).OrderByDescending(x=>x.AppId).FirstOrDefault().AppId;
             var (columnNames, columnValues) = await _eligibilityManager.InsertEligibilityLog(getappid);
             long insertedRowId;
             if (columnNames.Any() && columnValues.Any())
@@ -68,7 +68,7 @@ namespace HMIS.Web.Controllers.Eligibility
                     eligibility.Priority = 2;
                     eligibility.EligiblityDate = System.DateTime.Now;
                     eligibility.Mrno = mrno.ToString();
-                    _context.EligibilityLogs.Add(eligibility);
+                    _context.EligibilityLog.Add(eligibility);
                     _context.SaveChanges();
                     insertedRowId = eligibility.Id;
                     jsonData.Add(rowData);
@@ -86,7 +86,7 @@ namespace HMIS.Web.Controllers.Eligibility
         [HttpPost("Get270")]
         public async Task Get270Details(long getappid, long insertedRowId, long mrno)
         {
-            var getname = _context.RegPatients.FirstOrDefault(x => x.Mrno == mrno.ToString());
+            var getname = _context.RegPatient.FirstOrDefault(x => x.Mrno == mrno.ToString());
             var (columnNames, columnValues) = await _eligibilityManager.Get270fileInfoByAppId(getappid);
             if (columnNames.Any() && columnValues.Any())
             {

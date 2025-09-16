@@ -6,9 +6,9 @@
                 <div>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                          <button #notificationToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotification" aria-expanded="false" aria-controls="collapseNotification">
-                            Notification
-                            <ng-icon style="color: orange;" class="ms-auto mb-1" [name]="isNotificationFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isNotificationFiltered }"></ng-icon>
+                          <button #notificationToggler class="accordion-button collapsed d-flex align-items-center justify-content-between no-accordion-caret w-100 gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotification" aria-expanded="false" aria-controls="collapseNotification">
+                            <span>{{ 'Notification' | translate }}</span>
+                            <ng-icon style="color: orange;" [name]="isNotificationFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isNotificationFiltered }"></ng-icon>
                           </button>
                         </h2>
                         <div id="collapseNotification" class="accordion-collapse collapse" data-bs-parent="#Notificationaccordion">
@@ -16,25 +16,17 @@
                         <form *ngIf="NotificationFilterForm" [formGroup]="NotificationFilterForm">
                         <div class="row">
                             <div class="col-md-6">
-                                <label>From Date</label>
-                                <input
-                                    type="date"
-                                    class="form-control"
-                                    formControlName="fromDate"
-                                />
+                                <label>{{ 'From Date' | translate }}</label>
+                                <input type="date" class="form-control"formControlName="fromDate" />
                             </div>
                       
                             <div class="col-md-6">
-                                <label>To Date</label>
-                                <input
-                                    type="date"
-                                    class="form-control"
-                                    formControlName="toDate"
-                                />
+                                <label>{{ 'To Date' | translate }}</label>
+                                <input type="date" class="form-control"formControlName="toDate" />
                             </div>
                             <div class="col-12 mt-3 d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearNotification()">Clear</button>
-                                <button type="button" class="btn btn-primary btn-sm" (click)="onSearchNotification()">Search</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearNotification()">{{ 'Clear' | translate }}</button>
+                                <button type="button" class="btn btn-primary btn-sm" (click)="onSearchNotification()">{{ 'Search' | translate }}</button>
                             </div>
                         </div>
                         </form>
@@ -44,13 +36,13 @@
                 </div>
                 </div> 
         <div class="table-responsive">
-            <table class="table table-custom align-middle mb-0">
+            <table class="table table-custom align-middle mb-0 table-striped">
                 <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                     <tr class="text-uppercase fs-xxs">
-                        <th>Date</th>
-                        <th>Subject</th>
-                        <th>Patient Name (MR No)</th>
-                        <th>Sender</th>
+                        <th>{{ 'Date' | translate }}</th>
+                        <th>{{ 'Subject' | translate }}</th>
+                        <th>{{ 'Patient Name (MR No)' | translate }}</th>
+                        <th>{{ 'Sender' | translate }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,7 +55,7 @@
                         <td>{{ appointment.sender }}</td>
                     </tr>
                     <tr *ngIf="appointments.length === 0">
-                        <td colspan="9">No appointment found.</td>
+                        <td colspan="9">{{ 'No appointment found.' | translate }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -75,9 +67,9 @@
             <div>
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                      <button #notesToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotes" aria-expanded="false" aria-controls="collapseNotes">
-                        Notes
-                        <ng-icon style="color: orange;" class="ms-auto mb-1" [name]="isNotesFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isNotesFiltered }"></ng-icon>
+                      <button #notesToggler class="accordion-button collapsed d-flex align-items-center justify-content-between no-accordion-caret w-100 gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotes" aria-expanded="false" aria-controls="collapseNotes">
+                        <span>{{ 'Notes' | translate }}</span>
+                        <ng-icon style="color: orange;" [name]="isNotesFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isNotesFiltered }"></ng-icon>
                       </button>
                     </h2>
                     <div id="collapseNotes" class="accordion-collapse collapse" data-bs-parent="#Notesaccordion">
@@ -85,17 +77,17 @@
                     <form *ngIf="NotesFilterForm" [formGroup]="NotesFilterForm">
                     <div class="row">
                         <div class="col-md-6">
-                            <label>From Date</label>
+                            <label>{{ 'From Date' | translate }}</label>
                             <input type="date" class="form-control" formControlName="fromDate"/>
                         </div>
                   
                         <div class="col-md-6">
-                            <label>To Date</label>
+                            <label>{{ 'To Date' | translate }}</label>
                             <input type="date" class="form-control" formControlName="toDate"/>
                         </div>
                         <div class="col-12 mt-3 d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearNotes()">Clear</button>
-                            <button type="button" class="btn btn-primary btn-sm" (click)="onSearchNotes()">Search</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearNotes()">{{ 'Clear' | translate }}</button>
+                            <button type="button" class="btn btn-primary btn-sm" (click)="onSearchNotes()">{{ 'Search' | translate }}</button>
                         </div>
                     </div>
                     </form>
@@ -105,13 +97,13 @@
             </div>
             </div> 
         <div class="table-responsive">
-            <table class="table table-custom align-middle mb-0">
+            <table class="table table-custom align-middle mb-0 table-striped">
                 <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                     <tr class="text-uppercase fs-xxs">
-                        <th>Date</th>
-                        <th>Subject</th>
-                        <th>Patient Name (MR No)</th>
-                        <th>Sender</th>
+                        <th>{{ 'Date' | translate }}</th>
+                        <th>{{ 'Subject' | translate }}</th>
+                        <th>{{ 'Patient Name (MR No)' | translate }}</th>
+                        <th>{{ 'Sender' | translate }}</th>
                     </tr>
                 </thead>
                 <tbody >
@@ -136,9 +128,9 @@
                 <div>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                          <button #billedToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBilled" aria-expanded="false" aria-controls="collapseBilled">
-                            Billed
-                            <ng-icon style="color: orange;" class="ms-auto mb-1" [name]="isBilledFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isBilledFiltered }"></ng-icon>
+                          <button #billedToggler class="accordion-button collapsed d-flex align-items-center justify-content-between no-accordion-caret w-100 gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBilled" aria-expanded="false" aria-controls="collapseBilled">
+                            <span>{{ 'Billed' | translate }}</span>
+                            <ng-icon style="color: orange;" [name]="isBilledFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isBilledFiltered }"></ng-icon>
     
                           </button>
                         </h2>
@@ -147,7 +139,7 @@
                         <form *ngIf="BilledFilterForm" [formGroup]="BilledFilterForm">
                         <div class="row">
                             <div class="col-md-6">
-                                <label>From Date</label>
+                                <label>{{ 'From Date' | translate }}</label>
                                 <input
                                     type="date"
                                     class="form-control"
@@ -156,7 +148,7 @@
                             </div>
                       
                             <div class="col-md-6">
-                                <label>To Date</label>
+                                <label>{{ 'To Date' | translate }}</label>
                                 <input
                                     type="date"
                                     class="form-control"
@@ -164,8 +156,8 @@
                                 />
                             </div>
                             <div class="col-12 mt-3 d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearBilled()">Clear</button>
-                                <button type="button" class="btn btn-primary btn-sm" (click)="onSearchBilled()">Search</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearBilled()">{{ 'Clear' | translate }}</button>
+                                <button type="button" class="btn btn-primary btn-sm" (click)="onSearchBilled()">{{ 'Search' | translate }}</button>
                             </div>
                         </div>
                         </form>
@@ -175,13 +167,13 @@
                 </div>
                 </div> 
             <div class="table-responsive">
-                <table class="table table-custom align-middle mb-0">
+                <table class="table table-custom align-middle mb-0 table-striped">
                     <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                         <tr class="text-uppercase fs-xxs">
-                            <th>Date</th>
-                            <th>Subject</th>
-                            <th>Patient Name (MR No)</th>
-                            <th>Sender</th>
+                            <th>{{ 'Date' | translate }}</th>
+                            <th>{{ 'Subject' | translate }}</th>
+                            <th>{{ 'Patient Name (MR No)' | translate }}</th>
+                            <th>{{ 'Sender' | translate }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -207,9 +199,9 @@
             <div>
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                      <button #appointmentToggler class="accordion-button collapsed d-flex no-accordion-caret" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAppointment" aria-expanded="false" aria-controls="collapseAppointment">
-                        Appointment
-                        <ng-icon style="color: orange;" class="ms-auto mb-1" [name]="isAppointmentFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
+                      <button #appointmentToggler class="accordion-button collapsed d-flex align-items-center justify-content-between no-accordion-caret w-100 gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAppointment" aria-expanded="false" aria-controls="collapseAppointment">
+                        <span>{{ 'Appointment' | translate }}</span>
+                        <ng-icon style="color: orange;" [name]="isAppointmentFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
                       </button>
                     </h2>
                     <div id="collapseAppointment" class="accordion-collapse collapse" data-bs-parent="#Appointmentaccordion">
@@ -217,9 +209,9 @@
                           <form *ngIf="AppointmentFilterForm" [formGroup]="AppointmentFilterForm">
                     <div class="row">
                         <div class="col-md-4">
-                            <label>Provider</label>
+                            <label>{{ 'Provider' | translate }}</label>
                             <select class="form-control" formControlName="providerId">
-                                <option value="">-- Select Provider --</option>
+                                <option value="">-- {{ 'Provider' | translate }} --</option>
                                 <option *ngFor="let item of providers" [value]="item.code">
                                     {{ item.name }}
                                 </option>
@@ -227,18 +219,18 @@
                         </div>
                   
                         <div class="col-md-4">
-                            <label>Facility</label>
+                            <label>{{ 'Facility' | translate }}</label>
                             <select class="form-control form-select" formControlName="facility">
-                                <option value="">-- Select Facility --</option>
+                                <option value="">-- {{ 'Facility' | translate }} --</option>
                                 <option *ngFor="let f of facilities" [value]="f.code">
                                     {{ f.name }}
                                 </option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label>Site</label>
+                            <label>{{ 'Site' | translate }}</label>
                             <select class="form-control" formControlName="sitesId">
-                                <option value="">-- Select Site --</option>
+                                <option value="">-- {{ 'Site' | translate }} --</option>
                                 <option *ngFor="let item of sites" [value]="item.code">
                                     {{ item.name }}
                                 </option>
@@ -247,13 +239,13 @@
 
                         
                         <div class="col-md-4">
-                            <label>Appointment Date</label>
+                            <label>{{ 'Appointment Date' | translate }}</label>
                             <input type="date" class="form-control" formControlName="appDate">
                         </div>
 
 
                         <div class="col-md-4">
-                            <label>Status</label>
+                            <label>{{ 'Status' | translate }}</label>
                             <select #statusesSel class="form-select" choicesSelect [options]="{ removeItemButton: true, placeholder: true, placeholderValue: 'Select Status' }"
                                  formControlName="statuses" name="choices-multiple-remove-button" multiple>
                                 <option *ngFor="let s of statusOptions" [value]="s.id">{{ s.name }}</option>
@@ -263,13 +255,13 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="" id="chkScheduledOnly" formControlName="showScheduledAppointmentOnly">
                                 <label class="form-check-label" for="chkScheduledOnly">
-                                    Scheduled Appoinment
+                                    {{ 'Scheduled Appoinment' | translate }}
                                 </label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="" id="chkChargePending" formControlName="showChargeCapturePending">
                                 <label class="form-check-label" for="chkChargePending">
-                                    Charge Capture Pending
+                                    {{ 'Charge Capture Pending' | translate }}
                                 </label>
                             </div>
                         </div>
@@ -278,8 +270,8 @@
                         </div> -->
 
                         <div class="col-12 mt-3 d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearAppointment()">Clear</button>
-                            <button type="button" class="btn btn-primary btn-sm" (click)="onSearchAppointment()">Search</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearAppointment()">{{ 'Clear' | translate }}</button>
+                            <button type="button" class="btn btn-primary btn-sm" (click)="onSearchAppointment()">{{ 'Search' | translate }}</button>
                         </div>
                     </div>
                     </form>
@@ -291,14 +283,14 @@
 
 
             <div class="table-responsive">
-                <table class="table table-custom align-middle mb-0">
+                <table class="table table-custom align-middle mb-0 table-striped">
                     <thead class="bg-light align-middle bg-opacity-25 thead-sm">
                         <tr class="text-uppercase fs-xxs">
-                            <th>App Date</th>
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th>Site</th>
-                            <th>Action</th>
+                            <th>{{ 'App Date' | translate }}</th>
+                            <th>{{ 'Name' | translate }}</th>
+                            <th>{{ 'Status' | translate }}</th>
+                            <th>{{ 'Site' | translate }}</th>
+                            <th>{{ 'Action' | translate }}</th>
                         </tr>
                     </thead>
                     <tbody >
@@ -317,14 +309,14 @@
                                   </button>
                                   <ul class="dropdown-menu dropdown-menu-end">
                                     <li style="cursor: pointer;">
-                                      <a class="dropdown-item" (click)="onEditAppointment(appointment)">
-                                        Edit Appointment
-                                      </a>
+                                      <button class="dropdown-item" (click)="onEditAppointment(appointment)">
+                                        {{ 'Edit Appointment' | translate }}
+                                      </button>
                                     </li>
                                     <!-- *ngIf="appointment.appStatusId == 2" -->
                                     <li class="dropdown-submenu" >
                                       <button class="dropdown-item dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Change Status
+                                        {{ 'Change Status' | translate }}
                                       </button>
                                       <ul class="dropdown-menu">
                                         <li *ngFor="let s of tableStatus">

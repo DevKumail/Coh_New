@@ -3,13 +3,13 @@
         <li class="nav-item">
             <a href="javascript:void(0)" class="nav-link" (click)="onDashboardClick()">
                 <ng-icon name="tablerUser" class="menu-icon"></ng-icon>
-                <span class="menu-text">Dashboard</span>
+                <span class="menu-text">{{ 'Dashboard' | translate }}</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="javascript:void(0)" class="nav-link" (click)="onPatientSummaryClick()">
                 <ng-icon name="tablerUser" class="menu-icon"></ng-icon>
-                <span class="menu-text">Patient Chart</span>
+                <span class="menu-text">{{ 'Patient Chart' | translate }}</span>
             </a>
         </li>
         @for (item of menuItems; track $index) {
@@ -38,7 +38,7 @@
                 <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
             </span>
             }
-            <span class="menu-text"> {{ item.label }} </span>
+            <span class="menu-text"> {{ item.label | translate }} </span>
             @if (item.badge) {
             <span [class]="`badge bg-${item.badge.variant}`">{{ item.badge.text }}</span>
             }
@@ -65,6 +65,30 @@
     </li>
 </ng-template>
 
+<style>
+  /* Direction-aware spacing for navbar icons */
+  .menu-icon {
+    /* LTR default: space after icon */
+    margin-inline-end: .5rem;
+    margin-inline-start: 0;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+  }
+  [dir='rtl'] .menu-icon {
+    /* RTL: space before icon */
+    margin-inline-start: .5rem;
+    margin-inline-end: 0;
+  }
+  .menu-text { white-space: nowrap; }
+  .menu-arrow {
+    display: inline-flex;
+    align-items: center;
+    /* Space between text and chevron in both LTR/RTL */
+    margin-inline-start: .25rem;
+  }
+</style>
+
 <ng-template #MenuItem let-item="item" let-linkClass="linkClass">
     @if (item.url) {
     <a [routerLink]="item.url" [target]="item.target" [class]="linkClass" [class.active]="isActive(item)"
@@ -74,7 +98,7 @@
             <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
         </span>
         }
-        <span class="menu-text">{{ item.label }}</span>
+        <span class="menu-text">{{ item.label | translate }}</span>
         @if (item.badge) {
         <span class="badge text-bg-{{item.badge.variant}} opacity-50" [innerHTML]="item.badge.text"></span>
         }

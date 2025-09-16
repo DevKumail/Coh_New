@@ -7,6 +7,7 @@ import {
   transition,
   animate
 } from '@angular/animations';
+import { TranslatePipe } from '../../../shared/i18n/translate.pipe';
 import { IconsModule } from '@/app/shared/icons.module';
 import { DataStorageService } from '@/app/shared/data-storage.service';
 import { SharedApiService } from '@/app/shared/shared.api.service';
@@ -33,6 +34,7 @@ import Swal from 'sweetalert2';
     NgbTooltip,
     FormsModule,
     NgIconComponent,
+    TranslatePipe,
   ],
   animations: [
     trigger('slideToggle', [

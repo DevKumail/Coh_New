@@ -56,7 +56,7 @@ namespace HMIS.Application.ServiceLogics
         private bool Exist(long id)
         {
 
-            var patient = _context.PatientProcedures.Find(id);
+            var patient = _context.PatientProcedure.Find(id);
             return patient != null;
         }
          
@@ -102,14 +102,14 @@ namespace HMIS.Application.ServiceLogics
                    // newPatientProc.OutsideClinic = patientProcedure.providerDescription;
 
 
-                    _context.PatientProcedures.Add(newPatientProc);
+                    _context.PatientProcedure.Add(newPatientProc);
                     await _context.SaveChangesAsync();
                     return true;
 
                 }
                 else
                 {
-                    var patient = _context.PatientProcedures.FirstOrDefault(x => x.Id.Equals(patientProcedure.Id));
+                    var patient = _context.PatientProcedure.FirstOrDefault(x => x.Id.Equals(patientProcedure.Id));
 
                     if (patient != null)
                     {
@@ -162,7 +162,7 @@ namespace HMIS.Application.ServiceLogics
 
             try
             {
-                var data = _context.PatientProcedures.Where(x => x.Id == Id).FirstOrDefault();
+                var data = _context.PatientProcedure.Where(x => x.Id == Id).FirstOrDefault();
                 if (data != null)
                 {
                     data.IsDeleted = true;

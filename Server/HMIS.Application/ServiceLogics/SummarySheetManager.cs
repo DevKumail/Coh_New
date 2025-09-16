@@ -21,11 +21,11 @@ namespace HMIS.Application.ServiceLogics
         }
 
         #region Vital Signs
-        public async Task<bool> VitalSignsInsert(VitalSigns vs)
+        public async Task<bool> VitalSignsInsert(DTOs.Clinical.VitalSign vs)
         {
             try
             {
-                Core.Entities.VitalSign vital = new Core.Entities.VitalSign()
+                Core.Entities.VitalSigns vital = new Core.Entities.VitalSigns()
                 {
                     EntryDate = vs.EntryDate,
                     Bpdiastolic = vs.BPDiastolic,
@@ -93,11 +93,11 @@ namespace HMIS.Application.ServiceLogics
             }
         }
 
-        public async Task<bool> VSInsert(VitalSigns vitalSigns)
+        public async Task<bool> VSInsert(DTOs.Clinical.VitalSign vitalSigns)
         {
             try
             {
-                Core.Entities.VitalSign vital = new Core.Entities.VitalSign();
+                Core.Entities.VitalSigns vital = new Core.Entities.VitalSigns();
 
                 vital.AppointmentId = vitalSigns.AppointmentId;
                 vital.EntryDate = vitalSigns.EntryDate;
@@ -152,7 +152,7 @@ namespace HMIS.Application.ServiceLogics
                 return false;
             }
         }
-        public async Task<bool> VSUpdate(VitalSigns vitalSigns)
+        public async Task<bool> VSUpdate(DTOs.Clinical.VitalSign vitalSigns)
         {
             try
             {

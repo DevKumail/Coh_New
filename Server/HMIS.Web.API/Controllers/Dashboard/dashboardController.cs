@@ -30,7 +30,7 @@ namespace HMIS.Web.Controllers.Dashboard
         {
             try
             {
-                var todaysAppointments = _context.SchAppointments
+                var todaysAppointments = _context.SchAppointment
                     .Include(a => a.Patient)
                     .Include(a => a.Site)
                     .Include(a => a.Employee)
@@ -64,7 +64,7 @@ namespace HMIS.Web.Controllers.Dashboard
         {
             try
             {
-                var todaysCheckIns = _context.SchAppointments
+                var todaysCheckIns = _context.SchAppointment
                     .Include(a => a.Patient)
                     .Include(a => a.Facility)
                     .Include(a => a.Site)
@@ -113,7 +113,7 @@ namespace HMIS.Web.Controllers.Dashboard
                 DateTime startDate = DateTime.Now.Date.AddDays(-currentDayOfWeek);
 
                 DateTime endDate = startDate.AddDays(6);
-                List<DoctorAvailabilityDTO> doctorAvailability = _context.ProviderSchedules
+                List<DoctorAvailabilityDTO> doctorAvailability = _context.ProviderSchedule
                     .Where(ps =>
                                 (ps.Monday == true && currentDayOfWeek == 0) ||
                                 (ps.Tuesday == true && currentDayOfWeek == 1) ||
@@ -146,9 +146,9 @@ namespace HMIS.Web.Controllers.Dashboard
                 foreach (var Availability in doctorAvailability)
                 {
 
-                   var Avb= _context.Hremployees.ToList();
+                   var Avb= _context.Hremployee.ToList();
                     Availability.ProviderName = Avb.Where(x => x.EmployeeId == Availability.ProviderId).Select(x=>x.FullName).FirstOrDefault();
-                    var fac = _context.RegFacilities.ToList();
+                    var fac = _context.RegFacility.ToList();
                     Availability.FacilityName = fac.Where(x => x.Id == Availability.FacilityId).Select(x => x.Name).FirstOrDefault();
 
 

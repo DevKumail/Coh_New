@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("RegCompany")]
 public partial class RegCompany
 {
     [Key]
@@ -30,9 +29,9 @@ public partial class RegCompany
     public string? Desination { get; set; }
 
     [ForeignKey("CreatedById")]
-    [InverseProperty("RegCompanies")]
+    [InverseProperty("RegCompany")]
     public virtual Hremployee? CreatedBy { get; set; }
 
     [InverseProperty("Company")]
-    public virtual ICollection<RegFacility> RegFacilities { get; set; } = new List<RegFacility>();
+    public virtual ICollection<RegFacility> RegFacility { get; set; } = new List<RegFacility>();
 }

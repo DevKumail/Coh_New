@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Keyless]
-[Table("TestTableType")]
 public partial class TestTableType
 {
     [Column("MRNo")]

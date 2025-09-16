@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("LabOrderSetDetail")]
 public partial class LabOrderSetDetail
 {
     public long OrderSetId { get; set; }

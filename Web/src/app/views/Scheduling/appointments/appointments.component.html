@@ -3,17 +3,17 @@
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
                 <ng-icon name="tablerSmartHome"></ng-icon>
-                Scheduling
+                {{'Scheduling' | translate}}
             </a>
         </li>
         <li
             class="d-flex align-items-center text-muted mx-1"
             aria-current="page"
         >
-            <ng-icon name="tablerChevronRight"></ng-icon>
+            <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-            Appointments
+            {{'Appointments' | translate}}
         </li>
     </ol>
 </nav>
@@ -25,10 +25,14 @@
                     <h2 class="accordion-header">
                       <div class="d-flex w-100 align-items-center">
                         <button #appointmentToggler class="accordion-button collapsed d-flex no-accordion-caret flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAppointment" aria-expanded="false" aria-controls="collapseAppointment">
-                          Appointment
-                          <ng-icon style="color: orange;" class="ms-auto mb-1" [name]="isAppointmentFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
+                          {{'Appointment' | translate}}
                         </button>
-                        <button class="btn btn-success ms-2 me-2" (click)="buttonRoute('/scheduling/appointment booking')">Create</button>
+                        <button type="button" class="btn btn-link p-0 mb-1" title="Filter"
+                                (click)="appointmentToggler?.click()"
+                                [style.marginInlineStart]="'auto'">
+                                <ng-icon style="color: orange;" [name]="isAppointmentFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
+                            </button>
+                            <button class="btn btn-success ms-2 me-2" (click)="buttonRoute('/scheduling/appointment booking')"> {{'Create' | translate}} </button>
                       </div>
                     </h2>
                     <div id="collapseAppointment" class="accordion-collapse collapse" data-bs-parent="#Appointmentaccordion">
@@ -39,29 +43,29 @@
                                 <!-- <div class="container-fluid"> -->
                                     <!-- Row 1 -->
                                     <div class="row">
-                                        <div class="col-md-4 mb-3">
-                                            <label>From Date</label>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'From Date' | translate }}</label>
                                             <input
                                                 type="date"
                                                 class="form-control"
                                                 formControlName="fromDate"
                                             />
                                         </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label>To Date</label>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'To Date' | translate }}</label>
                                             <input
                                                 type="date"
                                                 class="form-control"
                                                 formControlName="toDate"
                                             />
                                         </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label>Provider</label>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'Provider' | translate }}</label>
                                             <select
                                                 class="form-control form-select"
                                                 formControlName="providerId"
                                             >
-                                                <option value="" disabled selected>-- Select Provider --</option>
+                                                <option value="" disabled selected>-- {{ 'Select Provider' | translate }} --</option>
                                                 <option
                                                     *ngFor="let item of providers"
                                                     [value]="item.code"
@@ -71,13 +75,13 @@
                                             </select>
                                         </div>
                                   
-                                        <div class="col-md-4 mb-3">
-                                            <label>Facility</label>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'Facility' | translate }}</label>
                                             <select
                                                 class="form-control form-select"
                                                 formControlName="facilityId"
                                             >
-                                                <option value="" disabled selected>-- Select Facility --</option>
+                                                <option value="" disabled selected>-- {{ 'Select Facility' | translate }} --</option>
                                                 <option
                                                     *ngFor="let f of facilities"
                                                     [value]="f.code"
@@ -86,13 +90,13 @@
                                                 </option>
                                             </select>
                                         </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label>Site</label>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'Site' | translate }}</label>
                                             <select
                                                 class="form-control form-select"
                                                 formControlName="sitesId"
                                             >
-                                                <option value="" disabled selected>-- Select Site --</option>
+                                                <option value="" disabled selected>-- {{ 'Select Site' | translate }} --</option>
                                                 <option
                                                     *ngFor="let item of sites"
                                                     [value]="item.code"
@@ -101,13 +105,13 @@
                                                 </option>
                                             </select>
                                         </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label>Speciality</label>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'Speciality' | translate }}</label>
                                             <select
                                                 class="form-control form-select"
                                                 formControlName="specialityId"
                                             >
-                                                <option value="" disabled selected>-- Select Speciality --</option>
+                                                <option value="" disabled selected>-- {{ 'Select Speciality' | translate }} --</option>
                                                 <option
                                                     *ngFor="let item of speciality"
                                                     [value]="item.code"
@@ -117,13 +121,13 @@
                                             </select>
                                         </div>
                               
-                                        <div class="col-md-4 mb-3">
-                                            <label>Criteria</label>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'Criteria' | translate }}</label>
                                             <select
                                                 class="form-control form-select"
                                                 formControlName="criteriaId"
                                             >
-                                                <option value="" disabled selected>-- Select Criteria --</option>
+                                                <option value="" disabled selected>-- {{ 'Select Criteria' | translate }} --</option>
                                                 <option
                                                     *ngFor="let item of appointmentcriteria"
                                                     [value]="item.code"
@@ -132,9 +136,9 @@
                                                 </option>
                                             </select>
                                         </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label>Visit Type</label>
-            
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'Visit Type' | translate }}</label>
+
                                             <div class="row g-4 align-items-end">
                                                 <div class="input-group">
                                                     <select
@@ -142,7 +146,7 @@
                                                         formControlName="visitTypeId"
                                                         id="visitTypeId"
                                                     >
-                                                        <option value="" disabled selected>-- Select Visit Type --</option>
+                                                        <option value="" disabled selected>-- {{ 'Select Visit Type' | translate }} --</option>
                                                         <option
                                                             *ngFor="let item of visitType"
                                                             [value]="item.code"
@@ -153,13 +157,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label>Location</label>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'Location' | translate }}</label>
                                             <select
                                                 class="form-control form-select"
                                                 formControlName="locationId"
                                             >
-                                                <option value="" disabled selected>-- Select Location --</option>
+                                                <option value="" disabled selected>-- {{ 'Select Location' | translate }} --</option>
                                                 <option
                                                     *ngFor="let l of locations"
                                                     [value]="l.code"
@@ -168,14 +172,14 @@
                                                 </option>
                                             </select>
                                         </div>
-                                
-                                        <div class="col-md-4 mb-3">
-                                            <label>Appointment Type</label>
+
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'Appointment Type' | translate }}</label>
                                             <select
                                                 class="form-control form-select"
                                                 formControlName="appointmentId"
                                             >
-                                                <option value="" disabled selected>-- Select Appointment Type --</option>
+                                                <option value="" disabled selected>-- {{ 'Select Appointment Type' | translate }} --</option>
                                                 <option
                                                     *ngFor="let item of appointmentType"
                                                     [value]="item.code"
@@ -184,13 +188,13 @@
                                                 </option>
                                             </select>
                                         </div>
-                                        <div class="col-md-4 mb-3"> 
+                                        <div class="col-md-3 mb-2"> 
 
                                         </div>
 
-                                        <div class="col-md-4 px-2" style="margin-top: 20px; text-align: right;">
-                                            <button type="button" class="btn btn-light me-2" (click)="ClearFilter()">Clear</button>
-                                            <button type="submit" (click)="FilterAppoinment()" class="btn btn-primary">Search</button>
+                                        <div class="col-md-3 px-2" style="margin-top: 20px; text-align: right;">
+                                            <button type="button" class="btn btn-light me-2" (click)="ClearFilter()">{{ 'Clear' | translate }}</button>
+                                            <button type="submit" (click)="FilterAppoinment()" class="btn btn-primary">{{ 'Search' | translate }}</button>
                                         </div>
                                     </div>
                                 <!-- </div> -->
@@ -209,15 +213,15 @@
             <table class="table table-bordered table-striped table-sm">
                 <thead>
                     <tr>
-                        <th>Visit Account Display</th>
-                        <th>Patient Name</th>
-                        <th>App Date</th>
-                        <th>Site Name</th>
-                        <th>Appointment Type</th>
-                        <th>Purpose</th>
-                        <th>App Status</th>
-                        <th>Patient Status</th>
-                        <th>Action</th>
+                        <th>{{ 'Visit Account Display' | translate }}</th>
+                        <th>{{ 'Patient Name' | translate }}</th>
+                        <th>{{ 'App Date' | translate }}</th>
+                        <th>{{ 'Site Name' | translate }}</th>
+                        <th>{{ 'Appointment Type' | translate }}</th>
+                        <th>{{ 'Purpose' | translate }}</th>
+                        <th>{{ 'App Status' | translate }}</th>
+                        <th>{{ 'Patient Status' | translate }}</th>
+                        <th>{{ 'Action' | translate }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -238,8 +242,7 @@
                             <button
                                 class="btn btn-outline-info p-0 px-1 py-1 me-1"
                                 style="font-size: 0.75rem"
-                                [routerLink]="['/scheduling/appointment/create']"
-                                [queryParams]="{ id: appointment.appointment_Id }"
+                                (click)="PatientEdit(appointment)"
                                 title="Edit Appointment"
                                 >
                                 <ng-icon name="tablerEdit"></ng-icon>
@@ -284,7 +287,7 @@
                         </td>
                     </tr>
                     <tr *ngIf="appointments.length === 0">
-                        <td colspan="9">No appointment found.</td>
+                        <td colspan="9">{{ 'No appointment found.' | translate }}</td>
                     </tr>
                 </tbody>
             </table>

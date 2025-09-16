@@ -34,5 +34,5 @@ public partial class Emrroute
     public string? MalaffiRoute { get; set; }
 
     [InverseProperty("Route")]
-    public virtual ICollection<PatientImmunization> PatientImmunizations { get; set; } = new List<PatientImmunization>();
+    public virtual ICollection<PatientImmunization> PatientImmunization { get; set; } = new List<PatientImmunization>();
 }

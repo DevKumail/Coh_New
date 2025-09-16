@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("PatientBillInvoice")]
 public partial class PatientBillInvoice
 {
     [Key]
@@ -39,6 +38,6 @@ public partial class PatientBillInvoice
     public long? AppointmentId { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("PatientBillInvoices")]
+    [InverseProperty("PatientBillInvoice")]
     public virtual SchAppointment? Appointment { get; set; }
 }

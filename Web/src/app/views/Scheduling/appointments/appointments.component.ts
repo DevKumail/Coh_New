@@ -12,8 +12,10 @@ import { FormBuilder, FormGroup, FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { LoaderService } from '@core/services/loader.service';
+import { SecureStorageService } from '@core/services/secure-storage.service';
 import { NgIconComponent } from '@ng-icons/core';
 import { StepsModule } from 'primeng/steps';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import moment from 'moment';
 
 @Component({
@@ -25,7 +27,8 @@ import moment from 'moment';
     GenericPaginationComponent,
     NgIconComponent,
     StepsModule,
-    FormsModule
+    FormsModule,
+    TranslatePipe
     ],
     templateUrl: './appointments.component.html',
     // styleUrl: './appointments.component.scss',
@@ -36,7 +39,8 @@ export class AppointmentsComponent {
         private router: Router,
         private fb: FormBuilder,
         private Service: SchedulingApiService,
-        private loader: LoaderService
+        private loader: LoaderService,
+        private secureStorage: SecureStorageService
     ) {}
     private modalRef!: NgbModalRef; 
     Patientpopup: boolean = false;
@@ -509,6 +513,16 @@ FillDropDown(response: any) {
             code: item.AppTypeId,
         }));
     }
+
+  // Layout helper for templates: flips icons/order in RTL
+
+}
+get isRtl(): boolean {
+  try {
+    return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+  } catch {
+    return false;
+  }
 }
 
   FillCache() {
@@ -830,5 +844,17 @@ FillDropDown(response: any) {
       const day = String(d.getDate()).padStart(2, '0');
       // HTML input[type=date] expects YYYY-MM-DD
       return `${year}-${month}-${day}`;
+  }
+
+  PatientEdit(appointment: any) {
+    // Derive a stable appointment id and persist as fallback for refresh
+    const appId: number = Number(appointment?.appointment_Id ?? appointment?.appId ?? 0);
+    if (appId) {
+      this.secureStorage.setItem('appointmentEditId', String(appId));
+    }
+    // Navigate using Router state (hide id from URL) and include full object for convenience
+    this.router.navigate(['/scheduling/appointment booking'], {
+      state: { appId, appointment },
+    });
   }
 }

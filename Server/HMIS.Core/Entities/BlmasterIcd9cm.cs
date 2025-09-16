@@ -55,8 +55,8 @@ public partial class BlmasterIcd9cm
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("Icd9codeNavigation")]
-    public virtual ICollection<Blicd9cmgroupCode> Blicd9cmgroupCodes { get; set; } = new List<Blicd9cmgroupCode>();
+    public virtual ICollection<Blicd9cmgroupCode> Blicd9cmgroupCode { get; set; } = new List<Blicd9cmgroupCode>();
 
     [InverseProperty("Icd9codeNavigation")]
-    public virtual ICollection<BlsuperBillDiagnosis> BlsuperBillDiagnoses { get; set; } = new List<BlsuperBillDiagnosis>();
+    public virtual ICollection<BlsuperBillDiagnosis> BlsuperBillDiagnosis { get; set; } = new List<BlsuperBillDiagnosis>();
 }

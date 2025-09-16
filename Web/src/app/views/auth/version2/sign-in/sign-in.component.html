@@ -13,14 +13,24 @@
                                     <a routerLink="/" class="logo-light">
                                         <img src="assets/images/logos/fuse3.png" alt="logo" height="50">
                                     </a>
-                                    <h4 class="fw-bold mt-4">Welcome to COHERENT </h4>
-                                    <p class="text-muted w-lg-75 mx-auto">Let’s get you signed in. Enter your email and
-                                        password to continue.</p>
+                                    <h4 class="fw-bold mt-4">{{ 'LOGIN_TITLE' | translate }}</h4>
+                                    <p class="text-muted w-lg-75 mx-auto">{{ 'LOGIN_SUBTITLE' | translate }}</p>
                                 </div>
 
                                 <form (submit)="onLogin(username.value, password.value); $event.preventDefault()">
+                                    <!-- <div class="mb-3 d-flex align-items-center justify-content-between">
+                                        <label class="form-label mb-0">Layout direction</label>
+                                        <div class="btn-group" role="group" aria-label="Direction selector">
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                    [class.active]="selectedDir === 'ltr'"
+                                                    (click)="setDir('ltr')">LTR</button>
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                    [class.active]="selectedDir === 'rtl'"
+                                                    (click)="setDir('rtl')">RTL</button>
+                                        </div>
+                                    </div> -->
                                     <div class="mb-3">
-                                        <label for="userEmail" class="form-label">User Name<span
+                                        <label for="userEmail" class="form-label">{{ 'USERNAME' | translate }}<span
                                                 class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-light"><ng-icon name="tablerUsers"
@@ -31,7 +41,7 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="userPassword" class="form-label">Password <span
+                                        <label for="userPassword" class="form-label">{{ 'PASSWORD' | translate }} <span
                                                 class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-light"><ng-icon name="tablerLockPassword"
@@ -48,24 +58,31 @@
                                             <label class="form-check-label" for="rememberMe">Keep me signed in</label>
                                         </div> -->
                                         <a routerLink="/auth-2/reset-pw"
-                                            class="text-decoration-underline link-offset-3 text-muted">Forgot
-                                            Password?</a>
+                                            class="text-decoration-underline link-offset-3 text-muted">{{ 'FORGOT_PASSWORD' | translate }}</a>
                                     </div>
 
                                     <div class="d-grid">
                                         <!-- <button type="submit" class="btn btn-primary fw-semibold py-2">Sign In</button> -->
                                         <button type="submit" class="btn btn-primary fw-semibold py-2"
                                             [disabled]="isLoading">
-                                            <ng-container *ngIf="!isLoading">Sign In</ng-container>
+                                            <ng-container *ngIf="!isLoading">{{ 'SIGN_IN' | translate }}</ng-container>
                                             <ng-container *ngIf="isLoading">
                                                 <span class="spinner-border spinner-border-sm me-1" role="status"
                                                     aria-hidden="true"></span>
-                                                Signing in...
+                                                {{ 'SIGN_IN' | translate }}...
                                             </ng-container>
                                         </button>
 
                                     </div>
                                 </form>
+
+                                <!-- Language/Direction flags: US (EN/LTR), UAE (AR/RTL) -->
+                                <div class="d-flex justify-content-center align-items-center mt-3 gap-2 small opacity-75">
+                                    <button type="button" class="btn btn-outline-light border px-2 py-1" title="English"
+                                            (click)="setUi('en','ltr')">🇺🇸</button>
+                                    <button type="button" class="btn btn-outline-light border px-2 py-1" title="Arabic"
+                                            (click)="setUi('ar','rtl')">🇦🇪</button>
+                                </div>
 
                                 <!-- <p class="text-muted text-center mt-4 mb-0">
                                     New here? <a routerLink="/auth-2/sign-up"

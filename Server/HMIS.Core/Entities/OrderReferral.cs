@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("OrderReferral")]
 public partial class OrderReferral
 {
     [Key]

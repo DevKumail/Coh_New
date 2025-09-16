@@ -143,29 +143,29 @@ public partial class Blpayer
     public int? PayerCodeforEligibilityInformation { get; set; }
 
     [InverseProperty("Payer")]
-    public virtual ICollection<BlpatientVisit> BlpatientVisits { get; set; } = new List<BlpatientVisit>();
+    public virtual ICollection<BlpatientVisit> BlpatientVisit { get; set; } = new List<BlpatientVisit>();
 
     [InverseProperty("Payer")]
-    public virtual ICollection<BlpayerPackage> BlpayerPackages { get; set; } = new List<BlpayerPackage>();
+    public virtual ICollection<BlpayerPackage> BlpayerPackage { get; set; } = new List<BlpayerPackage>();
 
     [InverseProperty("Payer")]
-    public virtual ICollection<BlpayerPlan> BlpayerPlans { get; set; } = new List<BlpayerPlan>();
+    public virtual ICollection<BlpayerPlan> BlpayerPlan { get; set; } = new List<BlpayerPlan>();
 
     [InverseProperty("Payer")]
-    public virtual ICollection<BlprocedureGroupCode> BlprocedureGroupCodes { get; set; } = new List<BlprocedureGroupCode>();
+    public virtual ICollection<BlprocedureGroupCode> BlprocedureGroupCode { get; set; } = new List<BlprocedureGroupCode>();
 
     [InverseProperty("Payer")]
-    public virtual ICollection<EligibilityLog> EligibilityLogs { get; set; } = new List<EligibilityLog>();
+    public virtual ICollection<EligibilityLog> EligibilityLog { get; set; } = new List<EligibilityLog>();
 
     [InverseProperty("BlPayer")]
-    public virtual ICollection<InsuranceEligibility> InsuranceEligibilities { get; set; } = new List<InsuranceEligibility>();
+    public virtual ICollection<InsuranceEligibility> InsuranceEligibility { get; set; } = new List<InsuranceEligibility>();
 
     [InverseProperty("Carrier")]
-    public virtual ICollection<InsuredSubscriber> InsuredSubscribers { get; set; } = new List<InsuredSubscriber>();
+    public virtual ICollection<Insured> Insured { get; set; } = new List<Insured>();
 
     [InverseProperty("Carrier")]
-    public virtual ICollection<Insured> Insureds { get; set; } = new List<Insured>();
+    public virtual ICollection<InsuredSubscriber> InsuredSubscriber { get; set; } = new List<InsuredSubscriber>();
 
     [InverseProperty("Payer")]
-    public virtual ICollection<SchAppointment> SchAppointments { get; set; } = new List<SchAppointment>();
+    public virtual ICollection<SchAppointment> SchAppointment { get; set; } = new List<SchAppointment>();
 }

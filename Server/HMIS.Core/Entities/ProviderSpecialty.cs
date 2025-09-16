@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("ProviderSpecialty")]
 public partial class ProviderSpecialty
 {
     [Key]
@@ -30,5 +29,5 @@ public partial class ProviderSpecialty
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("Speciality")]
-    public virtual ICollection<ProviderSchedule> ProviderSchedules { get; set; } = new List<ProviderSchedule>();
+    public virtual ICollection<ProviderSchedule> ProviderSchedule { get; set; } = new List<ProviderSchedule>();
 }

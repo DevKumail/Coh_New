@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Keyless]
-[Table("ClinicalUsage")]
 public partial class ClinicalUsage
 {
     public int ClinicalUsageId { get; set; }

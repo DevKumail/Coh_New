@@ -35,10 +35,10 @@ public partial class BlhcpcsgroupCode
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("GroupId")]
-    [InverseProperty("BlhcpcsgroupCodes")]
+    [InverseProperty("BlhcpcsgroupCode")]
     public virtual Blhcpcsgroup Group { get; set; } = null!;
 
     [ForeignKey("Hcpcscode")]
-    [InverseProperty("BlhcpcsgroupCodes")]
-    public virtual BlmasterHcpc HcpcscodeNavigation { get; set; } = null!;
+    [InverseProperty("BlhcpcsgroupCode")]
+    public virtual BlmasterHcpcs HcpcscodeNavigation { get; set; } = null!;
 }

@@ -153,14 +153,14 @@ public partial class BlpatientVisit
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("BlpatientVisits")]
+    [InverseProperty("BlpatientVisit")]
     public virtual SchAppointment? Appointment { get; set; }
 
     [ForeignKey("PayerId")]
-    [InverseProperty("BlpatientVisits")]
+    [InverseProperty("BlpatientVisit")]
     public virtual Blpayer? Payer { get; set; }
 
     [ForeignKey("SubscriberId")]
-    [InverseProperty("BlpatientVisits")]
+    [InverseProperty("BlpatientVisit")]
     public virtual InsuredSubscriber? Subscriber { get; set; }
 }
