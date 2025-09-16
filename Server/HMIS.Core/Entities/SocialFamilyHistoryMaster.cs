@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Keyless]
-[Table("SocialFamilyHistoryMaster")]
 public partial class SocialFamilyHistoryMaster
 {
     [Column("SHID")]

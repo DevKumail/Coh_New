@@ -8,14 +8,16 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { RouterModule } from '@angular/router';
 import { SchedulingApiService } from '../scheduling.api.service';
 import { NgIconComponent } from '@ng-icons/core';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import moment from 'moment';
-import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef, NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { D } from 'node_modules/@angular/cdk/bidi-module.d-D-fEBKdS';
 import { LoaderService } from '@core/services/loader.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
+import { SecureStorageService } from '@core/services/secure-storage.service';
 
 declare var flatpickr: any;
 
@@ -28,7 +30,8 @@ declare var flatpickr: any;
             CommonModule,
             RouterModule,
         NgbTimepickerModule,
-        NgIconComponent],
+        NgIconComponent,
+        TranslatePipe],
 
   templateUrl: './create-appointment.component.html',
   styleUrl: './create-appointment.component.scss'
@@ -39,6 +42,8 @@ export class CreateAppointmentComponent implements OnInit {
 
   appointmentForm!: FormGroup;
 minDate: any;
+    private modalRef!: NgbModalRef; 
+
 Times = [
   { Time: '01:00 AM' },
   { Time: '01:30 AM' },
@@ -99,6 +104,7 @@ Times = [
     private http: HttpClient,
     private loader : LoaderService,
     private patientBannerService: PatientBannerService,
+    private secureStorage: SecureStorageService,
   ) {}
 
 
@@ -212,7 +218,7 @@ Times = [
     'BLPayerPlan'
   ];
 
-  ngOnInit(): void {
+  async ngOnInit() {
 
 
     this.appointmentForm = this.fb.group({
@@ -238,17 +244,35 @@ Times = [
       PlanCopay: [''],
       PlanBalance: [''],
       PatientBalance: [''],
-      appointment: [''],
+      IsConsultationVisit: [''],
   });
-  
-      
-  // const appId: any = this.route.snapshot.paramMap.get('appId');
-  // console.log( 'on route appId',appId.appId);
-  // if (appId.appId) {
-  //   this.qid = appId.appId;
-  //   // this.getAppointmentData(appId);
-  // }
 
+  await this.FillCache();
+
+  // Prefer Router navigation state; fallback to window.history.state for refresh/reuse
+  const nav = this.router.getCurrentNavigation();
+  const navState: any = nav?.extras?.state ?? (window.history && (window.history.state as any)) ?? {};
+  const stateAppId = navState?.appId;
+  console.log('stateAppId =>',stateAppId);
+  const stateAppointment = navState?.appointment;
+
+  // Fallback to secure storage on page refresh
+  const storedId = this.secureStorage.getItem('appointmentEditId');
+
+  if (stateAppId != null) {
+    this.qid = Number(stateAppId);
+    await this.FillAppoinment(this.qid);
+  } else if (storedId) {  
+    this.qid = Number(storedId);
+    await this.FillAppoinment(this.qid);
+  }
+
+  // Clear once consumed to avoid stale usage
+  if (this.qid) {
+    this.secureStorage.removeItem('appointmentEditId');
+  }
+      
+  
   this.appointmentForm.get('facility')?.valueChanges.subscribe((facilityId) => {
     if (facilityId) {
       this.GetSpecialitybyFacilityId(facilityId);
@@ -264,7 +288,9 @@ Times = [
       this.siteArray = [];
     }
     });
-    this.FillCache();
+    
+
+    
 
     // Keep time grid highlight in sync with dropdown selection
     this.appointmentForm.get('time')?.valueChanges.subscribe((val) => {
@@ -616,8 +642,8 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
     this.mrNo = this.SearchPatientData?.table2[0]?.mrNo;;
     this.AppoinmentBooking.EmployeeId = userId;
     this.AppoinmentBooking.PatientId = this.SearchPatientData?.table2[0]?.patientId;;
-   console.log('submitAppointment hit');
-    if (!this.mrNo) {
+   console.log('submitAppointment hit', this.mrNo);
+    if (!this.mrNo || this.mrNo == null || this.mrNo == undefined) {
       Swal.fire(
         'Validation Error', 
         'MrNo is a required field. Please load a patient.', 
@@ -675,6 +701,7 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
     this.AppoinmentBooking.PlanBalance = this.appointmentForm.get('PlanBalance')?.value;;
     this.AppoinmentBooking.PlanCopay = this.appointmentForm.get('PlanCopay')?.value;;
     this.AppoinmentBooking.planId = this.appointmentForm.get('selectedPayerplan')?.value;
+    this.AppoinmentBooking.IsConsultationVisit = this.appointmentForm.get('IsConsultationVisit')?.value;
     this.AppoinmentBooking.VisitStatusEnabled = false;
     this.AppoinmentBooking.CPTGroupId = 101;
     this.AppoinmentBooking.AppointmentClassification = 1;
@@ -868,9 +895,7 @@ const dayName = days[dates.getDay()];
       return '';
     }
   }
-    eligibility(){
-
-    }
+    
 
     GetTime()
     {
@@ -927,9 +952,23 @@ isTimeBooked(displayTime: string): boolean {
   }
 }
 
-showDetailsDialog(element: any) {
+  // Layout helper: true when current document direction is RTL
+  get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
+  }
+
+    modalService = new NgbModal();
+
+
+showDetailsDialog(element: any,modalContent: any) {
   this.selectedElement = element;
-  this.detailsDialogVisible = true;
+  // if(this.selectedElement?.responseDetails){
+    this.modalRef = this.modalService.open(modalContent, { size: 'lg', backdrop: 'static' });
+  // }
 }
 
 FillCache() {
@@ -1202,6 +1241,86 @@ getEligibilityList() {
       .catch((error: any) => {
         console.error('Error fetching eligibility data:', error);
       });
+  }
+}
+
+
+
+ async FillAppoinment(AppointmentById: number) {
+  try {
+    this.loader.show();
+    const res: any = await this.SchedulingApiService.EditAppoimentByAppId(AppointmentById);
+    if (!res) { this.loader.hide(); return; }
+
+    const dateStr = this.datePipe.transform(res.appDateTime, 'yyyy-MM-dd') || '';
+    const timeStr = this.datePipe.transform(res.appDateTime, 'hh:mm a') || '';
+
+    this.GetSpecialitybyFacilityId(res.facilityId);
+    this.GetSitebySpecialityId(res.specialtyID);
+    this.GetProviderbySiteId(res.siteId);
+    this.GetSpecialityByEmployeeId(res.providerId);
+
+    // Patch ONLY the required fields, using IDs directly (not option objects)
+    this.appointmentForm.patchValue({
+      facility: res.facilityId ?? 0,
+      speciality: res.specialtyID ?? 0,
+      provider: res.providerId ?? 0,
+      site: res.siteId ?? 0,
+      date: dateStr,
+      time: timeStr,
+      selectedPurpose: res.purposeOfVisitId ?? 0,
+      selectedVisitType: res.visitTypeId ?? 0,
+      selectedReferredBy: res.referredProviderId ?? 0,
+      selectedType: res.appTypeId ?? 0,
+      selectedDuration: res.duration ?? 0,
+      selectedLocation: res.locationId ?? 0,
+      selectedCriteria: res.appCriteriaId ?? 0,
+      selectedNotified: res.patientNotifiedId ?? 0,
+      selectedStatus: res.appStatusId ?? 0,
+      selectedPayer: res.payerId ?? 0,
+      selectedPayerplan: res.planId ?? 0,
+      AppointmentNote: res.appNote ?? '',
+      PatientBalance: res.patientBalance ?? '',
+      PlanBalance: res.planBalance ?? '',
+      PlanCopay: res.planCopay ?? '',
+      IsConsultationVisit: res.isConsultationVisit ?? 0,
+    });
+
+    this.GetAppointmentByTime(dateStr);
+
+    // Optionally refresh time slots and provider availability for the selected site/date
+    if (res.siteId && res.providerId && res.facilityId && res.specialtyID && dateStr) {
+      await this.SchedulingApiService.GetSchAppointmentList(
+        res.siteId,
+        res.providerId,
+        res.facilityId,
+        res.specialtyID,
+        dateStr
+      );
+    }
+  } catch (e: any) {
+    Swal.fire({ icon: 'error', title: 'Error', text: e?.message || 'Failed to load appointment.' });
+  } finally {
+    this.loader.hide();
+  }
+}
+
+
+eligibility() {
+  var Demographicsinfo = sessionStorage.getItem('pb_patientData');
+  if (Demographicsinfo) {
+    var Demographics = JSON.parse(sessionStorage.getItem('pb_patientData') || '');
+    this.mrNo = Demographics.table2[0].mrNo;
+    this.SchedulingApiService.InsertEligibility(this.mrNo).then((res:any)=>{
+      if(res){
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Eligibility Inserted',
+        });
+      }
+    });
+
   }
 }
 

@@ -1,6 +1,7 @@
 .custom-border-right {
   display: inline-flex;
   align-items: center;
+  padding-inline: 0 8px; // space before the divider
 
   &::after {
     content: "";
@@ -8,6 +9,20 @@
     opacity: 0.35;
     width: 1px;
     border-left: 1px solid #6c757d;
-    margin-left: 8px; // 👈 Adjust this for desired spacing
+    margin-inline-start: 8px; // RTL/LTR aware spacing after the text
   }
+}
+
+/* Wider search input so long placeholders fit comfortably */
+.search-input {
+  min-width: 210px;
+}
+
+/* Slightly smaller placeholder text to avoid clipping with long translations */
+.search-input::placeholder {
+  font-size: .9rem;
+}
+
+@media (max-width: 992px) { // md/lg breakpoint: reduce a bit on smaller screens
+  .search-input { min-width: 200px; }
 }

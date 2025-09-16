@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("SeverityType")]
 public partial class SeverityType
 {
     [Key]
@@ -17,5 +16,5 @@ public partial class SeverityType
     public string? SeverityName { get; set; }
 
     [InverseProperty("SeverityCodeNavigation")]
-    public virtual ICollection<PatientAllergy> PatientAllergies { get; set; } = new List<PatientAllergy>();
+    public virtual ICollection<PatientAllergy> PatientAllergy { get; set; } = new List<PatientAllergy>();
 }

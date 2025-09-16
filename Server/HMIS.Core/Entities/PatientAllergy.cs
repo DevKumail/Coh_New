@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("PatientAllergy")]
 public partial class PatientAllergy
 {
     [Key]
@@ -74,26 +73,26 @@ public partial class PatientAllergy
     public long? AppointmentId { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("PatientAllergies")]
+    [InverseProperty("PatientAllergy")]
     public virtual SchAppointment? Appointment { get; set; }
 
     [ForeignKey("CreatedBy")]
-    [InverseProperty("PatientAllergyCreatedByNavigations")]
+    [InverseProperty("PatientAllergyCreatedByNavigation")]
     public virtual Hremployee? CreatedByNavigation { get; set; }
 
     [ForeignKey("ProviderId")]
-    [InverseProperty("PatientAllergyProviders")]
+    [InverseProperty("PatientAllergyProvider")]
     public virtual Hremployee? Provider { get; set; }
 
     [ForeignKey("SeverityCode")]
-    [InverseProperty("PatientAllergies")]
+    [InverseProperty("PatientAllergy")]
     public virtual SeverityType? SeverityCodeNavigation { get; set; }
 
     [ForeignKey("TypeId")]
-    [InverseProperty("PatientAllergies")]
-    public virtual AlergyType? Type { get; set; }
+    [InverseProperty("PatientAllergy")]
+    public virtual AlergyTypes? Type { get; set; }
 
     [ForeignKey("UpdatedBy")]
-    [InverseProperty("PatientAllergyUpdatedByNavigations")]
+    [InverseProperty("PatientAllergyUpdatedByNavigation")]
     public virtual Hremployee? UpdatedByNavigation { get; set; }
 }

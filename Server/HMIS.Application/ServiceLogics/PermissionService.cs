@@ -98,7 +98,7 @@ namespace HMIS.Application.ServiceLogics
                             int? employeeTypeId = 0;
                             if (employeeId != null)
                             {
-                                employeeTypeId = _context.Hremployees.Where(x => x.EmployeeId == employeeId).Select(x => x.EmployeeType).FirstOrDefault() ?? null;
+                                employeeTypeId = _context.Hremployee.Where(x => x.EmployeeId == employeeId).Select(x => x.EmployeeType).FirstOrDefault() ?? null;
 
                             }
 

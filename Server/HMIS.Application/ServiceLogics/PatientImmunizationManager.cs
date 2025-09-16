@@ -54,7 +54,7 @@ namespace HMIS.Application.ServiceLogics
         private bool Exist(long id)
         {
 
-            var patient = _context.PatientImmunizations.Find(id);
+            var patient = _context.PatientImmunization.Find(id);
             return patient != null;
         }
         public async Task<bool> InsertOrUpdatePatientImmunization(PatientImmunizationModel patientImmunization)
@@ -100,13 +100,13 @@ namespace HMIS.Application.ServiceLogics
                     newPatient.UpdatedBy = null;//patientImmunization.UpdatedBy;
                     newPatient.Visdate= patientImmunization.Visdate;
                   
-                    _context.PatientImmunizations.Add(newPatient);
+                    _context.PatientImmunization.Add(newPatient);
                     await _context.SaveChangesAsync();
                     return true;
                 }
                 else if (exist)
                 {
-                    var patient = _context.PatientImmunizations
+                    var patient = _context.PatientImmunization
                         .Where(x => x.Id.Equals(patientImmunization.Id)).FirstOrDefault();
 
 
@@ -170,7 +170,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var data =  _context.PatientImmunizations.Where(x => x.Id == Id).FirstOrDefault();
+                var data =  _context.PatientImmunization.Where(x => x.Id == Id).FirstOrDefault();
                 if(data != null)
                 {
                     data.IsDeleted = true;

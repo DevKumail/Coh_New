@@ -89,7 +89,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var comment = _dbContext.SchAppointments
+                var comment = _dbContext.SchAppointment
                     .Where(x => x.VisitAccountNo == VisitAccountNo)
                     .Select(x => x.ChargeCaptureComments).FirstOrDefault().ToString();
                 comment = (comment != null) ? comment : "";

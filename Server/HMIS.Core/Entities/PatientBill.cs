@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("PatientBill")]
 public partial class PatientBill
 {
     [Key]
@@ -127,6 +126,6 @@ public partial class PatientBill
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("ProcedureId")]
-    [InverseProperty("PatientBills")]
+    [InverseProperty("PatientBill")]
     public virtual BlsuperBillProcedure Procedure { get; set; } = null!;
 }

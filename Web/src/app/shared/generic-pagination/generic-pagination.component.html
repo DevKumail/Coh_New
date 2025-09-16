@@ -10,8 +10,9 @@
 
         <!-- Prev -->
         <li class="page-item" [class.disabled]="currentPage === 1">
-          <button class="page-link" (click)="prevPage()" [disabled]="currentPage === 1">
-            Previous
+          <button class="page-link d-flex align-items-center gap-1" (click)="prevPage()" [disabled]="currentPage === 1">
+            <ng-icon [name]="'tablerChevronLeft' | dirIcon:'tablerChevronRight'"></ng-icon>
+            <span>Previous</span>
           </button>
         </li>
 
@@ -34,8 +35,9 @@
 
         <!-- Next -->
         <li class="page-item" [class.disabled]="currentPage === totalPages">
-          <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">
-            Next
+          <button class="page-link d-flex align-items-center gap-1" (click)="nextPage()" [disabled]="currentPage === totalPages">
+            <span>Next</span>
+            <ng-icon [name]="'tablerChevronRight' | dirIcon:'tablerChevronLeft'"></ng-icon>
           </button>
         </li>
 

@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("RegPatient")]
 [Index("CreatedDate", Name = "IX_RegPatient_CreatedDate")]
 [Index("PatientBirthDate", Name = "IX_RegPatient_PatientBirthDate")]
 [Index("PersonFirstName", Name = "IX_RegPatient_PersonFirstName")]
@@ -151,34 +150,34 @@ public partial class RegPatient
     public string? PrimarycarephysicianPcp { get; set; }
 
     [InverseProperty("Patient")]
-    public virtual ICollection<EligibilityLog> EligibilityLogs { get; set; } = new List<EligibilityLog>();
+    public virtual ICollection<EligibilityLog> EligibilityLog { get; set; } = new List<EligibilityLog>();
 
     [InverseProperty("Patient")]
-    public virtual ICollection<Insured> Insureds { get; set; } = new List<Insured>();
+    public virtual ICollection<Insured> Insured { get; set; } = new List<Insured>();
 
     [ForeignKey("PatientBloodGroupId")]
-    [InverseProperty("RegPatients")]
+    [InverseProperty("RegPatient")]
     public virtual RegBloodGroup? PatientBloodGroup { get; set; }
 
     [InverseProperty("Patient")]
-    public virtual ICollection<PatientProblem> PatientProblems { get; set; } = new List<PatientProblem>();
+    public virtual ICollection<PatientProblem> PatientProblem { get; set; } = new List<PatientProblem>();
 
     [InverseProperty("Patient")]
-    public virtual ICollection<RegAccount> RegAccounts { get; set; } = new List<RegAccount>();
+    public virtual ICollection<RegAccount> RegAccount { get; set; } = new List<RegAccount>();
 
     [InverseProperty("Patient")]
-    public virtual ICollection<RegPatientDetail> RegPatientDetails { get; set; } = new List<RegPatientDetail>();
+    public virtual ICollection<RegPatientDetails> RegPatientDetails { get; set; } = new List<RegPatientDetails>();
 
     [InverseProperty("Patient")]
-    public virtual ICollection<RegPatientEmployer> RegPatientEmployers { get; set; } = new List<RegPatientEmployer>();
+    public virtual ICollection<RegPatientEmployer> RegPatientEmployer { get; set; } = new List<RegPatientEmployer>();
 
     [InverseProperty("Patient")]
-    public virtual ICollection<SchAppointment> SchAppointments { get; set; } = new List<SchAppointment>();
+    public virtual ICollection<SchAppointment> SchAppointment { get; set; } = new List<SchAppointment>();
 
     [InverseProperty("Patient")]
-    public virtual ICollection<SpeechToText> SpeechToTexts { get; set; } = new List<SpeechToText>();
+    public virtual ICollection<SpeechToText> SpeechToText { get; set; } = new List<SpeechToText>();
 
     [ForeignKey("TabsTypeId")]
-    [InverseProperty("RegPatients")]
+    [InverseProperty("RegPatient")]
     public virtual RegPatientTabsType? TabsType { get; set; }
 }

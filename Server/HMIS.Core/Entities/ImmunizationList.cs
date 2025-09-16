@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("ImmunizationList")]
 public partial class ImmunizationList
 {
     [StringLength(50)]
@@ -23,8 +22,8 @@ public partial class ImmunizationList
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("DrugType")]
-    public virtual ICollection<PatientImmunization> PatientImmunizationDrugTypes { get; set; } = new List<PatientImmunization>();
+    public virtual ICollection<PatientImmunization> PatientImmunizationDrugType { get; set; } = new List<PatientImmunization>();
 
     [InverseProperty("ImmType")]
-    public virtual ICollection<PatientImmunization> PatientImmunizationImmTypes { get; set; } = new List<PatientImmunization>();
+    public virtual ICollection<PatientImmunization> PatientImmunizationImmType { get; set; } = new List<PatientImmunization>();
 }

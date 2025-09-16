@@ -37,10 +37,10 @@ public partial class HremployeeFacility
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("EmployeeId")]
-    [InverseProperty("HremployeeFacilities")]
+    [InverseProperty("HremployeeFacility")]
     public virtual Hremployee Employee { get; set; } = null!;
 
     [ForeignKey("FacilityId")]
-    [InverseProperty("HremployeeFacilities")]
+    [InverseProperty("HremployeeFacility")]
     public virtual RegFacility Facility { get; set; } = null!;
 }

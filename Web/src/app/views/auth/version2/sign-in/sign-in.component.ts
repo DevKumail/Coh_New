@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { TranslationService } from '@/app/shared/i18n/translation.service';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 
 
@@ -15,7 +17,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
     selector: 'app-sign-in',
     host: { 'data-component-id': 'auth2-sign-in' },
     standalone : true,
-    imports: [RouterLink,NgIcon,HttpClientModule ,CommonModule],
+    imports: [RouterLink,NgIcon,HttpClientModule ,CommonModule, TranslatePipe],
     templateUrl: './sign-in.component.html',
     styles: ``,
 
@@ -28,11 +30,39 @@ export class SignInComponent {
   errorMessage = '';
   isLoading = false;
 
+  // Direction selection (applies on login screen)
+  selectedDir: 'ltr' | 'rtl' = (sessionStorage.getItem('uiDir') as 'ltr' | 'rtl') || 'ltr';
+
+  setDir(dir: 'ltr' | 'rtl') {
+    try {
+      this.selectedDir = dir;
+      sessionStorage.setItem('uiDir', dir);
+      // Apply immediately so user sees effect on login screen too
+      document.documentElement.setAttribute('dir', dir);
+      document.documentElement.setAttribute('lang', dir === 'rtl' ? 'ar' : 'en');
+      document.body.classList.toggle('rtl', dir === 'rtl');
+    } catch {}
+  }
+
+  // Set both language and direction from flags
+  async setUi(lang: 'en' | 'ar', dir: 'ltr' | 'rtl') {
+    try {
+      this.selectedDir = dir;
+      sessionStorage.setItem('uiDir', dir);
+      sessionStorage.setItem('uiLang', lang);
+      document.documentElement.setAttribute('dir', dir);
+      document.documentElement.setAttribute('lang', lang);
+      document.body.classList.toggle('rtl', dir === 'rtl');
+      await this.i18n.load(lang);
+    } catch {}
+  }
+
     constructor(
     private http: HttpClient,
     private authService: AuthService,
     private patientBanner: PatientBannerService,
-    private router: Router
+    private router: Router,
+    private i18n: TranslationService
   ) {}
 
 

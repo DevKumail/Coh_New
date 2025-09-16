@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("PatientImmunization")]
 public partial class PatientImmunization
 {
     [Key]
@@ -96,30 +95,30 @@ public partial class PatientImmunization
     public long? ImmTypeId { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("PatientImmunizations")]
+    [InverseProperty("PatientImmunization")]
     public virtual SchAppointment? Appointment { get; set; }
 
     [ForeignKey("CreatedBy")]
-    [InverseProperty("PatientImmunizationCreatedByNavigations")]
+    [InverseProperty("PatientImmunizationCreatedByNavigation")]
     public virtual Hremployee CreatedByNavigation { get; set; } = null!;
 
     [ForeignKey("DrugTypeId")]
-    [InverseProperty("PatientImmunizationDrugTypes")]
+    [InverseProperty("PatientImmunizationDrugType")]
     public virtual ImmunizationList? DrugType { get; set; }
 
     [ForeignKey("ImmTypeId")]
-    [InverseProperty("PatientImmunizationImmTypes")]
+    [InverseProperty("PatientImmunizationImmType")]
     public virtual ImmunizationList? ImmType { get; set; }
 
     [ForeignKey("ProviderId")]
-    [InverseProperty("PatientImmunizationProviders")]
+    [InverseProperty("PatientImmunizationProvider")]
     public virtual Hremployee? Provider { get; set; }
 
     [ForeignKey("RouteId")]
-    [InverseProperty("PatientImmunizations")]
+    [InverseProperty("PatientImmunization")]
     public virtual Emrroute? Route { get; set; }
 
     [ForeignKey("UpdatedBy")]
-    [InverseProperty("PatientImmunizationUpdatedByNavigations")]
+    [InverseProperty("PatientImmunizationUpdatedByNavigation")]
     public virtual Hremployee? UpdatedByNavigation { get; set; }
 }

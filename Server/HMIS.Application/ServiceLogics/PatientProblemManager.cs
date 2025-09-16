@@ -67,7 +67,7 @@ namespace HMIS.Application.ServiceLogics
         private bool Exist(long id)
         {
           
-            var patient = _context.PatientProblems.Find(id);
+            var patient = _context.PatientProblem.Find(id);
             return patient != null;
         }
         public async Task<bool> InsertOrUpdatePatientProblem(PatientProblemModel patientProblem)
@@ -124,13 +124,13 @@ namespace HMIS.Application.ServiceLogics
                     
 
 
-                    _context.PatientProblems.Add(newPatientProblem);
+                    _context.PatientProblem.Add(newPatientProblem);
                     await _context.SaveChangesAsync();
                     return true;
                 }
                 else if (exist)
                 {
-                    var patient = _context.PatientProblems
+                    var patient = _context.PatientProblem
                         .Where(x => x.Id.Equals(patientProblem.Id)).FirstOrDefault();
 
 
@@ -193,7 +193,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var data = _context.PatientProblems.Where(x => x.Id == Id).FirstOrDefault();
+                var data = _context.PatientProblem.Where(x => x.Id == Id).FirstOrDefault();
                 if (data != null)
                 {
                     data.IsDeleted = true;

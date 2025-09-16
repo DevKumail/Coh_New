@@ -148,7 +148,7 @@ namespace HMIS.Application.ServiceLogics
                 bool exit = Exist(alertModel.AlertId);
                 if (!exit)
                 {
-                    var newPatientAlert = new PatientAlert();
+                    var newPatientAlert = new PatientAlerts();
 
                     newPatientAlert.RuleId = alertModel.RuleId;
                     newPatientAlert.Mrno = alertModel.Mrno;

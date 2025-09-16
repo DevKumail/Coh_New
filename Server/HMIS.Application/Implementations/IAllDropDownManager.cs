@@ -11,13 +11,13 @@ namespace HMIS.ApplicationImplementations
 {
     public interface IAllDropdownsManager
     {
-        Task<List<RegState>> GetStateByCountry(long? Id);
-        Task<List<RegCity>> GetCityByState(long? Id);
+        Task<List<RegStates>> GetStateByCountry(long? Id);
+        Task<List<RegCities>> GetCityByState(long? Id);
         Task<List<FinancialClass>> GetFinancialClass();
         Task<List<FeeSchedule>> GetFeeSchedule();
-        Task<List<EntityType>> GetEntityTypes();
+        Task<List<EntityTypes>> GetEntityTypes();
         Task<List<EmirateType>> GetEmirateType();
-        Task<List<RegLocationType>> GetSitebyfacility(long? Id);
+        Task<List<RegLocationTypes>> GetSitebyfacility(long? Id);
         Task<List<CptbyAppType>> GetCPTGroupId();
         Task<List<BlEclaimEncounterType>> GetBlEclaimEncounterType();
         Task<List<BlEclaimEncounterStartType>> GetBlEclaimEncounterStartType();
@@ -33,7 +33,7 @@ namespace HMIS.ApplicationImplementations
 
         Task<List<Emrroute>> GetEMRRoute();
 
-        Task<List<AlergyType>> GetAlergyTypes();
+        Task<List<AlergyTypes>> GetAlergyTypes();
 
         Task<List<SeverityType>> GetSeverityType();
 
@@ -41,11 +41,11 @@ namespace HMIS.ApplicationImplementations
 
         Task<List<FamilyProblemList>> GetFamilyProblemHistory();
 
-        Task<List<MedicationComment>> GetComments();
+        Task<List<MedicationComments>> GetComments();
 
         Task<List<Emrfrequency>> GetFrequency();
         Task<List<PatientProcedureType>> GetPatientProcedureTypeList();
 
-        Task<List<RegAlertType>> GetAlertType();
+        Task<List<RegAlertTypes>> GetAlertType();
     }
 }

@@ -24,6 +24,7 @@ import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ModalTriggerService } from '@core/services/modal-trigger.service';
 import { PermissionService } from '@core/services/permission.service';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 @Component({
   selector: 'app-menu-navbar',
@@ -36,7 +37,8 @@ import { PermissionService } from '@core/services/permission.service';
     RouterLink,
     NgbDropdownMenu,
     LucideAngularModule,
-    FormsModule
+    FormsModule,
+    TranslatePipe
   ],
   templateUrl: './app-menu.component.html'
 })

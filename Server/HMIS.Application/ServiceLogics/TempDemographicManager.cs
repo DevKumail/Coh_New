@@ -149,7 +149,7 @@ namespace HMIS.Application.ServiceLogics
                     CreatedBy = string.IsNullOrWhiteSpace(reg.CreatedBy) ? null : reg.CreatedBy,
                     UpdatedBy = string.IsNullOrWhiteSpace(reg.UpdatedBy) ? null : reg.UpdatedBy,
                 };
-                await _context.RegPatientTemps.AddAsync(regPatientTemp);
+                await _context.RegPatientTemp.AddAsync(regPatientTemp);
                 await _context.SaveChangesAsync();
                 return true;
 
@@ -165,7 +165,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var chkResult = await Task.Run(() => _context.RegPatientTemps.Where(x => x.TempId.Equals(reg.TempId) && x.IsDeleted == false).FirstOrDefaultAsync());
+                var chkResult = await Task.Run(() => _context.RegPatientTemp.Where(x => x.TempId.Equals(reg.TempId) && x.IsDeleted == false).FirstOrDefaultAsync());
                 if (chkResult != null && chkResult.TempId > 0)
                 {
                     chkResult.TempId = reg.TempId;
@@ -203,7 +203,7 @@ namespace HMIS.Application.ServiceLogics
                     chkResult.UpdatedBy = reg.UpdatedBy;
                     chkResult.Active = reg.Active;
                     chkResult.PatientBirthDate = reg.PatientBirthDate;
-                    _context.RegPatientTemps.Update(chkResult);
+                    _context.RegPatientTemp.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return true;
 
@@ -219,12 +219,12 @@ namespace HMIS.Application.ServiceLogics
 
         public async Task<bool> DeleteTempDemographicDB(int TempId)
         {
-            var findResult = await Task.Run(() => _context.RegPatientTemps.Where(x => x.TempId.Equals(TempId) && x.IsDeleted == false).FirstOrDefaultAsync());
+            var findResult = await Task.Run(() => _context.RegPatientTemp.Where(x => x.TempId.Equals(TempId) && x.IsDeleted == false).FirstOrDefaultAsync());
             if (findResult != null)
             {
                 findResult.IsDeleted = true;
 
-                _context.RegPatientTemps.Update(findResult);
+                _context.RegPatientTemp.Update(findResult);
                 await _context.SaveChangesAsync();
                 return true;
             }

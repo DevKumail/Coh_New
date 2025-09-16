@@ -29,14 +29,14 @@
             <ng-icon name="tablerMenu4" class="fs-22" />
           </button>
 
-          <div class="input-group">
+          <div class="input-group" [class.flex-row-reverse]="isRtl">
             <button class="btn btn-light px-2" data-bs-toggle="modal" data-bs-target="#advance-filter-modal"
               type="button">
               <lucide-icon [img]="SliderIcon" class="lucide-lg"></lucide-icon>
             </button>
 
-            <input type="search4" class="form-control border-0 px-2" name="search" placeholder="Search Patient By Mr No"
-              style="box-shadow: none;" [(ngModel)]="mrNo" />
+            <input type="search" class="form-control border-0 px-2 search-input" name="search" [placeholder]="'Search Patient By Mr No' | translate"
+              style="box-shadow: none;" [(ngModel)]="mrNo" aria-label="Search" />
 
             <button class="btn btn-light px-2" type="button" (click)="onSearchClick()">
               <lucide-icon [img]="SearchIcon" class="lucide-lg"></lucide-icon>
@@ -52,7 +52,7 @@
         </div>
 
         <div class="d-flex align-items-center gap-2 ">
-          <span class="custom-border-right">Women's Health Center</span>
+          <span class="custom-border-right">{{ "Women's Health Center" | translate }}</span>
           <app-notification-dropdown />
           <app-theme-toggler />
           <app-user-profile-topbar />

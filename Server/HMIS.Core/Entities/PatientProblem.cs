@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("PatientProblem")]
 [Index("PatientId", Name = "IX_PatientProblem_PatientId")]
 public partial class PatientProblem
 {
@@ -90,10 +89,10 @@ public partial class PatientProblem
     public long? PatientId { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("PatientProblems")]
+    [InverseProperty("PatientProblem")]
     public virtual SchAppointment? Appointment { get; set; }
 
     [ForeignKey("PatientId")]
-    [InverseProperty("PatientProblems")]
+    [InverseProperty("PatientProblem")]
     public virtual RegPatient? Patient { get; set; }
 }

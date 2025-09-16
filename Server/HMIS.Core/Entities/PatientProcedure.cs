@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("PatientProcedure")]
 public partial class PatientProcedure
 {
     [Key]
@@ -94,18 +93,18 @@ public partial class PatientProcedure
     public long? AppointmentId { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("PatientProcedures")]
+    [InverseProperty("PatientProcedure")]
     public virtual SchAppointment? Appointment { get; set; }
 
     [ForeignKey("CreatedBy")]
-    [InverseProperty("PatientProcedureCreatedByNavigations")]
+    [InverseProperty("PatientProcedureCreatedByNavigation")]
     public virtual Hremployee? CreatedByNavigation { get; set; }
 
     [ForeignKey("ProcedureType")]
-    [InverseProperty("PatientProcedures")]
+    [InverseProperty("PatientProcedure")]
     public virtual PatientProcedureType? ProcedureTypeNavigation { get; set; }
 
     [ForeignKey("UpdatedBy")]
-    [InverseProperty("PatientProcedureUpdatedByNavigations")]
+    [InverseProperty("PatientProcedureUpdatedByNavigation")]
     public virtual Hremployee? UpdatedByNavigation { get; set; }
 }

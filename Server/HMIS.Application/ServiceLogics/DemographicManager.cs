@@ -74,16 +74,16 @@ namespace HMIS.Application.ServiceLogics
 
         public async Task<bool> DeleteDemographicDB(int PatientId)
         {
-            var findResult = await Task.Run(() => _context.RegPatients.Include(x => x.RegPatientEmployers).Include(x => x.RegAccounts).Include(x => x.RegPatientDetails).Where(x => x.PatientId.Equals(PatientId) && x.IsDeleted == false).FirstOrDefaultAsync());
+            var findResult = await Task.Run(() => _context.RegPatient.Include(x => x.RegPatientEmployer).Include(x => x.RegAccount).Include(x => x.RegPatientDetails).Where(x => x.PatientId.Equals(PatientId) && x.IsDeleted == false).FirstOrDefaultAsync());
             if (findResult != null)
             {
                 findResult.IsDeleted = true;
-                foreach (var item in findResult.RegPatientEmployers)
+                foreach (var item in findResult.RegPatientEmployer)
                 {
                     item.IsDeleted = true;
                     //findResult.RegPatientEmployers.Add(item);
                 }
-                foreach (var item1 in findResult.RegAccounts)
+                foreach (var item1 in findResult.RegAccount)
                 {
                     item1.IsDeleted = false;
                     //findResult.RegAccounts.Add(item1);
@@ -93,7 +93,7 @@ namespace HMIS.Application.ServiceLogics
                     item2.IsDeleted = false;
                     //findResult.RegPatientDetails.Add(item2);
                 }
-                _context.RegPatients.Update(findResult);
+                _context.RegPatient.Update(findResult);
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -105,7 +105,7 @@ namespace HMIS.Application.ServiceLogics
             try
 
             {
-                var findResult = await Task.Run(() => _context.RegPatients.Include(x=>x.RegPatientEmployers).Include(x=>x.RegAccounts).Include(x=>x.RegPatientDetails).Where(x => x.PatientId.Equals(regUpdate.PatientId) && x.IsDeleted == false).FirstOrDefaultAsync());
+                var findResult = await Task.Run(() => _context.RegPatient.Include(x=>x.RegPatientEmployer).Include(x=>x.RegAccount).Include(x=>x.RegPatientDetails).Where(x => x.PatientId.Equals(regUpdate.PatientId) && x.IsDeleted == false).FirstOrDefaultAsync());
 
                 if (findResult != null)
                 {
@@ -161,7 +161,7 @@ namespace HMIS.Application.ServiceLogics
                             IsDeleted = false,
 
                         };
-                        findResult.RegPatientEmployers.Add(regPatientEmployer);
+                        findResult.RegPatientEmployer.Add(regPatientEmployer);
                     }
                     foreach (var item1 in regUpdate.regAccount)
                     {
@@ -174,12 +174,12 @@ namespace HMIS.Application.ServiceLogics
                             RelationshipId = item1.RelationshipId,
                             IsDeleted = false,
                         };
-                        findResult.RegAccounts.Add(regAccount);
+                        findResult.RegAccount.Add(regAccount);
                     }
 
                     //foreach (var item2 in regUpdate.regPatientDetails)
                     //{
-                    Core.Entities.RegPatientDetail contact = new Core.Entities.RegPatientDetail()
+                    Core.Entities.RegPatientDetails contact = new Core.Entities.RegPatientDetails()
                     {
 
                         StreetName = regUpdate.Contact.StreetName,
@@ -198,7 +198,7 @@ namespace HMIS.Application.ServiceLogics
                         };
                         findResult.RegPatientDetails.Add(contact);
 
-                    Core.Entities.RegPatientDetail employment = new Core.Entities.RegPatientDetail()
+                    Core.Entities.RegPatientDetails employment = new Core.Entities.RegPatientDetails()
                     {
                         Company = regUpdate.Employment.company,
                         SectorOccupationId = regUpdate.Employment.sector_occupationId,
@@ -209,7 +209,7 @@ namespace HMIS.Application.ServiceLogics
                     };
                     findResult.RegPatientDetails.Add(employment);
 
-                    Core.Entities.RegPatientDetail emergencycontact = new Core.Entities.RegPatientDetail()
+                    Core.Entities.RegPatientDetails emergencycontact = new Core.Entities.RegPatientDetails()
                     {
                         RelationshipId = regUpdate.EmergencyContact.relationshipId,
                         FirstName = regUpdate.EmergencyContact.firstName,
@@ -228,7 +228,7 @@ namespace HMIS.Application.ServiceLogics
                     };
                     findResult.RegPatientDetails.Add(emergencycontact);
 
-                    Core.Entities.RegPatientDetail nextOfKin = new Core.Entities.RegPatientDetail()
+                    Core.Entities.RegPatientDetails nextOfKin = new Core.Entities.RegPatientDetails()
                     {
                         RelationshipId = regUpdate.NextOfKin.relationshipId,
                         FirstName = regUpdate.NextOfKin.firstName,
@@ -247,7 +247,7 @@ namespace HMIS.Application.ServiceLogics
                     };
                      findResult.RegPatientDetails.Add(nextOfKin);
 
-                    Core.Entities.RegPatientDetail spouse = new Core.Entities.RegPatientDetail()
+                    Core.Entities.RegPatientDetails spouse = new Core.Entities.RegPatientDetails()
                     {
                         FirstName = regUpdate.Spouse.firstName,
                         MiddleName = regUpdate.Spouse.middleName,
@@ -258,7 +258,7 @@ namespace HMIS.Application.ServiceLogics
                     };
                     findResult.RegPatientDetails.Add(spouse);
 
-                    Core.Entities.RegPatientDetail parent = new Core.Entities.RegPatientDetail()
+                    Core.Entities.RegPatientDetails parent = new Core.Entities.RegPatientDetails()
                     {
                         FirstName = regUpdate.Parent.firstName,
                         MiddleName = regUpdate.Parent.middleName,
@@ -276,7 +276,7 @@ namespace HMIS.Application.ServiceLogics
                     };
                     findResult.RegPatientDetails.Add(parent);
 
-                    Core.Entities.RegPatientDetail assigment = new Core.Entities.RegPatientDetail()
+                    Core.Entities.RegPatientDetails assigment = new Core.Entities.RegPatientDetails()
                     {
                         ProofOfIncome = regUpdate.Assignments.proofOfIncome,
                         ProviderId = regUpdate.Assignments.providerId,
@@ -292,7 +292,7 @@ namespace HMIS.Application.ServiceLogics
                     };
                     findResult.RegPatientDetails.Add(assigment);
 
-                    Core.Entities.RegPatientDetail familyMember = new Core.Entities.RegPatientDetail()
+                    Core.Entities.RegPatientDetails familyMember = new Core.Entities.RegPatientDetails()
                     {
                         MrNo = regUpdate.FamilyMembers.mrNo.ToString(),
                         AccountTypeId = regUpdate.FamilyMembers.accountTypeId,
@@ -303,7 +303,7 @@ namespace HMIS.Application.ServiceLogics
                     findResult.RegPatientDetails.Add(familyMember);
 
                 };
-                _context.RegPatients.Update(findResult);
+                _context.RegPatient.Update(findResult);
                     await _context.SaveChangesAsync();
                     return true;
                 
@@ -401,7 +401,7 @@ namespace HMIS.Application.ServiceLogics
                 var getLastMRNO = new RegLastMrno();
                 if (regInsert != null && regInsert.PatientId == 0)
                 {
-                    getLastMRNO = await Task.Run(() => _context.RegLastMrnos.FirstOrDefaultAsync());
+                    getLastMRNO = await Task.Run(() => _context.RegLastMrno.FirstOrDefaultAsync());
                     getLastMRNO.LastMrno = getLastMRNO.LastMrno + 1;
                     _context.Entry(getLastMRNO).State = EntityState.Modified;
                 }
@@ -450,7 +450,7 @@ namespace HMIS.Application.ServiceLogics
                 };
 
 
-                Core.Entities.RegPatientDetail contact = new Core.Entities.RegPatientDetail()
+                Core.Entities.RegPatientDetails contact = new Core.Entities.RegPatientDetails()
                 {
 
                     StreetName = regInsert.Contact.StreetName,
@@ -469,7 +469,7 @@ namespace HMIS.Application.ServiceLogics
                 };
                 //regPat.RegPatientDetails.Add(contact);
 
-                Core.Entities.RegPatientDetail employment = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails employment = new Core.Entities.RegPatientDetails();
 
                 if (regInsert.Employment != null)
                 {
@@ -482,7 +482,7 @@ namespace HMIS.Application.ServiceLogics
                 }
 
 
-                Core.Entities.RegPatientDetail emergencycontact = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails emergencycontact = new Core.Entities.RegPatientDetails();
                 if (regInsert.EmergencyContact != null) 
                 { 
                 emergencycontact.RelationshipId = regInsert.EmergencyContact.relationshipId;
@@ -502,7 +502,7 @@ namespace HMIS.Application.ServiceLogics
                 regPat.RegPatientDetails.Add(emergencycontact);
                 }
 
-                Core.Entities.RegPatientDetail nextOfKin = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails nextOfKin = new Core.Entities.RegPatientDetails();
                  if(regInsert.NextOfKin != null)
                 {
                     nextOfKin.RelationshipId = regInsert.NextOfKin.relationshipId;
@@ -522,7 +522,7 @@ namespace HMIS.Application.ServiceLogics
                     regPat.RegPatientDetails.Add(nextOfKin);
                 };
 
-                Core.Entities.RegPatientDetail spouse = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails spouse = new Core.Entities.RegPatientDetails();
                 if(regInsert.Spouse != null) 
                 {
                     spouse.FirstName = regInsert.Spouse.firstName;
@@ -533,7 +533,7 @@ namespace HMIS.Application.ServiceLogics
                     regPat.RegPatientDetails.Add(spouse);
                 };
 
-                Core.Entities.RegPatientDetail parent = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails parent = new Core.Entities.RegPatientDetails();
                 if(regInsert.Parent != null) 
                 {
                     parent.FirstName = regInsert.Parent.firstName;
@@ -552,7 +552,7 @@ namespace HMIS.Application.ServiceLogics
                     regPat.RegPatientDetails.Add(parent);
                 };
 
-                Core.Entities.RegPatientDetail assigment = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails assigment = new Core.Entities.RegPatientDetails();
                 if(regInsert.Assignments != null)
                 {
                     assigment.ProofOfIncome = regInsert.Assignments.proofOfIncome;
@@ -569,7 +569,7 @@ namespace HMIS.Application.ServiceLogics
                     regPat.RegPatientDetails.Add(assigment);
                 };
 
-                Core.Entities.RegPatientDetail familyMember = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails familyMember = new Core.Entities.RegPatientDetails();
                 if(regInsert.FamilyMembers != null)
                 {
                     familyMember.MrNo = regInsert.FamilyMembers.mrNo.ToString();
@@ -657,7 +657,7 @@ namespace HMIS.Application.ServiceLogics
             //    regPat.RegPatientDetails.Add(regPatientDetail);
             //}
             ////Core.Entities.em regPatientDetail = new Core.Entities.RegPatientDetail()
-            await _context.RegPatients.AddAsync(regPat);
+            await _context.RegPatient.AddAsync(regPat);
                 await _context.SaveChangesAsync();
                 return "insert successfully";
 

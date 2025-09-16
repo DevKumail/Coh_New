@@ -6,364 +6,364 @@ namespace HMIS.Core.Entities;
 
 public partial class HMISDbContext : DbContext
 {
-    public HMISDbContext()
-    {
-    }
-
     public HMISDbContext(DbContextOptions<HMISDbContext> options)
         : base(options)
     {
     }
 
-    public virtual DbSet<Action> Actions { get; set; }
+    public virtual DbSet<Action> Action { get; set; }
 
-    public virtual DbSet<AlergyType> AlergyTypes { get; set; }
+    public virtual DbSet<AlergyTypes> AlergyTypes { get; set; }
 
-    public virtual DbSet<Assingment> Assingments { get; set; }
+    public virtual DbSet<Assingment> Assingment { get; set; }
 
-    public virtual DbSet<AuditLog> AuditLogs { get; set; }
+    public virtual DbSet<AuditLog> AuditLog { get; set; }
 
-    public virtual DbSet<AvailableMrno> AvailableMrnos { get; set; }
+    public virtual DbSet<AvailableMrno> AvailableMrno { get; set; }
 
-    public virtual DbSet<BlEclaimEncounterEndType> BlEclaimEncounterEndTypes { get; set; }
+    public virtual DbSet<BlEclaimEncounterEndType> BlEclaimEncounterEndType { get; set; }
 
-    public virtual DbSet<BlEclaimEncounterStartType> BlEclaimEncounterStartTypes { get; set; }
+    public virtual DbSet<BlEclaimEncounterStartType> BlEclaimEncounterStartType { get; set; }
 
-    public virtual DbSet<BlEclaimEncounterType> BlEclaimEncounterTypes { get; set; }
+    public virtual DbSet<BlEclaimEncounterType> BlEclaimEncounterType { get; set; }
 
-    public virtual DbSet<BlProceduresGroup> BlProceduresGroups { get; set; }
+    public virtual DbSet<BlProceduresGroup> BlProceduresGroup { get; set; }
 
-    public virtual DbSet<Blcptgroup> Blcptgroups { get; set; }
+    public virtual DbSet<Blcptgroup> Blcptgroup { get; set; }
 
-    public virtual DbSet<BlcptgroupCode> BlcptgroupCodes { get; set; }
+    public virtual DbSet<BlcptgroupCode> BlcptgroupCode { get; set; }
 
-    public virtual DbSet<BlcptmasterRange> BlcptmasterRanges { get; set; }
+    public virtual DbSet<BlcptmasterRanges> BlcptmasterRanges { get; set; }
 
-    public virtual DbSet<BldentalGroup> BldentalGroups { get; set; }
+    public virtual DbSet<BldentalGroup> BldentalGroup { get; set; }
 
-    public virtual DbSet<BldentalGroupCode> BldentalGroupCodes { get; set; }
+    public virtual DbSet<BldentalGroupCode> BldentalGroupCode { get; set; }
 
-    public virtual DbSet<BleligibilityLog> BleligibilityLogs { get; set; }
+    public virtual DbSet<BleligibilityLog> BleligibilityLog { get; set; }
 
-    public virtual DbSet<Blhcpcsgroup> Blhcpcsgroups { get; set; }
+    public virtual DbSet<Blhcpcsgroup> Blhcpcsgroup { get; set; }
 
-    public virtual DbSet<BlhcpcsgroupCode> BlhcpcsgroupCodes { get; set; }
+    public virtual DbSet<BlhcpcsgroupCode> BlhcpcsgroupCode { get; set; }
 
-    public virtual DbSet<Blicd9cmgroup> Blicd9cmgroups { get; set; }
+    public virtual DbSet<Blicd9cmgroup> Blicd9cmgroup { get; set; }
 
-    public virtual DbSet<Blicd9cmgroupCode> Blicd9cmgroupCodes { get; set; }
+    public virtual DbSet<Blicd9cmgroupCode> Blicd9cmgroupCode { get; set; }
 
-    public virtual DbSet<Blicdversion> Blicdversions { get; set; }
+    public virtual DbSet<Blicdversion> Blicdversion { get; set; }
 
-    public virtual DbSet<BlmasterCpt> BlmasterCpts { get; set; }
+    public virtual DbSet<BlmasterCpt> BlmasterCpt { get; set; }
 
-    public virtual DbSet<BlmasterDentalCode> BlmasterDentalCodes { get; set; }
+    public virtual DbSet<BlmasterDentalCodes> BlmasterDentalCodes { get; set; }
 
-    public virtual DbSet<BlmasterHcpc> BlmasterHcpcs { get; set; }
+    public virtual DbSet<BlmasterHcpcs> BlmasterHcpcs { get; set; }
 
-    public virtual DbSet<BlmasterIcd9cm> BlmasterIcd9cms { get; set; }
+    public virtual DbSet<BlmasterIcd9cm> BlmasterIcd9cm { get; set; }
 
-    public virtual DbSet<BlmasterIrdrg> BlmasterIrdrgs { get; set; }
+    public virtual DbSet<BlmasterIrdrg> BlmasterIrdrg { get; set; }
 
-    public virtual DbSet<BlmasterProcedure> BlmasterProcedures { get; set; }
+    public virtual DbSet<BlmasterProcedures> BlmasterProcedures { get; set; }
 
-    public virtual DbSet<BlmasterWeqaya> BlmasterWeqayas { get; set; }
+    public virtual DbSet<BlmasterWeqaya> BlmasterWeqaya { get; set; }
 
-    public virtual DbSet<BlpatientVisit> BlpatientVisits { get; set; }
+    public virtual DbSet<BlpatientVisit> BlpatientVisit { get; set; }
 
-    public virtual DbSet<Blpayer> Blpayers { get; set; }
+    public virtual DbSet<Blpayer> Blpayer { get; set; }
 
-    public virtual DbSet<BlpayerPackage> BlpayerPackages { get; set; }
+    public virtual DbSet<BlpayerPackage> BlpayerPackage { get; set; }
 
-    public virtual DbSet<BlpayerPlan> BlpayerPlans { get; set; }
+    public virtual DbSet<BlpayerPlan> BlpayerPlan { get; set; }
 
-    public virtual DbSet<BlprocedureGroupCode> BlprocedureGroupCodes { get; set; }
+    public virtual DbSet<BlprocedureGroupCode> BlprocedureGroupCode { get; set; }
 
-    public virtual DbSet<BlsitePointOfSale> BlsitePointOfSales { get; set; }
+    public virtual DbSet<BlsitePointOfSale> BlsitePointOfSale { get; set; }
 
-    public virtual DbSet<BlsuperBillDiagnosis> BlsuperBillDiagnoses { get; set; }
+    public virtual DbSet<BlsuperBillDiagnosis> BlsuperBillDiagnosis { get; set; }
 
-    public virtual DbSet<BlsuperBillProcedure> BlsuperBillProcedures { get; set; }
+    public virtual DbSet<BlsuperBillProcedure> BlsuperBillProcedure { get; set; }
 
-    public virtual DbSet<BlsuperBillProcedureInvoice> BlsuperBillProcedureInvoices { get; set; }
+    public virtual DbSet<BlsuperBillProcedureInvoice> BlsuperBillProcedureInvoice { get; set; }
 
-    public virtual DbSet<BlunclassifiedCode> BlunclassifiedCodes { get; set; }
+    public virtual DbSet<BlunclassifiedCodes> BlunclassifiedCodes { get; set; }
 
-    public virtual DbSet<BluniversalToothCode> BluniversalToothCodes { get; set; }
+    public virtual DbSet<BluniversalToothCodes> BluniversalToothCodes { get; set; }
 
-    public virtual DbSet<CacheInfo> CacheInfos { get; set; }
+    public virtual DbSet<CacheInfo> CacheInfo { get; set; }
 
-    public virtual DbSet<Case> Cases { get; set; }
+    public virtual DbSet<Cases> Cases { get; set; }
 
-    public virtual DbSet<City> Cities { get; set; }
+    public virtual DbSet<City> City { get; set; }
 
-    public virtual DbSet<ClinicalUsage> ClinicalUsages { get; set; }
+    public virtual DbSet<ClinicalUsage> ClinicalUsage { get; set; }
 
-    public virtual DbSet<Consultationcategory> Consultationcategories { get; set; }
+    public virtual DbSet<Consultationcategory> Consultationcategory { get; set; }
 
-    public virtual DbSet<CptbyAppType> CptbyAppTypes { get; set; }
+    public virtual DbSet<CptbyAppType> CptbyAppType { get; set; }
 
-    public virtual DbSet<CptsInCptbyAppType> CptsInCptbyAppTypes { get; set; }
+    public virtual DbSet<CptsInCptbyAppType> CptsInCptbyAppType { get; set; }
 
-    public virtual DbSet<Customer> Customers { get; set; }
+    public virtual DbSet<DeductiblePercent> DeductiblePercent { get; set; }
 
-    public virtual DbSet<DeductiblePercent> DeductiblePercents { get; set; }
+    public virtual DbSet<EligibilityLog> EligibilityLog { get; set; }
 
-    public virtual DbSet<EligibilityLog> EligibilityLogs { get; set; }
+    public virtual DbSet<EmirateType> EmirateType { get; set; }
 
-    public virtual DbSet<EmirateType> EmirateTypes { get; set; }
+    public virtual DbSet<Emrfrequency> Emrfrequency { get; set; }
 
-    public virtual DbSet<Emrfrequency> Emrfrequencies { get; set; }
+    public virtual DbSet<Emrroute> Emrroute { get; set; }
 
-    public virtual DbSet<Emrroute> Emrroutes { get; set; }
+    public virtual DbSet<Emrsite> Emrsite { get; set; }
 
-    public virtual DbSet<Emrsite> Emrsites { get; set; }
+    public virtual DbSet<EntityTypes> EntityTypes { get; set; }
 
-    public virtual DbSet<EntityType> EntityTypes { get; set; }
+    public virtual DbSet<FamilyProblemList> FamilyProblemList { get; set; }
 
-    public virtual DbSet<FamilyProblemList> FamilyProblemLists { get; set; }
+    public virtual DbSet<FeeSchedule> FeeSchedule { get; set; }
 
-    public virtual DbSet<FeeSchedule> FeeSchedules { get; set; }
+    public virtual DbSet<FinancialClass> FinancialClass { get; set; }
 
-    public virtual DbSet<FinancialClass> FinancialClasses { get; set; }
+    public virtual DbSet<HolidaySchedule> HolidaySchedule { get; set; }
 
-    public virtual DbSet<HolidaySchedule> HolidaySchedules { get; set; }
+    public virtual DbSet<Hremployee> Hremployee { get; set; }
 
-    public virtual DbSet<Hremployee> Hremployees { get; set; }
+    public virtual DbSet<HremployeeFacility> HremployeeFacility { get; set; }
 
-    public virtual DbSet<HremployeeFacility> HremployeeFacilities { get; set; }
+    public virtual DbSet<HremployeeType> HremployeeType { get; set; }
 
-    public virtual DbSet<HremployeeType> HremployeeTypes { get; set; }
+    public virtual DbSet<HrlicenseInfo> HrlicenseInfo { get; set; }
 
-    public virtual DbSet<HrlicenseInfo> HrlicenseInfos { get; set; }
+    public virtual DbSet<ImmunizationList> ImmunizationList { get; set; }
 
-    public virtual DbSet<ImmunizationList> ImmunizationLists { get; set; }
+    public virtual DbSet<InsuranceCompanyFieldMapping> InsuranceCompanyFieldMapping { get; set; }
 
-    public virtual DbSet<InsuranceCompanyFieldMapping> InsuranceCompanyFieldMappings { get; set; }
+    public virtual DbSet<InsuranceEligibility> InsuranceEligibility { get; set; }
 
-    public virtual DbSet<InsuranceEligibility> InsuranceEligibilities { get; set; }
+    public virtual DbSet<InsuranceRelations> InsuranceRelations { get; set; }
 
-    public virtual DbSet<InsuranceRelation> InsuranceRelations { get; set; }
+    public virtual DbSet<InsuranceRequestType> InsuranceRequestType { get; set; }
 
-    public virtual DbSet<InsuranceRequestType> InsuranceRequestTypes { get; set; }
+    public virtual DbSet<Insured> Insured { get; set; }
 
-    public virtual DbSet<Insured> Insureds { get; set; }
+    public virtual DbSet<InsuredCoverage> InsuredCoverage { get; set; }
 
-    public virtual DbSet<InsuredCoverage> InsuredCoverages { get; set; }
+    public virtual DbSet<InsuredPolicy> InsuredPolicy { get; set; }
 
-    public virtual DbSet<InsuredPolicy> InsuredPolicies { get; set; }
+    public virtual DbSet<InsuredSubscriber> InsuredSubscriber { get; set; }
 
-    public virtual DbSet<InsuredSubscriber> InsuredSubscribers { get; set; }
+    public virtual DbSet<LabOrderSetDetail> LabOrderSetDetail { get; set; }
 
-    public virtual DbSet<LabOrderSetDetail> LabOrderSetDetails { get; set; }
+    public virtual DbSet<LabTests> LabTests { get; set; }
 
-    public virtual DbSet<LabTest> LabTests { get; set; }
+    public virtual DbSet<Language> Language { get; set; }
 
-    public virtual DbSet<Language> Languages { get; set; }
+    public virtual DbSet<LoginUserHistory> LoginUserHistory { get; set; }
 
-    public virtual DbSet<LoginUserHistory> LoginUserHistories { get; set; }
+    public virtual DbSet<MedicationComments> MedicationComments { get; set; }
 
-    public virtual DbSet<MedicationComment> MedicationComments { get; set; }
+    public virtual DbSet<Nationality> Nationality { get; set; }
 
-    public virtual DbSet<Nationality> Nationalities { get; set; }
+    public virtual DbSet<Notification> Notification { get; set; }
 
-    public virtual DbSet<Notification> Notifications { get; set; }
+    public virtual DbSet<OrderReferral> OrderReferral { get; set; }
 
-    public virtual DbSet<OrderReferral> OrderReferrals { get; set; }
+    public virtual DbSet<PatientAlerts> PatientAlerts { get; set; }
 
-    public virtual DbSet<PatientAlert> PatientAlerts { get; set; }
+    public virtual DbSet<PatientAllergy> PatientAllergy { get; set; }
 
-    public virtual DbSet<PatientAllergy> PatientAllergies { get; set; }
+    public virtual DbSet<PatientAllergyDetail> PatientAllergyDetail { get; set; }
 
-    public virtual DbSet<PatientAllergyDetail> PatientAllergyDetails { get; set; }
+    public virtual DbSet<PatientBill> PatientBill { get; set; }
 
-    public virtual DbSet<PatientBill> PatientBills { get; set; }
+    public virtual DbSet<PatientBillInvoice> PatientBillInvoice { get; set; }
 
-    public virtual DbSet<PatientBillInvoice> PatientBillInvoices { get; set; }
+    public virtual DbSet<PatientChartFamilyHistory> PatientChartFamilyHistory { get; set; }
 
-    public virtual DbSet<PatientChartFamilyHistory> PatientChartFamilyHistories { get; set; }
+    public virtual DbSet<PatientChartSocialHistory> PatientChartSocialHistory { get; set; }
 
-    public virtual DbSet<PatientChartSocialHistory> PatientChartSocialHistories { get; set; }
+    public virtual DbSet<PatientImmunization> PatientImmunization { get; set; }
 
-    public virtual DbSet<PatientImmunization> PatientImmunizations { get; set; }
+    public virtual DbSet<PatientNotifiedOptions> PatientNotifiedOptions { get; set; }
 
-    public virtual DbSet<PatientNotifiedOption> PatientNotifiedOptions { get; set; }
+    public virtual DbSet<PatientProblem> PatientProblem { get; set; }
 
-    public virtual DbSet<PatientProblem> PatientProblems { get; set; }
+    public virtual DbSet<PatientProcedure> PatientProcedure { get; set; }
 
-    public virtual DbSet<PatientProcedure> PatientProcedures { get; set; }
+    public virtual DbSet<PatientProcedureType> PatientProcedureType { get; set; }
 
-    public virtual DbSet<PatientProcedureType> PatientProcedureTypes { get; set; }
+    public virtual DbSet<PatientVisitStatus> PatientVisitStatus { get; set; }
 
-    public virtual DbSet<PatientVisitStatus> PatientVisitStatuses { get; set; }
+    public virtual DbSet<PersonalReminders> PersonalReminders { get; set; }
 
-    public virtual DbSet<PersonalReminder> PersonalReminders { get; set; }
+    public virtual DbSet<Prescription> Prescription { get; set; }
 
-    public virtual DbSet<Prescription> Prescriptions { get; set; }
+    public virtual DbSet<ProblemList> ProblemList { get; set; }
 
-    public virtual DbSet<ProblemList> ProblemLists { get; set; }
+    public virtual DbSet<ProcedureType> ProcedureType { get; set; }
 
-    public virtual DbSet<ProcedureType> ProcedureTypes { get; set; }
+    public virtual DbSet<PromotionalMediaChannel> PromotionalMediaChannel { get; set; }
 
-    public virtual DbSet<PromotionalMediaChannel> PromotionalMediaChannels { get; set; }
+    public virtual DbSet<PromotionalMediaItem> PromotionalMediaItem { get; set; }
 
-    public virtual DbSet<PromotionalMediaItem> PromotionalMediaItems { get; set; }
+    public virtual DbSet<Provider> Provider { get; set; }
 
-    public virtual DbSet<Provider> Providers { get; set; }
+    public virtual DbSet<ProviderSchedule> ProviderSchedule { get; set; }
 
-    public virtual DbSet<ProviderSchedule> ProviderSchedules { get; set; }
+    public virtual DbSet<ProviderScheduleByAppType> ProviderScheduleByAppType { get; set; }
 
-    public virtual DbSet<ProviderScheduleByAppType> ProviderScheduleByAppTypes { get; set; }
+    public virtual DbSet<ProviderSpecialty> ProviderSpecialty { get; set; }
 
-    public virtual DbSet<ProviderSpecialty> ProviderSpecialties { get; set; }
+    public virtual DbSet<ProviderSpecialtyAssign> ProviderSpecialtyAssign { get; set; }
 
-    public virtual DbSet<ProviderSpecialtyAssign> ProviderSpecialtyAssigns { get; set; }
+    public virtual DbSet<RegAccount> RegAccount { get; set; }
 
-    public virtual DbSet<RegAccount> RegAccounts { get; set; }
+    public virtual DbSet<RegAlertTypes> RegAlertTypes { get; set; }
 
-    public virtual DbSet<RegAlertType> RegAlertTypes { get; set; }
+    public virtual DbSet<RegAssignments> RegAssignments { get; set; }
 
-    public virtual DbSet<RegAssignment> RegAssignments { get; set; }
+    public virtual DbSet<RegBloodGroup> RegBloodGroup { get; set; }
 
-    public virtual DbSet<RegBloodGroup> RegBloodGroups { get; set; }
+    public virtual DbSet<RegCities> RegCities { get; set; }
 
-    public virtual DbSet<RegCity> RegCities { get; set; }
+    public virtual DbSet<RegCompany> RegCompany { get; set; }
 
-    public virtual DbSet<RegCompany> RegCompanies { get; set; }
+    public virtual DbSet<RegCountries> RegCountries { get; set; }
 
-    public virtual DbSet<RegCountry> RegCountries { get; set; }
+    public virtual DbSet<RegCreditCardTypes> RegCreditCardTypes { get; set; }
 
-    public virtual DbSet<RegCreditCardType> RegCreditCardTypes { get; set; }
+    public virtual DbSet<RegDebitCardTypes> RegDebitCardTypes { get; set; }
 
-    public virtual DbSet<RegDebitCardType> RegDebitCardTypes { get; set; }
+    public virtual DbSet<RegEmploymentStatus> RegEmploymentStatus { get; set; }
 
-    public virtual DbSet<RegEmploymentStatus> RegEmploymentStatuses { get; set; }
+    public virtual DbSet<RegEmploymentType> RegEmploymentType { get; set; }
 
-    public virtual DbSet<RegEmploymentType> RegEmploymentTypes { get; set; }
+    public virtual DbSet<RegEthnicityTypes> RegEthnicityTypes { get; set; }
 
-    public virtual DbSet<RegEthnicityType> RegEthnicityTypes { get; set; }
+    public virtual DbSet<RegFacility> RegFacility { get; set; }
 
-    public virtual DbSet<RegFacility> RegFacilities { get; set; }
+    public virtual DbSet<RegGender> RegGender { get; set; }
 
-    public virtual DbSet<RegGender> RegGenders { get; set; }
+    public virtual DbSet<RegGenderIdentity> RegGenderIdentity { get; set; }
 
-    public virtual DbSet<RegGenderIdentity> RegGenderIdentities { get; set; }
+    public virtual DbSet<RegLastMrno> RegLastMrno { get; set; }
 
-    public virtual DbSet<RegLastMrno> RegLastMrnos { get; set; }
+    public virtual DbSet<RegLocationTypes> RegLocationTypes { get; set; }
 
-    public virtual DbSet<RegLocation> RegLocations { get; set; }
+    public virtual DbSet<RegLocations> RegLocations { get; set; }
 
-    public virtual DbSet<RegLocationType> RegLocationTypes { get; set; }
+    public virtual DbSet<RegMaritalStatus> RegMaritalStatus { get; set; }
 
-    public virtual DbSet<RegMaritalStatus> RegMaritalStatuses { get; set; }
+    public virtual DbSet<RegOccupation> RegOccupation { get; set; }
 
-    public virtual DbSet<RegOccupation> RegOccupations { get; set; }
+    public virtual DbSet<RegPatient> RegPatient { get; set; }
 
-    public virtual DbSet<RegPatient> RegPatients { get; set; }
+    public virtual DbSet<RegPatientAddress> RegPatientAddress { get; set; }
 
-    public virtual DbSet<RegPatientAddress> RegPatientAddresses { get; set; }
+    public virtual DbSet<RegPatientDetails> RegPatientDetails { get; set; }
 
-    public virtual DbSet<RegPatientDetail> RegPatientDetails { get; set; }
+    public virtual DbSet<RegPatientEmployer> RegPatientEmployer { get; set; }
 
-    public virtual DbSet<RegPatientEmployer> RegPatientEmployers { get; set; }
+    public virtual DbSet<RegPatientOld> RegPatientOld { get; set; }
 
-    public virtual DbSet<RegPatientOld> RegPatientOlds { get; set; }
+    public virtual DbSet<RegPatientTabsType> RegPatientTabsType { get; set; }
 
-    public virtual DbSet<RegPatientTabsType> RegPatientTabsTypes { get; set; }
+    public virtual DbSet<RegPatientTemp> RegPatientTemp { get; set; }
 
-    public virtual DbSet<RegPatientTemp> RegPatientTemps { get; set; }
+    public virtual DbSet<RegRelationShip> RegRelationShip { get; set; }
 
-    public virtual DbSet<RegRelationShip> RegRelationShips { get; set; }
+    public virtual DbSet<RegStates> RegStates { get; set; }
 
-    public virtual DbSet<RegState> RegStates { get; set; }
+    public virtual DbSet<RegTitle> RegTitle { get; set; }
 
-    public virtual DbSet<RegTitle> RegTitles { get; set; }
+    public virtual DbSet<Religion> Religion { get; set; }
 
-    public virtual DbSet<Religion> Religions { get; set; }
+    public virtual DbSet<ReschedulingReasons> ReschedulingReasons { get; set; }
 
-    public virtual DbSet<ReschedulingReason> ReschedulingReasons { get; set; }
+    public virtual DbSet<SchAppointment> SchAppointment { get; set; }
 
-    public virtual DbSet<SchAppointment> SchAppointments { get; set; }
+    public virtual DbSet<SchAppointmentCriteria> SchAppointmentCriteria { get; set; }
 
-    public virtual DbSet<SchAppointmentCriterion> SchAppointmentCriteria { get; set; }
+    public virtual DbSet<SchAppointmentStatus> SchAppointmentStatus { get; set; }
 
-    public virtual DbSet<SchAppointmentStatus> SchAppointmentStatuses { get; set; }
+    public virtual DbSet<SchAppointmentType> SchAppointmentType { get; set; }
 
-    public virtual DbSet<SchAppointmentType> SchAppointmentTypes { get; set; }
+    public virtual DbSet<SchBlockTimeslots> SchBlockTimeslots { get; set; }
 
-    public virtual DbSet<SchBlockTimeslot> SchBlockTimeslots { get; set; }
+    public virtual DbSet<SchPatientCall> SchPatientCall { get; set; }
 
-    public virtual DbSet<SchPatientCall> SchPatientCalls { get; set; }
+    public virtual DbSet<SchPatientStatus> SchPatientStatus { get; set; }
 
-    public virtual DbSet<SchPatientStatus> SchPatientStatuses { get; set; }
+    public virtual DbSet<SecEmployeeRole> SecEmployeeRole { get; set; }
 
-    public virtual DbSet<SecEmployeeRole> SecEmployeeRoles { get; set; }
+    public virtual DbSet<SecModule> SecModule { get; set; }
 
-    public virtual DbSet<SecModule> SecModules { get; set; }
+    public virtual DbSet<SecModuleForm> SecModuleForm { get; set; }
 
-    public virtual DbSet<SecModuleForm> SecModuleForms { get; set; }
+    public virtual DbSet<SecPrivileges> SecPrivileges { get; set; }
 
-    public virtual DbSet<SecPrivilege> SecPrivileges { get; set; }
+    public virtual DbSet<SecPrivilegesAssignedRole> SecPrivilegesAssignedRole { get; set; }
 
-    public virtual DbSet<SecPrivilegesAssignedRole> SecPrivilegesAssignedRoles { get; set; }
+    public virtual DbSet<SecPrivilegesAvailableForm> SecPrivilegesAvailableForm { get; set; }
 
-    public virtual DbSet<SecPrivilegesAvailableForm> SecPrivilegesAvailableForms { get; set; }
+    public virtual DbSet<SecRole> SecRole { get; set; }
 
-    public virtual DbSet<SecRole> SecRoles { get; set; }
+    public virtual DbSet<SecRoleForm> SecRoleForm { get; set; }
 
-    public virtual DbSet<SecRoleForm> SecRoleForms { get; set; }
+    public virtual DbSet<Servicecategory> Servicecategory { get; set; }
 
-    public virtual DbSet<Servicecategory> Servicecategories { get; set; }
+    public virtual DbSet<SeverityType> SeverityType { get; set; }
 
-    public virtual DbSet<SeverityType> SeverityTypes { get; set; }
+    public virtual DbSet<SocialFamilyHistoryMaster> SocialFamilyHistoryMaster { get; set; }
 
-    public virtual DbSet<SocialFamilyHistoryMaster> SocialFamilyHistoryMasters { get; set; }
+    public virtual DbSet<SpeechToText> SpeechToText { get; set; }
 
-    public virtual DbSet<SpeechToText> SpeechToTexts { get; set; }
+    public virtual DbSet<StudentCourses> StudentCourses { get; set; }
 
-    public virtual DbSet<TabDrugsName> TabDrugsNames { get; set; }
+    public virtual DbSet<StudentInfo> StudentInfo { get; set; }
 
-    public virtual DbSet<Task> Tasks { get; set; }
+    public virtual DbSet<StudentPortal> StudentPortal { get; set; }
 
-    public virtual DbSet<TaskForwarding> TaskForwardings { get; set; }
+    public virtual DbSet<TabDrugsName> TabDrugsName { get; set; }
 
-    public virtual DbSet<TaskType> TaskTypes { get; set; }
+    public virtual DbSet<TabDrugsNameBackup> TabDrugsNameBackup { get; set; }
 
-    public virtual DbSet<Teacher> Teachers { get; set; }
+    public virtual DbSet<Task> Task { get; set; }
 
-    public virtual DbSet<TestTableType> TestTableTypes { get; set; }
+    public virtual DbSet<TaskForwarding> TaskForwarding { get; set; }
 
-    public virtual DbSet<TypeOfServiceMaster> TypeOfServiceMasters { get; set; }
+    public virtual DbSet<TaskType> TaskType { get; set; }
 
-    public virtual DbSet<VisitStatus> VisitStatuses { get; set; }
+    public virtual DbSet<Teacher> Teacher { get; set; }
 
-    public virtual DbSet<VisitType> VisitTypes { get; set; }
+    public virtual DbSet<TestTableType> TestTableType { get; set; }
 
-    public virtual DbSet<VitalSign> VitalSigns { get; set; }
+    public virtual DbSet<TypeOfServiceMaster> TypeOfServiceMaster { get; set; }
 
-    public virtual DbSet<VwAllActivePatient> VwAllActivePatients { get; set; }
+    public virtual DbSet<UppInsuranceClaims> UppInsuranceClaims { get; set; }
 
-    public virtual DbSet<VwGetDurationTimeSlot> VwGetDurationTimeSlots { get; set; }
+    public virtual DbSet<VisitStatus> VisitStatus { get; set; }
 
-    public virtual DbSet<VwProviderByFacilityId> VwProviderByFacilityIds { get; set; }
+    public virtual DbSet<VisitType> VisitType { get; set; }
 
-    public virtual DbSet<VwProviderbySiteid> VwProviderbySiteids { get; set; }
+    public virtual DbSet<VitalSigns> VitalSigns { get; set; }
 
-    public virtual DbSet<VwRegPatientAndAppointmentdetail> VwRegPatientAndAppointmentdetails { get; set; }
+    public virtual DbSet<VwAllActivePatients> VwAllActivePatients { get; set; }
 
-    public virtual DbSet<VwSiteByproviderId> VwSiteByproviderIds { get; set; }
+    public virtual DbSet<VwGetDurationTimeSlot> VwGetDurationTimeSlot { get; set; }
 
-    public virtual DbSet<VwSitebySpecialityid> VwSitebySpecialityids { get; set; }
+    public virtual DbSet<VwProviderByFacilityId> VwProviderByFacilityId { get; set; }
 
-    public virtual DbSet<VwSpecialityByEmployeeId> VwSpecialityByEmployeeIds { get; set; }
+    public virtual DbSet<VwProviderbySiteid> VwProviderbySiteid { get; set; }
 
-    public virtual DbSet<VwSpecialitybyFacilityid> VwSpecialitybyFacilityids { get; set; }
+    public virtual DbSet<VwRegPatientAndAppointmentdetails> VwRegPatientAndAppointmentdetails { get; set; }
 
-    public virtual DbSet<Vwprovider> Vwproviders { get; set; }
+    public virtual DbSet<VwSiteByproviderId> VwSiteByproviderId { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-OMTM2PC;Initial Catalog=HMIS;User Id=sa;Password=123qwe;TrustServerCertificate=True;");
+    public virtual DbSet<VwSitebySpecialityid> VwSitebySpecialityid { get; set; }
+
+    public virtual DbSet<VwSpecialityByEmployeeId> VwSpecialityByEmployeeId { get; set; }
+
+    public virtual DbSet<VwSpecialitybyFacilityid> VwSpecialitybyFacilityid { get; set; }
+
+    public virtual DbSet<Vwprovider> Vwprovider { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -372,7 +372,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<AlergyType>(entity =>
+        modelBuilder.Entity<AlergyTypes>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -385,9 +385,9 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Action).WithMany(p => p.AuditLogs).HasConstraintName("FK__AuditLog__Action__2DE6D218");
+            entity.HasOne(d => d.Action).WithMany(p => p.AuditLog).HasConstraintName("FK__AuditLog__Action__2DE6D218");
 
-            entity.HasOne(d => d.UserLoginHistory).WithMany(p => p.AuditLogs).HasConstraintName("FK__AuditLog__UserLo__32AB8735");
+            entity.HasOne(d => d.UserLoginHistory).WithMany(p => p.AuditLog).HasConstraintName("FK__AuditLog__UserLo__32AB8735");
         });
 
         modelBuilder.Entity<AvailableMrno>(entity =>
@@ -414,7 +414,7 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.GroupId).HasName("PK_BL_Group");
 
-            entity.HasOne(d => d.ProcedureType).WithMany(p => p.BlProceduresGroups).HasConstraintName("FK_BL_Group_Procedure_Type");
+            entity.HasOne(d => d.ProcedureType).WithMany(p => p.BlProceduresGroup).HasConstraintName("FK_BL_Group_Procedure_Type");
         });
 
         modelBuilder.Entity<Blcptgroup>(entity =>
@@ -429,12 +429,12 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.GroupCodeId).ValueGeneratedOnAdd();
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Group).WithMany(p => p.BlcptgroupCodes)
+            entity.HasOne(d => d.Group).WithMany(p => p.BlcptgroupCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BLCPTGroupCode_BLCPTGroup");
         });
 
-        modelBuilder.Entity<BlcptmasterRange>(entity =>
+        modelBuilder.Entity<BlcptmasterRanges>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
@@ -455,11 +455,11 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.GroupCodeId).ValueGeneratedOnAdd();
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.DentalCodeNavigation).WithMany(p => p.BldentalGroupCodes)
+            entity.HasOne(d => d.DentalCodeNavigation).WithMany(p => p.BldentalGroupCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BLDentalGroupCode_BLMasterDentalCodes");
 
-            entity.HasOne(d => d.Group).WithMany(p => p.BldentalGroupCodes)
+            entity.HasOne(d => d.Group).WithMany(p => p.BldentalGroupCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BLDentalGroupCode_BLDentalGroup");
         });
@@ -470,7 +470,7 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.BleligibilityLogs).HasConstraintName("FK_BLEligibilityLog_SchAppointment");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.BleligibilityLog).HasConstraintName("FK_BLEligibilityLog_SchAppointment");
         });
 
         modelBuilder.Entity<Blhcpcsgroup>(entity =>
@@ -483,11 +483,11 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.GroupCodeId).ValueGeneratedOnAdd();
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Group).WithMany(p => p.BlhcpcsgroupCodes)
+            entity.HasOne(d => d.Group).WithMany(p => p.BlhcpcsgroupCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BLHCPCSGroupCode_BLHCPCSGroup");
 
-            entity.HasOne(d => d.HcpcscodeNavigation).WithMany(p => p.BlhcpcsgroupCodes)
+            entity.HasOne(d => d.HcpcscodeNavigation).WithMany(p => p.BlhcpcsgroupCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BLHCPCSGroupCode_BLMasterHCPCS");
         });
@@ -502,11 +502,11 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.GroupCodeId).ValueGeneratedOnAdd();
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Group).WithMany(p => p.Blicd9cmgroupCodes)
+            entity.HasOne(d => d.Group).WithMany(p => p.Blicd9cmgroupCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BLICD9CMGroupCode_BLICD9CMGroup");
 
-            entity.HasOne(d => d.Icd9codeNavigation).WithMany(p => p.Blicd9cmgroupCodes)
+            entity.HasOne(d => d.Icd9codeNavigation).WithMany(p => p.Blicd9cmgroupCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BLICD9CMGroupCode_BLMasterICD9CM");
         });
@@ -527,14 +527,14 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<BlmasterDentalCode>(entity =>
+        modelBuilder.Entity<BlmasterDentalCodes>(entity =>
         {
             entity.HasKey(e => e.DentalCode).HasName("PK_DentalCode");
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<BlmasterHcpc>(entity =>
+        modelBuilder.Entity<BlmasterHcpcs>(entity =>
         {
             entity.HasKey(e => e.Hcpcscode).HasName("PK_HCPCSCode");
 
@@ -555,17 +555,17 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<BlmasterProcedure>(entity =>
+        modelBuilder.Entity<BlmasterProcedures>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Procedures");
 
             entity.Property(e => e.ItemName).IsFixedLength();
 
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BlmasterProcedureCreatedByNavigations).HasConstraintName("FK_Procedures_CreatedBy");
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BlmasterProceduresCreatedByNavigation).HasConstraintName("FK_Procedures_CreatedBy");
 
             entity.HasOne(d => d.ProcedureType).WithMany(p => p.BlmasterProcedures).HasConstraintName("FK_Procedures_Procedures_types");
 
-            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.BlmasterProcedureUpdatedByNavigations).HasConstraintName("FK_Procedures_UpdatedBy");
+            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.BlmasterProceduresUpdatedByNavigation).HasConstraintName("FK_Procedures_UpdatedBy");
         });
 
         modelBuilder.Entity<BlmasterWeqaya>(entity =>
@@ -582,11 +582,11 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.BlpatientVisits).HasConstraintName("FK_BLPatientVisit_SchAppointment");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.BlpatientVisit).HasConstraintName("FK_BLPatientVisit_SchAppointment");
 
-            entity.HasOne(d => d.Payer).WithMany(p => p.BlpatientVisits).HasConstraintName("FK_BLPatientVisit_BLPayer");
+            entity.HasOne(d => d.Payer).WithMany(p => p.BlpatientVisit).HasConstraintName("FK_BLPatientVisit_BLPayer");
 
-            entity.HasOne(d => d.Subscriber).WithMany(p => p.BlpatientVisits).HasConstraintName("FK_BLPatientVisit_InsuredSubscriber");
+            entity.HasOne(d => d.Subscriber).WithMany(p => p.BlpatientVisit).HasConstraintName("FK_BLPatientVisit_InsuredSubscriber");
         });
 
         modelBuilder.Entity<Blpayer>(entity =>
@@ -603,14 +603,14 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Payer).WithMany(p => p.BlpayerPackages).HasConstraintName("FK_BLPayerPackage_BLPayer");
+            entity.HasOne(d => d.Payer).WithMany(p => p.BlpayerPackage).HasConstraintName("FK_BLPayerPackage_BLPayer");
         });
 
         modelBuilder.Entity<BlpayerPlan>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Payer).WithMany(p => p.BlpayerPlans)
+            entity.HasOne(d => d.Payer).WithMany(p => p.BlpayerPlan)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BLPayerPlan_BLPayer");
         });
@@ -619,13 +619,13 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__BLProced__3214EC079A1BA76F");
 
-            entity.HasOne(d => d.Payer).WithMany(p => p.BlprocedureGroupCodes).HasConstraintName("FK_BLProcedureGroupCode_ProcedureMasterId");
+            entity.HasOne(d => d.Payer).WithMany(p => p.BlprocedureGroupCode).HasConstraintName("FK_BLProcedureGroupCode_ProcedureMasterId");
 
-            entity.HasOne(d => d.ProcedureGroup).WithMany(p => p.BlprocedureGroupCodes).HasConstraintName("FK_BLProcedureGroupCode_GroupId");
+            entity.HasOne(d => d.ProcedureGroup).WithMany(p => p.BlprocedureGroupCode).HasConstraintName("FK_BLProcedureGroupCode_GroupId");
 
-            entity.HasOne(d => d.ProcedureMaster).WithMany(p => p.BlprocedureGroupCodes).HasConstraintName("FK_BLProcedureGroupCode_PayerId");
+            entity.HasOne(d => d.ProcedureMaster).WithMany(p => p.BlprocedureGroupCode).HasConstraintName("FK_BLProcedureGroupCode_PayerId");
 
-            entity.HasOne(d => d.ProcedureType).WithMany(p => p.BlprocedureGroupCodes).HasConstraintName("FK_BLProcedureGroupCode_ProcedureTypeId");
+            entity.HasOne(d => d.ProcedureType).WithMany(p => p.BlprocedureGroupCode).HasConstraintName("FK_BLProcedureGroupCode_ProcedureTypeId");
         });
 
         modelBuilder.Entity<BlsitePointOfSale>(entity =>
@@ -641,13 +641,11 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
             entity.Property(e => e.IsHl7msgCreated).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.BlsuperBillDiagnoses).HasConstraintName("FK_BLSuperBillDiagnosis_SchAppointment");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.BlsuperBillDiagnosis).HasConstraintName("FK_BLSuperBillDiagnosis_SchAppointment");
 
-            entity.HasOne(d => d.Icd9codeNavigation).WithMany(p => p.BlsuperBillDiagnoses)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_BLSuperBillDiagnosis_BLMasterICD9CM");
+            entity.HasOne(d => d.Icd9codeNavigation).WithMany(p => p.BlsuperBillDiagnosis).HasConstraintName("FK_BLSuperBillDiagnosis_BLMasterICD9CM");
 
-            entity.HasOne(d => d.Icdversion).WithMany(p => p.BlsuperBillDiagnoses).HasConstraintName("FK_BLSuperBillDiagnosis_BLICDVersion");
+            entity.HasOne(d => d.Icdversion).WithMany(p => p.BlsuperBillDiagnosis).HasConstraintName("FK_BLSuperBillDiagnosis_BLICDVersion");
         });
 
         modelBuilder.Entity<BlsuperBillProcedure>(entity =>
@@ -656,7 +654,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
             entity.Property(e => e.IsHl7msgCreated).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.BlsuperBillProcedures).HasConstraintName("FK_BLSuperBillProcedure_SchAppointment");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.BlsuperBillProcedure).HasConstraintName("FK_BLSuperBillProcedure_SchAppointment");
         });
 
         modelBuilder.Entity<BlsuperBillProcedureInvoice>(entity =>
@@ -666,15 +664,15 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
             entity.Property(e => e.IsHl7msgCreated).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Appointent).WithMany(p => p.BlsuperBillProcedureInvoices).HasConstraintName("FK_BLSuperBillProcedureInvoice_SchAppointment");
+            entity.HasOne(d => d.Appointent).WithMany(p => p.BlsuperBillProcedureInvoice).HasConstraintName("FK_BLSuperBillProcedureInvoice_SchAppointment");
         });
 
-        modelBuilder.Entity<BlunclassifiedCode>(entity =>
+        modelBuilder.Entity<BlunclassifiedCodes>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<BluniversalToothCode>(entity =>
+        modelBuilder.Entity<BluniversalToothCodes>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -688,7 +686,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<Case>(entity =>
+        modelBuilder.Entity<Cases>(entity =>
         {
             entity.HasKey(e => e.CaseId).HasName("PK_Episode");
 
@@ -712,48 +710,40 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<CptbyAppType>(entity =>
         {
-            entity.HasOne(d => d.AppType).WithMany(p => p.CptbyAppTypes)
+            entity.HasOne(d => d.AppType).WithMany(p => p.CptbyAppType)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CPTByAppType_SchAppointmentType");
         });
 
         modelBuilder.Entity<CptsInCptbyAppType>(entity =>
         {
-            entity.HasOne(d => d.Group).WithMany(p => p.CptsInCptbyAppTypes)
+            entity.HasOne(d => d.Group).WithMany(p => p.CptsInCptbyAppType)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CPTsInCPTByAppType_CPTByAppType");
-        });
-
-        modelBuilder.Entity<Customer>(entity =>
-        {
-            entity.HasKey(e => e.CustomerId).HasName("PK__Customer__A4AE64B834EC4D62");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<DeductiblePercent>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Subscriber).WithMany(p => p.DeductiblePercents)
+            entity.HasOne(d => d.Subscriber).WithMany(p => p.DeductiblePercent)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_DeductiblePercent_InsuredSubscriber");
         });
 
         modelBuilder.Entity<EligibilityLog>(entity =>
         {
-            entity.HasOne(d => d.Facility).WithMany(p => p.EligibilityLogs).HasConstraintName("FK_EligibilityLog_RegFacility");
+            entity.HasOne(d => d.Facility).WithMany(p => p.EligibilityLog).HasConstraintName("FK_EligibilityLog_RegFacility");
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.EligibilityLogs).HasConstraintName("FK_EligibilityLog_RegPatient");
+            entity.HasOne(d => d.Patient).WithMany(p => p.EligibilityLog).HasConstraintName("FK_EligibilityLog_RegPatient");
 
-            entity.HasOne(d => d.Payer).WithMany(p => p.EligibilityLogs).HasConstraintName("FK_EligibilityLog_BlPayer");
+            entity.HasOne(d => d.Payer).WithMany(p => p.EligibilityLog).HasConstraintName("FK_EligibilityLog_BlPayer");
 
-            entity.HasOne(d => d.Plan).WithMany(p => p.EligibilityLogs).HasConstraintName("FK_EligibilityLog_BLPayerPlan");
+            entity.HasOne(d => d.Plan).WithMany(p => p.EligibilityLog).HasConstraintName("FK_EligibilityLog_BLPayerPlan");
 
-            entity.HasOne(d => d.Requestedby).WithMany(p => p.EligibilityLogs).HasConstraintName("FK_EligibilityLog_HrEmployee");
+            entity.HasOne(d => d.Requestedby).WithMany(p => p.EligibilityLog).HasConstraintName("FK_EligibilityLog_HrEmployee");
 
-            entity.HasOne(d => d.Visit).WithMany(p => p.EligibilityLogs).HasConstraintName("FK_EligibilityLog_SchAppointment");
+            entity.HasOne(d => d.Visit).WithMany(p => p.EligibilityLog).HasConstraintName("FK_EligibilityLog_SchAppointment");
         });
 
         modelBuilder.Entity<EmirateType>(entity =>
@@ -770,7 +760,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<EntityType>(entity =>
+        modelBuilder.Entity<EntityTypes>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -816,11 +806,11 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Employee).WithMany(p => p.HremployeeFacilities)
+            entity.HasOne(d => d.Employee).WithMany(p => p.HremployeeFacility)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__HREmployeeFacility__HREmployee");
 
-            entity.HasOne(d => d.Facility).WithMany(p => p.HremployeeFacilities)
+            entity.HasOne(d => d.Facility).WithMany(p => p.HremployeeFacility)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__HREmployeFacility__RegFacil");
         });
@@ -836,7 +826,7 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Employee).WithMany(p => p.HrlicenseInfos)
+            entity.HasOne(d => d.Employee).WithMany(p => p.HrlicenseInfo)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_HRLICENSEINFO_HREMPLOYEE");
         });
@@ -864,9 +854,9 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.PackageName).IsFixedLength();
             entity.Property(e => e.UpdatedBy).IsFixedLength();
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.InsuranceEligibilities).HasConstraintName("FK_InsuranceEligibility_SchAppointment");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.InsuranceEligibility).HasConstraintName("FK_InsuranceEligibility_SchAppointment");
 
-            entity.HasOne(d => d.BlPayer).WithMany(p => p.InsuranceEligibilities).HasConstraintName("FK_InsuranceEligibility_BLPayer");
+            entity.HasOne(d => d.BlPayer).WithMany(p => p.InsuranceEligibility).HasConstraintName("FK_InsuranceEligibility_BLPayer");
         });
 
         modelBuilder.Entity<InsuranceRequestType>(entity =>
@@ -886,11 +876,11 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Carrier).WithMany(p => p.Insureds).HasConstraintName("FK_Insured_BLPayer");
+            entity.HasOne(d => d.Carrier).WithMany(p => p.Insured).HasConstraintName("FK_Insured_BLPayer");
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.Insureds).HasConstraintName("FK__Insured__RegPatient");
+            entity.HasOne(d => d.Patient).WithMany(p => p.Insured).HasConstraintName("FK__Insured__RegPatient");
 
-            entity.HasOne(d => d.PayerPackage).WithMany(p => p.Insureds).HasConstraintName("FK_Insured_BLPayerPackage");
+            entity.HasOne(d => d.PayerPackage).WithMany(p => p.Insured).HasConstraintName("FK_Insured_BLPayerPackage");
         });
 
         modelBuilder.Entity<InsuredCoverage>(entity =>
@@ -902,26 +892,26 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Subscriber).WithMany(p => p.InsuredPolicies).HasConstraintName("FK_InsuredPolicy_InsuredSubscriber");
+            entity.HasOne(d => d.Subscriber).WithMany(p => p.InsuredPolicy).HasConstraintName("FK_InsuredPolicy_InsuredSubscriber");
         });
 
         modelBuilder.Entity<InsuredSubscriber>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Carrier).WithMany(p => p.InsuredSubscribers).HasConstraintName("FK_InsuredSubscriber_BLPayer");
+            entity.HasOne(d => d.Carrier).WithMany(p => p.InsuredSubscriber).HasConstraintName("FK_InsuredSubscriber_BLPayer");
 
-            entity.HasOne(d => d.City).WithMany(p => p.InsuredSubscribers)
+            entity.HasOne(d => d.City).WithMany(p => p.InsuredSubscriber)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_InsuredSubscriber_RegCities");
 
-            entity.HasOne(d => d.Country).WithMany(p => p.InsuredSubscribers)
+            entity.HasOne(d => d.Country).WithMany(p => p.InsuredSubscriber)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_InsuredSubscriber_RegCountries");
 
-            entity.HasOne(d => d.PayerPackage).WithMany(p => p.InsuredSubscribers).HasConstraintName("FK_InsuredSubscriber_BLPayerPackage");
+            entity.HasOne(d => d.PayerPackage).WithMany(p => p.InsuredSubscriber).HasConstraintName("FK_InsuredSubscriber_BLPayerPackage");
 
-            entity.HasOne(d => d.State).WithMany(p => p.InsuredSubscribers)
+            entity.HasOne(d => d.State).WithMany(p => p.InsuredSubscriber)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_InsuredSubscriber_RegStates");
         });
@@ -932,7 +922,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsRadiologyTest).HasComment("2 = Pathalogy\r\n1 = Lab\r\n0 = Radiology");
         });
 
-        modelBuilder.Entity<LabTest>(entity =>
+        modelBuilder.Entity<LabTests>(entity =>
         {
             entity.HasKey(e => e.LabTestId).HasName("PK_LabTestId");
 
@@ -966,23 +956,28 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
+        modelBuilder.Entity<PatientAlerts>(entity =>
+        {
+            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+        });
+
         modelBuilder.Entity<PatientAllergy>(entity =>
         {
             entity.HasIndex(e => e.CreatedDate, "IX_PatientAllergy_CreatedDate").HasFilter("([CreatedDate] IS NOT NULL)");
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientAllergies).HasConstraintName("FK_PatientAllergy_AppointmentId");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientAllergy).HasConstraintName("FK_PatientAllergy_AppointmentId");
 
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PatientAllergyCreatedByNavigations).HasConstraintName("FK_PatientAllergy_CreatedBy");
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PatientAllergyCreatedByNavigation).HasConstraintName("FK_PatientAllergy_CreatedBy");
 
-            entity.HasOne(d => d.Provider).WithMany(p => p.PatientAllergyProviders).HasConstraintName("FK_PatientAllergy_ProviderId");
+            entity.HasOne(d => d.Provider).WithMany(p => p.PatientAllergyProvider).HasConstraintName("FK_PatientAllergy_ProviderId");
 
-            entity.HasOne(d => d.SeverityCodeNavigation).WithMany(p => p.PatientAllergies).HasConstraintName("FK_PatientAllergy_Severity");
+            entity.HasOne(d => d.SeverityCodeNavigation).WithMany(p => p.PatientAllergy).HasConstraintName("FK_PatientAllergy_Severity");
 
-            entity.HasOne(d => d.Type).WithMany(p => p.PatientAllergies).HasConstraintName("FK_PatientAllergy_TypeId");
+            entity.HasOne(d => d.Type).WithMany(p => p.PatientAllergy).HasConstraintName("FK_PatientAllergy_TypeId");
 
-            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PatientAllergyUpdatedByNavigations).HasConstraintName("FK_PatientAllergy_UpdatedBy");
+            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PatientAllergyUpdatedByNavigation).HasConstraintName("FK_PatientAllergy_UpdatedBy");
         });
 
         modelBuilder.Entity<PatientAllergyDetail>(entity =>
@@ -997,7 +992,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsPaymentPosted).HasDefaultValue(false);
             entity.Property(e => e.IsPaymentPostedDelete).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Procedure).WithMany(p => p.PatientBills)
+            entity.HasOne(d => d.Procedure).WithMany(p => p.PatientBill)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PatientBill_BLSuperBillProcedure");
         });
@@ -1008,36 +1003,36 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientBillInvoices).HasConstraintName("FK_PatientBillInvoice_SchAppointment");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientBillInvoice).HasConstraintName("FK_PatientBillInvoice_SchAppointment");
         });
 
         modelBuilder.Entity<PatientChartFamilyHistory>(entity =>
         {
-            entity.HasOne(d => d.RelationShip).WithMany(p => p.PatientChartFamilyHistories).HasConstraintName("FK_PatientChartFamilyHistory_RegRelationShip");
+            entity.HasOne(d => d.RelationShip).WithMany(p => p.PatientChartFamilyHistory).HasConstraintName("FK_PatientChartFamilyHistory_RegRelationShip");
         });
 
         modelBuilder.Entity<PatientImmunization>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__PatientI__3214EC07517FDBEE");
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientImmunizations).HasConstraintName("FK_PatientImmunization_AppointmentId");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientImmunization).HasConstraintName("FK_PatientImmunization_AppointmentId");
 
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PatientImmunizationCreatedByNavigations)
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PatientImmunizationCreatedByNavigation)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PatientImmunization_CreatedBy");
 
-            entity.HasOne(d => d.DrugType).WithMany(p => p.PatientImmunizationDrugTypes).HasConstraintName("FK_PatientImmunization_DrugTypeId");
+            entity.HasOne(d => d.DrugType).WithMany(p => p.PatientImmunizationDrugType).HasConstraintName("FK_PatientImmunization_DrugTypeId");
 
-            entity.HasOne(d => d.ImmType).WithMany(p => p.PatientImmunizationImmTypes).HasConstraintName("FK_ImmunizationList_PatientImmunization");
+            entity.HasOne(d => d.ImmType).WithMany(p => p.PatientImmunizationImmType).HasConstraintName("FK_ImmunizationList_PatientImmunization");
 
-            entity.HasOne(d => d.Provider).WithMany(p => p.PatientImmunizationProviders).HasConstraintName("FK_PatientImmunization_ProviderId");
+            entity.HasOne(d => d.Provider).WithMany(p => p.PatientImmunizationProvider).HasConstraintName("FK_PatientImmunization_ProviderId");
 
-            entity.HasOne(d => d.Route).WithMany(p => p.PatientImmunizations).HasConstraintName("FK_PatientImmunization_RouteId");
+            entity.HasOne(d => d.Route).WithMany(p => p.PatientImmunization).HasConstraintName("FK_PatientImmunization_RouteId");
 
-            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PatientImmunizationUpdatedByNavigations).HasConstraintName("FK_PatientImmunization_UpdatedBy");
+            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PatientImmunizationUpdatedByNavigation).HasConstraintName("FK_PatientImmunization_UpdatedBy");
         });
 
-        modelBuilder.Entity<PatientNotifiedOption>(entity =>
+        modelBuilder.Entity<PatientNotifiedOptions>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -1046,9 +1041,9 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasIndex(e => e.CreatedDate, "IX_PatientProblem_CreatedDate").HasFilter("([CreatedDate] IS NOT NULL)");
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientProblems).HasConstraintName("FK_PatientProblemAppointment");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientProblem).HasConstraintName("FK_PatientProblemAppointment");
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.PatientProblems).HasConstraintName("FK_PatientProblemPatientId");
+            entity.HasOne(d => d.Patient).WithMany(p => p.PatientProblem).HasConstraintName("FK_PatientProblemPatientId");
         });
 
         modelBuilder.Entity<PatientProcedure>(entity =>
@@ -1061,13 +1056,13 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.ProcedurePriority).HasDefaultValue("");
             entity.Property(e => e.ProcedureType).HasDefaultValueSql("('')");
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientProcedures).HasConstraintName("FK_PatientProcedure_SchAppointment");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientProcedure).HasConstraintName("FK_PatientProcedure_SchAppointment");
 
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PatientProcedureCreatedByNavigations).HasConstraintName("FK_CreatedBy_HREmployee");
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PatientProcedureCreatedByNavigation).HasConstraintName("FK_CreatedBy_HREmployee");
 
-            entity.HasOne(d => d.ProcedureTypeNavigation).WithMany(p => p.PatientProcedures).HasConstraintName("FK_ProcedureTypeId");
+            entity.HasOne(d => d.ProcedureTypeNavigation).WithMany(p => p.PatientProcedure).HasConstraintName("FK_ProcedureTypeId");
 
-            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PatientProcedureUpdatedByNavigations).HasConstraintName("FK_UpdateBy_HREmployee");
+            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PatientProcedureUpdatedByNavigation).HasConstraintName("FK_UpdateBy_HREmployee");
         });
 
         modelBuilder.Entity<PatientProcedureType>(entity =>
@@ -1081,14 +1076,14 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientVisitStatuses).HasConstraintName("FK_PatientVisitStatus_SchAppointment");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.PatientVisitStatus).HasConstraintName("FK_PatientVisitStatus_SchAppointment");
 
-            entity.HasOne(d => d.Status).WithMany(p => p.PatientVisitStatuses).HasConstraintName("FK_PatientVisitStatus_SchPatientStatus");
+            entity.HasOne(d => d.Status).WithMany(p => p.PatientVisitStatus).HasConstraintName("FK_PatientVisitStatus_SchPatientStatus");
 
-            entity.HasOne(d => d.VisitStatus).WithMany(p => p.PatientVisitStatuses).HasConstraintName("FK_PATIENTVISITSTATUS_VisitStatus");
+            entity.HasOne(d => d.VisitStatus).WithMany(p => p.PatientVisitStatus).HasConstraintName("FK_PATIENTVISITSTATUS_VisitStatus");
         });
 
-        modelBuilder.Entity<PersonalReminder>(entity =>
+        modelBuilder.Entity<PersonalReminders>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -1097,11 +1092,11 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasIndex(e => e.ProviderId, "IX_Prescription_ProviderId").HasFilter("([ProviderId] IS NOT NULL)");
 
-            entity.HasOne(d => d.Appointment).WithMany(p => p.Prescriptions).HasConstraintName("fk_appointment");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.Prescription).HasConstraintName("fk_appointment");
 
-            entity.HasOne(d => d.Drug).WithMany(p => p.Prescriptions).HasConstraintName("FK_Prescription_TabsDrugName_DrugId");
+            entity.HasOne(d => d.Drug).WithMany(p => p.Prescription).HasConstraintName("FK_Prescription_TabsDrugName_DrugId");
 
-            entity.HasOne(d => d.Provider).WithMany(p => p.Prescriptions).HasConstraintName("fk_provider");
+            entity.HasOne(d => d.Provider).WithMany(p => p.Prescription).HasConstraintName("fk_provider");
         });
 
         modelBuilder.Entity<ProblemList>(entity =>
@@ -1143,18 +1138,18 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Facility).WithMany(p => p.ProviderSchedules).HasConstraintName("FK_ProviderSchedule_RegFacility");
+            entity.HasOne(d => d.Facility).WithMany(p => p.ProviderSchedule).HasConstraintName("FK_ProviderSchedule_RegFacility");
 
-            entity.HasOne(d => d.Speciality).WithMany(p => p.ProviderSchedules).HasConstraintName("FK_ProviderSchedule_ProviderSpeciality");
+            entity.HasOne(d => d.Speciality).WithMany(p => p.ProviderSchedule).HasConstraintName("FK_ProviderSchedule_ProviderSpeciality");
         });
 
         modelBuilder.Entity<ProviderScheduleByAppType>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.AppType).WithMany(p => p.ProviderScheduleByAppTypes).HasConstraintName("FK_ProviderScheduleByAppType_SchAppointmentType");
+            entity.HasOne(d => d.AppType).WithMany(p => p.ProviderScheduleByAppType).HasConstraintName("FK_ProviderScheduleByAppType_SchAppointmentType");
 
-            entity.HasOne(d => d.Ps).WithMany(p => p.ProviderScheduleByAppTypes)
+            entity.HasOne(d => d.Ps).WithMany(p => p.ProviderScheduleByAppType)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ProviderScheduleByAppType_ProviderSchedule");
         });
@@ -1174,12 +1169,12 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.RegAccounts).HasConstraintName("FK_RegAccount_RegPatientId");
+            entity.HasOne(d => d.Patient).WithMany(p => p.RegAccount).HasConstraintName("FK_RegAccount_RegPatientId");
 
-            entity.HasOne(d => d.Relationship).WithMany(p => p.RegAccounts).HasConstraintName("FK_RegAccount_RegRelationshipId");
+            entity.HasOne(d => d.Relationship).WithMany(p => p.RegAccount).HasConstraintName("FK_RegAccount_RegRelationshipId");
         });
 
-        modelBuilder.Entity<RegAlertType>(entity =>
+        modelBuilder.Entity<RegAlertTypes>(entity =>
         {
             entity.HasKey(e => e.TypeId).HasName("PK_TypeIdAlert");
 
@@ -1187,7 +1182,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<RegAssignment>(entity =>
+        modelBuilder.Entity<RegAssignments>(entity =>
         {
             entity.Property(e => e.Active).HasDefaultValue(false);
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
@@ -1201,7 +1196,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<RegCity>(entity =>
+        modelBuilder.Entity<RegCities>(entity =>
         {
             entity.HasKey(e => e.CityId).HasName("PK_CityId");
 
@@ -1211,10 +1206,10 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<RegCompany>(entity =>
         {
-            entity.HasOne(d => d.CreatedBy).WithMany(p => p.RegCompanies).HasConstraintName("FK_RegCompany_HREmployee");
+            entity.HasOne(d => d.CreatedBy).WithMany(p => p.RegCompany).HasConstraintName("FK_RegCompany_HREmployee");
         });
 
-        modelBuilder.Entity<RegCountry>(entity =>
+        modelBuilder.Entity<RegCountries>(entity =>
         {
             entity.HasKey(e => e.CountryId).HasName("PK_CountryId");
 
@@ -1222,7 +1217,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<RegCreditCardType>(entity =>
+        modelBuilder.Entity<RegCreditCardTypes>(entity =>
         {
             entity.HasKey(e => e.TypeId).HasName("PK_TypeId");
 
@@ -1230,7 +1225,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<RegDebitCardType>(entity =>
+        modelBuilder.Entity<RegDebitCardTypes>(entity =>
         {
             entity.HasKey(e => e.TypeId).HasName("PK_TypeIdDebit");
 
@@ -1254,7 +1249,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<RegEthnicityType>(entity =>
+        modelBuilder.Entity<RegEthnicityTypes>(entity =>
         {
             entity.HasKey(e => e.TypeId).HasName("PK_TypeIdEthnicity");
 
@@ -1269,7 +1264,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Company).WithMany(p => p.RegFacilities).HasConstraintName("FK_RegFacility_RegCompany");
+            entity.HasOne(d => d.Company).WithMany(p => p.RegFacility).HasConstraintName("FK_RegFacility_RegCompany");
         });
 
         modelBuilder.Entity<RegGender>(entity =>
@@ -1292,19 +1287,19 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
         });
 
-        modelBuilder.Entity<RegLocation>(entity =>
+        modelBuilder.Entity<RegLocationTypes>(entity =>
+        {
+            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+
+            entity.HasOne(d => d.Facility).WithMany(p => p.RegLocationTypes).HasConstraintName("FK_RegLocationTypes_RegFacility");
+        });
+
+        modelBuilder.Entity<RegLocations>(entity =>
         {
             entity.HasKey(e => e.LocationId).HasName("PK_LocationId");
 
             entity.Property(e => e.LocationId).ValueGeneratedNever();
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
-        });
-
-        modelBuilder.Entity<RegLocationType>(entity =>
-        {
-            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
-
-            entity.HasOne(d => d.Facility).WithMany(p => p.RegLocationTypes).HasConstraintName("FK_RegLocationTypes_RegFacility");
         });
 
         modelBuilder.Entity<RegMaritalStatus>(entity =>
@@ -1330,9 +1325,9 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.PatientBloodGroup).WithMany(p => p.RegPatients).HasConstraintName("FK_RegPatient_RegBloodGroup");
+            entity.HasOne(d => d.PatientBloodGroup).WithMany(p => p.RegPatient).HasConstraintName("FK_RegPatient_RegBloodGroup");
 
-            entity.HasOne(d => d.TabsType).WithMany(p => p.RegPatients).HasConstraintName("FK_RegPatient_RegPateintTabsType");
+            entity.HasOne(d => d.TabsType).WithMany(p => p.RegPatient).HasConstraintName("FK_RegPatient_RegPateintTabsType");
         });
 
         modelBuilder.Entity<RegPatientAddress>(entity =>
@@ -1340,7 +1335,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<RegPatientDetail>(entity =>
+        modelBuilder.Entity<RegPatientDetails>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
@@ -1367,11 +1362,11 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.EmploymentOccupation).WithMany(p => p.RegPatientEmployers).HasConstraintName("FK_RegPatientEmployer_RegOccupationId");
+            entity.HasOne(d => d.EmploymentOccupation).WithMany(p => p.RegPatientEmployer).HasConstraintName("FK_RegPatientEmployer_RegOccupationId");
 
-            entity.HasOne(d => d.EmploymentType).WithMany(p => p.RegPatientEmployers).HasConstraintName("FK_RegPatientEmployer_RegEmploymentTypeId");
+            entity.HasOne(d => d.EmploymentType).WithMany(p => p.RegPatientEmployer).HasConstraintName("FK_RegPatientEmployer_RegEmploymentTypeId");
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.RegPatientEmployers).HasConstraintName("FK_RegPatientEmployer_RegPatientId");
+            entity.HasOne(d => d.Patient).WithMany(p => p.RegPatientEmployer).HasConstraintName("FK_RegPatientEmployer_RegPatientId");
         });
 
         modelBuilder.Entity<RegPatientOld>(entity =>
@@ -1396,21 +1391,21 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Nokcity).WithMany(p => p.RegPatientTempNokcities).HasConstraintName("FK_NOK_RegPatientTemp_RegCities");
+            entity.HasOne(d => d.Nokcity).WithMany(p => p.RegPatientTempNokcity).HasConstraintName("FK_NOK_RegPatientTemp_RegCities");
 
-            entity.HasOne(d => d.Nokcountry).WithMany(p => p.RegPatientTempNokcountries).HasConstraintName("FK_NOK_RegPatientTemp_RegCountries");
+            entity.HasOne(d => d.Nokcountry).WithMany(p => p.RegPatientTempNokcountry).HasConstraintName("FK_NOK_RegPatientTemp_RegCountries");
 
-            entity.HasOne(d => d.Nokstate).WithMany(p => p.RegPatientTempNokstates).HasConstraintName("FK_NOK_RegPatientTemp_RegStates");
+            entity.HasOne(d => d.Nokstate).WithMany(p => p.RegPatientTempNokstate).HasConstraintName("FK_NOK_RegPatientTemp_RegStates");
 
-            entity.HasOne(d => d.PersonCity).WithMany(p => p.RegPatientTempPersonCities).HasConstraintName("FK_RegPatientTemp_RegCities");
+            entity.HasOne(d => d.PersonCity).WithMany(p => p.RegPatientTempPersonCity).HasConstraintName("FK_RegPatientTemp_RegCities");
 
-            entity.HasOne(d => d.PersonCountry).WithMany(p => p.RegPatientTempPersonCountries).HasConstraintName("FK_RegPatientTemp_RegCountries");
+            entity.HasOne(d => d.PersonCountry).WithMany(p => p.RegPatientTempPersonCountry).HasConstraintName("FK_RegPatientTemp_RegCountries");
 
-            entity.HasOne(d => d.PersonNationality).WithMany(p => p.RegPatientTemps).HasConstraintName("FK_RegPatientTemp_Nationality");
+            entity.HasOne(d => d.PersonNationality).WithMany(p => p.RegPatientTemp).HasConstraintName("FK_RegPatientTemp_Nationality");
 
-            entity.HasOne(d => d.PersonState).WithMany(p => p.RegPatientTempPersonStates).HasConstraintName("FK_RegPatientTemp_RegStates");
+            entity.HasOne(d => d.PersonState).WithMany(p => p.RegPatientTempPersonState).HasConstraintName("FK_RegPatientTemp_RegStates");
 
-            entity.HasOne(d => d.PersonTitle).WithMany(p => p.RegPatientTemps).HasConstraintName("FK_RegPatientTemp_RegTitle");
+            entity.HasOne(d => d.PersonTitle).WithMany(p => p.RegPatientTemp).HasConstraintName("FK_RegPatientTemp_RegTitle");
         });
 
         modelBuilder.Entity<RegRelationShip>(entity =>
@@ -1421,7 +1416,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<RegState>(entity =>
+        modelBuilder.Entity<RegStates>(entity =>
         {
             entity.HasKey(e => e.StateId).HasName("PK_StateID");
 
@@ -1444,7 +1439,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<ReschedulingReason>(entity =>
+        modelBuilder.Entity<ReschedulingReasons>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -1453,44 +1448,44 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.AppCriteria).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_SchAppointmentCriteria");
+            entity.HasOne(d => d.AppCriteria).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_SchAppointmentCriteria");
 
-            entity.HasOne(d => d.AppStatus).WithMany(p => p.SchAppointments)
+            entity.HasOne(d => d.AppStatus).WithMany(p => p.SchAppointment)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SchAppointment_SchAppointmentStatus");
 
-            entity.HasOne(d => d.Employee).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_HrEmployee");
+            entity.HasOne(d => d.Employee).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_HrEmployee");
 
-            entity.HasOne(d => d.Facility).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_RegFacility");
+            entity.HasOne(d => d.Facility).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_RegFacility");
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_RegPatient");
+            entity.HasOne(d => d.Patient).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_RegPatient");
 
-            entity.HasOne(d => d.PatientNotified).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_PatientNotifiedOptions");
+            entity.HasOne(d => d.PatientNotified).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_PatientNotifiedOptions");
 
-            entity.HasOne(d => d.PatientStatus).WithMany(p => p.SchAppointments)
+            entity.HasOne(d => d.PatientStatus).WithMany(p => p.SchAppointment)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SchAppointment_SchPatientStatus");
 
-            entity.HasOne(d => d.Payer).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_BLPayer");
+            entity.HasOne(d => d.Payer).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_BLPayer");
 
-            entity.HasOne(d => d.Plan).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_BLPayerPlan");
+            entity.HasOne(d => d.Plan).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_BLPayerPlan");
 
-            entity.HasOne(d => d.PurposeOfVisitNavigation).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_ProblemList");
+            entity.HasOne(d => d.PurposeOfVisitNavigation).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_ProblemList");
 
-            entity.HasOne(d => d.Rescheduled).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_ReschedulingReasons");
+            entity.HasOne(d => d.Rescheduled).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_ReschedulingReasons");
 
-            entity.HasOne(d => d.Site).WithMany(p => p.SchAppointments)
+            entity.HasOne(d => d.Site).WithMany(p => p.SchAppointment)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SchAppointment_RegLocationTypes");
 
-            entity.HasOne(d => d.Subscriber).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_InsuredSubscriber");
+            entity.HasOne(d => d.Subscriber).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_InsuredSubscriber");
 
-            entity.HasOne(d => d.VisitStatus).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_VisitStatus");
+            entity.HasOne(d => d.VisitStatus).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_VisitStatus");
 
-            entity.HasOne(d => d.VisitType).WithMany(p => p.SchAppointments).HasConstraintName("FK_SchAppointment_VisitType");
+            entity.HasOne(d => d.VisitType).WithMany(p => p.SchAppointment).HasConstraintName("FK_SchAppointment_VisitType");
         });
 
-        modelBuilder.Entity<SchAppointmentCriterion>(entity =>
+        modelBuilder.Entity<SchAppointmentCriteria>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -1505,7 +1500,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<SchBlockTimeslot>(entity =>
+        modelBuilder.Entity<SchBlockTimeslots>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -1524,11 +1519,11 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Employee).WithMany(p => p.SecEmployeeRoles)
+            entity.HasOne(d => d.Employee).WithMany(p => p.SecEmployeeRole)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SecEmployeeRole_HREmployee");
 
-            entity.HasOne(d => d.Role).WithMany(p => p.SecEmployeeRoles).HasConstraintName("FK_SecEmployeeRole_SecRole");
+            entity.HasOne(d => d.Role).WithMany(p => p.SecEmployeeRole).HasConstraintName("FK_SecEmployeeRole_SecRole");
         });
 
         modelBuilder.Entity<SecModule>(entity =>
@@ -1540,12 +1535,12 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Module).WithMany(p => p.SecModuleForms)
+            entity.HasOne(d => d.Module).WithMany(p => p.SecModuleForm)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SecModuleForm_SecModule");
         });
 
-        modelBuilder.Entity<SecPrivilege>(entity =>
+        modelBuilder.Entity<SecPrivileges>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -1556,11 +1551,11 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.FormPrivilege).WithMany(p => p.SecPrivilegesAssignedRoles)
+            entity.HasOne(d => d.FormPrivilege).WithMany(p => p.SecPrivilegesAssignedRole)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__SecPrivil__SecPrivilegesAvailableForm");
 
-            entity.HasOne(d => d.Role).WithMany(p => p.SecPrivilegesAssignedRoles)
+            entity.HasOne(d => d.Role).WithMany(p => p.SecPrivilegesAssignedRole)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__SecPrivil__SecRoleI");
         });
@@ -1569,11 +1564,11 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Form).WithMany(p => p.SecPrivilegesAvailableForms)
+            entity.HasOne(d => d.Form).WithMany(p => p.SecPrivilegesAvailableForm)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SecPrivilegesAvailableForm_SecModuleForm");
 
-            entity.HasOne(d => d.Privilege).WithMany(p => p.SecPrivilegesAvailableForms)
+            entity.HasOne(d => d.Privilege).WithMany(p => p.SecPrivilegesAvailableForm)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__SecPrivil__SecPrivileges");
         });
@@ -1587,7 +1582,7 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Form).WithMany(p => p.SecRoleForms)
+            entity.HasOne(d => d.Form).WithMany(p => p.SecRoleForm)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SecRoleForm_SecModuleForm");
         });
@@ -1612,7 +1607,7 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<SpeechToText>(entity =>
         {
-            entity.HasOne(d => d.Patient).WithMany(p => p.SpeechToTexts)
+            entity.HasOne(d => d.Patient).WithMany(p => p.SpeechToText)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SpeechToText_RegPatient");
         });
@@ -1620,8 +1615,11 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<TabDrugsName>(entity =>
         {
             entity.HasKey(e => e.DrugId).HasName("PK_TabsDrugName_DrugId");
+        });
 
-            entity.Property(e => e.DrugId).ValueGeneratedNever();
+        modelBuilder.Entity<TabDrugsNameBackup>(entity =>
+        {
+            entity.Property(e => e.NewDrugId).ValueGeneratedOnAdd();
         });
 
         modelBuilder.Entity<Task>(entity =>
@@ -1633,7 +1631,7 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
-            entity.HasOne(d => d.ReceiverRole).WithMany(p => p.TaskForwardings)
+            entity.HasOne(d => d.ReceiverRole).WithMany(p => p.TaskForwarding)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__TaskForwa__SecRole");
         });
@@ -1659,6 +1657,14 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
+        modelBuilder.Entity<UppInsuranceClaims>(entity =>
+        {
+            entity.HasKey(e => e.InsuranceId).HasName("PK__UPP_Insu__74231A24A45695B6");
+
+            entity.Property(e => e.Active).HasDefaultValue(true);
+            entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
+        });
+
         modelBuilder.Entity<VisitStatus>(entity =>
         {
             entity.HasKey(e => e.VisitStatusId).HasName("PK__VisitSta__8013A2D38F0919E1");
@@ -1675,12 +1681,12 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<VitalSign>(entity =>
+        modelBuilder.Entity<VitalSigns>(entity =>
         {
             entity.HasOne(d => d.Appointment).WithMany(p => p.VitalSigns).HasConstraintName("FK_VitalSigns_SchAppointment");
         });
 
-        modelBuilder.Entity<VwAllActivePatient>(entity =>
+        modelBuilder.Entity<VwAllActivePatients>(entity =>
         {
             entity.ToView("vwAllActivePatients");
         });
@@ -1700,7 +1706,7 @@ public partial class HMISDbContext : DbContext
             entity.ToView("VwProviderbySiteid");
         });
 
-        modelBuilder.Entity<VwRegPatientAndAppointmentdetail>(entity =>
+        modelBuilder.Entity<VwRegPatientAndAppointmentdetails>(entity =>
         {
             entity.ToView("VwRegPatientAndAppointmentdetails");
         });

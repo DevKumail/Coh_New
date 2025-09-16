@@ -20,6 +20,8 @@ import { SchedulingApiService } from '@/app/views/Scheduling/scheduling.api.serv
 import { LoaderService } from '@core/services/loader.service';
 import { ChoiceSelectInputDirective } from '@core/directive/choices-select.directive';
 import { Roles } from '@/app/shared/enum/roles.enum';
+import { SecureStorageService } from '@core/services/secure-storage.service';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 @Component({
     selector: 'app-order-statistics',
@@ -39,7 +41,7 @@ import { Roles } from '@/app/shared/enum/roles.enum';
         NgbNavOutlet,
         EchartComponent,
         NgbTooltip,
-        NgbProgressbar, RouterLink
+        NgbProgressbar, RouterLink, TranslatePipe
     ],
     templateUrl: './order-statistics.component.html',
 })
@@ -181,7 +183,8 @@ export class OrderStatisticsComponent {
         private router: Router,
         private fb: FormBuilder,
         private Service: SchedulingApiService,
-        private loader: LoaderService
+        private loader: LoaderService,
+        private secureStorage: SecureStorageService
     ) {}
 
     async ngOnInit() {
@@ -221,7 +224,7 @@ export class OrderStatisticsComponent {
         let EmpId = sessionStorage.getItem('empId');
         console.log('UserId =>',UserId);
         console.log('EmpId =>',EmpId);
-        
+        debugger
         if(EmpId != null && EmpId != "" && EmpId != undefined && EmpId != "0" && EmpId == "1"){
             this.AppointmentFilterForm.patchValue({ providerId: UserId });
         }
@@ -231,7 +234,7 @@ export class OrderStatisticsComponent {
 
 
     FillDropDown(response: any) {
-        debugger
+         
         let jParse = JSON.parse(JSON.stringify(response)).cache;
         let provider = JSON.parse(jParse).Provider;
         let sites = JSON.parse(jParse).RegLocationTypes;
@@ -245,7 +248,7 @@ export class OrderStatisticsComponent {
     
         // ✅ Provider
         if (provider) {
-            debugger
+             
             this.providers = provider.map((item: { EmployeeId: any; FullName: any }) => ({
                 name: item.FullName,
                 code: item.EmployeeId,
@@ -419,7 +422,7 @@ export class OrderStatisticsComponent {
 
 
     async getAllDashboardData() {
-        debugger
+         
         this.loader.show();
         const { providerId, facility, sitesId, appDate, statuses, showScheduledAppointmentOnly, showChargeCapturePending } = this.AppointmentFilterForm.value;
         const selStatuses: string[] = Array.isArray(statuses) ? statuses : [];
@@ -489,11 +492,16 @@ export class OrderStatisticsComponent {
     }
 
     onEditAppointment(appointment: any) {
-        debugger
-        this.router.navigate(['/scheduling/appointment booking'],
-        {
-        state: { appId: appointment },
-      });
-      }
+        debugger 
+        // Derive a stable appointment id and persist as fallback for refresh
+        const appId: number = Number(appointment?.appointment_Id ?? appointment?.appId ?? 0);
+        if (appId) {
+            this.secureStorage.setItem('appointmentEditId', String(appId));
+        }
+        // Navigate using Router state (hide id from URL) and include full object for convenience
+        this.router.navigate(['/scheduling/appointment booking'], {
+            state: { appId, appointment },
+        });
+    }
 
 }

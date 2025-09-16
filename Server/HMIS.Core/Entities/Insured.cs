@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("Insured")]
 [Index("PatientId", Name = "IX_Insured_PatientId")]
 public partial class Insured
 {
@@ -165,14 +164,14 @@ public partial class Insured
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("CarrierId")]
-    [InverseProperty("Insureds")]
+    [InverseProperty("Insured")]
     public virtual Blpayer? Carrier { get; set; }
 
     [ForeignKey("PatientId")]
-    [InverseProperty("Insureds")]
+    [InverseProperty("Insured")]
     public virtual RegPatient? Patient { get; set; }
 
     [ForeignKey("PayerPackageId")]
-    [InverseProperty("Insureds")]
+    [InverseProperty("Insured")]
     public virtual BlpayerPackage? PayerPackage { get; set; }
 }

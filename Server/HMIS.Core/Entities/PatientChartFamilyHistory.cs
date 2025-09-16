@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("PatientChartFamilyHistory")]
 public partial class PatientChartFamilyHistory
 {
     [Key]
@@ -36,6 +35,6 @@ public partial class PatientChartFamilyHistory
     public bool? Active { get; set; }
 
     [ForeignKey("RelationShipId")]
-    [InverseProperty("PatientChartFamilyHistories")]
+    [InverseProperty("PatientChartFamilyHistory")]
     public virtual RegRelationShip? RelationShip { get; set; }
 }

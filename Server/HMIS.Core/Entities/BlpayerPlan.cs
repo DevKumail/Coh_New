@@ -67,12 +67,12 @@ public partial class BlpayerPlan
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("Plan")]
-    public virtual ICollection<EligibilityLog> EligibilityLogs { get; set; } = new List<EligibilityLog>();
+    public virtual ICollection<EligibilityLog> EligibilityLog { get; set; } = new List<EligibilityLog>();
 
     [ForeignKey("PayerId")]
-    [InverseProperty("BlpayerPlans")]
+    [InverseProperty("BlpayerPlan")]
     public virtual Blpayer Payer { get; set; } = null!;
 
     [InverseProperty("Plan")]
-    public virtual ICollection<SchAppointment> SchAppointments { get; set; } = new List<SchAppointment>();
+    public virtual ICollection<SchAppointment> SchAppointment { get; set; } = new List<SchAppointment>();
 }

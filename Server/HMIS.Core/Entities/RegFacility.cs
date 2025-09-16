@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("RegFacility")]
 public partial class RegFacility
 {
     [Key]
@@ -97,21 +96,21 @@ public partial class RegFacility
     public long? CompanyId { get; set; }
 
     [ForeignKey("CompanyId")]
-    [InverseProperty("RegFacilities")]
+    [InverseProperty("RegFacility")]
     public virtual RegCompany? Company { get; set; }
 
     [InverseProperty("Facility")]
-    public virtual ICollection<EligibilityLog> EligibilityLogs { get; set; } = new List<EligibilityLog>();
+    public virtual ICollection<EligibilityLog> EligibilityLog { get; set; } = new List<EligibilityLog>();
 
     [InverseProperty("Facility")]
-    public virtual ICollection<HremployeeFacility> HremployeeFacilities { get; set; } = new List<HremployeeFacility>();
+    public virtual ICollection<HremployeeFacility> HremployeeFacility { get; set; } = new List<HremployeeFacility>();
 
     [InverseProperty("Facility")]
-    public virtual ICollection<ProviderSchedule> ProviderSchedules { get; set; } = new List<ProviderSchedule>();
+    public virtual ICollection<ProviderSchedule> ProviderSchedule { get; set; } = new List<ProviderSchedule>();
 
     [InverseProperty("Facility")]
-    public virtual ICollection<RegLocationType> RegLocationTypes { get; set; } = new List<RegLocationType>();
+    public virtual ICollection<RegLocationTypes> RegLocationTypes { get; set; } = new List<RegLocationTypes>();
 
     [InverseProperty("Facility")]
-    public virtual ICollection<SchAppointment> SchAppointments { get; set; } = new List<SchAppointment>();
+    public virtual ICollection<SchAppointment> SchAppointment { get; set; } = new List<SchAppointment>();
 }

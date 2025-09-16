@@ -173,6 +173,18 @@ export class SchedulingApiService {
     return this.api.get(`Appointment/DashboardSearchAppointmentDB`, params).toPromise();
   }
 
+
+  EditAppoimentByAppId( AppId: number) {
+    debugger
+    // return this.app.put(`Appointment/EditAppoimentByAppId`,{AppId}).toPromise();
+    // const body={AppId:AppId}
+    return this.api.get(`Appointment/EditAppoimentByAppId?appId=${AppId}`).toPromise();
+  }
+
+  InsertEligibility(mrno: any) {
+    return this.api.post(`Eligibility/InsertEligibility?mrno=${mrno}`, {}).toPromise();
+  }
+
   // SearchDashboardAppointment(data:any) {
 
   //   return this.api.get(

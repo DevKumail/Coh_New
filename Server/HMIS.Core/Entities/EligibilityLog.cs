@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("EligibilityLog")]
 public partial class EligibilityLog
 {
     [Key]
@@ -48,26 +47,26 @@ public partial class EligibilityLog
     public string? ResponseDetails { get; set; }
 
     [ForeignKey("FacilityId")]
-    [InverseProperty("EligibilityLogs")]
+    [InverseProperty("EligibilityLog")]
     public virtual RegFacility? Facility { get; set; }
 
     [ForeignKey("PatientId")]
-    [InverseProperty("EligibilityLogs")]
+    [InverseProperty("EligibilityLog")]
     public virtual RegPatient? Patient { get; set; }
 
     [ForeignKey("PayerId")]
-    [InverseProperty("EligibilityLogs")]
+    [InverseProperty("EligibilityLog")]
     public virtual Blpayer? Payer { get; set; }
 
     [ForeignKey("PlanId")]
-    [InverseProperty("EligibilityLogs")]
+    [InverseProperty("EligibilityLog")]
     public virtual BlpayerPlan? Plan { get; set; }
 
     [ForeignKey("RequestedbyId")]
-    [InverseProperty("EligibilityLogs")]
+    [InverseProperty("EligibilityLog")]
     public virtual Hremployee? Requestedby { get; set; }
 
     [ForeignKey("VisitId")]
-    [InverseProperty("EligibilityLogs")]
+    [InverseProperty("EligibilityLog")]
     public virtual SchAppointment? Visit { get; set; }
 }

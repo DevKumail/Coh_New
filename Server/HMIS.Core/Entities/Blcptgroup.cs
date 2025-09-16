@@ -21,5 +21,5 @@ public partial class Blcptgroup
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("Group")]
-    public virtual ICollection<BlcptgroupCode> BlcptgroupCodes { get; set; } = new List<BlcptgroupCode>();
+    public virtual ICollection<BlcptgroupCode> BlcptgroupCode { get; set; } = new List<BlcptgroupCode>();
 }

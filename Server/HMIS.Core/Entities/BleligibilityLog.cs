@@ -51,6 +51,6 @@ public partial class BleligibilityLog
     public long? AppointmentId { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("BleligibilityLogs")]
+    [InverseProperty("BleligibilityLog")]
     public virtual SchAppointment? Appointment { get; set; }
 }

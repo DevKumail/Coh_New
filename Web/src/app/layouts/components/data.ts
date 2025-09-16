@@ -26,16 +26,6 @@ export const userDropdownItems: UserDropdownItemType[] = [
         url: 'pages-profile.html',
     },
     {
-        label: 'Notifications',
-        icon: 'tablerBellRinging',
-        url: '#',
-    },
-    {
-        label: 'Balance: $985.25',
-        icon: 'tablerCreditCard',
-        url: '#',
-    },
-    {
         label: 'Account Settings',
         icon: 'tablerSettings2',
         url: '#',
@@ -47,11 +37,6 @@ export const userDropdownItems: UserDropdownItemType[] = [
     },
     {
         isDivider: true,
-    },
-    {
-        label: 'Lock Screen',
-        icon: 'tablerLock',
-        url: 'auth-lock-screen.html',
     },
     {
         // label: 'Log Out',

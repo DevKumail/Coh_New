@@ -270,7 +270,7 @@ namespace HMIS.Application.ServiceLogics
         }
         private bool Exist(long id)
         {
-            var employee = _context.Hremployees.Find(id);
+            var employee = _context.Hremployee.Find(id);
             return employee != null;
         }
         //public async Task<bool> InsertUserDB1(DTOs.ControlPanel.Hremployee hremployee)
@@ -724,7 +724,7 @@ namespace HMIS.Application.ServiceLogics
                 bool exist = Exist(hremployee.EmployeeId);
                 if (exist)
                 {
-                    var hrEmp = _context.Hremployees
+                    var hrEmp = _context.Hremployee
                         .Where(x => x.EmployeeId.Equals(hremployee.EmployeeId) && x.IsDeleted == false).FirstOrDefault();
 
                     if (hrEmp != null)
@@ -814,24 +814,24 @@ namespace HMIS.Application.ServiceLogics
                         hrEmp.BusEnitity = hremployee.BusEnitity;
                         hrEmp.IsDeleted = false;
 
-                        _context.Hremployees.Update(hrEmp);
+                        _context.Hremployee.Update(hrEmp);
 
 
-                        var hremployeeFacilities = _context.HremployeeFacilities
+                        var hremployeeFacilities = _context.HremployeeFacility
                             .Where(x => x.EmployeeId.Equals(hremployee.EmployeeId) && x.IsDeleted == false).ToList();
                         foreach (var facility in hremployeeFacilities)
                         {
                             var Removehremp = hremployeeFacilities.FirstOrDefault(x => x.EmployeeId == hremployee.EmployeeId && x.FacilityId == facility.FacilityId);
                             if (Removehremp != null)
                             {
-                                _context.HremployeeFacilities.Remove(Removehremp);
+                                _context.HremployeeFacility.Remove(Removehremp);
                             }
                         }
 
 
                         foreach (var facility in hremployee.EmployeeFacility)
                         {
-                            var hremp = _context.HremployeeFacilities.FirstOrDefault(x => x.EmployeeId == hremployee.EmployeeId && x.FacilityId == facility.FacilityID && x.IsDeleted == false);
+                            var hremp = _context.HremployeeFacility.FirstOrDefault(x => x.EmployeeId == hremployee.EmployeeId && x.FacilityId == facility.FacilityID && x.IsDeleted == false);
                             if (hremp != null)
                             {
                                 hremp.EmployeeId = facility.EmployeeId;
@@ -839,7 +839,7 @@ namespace HMIS.Application.ServiceLogics
                                 hremp.FacilityId = facility.FacilityID;
                                 hremp.CreatedOn = DateTime.Now;
                                 hremp.IsDeleted = false;
-                                _context.HremployeeFacilities.Update(hremp);
+                                _context.HremployeeFacility.Update(hremp);
                             }
                             else
                             {
@@ -849,13 +849,13 @@ namespace HMIS.Application.ServiceLogics
                                 hr.FacilityId = facility.FacilityID;
                                 hr.CreatedOn = DateTime.Now;
                                 hr.IsDeleted = false;
-                                _context.HremployeeFacilities.Add(hr);
+                                _context.HremployeeFacility.Add(hr);
                             }
                         }
                         await _context.SaveChangesAsync();
 
 
-                        var hrLicenseInfos = _context.HrlicenseInfos
+                        var hrLicenseInfos = _context.HrlicenseInfo
                             .Where(x => x.EmployeeId.Equals(hremployee.EmployeeId) && x.IsDeleted == false).ToList();
 
                         foreach (var license in hremployee.LicenseInfo)
@@ -870,7 +870,7 @@ namespace HMIS.Application.ServiceLogics
                                 hrLicenseInfoToUpdate.EmployeeId = license.EmployeeId;
                                 hrLicenseInfoToUpdate.IsDeleted = false;
 
-                                _context.HrlicenseInfos.Update(hrLicenseInfoToUpdate);
+                                _context.HrlicenseInfo.Update(hrLicenseInfoToUpdate);
                             }
                         }
 
@@ -878,7 +878,7 @@ namespace HMIS.Application.ServiceLogics
 
                             
 
-                        var secEmpRoles = _context.SecEmployeeRoles
+                        var secEmpRoles = _context.SecEmployeeRole
                             .Where(x => x.EmployeeId.Equals(hremployee.EmployeeId) && x.IsDeleted == false).ToList();
 
                         foreach (var empRole in hremployee.EmployeeRole)
@@ -891,7 +891,7 @@ namespace HMIS.Application.ServiceLogics
                                 secEmpRoleToUpdate.CreatedOn = DateTime.Now;
                                 secEmpRoleToUpdate.IsDeleted = false;
 
-                                _context.SecEmployeeRoles.Update(secEmpRoleToUpdate);
+                                _context.SecEmployeeRole.Update(secEmpRoleToUpdate);
                             }
                         }
 
@@ -1001,27 +1001,27 @@ namespace HMIS.Application.ServiceLogics
                     hrEmp1.BusEnitity = emp.BusEnitity;
                     hrEmp1.IsDeleted = false;
 
-                    _context.Hremployees.Add(hrEmp1);
+                    _context.Hremployee.Add(hrEmp1);
                     await _context.SaveChangesAsync();
 
                     long hrEmployeeId = hrEmp1.EmployeeId;
 
 
-                    var hremployeeFacilities = _context.HremployeeFacilities
+                    var hremployeeFacilities = _context.HremployeeFacility
                              .Where(x => x.EmployeeId.Equals(hrEmployeeId) && x.IsDeleted == false).ToList();
                     foreach (var facility in hremployeeFacilities)
                     {
                         var Removehremp = hremployeeFacilities.FirstOrDefault(x => x.EmployeeId == hrEmployeeId && x.FacilityId == facility.FacilityId);
                         if (Removehremp != null)
                         {
-                            _context.HremployeeFacilities.Remove(Removehremp);
+                            _context.HremployeeFacility.Remove(Removehremp);
                         }
                     }
 
 
                     foreach (var facility in hremployee.EmployeeFacility)
                     {
-                        var hremp = _context.HremployeeFacilities.FirstOrDefault(x => x.EmployeeId == hrEmployeeId && x.FacilityId == facility.FacilityID && x.IsDeleted == false);
+                        var hremp = _context.HremployeeFacility.FirstOrDefault(x => x.EmployeeId == hrEmployeeId && x.FacilityId == facility.FacilityID && x.IsDeleted == false);
                         if (hremp != null)
                         {
                             hremp.EmployeeId = hrEmployeeId;
@@ -1029,7 +1029,7 @@ namespace HMIS.Application.ServiceLogics
                             hremp.FacilityId = facility.FacilityID;
                             hremp.CreatedOn = DateTime.Now;
                             hremp.IsDeleted = false;
-                            _context.HremployeeFacilities.Update(hremp);
+                            _context.HremployeeFacility.Update(hremp);
                         }
                         else
                         {
@@ -1039,7 +1039,7 @@ namespace HMIS.Application.ServiceLogics
                             hr.FacilityId = facility.FacilityID;
                             hr.CreatedOn = DateTime.Now;
                             hr.IsDeleted = false;
-                            _context.HremployeeFacilities.Add(hr);
+                            _context.HremployeeFacility.Add(hr);
                         }
                     }
                     await _context.SaveChangesAsync();
@@ -1060,7 +1060,7 @@ namespace HMIS.Application.ServiceLogics
                                 hrLicenseInfo.ExpiryDate = licenseInfo?.ExpiryDate;
                                 hrLicenseInfo.EmployeeId = hrEmployeeId;
                                 hrLicenseInfo.IsDeleted = false;
-                                _context.HrlicenseInfos.Add(hrLicenseInfo);
+                                _context.HrlicenseInfo.Add(hrLicenseInfo);
 
                             }
                         }
@@ -1080,7 +1080,7 @@ namespace HMIS.Application.ServiceLogics
                         secEmpRole.CreatedOn = DateTime.Now;
                         secEmpRole.IsDeleted = false;
 
-                        _context.SecEmployeeRoles.Add(secEmpRole);
+                        _context.SecEmployeeRole.Add(secEmpRole);
                     }
 
                     await _context.SaveChangesAsync();
@@ -1191,7 +1191,7 @@ namespace HMIS.Application.ServiceLogics
         }
         public async Task<DataSet> GetHREmployeeTypesDataSet()
         {
-            var employeeTypes =  _context.HremployeeTypes
+            var employeeTypes =  _context.HremployeeType
      .Select(x => new { x.TypeId, TypeDescription = x.TypeDescription.Trim() })
      .ToList();
 

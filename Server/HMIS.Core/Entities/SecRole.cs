@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("SecRole")]
 public partial class SecRole
 {
     [Key]
@@ -35,11 +34,11 @@ public partial class SecRole
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("Role")]
-    public virtual ICollection<SecEmployeeRole> SecEmployeeRoles { get; set; } = new List<SecEmployeeRole>();
+    public virtual ICollection<SecEmployeeRole> SecEmployeeRole { get; set; } = new List<SecEmployeeRole>();
 
     [InverseProperty("Role")]
-    public virtual ICollection<SecPrivilegesAssignedRole> SecPrivilegesAssignedRoles { get; set; } = new List<SecPrivilegesAssignedRole>();
+    public virtual ICollection<SecPrivilegesAssignedRole> SecPrivilegesAssignedRole { get; set; } = new List<SecPrivilegesAssignedRole>();
 
     [InverseProperty("ReceiverRole")]
-    public virtual ICollection<TaskForwarding> TaskForwardings { get; set; } = new List<TaskForwarding>();
+    public virtual ICollection<TaskForwarding> TaskForwarding { get; set; } = new List<TaskForwarding>();
 }

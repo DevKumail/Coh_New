@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("EmirateType")]
 public partial class EmirateType
 {
     [Key]

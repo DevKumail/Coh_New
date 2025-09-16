@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("PromotionalMediaItem")]
 public partial class PromotionalMediaItem
 {
     [Key]

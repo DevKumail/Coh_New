@@ -23,9 +23,9 @@ public partial class BlProceduresGroup
     public bool? Isdeleted { get; set; }
 
     [InverseProperty("ProcedureGroup")]
-    public virtual ICollection<BlprocedureGroupCode> BlprocedureGroupCodes { get; set; } = new List<BlprocedureGroupCode>();
+    public virtual ICollection<BlprocedureGroupCode> BlprocedureGroupCode { get; set; } = new List<BlprocedureGroupCode>();
 
     [ForeignKey("ProcedureTypeId")]
-    [InverseProperty("BlProceduresGroups")]
+    [InverseProperty("BlProceduresGroup")]
     public virtual ProcedureType? ProcedureType { get; set; }
 }

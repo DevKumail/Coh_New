@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("SpeechToText")]
 public partial class SpeechToText
 {
     [Key]
@@ -52,7 +51,9 @@ public partial class SpeechToText
     [Unicode(false)]
     public string? UpdatedBy { get; set; }
 
+    public string? NotePath { get; set; }
+
     [ForeignKey("PatientId")]
-    [InverseProperty("SpeechToTexts")]
+    [InverseProperty("SpeechToText")]
     public virtual RegPatient Patient { get; set; } = null!;
 }

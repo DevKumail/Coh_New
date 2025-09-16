@@ -252,6 +252,6 @@ public partial class BlsuperBillProcedureInvoice
     public long? AppointentId { get; set; }
 
     [ForeignKey("AppointentId")]
-    [InverseProperty("BlsuperBillProcedureInvoices")]
+    [InverseProperty("BlsuperBillProcedureInvoice")]
     public virtual SchAppointment? Appointent { get; set; }
 }

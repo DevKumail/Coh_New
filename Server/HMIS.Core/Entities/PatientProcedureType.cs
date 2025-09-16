@@ -16,5 +16,5 @@ public partial class PatientProcedureType
     public string? Name { get; set; }
 
     [InverseProperty("ProcedureTypeNavigation")]
-    public virtual ICollection<PatientProcedure> PatientProcedures { get; set; } = new List<PatientProcedure>();
+    public virtual ICollection<PatientProcedure> PatientProcedure { get; set; } = new List<PatientProcedure>();
 }
