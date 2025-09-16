@@ -22,6 +22,7 @@ import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { HasPermissionDirective } from '@/app/shared/directives/has-permission.directive';
+import { LucideAngularModule, LucideHome, LucideChevronRight, LucideUsers, LucideFilter, LucideFilterX, LucideUserPlus, LucideEdit, LucideTrash2 } from 'lucide-angular';
 
 
 
@@ -34,6 +35,7 @@ import { HasPermissionDirective } from '@/app/shared/directives/has-permission.d
         RouterModule,
         NgIconComponent,
         NgIcon,
+        LucideAngularModule,
         HasPermissionDirective,
     ],
     templateUrl: './demographic-list.component.html',
@@ -58,6 +60,16 @@ export class DemographicListComponent {
     public DemographicApiServices: DemographicApiServices,
     public Loader : LoaderService,
   ) {}
+
+  // lucide-angular icons for breadcrumb, heading and actions
+  protected readonly homeIcon = LucideHome;
+  protected readonly chevronRightIcon = LucideChevronRight;
+  protected readonly headingIcon = LucideUsers;
+  protected readonly filterIcon = LucideFilter;
+  protected readonly filterOffIcon = LucideFilterX;
+  protected readonly addIcon = LucideUserPlus;
+  protected readonly editIcon = LucideEdit;
+  protected readonly deleteIcon = LucideTrash2;
 
   Patient: any[] = [];
   pagedPatients: any[] = [];

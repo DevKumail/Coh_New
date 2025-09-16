@@ -2,12 +2,12 @@
     <ol class="breadcrumb bg-light bg-opacity-50 p-2">
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
-                <ng-icon name="tablerSmartHome"></ng-icon>
+                <lucide-angular [img]="homeIcon" class="fs-6"></lucide-angular>
                 Registration
             </a>
         </li>
         <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
-            <ng-icon name="tablerChevronRight"></ng-icon>
+            <lucide-angular [img]="chevronRightIcon" class="fs-6"></lucide-angular>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
             Demographics
@@ -19,14 +19,17 @@
   <!-- <div class="card p-3 shadow mt-2"> -->
     <!-- Header section -->
     <div class="d-flex justify-content-between align-items-center mb-2 p-2">
-      <h4 class="m-0 fw-bold">Demographics</h4>
+      <h4 class="m-0 fw-bold heading-title">
+        <lucide-angular [img]="headingIcon" aria-hidden="true"></lucide-angular>
+        <span>Demographics</span>
+      </h4>
       <div class="d-flex gap-2">
         <button
           class="btn btn-outline-secondary btn-sm"
           type="button"
           (click)="filter = !filter"
         >
-          <ng-icon [name]="filter ? 'tablerFilterOff' : 'tablerFilter'" class="me-1"></ng-icon>
+          <lucide-angular [img]="filter ? filterOffIcon : filterIcon" class="me-1"></lucide-angular>
           {{ filter ? 'Hide Filters' : 'Show Filters' }}
         </button>
         <button
@@ -35,7 +38,7 @@
           type="button"
           (click)="router.navigate(['/registration/demographic-create'])"
         >
-          <ng-icon name="tablerUserPlus" class="me-1 text-white"></ng-icon>
+          <lucide-angular [img]="addIcon" class="me-1 text-white"></lucide-angular>
           Add Patient
         </button>
       </div>
@@ -100,24 +103,24 @@
                   <td>{{ patient.personSex || 'N/A' }}</td>
                   <td class="text-center align-middle actions-cell">
                     <div class="d-inline-flex justify-content-center align-items-center gap-2 text-nowrap actions-wrap">
-                      <ng-icon
+                      <lucide-angular
                         *hasPermission="'Registration:Demographics:Edit'"
-                        name="tablerEdit"
+                        [img]="editIcon"
                         title="Update"
                         aria-label="Update"
                         class="text-primary fs-5 action-icon"
                         style="cursor: pointer;"
                         (click)="editPatient(patient)"
-                      ></ng-icon>
-                      <ng-icon
+                      ></lucide-angular>
+                      <lucide-angular
                         *hasPermission="'Registration:Demographics:Delete'"
-                        name="tablerTrash"
+                        [img]="deleteIcon"
                         title="Delete"
                         aria-label="Delete"
                         class="text-danger fs-5 action-icon"
                         style="cursor: pointer;"
                         (click)="Remove($event, patient.patientId, 'center')"
-                      ></ng-icon>
+                      ></lucide-angular>
                     </div>
                   </td>
                 </tr>

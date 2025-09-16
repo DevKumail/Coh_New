@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FilePondModule } from 'ngx-filepond';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, LucideHome, LucideChevronRight, LucideUsers } from 'lucide-angular';
 import { Observable, ReplaySubject } from 'rxjs';
 import { NgxDaterangepickerBootstrapDirective } from 'ngx-daterangepicker-bootstrap';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
@@ -75,6 +75,11 @@ import { DemographicDTO } from '@/app/shared/Models/registration/Demographics/De
 })
 export class DemographicCreateComponent implements OnInit, AfterViewInit {
     @ViewChild('picker') picker!: NgxDaterangepickerBootstrapDirective;
+
+    // lucide-angular icons for breadcrumb + heading
+    protected readonly homeIcon = LucideHome;
+    protected readonly chevronRightIcon = LucideChevronRight;
+    protected readonly headingIcon = LucideUsers;
 
     demographicForm!: FormGroup;
     contactForm!: FormGroup;

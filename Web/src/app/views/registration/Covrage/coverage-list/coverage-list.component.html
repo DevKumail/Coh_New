@@ -2,18 +2,13 @@
     <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
-                <ng-icon name="tablerSmartHome"></ng-icon>
-                Clinical
+                <lucide-angular [img]="homeIcon"></lucide-angular>
+                Registration
             </a>
         </li>
-        <li
-            class="d-flex align-items-center text-muted mx-1"
-            aria-current="page"
-        >
-            <ng-icon name="tablerChevronRight"></ng-icon>
-        </li>
-        <li class="breadcrumb-item active" aria-current="page">
-            Coverage List
+        <li class="breadcrumb-item active d-flex align-items-center text-muted mx-1" aria-current="page">
+            <lucide-angular [img]="chevronRightIcon" class="me-1 fs-6"></lucide-angular>
+            Coverage
         </li>
     </ol>
 </nav>
@@ -23,13 +18,16 @@
         <!-- <div class="card p-3 shadow mt-2"> -->
         <!-- Header section inside the card -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3 style="font-weight: bold" class="m-0">Coverage List</h3>
+            <h3 style="font-weight: bold" class="m-0 heading-title">
+                <lucide-angular [img]="headingIcon" aria-hidden="true"></lucide-angular>
+                <span>Coverage</span>
+            </h3>
             <button
                 class="btn btn-success btn-sm w-150"
                 type="button"
                 (click)="router.navigate(['/registration/covrage-create'])"
             >
-                <ng-icon name="tablerPlus" class="me-1 text-white"></ng-icon>
+                <lucide-angular [img]="plusIcon" class="me-1 text-white"></lucide-angular>
                 Add Coverage
             </button>
         </div>
@@ -41,23 +39,32 @@
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr class="text-center">
-                        <th>Subscriber Id</th>
                         <th>Subscriber Name</th>
                         <th>Mr No</th>
                         <th>Insurance Carrier</th>
                         <th>Insured Id No</th>
                         <th>Type</th>
+                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let inssub of pagedCoverages">
-                        <td class="text-center">{{ inssub.subscriberId }}</td>
                         <td>{{ inssub.subscriberName }}</td>
                         <td class="text-center">{{ inssub.mrNo }}</td>
                         <td>{{ inssub.insuranceCarrier }}</td>
                         <td>{{ inssub.insuredIDNo }}</td>
                         <td class="text-center">{{ inssub.type || "N/A" }}</td>
+                        <td class="text-center">
+                            <select class="form-select form-select-sm w-auto d-inline-block"
+                                    [ngModel]="getRowCoverageOrder(inssub)"
+                                    (ngModelChange)="onStatusChange(inssub, $event)">
+                                <option [ngValue]="null" disabled>--- Select Status ---</option>
+                                <option [ngValue]="0">Inactive</option>
+                                <option [ngValue]="1">Primary</option>
+                                <option [ngValue]="2">Secondary</option>
+                            </select>
+                        </td>
                         <td class="text-center">
 
                             <div ngbDropdown placement="left-top" class="text-muted">
@@ -65,11 +72,11 @@
                                     ngbDropdownMenu
                                     class="dropdown-menu-end d-flex gap-2 px-2 py-1"
                                 >
-                                    <ng-icon
-                                        name="tablerEdit"
+                                    <lucide-angular
+                                        [img]="editIcon"
                                         class="me-1"
                                         (click)="EditCoverage(inssub.subscriberId)"
-                                    ></ng-icon>
+                                    ></lucide-angular>
                                     <!-- <ng-icon
                                         name="tablerTrash"
                                         class="text-danger me-1"
@@ -125,8 +132,7 @@
                             class="page-item"
                             *ngFor="let page of coveragePageNumbers"
                             [class.active]="page === coverageCurrentPage"
-                            [class.disabled]="page === '...'"
-                        >
+                            [class.disabled]="page === '...'">
                             <button *ngIf="page !== '...'" class="page-link" (click)="coverageGoToPage(+page)">
                                 {{ page }}
                             </button>

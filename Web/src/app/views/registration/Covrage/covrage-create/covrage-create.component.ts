@@ -83,7 +83,10 @@ export class CovrageCreateComponent implements OnInit {
     patient: any;
     modalLg: any;
 
-  patientSubscription: Subscription | undefined;
+    patientSubscription: Subscription | undefined;
+
+    // Controls when to show validation across the form
+    isSubmitted = false;
 
     constructor(
         private fb: FormBuilder,
@@ -783,6 +786,7 @@ export class CovrageCreateComponent implements OnInit {
 
     insertsubscriber() {
         debugger;
+        this.isSubmitted = true;
         if (this.subscriberForm.invalid) {
             Swal.fire('Error', 'Please fill all required fields', 'error');
             this.subscriberForm.markAllAsTouched();
@@ -861,6 +865,7 @@ export class CovrageCreateComponent implements OnInit {
                         timer: 2000,
                     });
                     this.subscriberForm.reset();
+                    this.isSubmitted = false;
                     this.router.navigate(['/registration/coverages']);
                 } else {
                     Swal.fire({

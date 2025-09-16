@@ -2,7 +2,7 @@
     <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
-                <ng-icon name="tablerSmartHome"></ng-icon>
+                <lucide-angular [img]="homeIcon" class="fs-6"></lucide-angular>
                 Clinical
             </a>
         </li>
@@ -10,7 +10,7 @@
             class="d-flex align-items-center text-muted mx-1"
             aria-current="page"
         >
-            <ng-icon name="tablerChevronRight"></ng-icon>
+            <lucide-angular [img]="chevronRightIcon" class="fs-6"></lucide-angular>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
             temporary-demographic-create
@@ -20,7 +20,10 @@
 
 <!-- <div class="container-fluid w-100"> -->
     <div class="card p-3 shadow mt-2">
-        <h3 class="card-title mb-3 fw-bold">Temporary Demographic Create</h3>
+        <h3 class="card-title mb-3 fw-bold heading-title">
+            <lucide-angular [img]="headingIcon" aria-hidden="true"></lucide-angular>
+            <span>Temporary Demographic Create</span>
+        </h3>
         <form [formGroup]="temporaryForm" (ngSubmit)="onSubmit()" novalidate class="no-invalid-icon">
             <div class="row">
                 <!-- Title -->
@@ -379,7 +382,7 @@
 
             <div class="text-end mt-4">
                 <button type="submit" class="btn btn-info me-2">
-                    <ng-icon name="tablerDeviceFloppy" class="me-1"></ng-icon>
+                    <lucide-angular [img]="saveIcon" class="me-1"></lucide-angular>
                     Submit
                 </button>
                 <button
@@ -387,7 +390,7 @@
                     class="btn btn-danger"
                     (click)="onCancel()"
                 >
-                    <ng-icon name="tablerX" class="me-1"></ng-icon>
+                    <lucide-angular [img]="cancelIcon" class="me-1"></lucide-angular>
                     Cancel
                 </button>
             </div>

@@ -61,4 +61,7 @@ public partial class PatientAlert
     [Key]
     [Column("AlertID")]
     public long AlertId { get; set; }
+
+    [Column(TypeName = "UpdateDate")]
+    public DateTime? UpdateDate { get; set; }
 }

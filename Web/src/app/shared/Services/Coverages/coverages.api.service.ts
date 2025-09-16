@@ -73,4 +73,9 @@ GetInsuranceRelation() {
   return this.api.get('Coverages/GetInsuranceRelation')
 }
 
+  // Update coverage order/status for a specific subscriber or coverage row
+  UpdateCoverageOrder(payload: { subscriberId: number; mrno: string | number | null; coverageOrder: number; }) {
+    return this.api.post('Coverages/UpdateCoverageOrder', payload).toPromise();
+  }
+
 }

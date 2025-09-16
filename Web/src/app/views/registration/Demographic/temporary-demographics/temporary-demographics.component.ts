@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, For
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
+import { LucideAngularModule, LucideHome, LucideChevronRight, LucideIdCard, LucideSave, LucideX } from 'lucide-angular';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FilePondModule } from 'ngx-filepond';
@@ -27,6 +28,7 @@ declare var flatpickr: any;
         FormsModule,
         RouterModule,
         NgIconComponent,
+        LucideAngularModule,
         FilePondModule,
         NgbNavModule,NgxMaskDirective],
 
@@ -42,6 +44,13 @@ declare var flatpickr: any;
 export class TemporaryDemographicsComponent implements OnInit {
 
 @ViewChild('picker') picker!: NgxDaterangepickerBootstrapDirective;
+
+  // lucide-angular icons for breadcrumb, heading, and buttons
+  protected readonly homeIcon = LucideHome;
+  protected readonly chevronRightIcon = LucideChevronRight;
+  protected readonly headingIcon = LucideIdCard;
+  protected readonly saveIcon = LucideSave;
+  protected readonly cancelIcon = LucideX;
 
   temporaryForm!: FormGroup;
   activeTabId = 1;

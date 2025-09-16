@@ -768,12 +768,12 @@ export const horizontalMenuItems: MenuItemType[] = [
             // },
             {
                 label: 'Coverages',
-                icon: 'tablerBell',
+                icon: 'tablerIdBadge2',
                 url: '/registration/coverages',
             },
             {
                 label: 'Demographics',
-                icon: 'tablerBell',
+                icon: 'tablerUsers',
                 url: '/registration/demographics',
             },
 
@@ -784,7 +784,7 @@ export const horizontalMenuItems: MenuItemType[] = [
             },
             {
                 label: 'Temporary Patient Demographics',
-                icon: 'tablerUserPlus', // 👈 icon optional — koi bhi use kar sakte ho
+                icon: 'tablerUserPlus',
                 url: '/registration/temporary-patient-demographics',
             },
         ],
@@ -797,12 +797,12 @@ export const horizontalMenuItems: MenuItemType[] = [
         children: [
             {
                 label: 'Alerts',
-                icon: 'tablerBell', // Choose a relevant icon
+                icon: 'tablerBell',
                 url: '/clinical/alerts',
             },
             {
                 label: 'Allergies',
-                icon: 'tablerAlertTriangle', // Choose a relevant icon
+                icon: 'tablerAlertTriangle',
                 url: '/clinical/allergies',
             },
             {
@@ -812,7 +812,7 @@ export const horizontalMenuItems: MenuItemType[] = [
             },
             {
                 label: 'Medical History',
-                icon: 'tablerHeartbeat', // Choose a relevant icon
+                icon: 'tablerHeartbeat',
                 url: '/clinical/medical-history',
             },
             {
@@ -822,12 +822,13 @@ export const horizontalMenuItems: MenuItemType[] = [
             },
             {
                 label: 'Vital Signs',
-                icon: 'tablerClipboardText',
+                icon: 'tablerHeartbeat',
                 url: '/clinical/vital-signs',
                 // url: '/clinical/vital-signs'
             },
             {
                 label:'immunizations',
+                icon: 'tablerSyringe',
                 url:'/clinical/immunizations'
 
             }
@@ -836,20 +837,15 @@ export const horizontalMenuItems: MenuItemType[] = [
 
     {
         label: 'Billing',
-        icon: 'tablerHeartbeat',
-        module: 'Billing',
+        icon: 'tablerReceipt', // Use receipt icon for billing module
+        module: 'Billing', // this is used by PermissionService
         isCollapsed: true,
         children: [
             {
                 label: 'Charge Capture',
-                icon: 'tablerBell',
+                icon: 'tablerReceipt',
                 url: '/billing/charge-capture',
             },
-            // {
-            //     label: 'Bill Generator',
-            //     icon: 'tablerBell',
-            //     url: '/billing/bill generator',
-            // },
         ],
     },
 

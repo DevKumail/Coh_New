@@ -74,13 +74,13 @@
                 <div class="col-3">
                     <label>Title</label><span class="danger"> *</span>
                     <select class="form-select no-invalid-icon" formControlName="Suffix"
-                        [class.is-invalid]="subscriberForm.get('Suffix')?.invalid && (subscriberForm.get('Suffix')?.touched || subscriberForm.touched)">
+                        [class.is-invalid]="subscriberForm.get('Suffix')?.invalid && (subscriberForm.get('Suffix')?.touched || isSubmitted)">
                         <option value="">-- Select Title --</option>
                         <option *ngFor="let t of titles" [value]="t.code">
                             {{ t.name }}
                         </option>
                     </select>
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('Suffix')?.invalid && (subscriberForm.get('Suffix')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('Suffix')?.invalid && (subscriberForm.get('Suffix')?.touched || isSubmitted)">
                         Title is required.
                     </div>
                 </div>
@@ -93,9 +93,9 @@
                         class="form-control no-invalid-icon"
                         formControlName="FirstName"
                         placeholder="First Name"
-                        [class.is-invalid]="subscriberForm.get('FirstName')?.invalid && (subscriberForm.get('FirstName')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('FirstName')?.invalid && (subscriberForm.get('FirstName')?.touched || isSubmitted)"
                     />
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('FirstName')?.invalid && (subscriberForm.get('FirstName')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('FirstName')?.invalid && (subscriberForm.get('FirstName')?.touched || isSubmitted)">
                         First name is required.
                     </div>
                 </div>
@@ -119,9 +119,9 @@
                         class="form-control no-invalid-icon"
                         formControlName="LastName"
                         placeholder="Last Name"
-                        [class.is-invalid]="subscriberForm.get('LastName')?.invalid && (subscriberForm.get('LastName')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('LastName')?.invalid && (subscriberForm.get('LastName')?.touched || isSubmitted)"
                     />
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('LastName')?.invalid && (subscriberForm.get('LastName')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('LastName')?.invalid && (subscriberForm.get('LastName')?.touched || isSubmitted)">
                         Last name is required.
                     </div>
                 </div>
@@ -136,9 +136,9 @@
                         formControlName="InsuredPhone"
                         placeholder="(00) 0000-0000"
                         [mask]="'(00) 0000-0000'"
-                        [class.is-invalid]="subscriberForm.get('InsuredPhone')?.invalid && (subscriberForm.get('InsuredPhone')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('InsuredPhone')?.invalid && (subscriberForm.get('InsuredPhone')?.touched || isSubmitted)"
                     />
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('InsuredPhone')?.invalid && (subscriberForm.get('InsuredPhone')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('InsuredPhone')?.invalid && (subscriberForm.get('InsuredPhone')?.touched || isSubmitted)">
                         Cell phone is required.
                     </div>
                 </div>
@@ -152,9 +152,9 @@
                         data-provider="flatpickr"
                         id="BirthDate"
                         placeholder="Select date"
-                        [class.is-invalid]="subscriberForm.get('BirthDate')?.invalid && (subscriberForm.get('BirthDate')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('BirthDate')?.invalid && (subscriberForm.get('BirthDate')?.touched || isSubmitted)"
                     />
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('BirthDate')?.invalid && (subscriberForm.get('BirthDate')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('BirthDate')?.invalid && (subscriberForm.get('BirthDate')?.touched || isSubmitted)">
                         Date of birth is required.
                     </div>
                 </div>
@@ -180,14 +180,14 @@
                         class="form-select no-invalid-icon"
                         formControlName="CountryId"
                         (change)="onCountryChange()"
-                        [class.is-invalid]="subscriberForm.get('CountryId')?.invalid && (subscriberForm.get('CountryId')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('CountryId')?.invalid && (subscriberForm.get('CountryId')?.touched || isSubmitted)"
                     >
                         <option value="">-- Select Country --</option>
                         <option *ngFor="let c of Country" [value]="c.code">
                             {{ c.name }}
                         </option>
                     </select>
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CountryId')?.invalid && (subscriberForm.get('CountryId')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CountryId')?.invalid && (subscriberForm.get('CountryId')?.touched || isSubmitted)">
                         Country is required.
                     </div>
                 </div>
@@ -199,14 +199,14 @@
                         class="form-select no-invalid-icon"
                         formControlName="StateId"
                         (change)="onStateChange()"
-                        [class.is-invalid]="subscriberForm.get('StateId')?.invalid && (subscriberForm.get('StateId')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('StateId')?.invalid && (subscriberForm.get('StateId')?.touched || isSubmitted)"
                     >
                         <option value="">-- Select State --</option>
                         <option *ngFor="let s of states" [value]="s.stateId">
                             {{ s.name }}
                         </option>
                     </select>
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('StateId')?.invalid && (subscriberForm.get('StateId')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('StateId')?.invalid && (subscriberForm.get('StateId')?.touched || isSubmitted)">
                         State is required.
                     </div>
                 </div>
@@ -215,13 +215,13 @@
                 <div class="col-3">
                     <label>City</label><span class="danger"> *</span>
                     <select class="form-select no-invalid-icon" formControlName="CityId"
-                        [class.is-invalid]="subscriberForm.get('CityId')?.invalid && (subscriberForm.get('CityId')?.touched || subscriberForm.touched)">
+                        [class.is-invalid]="subscriberForm.get('CityId')?.invalid && (subscriberForm.get('CityId')?.touched || isSubmitted)">
                         <option value="">-- Select City --</option>
                         <option *ngFor="let c of city" [value]="c.cityId">
                             {{ c.name }}
                         </option>
                     </select>
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CityId')?.invalid && (subscriberForm.get('CityId')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CityId')?.invalid && (subscriberForm.get('CityId')?.touched || isSubmitted)">
                         City is required.
                     </div>
                 </div>
@@ -235,9 +235,9 @@
                         formControlName="ZipCode"
                         placeholder="Zip Code"
                         [mask]="'00000'"
-                        [class.is-invalid]="subscriberForm.get('ZipCode')?.invalid && (subscriberForm.get('ZipCode')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('ZipCode')?.invalid && (subscriberForm.get('ZipCode')?.touched || isSubmitted)"
                     />
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('ZipCode')?.invalid && (subscriberForm.get('ZipCode')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('ZipCode')?.invalid && (subscriberForm.get('ZipCode')?.touched || isSubmitted)">
                         Zip code is required.
                     </div>
                 </div>
@@ -250,13 +250,13 @@
                         class="form-select no-invalid-icon"
                         formControlName="CarrierId"
                         (change)="onCarrierChange()"
-                        [class.is-invalid]="subscriberForm.get('CarrierId')?.invalid && (subscriberForm.get('CarrierId')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('CarrierId')?.invalid && (subscriberForm.get('CarrierId')?.touched || isSubmitted)"
                     >
                         <option *ngFor="let p of BLPayer" [value]="p.code">
                             {{ p.name }}
                         </option>
                     </select>
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CarrierId')?.invalid && (subscriberForm.get('CarrierId')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CarrierId')?.invalid && (subscriberForm.get('CarrierId')?.touched || isSubmitted)">
                         Insurance Carrier is required.
                     </div>
                 </div>
@@ -266,7 +266,7 @@
                     <select
                         class="form-select policy-select no-invalid-icon"
                         formControlName="selectedBLPayerPlan"
-                        [class.is-invalid]="subscriberForm.get('selectedBLPayerPlan')?.invalid && (subscriberForm.get('selectedBLPayerPlan')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('selectedBLPayerPlan')?.invalid && (subscriberForm.get('selectedBLPayerPlan')?.touched || isSubmitted)"
                     >
                         <option
                             *ngFor="let plan of BLPayerPlan"
@@ -276,7 +276,7 @@
                             {{ plan.name }}
                         </option>
                     </select>
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('selectedBLPayerPlan')?.invalid && (subscriberForm.get('selectedBLPayerPlan')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('selectedBLPayerPlan')?.invalid && (subscriberForm.get('selectedBLPayerPlan')?.touched || isSubmitted)">
                         Policy Plan is required.
                     </div>
                 </div>
@@ -287,7 +287,7 @@
                     <select
                         class="form-select no-invalid-icon"
                         formControlName="selectedBLPayerPackage"
-                        [class.is-invalid]="subscriberForm.get('selectedBLPayerPackage')?.invalid && (subscriberForm.get('selectedBLPayerPackage')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('selectedBLPayerPackage')?.invalid && (subscriberForm.get('selectedBLPayerPackage')?.touched || isSubmitted)"
                     >
                         <option
                             *ngFor="let pack of BLPayerPackage"
@@ -296,7 +296,7 @@
                             {{ pack.name }}
                         </option>
                     </select>
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('selectedBLPayerPackage')?.invalid && (subscriberForm.get('selectedBLPayerPackage')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('selectedBLPayerPackage')?.invalid && (subscriberForm.get('selectedBLPayerPackage')?.touched || isSubmitted)">
                         Package is required.
                     </div>
                 </div>
@@ -305,12 +305,12 @@
                 <div class="col-3">
                     <label>Gender</label><span class="danger"> *</span>
                     <select class="form-select no-invalid-icon" formControlName="Sex"
-                        [class.is-invalid]="subscriberForm.get('Sex')?.invalid && (subscriberForm.get('Sex')?.touched || subscriberForm.touched)">
+                        [class.is-invalid]="subscriberForm.get('Sex')?.invalid && (subscriberForm.get('Sex')?.touched || isSubmitted)">
                         <option *ngFor="let g of genders" [value]="g.code">
                             {{ g.name }}
                         </option>
                     </select>
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('Sex')?.invalid && (subscriberForm.get('Sex')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('Sex')?.invalid && (subscriberForm.get('Sex')?.touched || isSubmitted)">
                         Gender is required.
                     </div>
                 </div>
@@ -324,9 +324,9 @@
                         class="form-control no-invalid-icon"
                         formControlName="InsuredIdNo"
                         placeholder="Member Id / Emp Id"
-                        [class.is-invalid]="subscriberForm.get('InsuredIdNo')?.invalid && (subscriberForm.get('InsuredIdNo')?.touched || subscriberForm.touched)"
+                        [class.is-invalid]="subscriberForm.get('InsuredIdNo')?.invalid && (subscriberForm.get('InsuredIdNo')?.touched || isSubmitted)"
                     />
-                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('InsuredIdNo')?.invalid && (subscriberForm.get('InsuredIdNo')?.touched || subscriberForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('InsuredIdNo')?.invalid && (subscriberForm.get('InsuredIdNo')?.touched || isSubmitted)">
                         Member ID / Emp ID is required.
                     </div>
                 </div>
@@ -430,7 +430,7 @@
                                             >
                                                 <th>Effective Date</th>
                                                 <th>Termination Date</th>
-                                                <th>Group No</th>
+                                                <th>Policy No</th>
                                                 <th>No of Visits</th>
                                                 <th>Amount</th>
                                                 <th>Status</th>
@@ -468,12 +468,10 @@
                                                     }}
                                                 </td>
                                                 <td>
-                                                    {{
-                                                        policy.amount | currency
-                                                    }}
+                                                    {{ policy.amount | currency }}
                                                 </td>
                                                 <td>
-                                                    {{ policy.status || "N/A" }}
+                                                    {{ policy.status === 1 ? 'Active' : policy.status === 0 ? 'InActive' : (policy.status || 'N/A') }}
                                                 </td>
                                             </tr>
                                             <tr
@@ -531,7 +529,7 @@
                                                     />
                                                 </div>
                                                 <div class="col-4">
-                                                    <label>Group No</label>
+                                                    <label>Policy No</label>
                                                     <input
                                                         type="text"
                                                         class="form-control"
@@ -559,11 +557,11 @@
                                                 </div>
                                                 <div class="col-4">
                                                     <label>Status</label>
-                                                    <input
-                                                        type="text"
-                                                        class="form-control"
-                                                        formControlName="status"
-                                                    />
+                                                    <select class="form-select" formControlName="status">
+                                                        <option [ngValue]="null">-- Select Status --</option>
+                                                        <option [ngValue]="1">Active</option>
+                                                        <option [ngValue]="0">InActive</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
