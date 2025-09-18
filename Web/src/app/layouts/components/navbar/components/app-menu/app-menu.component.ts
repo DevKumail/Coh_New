@@ -17,7 +17,7 @@ import {
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter, Subject, Subscription } from 'rxjs';
 import { horizontalMenuItems } from '@layouts/components/data';
-import { LucideAngularModule, Search, Sliders } from 'lucide-angular';
+import { LucideAngularModule, Search, Sliders, Home, User, Users, ChevronDown, ChevronRight, Bell, IdCard, LayoutDashboard, ClipboardList, Stethoscope, UserPlus, FileText, AlertTriangle, List, HeartPulse, Receipt, Syringe, Calendar, CalendarDays } from 'lucide-angular';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import { FormsModule } from '@angular/forms';
@@ -62,6 +62,35 @@ export class AppMenuComponent implements OnInit, OnDestroy {
 
   menuItems: MenuItemType[] = horizontalMenuItems;
   private subscription = new Subscription();
+
+  // Map existing icon string keys to lucide components
+  private iconMap: Record<string, any> = {
+    // Common
+    tablerHome: Home,
+    tablerUser: User,
+    tablerUsers: Users,
+    tablerChevronDown: ChevronDown,
+    tablerChevronRight: ChevronRight,
+    tablerLayoutDashboard: LayoutDashboard,
+    tablerClipboardText: ClipboardList,
+    tablerStethoscope: Stethoscope,
+    tablerAlertTriangle: AlertTriangle,
+    tablerListDetails: List,
+    tablerHeartbeat: HeartPulse,
+    tablerReceipt: Receipt,
+    tablerSyringe: Syringe,
+    tablerIdBadge2: IdCard,
+    tablerBell: Bell,
+    tablerUserPlus: UserPlus,
+    tablerFiles: FileText,
+    tablerCalendar: Calendar,
+    tablerCalendarEvent: CalendarDays,
+  };
+
+  getIcon(key?: string) {
+    if (!key) return Users; // fallback
+    return this.iconMap[key] || Users; // fallback to a generic icon
+  }
 
   ngOnInit() {
     // Dynamic menu filtering based on allowed screens
@@ -124,8 +153,9 @@ export class AppMenuComponent implements OnInit, OnDestroy {
     const menuMap = new Map<string, MenuItemType>();
     const validModules = new Set<string>();
     const validComponentsPerModule = new Map<string, Set<string>>();
-    // Map of module -> (component label -> url) pulled from static menu config
+    // Map of module -> (component label -> url/icon) pulled from static menu config
     const childUrlLookup = new Map<string, Map<string, string>>();
+    const childIconLookup = new Map<string, Map<string, string>>();
     const iconLookup = new Map<string, string>();
 
     for (const item of staticMenu) {
@@ -139,15 +169,20 @@ export class AppMenuComponent implements OnInit, OnDestroy {
       }
 
       if (item.children) {
-        // Build lookup of child label -> url for each module
+        // Build lookup of child label -> url and icon for each module
         const childMap = childUrlLookup.get(module) || new Map<string, string>();
+        const iconMap = childIconLookup.get(module) || new Map<string, string>();
         for (const child of item.children) {
           validComponentsPerModule.get(module)?.add(child.label);
           if (child.label && child.url) {
             childMap.set(child.label, child.url);
           }
+          if (child.label && child.icon) {
+            iconMap.set(child.label, child.icon);
+          }
         }
         childUrlLookup.set(module, childMap);
+        childIconLookup.set(module, iconMap);
       }
 
       if (item.icon) {
@@ -187,7 +222,8 @@ export class AppMenuComponent implements OnInit, OnDestroy {
             .replace(/\s+/g, '-');
           parent.children!.push({
             label: componentName,
-            url: staticUrl || `/${moduleName.toLowerCase()}/${safeSlug}`
+            url: staticUrl || `/${moduleName.toLowerCase()}/${safeSlug}`,
+            icon: childIconLookup.get(moduleName)?.get(componentName)
           });
         }
       }

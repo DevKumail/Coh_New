@@ -45,3 +45,34 @@
 .no-invalid-icon.was-validated .form-control.date:invalid {
   background-image: none !important;
 }
+
+/* Normalize lucide-angular icons app-wide so they don't break layout */
+lucide-angular {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle; /* align with adjacent text */
+  color: currentColor; /* inherit text color */
+}
+
+/* Make inner SVGs of lucide-angular scale with the element's font-size
+   and override any generic svg sizing rules from component styles */
+lucide-angular svg {
+  width: 1em !important;
+  height: 1em !important;
+  stroke: currentColor;
+}
+
+/* Common placements */
+.breadcrumb lucide-angular { margin: 0 .25rem; }
+.btn lucide-angular { margin-right: .25rem; }
+
+/* Consistent heading with icon utility */
+.heading-title {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem; /* spacing between icon and text */
+}
+
+.heading-title lucide-angular {
+  font-size: 1.25rem; /* similar to fs-4 */
+}

@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
+import { LucideAngularModule, LucideHome, LucideChevronRight, LucideUsers, LucideFilter, LucideFilterX, LucideUserPlus, LucideEdit, LucideTrash2 } from 'lucide-angular';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import moment from 'moment';
@@ -26,6 +27,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
         FormsModule,
         RouterModule,
         NgIconComponent,
+        LucideAngularModule,
       HasPermissionDirective],
   templateUrl: './temporary-patient-demographic-list.component.html',
   styleUrls: ['./temporary-patient-demographic-list.component.scss'],
@@ -46,6 +48,16 @@ import { trigger, transition, style, animate } from '@angular/animations';
 export class TemporaryPatientDemographicListComponent {
   pagedTemps: any[] = [];
   FilterData: any = {};
+
+  // lucide-angular icons for breadcrumb, heading and actions
+  protected readonly homeIcon = LucideHome;
+  protected readonly chevronRightIcon = LucideChevronRight;
+  protected readonly headingIcon = LucideUserPlus;
+  protected readonly filterIcon = LucideFilter;
+  protected readonly filterOffIcon = LucideFilterX;
+  protected readonly addIcon = LucideUserPlus;
+  protected readonly editIcon = LucideEdit;
+  protected readonly deleteIcon = LucideTrash2;
 
   pageSize = 10;
   currentPage = 1;

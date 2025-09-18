@@ -36,7 +36,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
           </div>
 
           <!-- Gender Identity -->
-          <div class="form-group form-item">
+          <div class="form-group form-item span-2">
             <label class="control-label required">Gender Identity</label>
             <select class="form-control"
                     [class.is-invalid]="demographicForm.get('genderIdentity')?.invalid && (demographicForm.get('genderIdentity')?.touched || isFormSubmitted)"
@@ -127,6 +127,8 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
     }
     .form-item { min-width: 0; }
     .form-item.small { max-width: 200px; }
+    /* Make specific wide fields span two columns */
+    .form-item.span-2 { grid-column: span 2; }
 
     .control-label { display: block; font-weight: 600; margin-bottom: 6px; }
     .required::after { content: ' *'; color: #e74c3c; font-weight: 700; }
@@ -139,6 +141,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
     @media (max-width: 480px) {
       .form-item.small { max-width: unset; }
+      .form-item.span-2 { grid-column: auto; }
     }
     `
   ]

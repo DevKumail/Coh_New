@@ -35,7 +35,7 @@
         <a ngbDropdownToggle [class]="togglerClass" class="dropdown-toggle drop-arrow-none" role="button">
             @if (item.icon) {
             <span>
-                <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
+                <lucide-angular class="menu-icon" [img]="getIcon(item.icon)"></lucide-angular>
             </span>
             }
             <span class="menu-text"> {{ item.label | translate }} </span>
@@ -44,7 +44,7 @@
             }
             @if (!item.badge) {
             <span class="menu-arrow">
-                <ng-icon name="tablerChevronDown"></ng-icon>
+                <lucide-angular [img]="getIcon('tablerChevronDown')"></lucide-angular>
             </span>
             }
         </a>
@@ -80,6 +80,15 @@
     margin-inline-start: .5rem;
     margin-inline-end: 0;
   }
+  /* Larger size for PARENT (top-level) menu icons only */
+  .navbar-nav > .nav-item > .nav-link .menu-icon,
+  .navbar-nav > .nav-item > .nav-link .menu-icon svg,
+  .navbar-nav > .nav-item > .nav-link .menu-icon ng-icon,
+  .navbar-nav > .nav-item > .nav-link .menu-icon lucide-angular {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 1.75rem;
+  }
   .menu-text { white-space: nowrap; }
   .menu-arrow {
     display: inline-flex;
@@ -95,7 +104,7 @@
         [class.disabled]="item.isDisabled" [class.special-menu]="item.isSpecial">
         @if (item.icon) {
         <span>
-            <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
+            <lucide-angular class="menu-icon" [img]="getIcon(item.icon)"></lucide-angular>
         </span>
         }
         <span class="menu-text">{{ item.label | translate }}</span>

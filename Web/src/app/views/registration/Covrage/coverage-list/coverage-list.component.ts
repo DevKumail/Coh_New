@@ -4,10 +4,9 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } fr
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgIconComponent } from '@ng-icons/core';
+import { LucideAngularModule, LucideHome, LucideChevronRight, LucidePlus, LucideEdit, LucideIdCard as LucideIdCard } from 'lucide-angular';
 import { PageTitleComponent} from '@app/components/page-title.component';
 import { UiCardComponent} from '@app/components/ui-card.component';
-import { NgIcon} from '@ng-icons/core';
 import { NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
@@ -19,26 +18,27 @@ import { OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LoaderService } from '@core/services/loader.service';
 
-
-
 @Component({
   selector: 'app-coverage-list',
   standalone: true,
   templateUrl: './coverage-list.component.html',
-  styleUrl: './coverage-list.component.scss',
+  styleUrls: ['./coverage-list.component.scss'],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
     RouterModule,
-    NgIconComponent,
+    LucideAngularModule,
   ]
 })
 
-
 export class CoverageListComponent implements OnInit, OnDestroy {
 
-
+  protected readonly homeIcon = LucideHome;
+  protected readonly chevronRightIcon = LucideChevronRight;
+  protected readonly plusIcon = LucidePlus;
+  protected readonly editIcon = LucideEdit;
+  protected readonly headingIcon = LucideIdCard;
 
 
 
@@ -210,28 +210,58 @@ coveragePrevPage() {
 }
 
 async coverageFetchData() {
-  this.Loader.show();
-  const paginationInfo = {
-    Page: this.coverageCurrentPage,
-    RowsPerPage: this.coveragePageSize
-  };
-  await this.GetCoverageData();
+  try {
+    this.Loader.show();
+    await this.GetCoverageData();
+  } finally {
+    this.Loader.hide();
+  }
 }
 
 oncoveragePageSizeChange(event: any) {
   this.coveragePageSize = +event.target.value;
   this.coverageCurrentPage = 1; // Reset to first page
-  debugger
   this.coverageFetchData();
 }
 
+// Map a row's current status value. Try multiple casings/properties to be resilient to backend variations.
+getRowCoverageOrder(row: any): number | null {
+  if (!row) return null;
+  const val = row.coverageOrder ?? row.CoverageOrder ?? row.coverage_Status ?? row.priority ?? null;
+  const num = typeof val === 'string' ? parseInt(val, 10) : val;
+  return Number.isFinite(num) ? num : null;
+}
 
-  ngOnDestroy(): void {
-    if (this.patientSubscription) {
-      this.patientSubscription.unsubscribe();
-    }
+// Persist inline status change
+async onStatusChange(row: any, newValue: number | null) {
+  if (!row) return;
+  if (newValue === null || newValue === undefined) return;
+  const oldValue = this.getRowCoverageOrder(row);
+  // Optimistic update in UI
+  if ('coverageOrder' in row) row.coverageOrder = newValue;
+  else if ('CoverageOrder' in row) row.CoverageOrder = newValue;
+  else row.coverageOrder = newValue;
 
+  try {
+    await this.CoveragesApiService.UpdateCoverageOrder({
+      subscriberId: row.subscriberId ?? row.SubscriberId ?? row.subscribedId ?? row.SubscribedId,
+      mrno: row.mrNo ?? row.MRNo ?? row.mrno ?? null,
+      coverageOrder: newValue
+    });
+    Swal.fire({ icon: 'success', title: 'Updated', text: 'Status updated successfully.', timer: 1200, showConfirmButton: false });
+  } catch (error: any) {
+    // Revert UI on failure
+    if ('coverageOrder' in row) row.coverageOrder = oldValue;
+    else if ('CoverageOrder' in row) row.CoverageOrder = oldValue as any;
+    Swal.fire('Error', error?.message || 'Failed to update status.', 'error');
   }
+}
+
+ngOnDestroy(): void {
+  if (this.patientSubscription) {
+    this.patientSubscription.unsubscribe();
+  }
+}
 
 Remove($event: MouseEvent,arg1: any,arg2: string) {
 Swal.fire({

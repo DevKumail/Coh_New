@@ -10,10 +10,12 @@ export interface AlertDTO {
   enteredBy: string | null;
   enteredDate: Date;
   updatedBy: string | null;
+  updatedDate?: Date | string | null;
   appointmentId: number;
   alertTypeId: number;
   comments: string | null;
   hasChild: boolean;
   oldMrno: string | number | null;
   isDeleted: boolean;
+  updateDate: Date;
 }

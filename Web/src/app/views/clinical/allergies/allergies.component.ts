@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NgIconComponent, NgIcon } from '@ng-icons/core';
+import { LucideAngularModule, LucideHome, LucideChevronRight, LucideAlertTriangle } from 'lucide-angular';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Injectable } from '@angular/core';
@@ -21,13 +22,20 @@ declare var flatpickr: any;
   imports: [CommonModule,
     ReactiveFormsModule,
     GenericPaginationComponent,
-    FormsModule, NgIcon],
+    FormsModule,
+    NgIcon,
+    LucideAngularModule],
   templateUrl: './allergies.component.html',
   styleUrl: './allergies.component.scss'
 })
 
 export class AllergiesComponent implements OnInit, AfterViewInit {
   buttonText: string | undefined;
+
+  // lucide-angular icons for breadcrumb and heading
+  protected readonly homeIcon = LucideHome;
+  protected readonly chevronRightIcon = LucideChevronRight;
+  protected readonly headingIcon = LucideAlertTriangle;
 
   resetForm() {
     throw new Error('Method not implemented.');

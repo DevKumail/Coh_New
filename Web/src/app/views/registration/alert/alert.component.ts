@@ -3,7 +3,8 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NgIconComponent } from '@ng-icons/core';
+import { LucideAngularModule, LucideHome, LucideChevronRight, LucideBell, LucideEdit } from 'lucide-angular';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Injectable } from '@angular/core';
@@ -20,8 +21,9 @@ import { AlertType } from '@/app/shared/Models/Clinical/alert-type.model';
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule, NgIconComponent
-    , FormsModule
+    ReactiveFormsModule, LucideAngularModule
+    , FormsModule,
+    NgbTooltip
   ],
   templateUrl: './alert.component.html',
   styleUrl: './alert.component.scss'
@@ -30,6 +32,11 @@ import { AlertType } from '@/app/shared/Models/Clinical/alert-type.model';
   providedIn: 'root'
 })
 export class AlertComponent implements OnInit, AfterViewInit {
+  // lucide-angular icons for template
+  protected readonly homeIcon = LucideHome;
+  protected readonly chevronRightIcon = LucideChevronRight;
+  protected readonly bellIcon = LucideBell;
+  protected readonly editIcon = LucideEdit;
  MyAlertsData: AlertDTO[] = [];
   filteredAlertsData: any[] = [];
   pagedAlerts: AlertDTO[] = [];
@@ -173,9 +180,25 @@ export class AlertComponent implements OnInit, AfterViewInit {
           flatpickr(startEl, {
             dateFormat: 'd/m/Y',
             allowInput: true,
+            // Disallow selecting any date before today
+            minDate: 'today',
             onChange: (_sd: any, dateStr: string) => {
               this.alertForm?.patchValue({ startDate: dateStr });
             },
+            // Extra guard: if user typed a backdate and blurred, correct it
+            onClose: (selectedDates: any[], dateStr: string, instance: any) => {
+              const todayZero = new Date();
+              todayZero.setHours(0, 0, 0, 0);
+              const parsed = this.parseDMYToDate(dateStr);
+              if (parsed) {
+                const startZero = new Date(parsed);
+                startZero.setHours(0, 0, 0, 0);
+                if (startZero < todayZero) {
+                  try { Swal.fire('Validation', 'Start Date cannot be in the past.', 'warning'); } catch {}
+                  instance.setDate(new Date(), true); // also triggers onChange to patch form
+                }
+              }
+            }
           });
           startEl.setAttribute('data-fp-applied', '1');
         }
@@ -183,9 +206,25 @@ export class AlertComponent implements OnInit, AfterViewInit {
           flatpickr(repeatEl, {
             dateFormat: 'd/m/Y',
             allowInput: true,
+            // Disallow selecting any date before today
+            minDate: 'today',
             onChange: (_sd: any, dateStr: string) => {
               this.alertForm?.patchValue({ repeatDate: dateStr });
             },
+            // Extra guard to prevent manual backdate typing
+            onClose: (selectedDates: any[], dateStr: string, instance: any) => {
+              const todayZero = new Date();
+              todayZero.setHours(0, 0, 0, 0);
+              const parsed = this.parseDMYToDate(dateStr);
+              if (parsed) {
+                const repZero = new Date(parsed);
+                repZero.setHours(0, 0, 0, 0);
+                if (repZero < todayZero) {
+                  try { Swal.fire('Validation', 'Repeat Date cannot be in the past.', 'warning'); } catch {}
+                  instance.setDate(new Date(), true);
+                }
+              }
+            }
           });
           repeatEl.setAttribute('data-fp-applied', '1');
         }
@@ -260,6 +299,8 @@ export class AlertComponent implements OnInit, AfterViewInit {
           // Normalize alertId from multiple possible back-end keys
           const idCandidate = it?.alertId ?? it?.AlertId ?? it?.AlertID ?? it?.ALERTID ?? it?.id ?? it?.ID ?? 0;
           normalized.alertId = Number(idCandidate) || 0;
+          // Normalize updatedDate from common backend casings
+          normalized.updatedDate = it?.updatedDate ?? it?.UpdatedDate ?? it?.UPDATEDDATE ?? null;
           return normalized as AlertDTO;
         });
         this.filteredAlertsData = this.MyAlertsData;
@@ -336,6 +377,8 @@ export class AlertComponent implements OnInit, AfterViewInit {
       .toISOString()
       .slice(0, 10);
     const effectiveEnteredDateStr = formValue.enteredDate || todayStr;
+    // updatedDate: prefer form value (set in edit mode), fallback to today
+    const effectiveUpdatedDateStr = formValue.updatedDate || todayStr;
 
     // Additional validation: Start Date is always required; Repeat Date only required in update mode
     let sd = this.parseDMYToDate(formValue.startDate);
@@ -345,14 +388,29 @@ export class AlertComponent implements OnInit, AfterViewInit {
     }
     let rd: Date | null = null;
     if (this.buttontext === 'update') {
-      rd = this.parseDMYToDate(formValue.repeatDate);
-      if (!rd) {
-        Swal.fire('Validation Error', 'Please enter a valid Repeat Date in dd/MM/yyyy format.', 'warning');
-        return;
-      }
-      if (rd < sd) {
-        Swal.fire('Validation Error', 'Repeat Date cannot be earlier than Start Date.', 'warning');
-        return;
+      const hasRepeat = !!formValue.repeatDate;
+      if (hasRepeat) {
+        rd = this.parseDMYToDate(formValue.repeatDate);
+        if (!rd) {
+          Swal.fire('Validation Error', 'Please enter a valid Repeat Date in dd/MM/yyyy format.', 'warning');
+          return;
+        }
+        // Disallow past repeat date (must be today or future)
+        const todayZero2 = new Date();
+        todayZero2.setHours(0, 0, 0, 0);
+        const rdZero = new Date(rd);
+        rdZero.setHours(0, 0, 0, 0);
+        if (rdZero < todayZero2) {
+          Swal.fire('Validation Error', 'Repeat Date cannot be in the past.', 'warning');
+          return;
+        }
+        if (rd < sd) {
+          Swal.fire('Validation Error', 'Repeat Date cannot be earlier than Start Date.', 'warning');
+          return;
+        }
+      } else {
+        // user didn't provide a repeat date; keep it null
+        rd = null;
       }
     } else {
       // In create mode, send repeatDate as null
@@ -376,6 +434,8 @@ export class AlertComponent implements OnInit, AfterViewInit {
       isFinished: String(formValue.status) === '2',
       enteredBy: effectiveEnteredBy,
       enteredDate: new Date(effectiveEnteredDateStr),
+      // Send updatedDate only in update mode (id > 0); otherwise null
+      updatedDate: selectedId > 0 ? new Date(effectiveUpdatedDateStr) : null,
       // For new insert (no id), send empty string for UpdatedBy per requirement; for updates, use updatedBy/current user
       updatedBy: selectedId > 0 ? effectiveUpdatedBy : '',
       appointmentId: Number(this.appID) || 0,
@@ -392,6 +452,9 @@ export class AlertComponent implements OnInit, AfterViewInit {
     }
     // Also mirror UpdatedBy in PascalCase to satisfy strict backends
     (alert as any).UpdatedBy = alert.updatedBy;
+    // Mirror UpdatedDate in PascalCase to satisfy backends expecting 'UpdateDate'
+    ;(alert as any).UpdatedDate = (alert as any).updatedDate;
+    ;(alert as any).UpdateDate = (alert as any).updatedDate;
 
     // Guard: If user is updating but alertId is 0, stop and inform
     if (this.buttontext === 'update' && (!alert.alertId || alert.alertId === 0)) {
@@ -511,6 +574,21 @@ export class AlertComponent implements OnInit, AfterViewInit {
     } as any;
     this.alertForm.patchValue(patch);
 
+    // If existing repeat date is in the past, auto-correct it to today in update mode
+    try {
+      const parsedRep = this.parseDMYToDate(this.alertForm.get('repeatDate')?.value);
+      const todayZero = new Date();
+      todayZero.setHours(0, 0, 0, 0);
+      if (parsedRep) {
+        const repZero = new Date(parsedRep);
+        repZero.setHours(0, 0, 0, 0);
+        if (repZero < todayZero) {
+          const todayStrDMY = this.formatDateForInputDMY(new Date());
+          this.alertForm.patchValue({ repeatDate: todayStrDMY });
+        }
+      }
+    } catch {}
+
     // Ensure updatedBy is set to current user for the eventual update
     try {
       const ssUserName = (typeof window !== 'undefined' && window?.sessionStorage)
@@ -526,6 +604,11 @@ export class AlertComponent implements OnInit, AfterViewInit {
 
     // Repeat Date should be required in update mode
     this.updateRepeatDateValidator();
+
+    // Now that the Repeat Date input is visible in the DOM (only in update mode),
+    // re-initialize flatpickr to attach the date picker to it.
+    // Use setTimeout to ensure the view has updated before initialization.
+    setTimeout(() => this.initDatePickers(), 0);
 
     // Scroll to the form for user convenience
     try { window?.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
@@ -642,15 +725,16 @@ export class AlertComponent implements OnInit, AfterViewInit {
     this.pagedAlerts = this.MyAlertsData.slice(this.start, this.end);
   }
   
-  // Toggle Repeat Date validator based on mode
+  // Compute column class so fields stretch when Repeat Date is hidden
+  getFormColClass(): string {
+    return this.buttontext === 'update' ? 'col-lg-3' : 'col-lg-4';
+  }
+  
+  // Ensure Repeat Date is optional; validate only when provided
   private updateRepeatDateValidator() {
     const ctrl = this.alertForm?.get('repeatDate');
     if (!ctrl) return;
-    if (this.buttontext === 'update') {
-      ctrl.setValidators([Validators.required]);
-    } else {
-      ctrl.clearValidators();
-    }
+    ctrl.clearValidators();
     ctrl.updateValueAndValidity({ emitEvent: false });
   }
 }
