@@ -161,8 +161,13 @@ export class SchedulingApiService {
     if (data.ProviderID) params = params.set('ProviderID', data.ProviderID);
     if (data.FacilityID) params = params.set('FacilityID', data.FacilityID);
     if (data.SiteID) params = params.set('SiteID', data.SiteID);
+    // if (data.AppStatusIds && data.AppStatusIds.length > 0) {
+    //   params = params.set('AppStatusIds', data.AppStatusIds.toString());
+    // }
     if (data.AppStatusIds && data.AppStatusIds.length > 0) {
-      params = params.set('AppStatusIds', data.AppStatusIds.toString());
+      data.AppStatusIds.forEach((id: number) => {
+        params = params.append('AppStatusIds', id.toString());
+      });
     }
     if (data.showScheduledAppointmentOnly !== undefined) {
       params = params.set('showScheduledAppointmentOnly', String(data.showScheduledAppointmentOnly));

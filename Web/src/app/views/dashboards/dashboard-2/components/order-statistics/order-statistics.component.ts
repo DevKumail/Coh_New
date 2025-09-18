@@ -377,10 +377,10 @@ export class OrderStatisticsComponent {
         }
         await this.Service.SearchDashboardAppointment(body).then((res:any)=>{
             this.appointments = res.table1 || [];
+            this.appointmentstotaldata = res?.table2[0]?.totalCount || 0;  // total count
             // this.appointmentstotaldata = res.table2;
 
             if (res && res.table2) {
-                this.appointmentstotaldata = res.table2[0].totalCount;  // total count
               }
 
             console.log(this.appointments,'this.appointments response');
