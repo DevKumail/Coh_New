@@ -17,6 +17,9 @@ import { filter, distinctUntilChanged } from 'rxjs/operators';
 import { OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LoaderService } from '@core/services/loader.service';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { NgIconComponent } from '@ng-icons/core';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 
 @Component({
   selector: 'app-coverage-list',
@@ -29,6 +32,9 @@ import { LoaderService } from '@core/services/loader.service';
     FormsModule,
     RouterModule,
     LucideAngularModule,
+    NgIconComponent,
+    TranslatePipe,
+    GenericPaginationComponent
   ]
 })
 
@@ -123,6 +129,13 @@ GetCoverage(MrNo: string) {
     );
 }
 
+
+paginationInfo = {
+  Page: 1,
+  RowsPerPage: 10
+};
+coverageTotalItems = 0;
+
 GetCoverageData() {
   debugger
   if (!this.SearchPatientData?.table2[0]?.mrNo) {
@@ -132,16 +145,16 @@ GetCoverageData() {
 
   this.Loader.show();
 
-  const paginationInfo = {
-    page: this.coverageCurrentPage,
-    RowsPerPage: this.coveragePageSize
-  };
+  // const paginationInfo = {
+  //   page: this.coverageCurrentPage,
+  //   RowsPerPage: this.coveragePageSize
+  // };
 
   const coverageListReq = {
     mrno: this.SearchPatientData?.table2[0]?.mrNo || 0
   }
 
-  this.CoveragesApiService.GetCoverageList(coverageListReq, paginationInfo)
+  this.CoveragesApiService.GetCoverageList(coverageListReq, this.paginationInfo)
     .then((res: any) => {
       this.pagedCoverages = res?.table1 || [];
       this.coverageTotalItems = res?.table2?.[0]?.totalCount || 0;
@@ -153,76 +166,12 @@ GetCoverageData() {
     });
 }
 
+ async onCoveragePageChanged(page: number) {
+    this.paginationInfo.Page = page;
+    this.GetCoverageData();
+    }
 
 
-coverageCurrentPage = 1;
-coveragePageSize = 5;
-coverageTotalItems = 0;
-
-get coverageTotalPages(): number {
-  return Math.ceil(this.coverageTotalItems / this.coveragePageSize);
-}
-
-get coverageStart(): number {
-  return (this.coverageCurrentPage - 1) * this.coveragePageSize;
-}
-
-get coverageEnd(): number {
-  return Math.min(this.coverageStart + this.coveragePageSize, this.coverageTotalItems);
-}
-
-get coveragePageNumbers(): (number | string)[] {
-  const total = this.coverageTotalPages;
-  const current = this.coverageCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1);
-  if (left > 2) range.push('...');
-  for (let i = left; i <= right; i++) range.push(i);
-  if (right < total - 1) range.push('...');
-  if (total > 1) range.push(total);
-
-  return range;
-}
-
-coverageGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.coverageTotalPages) return;
-  this.coverageCurrentPage = page;
-  this.coverageFetchData();
-}
-
-coverageNextPage() {
-  if (this.coverageCurrentPage < this.coverageTotalPages) {
-    this.coverageCurrentPage++;
-    this.coverageFetchData();
-  }
-}
-
-coveragePrevPage() {
-  if (this.coverageCurrentPage > 1) {
-    this.coverageCurrentPage--;
-    this.coverageFetchData();
-  }
-}
-
-async coverageFetchData() {
-  try {
-    this.Loader.show();
-    await this.GetCoverageData();
-  } finally {
-    this.Loader.hide();
-  }
-}
-
-oncoveragePageSizeChange(event: any) {
-  this.coveragePageSize = +event.target.value;
-  this.coverageCurrentPage = 1; // Reset to first page
-  this.coverageFetchData();
-}
 
 // Map a row's current status value. Try multiple casings/properties to be resilient to backend variations.
 getRowCoverageOrder(row: any): number | null {
@@ -293,6 +242,13 @@ EditCoverage(subscriberId: number) {
 
 }
 
+get isRtl(): boolean {
+  try {
+    return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+  } catch {
+    return false;
+  }
+}
 
 }
   interface CoverageResponse {

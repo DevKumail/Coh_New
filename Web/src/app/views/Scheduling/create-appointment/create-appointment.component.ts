@@ -39,6 +39,78 @@ declare var flatpickr: any;
 export class CreateAppointmentComponent implements OnInit {
   date: any;
 
+  private focusFirstInvalidControl(): void {
+    try {
+      setTimeout(() => {
+        const firstInvalid = document.querySelector('.is-invalid, .ng-invalid.ng-touched') as HTMLElement | null;
+        firstInvalid?.focus({ preventScroll: true } as any);
+        firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    } catch {}
+  }
+  
+  // Reset the appointment form and related UI state
+  resetForm(): void {
+    if (!this.appointmentForm) return;
+    this.appointmentForm.reset({
+      facility: '',
+      speciality: '',
+      provider: '',
+      site: '',
+      date: '',
+      time: '',
+      selectedPurpose: '',
+      selectedVisitType: '',
+      selectedType: '',
+      selectedReferredBy: '',
+      selectedDuration: '',
+      selectedLocation: '',
+      selectedCriteria: '',
+      selectedNotified: '',
+      selectedStatus: '1',
+      selectedPayer: '',
+      AppointmentNote: '',
+      selectedPayerplan: '',
+      PlanCopay: '',
+      PlanBalance: '',
+      PatientBalance: '',
+      IsConsultationVisit: ''
+    });
+
+    // Clear dependent UI state
+    this.siteArray = [];
+    this.AppointmentData = [];
+    this.DurationData = [];
+
+    // Reset selection trackers
+    this.selectedFacility = 0;
+    this.selectedSpeciality = 0;
+    this.selectedProvider = 0;
+    this.selectedSite = 0;
+    this.selectedDate = null;
+    this.selectedProviders = 0;
+    this.selectedSites = 0;
+    this.selectedSpecialities = 0;
+    this.selectedFacilities = 0;
+    this.selectedLocations = 0;
+    this.selectedCriteria = 0;
+    this.selectedNotified = 0;
+    this.selectedStatus = 0;
+    this.selectedVisitType = 0;
+    this.selectedPayer = 0;
+    this.selectedPayerPlan = 0;
+    this.selectedDuration = 0;
+    this.selectedPurpose = 0;
+    this.selectedReferred = 0;
+
+    // UI housekeeping
+    this.showTable = false;
+
+    // Mark form pristine and untouched
+    this.appointmentForm.markAsPristine();
+    this.appointmentForm.markAsUntouched();
+  }
+
 
   appointmentForm!: FormGroup;
 minDate: any;
@@ -244,9 +316,8 @@ Times = [
       PlanCopay: [''],
       PlanBalance: [''],
       PatientBalance: [''],
-      IsConsultationVisit: [''],
+    IsConsultationVisit: [''],
   });
-
   await this.FillCache();
 
   // Prefer Router navigation state; fallback to window.history.state for refresh/reuse
@@ -336,25 +407,28 @@ this.patientBannerService.visitAppointments$.subscribe((data: any) => {
 
 
 
-  onSubmit(): void {
-    if (this.appointmentForm.invalid) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Invalid Form',
-        text: 'Please fill all required fields.'
-      });
-      return;
-    }
+  // onSubmit(): void {
+  //   if (this.appointmentForm.invalid) {
+  //     this.appointmentForm.markAllAsTouched();
+  //     try { this.focusFirstInvalidControl(); } catch {}
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Invalid Form',
+  //       text: 'Please fill all required fields.'
+  //     });
+  //     return;
+  //   }
 
-    const formData = this.appointmentForm.value;
-    console.log('Submitting appointment:', formData);
+  //   const formData = this.appointmentForm.value;
+  //   console.log('Submitting appointment:', formData);
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Appointment Created',
-      text: 'The appointment has been successfully created.'
-    });
-  }
+  //   Swal.fire({
+  //     icon: 'success',
+  //     title: 'Appointment Created',
+  //     text: 'The appointment has been successfully created.'
+  //   });
+  // }
+
     generateTimeSlots(): void {
     const times = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -635,7 +709,16 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
   submitAppointment() {
       
     // this.AppoinmentBooking.AppDateTime = this.combineDateTime();
-
+   if (this.appointmentForm.invalid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Please fill all required fields',
+      });
+  this.appointmentForm.markAllAsTouched(); // saare errors dikhane k liye
+  try { this.focusFirstInvalidControl(); } catch {}
+  return;
+    }
     var userId = sessionStorage.getItem('userId');
     // var currentUser = JSON.parse(sessionStorage.getItem('userName') || '');
     
@@ -652,15 +735,7 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
         return;
     }
 
-    if (this.appointmentForm.invalid) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Please fill all required fields',
-      });
-      this.appointmentForm.markAllAsTouched(); // saare errors dikhane k liye
-      return;
-    }
+ 
 
 
     if (this.qid != null || this.qid != undefined) {
@@ -701,7 +776,12 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
     this.AppoinmentBooking.PlanBalance = this.appointmentForm.get('PlanBalance')?.value;;
     this.AppoinmentBooking.PlanCopay = this.appointmentForm.get('PlanCopay')?.value;;
     this.AppoinmentBooking.planId = this.appointmentForm.get('selectedPayerplan')?.value;
-    this.AppoinmentBooking.IsConsultationVisit = this.appointmentForm.get('IsConsultationVisit')?.value;
+    if(this.appointmentForm.get('IsConsultationVisit')?.value == "0"){
+      this.AppoinmentBooking.IsConsultationVisit = false
+    }
+    if (this.appointmentForm.get('IsConsultationVisit')?.value == "1") {
+      this.AppoinmentBooking.IsConsultationVisit = true
+    }
     this.AppoinmentBooking.VisitStatusEnabled = false;
     this.AppoinmentBooking.CPTGroupId = 101;
     this.AppoinmentBooking.AppointmentClassification = 1;

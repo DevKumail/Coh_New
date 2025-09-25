@@ -9,10 +9,11 @@ import { scrollToElement } from '@/app/utils/layout-utils';
 import { menuItems } from '@layouts/components/data';
 import { LayoutStoreService } from '@core/services/layout-store.service';
 import { PermissionService } from '@core/services/permission.service';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 @Component({
   selector: 'app-menu',
-  imports: [NgIcon, NgbCollapse, RouterLink, CommonModule],
+  imports: [NgIcon, NgbCollapse, RouterLink, CommonModule, TranslatePipe],
   templateUrl: './app-menu.component.html'
 })
 export class AppMenuComponent implements OnInit, OnDestroy {
@@ -84,6 +85,17 @@ export class AppMenuComponent implements OnInit, OnDestroy {
 
   isActive(item: MenuItemType): boolean {
     return this.router.url === item.url;
+  }
+
+  // Normalize labels like "Patient Chart" -> "PATIENT_CHART" for translation keys
+  normalizeKey(input: any): string {
+    if (input == null) { return ''; }
+    return input
+      .toString()
+      .replace(/[^A-Za-z0-9]+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .toUpperCase();
   }
 
   scrollToActiveLink(): void {

@@ -63,42 +63,42 @@ export class Dashboard2Component {
     // Editable data sources (modify these arrays as needed)
     AllAppoinment = {
         salesData : [
-            { name: 'Not Yet Arrived', value: 15 },
-            { name: 'Check In', value: 20 },
-            { name: 'Ready', value: 10 },
-            { name: 'Seen', value: 15 },
-            { name: 'Billed', value: 15 },
-            { name: 'Check Out', value: 20 },
+            { name: 'NOT_YET_ARRIVED', value: 15 },
+            { name: 'CHECK_IN', value: 20 },
+            { name: 'READY', value: 10 },
+            { name: 'SEEN', value: 15 },
+            { name: 'BILLED', value: 15 },
+            { name: 'CHECK_OUT', value: 20 },
         ],
-        title : 'Appointment',
+        title : 'APPOINTMENT',
         value: 95,
     }
 
     Notes = {
         Data : [
-            { name: 'Pending', value: 100 },
-            { name: 'Completed', value: 50 }
+            { name: 'PENDING', value: 100 },
+            { name: 'COMPLETED', value: 50 }
         ],
-        title : 'Notes',
+        title : 'NOTES',
         value: 150,
     }
 
     Result = {
         Data : [
-            { name: 'Review', value: 70 },
-            { name: 'Non Review', value: 40 }
+            { name: 'REVIEW', value: 70 },
+            { name: 'NON_REVIEW', value: 40 }
         ],
-        title : 'Result',
+        title : 'RESULT',
         value: 110,
     }
 
 
     Billing = {
         Data : [
-            { name: 'Paid', value: 40 },
-            { name: 'Unpaid', value: 10 }
+            { name: 'PAID', value: 40 },
+            { name: 'UNPAID', value: 10 }
         ],
-        title: 'Billed',
+        title: 'BILLED',
         value: 50
     }
 
@@ -106,9 +106,9 @@ export class Dashboard2Component {
         {
             showpie: true,
             title: this.AllAppoinment?.title,
-            badge: {text: 'Daily', variant: 'success'},
+            badge: {text: 'DAILY', variant: 'success'},
             value: this.AllAppoinment?.value,
-            description: 'Today Total Appoinment',
+            description: 'TODAY_TOTAL_APPOINMENT',
             chartOptions: () => ({
                 tooltip: {
                     show: true,
@@ -137,9 +137,9 @@ export class Dashboard2Component {
         {
             showpie: true,
             title: this.Notes?.title,
-            badge: {text: 'Monthly', variant: 'primary'},
+            badge: {text: 'MONTHLY', variant: 'primary'},
             value: this.Notes?.value,
-            description: 'Monthly Total Notes',
+            description: 'MONTHLY_TOTAL_NOTES',
             chartOptions: () => ({
                 tooltip: {
                     show: true,
@@ -168,9 +168,9 @@ export class Dashboard2Component {
         {
             showpie: true,
             title: this.Billing?.title,
-            badge: {text: 'Monthly', variant: 'primary'},
+            badge: {text: 'MONTHLY', variant: 'primary'},
             value: this.Billing?.value,
-            description: 'Monthly Total Billed',
+            description: 'MONTHLY_TOTAL_BILLED',
             chartOptions: () => ({
                 tooltip: {
                     show: true,
@@ -225,9 +225,9 @@ export class Dashboard2Component {
         // },
         {
             showpie: false,
-            title: 'My_Tasks',
-            description: 'Total Tasks',
-            label: '+3 New',
+            title: 'MY_TASKS',
+            description: 'TOTAL_TASKS',
+            label: '3 New',
             icon: 'tablerChecklist',
             count: {value: 124},
             variant: 'primary',
@@ -235,9 +235,9 @@ export class Dashboard2Component {
         },
         {
             showpie: false,
-            title: 'Messages',
-            description: 'Total Messages',
-            label: '+5 New',
+            title: 'MESSAGES',
+            description: 'TOTAL_MESSAGES',
+            label: '5 New',
             icon: 'tablerMessageCircle',
             count: {value: 69.5, suffix: 'k'},
             variant: 'purple',

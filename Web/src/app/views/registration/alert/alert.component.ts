@@ -3,6 +3,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { LucideAngularModule, LucideHome, LucideChevronRight, LucideBell, LucideEdit } from 'lucide-angular';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
@@ -14,16 +15,22 @@ import { AlertDTO } from '@/app/shared/Models/Clinical/alert.model';
 
 declare var flatpickr: any;
 import { AlertType } from '@/app/shared/Models/Clinical/alert-type.model';
+import { NgIconComponent } from '@ng-icons/core';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 
 
 @Component({
   selector: 'app-alert',
   standalone: true,
   imports: [
-    CommonModule,
-    ReactiveFormsModule, LucideAngularModule
-    , FormsModule,
-    NgbTooltip
+  CommonModule,
+  ReactiveFormsModule, 
+  LucideAngularModule, 
+  FormsModule,
+  NgIconComponent,
+  NgbTooltip,
+  TranslatePipe,
+  GenericPaginationComponent
   ],
   templateUrl: './alert.component.html',
   styleUrl: './alert.component.scss'
@@ -737,5 +744,13 @@ export class AlertComponent implements OnInit, AfterViewInit {
     ctrl.clearValidators();
     ctrl.updateValueAndValidity({ emitEvent: false });
   }
+
+  get isRtl(): boolean {
+  try {
+    return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+  } catch {
+    return false;
+  }
+}
 }
 

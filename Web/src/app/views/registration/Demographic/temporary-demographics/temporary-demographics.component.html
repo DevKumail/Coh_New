@@ -3,17 +3,17 @@
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
                 <lucide-angular [img]="homeIcon" class="fs-6"></lucide-angular>
-                Clinical
+                {{'CLINICAL' | translate }}
             </a>
         </li>
         <li
             class="d-flex align-items-center text-muted mx-1"
             aria-current="page"
         >
-            <lucide-angular [img]="chevronRightIcon" class="fs-6"></lucide-angular>
+        <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-            temporary-demographic-create
+            {{ 'TEMPORARY_DEMOGRAPHIC_CREATE' | translate }}
         </li>
     </ol>
 </nav>
@@ -22,16 +22,16 @@
     <div class="card p-3 shadow mt-2">
         <h3 class="card-title mb-3 fw-bold heading-title">
             <lucide-angular [img]="headingIcon" aria-hidden="true"></lucide-angular>
-            <span>Temporary Demographic Create</span>
+            <span>{{ 'TEMPORARY_DEMOGRAPHIC_CREATE' | translate }}</span>
         </h3>
         <form [formGroup]="temporaryForm" (ngSubmit)="onSubmit()" novalidate class="no-invalid-icon">
             <div class="row">
                 <!-- Title -->
                 <div class="col-md-3">
-                    <label>Title</label>
+                    <label>{{ 'TITLE' | translate }}</label>
                     <select class="form-select" formControlName="personTitleId">
                         <option [ngValue]="null" disabled>
-                            -- Select Title --
+                            {{ 'SELECT_TITLE' | translate }}
                         </option>
                         <option *ngFor="let t of titles" [value]="t.code">
                             {{ t.name }}
@@ -41,48 +41,48 @@
 
                 <!-- First Name -->
                 <div class="col-md-3">
-                    <label>First Name <span class="text-danger">*</span></label>
+                    <label>{{ 'FIRST_NAME' | translate }} <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control no-invalid-icon"
                         [class.is-invalid]="temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched || temporaryForm.touched)"
                         formControlName="personFirstName"
-                        placeholder="First Name"
+                        placeholder="{{ 'ENTER_FIRST_NAME' | translate }}"
                     />
                     <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched || temporaryForm.touched)">
-                        First name is required.
+                        {{ 'FIRST_NAME_REQUIRED' | translate }}
                     </div>
                 </div>
 
                 <!-- Middle Name -->
                 <div class="col-md-3">
-                    <label>Middle Name</label>
+                    <label>{{ 'MIDDLE_NAME' | translate }}</label>
                     <input
                         type="text"
                         class="form-control"
                         formControlName="personMiddleName"
-                        placeholder="Middle Name"
+                        placeholder="{{ 'ENTER_MIDDLE_NAME' | translate }}"
                     />
                 </div>
 
                 <!-- Last Name -->
                 <div class="col-md-3">
-                    <label>Last Name</label>
+                    <label>{{ 'LAST_NAME' | translate }}</label>
                     <input
                         type="text"
                         class="form-control"
                         [class.is-invalid]="temporaryForm.get('personLastName')?.invalid && (temporaryForm.get('personLastName')?.touched || temporaryForm.touched)"
                         formControlName="personLastName"
-                        placeholder="Last Name"
+                        placeholder="{{ 'ENTER_LAST_NAME' | translate }}"
                     />
                     <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personLastName')?.invalid && (temporaryForm.get('personLastName')?.touched || temporaryForm.touched)">
-                        Last name is required.
+                        {{ 'LAST_NAME_REQUIRED' | translate }}
                     </div>
                 </div>
 
                 <!-- Gender -->
                 <div class="col-md-3">
-                    <label>Gender <span class="text-danger">*</span></label>
+                    <label>{{ 'GENDER' | translate }} <span class="text-danger">*</span></label>
                     <select class="form-select" formControlName="personSex"
                             [class.is-invalid]="temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched || temporaryForm.touched)">
                         <option *ngFor="let g of personSexId" [value]="g.code">
@@ -90,12 +90,12 @@
                         </option>
                     </select>
                     <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched || temporaryForm.touched)">
-                        Gender is required.
+                        {{ 'GENDER_REQUIRED' | translate }}
                     </div>
                 </div>
 
                 <div class="col-md-3">
-                    <label>Date of Birth <span class="text-danger">*</span></label>
+                    <label>{{ 'DOB' | translate }} <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control date"
@@ -103,27 +103,27 @@
                         formControlName="patientBirthDate"
                         data-provider="flatpickr"
                         id="birthDate"
-                        placeholder="dd/MM/yyyy"
+                        placeholder="{{ 'DATE_PLACEHOLDER' | translate }}"
                     />
                     <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched || temporaryForm.touched)">
-                        Date of birth is required.
+                        {{ 'DOB_REQUIRED' | translate }}
                     </div>
                 </div>
 
                 <!-- Age -->
                 <div class="col-md-3">
-                    <label>Age</label>
+                    <label>{{ 'AGE' | translate }}</label>
                     <input
                         type="number"
                         class="form-control"
                         formControlName="personAge"
-                        placeholder="Age"
+                        placeholder="{{ 'AGE' | translate }}"
                     />
                 </div>
 
                 <!-- Home Phone -->
                 <div class="col-md-3">
-                    <label>Home Phone</label>
+                    <label>{{ 'HOME_PHONE' | translate }}</label>
                     <input
                         type="text"
                         class="form-control"
@@ -136,7 +136,7 @@
 
                 <!-- Work Phone -->
                 <div class="col-md-3">
-                    <label>Work Phone</label>
+                    <label>{{ 'WORK_PHONE' | translate }}</label>
                     <input
                         type="text"
                         class="form-control"
@@ -149,12 +149,12 @@
 
                 <!-- Street Number -->
                 <div class="col-md-3">
-                    <label>Street Number</label>
+                    <label>{{ 'STREET_NUMBER' | translate }}</label>
                     <input
                         type="text"
                         class="form-control"
                         formControlName="streetNumber"
-                        placeholder="Street Number"
+                        placeholder="{{ 'ENTER_STREET_NUMBER' | translate }}"
                         [mask]="'0000'"
                         [validation]="false"
                     />
@@ -162,23 +162,23 @@
 
                 <!-- Dwelling Number -->
                 <div class="col-md-3">
-                    <label>Dwelling Number</label>
+                    <label>{{ 'DWELLING_NUMBER' | translate }}</label>
                     <input
                         type="text"
                         class="form-control"
                         formControlName="dwellingNumber"
-                        placeholder="Dwelling Number"
+                        placeholder="{{ 'DWELLING_NUMBER' | translate }}"
                     />
                 </div>
 
                 <!-- Zip Code -->
                 <div class="col-md-3">
-                    <label>Zip/Postal Code</label>
+                    <label>{{ 'ZIP_CODE' | translate }}</label>
                     <input
                         type="text"
                         class="form-control"
                         formControlName="personZipCode"
-                        placeholder="Zip Code"
+                        placeholder="{{ 'ZIP_CODE' | translate }}"
                         [mask]="'00000'"
                         [validation]="false"
                     />
@@ -186,14 +186,14 @@
 
                 <!-- Country -->
                 <div class="col-md-3">
-                    <label>Select Country</label>
+                    <label>{{ 'SELECT_COUNTRY' | translate }}</label>
                     <select
                         class="form-select"
                         formControlName="selectedCountry"
                         (change)="onCountryChange()"
                     >
                         <option [ngValue]="null" disabled>
-                            -- Select Country --
+                            {{ 'SELECT_COUNTRY' | translate }}
                         </option>
                         <option *ngFor="let c of countries" [value]="c.code">
                             {{ c.name }}
@@ -203,14 +203,14 @@
 
                 <!-- State -->
                 <div class="col-md-3">
-                    <label>Select State</label>
+                    <label>{{ 'SELECT_STATE' | translate }}</label>
                     <select
                         class="form-select"
                         formControlName="selectedState"
                         (change)="onStateChange()"
                     >
                         <option [ngValue]="null" disabled>
-                            -- Select State --
+                            {{ 'SELECT_STATE' | translate }}
                         </option>
                         <option *ngFor="let s of states" [value]="s.code">
                             {{ s.name }}
@@ -220,10 +220,10 @@
 
                 <!-- City -->
                 <div class="col-md-3">
-                    <label>Select City</label>
+                    <label>{{ 'SELECT_CITY' | translate }}</label>
                     <select class="form-select" formControlName="selectedCity">
                         <option [ngValue]="null" disabled>
-                            -- Select City --
+                            {{ 'SELECT_CITY' | translate }}
                         </option>
                         <option *ngFor="let c of cities" [value]="c.code">
                             {{ c.name }}
@@ -233,10 +233,10 @@
 
                 <!-- Nationality -->
                 <div class="col-md-3">
-                    <label>Select Nationality</label>
+                    <label>{{ 'SELECT_NATIONALITY' | translate }}</label>
                     <select class="form-select" formControlName="nationality">
                         <option [ngValue]="null" disabled>
-                            -- Select Nationality --
+                            {{ 'SELECT_NATIONALITY' | translate }}
                         </option>
                         <option
                             *ngFor="let n of nationality"
@@ -249,7 +249,7 @@
 
                 <!-- Cell Phone -->
                 <div class="col-md-3">
-                    <label>Cell Phone <span class="text-danger">*</span></label>
+                    <label>{{ 'CELL_PHONE' | translate }} <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control"
@@ -259,18 +259,18 @@
                         [mask]="'(00) 0000-0000'"
                     />
                     <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personCellPhone')?.invalid && (temporaryForm.get('personCellPhone')?.touched || temporaryForm.touched)">
-                        Cell phone is required.
+                        {{ 'CELL_PHONE_REQUIRED' | translate }}
                     </div>
                 </div>
 
                 <!-- Email -->
                 <div class="col-md-3">
-                    <label>Email</label>
+                    <label>{{ 'EMAIL' | translate }}</label>
                     <input
                         type="email"
                         class="form-control"
                         formControlName="personEmail"
-                        placeholder="you@example.com"
+                        placeholder="{{ 'ENTER_EMAIL_ADDRESS' | translate }}"
                     />
                 </div>
 
@@ -370,28 +370,26 @@
  -->
                 <!-- Comment -->
                 <div class="col-md-3">
-                    <label>Comment</label>
+                    <label>{{ 'COMMENT' | translate }}</label>
                     <input
                         type="text"
                         class="form-control"
                         formControlName="comments"
-                        placeholder="Comment"
+                        placeholder="{{ 'COMMENT' | translate }}"
                     />
                 </div>
             </div>
 
             <div class="text-end mt-4">
-                <button type="submit" class="btn btn-info me-2">
-                    <lucide-angular [img]="saveIcon" class="me-1"></lucide-angular>
-                    Submit
+                <button type="submit" class="btn btn-info">
+                    {{ 'SUBMIT' | translate }}
                 </button>
                 <button
                     type="button"
-                    class="btn btn-danger"
+                    class="btn btn-danger me-1 ms-1"
                     (click)="onCancel()"
                 >
-                    <lucide-angular [img]="cancelIcon" class="me-1"></lucide-angular>
-                    Cancel
+                    {{ 'BACK' | translate }}
                 </button>
             </div>
         </form>

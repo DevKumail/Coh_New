@@ -5,11 +5,12 @@ import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, NgIconComponent, FormsModule],
+  imports: [ReactiveFormsModule, CommonModule, NgIconComponent, FormsModule,TranslatePipe ],
   templateUrl: './favorites.component.html',
   styleUrl: './favorites.component.scss',
 

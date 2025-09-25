@@ -3,7 +3,7 @@
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
                 <ng-icon name="tablerSmartHome"></ng-icon>
-                {{ 'Scheduling' | translate }}
+                {{ 'SCHEDULING' | translate }}
             </a>
         </li>
         <li
@@ -13,7 +13,7 @@
             <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-            {{ 'Create Appointment' | translate }}
+            {{ 'APPOINTMENT_BOOKING' | translate }}
         </li>
     </ol>
 </nav>
@@ -24,81 +24,97 @@
     <!-- Book Appointment Form Card -->
     <div class="card shadow-lg mb-2">
         <div class="card-header">
-            <h5 class="mb-0">{{ 'Appointment Booking' | translate }}</h5>
+            <h5 class="mb-0">{{ 'APPOINTMENT_BOOKING' | translate }}</h5>
         </div>
 
         <div class="card-body">
-            <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+            <form *ngIf="appointmentForm" [formGroup]="appointmentForm">
                 <div class="row col-12">
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Facility' | translate }} <span class="text-danger">*</span></label>
+                        <label>{{ 'FACILITY' | translate }} <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
                             formControlName="facility"
                             (change)="GetSpecialitybyFacilityId(this.appointmentForm.get('facility')?.value)">
-                            <option value="">-- {{ 'Select Facility' | translate }} --</option>
+                            <option value="">-- {{ 'SELECT_FACILITY' | translate }} --</option>
                             <option *ngFor="let f of facilities"[value]="f.code">
                                 {{ f.name }}
                             </option> 
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('facility')?.touched && appointmentForm.get('facility')?.invalid">
+                            {{ 'FACILITY_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Speciality' | translate }} <span class="text-danger">*</span></label>
+                        <label>{{ 'SPECIALITY' | translate }} <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
                             formControlName="speciality"
                             (change)="GetSitebySpecialityId(this.appointmentForm.get('speciality')?.value)">
-                            <option value="">-- {{ 'Select Speciality' | translate }} --</option>
+                            <option value="">-- {{ 'SELECT_SPECIALITY' | translate }} --</option>
                             <option *ngFor="let s of specialities" [value]="s.specialtyId">
                                 {{ s.specialtyName }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('speciality')?.touched && appointmentForm.get('speciality')?.invalid">
+                            {{ 'SPECIALITY_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Provider' | translate }} <span class="text-danger">*</span></label>
+                        <label>{{ 'PROVIDER' | translate }} <span class="text-danger">*</span></label>
                         <select
                         class="form-control form-select"
                         formControlName="provider"
                         (change)="GetSpecialityByEmployeeId(appointmentForm.get('provider')?.value)">
-                        <option value="">-- {{ 'Select Provider' | translate }} --</option>
+                        <option value="">-- {{ 'SELECT_PROVIDER' | translate }} --</option>
                         <option *ngFor="let p of providers" [value]="p.employeeId">
                             {{ p.fullName }}
                         </option>
                         </select>
 
+                        <div class="text-danger small" *ngIf="appointmentForm.get('provider')?.touched && appointmentForm.get('provider')?.invalid">
+                            {{ 'PROVIDER_IS_REQUIRED' | translate }}
+                        </div>
+
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Sites' | translate }} <span class="text-danger">*</span></label>
+                        <label>{{ 'SITE' | translate }} <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
                             formControlName="site"
                             (change)="GetProviderbySiteId(this.appointmentForm.get('site')?.value)"
                         >
-                            <option value="">-- {{ 'Select Site' | translate }} --</option>
+                            <option value="">-- {{ 'SELECT_SITE' | translate }} --</option>
                             <option *ngFor="let site of siteArray" [value]="site.siteId">
                                 {{ site.siteName }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('site')?.touched && appointmentForm.get('site')?.invalid">
+                            {{ 'SITE_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
                 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Date' | translate }} <span class="text-danger">*</span></label>
+                        <label>{{ 'DATE' | translate }} <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             class="form-control date"
                             formControlName="date"
                             data-provider="flatpickr"
                             id="entryDate"
-                            placeholder="{{ 'Select date' | translate }}"
+                            placeholder="{{ 'SELECT_DATE' | translate }}"
                             (change)="GetAppointmentByTime(this.appointmentForm.get('date')?.value)"
                         />
+                        <div class="text-danger small" *ngIf="appointmentForm.get('date')?.touched && appointmentForm.get('date')?.invalid">
+                            {{ 'DATE_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Time' | translate }} <span class="text-danger">*</span></label>
+                        <label>{{ 'TIME' | translate }} <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select scrollable-select"
                             formControlName="time"
@@ -106,15 +122,18 @@
                             /* Approx 3-4 options height */ 
                             overflow-y: auto !important;"
                             (onClick)="GetTime()">
-                            <option value="" disabled selected>-- {{ 'Select Time' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT_TIME' | translate }} --</option>
                             <option *ngFor="let t of Times"
                                     [value]="formatDisplayTime(t.Time)"
                                     [disabled]="isTimeBooked(formatDisplayTime(t.Time))"
                                     [ngClass]="{ 'text-muted': isTimeBooked(formatDisplayTime(t.Time)) }"
-                                    [title]="isTimeBooked(formatDisplayTime(t.Time)) ? ('Already booked' | translate) : ''">
-                                {{ formatDisplayTime(t.Time) }} {{ isTimeBooked(formatDisplayTime(t.Time)) ? ('(Booked)' | translate) : '' }}
+                                    [title]="isTimeBooked(formatDisplayTime(t.Time)) ? ('ALREADY_BOOKED' | translate) : ''">
+                                {{ formatDisplayTime(t.Time) }} {{ isTimeBooked(formatDisplayTime(t.Time)) ? ('BOOKED' | translate) : '' }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('time')?.touched && appointmentForm.get('time')?.invalid">
+                            {{ 'TIME_IS_REQUIRED' | translate }} is required.
+                        </div>
                     </div>
 
                     <!-- <div class="col-sm-3 mb-3">
@@ -155,30 +174,33 @@
 
                     <div class="col-sm-3 mb-2">
                         <label
-                            >{{ 'Purpose of Visit' | translate }}
+                            >{{ 'PURPOSE_OF_VISIT' | translate }}
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
                             formControlName="selectedPurpose"
                         >
-                            <option value="" disabled selected>-- {{ 'Select Purpose' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT_PURPOSE' | translate }} --</option>
                             <option *ngFor="let p of purpose" [value]="p.code">
                                 {{ p.name }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('selectedPurpose')?.touched && appointmentForm.get('selectedPurpose')?.invalid">
+                            {{ 'PURPOSE_OF_VISIT_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2">
                         <label
-                            >{{ 'Visit Type' | translate }}
+                            >{{ 'VISIT_TYPE' | translate }}
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
                             formControlName="selectedVisitType"
                         >
-                            <option value="" disabled selected>-- {{ 'Select Visit Type' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT_VISIT_TYPE' | translate }} --</option>
                             <option
                                 *ngFor="let v of visittype"
                                 [value]="v.code"
@@ -186,135 +208,162 @@
                                 {{ v.name }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('selectedVisitType')?.touched && appointmentForm.get('selectedVisitType')?.invalid">
+                            {{ 'VISIT_TYPE_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
                 
                     <div class="col-sm-3 mb-2">
                         <label
-                            >{{ 'Referred By' | translate }} 
+                            >{{ 'REFERRED_BY' | translate }} 
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
                             formControlName="selectedReferredBy"
                         >
-                            <option value="" disabled selected>-- {{ 'Select Referred By' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT_REFERRED_BY' | translate }} --</option>
                             <option *ngFor="let r of referred" [value]="r.code">
                                 {{ r.name }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('selectedReferredBy')?.touched && appointmentForm.get('selectedReferredBy')?.invalid">
+                            {{ 'REFERRED_BY_IS_REQUIRED' | translate }} 
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Type' | translate }} <span class="text-danger">*</span></label>
+                        <label>{{ 'TYPE' | translate }} <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
                             formControlName="selectedType"
                         >
-                            <option value="" disabled selected>-- {{ 'Select Type' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT_TYPE' | translate }} --</option>
                             <option *ngFor="let t of type" [value]="t.code">
                                 {{ t.name }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('selectedType')?.touched && appointmentForm.get('selectedType')?.invalid">
+                            {{ 'TYPE_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2">
                         <label
-                            >{{ 'Duration' | translate }} <span class="text-danger">*</span></label
+                            >{{ 'DURATION' | translate }} <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
                             formControlName="selectedDuration"
                         >
-                            <option value="" disabled selected>-- {{ 'Select Duration' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT_DURATION' | translate }} --</option>
                             <option *ngFor="let d of duration" [value]="d.value">
                                 {{ d.name }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('selectedDuration')?.touched && appointmentForm.get('selectedDuration')?.invalid">
+                            {{ 'DURATION_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2">
                         <label
-                            >{{ 'Location' | translate }} <span class="text-danger">*</span></label
+                            >{{ 'LOCATION' | translate }} <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
                             formControlName="selectedLocation"
                         >
-                            <option value="" disabled selected>-- {{ 'Select Location' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT_LOCATION' | translate }} --</option>
                             <option *ngFor="let l of location" [value]="l.code">
                                 {{ l.name }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('selectedLocation')?.touched && appointmentForm.get('selectedLocation')?.invalid">
+                            {{ 'LOCATION_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Appointment Criteria' | translate }}<span class="text-danger">*</span></label>
+                        <label>{{ 'APPOINTMENT_CRITERIA' | translate }}<span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
                             formControlName="selectedCriteria"
                         >
-                            <option value="" disabled selected>-- {{ 'Select Criteria' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT_CRITERIA' | translate }} --</option>
                             <option *ngFor="let c of criteria" [value]="c.code">
                                 {{ c.name }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('selectedCriteria')?.touched && appointmentForm.get('selectedCriteria')?.invalid">
+                            {{ 'APPOINTMENT_CRITERIA_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2">
                         <label
-                            >{{ 'Patient Notified' | translate }}
+                            >{{ 'PATIENT_NOTIFIED' | translate }}
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
                             formControlName="selectedNotified"
                         >
-                            <option value="" disabled selected>-- {{ 'Select' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT' | translate }} --</option>
                             <option *ngFor="let n of notified" [value]="n.code">
                                 {{ n.name }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('selectedNotified')?.touched && appointmentForm.get('selectedNotified')?.invalid">
+                            {{ 'PATIENT_NOTIFIED_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2" *ngIf="this.qid">
                         <label
-                            >{{ 'Appointment Status' | translate }}
+                            >{{ 'APPOINTMENT_STATUS' | translate }}
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
                             formControlName="selectedStatus"
                         >
-                            <option value="">-- {{ 'Select' | translate }} --</option>
+                            <option value="">-- {{ 'SELECT' | translate }} --</option>
                             <option *ngFor="let s of status" [value]="s.code">
                                 {{ s.name }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('selectedStatus')?.touched && appointmentForm.get('selectedStatus')?.invalid">
+                            {{ 'APPOINTMENT_STATUS_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2"> 
                         <label
-                            >{{ 'Payer Info' | translate }}
+                            >{{ 'PAYER_INFO' | translate }}
                             <span class="text-danger">*</span></label
                         >
                         <select
                             class="form-control form-select"
                             formControlName="selectedPayer"
                         >
-                            <option value="" disabled selected>-- {{ 'Select' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT' | translate }} --</option>
                             <option *ngFor="let p of payer" [value]="p.code">
                                 {{ p.name }}
                             </option>
                         </select>
+                        <div class="text-danger small" *ngIf="appointmentForm.get('selectedPayer')?.touched && appointmentForm.get('selectedPayer')?.invalid">
+                            {{ 'PAYER_INFO_IS_REQUIRED' | translate }}
+                        </div>
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Payer Plan' | translate }}</label>
+                        <label>{{ 'PAYER_PLAN' | translate }}</label>
                         <select
                             class="form-control form-select"
                             formControlName="selectedPayerplan"
                         >
-                            <option value="" disabled selected>-- {{ 'Select Payer Plan' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT_PAYER_PLAN' | translate }} --</option>
                             <option
                                 *ngFor="let plan of payerPlan"
                                 [value]="plan.code"
@@ -325,42 +374,42 @@
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Appointment Note' | translate }}</label>
+                        <label>{{ 'APPOINTMENT_NOTE' | translate }}</label>
                         <input
                             type="text"
                             class="form-control"
                             formControlName="AppointmentNote"
-                            placeholder="{{ 'Appointment Note' | translate }}"
+                            placeholder="{{ 'APPOINTMENT_NOTE' | translate }}"
                         />
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Patient Balance' | translate }}</label>
+                        <label>{{ 'PATIENT_BALANCE' | translate }}</label>
                         <input
                             type="text"
                             class="form-control"
                             formControlName="PatientBalance"
-                            placeholder="{{ 'Patient Balance' | translate }}"
+                            placeholder="{{ 'PATIENT_BALANCE' | translate }}"
                         />
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Plan Balance' | translate }}</label>
+                        <label>{{ 'PLAN_BALANCE' | translate }}</label>
                         <input
                             type="text"
                             class="form-control"
                             formControlName="PlanBalance"
-                            placeholder="{{ 'Plan Balance' | translate }}"
+                            placeholder="{{ 'PLAN_BALANCE' | translate }}"
                         />
                     </div>
 
                     <div class="col-sm-3 mb-2">
-                        <label>{{ 'Plan Copay' | translate }}</label>
+                        <label>{{ 'PLAN_COPAY' | translate }}</label>
                         <input
                             type="text"
                             class="form-control"
                             formControlName="PlanCopay"
-                            placeholder="{{ 'Plan Copay' | translate }}"
+                            placeholder="{{ 'PLAN_COPAY' | translate }}"
                         />
                     </div>
 
@@ -368,7 +417,7 @@
 
                 <div class="row mt-2"> -->
                     <div class="col-sm-6 mt-4">
-                        <label><b>{{ 'Insurance No:' | translate }}</b> {{ insurranceNo }}</label>
+                        <label><b>{{ 'INSURANCE_NO' | translate }}</b> {{ insurranceNo }}</label>
                         <div class="form-check form-check-inline ms-3">
                             <input
                                 type="radio"
@@ -376,7 +425,7 @@
                                 formControlName="IsConsultationVisit"
                                 value="0"
                             />
-                            <label class="form-check-label">{{ 'Consultation' | translate }}</label>
+                            <label class="form-check-label">{{ 'CONSULTATION' | translate }}</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input
@@ -385,14 +434,17 @@
                                 formControlName="appointment"
                                 value="1"
                             />
-                            <label class="form-check-label">{{ 'Non Consultation' | translate }}</label>
+                            <label class="form-check-label">{{ 'NON_CONSULTATION' | translate }}</label>
                         </div>
                     </div>
                     <!-- Action Buttons -->
                     <div class="col-sm-3 text-end mt-2">
                         <!-- <button class="btn btn-danger me-2" (click)="cancel()">Cancel</button> -->
-                        <button class="btn btn-primary me-2" (click)="submitAppointment()">
-                            {{ 'Submit' | translate }}
+                        <button class="btn btn-primary me-1 ms-1" (click)="submitAppointment()">
+                            {{ 'SUBMIT' | translate }}
+                        </button>
+                        <button class="btn btn-secondary" (click)="resetForm()">
+                            {{ 'RESET' | translate }}
                         </button>
                     </div>
                 </div>
@@ -406,7 +458,7 @@
             <!-- Normal Timeslots Card (no accordion) -->
             <div class="card shadow-sm">
                 <div class="card-header">
-                    <h5 class="mb-0">{{ 'Available Timeslots' | translate }}</h5>
+                    <h5 class="mb-0">{{ 'AVAILABLE_TIMESLOTS' | translate }}</h5>
                 </div>
                 <div class="card-body d-flex flex-column">
                     <div class="table-responsive timeslots-scroll">
@@ -415,30 +467,24 @@
                         >
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 30%">{{ 'Time' | translate }}</th>
-                                    <th style="width: 70%">{{ 'MR No / Patient' | translate }}</th>
-                                    <!-- <th>MR No.</th> -->
-                                    <!-- <th>Duration</th>
-                                    <th>Purpose</th> -->
+                                    <th style="width: 30%">{{ 'TIME' | translate }}</th>
+                                    <th style="width: 70%">{{ 'PATIENT_NAME_MR_NO' | translate }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr
                                     *ngFor="let a of AppointmentData"
                                     [ngClass]="{ 'high-rated': RowColor(a), 'time-selected': isSelectedTime(a.Time), 'text-muted': a.mrno }"
-                                    [attr.title]="a.mrno ? ('This slot is already booked' | translate) : ''"
+                                    [attr.title]="a.mrno ? ('ALREADY_BOOKED' | translate) : ''"
                                     [style.cursor]="a.mrno ? 'not-allowed' : 'pointer'"
                                     (click)="!a.mrno && onTimeRowClick(a)">
                                     <td style="width: 30%">{{ a.Time }}</td>
-                                    <td style="width: 70%"><b> {{ a.mrno }} </b> 
-                                        <span *ngIf="a.mrno"> | </span> {{ a.personName }}</td>
-                                    <!-- <td>{{ a.mrno }}</td> -->
-                                    <!-- <td>{{ a.duration }}</td>
-                                    <td>{{ a.purposeOfVisit }}</td> -->
+                                    <td style="width: 70%"><b> {{ a.personName }} </b> 
+                                        <span *ngIf="a.mrno"> | </span> {{ a.mrno }}</td>
                                 </tr>
                                 <tr *ngIf="AppointmentData.length === 0">
                                     <td colspan="5" class="text-center">
-                                        {{ 'No appointment found.' | translate }}
+                                        {{ 'NO_DATA_FOUND' | translate }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -451,7 +497,7 @@
     <!-- Eligibility Card -->
     <div class="card shadow-sm mb-2">
         <div class="card-header">
-            <h5 class="mb-0">{{ 'Eligibility Info' | translate }}</h5>
+            <h5 class="mb-0">{{ 'ELIGIBILITY_INFO' | translate }}</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -460,13 +506,13 @@
                 >
                     <thead class="table-light">
                         <tr>
-                            <th>{{ 'MR No' | translate }}</th>
-                            <th>{{ 'Status' | translate }}</th>
-                            <th>{{ 'Payer Name' | translate }}</th>
-                            <th>{{ 'Plan' | translate }}</th>
-                            <th>{{ 'Facility' | translate }}</th>
-                            <th>{{ 'Eligibility Date' | translate }}</th>
-                            <th>{{ 'View Details' | translate }}</th>
+                            <th>{{ 'MR_NO' | translate }}</th>
+                            <th>{{ 'STATUS' | translate }}</th>
+                            <th>{{ 'NAME' | translate }}</th>
+                            <th>{{ 'PLAN' | translate }}</th>
+                            <th>{{ 'FACILITY' | translate }}</th>
+                            <th>{{ 'ELIGIBILITY_DATE' | translate }}</th>
+                            <th>{{ 'VIEW_DETAILS' | translate }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -479,13 +525,13 @@
                             <td>{{ e.eligiblityDate }}</td>
                             <td>
                                 <button class="btn btn-outline-primary btn-sm" (click)="showDetailsDialog(e,cancelAppointmentModal)">
-                                    {{ 'View' | translate }}
+                                {{ 'VIEW' | translate }}
                                 </button>
                             </td>
                         </tr>
                         <tr *ngIf="!eligibty || eligibty.length === 0">
                             <td colspan="7" class="text-center">
-                                {{ 'No data found.' | translate }}
+                                {{ 'NO_DATA_FOUND' | translate }}
                             </td>
                         </tr>
                     </tbody>
@@ -493,7 +539,7 @@
                 <!-- Action Buttons -->
                 <div class="text-end">
                     <button class="btn btn-secondary me-2" (click)="checkEligibility()">
-                        {{ 'Eligibility' | translate }}
+                        {{ 'ELIGIBILITY' | translate }}
                     </button>
                 </div>
             </div>

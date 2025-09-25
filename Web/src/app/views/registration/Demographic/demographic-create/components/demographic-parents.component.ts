@@ -1,3 +1,4 @@
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -5,65 +6,65 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 @Component({
   selector: 'app-demographic-parents',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   template: `
     <!-- FATHER SECTION -->
-    <h5>Father</h5>
+    <h5>{{'FATHER' | translate}}</h5>
     <form [formGroup]="parentsInfo" class="row g-3">
       <div class="col-md-3">
-        <label>First Name</label>
-        <input class="form-control" formControlName="fatherFirstName" type="text" />
+        <label>{{'FIRST_NAME' | translate}}</label>
+        <input class="form-control" formControlName="fatherFirstName" type="text" placeholder="{{'ENTER_FIRST_NAME' | translate}}" />
       </div>
       <div class="col-md-3">
-        <label>Middle Name</label>
-        <input class="form-control" formControlName="fatherMiddleName" type="text" />
+        <label>{{'MIDDLE_NAME' | translate}}</label>
+        <input class="form-control" formControlName="fatherMiddleName" type="text" placeholder="{{'ENTER_MIDDLE_NAME' | translate}}" />
       </div>
       <div class="col-md-3">
-        <label>Last Name</label>
-        <input class="form-control" formControlName="fatherLastName" type="text" />
+        <label>{{'LAST_NAME' | translate}}</label>
+        <input class="form-control" formControlName="fatherLastName" type="text" placeholder="{{'ENTER_LAST_NAME' | translate}}" />
       </div>
       <div class="col-md-3">
-        <label>Home Phone</label>
-        <input class="form-control" formControlName="fatherHomePhone" type="text" />
+        <label>{{'HOME_PHONE' | translate}}</label>
+        <input class="form-control" formControlName="fatherHomePhone" type="text" placeholder="{{'ENTER_HOME_PHONE' | translate}}" />
       </div>
       <div class="col-md-3">
-        <label>Cell Phone</label>
-        <input class="form-control" formControlName="fatherCellPhone" type="text" />
+        <label>{{'CELL_PHONE' | translate}}</label>
+        <input class="form-control" formControlName="fatherCellPhone" type="text" placeholder="{{'ENTER_CELL_PHONE' | translate}}" />
       </div>
       <div class="col-md-3">
-        <label>Email</label>
-        <input class="form-control" formControlName="fatherEmail" type="email" />
+        <label>{{'EMAIL' | translate}}</label>
+        <input class="form-control" formControlName="fatherEmail" type="email" placeholder="{{'ENTER_EMAIL_ADDRESS' | translate}}" />
       </div>
     </form>
 
     <hr />
 
     <!-- MOTHER SECTION -->
-    <h5>Mother</h5>
+    <h5>{{'MOTHER' | translate}}</h5>
     <form [formGroup]="parentsInfo" class="row g-3">
       <div class="col-md-3">
-        <label>First Name</label>
-        <input class="form-control" formControlName="motherFirstName" type="text" />
+        <label>{{'FIRST_NAME' | translate}}</label>
+        <input class="form-control" formControlName="motherFirstName" type="text" placeholder="{{'ENTER_FIRST_NAME' | translate}}" />
       </div>
       <div class="col-md-3">
-        <label>Middle Name</label>
-        <input class="form-control" formControlName="motherMiddleName" type="text" />
+        <label>{{'MIDDLE_NAME' | translate}}</label>
+        <input class="form-control" formControlName="motherMiddleName" type="text" placeholder="{{'ENTER_MIDDLE_NAME' | translate}}" />
       </div>
       <div class="col-md-3">
-        <label>Last Name</label>
-        <input class="form-control" formControlName="motherLastName" type="text" />
+        <label>{{'LAST_NAME' | translate}}</label>
+        <input class="form-control" formControlName="motherLastName" type="text" placeholder="{{'ENTER_LAST_NAME' | translate}}" />
       </div>
       <div class="col-md-3">
-        <label>Home Phone</label>
-        <input class="form-control" formControlName="motherHomePhone" type="text" />
+        <label>{{'HOME_PHONE' | translate}}</label>
+        <input class="form-control" formControlName="motherHomePhone" type="text" placeholder="{{'ENTER_HOME_PHONE' | translate}}" />
       </div>
       <div class="col-md-3">
-        <label>Cell Phone</label>
-        <input class="form-control" formControlName="motherCellPhone" type="text" />
+        <label>{{'CELL_PHONE' | translate}}</label>
+        <input class="form-control" formControlName="motherCellPhone" type="text" placeholder="{{'ENTER_CELL_PHONE' | translate}}" />
       </div>
       <div class="col-md-3">
-        <label>Email</label>
-        <input class="form-control" formControlName="motherEmail" type="email" />
+        <label>{{'EMAIL' | translate}}</label>
+        <input class="form-control" formControlName="motherEmail" type="email" placeholder="{{'ENTER_EMAIL_ADDRESS' | translate}}" />
       </div>
     </form>
   `,

@@ -3,11 +3,12 @@
     <div class="modal-dialog modal-xl-custom">
         <div class="modal-content">
             <div class="modal-header">
-                <div>
-                    <h4 class="modal-title" id="standard-modalLabel">Advanced Filter</h4>
-                    <small>Search Patients By Advanced Filter</small>
+                <div [class.text-start]="!isRtl" [class.text-end]="isRtl">
+                    <h4 class="modal-title" id="standard-modalLabel">{{ 'ADVANCED_FILTER' | translate }}</h4>
+                    <small>{{ 'SEARCH_PATIENTS_BY_ADVANCED_FILTER' | translate }}</small>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    [class.order-first]="isRtl" [class.ms-auto]="!isRtl"></button>
                 <button #hiddenCloseBtn type="button" class="d-none" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-2">
@@ -17,36 +18,36 @@
                         <div formGroupName="demographicList">
                             <div class="row gy-1">
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">MR No. / Temp ID</label>
+                                    <label class="form-label small mb-1">{{ 'MR_NO' | translate }}</label>
                                     <input type="text" class="form-control form-control-sm" formControlName="mrno"
-                                        placeholder="Enter MR No" />
+                                        placeholder="{{ 'ENTER_MR_NO' | translate }}" />
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Name</label>
+                                    <label class="form-label small mb-1">{{ 'NAME' | translate }}</label>
                                     <input type="text" class="form-control form-control-sm" formControlName="name"
-                                        placeholder="Enter Name" />
+                                        placeholder="{{ 'ENTER_NAME' | translate }}" />
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Gender</label>
+                                    <label class="form-label small mb-1">{{ 'GENDER' | translate }}</label>
                                     <select class="form-select form-select-sm" formControlName="genderId">
-                                        <option [ngValue]="0">All</option>
-                                        <option [ngValue]="1">Male</option>
-                                        <option [ngValue]="2">Female</option>
+                                        <option [ngValue]="0">{{ 'ALL' | translate }}</option>
+                                        <option [ngValue]="1">{{ 'MALE'}}</option>
+                                        <option [ngValue]="2">{{ 'FEMALE' }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Phone</label>
+                                    <label class="form-label small mb-1">{{ 'PHONE' | translate }}</label>
                                     <input type="text" class="form-control form-control-sm" formControlName="phone"
-                                        placeholder="Enter Phone No" />
+                                        placeholder="{{ 'ENTER_CELL_PHONE' | translate }}" />
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Date of Birth</label>
+                                    <label class="form-label small mb-1">{{ 'DOB' | translate }}</label>
                                     <input type="date" class="form-control form-control-sm" />
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Country</label>
+                                    <label class="form-label small mb-1">{{ 'COUNTRY' | translate }}</label>
                                     <select class="form-select form-select-sm">
-                                        <option value="">All Countries</option>
+                                        <option value="">{{ 'SELECT_COUNTRY' | translate }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -54,62 +55,62 @@
                             <div class="row gy-1 mt-1">
 
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">State / Emirate</label>
+                                    <label class="form-label small mb-1">{{ 'STATE' | translate }}</label>
                                     <select class="form-select form-select-sm">
-                                        <option value="">All States</option>
+                                        <option value="">{{ 'SELECT_STATE' | translate }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">City</label>
+                                    <label class="form-label small mb-1">{{ 'CITY' | translate }}</label>
                                     <select class="form-select form-select-sm">
-                                        <option value="">All Cities</option>
+                                        <option value="">{{ 'SELECT_CITY' | translate }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Zipcode</label>
-                                    <input type="text" class="form-control form-control-sm" />
+                                    <label class="form-label small mb-1">{{ 'ZIP_CODE' | translate }}</label>
+                                    <input type="text" class="form-control form-control-sm" placeholder="{{'ENTER_ZIP_CODE'|translate}}" />
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">National ID</label>
-                                    <input type="text" class="form-control form-control-sm" />
+                                    <label class="form-label small mb-1">{{ 'NATIONAL_ID' | translate }}</label>
+                                    <input type="text" class="form-control form-control-sm" placeholder="{{'ENTER_NATIONAL_ID'| translate}}" />
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Insurance Carrier</label>
+                                    <label class="form-label small mb-1">{{ 'INSURANCE_CARRIER' | translate }}</label>
                                     <select class="form-select form-select-sm">
-                                        <option value="">All</option>
+                                        <option value="">{{ 'ALL' | translate }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Member ID / Insured ID</label>
-                                    <input type="text" class="form-control form-control-sm" />
+                                    <label class="form-label small mb-1">{{ 'MEMBER_ID_INSURED_ID' | translate }}</label>
+                                    <input type="text" class="form-control form-control-sm" placeholder="{{'Enter_MEMBER_ID_INSURED_ID' | translate}}" />
                                 </div>
                             </div>
 
                             <div class="row gy-1 mt-1">
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Reference Channel</label>
+                                    <label class="form-label small mb-1">{{ 'REFERENCE_CHANNEL' | translate }}</label>
                                     <select class="form-select form-select-sm">
-                                        <option value="">-- All --</option>
+                                        <option value="">{{ 'ALL' | translate }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">VIP Patient</label>
+                                    <label class="form-label small mb-1">{{ 'VIP_PATIENT' | translate }}</label>
                                     <select class="form-select form-select-sm">
-                                        <option value="">-- All --</option>
-                                        <option value="true">Yes</option>
-                                        <option value="false">No</option>
+                                        <option value="">{{ 'ALL' | translate }}</option>
+                                        <option value="true">{{ 'YES'  }}</option>
+                                        <option value="false">{{ 'NO'  }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Channel Items</label>
+                                    <label class="form-label small mb-1">{{ 'CHANNEL_ITEMS' | translate }}</label>
                                     <select class="form-select form-select-sm">
-                                        <option value="">-- All --</option>
+                                        <option value="">{{ 'ALL' | translate }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label class="form-label small mb-1">Patient Type</label>
+                                    <label class="form-label small mb-1">{{ 'PATIENT_TYPE' | translate }}</label>
                                     <select class="form-select form-select-sm">
-                                        <option value="">-- All --</option>
+                                        <option value="">{{ 'ALL' | translate }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -118,29 +119,29 @@
                         <div class="d-flex gap-1 mt-2 justify-content-end">
                             <button type="button" class="btn btn-outline-danger btn-sm" (click)="resetFilter()">
                                 <lucide-icon name="RefreshCcw" class="me-1"></lucide-icon>
-                                Reset
+                                {{ 'RESET' | translate }}
                             </button>
 
                             <button class="btn btn-outline-primary btn-sm" type="submit" [disabled]="isLoading">
                                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"
                                     aria-hidden="true"></span>
-                                <span>{{ isLoading ? 'Searching' : 'Search' }}</span>
+                                <span>{{ isLoading ? ('SEARCHING' | translate) : ('SEARCH' | translate) }}</span>
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <app-ui-card *ngIf="searchResults.length > 0" title="Search Results" [isTogglable]="true"
+                <app-ui-card *ngIf="searchResults.length > 0" title="{{ 'SEARCH_RESULTS' | translate }}" [isTogglable]="true"
                     bodyClass="p-0">
                     <div card-body>
                         <table class="table table-sm table-hover table-bordered align-middle mb-0 fs-sm"
                             id="patient-select">
                             <thead class="thead-light text-uppercase small">
                                 <tr>
-                                    <th class="py-1 px-2">MR No</th>
-                                    <th class="py-1 px-2">Name</th>
-                                    <th class="py-1 px-2">Gender</th>
-                                    <th class="py-1 px-2">Age</th>
+                                    <th class="py-1 px-2">{{ 'MR_NO' | translate }}</th>
+                                    <th class="py-1 px-2">{{ 'NAME' | translate }}</th>
+                                    <th class="py-1 px-2">{{ 'GENDER' | translate }}</th>
+                                    <th class="py-1 px-2">{{ 'AGE' | translate }}</th>
                                 </tr>
                             </thead>
                             <tbody>

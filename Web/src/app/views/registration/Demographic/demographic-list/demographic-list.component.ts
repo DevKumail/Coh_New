@@ -23,6 +23,8 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { HasPermissionDirective } from '@/app/shared/directives/has-permission.directive';
 import { LucideAngularModule, LucideHome, LucideChevronRight, LucideUsers, LucideFilter, LucideFilterX, LucideUserPlus, LucideEdit, LucideTrash2 } from 'lucide-angular';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 
 
 
@@ -35,8 +37,10 @@ import { LucideAngularModule, LucideHome, LucideChevronRight, LucideUsers, Lucid
         RouterModule,
         NgIconComponent,
         NgIcon,
+        TranslatePipe,
         LucideAngularModule,
         HasPermissionDirective,
+        GenericPaginationComponent
     ],
     templateUrl: './demographic-list.component.html',
     styleUrl: './demographic-list.component.scss',
@@ -76,7 +80,7 @@ export class DemographicListComponent {
   RegPatient: any[] = [];
   genders: any[] = [];
   loader: any
-
+  isAppointmentFiltered: boolean = false;
   pageSize = 25;
   currentPage = 1;
   totalRecord = 0;
@@ -92,6 +96,8 @@ export class DemographicListComponent {
   cancelpopup: boolean = false;
   position: string = '';
   selectedGender: any | undefined;
+  DemographicsPagedData: any[] = [];
+  DemographicsTotalItems: any;
 
   FilterData: any = {
     mrNo: '',
@@ -101,7 +107,7 @@ export class DemographicListComponent {
   };
 
   PaginationInfo: any = {
-    RowsPerPage: 5,
+    RowsPerPage: 10,
     Page: 1,
   };
 
@@ -128,16 +134,6 @@ export class DemographicListComponent {
     // this.GetCoverageAndRegPatient(this.FilterData);
   }
 
-  // reloadData() {
-  //   const Demographicsinfo = localStorage.getItem('Demographics');
-  //   if (Demographicsinfo) {
-  //     const Demographics = JSON.parse(Demographicsinfo);
-  //     this.mrNo = Demographics.table2[0]?.mrNo || '';
-  //   }
-  //   this.GetAllRegPatient(this.mrNo);
-  //   this.clearFilter();
-  // }
-
   GetAllRegPatient(MRNo: string) {
     this.DemographicApiServices.GetRegPatientList()
       .then((res: any) => {
@@ -149,34 +145,6 @@ export class DemographicListComponent {
         Swal.fire({ icon: 'error', title: 'Rejected', text: error.message });
       });
   }
-
-//   GetCoverageAndRegPatient(req: any) {
-//     this.load = true;
-//     this.PaginationInfo.RowsPerPage = this.pageSize;
-//     this.PaginationInfo.Page = this.currentPage;
-
-//     this.DemographicApiServices.GetAllDemographicsData(
-//       req,
-//       this.PaginationInfo
-//     ).subscribe({
-//       next: (demographics: any) => {
-//         if (demographics?.table1) {
-//           this.Patient = demographics.table1;
-//           this.pagedPatients = this.Patient; // backend returns current page
-//           this.totalRecord = demographics.table2?.[0]?.totalCount || 0;
-//           this.RegPatient = demographics.table2 || [];
-//         }
-
-//         this.updatePagination();
-//         this.load = false;
-//       },
-//       error: (error: any) => {
-//         this.load = false;
-//         Swal.fire({ icon: 'error', title: 'Rejected', text: error.message });
-//       },
-//     });
-//   }
-
 
   clearFilter() {
     this.FilterData = {
@@ -265,73 +233,18 @@ export class DemographicListComponent {
   }
 
 
-DemographicsPagedData: any[] = [];
-DemographicsCurrentPage = 1;
-DemographicsPageSize = 10;
-DemographicsTotalItems = 0;
-
-get DemographicsTotalPages(): number {
-  return Math.ceil(this.DemographicsTotalItems / this.DemographicsPageSize);
-}
-
-get DemographicsStart(): number {
-  return (this.DemographicsCurrentPage - 1) * this.DemographicsPageSize;
-}
-
-get DemographicsEnd(): number {
-  return Math.min(this.DemographicsStart + this.DemographicsPageSize, this.DemographicsTotalItems);
-}
-
-get DemographicsPageNumbers(): (number | string)[] {
-  const total = this.DemographicsTotalPages;
-  const current = this.DemographicsCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1);
-  if (left > 2) range.push('...');
-  for (let i = left; i <= right; i++) range.push(i);
-  if (right < total - 1) range.push('...');
-  if (total > 1) range.push(total);
-
-  return range;
-}
-
-DemographicsGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.DemographicsTotalPages) return;
-  this.DemographicsCurrentPage = page;
-  this.DemographicsFetchData(this.FilterData);
-}
-
-DemographicsNextPage() {
-  if (this.DemographicsCurrentPage < this.DemographicsTotalPages) {
-    this.DemographicsCurrentPage++;
-    this.DemographicsFetchData(this.FilterData);
-  }
-}
-
-DemographicsPrevPage() {
-  if (this.DemographicsCurrentPage > 1) {
-    this.DemographicsCurrentPage--;
-    this.DemographicsFetchData(this.FilterData);
-  }
-}
 
 async DemographicsFetchData(req: any) {
     debugger
   this.Loader.show();
-  const paginationInfo = {
-    Page: this.DemographicsCurrentPage,
-    RowsPerPage: this.DemographicsPageSize
-  };
 
-  await this.DemographicApiServices.GetAllDemographicsData(req, paginationInfo).subscribe({
+ // Set filter flag based on FilterData
+  this.isAppointmentFiltered = Object.values(this.FilterData).some(
+    (value) => value !== '' && value !== null && value !== undefined
+  );
+  await this.DemographicApiServices.GetAllDemographicsData(req, this.PaginationInfo).subscribe({
     next: (response: any) => {
       this.DemographicsPagedData = response?.table1 || [];
-      console.log( 'this.DemographicsPagedData =>',this.DemographicsPagedData);
 
       this.DemographicsTotalItems = response?.table2?.[0]?.totalCount || 0;
       this.RegPatient = response.table2 || [];
@@ -344,12 +257,19 @@ async DemographicsFetchData(req: any) {
   });
 }
 
-onDemographicsPageSizeChange(event: any) {
-  this.DemographicsPageSize = +event.target.value;
-  this.DemographicsCurrentPage = 1; // Reset to first page
-  debugger
-  this.DemographicsFetchData(this.FilterData);
-}
+
+  get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
+  }
+
+   async onDemographicPageChanged(page: number) {
+    this.PaginationInfo.Page = page;
+    this.DemographicsFetchData(this.FilterData);
+    }
 
 }
 

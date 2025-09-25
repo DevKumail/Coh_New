@@ -29,6 +29,7 @@ import { Subscription } from 'rxjs';
 import { filter, distinctUntilChanged } from 'rxjs/operators';
 import { OnDestroy } from '@angular/core';
 import { LoaderService } from '@core/services/loader.service';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 declare var flatpickr: any;
 
@@ -40,6 +41,7 @@ declare var flatpickr: any;
         FormsModule,
         NgbNavModule,
         NgIconComponent,
+        TranslatePipe,
         FilePondModule,NgxMaskDirective,
     ],
     providers: [provideNgxMask()],
@@ -1100,7 +1102,13 @@ async GetCoverageById(subscribedId: number) {
   }
 }
 
-
+get isRtl(): boolean {
+  try {
+    return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+  } catch {
+    return false;
+  }
+}
 
 }
 

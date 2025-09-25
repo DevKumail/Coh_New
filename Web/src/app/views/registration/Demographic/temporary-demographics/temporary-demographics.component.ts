@@ -4,8 +4,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, For
 
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { NgIconComponent } from '@ng-icons/core';
 import { LucideAngularModule, LucideHome, LucideChevronRight, LucideIdCard, LucideSave, LucideX } from 'lucide-angular';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FilePondModule } from 'ngx-filepond';
@@ -16,6 +16,7 @@ import { NgxDaterangepickerBootstrapDirective} from "ngx-daterangepicker-bootstr
 import {NgxMaskDirective, provideNgxMask} from 'ngx-mask'
 import { TempdemographicDto } from '@/app/shared/Models/registration/Tempdemo/Tempdemographic.model';
 import { SecureStorageService } from '@core/services/secure-storage.service';
+import { NgIconComponent } from '@ng-icons/core';
 
 declare var flatpickr: any;
 
@@ -23,14 +24,17 @@ declare var flatpickr: any;
   selector: 'app-temporary-demographics',
   standalone: true,
   imports: [
-        CommonModule,NgxMaskDirective,
-        ReactiveFormsModule,
-        FormsModule,
-        RouterModule,
-        NgIconComponent,
-        LucideAngularModule,
-        FilePondModule,
-        NgbNavModule,NgxMaskDirective],
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    RouterModule,
+    LucideAngularModule,
+    TranslatePipe,
+    FilePondModule,
+    NgbNavModule,
+    NgIconComponent,
+    NgxMaskDirective
+  ],
 
 
         providers: [
@@ -677,6 +681,15 @@ export class TemporaryDemographicsComponent implements OnInit {
       const yyyy = d.getFullYear();
       return `${dd}/${mm}/${yyyy}`;
     } catch { return ''; }
+  }
+
+
+    get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
   }
 
 }

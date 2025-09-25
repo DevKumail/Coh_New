@@ -3,13 +3,13 @@
         <li class="nav-item">
             <a href="javascript:void(0)" class="nav-link" (click)="onDashboardClick()">
                 <ng-icon name="tablerUser" class="menu-icon"></ng-icon>
-                <span class="menu-text">{{ 'Dashboard' | translate }}</span>
+                <span class="menu-text">{{ 'DASHBOARD' | translate }}</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="javascript:void(0)" class="nav-link" (click)="onPatientSummaryClick()">
                 <ng-icon name="tablerUser" class="menu-icon"></ng-icon>
-                <span class="menu-text">{{ 'Patient Chart' | translate }}</span>
+                <span class="menu-text">{{ 'PATIENT_CHART' | translate }}</span>
             </a>
         </li>
         @for (item of menuItems; track $index) {
@@ -33,12 +33,12 @@
 <ng-template #MenuItemWithChildren let-item="item" let-wrapperClass="wrapperClass" let-togglerClass="togglerClass">
     <li ngbDropdown [class]="wrapperClass" class="dropdown" [class.active]="isChildActive(item)">
         <a ngbDropdownToggle [class]="togglerClass" class="dropdown-toggle drop-arrow-none" role="button">
-            @if (item.icon) {
-            <span>
-                <lucide-angular class="menu-icon" [img]="getIcon(item.icon)"></lucide-angular>
-            </span>
-            }
-            <span class="menu-text"> {{ item.label | translate }} </span>
+                @if (item.icon) {
+                <span>
+                    <lucide-angular class="menu-icon" [img]="getIcon(item.icon)"></lucide-angular>
+                </span>
+                }
+                <span class="menu-text"> {{ normalizeKey(item.label) | translate }} </span>
             @if (item.badge) {
             <span [class]="`badge bg-${item.badge.variant}`">{{ item.badge.text }}</span>
             }
@@ -107,7 +107,7 @@
             <lucide-angular class="menu-icon" [img]="getIcon(item.icon)"></lucide-angular>
         </span>
         }
-        <span class="menu-text">{{ item.label | translate }}</span>
+    <span class="menu-text">{{ normalizeKey(item.label) | translate }}</span>
         @if (item.badge) {
         <span class="badge text-bg-{{item.badge.variant}} opacity-50" [innerHTML]="item.badge.text"></span>
         }

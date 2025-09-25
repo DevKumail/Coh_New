@@ -3,93 +3,97 @@
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
                 <lucide-angular [img]="homeIcon" class="fs-6"></lucide-angular>
-                Registration
+                {{'REGISTRATION' | translate}}
             </a>
         </li>
         <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
-            <lucide-angular [img]="chevronRightIcon" class="fs-6"></lucide-angular>
+            <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-            Demographics
+            {{'DEMOGRAPHICS' | translate}}
         </li>
     </ol>
 </nav>
 
-<div class="card p-3 shadow" *hasPermission="'Registration:Demographics:View'">
-  <!-- <div class="card p-3 shadow mt-2"> -->
-    <!-- Header section -->
-    <div class="d-flex justify-content-between align-items-center mb-2 p-2">
-      <h4 class="m-0 fw-bold heading-title">
-        <lucide-angular [img]="headingIcon" aria-hidden="true"></lucide-angular>
-        <span>Demographics</span>
-      </h4>
-      <div class="d-flex gap-2">
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          type="button"
-          (click)="filter = !filter"
-        >
-          <lucide-angular [img]="filter ? filterOffIcon : filterIcon" class="me-1"></lucide-angular>
-          {{ filter ? 'Hide Filters' : 'Show Filters' }}
-        </button>
-        <button
-          class="btn btn-success btn-sm w-150"
-          *hasPermission="'Registration:Demographics:Add'"
-          type="button"
-          (click)="router.navigate(['/registration/demographic-create'])"
-        >
-          <lucide-angular [img]="addIcon" class="me-1 text-white"></lucide-angular>
-          Add Patient
-        </button>
-      </div>
-    </div>
+<div class="card"  *hasPermission="'Registration:Demographics:View'">
+<div class="accordion" id="Appointmentaccordion">
+            <div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <div class="d-flex w-100 align-items-center">
+                        <button #appointmentToggler class="accordion-button collapsed d-flex no-accordion-caret flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAppointment" aria-expanded="false" aria-controls="collapseAppointment">
+                                  <lucide-angular class="me-1 ms-1" [img]="headingIcon" aria-hidden="true"></lucide-angular>
+                          {{'DEMOGRAPHICS' | translate}}
+                        </button>
+                        <button type="button" class="btn btn-link p-0 mb-1" title="Filter"
+                                (click)="appointmentToggler?.click()"
+                                [style.marginInlineStart]="'auto'">
+                                <ng-icon style="color: orange;" [name]="isAppointmentFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
+                            </button>
+                            <button style="width: 100px;" class="btn btn-success ms-1 me-1" (click)="router.navigate(['/registration/demographic-create'])"> 
+                                <ng-icon style="margin-bottom: 1px;" class="me-1 ms-1" name='tablerPlus'></ng-icon>
+                                <span class="me-1">
+                                    {{'ADD' | translate}} 
+                                </span>
+                            </button>
+                      </div>
+                    </h2>
+                    <div id="collapseAppointment" class="accordion-collapse collapse" data-bs-parent="#Appointmentaccordion">
+                      <div class="accordion-body">
+                        <div class="card shadow-sm rounded-3">
+                            <div class="card-body">
 
-    <!-- Filters -->
-    <div class="card card-body mb-3 border-0 bg-light" *ngIf="filter" [@slideFade]="filter">
-      <form (ngSubmit)="submitFilter()" class="row g-3 align-items-end">
+                                   <form (ngSubmit)="submitFilter()" class="row g-3 align-items-end">
         <div class="col-12 col-sm-6 col-lg-3">
-          <label class="form-label">MR NO</label>
-          <input type="text" class="form-control" [(ngModel)]="FilterData.mrNo" name="mrNo" placeholder="e.g. 1023" />
+          <label class="form-label">{{'MR_NO' | translate }}</label>
+          <input type="text" class="form-control" [(ngModel)]="FilterData.mrNo" name="mrNo" placeholder="{{ 'MR_NO' | translate }}" />
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
-          <label class="form-label">Name</label>
-          <input type="text" class="form-control" [(ngModel)]="FilterData.name" name="name" placeholder="Patient name" />
+          <label class="form-label">{{'NAME' | translate }}</label>
+          <input type="text" class="form-control" [(ngModel)]="FilterData.name" name="name" placeholder="{{ 'NAME' | translate }}" />
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
-          <label class="form-label">Phone</label>
-          <input type="text" class="form-control" [(ngModel)]="FilterData.phone" name="phone" placeholder="Phone" />
+          <label class="form-label">{{'PHONE' | translate }}</label>
+          <input type="text" class="form-control" [(ngModel)]="FilterData.phone" name="phone" placeholder="{{'PHONE' | translate }}" />
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
-          <label class="form-label">Gender</label>
+          <label class="form-label">{{'GENDER' | translate }}</label>
           <select class="form-select" [(ngModel)]="FilterData.genderId" name="genderId">
-            <option value="">Any</option>
+              <option value="" disabled selected>-- {{ 'ALL' | translate }} --</option>
             <option *ngFor="let g of genders" [ngValue]="g.code">{{ g.name }}</option>
           </select>
         </div>
         <div class="col-12 d-flex gap-2 justify-content-end">
           <button type="button" class="btn btn-light" (click)="clearFilter()">
-            Clear
+            {{'CLEAR' | translate }} 
           </button>
           <button type="submit" class="btn btn-primary">
-            Apply
+            {{'SEARCH' | translate }} 
           </button>
         </div>
       </form>
     </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            </div>
+
 
         <!-- Table -->
-        <div class="table-responsive">
-            <table class="table align-middle mb-0 table-striped">
+        <div class="card-body">
+            <table class="table table-bordered table-striped table-sm">
               <thead class="thead-sm">
                 <tr class="text-uppercase text-center">
-                  <th>MR No</th>
-                  <th>Name</th>
-                  <th>Date of Birth</th>
-                  <th>SSN</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Gender</th>
-                  <th class="text-center" style="width: 100px;">Actions</th>
+                  <th>{{'MR_NO' | translate}}</th>
+                  <th>{{'NAME' | translate}}</th>
+                  <th>{{'DOB' | translate}}</th>
+                  <th>{{'SSN' | translate}}</th>
+                  <th>{{'EMAIL' | translate}}</th>
+                  <th>{{'PHONE' | translate}}</th>
+                  <th>{{'GENDER' | translate}}</th>
+                  <th class="text-center" style="width: 100px;">{{'ACTION' | translate}}</th>
                 </tr>
               </thead>
               <tbody class="table-group-divider text-center">
@@ -125,14 +129,23 @@
                   </td>
                 </tr>
                 <tr *ngIf="DemographicsPagedData?.length === 0">
-                  <td colspan="8" class="text-center">No patient found.</td>
+                  <td colspan="8" class="text-center">{{'NO_DATA_FOUND' | translate}}</td>
                 </tr>
               </tbody>
             </table>
         </div>
 
         <!-- Pagination -->
-        <div class="d-flex flex-column align-items-center mt-3 gap-2">
+               <app-generic-pagination
+                    [totalItems]="DemographicsTotalItems"
+                    [pageSize]="PaginationInfo.RowsPerPage"
+                    [currentPage]="PaginationInfo.Page"
+                    (pageChanged)="onDemographicPageChanged($event)"
+                >
+                </app-generic-pagination>
+
+
+        <!-- <div class="d-flex flex-column align-items-center mt-3 gap-2">
             <div
                 class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap"
             >
@@ -179,6 +192,6 @@
                     </ul>
                 </nav>
             </div>
-        </div>
+        </div> -->
     </div>
 <!-- </div> -->

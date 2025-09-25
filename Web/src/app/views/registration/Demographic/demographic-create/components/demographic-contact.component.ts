@@ -1,3 +1,4 @@
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -6,125 +7,125 @@ import { NgxMaskDirective } from 'ngx-mask';
 @Component({
   selector: 'app-demographic-contact',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, TranslatePipe],
   template: `
     <form [formGroup]="contactForm" class="row g-3">
       <!-- Street Name -->
       <div class="col-md-3">
-        <label>Street Name <span class="text-danger">*</span></label>
+        <label>{{'STREET_NAME' | translate}} <span class="text-danger">*</span></label>
         <input class="form-control"
                [class.is-invalid]="contactForm.get('streetName')?.invalid && (contactForm.get('streetName')?.touched || isFormSubmitted)"
-               formControlName="streetName" type="text" />
+               formControlName="streetName" type="text" placeholder="{{'ENTER_STREET_NAME' | translate}}" />
         <div class="invalid-feedback d-block"
              *ngIf="contactForm.get('streetName')?.invalid && (contactForm.get('streetName')?.touched || isFormSubmitted)">
-          Street name is required.
+             {{'STREET_NAME_IS_REQUIRED' | translate}}
         </div>
       </div>
 
       <!-- Dwelling Number -->
       <div class="col-md-3">
-        <label>Dwelling Number</label>
-        <input class="form-control" formControlName="dwellingNumber" type="text" />
+        <label>{{'DWELLING_NUMBER' | translate}}</label>
+        <input class="form-control" placeholder="{{'ENTER_DWELLING_NUMBER' | translate}}" formControlName="dwellingNumber" type="text" />
       </div>
 
       <!-- Country -->
       <div class="col-md-3">
-        <label>Country <span class="text-danger">*</span></label>
+        <label>{{'COUNTRY' | translate}} <span class="text-danger">*</span></label>
         <select class="form-select"
                 [class.is-invalid]="contactForm.get('CountryId')?.invalid && (contactForm.get('CountryId')?.touched || isFormSubmitted)"
                 formControlName="CountryId" (change)="countryChange.emit()">
-          <option [ngValue]="null">-- Select Country --</option>
+          <option [ngValue]="null">-- {{'SELECT_COUNTRY' | translate}} --</option>
           <option *ngFor="let c of Country" [ngValue]="c.code">{{ c.name }}</option>
         </select>
         <div class="invalid-feedback d-block"
              *ngIf="contactForm.get('CountryId')?.invalid && (contactForm.get('CountryId')?.touched || isFormSubmitted)">
-          Country is required.
+          {{'COUNTRY_IS_REQUIRED' | translate}}
         </div>
       </div>
 
       <!-- State -->
       <div class="col-md-3">
-        <label>State <span class="text-danger">*</span></label>
+        <label>{{'STATE' | translate}} <span class="text-danger">*</span></label>
         <select class="form-select"
                 [class.is-invalid]="contactForm.get('StateId')?.invalid && (contactForm.get('StateId')?.touched || isFormSubmitted)"
                 formControlName="StateId" (change)="stateChange.emit()">
-          <option [ngValue]="null">-- Select State --</option>
+          <option [ngValue]="null">-- {{'SELECT_STATE' | translate}} --</option>
           <option *ngFor="let s of states" [ngValue]="s.stateId">{{ s.name }}</option>
         </select>
         <div class="invalid-feedback d-block"
              *ngIf="contactForm.get('StateId')?.invalid && (contactForm.get('StateId')?.touched || isFormSubmitted)">
-          State is required.
+          {{'STATE_IS_REQUIRED' | translate}}
         </div>
       </div>
 
       <!-- City -->
       <div class="col-md-3">
-        <label>City <span class="text-danger">*</span></label>
+        <label>{{'CITY' | translate}}<span class="text-danger">*</span></label>
         <select class="form-select"
                 [class.is-invalid]="contactForm.get('CityId')?.invalid && (contactForm.get('CityId')?.touched || isFormSubmitted)"
                 formControlName="CityId">
-          <option [ngValue]="null">-- Select City --</option>
+          <option [ngValue]="null">-- {{'SELECT_CITY' | translate}} --</option>
           <option *ngFor="let c of city" [ngValue]="c.cityId">{{ c.name }}</option>
         </select>
         <div class="invalid-feedback d-block"
              *ngIf="contactForm.get('CityId')?.invalid && (contactForm.get('CityId')?.touched || isFormSubmitted)">
-          City is required.
+          {{'CITY_IS_REQUIRED' | translate}}
         </div>
       </div>
 
       <!-- Fax No -->
       <div class="col-md-3">
-        <label>Fax No</label>
-        <input class="form-control" formControlName="faxNo" type="text" />
+        <label>{{'FAX_NO' | translate}}</label>
+        <input class="form-control" formControlName="faxNo" type="text" placeholder="{{'ENTER_FAX_NO' | translate}}" />
       </div>
 
       <!-- Postal Code -->
       <div class="col-md-3">
-        <label>Postal Code <span class="text-danger">*</span></label>
+        <label>{{ 'POSTAL_CODE' | translate }} <span class="text-danger">*</span></label>
         <input class="form-control"
                [class.is-invalid]="contactForm.get('postalCode')?.invalid && (contactForm.get('postalCode')?.touched || isFormSubmitted)"
-               formControlName="postalCode" type="text" [mask]="'00000'" placeholder="e.g. 75000" />
+               formControlName="postalCode" type="text" [mask]="'00000'" placeholder="{{'ENTER_POSTAL_CODE' | translate}}" />
         <div class="invalid-feedback d-block"
              *ngIf="contactForm.get('postalCode')?.invalid && (contactForm.get('postalCode')?.touched || isFormSubmitted)">
-          Postal code is required.
+          {{'POSTAL_CODE_IS_REQUIRED' | translate}}
         </div>
       </div>
 
       <!-- Home Phone -->
       <div class="col-md-3">
-        <label>Home Phone</label>
-        <input class="form-control" formControlName="homePhone" type="text" />
+        <label>{{'HOME_PHONE' | translate}}</label>
+        <input class="form-control" formControlName="homePhone" type="text" placeholder="{{'ENTER_HOME_PHONE' | translate}}" />
       </div>
 
       <!-- Cell Phone -->
       <div class="col-md-3">
-        <label>Cell Phone <span class="text-danger">*</span></label>
+        <label>{{'CELL_PHONE' | translate}} <span class="text-danger">*</span></label>
         <input class="form-control"
                [class.is-invalid]="contactForm.get('cellPhone')?.invalid && (contactForm.get('cellPhone')?.touched || isFormSubmitted)"
-               formControlName="cellPhone" type="text" />
+               formControlName="cellPhone" type="text" placeholder="{{'ENTER_CELL_PHONE' | translate}}" />
         <div class="invalid-feedback d-block"
              *ngIf="contactForm.get('cellPhone')?.invalid && (contactForm.get('cellPhone')?.touched || isFormSubmitted)">
-          Valid cell phone is required.
+          {{'CELL_PHONE_IS_REQUIRED' | translate}}
         </div>
       </div>
 
       <!-- Work Phone -->
       <div class="col-md-3">
-        <label>Work Phone</label>
-        <input class="form-control" formControlName="workPhone" type="text" />
+        <label>{{'WORK_PHONE' | translate}}</label>
+        <input class="form-control" formControlName="workPhone" type="text" placeholder="{{'ENTER_WORK_PHONE' | translate}}" />
       </div>
 
       <!-- Email -->
       <div class="col-md-3">
-        <label for="userEmail" class="form-label"> Email address <span class="text-danger">*</span> </label>
+        <label for="userEmail" class="form-label"> {{'EMAIL_ADDRESS' | translate}} <span class="text-danger">*</span> </label>
         <div class="input-group">
           <input type="email" class="form-control"
                  [class.is-invalid]="contactForm.get('email')?.invalid && (contactForm.get('email')?.touched || isFormSubmitted)"
-                 id="userEmail" placeholder="you@example.com" formControlName="email" />
+                 id="userEmail" placeholder="{{'ENTER_EMAIL_ADDRESS' | translate}}" formControlName="email" />
         </div>
         <div class="invalid-feedback d-block"
              *ngIf="contactForm.get('email')?.invalid && (contactForm.get('email')?.touched || isFormSubmitted)">
-          A valid email is required.
+          {{'VALID_EMAIL_IS_REQUIRED' | translate}}
         </div>
       </div>
     </form>

@@ -19,7 +19,7 @@
           <div class="form-check">
             <input type="checkbox" class="form-check-input" formControlName="isProviderCheck" id="isProviderCheck" style="height: 20px; width: 20px;" />
             <label class="form-check-label" for="isProviderCheck" style="margin-bottom: -22px;">
-              Provider Outside Clinic
+              {{ 'PROVIDER_OUTSIDE_CLINIC' | translate }}
             </label>
           </div>
         </div>
@@ -27,25 +27,27 @@
 
       <div class="col-lg-3">
         <div class="mb-3">
-           <label class="form-label fw-semibold">Provider</label>
+           <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }}</label>
           <select class="form-select" formControlName="providerId">
-            <option [ngValue]="null" disabled>Select Provider</option>
+            <option [ngValue]="" disabled>{{'SELECT_PROVIDER' | translate}}</option>
             <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}</option>
           </select>
+          <div class="text-danger small" *ngIf="(medicalForm.get('providerId')?.touched || submitted) && medicalForm.get('providerId')?.invalid">{{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
         </div>
       </div>
 
 
       <div class="col-lg-3">
         <div class="mb-3">
-          <label class="form-label">Problem</label>
+          <label class="form-label">{{'PROBLEM' | translate}}</label>
 
           <div class="input-group">
-            <input type="text" class="form-control" formControlName="problem" placeholder="Enter problem" />
+            <input type="text" class="form-control" formControlName="problem" placeholder="{{ 'ENTER_PROBLEM' | translate }}" />
             <button class="btn btn-success" type="button" (click)="ClickFilter(standardModal)">
               <i class="fa fa-search"></i>
             </button>
           </div>
+          <div class="text-danger small" *ngIf="(medicalForm.get('problem')?.touched || submitted) && medicalForm.get('problem')?.invalid">{{ 'PROBLEM_IS_REQUIRED' | translate }}</div>
 
         </div>
       </div>
@@ -54,8 +56,9 @@
 
       <div class="col-lg-3">
         <div class="mb-3">
-          <label class="form-label">Comments</label>
-          <input type="text" class="form-control" formControlName="comments" placeholder="Enter comments" />
+          <label class="form-label">{{ 'COMMENT' | translate }}</label>
+          <input type="text" class="form-control" formControlName="comments" placeholder="{{ 'ENTER_COMMENT' | translate }}"/>
+          <div class="text-danger small" *ngIf="(medicalForm.get('comments')?.touched || submitted) && medicalForm.get('comments')?.invalid">{{ 'COMMENT_IS_REQUIRED' | translate }}</div>
         </div>
       </div>
 
@@ -65,34 +68,36 @@
     <div class="row">
       <div class="col-lg-3">
         <div class="mb-3">
-          <label class="form-label">Status</label>
+          <label class="form-label">{{ 'STATUS' | translate }}</label>
           <select class="form-select" formControlName="status">
-            <option value="" disabled selected>Select Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
+            <option value="" disabled selected>{{ 'SELECT_STATUS' | translate }}</option>
+            <option value="Active">{{ 'Active'}}</option>
+            <option value="Inactive">{{ 'InActive'}}</option>
           </select>
+          <div class="text-danger small" *ngIf="(medicalForm.get('status')?.touched || submitted) && medicalForm.get('status')?.invalid">{{ 'STATUS_IS_REQUIRED' | translate }}</div>
         </div>
       </div>
 
       <div class="col-lg-3">
         <div class="mb-3">
-          <label class="form-label">Start Date</label>
+          <label class="form-label">{{ 'START_DATE' | translate }}</label>
           <input type="date" class="form-control" formControlName="startDate" />
+          <div class="text-danger small" *ngIf="(medicalForm.get('startDate')?.touched || submitted) && medicalForm.get('startDate')?.invalid">{{ 'START_DATE_IS_REQUIRED' | translate }}</div>
         </div>
       </div>
 
       <div class="col-lg-3">
         <div class="mb-3">
-          <label class="form-label">End Date</label>
+          <label class="form-label">{{ 'END_DATE' | translate }}</label>
           <input type="date" class="form-control" formControlName="endDate" />
+          <div class="text-danger small" *ngIf="(medicalForm.get('endDate')?.touched || submitted) && medicalForm.get('endDate')?.invalid">{{ 'END_DATE_REQUIRED' | translate }}</div>
         </div>
       </div>
 
       <div class="col-lg-3 ms-auto">
         <div class="d-flex justify-content-end gap-2 mt-2">
-
-          <button type="button" class="btn btn-secondary" (click)="onClear()">Clear</button>
-          <button type="submit" class="btn btn-success">Save</button>
+          <button type="button" class="btn btn-secondary" (click)="onClear()">{{ 'CLEAR' | translate }}</button>
+          <button type="submit" class="btn btn-success">{{ 'SUBMIT' | translate }}</button>
         </div>
       </div>
     </div>
@@ -103,13 +108,13 @@
         <table class="table table-bordered table-striped">
           <thead>
             <tr class="text-center">
-              <th>Provider</th>
-              <th>Problem</th>
-              <th>Comments</th>
-              <th>Confidential</th>
-              <th>Status</th>
-              <th>Start Date</th>
-              <th>End Date</th>
+              <th>{{ 'PROVIDER' | translate }}</th>
+              <th>{{ 'PROBLEM' | translate }}</th>
+              <th>{{ 'COMMENT' | translate }}</th>
+              <th>{{ 'CONFIDENTIAL' | translate }}</th>
+              <th>{{ 'STATUS' | translate }}</th>
+              <th>{{ 'START_DATE' | translate }}</th>
+              <th>{{ 'END_DATE' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -165,7 +170,7 @@
 </form>
 
 <ng-template #standardModal let-modal>
-  <form  [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
+  <form  *ngIf="FilterForm" [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
     <div class="modal-header">
       <h5 class="modal-title">Search-Problem</h5>
       <button type="button" class="btn-close" (click)="modal.dismiss()"></button>

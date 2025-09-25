@@ -223,6 +223,7 @@ export class PatientHeaderPanelComponent implements OnInit {
       console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
       if (data) {
         this.AppoinmentData = data?.table;
+        this.updatePagination()
         // this.ActiveAppoinment = this.visitAppointments?.appointmentId; 
         // Persist currently selected visit
         // this.secureStorage.setJson(this.STORAGE_KEYS.selectedVisit, this.visitAppointments);
@@ -270,6 +271,14 @@ export class PatientHeaderPanelComponent implements OnInit {
     // Persist selected visit explicitly on selection
     if (data) {
       this.secureStorage.setJson(this.STORAGE_KEYS.selectedVisit, data);
+    }
+  }
+
+       get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
     }
   }
 }

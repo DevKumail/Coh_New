@@ -17,21 +17,21 @@ export interface ExtendedMenuItemType extends MenuItemType {
 
 export const userDropdownItems: UserDropdownItemType[] = [
     {
-        label: 'Welcome back!',
+        label: 'WELCOME_BACK!',
         isHeader: true,
     },
     {
-        label: 'Profile',
+        label: 'PROFILE',
         icon: 'tablerUserCircle',
         url: 'pages-profile.html',
     },
     {
-        label: 'Account Settings',
+        label: 'ACCOUNT_SETTINGS',
         icon: 'tablerSettings2',
         url: '#',
     },
     {
-        label: 'Support Center',
+        label: 'SUPPORT_CENTER',
         icon: 'tablerHeadset',
         url: '#',
     },
@@ -45,7 +45,7 @@ export const userDropdownItems: UserDropdownItemType[] = [
         // class: 'text-danger fw-semibold',
         // action: 'logout'
 
-        label: 'Log Out',
+        label: 'LOG_OUT',
         icon: 'tablerLogout2',
         url: '', // Remove the #
         class: 'text-danger fw-semibold',
@@ -72,6 +72,8 @@ export const menuItems: ExtendedMenuItemType[] = [
     },
 
     { label: 'Menu', isTitle: true },
+
+    
     {
         label: 'Registration',
         icon: 'tablerIdBadge2',
@@ -219,7 +221,7 @@ export const menuItems: ExtendedMenuItemType[] = [
         icon: 'tablerHeartbeat',
         module: 'Billing', // 👈 this is used by PermissionService
         isCollapsed: true,
-        children: [{ label: 'Charge Capture', url: '/billing/charge-capture' }],
+        children: [{ label: 'Charge Capture', url: '/billing/charge capture' }],
     },
 
     { label: 'Apps', isTitle: true },
@@ -829,7 +831,7 @@ export const horizontalMenuItems: MenuItemType[] = [
             {
                 label: 'Charge Capture',
                 icon: 'tablerReceipt',
-                url: '/billing/charge-capture',
+                url: '/billing/charge capture',
             },
         ],
     },

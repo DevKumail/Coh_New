@@ -1,3 +1,4 @@
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -5,96 +6,96 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 @Component({
   selector: 'app-demographic-next-of-kin',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   template: `
     <form [formGroup]="nextForm" class="row g-3">
       <!-- Relationship -->
       <div class="col-md-3">
-        <label>Relationship</label>
+        <label>{{'RELATIONSHIP' | translate}}</label>
         <select class="form-select" formControlName="relationshipId">
-          <option value="">Select Relationship</option>
+          <option value="">{{'SELECT_RELATIONSHIP' | translate}}</option>
           <option *ngFor="let r of relationships" [value]="r.code">{{ r.name }}</option>
         </select>
       </div>
 
       <!-- First Name -->
       <div class="col-md-3">
-        <label>First Name</label>
-        <input class="form-control" formControlName="firstName" type="text" />
+        <label>{{'FIRST_NAME' | translate}}</label>
+        <input class="form-control" formControlName="firstName" type="text" placeholder="{{'ENTER_FIRST_NAME' | translate}}" />
       </div>
 
       <!-- Middle Name -->
       <div class="col-md-3">
-        <label>Middle Name</label>
-        <input class="form-control" formControlName="middleName" type="text" />
+        <label>{{'MIDDLE_NAME' | translate}}</label>
+        <input class="form-control" formControlName="middleName" type="text" placeholder="{{'ENTER_MIDDLE_NAME' | translate}}" />
       </div>
 
       <!-- Last Name -->
       <div class="col-md-3">
-        <label>Last Name</label>
-        <input class="form-control" formControlName="lastName" type="text" />
+        <label>{{'LAST_NAME' | translate}}</label>
+        <input class="form-control" formControlName="lastName" type="text" placeholder="{{'ENTER_LAST_NAME' | translate}}" />
       </div>
 
       <div class="col-md-3">
-        <label>Street Name</label>
-        <input class="form-control" formControlName="streetName" type="text" />
+        <label>{{'STREET_NAME' | translate}}</label>
+        <input class="form-control" formControlName="streetName" type="text" placeholder="{{'ENTER_STREET_NAME' | translate}}" />
       </div>
 
       <!-- Country -->
       <div class="col-md-3">
-        <label>Country</label><span class="text-danger">*</span>
+        <label>{{'COUNTRY' | translate}}</label><span class="text-danger">*</span>
         <select class="form-select" formControlName="CountryId" (change)="countryChange.emit()">
-          <option value="">-- Select Country --</option>
+          <option value="">-- {{'SELECT_COUNTRY' | translate}} --</option>
           <option *ngFor="let c of Country" [value]="c.code">{{ c.name }}</option>
         </select>
       </div>
 
       <!-- State/ Emirate -->
       <div class="col-md-3">
-        <label>State/ Emirate</label><span class="text-danger">*</span>
+        <label>{{'STATE' | translate}}</label><span class="text-danger">*</span>
         <select class="form-select" formControlName="StateId" (change)="stateChange.emit()">
-          <option value="">-- Select State --</option>
+          <option value="">-- {{'SELECT_STATE' | translate}} --</option>
           <option *ngFor="let s of states" [value]="s.stateId">{{ s.name }}</option>
         </select>
       </div>
 
       <!-- City/ Location -->
       <div class="col-md-3">
-        <label>City/ Location</label><span class="text-danger">*</span>
+        <label>{{'CITY' | translate}}</label><span class="text-danger">*</span>
         <select class="form-select" formControlName="CityId">
-          <option value="">-- Select City --</option>
+          <option value="">-- {{'SELECT_CITY' | translate}} --</option>
           <option *ngFor="let c of city" [value]="c.code">{{ c.name }}</option>
         </select>
       </div>
 
       <!-- Postal Code -->
       <div class="col-md-3">
-        <label>Postal Code</label>
-        <input class="form-control" formControlName="postalCode" type="text" />
+        <label>{{'POSTAL_CODE' | translate}}</label>
+        <input class="form-control" formControlName="postalCode" type="text" placeholder="{{'ENTER_POSTAL_CODE' | translate}}" />
       </div>
 
       <!-- Phone No -->
       <div class="col-md-3">
-        <label>Phone No</label>
-        <input class="form-control" formControlName="cellPhone" type="text" />
+        <label>{{'CELL_PHONE' | translate}}</label>
+        <input class="form-control" formControlName="cellPhone" type="text" placeholder="{{'ENTER_CELL_PHONE' | translate}}" />
       </div>
 
       <!-- Home Phone -->
       <div class="col-md-3">
-        <label>Home Phone</label>
-        <input class="form-control" formControlName="homePhone" type="text" />
+        <label>{{'HOME_PHONE' | translate}}</label>
+        <input class="form-control" formControlName="homePhone" type="text" placeholder="{{'ENTER_HOME_PHONE' | translate}}" />
       </div>
 
       <!-- Work Phone -->
       <div class="col-md-3">
-        <label>Work Phone</label>
-        <input class="form-control" formControlName="workPhone" type="text" />
+        <label>{{'WORK_PHONE' | translate}}</label>
+        <input class="form-control" formControlName="workPhone" type="text" placeholder="{{'ENTER_WORK_PHONE' | translate}}" />
       </div>
 
       <!-- Email -->
       <div class="col-md-3">
-        <label>Email</label>
-        <input class="form-control" formControlName="email" type="email" />
+        <label>{{'EMAIL' | translate}}</label>
+        <input class="form-control" formControlName="email" type="email" placeholder="{{'ENTER_EMAIL_ADDRESS' | translate}}" />
       </div>
     </form>
   `,

@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LucideAngularModule, LucideCamera, LucideTrash2 } from 'lucide-angular';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 @Component({
   selector: 'app-demographic-photo-personal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule,TranslatePipe],
   template: `
   <div class="row mb-3 gx-2 align-items-start">
     <!-- Patient Photo Section - Left Side -->
@@ -15,7 +16,7 @@ import { LucideAngularModule, LucideCamera, LucideTrash2 } from 'lucide-angular'
         <div class="card-body text-center p-1">
           <h5 class="card-title mb-1 d-flex align-items-center justify-content-center gap-1">
             <lucide-angular [img]="LucideCamera" class="fs-5"></lucide-angular>
-            <span>Patient Photo</span>
+            <span>{{'PATIENT_PHOTO' | translate}}</span>
           </h5>
           <div class="profile-image-container mb-1" [class.has-image]="imageSrc && imageSrc !== defaultImage">
             <img
@@ -55,51 +56,51 @@ import { LucideAngularModule, LucideCamera, LucideTrash2 } from 'lucide-angular'
         <div class="card-body">
           <h5 class="card-title mb-3 d-flex align-items-center gap-2">
             <i class="fa fa-user"></i>
-            <span>Personal & Basic Details</span>
+            <span>{{'PERSONAL_DETAILS' | translate}}</span>
           </h5>
           <div class="row g-2" [formGroup]="demographicForm">
             <!-- Title -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label">Title <span class="text-danger">*</span></label>
+              <label class="form-label">{{'TITLE' | translate}} <span class="text-danger">*</span></label>
               <select class="form-select"
                       [class.is-invalid]="demographicForm.get('PersonTitleId')?.invalid && (demographicForm.get('PersonTitleId')?.touched || isFormSubmitted)"
                       formControlName="PersonTitleId">
-                <option value="" disabled selected hidden>-- Select Title --</option>
+                <option value="" disabled selected hidden>-- {{'SELECT_TITEL' | translate}} --</option>
                 <option *ngFor="let t of titles" [ngValue]="t.code">{{ t.name }}</option>
               </select>
               <div class="invalid-feedback d-block"
                    *ngIf="demographicForm.get('PersonTitleId')?.invalid && (demographicForm.get('PersonTitleId')?.touched || isFormSubmitted)">
-                Title is required.
+                {{'TITLE_IS_REQUIRED' | translate}} 
               </div>
             </div>
 
             <!-- First Name -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label">First Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control"
-                     [class.is-invalid]="demographicForm.get('PersonFirstName')?.invalid && (demographicForm.get('PersonFirstName')?.touched || isFormSubmitted)"
-                     formControlName="PersonFirstName" placeholder="Enter first name" />
+              <label class="form-label">{{'FIRST_NAME' | translate}} <span class="text-danger">*</span></label>
+    <input type="text" class="form-control"
+      [class.is-invalid]="demographicForm.get('PersonFirstName')?.invalid && (demographicForm.get('PersonFirstName')?.touched || isFormSubmitted)"
+      formControlName="PersonFirstName" placeholder="{{'ENTER_FIRST_NAME' | translate }}" />
               <div class="invalid-feedback d-block"
                    *ngIf="demographicForm.get('PersonFirstName')?.invalid && (demographicForm.get('PersonFirstName')?.touched || isFormSubmitted)">
-                First name is required.
+                {{'FIRST_NAME_IS_REQUIRED' | translate}}
               </div>
             </div>
 
             <!-- Middle Name -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label">Middle Name</label>
-              <input type="text" class="form-control" formControlName="PersonMiddleName" placeholder="Enter middle name" />
+              <label class="form-label">{{'MIDDLE_NAME' | translate }}</label>
+              <input type="text" class="form-control" formControlName="PersonMiddleName" placeholder="{{'ENTER_MIDDLE_NAME' | translate }}" />
             </div>
 
             <!-- Last Name -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label">Last Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control"
-                     [class.is-invalid]="demographicForm.get('PersonLastName')?.invalid && (demographicForm.get('PersonLastName')?.touched || isFormSubmitted)"
-                     formControlName="PersonLastName" placeholder="Enter last name" />
+              <label class="form-label">{{'LAST_NAME' | translate}} <span class="text-danger">*</span></label>
+    <input type="text" class="form-control"
+      [class.is-invalid]="demographicForm.get('PersonLastName')?.invalid && (demographicForm.get('PersonLastName')?.touched || isFormSubmitted)"
+      formControlName="PersonLastName" placeholder="{{'ENTER_LAST_NAME' | translate }}" />
               <div class="invalid-feedback d-block"
                    *ngIf="demographicForm.get('PersonLastName')?.invalid && (demographicForm.get('PersonLastName')?.touched || isFormSubmitted)">
-                Last name is required.
+                {{'LAST_NAME_IS_REQUIRED' | translate}}
               </div>
             </div>
 
@@ -109,93 +110,93 @@ import { LucideAngularModule, LucideCamera, LucideTrash2 } from 'lucide-angular'
             <!-- Basic Details (merged) -->
             <!-- Gender -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label required">Gender</label>
+              <label class="form-label required">{{'GENDER' | translate }}</label>
               <select class="form-select"
                       [class.is-invalid]="demographicForm.get('PersonSexId')?.invalid && (demographicForm.get('PersonSexId')?.touched || isFormSubmitted)"
                       formControlName="PersonSexId">
-                <option [ngValue]="null" disabled>-- Select Gender --</option>
-                <option *ngFor="let g of gender" [ngValue]="g.code">{{ g.name }}</option>
+                <option [ngValue]="null" disabled>-- {{'SELECT_GENDER' | translate}} --</option>
+                <option *ngFor="let g of gender" [ngValue]="g.code">{{ g.name  }}</option>
               </select>
               <div class="invalid-feedback d-block"
                    *ngIf="demographicForm.get('PersonSexId')?.invalid && (demographicForm.get('PersonSexId')?.touched || isFormSubmitted)">
-                Gender is required.
+                {{'GENDER_IS_REQUIRED' | translate}}
               </div>
             </div>
 
             <!-- Preferred Name -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label">Preferred Name</label>
-              <input type="text" class="form-control" formControlName="preferredName" placeholder="Enter preferred name"/>
+              <label class="form-label">{{'PREFERRED_NAME' | translate}}</label>
+              <input type="text" class="form-control" formControlName="preferredName" placeholder="{{'ENTER_PREFERRED_NAME' | translate}}"/>
             </div>
 
             <!-- Gender Identity -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label required">Gender Identity</label>
+              <label class="form-label required">{{'GENDER_IDENTITY' | translate}}</label>
               <select class="form-select"
                       [class.is-invalid]="demographicForm.get('genderIdentity')?.invalid && (demographicForm.get('genderIdentity')?.touched || isFormSubmitted)"
                       formControlName="genderIdentity">
-                <option [ngValue]="null" disabled>-- Select Gender Identity --</option>
+                <option [ngValue]="null" disabled>-- {{'SELECT_GENDER_IDENTITY' | translate}} --</option>
                 <option *ngFor="let gi of genderIdentity" [ngValue]="gi.genderId">{{ gi.genderText }}</option>
               </select>
               <div class="invalid-feedback d-block"
                    *ngIf="demographicForm.get('genderIdentity')?.invalid && (demographicForm.get('genderIdentity')?.touched || isFormSubmitted)">
-                Gender Identity is required.
+                {{'GENDER_IDENTITY_IS_REQUIRED' | translate}}
               </div>
             </div>
 
             <!-- Marital Status -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label required">Marital Status</label>
+              <label class="form-label required">{{'MARITAL_STATUS' | translate}}</label>
               <select class="form-select"
                       [class.is-invalid]="demographicForm.get('PersonMaritalStatus')?.invalid && (demographicForm.get('PersonMaritalStatus')?.touched || isFormSubmitted)"
                       formControlName="PersonMaritalStatus">
-                <option [ngValue]="null" disabled>-- Select Marital Status --</option>
+                <option [ngValue]="null" disabled>-- {{'SELECT_MARITAL_STATUS' | translate}} --</option>
                 <option *ngFor="let m of maritalstatus" [ngValue]="m.code">{{ m.name }}</option>
               </select>
               <div class="invalid-feedback d-block"
                    *ngIf="demographicForm.get('PersonMaritalStatus')?.invalid && (demographicForm.get('PersonMaritalStatus')?.touched || isFormSubmitted)">
-                Marital Status is required.
+                {{'MARITAL_STATUS_IS_REQUIRED' | translate}}
               </div>
             </div>
 
             <!-- Blood Group -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label required">Blood Group</label>
+              <label class="form-label required">{{'BLOOD_GROUP' | translate}}</label>
               <select class="form-select"
                       [class.is-invalid]="demographicForm.get('PatientBloodGroupId')?.invalid && (demographicForm.get('PatientBloodGroupId')?.touched || isFormSubmitted)"
                       formControlName="PatientBloodGroupId">
-                <option [ngValue]="null" disabled>-- Select Blood Group --</option>
+                <option [ngValue]="null" disabled>-- {{'SELECT_BLOOD_GROUP' | translate}} --</option>
                 <option *ngFor="let b of bloodgroup" [ngValue]="b.code">{{ b.name }}</option>
               </select>
               <div class="invalid-feedback d-block"
                    *ngIf="demographicForm.get('PatientBloodGroupId')?.invalid && (demographicForm.get('PatientBloodGroupId')?.touched || isFormSubmitted)">
-                Blood Group is required.
+                {{'BLOOD_GROUP_IS_REQUIRED' | translate}}
               </div>
             </div>
 
             <!-- Date of Birth -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label required">Date of Birth</label>
-              <input type="text" class="form-control"
-                     [class.is-invalid]="demographicForm.get('PatientBirthDate')?.invalid && (demographicForm.get('PatientBirthDate')?.touched || isFormSubmitted)"
-                     formControlName="PatientBirthDate" data-provider="flatpickr" id="birthDate" placeholder="Select date" />
+              <label class="form-label required">{{'DOB' | translate}}</label>
+    <input type="text" class="form-control"
+      [class.is-invalid]="demographicForm.get('PatientBirthDate')?.invalid && (demographicForm.get('PatientBirthDate')?.touched || isFormSubmitted)"
+      formControlName="PatientBirthDate" data-provider="flatpickr" id="birthDate" placeholder="{{'SELECT_DATE' | translate}}" />
               <div class="invalid-feedback d-block"
                    *ngIf="demographicForm.get('PatientBirthDate')?.invalid && (demographicForm.get('PatientBirthDate')?.touched || isFormSubmitted)">
-                Date of Birth is required.
+                {{'DATE_OF_BIRTH_IS_REQUIRED' | translate}}
               </div>
             </div>
 
             <!-- Age -->
             <div class="col-sm-6 col-md-2 col-lg-2">
-              <label class="form-label">Age</label>
-              <input type="text" class="form-control" formControlName="Age" placeholder="Age" readonly />
+              <label class="form-label">{{'AGE' | translate}}</label>
+              <input type="text" class="form-control" formControlName="Age" placeholder="{{'AGE' | translate}}" readonly />
             </div>
 
             <!-- VIP -->
             <div class="col-sm-6 col-md-2 col-lg-2 d-flex align-items-end">
               <div class="form-check ms-2">
                 <input type="checkbox" class="form-check-input" id="vipCheck" formControlName="VIPPatient" />
-                <label for="vipCheck" class="form-check-label">VIP</label>
+                <label for="vipCheck" class="form-check-label">{{'VIP' | translate}}</label>
               </div>
             </div>
           </div>

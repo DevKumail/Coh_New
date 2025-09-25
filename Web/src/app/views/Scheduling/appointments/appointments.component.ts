@@ -17,6 +17,7 @@ import { NgIconComponent } from '@ng-icons/core';
 import { StepsModule } from 'primeng/steps';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import moment from 'moment';
+import { LucideAngularModule, LucideUserPlus } from 'lucide-angular';
 
 @Component({
     selector: 'app-appointments',
@@ -28,7 +29,8 @@ import moment from 'moment';
     NgIconComponent,
     StepsModule,
     FormsModule,
-    TranslatePipe
+    TranslatePipe,
+    LucideAngularModule
     ],
     templateUrl: './appointments.component.html',
     // styleUrl: './appointments.component.scss',
@@ -43,6 +45,7 @@ export class AppointmentsComponent {
         private secureStorage: SecureStorageService
     ) {}
     private modalRef!: NgbModalRef; 
+    protected readonly addIcon = LucideUserPlus;
     Patientpopup: boolean = false;
     FilterForm!: FormGroup;
     mrNO: any;

@@ -362,7 +362,7 @@ export class OrderStatisticsComponent {
         this.loader.show();
         const { providerId, facility, sitesId, appDate, statuses, showScheduledAppointmentOnly, showChargeCapturePending } = this.AppointmentFilterForm.value;
         const selStatuses: string[] = Array.isArray(statuses) ? statuses : [];
-
+        this.appointmentstotaldata = 0;
         console.log( 'AppointmentFilterForm',this.AppointmentFilterForm.value);
         const body = {
             ToDate: this.AppointmentFilterForm.value.appDate,
@@ -377,10 +377,10 @@ export class OrderStatisticsComponent {
         }
         await this.Service.SearchDashboardAppointment(body).then((res:any)=>{
             this.appointments = res.table1 || [];
-            this.appointmentstotaldata = res?.table2[0]?.totalCount || 0;  // total count
             // this.appointmentstotaldata = res.table2;
-
+            
             if (res && res.table2) {
+                this.appointmentstotaldata = res?.table2[0]?.totalCount || 0;  // total count
               }
 
             console.log(this.appointments,'this.appointments response');

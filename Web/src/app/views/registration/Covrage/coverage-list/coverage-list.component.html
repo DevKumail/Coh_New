@@ -3,12 +3,12 @@
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
                 <lucide-angular [img]="homeIcon"></lucide-angular>
-                Registration
+                {{'REGISTRATION' | translate}}
             </a>
         </li>
-        <li class="breadcrumb-item active d-flex align-items-center text-muted mx-1" aria-current="page">
-            <lucide-angular [img]="chevronRightIcon" class="me-1 fs-6"></lucide-angular>
-            Coverage
+        <li class="breadcrumb-item active d-flex align-items-center text-muted" aria-current="page">
+        <ng-icon class="me-1 ms-1"  [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
+             {{'COVERAGES' | translate}}
         </li>
     </ol>
 </nav>
@@ -18,17 +18,17 @@
         <!-- <div class="card p-3 shadow mt-2"> -->
         <!-- Header section inside the card -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3 style="font-weight: bold" class="m-0 heading-title">
+            <h3  class="card-title mb-3 fw-bold heading-title">
                 <lucide-angular [img]="headingIcon" aria-hidden="true"></lucide-angular>
-                <span>Coverage</span>
+                <span>{{'COVERAGES' | translate}}</span>
             </h3>
             <button
-                class="btn btn-success btn-sm w-150"
+                class="btn btn-success btn-sm w-150 me-1 ms-1"
                 type="button"
                 (click)="router.navigate(['/registration/covrage-create'])"
             >
-                <lucide-angular [img]="plusIcon" class="me-1 text-white"></lucide-angular>
-                Add Coverage
+                <lucide-angular [img]="plusIcon" class="me-1 ms-1 text-white"></lucide-angular>
+                {{'ADD' | translate}}
             </button>
         </div>
 
@@ -39,13 +39,13 @@
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr class="text-center">
-                        <th>Subscriber Name</th>
-                        <th>Mr No</th>
-                        <th>Insurance Carrier</th>
-                        <th>Insured Id No</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th>{{'NAME' | translate}}</th>
+                        <th>{{'MR_NO' | translate}}</th>
+                        <th>{{'INSURANCE_CARRIER' | translate}}</th>
+                        <th>{{'INSURED_ID_NO' | translate}}</th>
+                        <th>{{'TYPE' | translate}}</th>
+                        <th>{{'STATUS' | translate}}</th>
+                        <th>{{'ACTION' | translate}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,10 +59,10 @@
                             <select class="form-select form-select-sm w-auto d-inline-block"
                                     [ngModel]="getRowCoverageOrder(inssub)"
                                     (ngModelChange)="onStatusChange(inssub, $event)">
-                                <option [ngValue]="null" disabled>--- Select Status ---</option>
-                                <option [ngValue]="0">Inactive</option>
-                                <option [ngValue]="1">Primary</option>
-                                <option [ngValue]="2">Secondary</option>
+                                <option [ngValue]="null" disabled>{{'SELECT_STATUS' | translate}}</option>
+                                <option [ngValue]="0">{{'INACTIVE'}}</option>
+                                <option [ngValue]="1">{{'PRIMARY' }}</option>
+                                <option [ngValue]="2">{{'SECONDARY'}}</option>
                             </select>
                         </td>
                         <td class="text-center">
@@ -90,23 +90,33 @@
                     </tr>
                     <tr *ngIf="pagedCoverages.length === 0">
                         <td colspan="8" class="text-center">
-                            No Coverage found.
+                            {{'NO_DATA_FOUND' | translate}}
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
+
+                <!-- Pagination -->
+               <app-generic-pagination
+                    [totalItems]="coverageTotalItems"
+                    [pageSize]="paginationInfo.RowsPerPage"
+                    [currentPage]="paginationInfo.Page"
+                    (pageChanged)="onCoveragePageChanged($event)"
+                >
+                </app-generic-pagination>
+                
             <!-- Pagination -->
-        <div class="d-flex flex-column align-items-center mt-3 gap-2">
+        <!-- <div class="d-flex flex-column align-items-center mt-3 gap-2">
             <div
                 class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap"
             >
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <div class="me-2">
-                        Showing {{ coverageStart + 1 }} to
+                        {{'SHOWING' | translate}} {{ coverageStart + 1 }} {{'TO' | translate}}
                         {{ coverageEnd > coverageTotalItems ? coverageTotalItems : coverageEnd }}
-                        of {{ coverageTotalItems }} entries
+                        {{'OF' | translate}} {{ coverageTotalItems }} {{'ENTRIES' | translate}}
                     </div>
                     <div>
                         <select
@@ -126,7 +136,7 @@
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
                         <li class="page-item" [class.disabled]="coverageCurrentPage === 1">
-                            <button class="page-link" (click)="coveragePrevPage()">Previous</button>
+                            <button class="page-link" (click)="coveragePrevPage()">{{'PREVIOUS' | translate}}</button>
                         </li>
                         <li
                             class="page-item"
@@ -139,11 +149,11 @@
                             <span *ngIf="page === '...'" class="page-link">…</span>
                         </li>
                         <li class="page-item" [class.disabled]="coverageCurrentPage === coverageTotalPages">
-                            <button class="page-link" (click)="coverageNextPage()">Next</button>
+                            <button class="page-link" (click)="coverageNextPage()">{{'NEXT' | translate}}</button>
                         </li>
                     </ul>
                 </nav>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>

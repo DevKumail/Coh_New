@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { NgIconComponent, NgIcon } from '@ng-icons/core';
 import { LucideAngularModule, LucideHome, LucideChevronRight, LucideAlertTriangle } from 'lucide-angular';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import Swal from 'sweetalert2';
 import { Injectable } from '@angular/core';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
@@ -24,12 +25,22 @@ declare var flatpickr: any;
     GenericPaginationComponent,
     FormsModule,
     NgIcon,
-    LucideAngularModule],
+    LucideAngularModule,
+    TranslatePipe],
   templateUrl: './allergies.component.html',
   styleUrl: './allergies.component.scss'
 })
 
 export class AllergiesComponent implements OnInit, AfterViewInit {
+  private focusFirstInvalidControl(): void {
+    try {
+      setTimeout(() => {
+        const firstInvalid = document.querySelector('.is-invalid, .ng-invalid.ng-touched') as HTMLElement | null;
+        firstInvalid?.focus({ preventScroll: true } as any);
+        firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    } catch {}
+  }
   buttonText: string | undefined;
 
   // lucide-angular icons for breadcrumb and heading
@@ -37,10 +48,23 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
   protected readonly chevronRightIcon = LucideChevronRight;
   protected readonly headingIcon = LucideAlertTriangle;
 
-  resetForm() {
-    throw new Error('Method not implemented.');
-  }
-
+    resetForm(): void {
+      if (!this.allergyForm) return;
+      try {
+        Object.keys(this.allergyForm.controls).forEach(key => {
+          const control = this.allergyForm.get(key);
+          control?.setValue("");
+          control?.markAsPristine();
+          control?.markAsUntouched();
+        });
+        this.allergyForm.markAsPristine();
+        this.allergyForm.markAsUntouched();
+        this.id = undefined;
+        this.buttonText = undefined;
+      } catch (e) {
+        console.warn('resetForm failed', e);
+      }
+    }
   ngAfterViewInit(): void {
     // Initialize date pickers after view is ready
     this.initDatePickers();
@@ -360,8 +384,9 @@ submit() {
     console.log( 'this.allergyForm =>',this.allergyForm.value);
 
   if (this.allergyForm.invalid) {
-    this.allergyForm.markAllAsTouched(); // show validation messages
-    Swal.fire('Validation Error', 'Please fill all required fields.', 'warning');
+  this.allergyForm.markAllAsTouched(); // show validation messages
+  this.focusFirstInvalidControl();
+  Swal.fire('Validation Error', 'Please fill all required fields.', 'warning');
     return;
   }
 
@@ -575,5 +600,13 @@ setPagedallergieData() {
   this.pagedallergie = this.MyAllergiesData.slice(startIndex, endIndex);
 
 }
+
+  get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
+  }
 
 }

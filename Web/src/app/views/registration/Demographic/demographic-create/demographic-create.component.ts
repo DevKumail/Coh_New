@@ -42,6 +42,7 @@ import { DemographicAssignmentsComponent } from './components/demographic-assign
 import { DemographicFamilyComponent } from './components/demographic-family.component';
 import { DemographicTabsComponent } from './components/demographic-tabs.component';
 import { DemographicDTO } from '@/app/shared/Models/registration/Demographics/Demographic.type.model';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 @Component({
     selector: 'app-demographic-create',
@@ -51,12 +52,11 @@ import { DemographicDTO } from '@/app/shared/Models/registration/Demographics/De
         FormsModule,
         RouterModule,
         NgIconComponent,
+        TranslatePipe,
         FilePondModule,
         NgbNavModule,
-        NgxMaskDirective,
         LucideAngularModule,
         DemographicPhotoPersonalComponent,
-        DemographicBasicDetailsComponent,
         DemographicIdentificationComponent,
         DemographicContactComponent,
         DemographicEmergencyContactComponent,

@@ -63,6 +63,11 @@ export class UserProfileComponent {
         allowOutsideClick: false
     }).then((result) => {
         if (result.isConfirmed) {
+          caches.keys().then(names => {
+            return Promise.all(
+              names.map(name => caches.delete(name))
+            );
+          });
             this.executeLogout();
         }
     });

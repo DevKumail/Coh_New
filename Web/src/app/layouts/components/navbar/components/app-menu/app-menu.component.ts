@@ -248,4 +248,14 @@ export class AppMenuComponent implements OnInit, OnDestroy {
     this.modalTriggerService.openModal('advance-filter-modal', 'patient-summary');
   }
 
+  // Normalize dynamic labels for translation keys
+  normalizeKey(input: any): string {
+    if (input == null) { return ''; }
+    return input
+      .toString()
+      .replace(/[^A-Za-z0-9]+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .toUpperCase();
+  }
 }

@@ -19,6 +19,8 @@ import { LoaderService } from '@core/services/loader.service';
 import { SecureStorageService } from '@core/services/secure-storage.service';
 import { HasPermissionDirective } from '@/app/shared/directives/has-permission.directive';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 
 @Component({
   selector: 'app-temporary-patient-demographic-list',
@@ -26,7 +28,9 @@ import { trigger, transition, style, animate } from '@angular/animations';
         ReactiveFormsModule,
         FormsModule,
         RouterModule,
+        TranslatePipe,
         NgIconComponent,
+        GenericPaginationComponent,
         LucideAngularModule,
       HasPermissionDirective],
   templateUrl: './temporary-patient-demographic-list.component.html',
@@ -48,7 +52,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 export class TemporaryPatientDemographicListComponent {
   pagedTemps: any[] = [];
   FilterData: any = {};
-
+  TotalTempCount: any = 0;
   // lucide-angular icons for breadcrumb, heading and actions
   protected readonly homeIcon = LucideHome;
   protected readonly chevronRightIcon = LucideChevronRight;
@@ -66,6 +70,7 @@ export class TemporaryPatientDemographicListComponent {
   pageNumbers: number[] = [];
   start = 0;
   end = 0;
+  isTempDemoFiltered : boolean = false;
   pageSizes = [5, 10, 25, 50];
   PaginationInfo: any = {
     RowsPerPage: 10,
@@ -116,7 +121,10 @@ export class TemporaryPatientDemographicListComponent {
     }
     if (gender !== undefined && gender !== null && String(gender) !== '') clean.Gender = gender;
 
-    this.getTempDemographics(clean);
+  // mark filter flag based on what's in the clean object
+  this.isTempDemoFiltered = Object.keys(clean).length > 0;
+
+  this.getTempDemographics(clean);
   }
 
   clearFilter() {
@@ -124,7 +132,8 @@ export class TemporaryPatientDemographicListComponent {
     this.FilterData = {};
     this.currentPage = 1;
     this.PaginationInfo.Page = 1;
-    this.getTempDemographics({});
+  this.isTempDemoFiltered = false;
+  this.getTempDemographics({});
   }
 
 
@@ -154,16 +163,14 @@ export class TemporaryPatientDemographicListComponent {
     this.router.navigate([url]);
   }
 
-  onPageChanges(event: any) {
-    this.PaginationInfo.RowsPerPage = event.rows;
-    this.PaginationInfo.Page = Math.floor(event.first / event.rows) + 1;
-    this.pageSize = event.rows;
-    this.currentPage = Math.floor(event.first / event.rows) + 1;
-    this.getTempDemographics(this.FilterData);
-  }
+
 
 getTempDemographics(data: any) {
   this.Loader.show(); // Show loader at start
+
+    this.isTempDemoFiltered = Object.values(data).some(
+    (value) => value !== '' && value !== null && value !== undefined
+  );
 
   // Build TempListReq with only allowed fields and omit empty values
   const tempReq: any = {};
@@ -184,6 +191,7 @@ getTempDemographics(data: any) {
       if (res.table2) {
         // Keep the full API row object so downstream pages can use all fields
         this.pagedTemps = res.table2.map((item: any) => ({ ...item }));
+        this.TotalTempCount = res.table1[0]?.totalCount || 0;
 
         this.totalRecord = res.table1[0]?.totalCount || 0;
         const rowsPerPage = this.PaginationInfo.RowsPerPage;
@@ -208,63 +216,6 @@ getTempDemographics(data: any) {
     });
 }
 
-// GetTempDemographicsByTempId(){
-//     this.Loader.show();
-
-//     this.TemporaryPatientDemographicApiServices.GetTempDemographicsByTempId(this.FilterData.TempId).then((res: any) => {
-//         if (res) {
-//         this.pagedTemps = res.table2.map((item: any) => ({
-//             personFullName: item.personFullName,
-//             personEmail: item.personEmail,
-//             patientBirthDate: item.patientBirthDate,
-//             nationalityName: item.nationalityName,
-//             countryName: item.countryName,
-//             personSex: item.personSex,
-//             tempId: item.tempId,
-//           }));
-//         }
-//         this.Loader.hide();
-//       }).catch((error: any) => {
-//         this.Loader.hide();
-//         Swal.fire({
-//           icon: 'error',
-//           title: 'Error',
-//           text: error.message || 'Failed to fetch temporary demographics'
-//         });
-//       });
-//   }
-
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.PaginationInfo.Page = page;
-      this.getTempDemographics(this.FilterData);
-    }
-  }
-
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.PaginationInfo.Page = this.currentPage;
-      this.getTempDemographics(this.FilterData);
-    }
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.PaginationInfo.Page = this.currentPage;
-      this.getTempDemographics(this.FilterData);
-    }
-  }
-
-  onPageSizeChange(event: any) {
-    this.pageSize = +event.target.value;
-    this.currentPage = 1;
-    this.PaginationInfo.Page = 1;
-    this.PaginationInfo.RowsPerPage = this.pageSize;
-    this.getTempDemographics(this.FilterData);
-  }
 
 
   editTemp(tempOrId: any) {
@@ -314,4 +265,20 @@ Remove(Id: number) {
     }
   });
 }
+
+
+onTEMPDEMOPageChanged(event: number) {
+  this.PaginationInfo.Page = event;
+  this.currentPage = event; 
+  this.getTempDemographics(this.FilterData);
+}
+
+
+  get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
+  }
 }

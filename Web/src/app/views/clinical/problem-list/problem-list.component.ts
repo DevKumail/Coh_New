@@ -16,6 +16,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 
 @Component({
@@ -26,7 +27,7 @@ import { Subscription } from 'rxjs';
     FormsModule,
     NgbNavModule,
     NgIconComponent,
-
+  TranslatePipe,
   ],
 
 
@@ -36,6 +37,7 @@ import { Subscription } from 'rxjs';
 export class ProblemListComponent implements OnInit {
 
   medicalForm!: FormGroup;
+  submitted: boolean = false;
   currentPage = 1;
   pageSize = 10;
   pageSizes = [5, 10, 25, 50];
@@ -119,6 +121,16 @@ appId:any;
 
   private patientDataSubscription!: Subscription;
 
+  private focusFirstInvalidControl(): void {
+    try {
+      setTimeout(() => {
+        const firstInvalid = document.querySelector('.is-invalid, .ng-invalid.ng-touched') as HTMLElement | null;
+        firstInvalid?.focus({ preventScroll: true } as any);
+        firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    } catch {}
+  }
+
 
 
   constructor(
@@ -163,7 +175,7 @@ appId:any;
       confidential: [false],
       isProviderCheck: [false],
       startDate: ['', Validators.required],
-      endDate: [''],
+      endDate: ['', Validators.required],
       comments: ['', Validators.required],
       status: ['', Validators.required],  
       mrno: ['', Validators.required],     
@@ -275,7 +287,8 @@ setPagedProblemData() {
 
   // ✅ Clear form
   onClear(): void {
-    this.medicalForm.reset();
+  this.medicalForm.reset();
+  this.submitted = false;
   }
     DropFilled (){
     this.Problems.ProviderId = ""
@@ -375,10 +388,12 @@ setPagedProblemData() {
 //   });
 // }
 onSubmit() {
-
-  // if (this.medicalForm.invalid) {
-  //   return;
-  // }
+  if (this.medicalForm.invalid) {
+    this.submitted = true;
+    this.medicalForm.markAllAsTouched();
+    try { this.focusFirstInvalidControl(); } catch {}
+    return;
+  }
   debugger
 
   const formData = this.medicalForm.value;

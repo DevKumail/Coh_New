@@ -30,10 +30,11 @@ import { vitalsingsDto } from '@/app/shared/Models/Clinical/vitalsings.model';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { LoaderService } from '@core/services/loader.service';
 import { error } from 'console';
-import { TheaterIcon } from 'lucide-angular';
+import { LucideAlertTriangle, LucideAngularModule, TheaterIcon } from 'lucide-angular';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 
 
@@ -45,11 +46,13 @@ declare var flatpickr: any;
         CommonModule,
         ReactiveFormsModule,
         FormsModule,
+        LucideAngularModule,
         RouterModule,
         NgIconComponent,
         FilePondModule,
         NgbNavModule,
-        GenericPaginationComponent
+  GenericPaginationComponent,
+  TranslatePipe
     ],
     templateUrl: './vital-signs.component.html',
     styleUrl: './vital-signs.component.scss',
@@ -59,6 +62,7 @@ export class VitalSignsComponent implements OnInit {
   vitalSignsForm!: FormGroup;
   SearchPatientData: any;
   patientDataSubscription!: Subscription;
+  protected readonly headingIcon = LucideAlertTriangle;
 
   vitalSignsPagedData: any[] = [];
   VitalCurrentPage = 1;
@@ -235,6 +239,14 @@ onSubmit() {
     this.pagedvital = this.vitalSignsPagedData.slice(startIndex, endIndex);
 
     }
+
+    get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
+  }
 
   ngOnDestroy(): void {
     if (this.patientDataSubscription) {
