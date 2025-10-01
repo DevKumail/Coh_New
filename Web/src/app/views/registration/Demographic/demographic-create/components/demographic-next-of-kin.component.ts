@@ -51,6 +51,14 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
       </div>
 
       <!-- State/ Emirate -->
+      <!-- <div class="col-md-3">
+        <label>{{'STATE' | translate}}</label><span class="text-danger">*</span>
+        <select class="form-select" formControlName="StateId" (change)="stateChange.emit()">
+          <option value="">-- {{'SELECT_STATE' | translate}} --</option>
+          <option *ngFor="let s of states" [value]="s.stateId">{{ s.name }}</option>
+        </select>
+      </div> -->
+
       <div class="col-md-3">
         <label>{{'STATE' | translate}}</label><span class="text-danger">*</span>
         <select class="form-select" formControlName="StateId" (change)="stateChange.emit()">
@@ -64,7 +72,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
         <label>{{'CITY' | translate}}</label><span class="text-danger">*</span>
         <select class="form-select" formControlName="CityId">
           <option value="">-- {{'SELECT_CITY' | translate}} --</option>
-          <option *ngFor="let c of city" [value]="c.code">{{ c.name }}</option>
+          <option *ngFor="let c of city" [value]="c.cityId">{{ c.name }}</option>
         </select>
       </div>
 

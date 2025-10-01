@@ -34,7 +34,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
         </select>
       </div>
     </form>
-  `,
+  `,  
 })
 export class DemographicSpouseComponent {
   @Input() spouseForm!: FormGroup;

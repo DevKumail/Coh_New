@@ -15,10 +15,10 @@
 
     <div class="row">
       <div class="row">
-        <div class="col-12" style="margin-top: -20px;">
+        <div class="col-12 mt-1 mb-2">
           <div class="form-check">
             <input type="checkbox" class="form-check-input" formControlName="isProviderCheck" id="isProviderCheck" style="height: 20px; width: 20px;" />
-            <label class="form-check-label" for="isProviderCheck" style="margin-bottom: -22px;">
+            <label class="form-check-label me-2 ms-2 mt-1" for="isProviderCheck" >
               {{ 'PROVIDER_OUTSIDE_CLINIC' | translate }}
             </label>
           </div>
@@ -179,7 +179,7 @@
     <div class="modal-body">
       <div class="card shadow-sm rounded-3">
         <div class="card-body">
-          <div class="container-fluid">
+          <div class="">
             <div class="row g-3">
               <div class="col-md-4 col-sm-12">
                 <label for="icdVersionId" class="form-label">ICD Versions:</label>
@@ -202,44 +202,61 @@
                 </select>
               </div>
 
-              <div class="col-md-4 col-sm-12" *ngIf="Searchby != 3">
+              <div class="col-md-4 col-sm-12"  *ngIf="FilterForm.value.searchById != 3">
                 <label for="startingCode" class="form-label">Starting Code:</label>
                 <input type="text" class="form-control" formControlName="startingCode" id="startingCode"
                   placeholder="Enter Starting Code" />
               </div>
-              <form [formGroup]="diagnosisForm">
-                <div class="row col-12">
+                <!-- <div class="row col-12"> -->
                   <!-- Ending Code -->
-                  <!-- <div class="col-md-2 col-sm-12 col-12" *ngIf="diagnosisForm.get('searchBy')?.value == 2">
+                  <div class="col-md-4 col-sm-12" *ngIf="FilterForm.get('searchById')?.value == 2">
                     <label for="endingCode">Ending Code</label>
                     <input type="text" class="form-control" id="endingCode" formControlName="endingCode"
                       placeholder="Ending Code" />
-                  </div> -->
+                  </div>
 
                   <!-- Description -->
-                  <!-- <div class="col-md-2 col-sm-12 col-12" *ngIf="diagnosisForm.get('searchBy')?.value == 3">
+                  <div class="col-md-4 col-sm-12" *ngIf="FilterForm.get('searchById')?.value == 3">
                     <label for="description">Description</label>
                     <input type="text" class="form-control" id="description" formControlName="description"
                       placeholder="Description" />
-                  </div> -->
+                  </div>
 
                   <!-- Search Button -->
-                  <div class="col-md-2 col-sm-12 col-12 mt-3">
+                  <!-- <div class="col-md-2 col-sm-12 col-12 mt-3">
                     <button class="btn btn-info mt-3 w-100" type="button" (click)="SearchDiagnosis()">Search</button>
-                  </div>
-                </div>
-              </form>
+                  </div> -->
+                <!-- </div> -->
 
 
             </div>
           </div>
         </div>
       </div>
+
+      <div class="card shadow-sm rounded-3">
+      <table class="table table-sm table-striped table-bordered text-center align-middle">
+        <thead>
+          <tr>
+            <th style="font-size: 14px">Code</th>
+            <th style="font-size: 14px">ICD Version</th>
+            <th style="font-size: 14px">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let diagnosis of DiagnosisCode" (click)="onRowSelect(diagnosis, modal)">
+            <td style="font-size: 12px">{{ diagnosis.icD9Code }}</td>
+            <td style="font-size: 12px">{{ diagnosis.icdVersion }}</td>
+            <td style="font-size: 12px">{{ diagnosis.descriptionFull }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 
     <div class="modal-footer">
       <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
-      <button type="submit" class="btn btn-primary">Search</button>
+      <button type="submit" class="btn btn-primary" (click)="SearchDiagnosis()">Search</button>
     </div>
   </form>
 </ng-template>

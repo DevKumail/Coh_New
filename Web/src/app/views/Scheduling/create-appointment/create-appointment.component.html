@@ -417,7 +417,7 @@
 
                 <div class="row mt-2"> -->
                     <div class="col-sm-6 mt-4">
-                        <label><b>{{ 'INSURANCE_NO' | translate }}</b> {{ insurranceNo }}</label>
+                        <!-- <label><b>{{ 'INSURANCE_NO' | translate }}</b> {{ insurranceNo }}</label> -->
                         <div class="form-check form-check-inline ms-3">
                             <input
                                 type="radio"
@@ -431,7 +431,7 @@
                             <input
                                 type="radio"
                                 class="form-check-input"
-                                formControlName="appointment"
+                                formControlName="IsConsultationVisit"
                                 value="1"
                             />
                             <label class="form-check-label">{{ 'NON_CONSULTATION' | translate }}</label>
@@ -473,7 +473,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let a of AppointmentData"
+                                    *ngFor="let a of AppointmentData;  trackBy: trackByTime"
                                     [ngClass]="{ 'high-rated': RowColor(a), 'time-selected': isSelectedTime(a.Time), 'text-muted': a.mrno }"
                                     [attr.title]="a.mrno ? ('ALREADY_BOOKED' | translate) : ''"
                                     [style.cursor]="a.mrno ? 'not-allowed' : 'pointer'"

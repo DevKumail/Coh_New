@@ -110,7 +110,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
             <!-- Basic Details (merged) -->
             <!-- Gender -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label required">{{'GENDER' | translate }}</label>
+              <label class="form-label required">{{'GENDER' | translate }} <span class="text-danger">*</span></label>
               <select class="form-select"
                       [class.is-invalid]="demographicForm.get('PersonSexId')?.invalid && (demographicForm.get('PersonSexId')?.touched || isFormSubmitted)"
                       formControlName="PersonSexId">
@@ -125,13 +125,13 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
             <!-- Preferred Name -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label">{{'PREFERRED_NAME' | translate}}</label>
+              <label class="form-label">{{'PREFERRED_NAME' | translate}} </label>
               <input type="text" class="form-control" formControlName="preferredName" placeholder="{{'ENTER_PREFERRED_NAME' | translate}}"/>
             </div>
 
             <!-- Gender Identity -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label required">{{'GENDER_IDENTITY' | translate}}</label>
+              <label class="form-label required">{{'GENDER_IDENTITY' | translate}} <span class="text-danger">*</span></label>
               <select class="form-select"
                       [class.is-invalid]="demographicForm.get('genderIdentity')?.invalid && (demographicForm.get('genderIdentity')?.touched || isFormSubmitted)"
                       formControlName="genderIdentity">
@@ -146,7 +146,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
             <!-- Marital Status -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label required">{{'MARITAL_STATUS' | translate}}</label>
+              <label class="form-label required">{{'MARITAL_STATUS' | translate}} <span class="text-danger">*</span></label>
               <select class="form-select"
                       [class.is-invalid]="demographicForm.get('PersonMaritalStatus')?.invalid && (demographicForm.get('PersonMaritalStatus')?.touched || isFormSubmitted)"
                       formControlName="PersonMaritalStatus">
@@ -161,7 +161,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
             <!-- Blood Group -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label required">{{'BLOOD_GROUP' | translate}}</label>
+              <label class="form-label required">{{'BLOOD_GROUP' | translate}} <span class="text-danger">*</span></label>
               <select class="form-select"
                       [class.is-invalid]="demographicForm.get('PatientBloodGroupId')?.invalid && (demographicForm.get('PatientBloodGroupId')?.touched || isFormSubmitted)"
                       formControlName="PatientBloodGroupId">
@@ -176,7 +176,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
             <!-- Date of Birth -->
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <label class="form-label required">{{'DOB' | translate}}</label>
+              <label class="form-label required">{{'DOB' | translate}}  <span class="text-danger">*</span></label>
     <input type="text" class="form-control"
       [class.is-invalid]="demographicForm.get('PatientBirthDate')?.invalid && (demographicForm.get('PatientBirthDate')?.touched || isFormSubmitted)"
       formControlName="PatientBirthDate" data-provider="flatpickr" id="birthDate" placeholder="{{'SELECT_DATE' | translate}}" />
@@ -264,6 +264,7 @@ export class DemographicPhotoPersonalComponent {
   @Input() imageSrc: string = '';
   @Input() defaultImage: string = 'assets/images/patient.jpg';
   @Input() fileName: string = '';
+  @Input() preferredName: string = '';
   @Input() isFormSubmitted: boolean = false;
   @Input() gender: any[] = [];
   @Input() genderIdentity: any[] = [];

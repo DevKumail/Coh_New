@@ -32,6 +32,7 @@
                 [imageSrc]="imageSrc"
                 [defaultImage]="defaultImage"
                 [fileName]="fileName"
+                [preferredName]="preferredName"
                 [isFormSubmitted]="isFormSubmitted"
                 [gender]="gender"
                 [genderIdentity]="genderIdentity"
@@ -75,8 +76,8 @@
                     [states]="states"
                     [city]="city"
                     [isFormSubmitted]="isFormSubmitted"
-                    (countryChange)="onCountryChange()"
-                    (stateChange)="onStateChange()"
+                    (countryChange)="onContactCountryChange()"
+                    (stateChange)="onContactStateChange()"
                 ></app-demographic-contact>
 
                 <!-- Emergency Contact Tab Content -->
@@ -99,8 +100,8 @@
                     [states]="states"
                     [city]="city"
                     [relationships]="relationships"
-                    (countryChange)="onCountryChange()"
-                    (stateChange)="onStateChange()"
+                    (countryChange)="onNFKCountryChange()"
+                    (stateChange)="onNFKStateChange()"
                 ></app-demographic-next-of-kin>
 
                 <!-- Spouse Tab Content -->

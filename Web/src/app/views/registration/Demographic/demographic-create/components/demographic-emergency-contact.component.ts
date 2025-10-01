@@ -64,7 +64,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
         <label>{{'CITY' | translate}}</label><span class="text-danger">*</span>
         <select class="form-select" formControlName="CityId">
           <option value="">-- {{'SELECT_CITY' | translate}} --</option>
-          <option *ngFor="let c of city" [value]="c.code">{{ c.name }}</option>
+          <option *ngFor="let c of city" [value]="c.cityId">{{ c.name }}</option>
         </select>
       </div>
 

@@ -25,6 +25,7 @@ import { HasPermissionDirective } from '@/app/shared/directives/has-permission.d
 import { LucideAngularModule, LucideHome, LucideChevronRight, LucideUsers, LucideFilter, LucideFilterX, LucideUserPlus, LucideEdit, LucideTrash2 } from 'lucide-angular';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { SecureStorageService } from '@core/services/secure-storage.service';
 
 
 
@@ -63,6 +64,8 @@ export class DemographicListComponent {
     public router: Router,
     public DemographicApiServices: DemographicApiServices,
     public Loader : LoaderService,
+    private secureStorage: SecureStorageService,
+    
   ) {}
 
   // lucide-angular icons for breadcrumb, heading and actions
@@ -193,10 +196,23 @@ export class DemographicListComponent {
   }
 
   editPatient(patient: any) {
-    this.router.navigate(['/registration/demographic-create'], //{
-    {
-    state: { patient },
-  });
+
+        // Derive a stable appointment id and persist as fallback for refresh
+    const mrNo: number = Number(patient?.mrNo ?? patient?.mrNo ?? 0);
+    if (mrNo) {
+      this.secureStorage.setItem('demographicEditId', String(mrNo));
+    }
+    // Navigate using Router state (hide id from URL) and include full object for convenience
+    this.router.navigate(['/registration/demographic-create'], {
+      state: { mrNo, patient },
+    });
+
+
+
+  //   this.router.navigate(['/registration/demographic-create'], //{
+  //   {
+  //   state: { patient },
+  // });
   }
 
   Remove(e: Event, Id: number, position: string) {

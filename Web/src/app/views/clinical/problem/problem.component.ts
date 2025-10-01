@@ -590,10 +590,10 @@ const problemPayload: Partial<PatientProblemModel> = {
   this.totalPagesDiagnoseCode = Array.from({ length: total }, (_, i) => i + 1);
 }
 onRowSelect(diagnosis: any, modal: any) {
-   modal.close(diagnosis); 
-   console.log("diagnosis waleed",diagnosis)
+  modal.close(diagnosis); 
+  console.log("diagnosis waleed",diagnosis)
 
- }
+}
 // onRowSelect(diagnosis: any, modal: any) {
 //   // Pura object bhej rahe hain taake parent component sab fields use kar sake
 //   modal.close({

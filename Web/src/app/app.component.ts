@@ -12,6 +12,7 @@ import { LoaderComponent } from "./components/loader/loader.component";
 import { CommonModule } from '@angular/common';
 import { LoaderService } from '@core/services/loader.service';
 import { environment } from '../environments/environment';
+import { ChangeDetectorRef } from '@angular/core';
 
 
 @Component({
@@ -28,9 +29,10 @@ export class AppComponent implements OnInit {
     private healthCheck = inject(HealthCheckService);
     private loadingService = inject(LoaderService);
 
-    isLoading = this.loadingService.loading$;
-
-    constructor() {
+    isLoading: boolean = false;
+    constructor(
+        private cdr: ChangeDetectorRef
+    ) {
         // Start periodic health monitoring only in production
         if (environment.production) {
             this.healthCheck.startMonitoring();
@@ -38,6 +40,10 @@ export class AppComponent implements OnInit {
 
     }
     ngOnInit(): void {
+        this.loadingService.loading$.subscribe(val => {
+            this.isLoading = val;
+            this.cdr.detectChanges(); // force refresh
+        });
         // Apply global direction (RTL/LTR) as early as possible
         try {
             let storedLang = (sessionStorage.getItem('uiLang') as 'en' | 'ar') || 'en';

@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { ApiService } from '@core/services/api.service';
@@ -13,11 +13,11 @@ import moment from 'moment';
 import { NgbModal, NgbModalRef, NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
-import { D } from 'node_modules/@angular/cdk/bidi-module.d-D-fEBKdS';
 import { LoaderService } from '@core/services/loader.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { SecureStorageService } from '@core/services/secure-storage.service';
+import { ChangeDetectorRef } from '@angular/core';
 
 declare var flatpickr: any;
 
@@ -34,20 +34,35 @@ declare var flatpickr: any;
         TranslatePipe],
 
   templateUrl: './create-appointment.component.html',
-  styleUrl: './create-appointment.component.scss'
+  styleUrl: './create-appointment.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 export class CreateAppointmentComponent implements OnInit {
   date: any;
 
-  private focusFirstInvalidControl(): void {
-    try {
-      setTimeout(() => {
-        const firstInvalid = document.querySelector('.is-invalid, .ng-invalid.ng-touched') as HTMLElement | null;
-        firstInvalid?.focus({ preventScroll: true } as any);
-        firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      });
-    } catch {}
-  }
+  // private focusFirstInvalidControl(): void {
+  //   try {
+  //     setTimeout(() => {
+  //       const firstInvalid = document.querySelector('.is-invalid, .ng-invalid.ng-touched') as HTMLElement | null;
+  //       firstInvalid?.focus({ preventScroll: true } as any);
+  //       firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  //     });
+  //   } catch {}
+  // }
+
+    //  focusFirstInvalidControl() {
+    //     // Defer to allow template to update validation classes
+    //   const selector = 'form .ng-invalid.ng-touched, form .ng-invalid[formcontrolname]';
+    //   const firstInvalid = document.querySelector(selector) as HTMLElement | null;
+    //   if (firstInvalid) {
+    //     firstInvalid.focus({ preventScroll: true } as any);
+    //     firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    //   }
+    // }
+
+
+    
   
   // Reset the appointment form and related UI state
   resetForm(): void {
@@ -177,6 +192,7 @@ Times = [
     private loader : LoaderService,
     private patientBannerService: PatientBannerService,
     private secureStorage: SecureStorageService,
+    private cdr: ChangeDetectorRef
   ) {}
 
 
@@ -319,12 +335,13 @@ Times = [
     IsConsultationVisit: [''],
   });
   await this.FillCache();
+  this.cdr.markForCheck();
+
 
   // Prefer Router navigation state; fallback to window.history.state for refresh/reuse
   const nav = this.router.getCurrentNavigation();
   const navState: any = nav?.extras?.state ?? (window.history && (window.history.state as any)) ?? {};
   const stateAppId = navState?.appId;
-  console.log('stateAppId =>',stateAppId);
   const stateAppointment = navState?.appointment;
 
   // Fallback to secure storage on page refresh
@@ -333,9 +350,12 @@ Times = [
   if (stateAppId != null) {
     this.qid = Number(stateAppId);
     await this.FillAppoinment(this.qid);
+    this.cdr.markForCheck();
   } else if (storedId) {  
     this.qid = Number(storedId);
     await this.FillAppoinment(this.qid);
+    this.cdr.markForCheck();
+
   }
 
   // Clear once consumed to avoid stale usage
@@ -346,6 +366,7 @@ Times = [
   
   this.appointmentForm.get('facility')?.valueChanges.subscribe((facilityId) => {
     if (facilityId) {
+      this.cdr.markForCheck();
       this.GetSpecialitybyFacilityId(facilityId);
     } else {
       this.specialities = [];
@@ -386,24 +407,24 @@ Times = [
                 )
               )
               .subscribe((data: any) => {
-                console.log('✅ Subscription triggered with MRNO in Alert Component:', data?.table2?.[0]?.mrNo);
                 this.SearchPatientData = data;
                 if (this.SearchPatientData) {
-                  console.log('mr Data',this.SearchPatientData);
                   this.getEligibilityList();
 
                 }
       });
 
 this.patientBannerService.visitAppointments$.subscribe((data: any) => {
-  console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
   this.visitAppointments = data;
+  this.cdr.markForCheck();
   if (this.visitAppointments) {
-    console.log('Visit Appointments',this.visitAppointments);
       this.getEligibilityList();    
     }
   });
+
+  
 }
+
 
 
 
@@ -420,7 +441,6 @@ this.patientBannerService.visitAppointments$.subscribe((data: any) => {
   //   }
 
   //   const formData = this.appointmentForm.value;
-  //   console.log('Submitting appointment:', formData);
 
   //   Swal.fire({
   //     icon: 'success',
@@ -449,7 +469,7 @@ this.patientBannerService.visitAppointments$.subscribe((data: any) => {
     this.selectedSpeciality=SpecialtyId;
       this.SchedulingApiService.GetSitebySpecialityId(SpecialtyId).then((res: any) => {
         this.siteArray=res
-
+this.cdr.markForCheck();
       }).catch((error: { message: any }) =>
             Swal.fire({
       icon: 'error',
@@ -469,9 +489,11 @@ this.patientBannerService.visitAppointments$.subscribe((data: any) => {
       .then((appointmentRes: any) => {
         if (Array.isArray(appointmentRes)) {
           this.DurationData = appointmentRes;
+          this.cdr.markForCheck();
           this.loader.hide();
         } else {
           this.DurationData = [];
+          this.cdr.markForCheck();
           this.loader.hide();
           Swal.fire({
             icon: 'warning',
@@ -514,11 +536,13 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
   this.selectedFacility=FacilityId;
    await this.SchedulingApiService.GetSpecialitybyFacilityId(FacilityId).subscribe((res:any) => {
     this.specialities = res;
+    this.cdr.markForCheck();
   })
    //  
   this.SchedulingApiService.GetProviderByFacilityId(FacilityId).subscribe({
     next: (providerRes: any) => {
     this.providers = providerRes;
+    this.cdr.markForCheck();
     // ✅ Step 5: Update Times (if needed)
     this.Times = this.AppointmentData;
       this.loader.hide();
@@ -541,6 +565,7 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
     this.selectedProviders=EmployeeId;
         this.SchedulingApiService.GetSiteByProviderId(EmployeeId).then((res:any) => {
         this.siteArray=res
+        this.cdr.markForCheck();
       })
         this.SchedulingApiService.GetProviderScheduleData(EmployeeId).then((res:any) => {
       })
@@ -567,10 +592,12 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
         if(ress.length>0)
         {
           this.DurationData=ress
+          this.cdr.markForCheck();
         }
         else
         {
           this.DurationData=[]
+          this.cdr.markForCheck();
         }
         if(this.selectedSites!=undefined && this.selectedSites!=null)
         {
@@ -595,8 +622,10 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
     let Duration:any
     let date:any
     this.date = this.appointmentForm?.get('date')?.value;
+    
     if(!this.date)
-    {
+      {
+      this.cdr.markForCheck();
       date=new Date();
     }
     else
@@ -615,9 +644,12 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
           if(res)
           {
             Data=res
+            this.cdr.markForCheck();
+
 
           this.SchedulingApiService.GetDurationOfTimeSlot(SiteId,provider,facility,dayName).then((ress) => {
           DataDuration=ress
+          this.cdr.markForCheck();
           if(DataDuration.duration==null)
           {
             Duration =60/DataDuration.appPerHour
@@ -635,6 +667,8 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
             while (currentTime <= endTime) {
               let timeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
               currentTime.setMinutes(currentTime.getMinutes() + Duration);
+              this.cdr.markForCheck();
+
               // this.AppointmentData.push({ Time:timeString })
             }
 
@@ -656,6 +690,7 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
          //  
         this.SchedulingApiService.GetSchAppointmentList(site,provider,facility,speciality,Currentdate).then((ress:any) => {
         this.DurationData=ress
+        this.cdr.markForCheck();
       })
        //  
       if(this.qid!=null)
@@ -678,6 +713,7 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
 
     this.SchedulingApiService.GetProviderByFacilityId(FacilityId).subscribe((res:any) => {
       this.providers = res;
+      this.cdr.markForCheck();
     }, (error:any) => {
       Swal.fire({
         icon: 'error',
@@ -715,9 +751,9 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
         title: 'Error',
         text: 'Please fill all required fields',
       });
-  this.appointmentForm.markAllAsTouched(); // saare errors dikhane k liye
-  try { this.focusFirstInvalidControl(); } catch {}
-  return;
+    this.appointmentForm.markAllAsTouched(); // saare errors dikhane k liye
+    // setTimeout(() => this.focusFirstInvalidControl(), 0);
+      return;
     }
     var userId = sessionStorage.getItem('userId');
     // var currentUser = JSON.parse(sessionStorage.getItem('userName') || '');
@@ -725,13 +761,11 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
     this.mrNo = this.SearchPatientData?.table2[0]?.mrNo;;
     this.AppoinmentBooking.EmployeeId = userId;
     this.AppoinmentBooking.PatientId = this.SearchPatientData?.table2[0]?.patientId;;
-   console.log('submitAppointment hit', this.mrNo);
     if (!this.mrNo || this.mrNo == null || this.mrNo == undefined) {
       Swal.fire(
         'Validation Error', 
         'MrNo is a required field. Please load a patient.', 
         'warning');
-        console.log('MrNo is a required field. Please load a patient line no 688.');
         return;
     }
 
@@ -830,7 +864,6 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
       );
     }
 
-    // console.log('Selected Purpose:', this.AppoinmentBooking);
   }
   cancel(){
 
@@ -889,7 +922,6 @@ const dayName = days[dates.getDay()];
             let timeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
             currentTime.setMinutes(currentTime.getMinutes() + Duration);
             this.AppointmentData.push({ Time:timeString })
-            console.log('GetAppointmentByTime',this.AppointmentData)
           }
           this.showTable=true
     
@@ -918,6 +950,7 @@ const dayName = days[dates.getDay()];
         });
         this.AppointmentData=mappedArray
         this.DurationData=ress
+        this.cdr.markForCheck();
       }
       else
       {
@@ -932,6 +965,7 @@ const dayName = days[dates.getDay()];
         });
         this.AppointmentData=mappedArray
         this.DurationData=[]
+        this.cdr.markForCheck();
       }
     })
    this.Times=this.AppointmentData;
@@ -942,40 +976,38 @@ const dayName = days[dates.getDay()];
 // });
   }
   RowColor(rowData: any) {
-      
-    const TotalTime = moment(rowData.Time, 'HH:mm:ss a')
-    if (this.DurationData.length > 0) {
-      for (const timeSlot of this.DurationData) {
-        let time: any = this.datePipe.transform( 
-          timeSlot.appDateTime, 'hh:mm:ss a'
-        )
-        const StartTime = moment(time, 'HH:mm:ss a')
-        let endTime: any;
-        endTime = Number(timeSlot.duration)
-        let endDate = new Date(StartTime.toISOString());
-        let futureDate = new Date(endDate.setMinutes(endDate.getMinutes() + endTime));
-        if (endTime == 0) { return false; }
-        else {
-          while (rowData.Time == time) {
-            rowData.personName = timeSlot.personName;
-            rowData.mrno = timeSlot.mrno;
-            rowData.duration = timeSlot.duration;
-            rowData.purposeOfVisit = timeSlot.purposeOfVisit;
-            return 'true';
-          }
-        }
+    try {
+      if (!rowData?.Time || !Array.isArray(this.DurationData) || this.DurationData.length === 0) {
+        rowData.personName = '';
+        rowData.mrno = '';
+        rowData.duration = '';
+        rowData.purposeOfVisit = '';
+        return '';
       }
-      return '';
-
-    } else {
+  
+      const displayTime = this.formatDisplayTime(rowData.Time);
+      const slot = this.DurationData.find((s: any) => {
+        const startStr = this.datePipe.transform(s.appDateTime, 'hh:mm a');
+        return startStr && this.formatDisplayTime(startStr) === displayTime;
+      });
+  
+      if (slot) {
+        rowData.personName = slot.personName;
+        rowData.mrno = slot.mrno;
+        rowData.duration = slot.duration;
+        rowData.purposeOfVisit = slot.purposeOfVisit;
+        return 'true';
+      }
+  
       rowData.personName = '';
       rowData.mrno = '';
       rowData.duration = '';
       rowData.purposeOfVisit = '';
       return '';
+    } catch {
+      return '';
     }
   }
-    
 
     GetTime()
     {
@@ -1071,7 +1103,6 @@ FillCache() {
 
   FillDropDown(response: any) {
     let jParse = JSON.parse(JSON.stringify(response)).cache;
-    console.log(jParse,'wer');
     let visitType = JSON.parse(jParse).VisitType;
     let regLocations = JSON.parse(jParse).RegLocations;
     let schAppointmentCriteria = JSON.parse(jParse).SchAppointmentCriteria;
@@ -1214,7 +1245,6 @@ FillCache() {
         };
       });
       this.facilities = regFacility;
-      console.log(this.facilities, 'this.facilities');
     }
 
     if (patientNotifiedOptions) {
@@ -1296,7 +1326,6 @@ getEligibilityList() {
       'Validation Error', 
       'MrNo is a required field. Please load a patient.',
       'warning');
-    console.log('MrNo is a required field. Please load a patient line no 1183.');
     return;
   }
   if (this.mrNo) {
@@ -1330,7 +1359,8 @@ getEligibilityList() {
   try {
     this.loader.show();
     const res: any = await this.SchedulingApiService.EditAppoimentByAppId(AppointmentById);
-    if (!res) { this.loader.hide(); return; }
+    if (!res)
+    this.cdr.markForCheck();
 
     const dateStr = this.datePipe.transform(res.appDateTime, 'yyyy-MM-dd') || '';
     const timeStr = this.datePipe.transform(res.appDateTime, 'hh:mm a') || '';
@@ -1367,6 +1397,7 @@ getEligibilityList() {
     });
 
     this.GetAppointmentByTime(dateStr);
+    
 
     // Optionally refresh time slots and provider availability for the selected site/date
     if (res.siteId && res.providerId && res.facilityId && res.specialtyID && dateStr) {
@@ -1378,11 +1409,16 @@ getEligibilityList() {
         dateStr
       );
     }
+this.cdr.markForCheck();
+
+        this.loader.hide();
   } catch (e: any) {
     Swal.fire({ icon: 'error', title: 'Error', text: e?.message || 'Failed to load appointment.' });
   } finally {
     this.loader.hide();
   }
+      this.loader.hide();
+
 }
 
 
@@ -1403,5 +1439,7 @@ eligibility() {
 
   }
 }
+
+trackByTime = (_: number, a: any) => a?.Time || _;
 
 }

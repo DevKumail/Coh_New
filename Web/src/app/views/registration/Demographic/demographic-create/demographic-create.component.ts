@@ -43,6 +43,7 @@ import { DemographicFamilyComponent } from './components/demographic-family.comp
 import { DemographicTabsComponent } from './components/demographic-tabs.component';
 import { DemographicDTO } from '@/app/shared/Models/registration/Demographics/Demographic.type.model';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { SecureStorageService } from '@core/services/secure-storage.service';
 
 @Component({
     selector: 'app-demographic-create',
@@ -94,7 +95,7 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
     titles: any[] = [];
     gender: any[] = [];
     genderIdentity: any[] = [];
-    preferredName: [] = [];
+    // preferredName: [] = [];
     maritalstatus: any[] = [];
     bloodgroup: any[] = [];
     laborCardNo: any[] = [];
@@ -134,26 +135,67 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
     imageSrc: string = '';
     fileName: string = '';
     defaultImage: string = 'assets/images/patient.jpg';
+    preferredName: string = '';
     familyMembers: any;
-
+    patientId: any;
     constructor(
         private fb: FormBuilder,
         private router: Router,
         private route: ActivatedRoute,
         private DemographicApiServices: DemographicApiServices,
         private registrationApi: RegistrationApiService,
-        public Loader: LoaderService
+        public Loader: LoaderService,
+        private secureStorage: SecureStorageService,
+
     ) {}
 
-    ngOnInit(): void {
+    async ngOnInit() {
         this.initializeForm();
         this.fillDropdown();
         
         // Set up real-time validation listeners
         this.setupFormValidationListeners();
         
+
+
+
+
+          // Prefer Router navigation state; fallback to window.history.state for refresh/reuse
+  const nav = this.router.getCurrentNavigation();
+  const navState: any = nav?.extras?.state ?? (window.history && (window.history.state as any)) ?? {};
+  const statemrNo = navState?.mrNo;
+  console.log('stateAppId =>',statemrNo);
+  const statepatient = navState?.patient;
+  console.log('stateAppId =>',statepatient);
+  if(statepatient){
+      this.patientId = statepatient.patientId;
+  }
+
+  // Fallback to secure storage on page refresh
+  const storedId = this.secureStorage.getItem('demographicEditId');
+
+  if (statemrNo != null) {
+    this.qid = Number(statemrNo);
+    await this.getDemographicsByMRNo(this.qid);
+  } else if (storedId) {  
+    this.qid = Number(storedId);
+    await this.getDemographicsByMRNo(this.qid);
+  }
+
+  // Clear once consumed to avoid stale usage
+  if (this.qid) {
+    this.secureStorage.removeItem('demographicEditId');
+  }
+
+
+
+
+
+
         // Get MR number from route if editing
         const mrNo = this.route.snapshot.paramMap.get('mrNo');
+        console.log('mrNo', mrNo);
+        
         if (mrNo) {
             this.getDemographicsByMRNo(mrNo);
         }
@@ -254,7 +296,7 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
     initializeForm() {
 
         this.demographicForm = this.fb.group({
-            PatientPicture: [''],
+            imageSrc: [''],
             practice: [{ value: '', disabled: true }],
             MrNo: [{ value: '', disabled: true }],
             PersonTitleId: [null, Validators.required],
@@ -716,9 +758,11 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
         }));
     }
 
-    getDemographicsByMRNo(MrNo: string = '') {
-        this.DemographicApiServices.getDemographicsByMRNo(MrNo)
-            .then((demographics: any) => {
+
+    async getDemographicsByMRNo(MrNo: string = '') {
+        this.Loader.show();
+        await this.DemographicApiServices.getDemographicsByMRNo(MrNo)
+            .then( async (demographics: any) => {
                 if (demographics?.table1?.length > 0) {
                     console.log('responce', demographics.table1[0]);
 
@@ -729,25 +773,72 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
                     const title = this.titles.find((e: any) => e.name == demographics?.table1[0]?.title)?.code;
                     const maritalstatus = this.maritalstatus.find((e: any) => e.name == demographics?.table1[0]?.maritalStatus)?.code;
                     const bloodGroup = this.bloodgroup.find((e: any) => e.name == demographics?.table1[0]?.bloodGroup)?.code;
-                    const billingNote = this.billingNote.find((e: any) => e.name == demographics?.table1[0]?.billingNote)?.code;
-                    const ethinic = this.ethinic.find((e: any) => e.name == demographics?.table1[0]?.ethinic)?.code;
+                    const ethinic = this.ethinic.find((e: any) => e.name == demographics?.table1[0]?.ethnicityType)?.code;
                     const DOB = demographics?.table1[0]?.patientBirthDate;
-                    const emiratesIDN = this.Emirates.find((e: any) => e.name == demographics?.table1[0]?.emiratesIDN)?.code;
+                    const emiratesIDN = this.Emirates.find((e: any) => e.code == demographics?.table1[0]?.emiratesIDN)?.code;
+                    const Nationality  =  this.nationality.find((e: any) => e.name == demographics?.table1[0]?.nationalityName)?.code;
+                    const genderIdentity = this.genderIdentity.find((e: any) => e.genderId == demographics?.table1[0]?.genderIdentity)?.genderId;
+                    const religionName = this.religion.find((e: any) => e.name == demographics?.table1[0]?.religionName)?.code;
+                    const languageName = this.language.find((e: any) => e.name == demographics?.table1[0]?.languageName)?.code;
+                    const primarycarephysicianPCP = this.referred.find((e: any) => e.code == demographics?.table1[0]?.primarycarephysicianPCP)?.code;
+                    const mediaChannel = this.MediaChannel.find((e: any) => e.name == demographics?.table1[0]?.mediaChannel)?.code;
+                    const mediaItem = this.MediaItem.find((e: any) => e.name == demographics?.table1[0]?.mediaItem)?.code;
+                    const CID = this.Country.find((e: any) => e.code == demographics?.table1[0]?.countryId)?.code;
+                    const cont = await this.onContactCountryChange(CID);
+                    const SID = this.states.find((e: any) => e.stateId == demographics?.table1[0]?.stateId)?.stateId;
+                    await this.onContactStateChange(SID);
+                    const CityId = this.city.find((e: any) => e.code == demographics?.table1[0]?.cityId)?.code;
+                    
                     this.demographicForm.patchValue({
+                        imageSrc: demographics?.table1[0]?.patientPicture,
+                        PersonTitleId: title,
                         PersonFirstName: demographics?.table1[0]?.personFirstName,
                         PersonMiddleName: demographics?.table1[0]?.personMiddleName,
                         PersonLastName: demographics?.table1[0]?.personLastName,
                         PersonSexId: gender,
-                        PersonTitleId: title,
-                        BillingNote: billingNote,
+                        preferredName: demographics?.table1[0]?.preferredName,
+                        genderIdentity: genderIdentity,
                         PersonMaritalStatus: maritalstatus,
-                        emails: demographics?.table1[0]?.email,
-                        PersonEthnicityType: demographics?.table1[0]?.PersonEthnicityType,
                         PatientBloodGroupId: bloodGroup,
                         PatientBirthDate: this.formatToDMY(DOB) || null,
-                        LaborCardNo: demographics?.table1[0]?.LaborCardNo,
+                        
+                        VIPPatient: demographics?.table1[0]?.vipPatient,
+                        // Identification
+                        personSocialSecurityNo: demographics?.table1[0]?.personSocialSecurityNo,
+                        LaborCardNo: demographics?.table1[0]?.laborCardNo,
+                        Nationality: Nationality,
+                        Religion: religionName,
+                        PersonEthnicityTypeId: ethinic,
+                        PersonPassportNo: demographics?.table1[0]?.personPassportNo,
+                        PersonDriversLicenseNo: demographics?.table1[0]?.personDriversLicenseNo,
+                        ResidenceVisaNo: demographics?.table1[0]?.residenceVisaNo,
+                        PrimaryLanguage: languageName,
+                        EmiratesIDN: emiratesIDN,
+                        primarycarephysicianPcp: primarycarephysicianPCP,
+                        MediaChannelId: mediaChannel,
+                        MediaItemId: mediaItem,
+                        causeofDeath: demographics?.table1[0]?.causeofDeath,
+                        DeathDate: this.formatToDMY(demographics?.table1[0]?.dateofDeath) || null,
+                        BillingNote: demographics?.table1[0]?.billingNote,
+
+                        emails: demographics?.table1[0]?.email,
                 });
-                this.imageSrc = data.PatientPicture ?? '';
+                this.calculateAgeOnChangeDOB();
+                this.contactForm.patchValue({
+                    streetName: demographics?.table1[0]?.streetName,
+                    dwellingNumber: demographics?.table1[0]?.dwellingNumber,
+                    faxNo: demographics?.table1[0]?.fax,
+                    postalCode: demographics?.table1[0]?.postalCode,
+                    homePhone: demographics?.table1[0]?.homePhone,
+                    cellPhone: demographics?.table1[0]?.cellPhone,
+                    workPhone: demographics?.table1[0]?.workPhone,
+                    email: demographics?.table1[0]?.email,
+                    CountryId: CID,
+                    StateId: SID,
+                    CityId: CityId,
+                })
+
+                this.Loader.hide();
             }
         })
         .catch((error) => {
@@ -756,7 +847,10 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
                 title: 'Error',
                 text: error.message || 'Failed to load demographic data.',
             });
+                this.Loader.hide();
         });
+                this.Loader.hide();
+
 }
 
 onSubmit() {
@@ -795,7 +889,6 @@ onSubmit() {
     // Contact (use RegPatientTabsType: 1 = Contact Residence)
     const Contact: ContactModel = {
         streetName: this.contactForm.get('streetName')?.value || '',
-        dwellingNumber: this.contactForm.get('dwellingNumber')?.value || '',
         countryId: this.contactForm.get('CountryId')?.value || 0,
         stateId: this.contactForm.get('StateId')?.value || 0,
         cityId: this.contactForm.get('CityId')?.value || 0,
@@ -815,7 +908,7 @@ onSubmit() {
         middleName: this.emergencyContactForm.get('middleName')?.value || '',
         lastName: this.emergencyContactForm.get('lastName')?.value || '',
         streetName: this.emergencyContactForm.get('streetName')?.value || '',
-        dwellingNumber: this.emergencyContactForm.get('dwellingNumber')?.value || '',
+        email: this.emergencyContactForm.get('email')?.value || '',
         countryId: this.emergencyContactForm.get('CountryId')?.value || 0,
         stateId: this.emergencyContactForm.get('StateId')?.value || 0,
         cityId: this.emergencyContactForm.get('CityId')?.value || 0,
@@ -833,7 +926,7 @@ onSubmit() {
         middleName: this.nextForm.get('middleName')?.value || '',
         lastName: this.nextForm.get('lastName')?.value || '',
         streetName: this.nextForm.get('streetName')?.value || '',
-        NokdwellingNumber: this.nextForm.get('dwellingNumber')?.value || 0,
+        email: this.nextForm.get('email')?.value || 0,
         countryId: this.nextForm.get('CountryId')?.value || 0,
         stateId: this.nextForm.get('StateId')?.value || 0,
         cityId: this.nextForm.get('CityId')?.value || 0,
@@ -906,7 +999,7 @@ onSubmit() {
 
         // Final payload matching DTO
         const demographic: any = {
-            patientId: 0,
+            patientId: this.patientId || 0,
             personFirstName: formData.PersonFirstName || '',
             personMiddleName: formData.PersonMiddleName || '',
             personLastName: formData.PersonLastName || '',
@@ -946,6 +1039,10 @@ onSubmit() {
             primarycarephysicianPcp: formData.primarycarephysicianPcp || '',
             erelationshipId: 0,
             regPatientEmployer: [],
+            // emergencyContact: EmergencyContact || [],
+            // nextOfKin: NextOfKin || [],
+            // spouse: Spouse || [],
+            // parent: Parent || [],
             regAccount: [],
         };
 
@@ -981,7 +1078,7 @@ onSubmit() {
                     showConfirmButton: false,
                     timer: 2000,
                 });
-                this.router.navigate(['/registration/demographic']);
+                this.router.navigate(['/registration/demographics']);
             },
             error: (error: any) => {
                 let errorMessage = 'Something went wrong';
@@ -1015,19 +1112,19 @@ onSubmit() {
     MyEmployment: any[] = [];
     selectedRowIds: Set<number> = new Set();
     currentMaxId: number = 0;
-
-    OnCountryChange(countryId: any) {
-        this.contactForm.patchValue({ CountryId: countryId });
-        this.DemographicApiServices.getStateByCountry(countryId).then(
+ 
+    async OnCountryChange(countryId: any) {
+         this.contactForm.patchValue({ CountryId: countryId });
+        await this.DemographicApiServices.getStateByCountry(countryId).then(
             (response) => {
                 this.state = response as any[];
             }
         );
     }
 
-    OnStateChange(State: any) {
+    async OnStateChange(State: any) {
         if (State?.value?.stateId) {
-            this.DemographicApiServices.getCityByState(
+          await  this.DemographicApiServices.getCityByState(
                 State.value.stateId
             ).then((response) => {
                 this.citie = response as any[];
@@ -1037,10 +1134,42 @@ onSubmit() {
         }
     }
 
-    onCountryChange() {
+    async onNFKCountryChange(id: any = 0) {
+        const countryId = this.nextForm.get('CountryId')?.value;
+        if (countryId) {
+          await  this.registrationApi
+                .getStateByCountry(countryId)
+                .then((res: any) => {
+                    this.states = res;
+                    this.nextForm.get('StateId')?.setValue(null); // Reset State
+                    this.city = [];
+                    this.nextForm.get('CityId')?.setValue(null); // Reset City
+                });
+        } else {
+            this.states = [];
+            this.city = [];
+            this.nextForm.get('StateId')?.setValue(null);
+            this.nextForm.get('CityId')?.setValue(null);
+        }
+    }
+
+    async onNFKStateChange(id: any = 0) {
+        const stateId = this.nextForm.get('StateId')?.value;
+        if (stateId) {
+           await this.registrationApi.getCityByState(stateId).then((res: any) => {
+                this.city = res;
+                this.nextForm.get('CityId')?.setValue(null); // Reset City
+            });
+        } else {
+            this.city = [];
+            this.nextForm.get('CityId')?.setValue(null);
+        }
+    }
+
+    async onContactCountryChange(id: any = 0) {
         const countryId = this.contactForm.get('CountryId')?.value;
         if (countryId) {
-            this.registrationApi
+          await  this.registrationApi
                 .getStateByCountry(countryId)
                 .then((res: any) => {
                     this.states = res;
@@ -1056,10 +1185,10 @@ onSubmit() {
         }
     }
 
-    onStateChange() {
+    async onContactStateChange(id: any = 0) {
         const stateId = this.contactForm.get('StateId')?.value;
         if (stateId) {
-            this.registrationApi.getCityByState(stateId).then((res: any) => {
+           await this.registrationApi.getCityByState(stateId).then((res: any) => {
                 this.city = res;
                 this.contactForm.get('CityId')?.setValue(null); // Reset City
             });
@@ -1068,6 +1197,7 @@ onSubmit() {
             this.contactForm.get('CityId')?.setValue(null);
         }
     }
+
     onCarrierChange() {
         if (this.CarrierId != null) {
             if (this.CarrierId.name == 'Met Life') {

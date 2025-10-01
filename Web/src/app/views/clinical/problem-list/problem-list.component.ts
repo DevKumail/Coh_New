@@ -56,7 +56,7 @@ export class ProblemListComponent implements OnInit {
   // ICDVersions: any;
   // Searchby: any;
   searchForm: any;
-  diagnosisForm: any
+  // diagnosisForm: any
   hrEmployees: any = [];
   form: any;
   Problems: any = {}
@@ -186,8 +186,8 @@ appId:any;
       icdVersionId: [''],
       searchById: [''],
       startingCode: [''],
-      diagnosisEndCode: [''],
-      descriptionFilter: ['']
+      endingCode: [''],
+      description: ['']
 
     });
     console.log(this.FilterForm)
@@ -618,8 +618,10 @@ onSubmit() {
 
   }
 
-  onRowSelect() {
-
+  onRowSelect(diagnosis: any, modal: any) {
+    modal.close(diagnosis); 
+    console.log("diagnosis waleed",diagnosis)
+ 
   }
   async FillCache() {
 
@@ -692,15 +694,16 @@ onSubmit() {
     }
   }
   SearchDiagnosis() {
+    this.loader.show();
     console.log(this.FilterForm.value)
-    return
-    debugger
     this.DiagnosisCode = [];
     this.clinicalApiService.DiagnosisCodebyProvider(this.ICDVersionId, this.DiagnosisStartCode, this.DiagnosisEndCode, this.DescriptionFilter).then((response: any) => {
       this.DiagnosisCode = response.table1;
+    this.loader.hide();
       console.log(this.DiagnosisCode, 'this.DiagnosisCode');
 
     })
+    this.loader.hide();
   }
   provider(event: any) {
 
