@@ -2,11 +2,12 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-demographic-family',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe, FilledOnValueDirective],
   template: `
     <form [formGroup]="familyForm" class="d-flex justify-content-between">
       <!-- Left Side: Form Inputs -->
@@ -14,7 +15,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
         <!-- Mr No -->
         <div class="mb-3">
           <label class="form-label">{{'MR_NO' | translate}}</label>
-          <input type="text" class="form-control" formControlName="mrNo" placeholder="{{'MR_NO' | translate}}" />
+          <input type="text" class="form-control" appFilledOnValue formControlName="mrNo" placeholder="{{'MR_NO' | translate}}" />
         </div>
 
         <!-- Account Type -->
@@ -35,15 +36,15 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
         <!-- Master Mr No -->
         <div class="mb-3">
           <label class="form-label">{{'MASTER_MR_NO' | translate}}</label>
-          <input type="text" class="form-control" formControlName="masterMrNo" placeholder="{{'SELECT_MASTER_MR_NO' | translate}}" />
+          <input type="text" class="form-control" appFilledOnValue formControlName="masterMrNo" placeholder="{{'SELECT_MASTER_MR_NO' | translate}}" />
         </div>
 
         <!-- Relationship -->
         <div class="mb-3">
           <label class="form-label">{{'RELATIONSHIP' | translate}}</label>
-          <select class="form-select" formControlName="relationshipId">
+          <select class="form-select" appFilledOnValue formControlName="relationshipId">
             <option value="">{{'RELATIONSHIP' | translate}}</option>
-            <option *ngFor="let r of relationships" [value]="r.id">{{ r.name }}</option>
+            <option *ngFor="let r of relationships" [value]="r.code">{{ r.name }}</option>
           </select>
         </div>
       </div>

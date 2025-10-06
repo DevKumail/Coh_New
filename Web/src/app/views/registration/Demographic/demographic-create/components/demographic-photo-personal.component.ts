@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LucideAngularModule, LucideCamera, LucideTrash2 } from 'lucide-angular';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-demographic-photo-personal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule,TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule,TranslatePipe, FilledOnValueDirective],
   template: `
   <div class="row mb-3 gx-2 align-items-start">
     <!-- Patient Photo Section - Left Side -->
@@ -62,7 +63,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
             <!-- Title -->
             <div class="col-sm-6 col-md-4 col-lg-3">
               <label class="form-label">{{'TITLE' | translate}} <span class="text-danger">*</span></label>
-              <select class="form-select"
+              <select class="form-select" appFilledOnValue
                       [class.is-invalid]="demographicForm.get('PersonTitleId')?.invalid && (demographicForm.get('PersonTitleId')?.touched || isFormSubmitted)"
                       formControlName="PersonTitleId">
                 <option value="" disabled selected hidden>-- {{'SELECT_TITEL' | translate}} --</option>
@@ -77,7 +78,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
             <!-- First Name -->
             <div class="col-sm-6 col-md-4 col-lg-3">
               <label class="form-label">{{'FIRST_NAME' | translate}} <span class="text-danger">*</span></label>
-    <input type="text" class="form-control"
+    <input type="text" class="form-control" appFilledOnValue
       [class.is-invalid]="demographicForm.get('PersonFirstName')?.invalid && (demographicForm.get('PersonFirstName')?.touched || isFormSubmitted)"
       formControlName="PersonFirstName" placeholder="{{'ENTER_FIRST_NAME' | translate }}" />
               <div class="invalid-feedback d-block"
@@ -89,13 +90,13 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
             <!-- Middle Name -->
             <div class="col-sm-6 col-md-4 col-lg-3">
               <label class="form-label">{{'MIDDLE_NAME' | translate }}</label>
-              <input type="text" class="form-control" formControlName="PersonMiddleName" placeholder="{{'ENTER_MIDDLE_NAME' | translate }}" />
+              <input type="text" class="form-control" appFilledOnValue formControlName="PersonMiddleName" placeholder="{{'ENTER_MIDDLE_NAME' | translate }}" />
             </div>
 
             <!-- Last Name -->
             <div class="col-sm-6 col-md-4 col-lg-3">
               <label class="form-label">{{'LAST_NAME' | translate}} <span class="text-danger">*</span></label>
-    <input type="text" class="form-control"
+    <input type="text" class="form-control" appFilledOnValue
       [class.is-invalid]="demographicForm.get('PersonLastName')?.invalid && (demographicForm.get('PersonLastName')?.touched || isFormSubmitted)"
       formControlName="PersonLastName" placeholder="{{'ENTER_LAST_NAME' | translate }}" />
               <div class="invalid-feedback d-block"
@@ -111,7 +112,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
             <!-- Gender -->
             <div class="col-sm-6 col-md-4 col-lg-3">
               <label class="form-label required">{{'GENDER' | translate }} <span class="text-danger">*</span></label>
-              <select class="form-select"
+              <select class="form-select" appFilledOnValue
                       [class.is-invalid]="demographicForm.get('PersonSexId')?.invalid && (demographicForm.get('PersonSexId')?.touched || isFormSubmitted)"
                       formControlName="PersonSexId">
                 <option [ngValue]="null" disabled>-- {{'SELECT_GENDER' | translate}} --</option>
@@ -126,13 +127,13 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
             <!-- Preferred Name -->
             <div class="col-sm-6 col-md-4 col-lg-3">
               <label class="form-label">{{'PREFERRED_NAME' | translate}} </label>
-              <input type="text" class="form-control" formControlName="preferredName" placeholder="{{'ENTER_PREFERRED_NAME' | translate}}"/>
+              <input type="text" class="form-control" appFilledOnValue formControlName="preferredName" placeholder="{{'ENTER_PREFERRED_NAME' | translate}}"/>
             </div>
 
             <!-- Gender Identity -->
             <div class="col-sm-6 col-md-4 col-lg-3">
               <label class="form-label required">{{'GENDER_IDENTITY' | translate}} <span class="text-danger">*</span></label>
-              <select class="form-select"
+              <select class="form-select" appFilledOnValue
                       [class.is-invalid]="demographicForm.get('genderIdentity')?.invalid && (demographicForm.get('genderIdentity')?.touched || isFormSubmitted)"
                       formControlName="genderIdentity">
                 <option [ngValue]="null" disabled>-- {{'SELECT_GENDER_IDENTITY' | translate}} --</option>
@@ -147,7 +148,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
             <!-- Marital Status -->
             <div class="col-sm-6 col-md-4 col-lg-3">
               <label class="form-label required">{{'MARITAL_STATUS' | translate}} <span class="text-danger">*</span></label>
-              <select class="form-select"
+              <select class="form-select" appFilledOnValue
                       [class.is-invalid]="demographicForm.get('PersonMaritalStatus')?.invalid && (demographicForm.get('PersonMaritalStatus')?.touched || isFormSubmitted)"
                       formControlName="PersonMaritalStatus">
                 <option [ngValue]="null" disabled>-- {{'SELECT_MARITAL_STATUS' | translate}} --</option>
@@ -162,7 +163,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
             <!-- Blood Group -->
             <div class="col-sm-6 col-md-4 col-lg-3">
               <label class="form-label required">{{'BLOOD_GROUP' | translate}} <span class="text-danger">*</span></label>
-              <select class="form-select"
+              <select class="form-select" appFilledOnValue
                       [class.is-invalid]="demographicForm.get('PatientBloodGroupId')?.invalid && (demographicForm.get('PatientBloodGroupId')?.touched || isFormSubmitted)"
                       formControlName="PatientBloodGroupId">
                 <option [ngValue]="null" disabled>-- {{'SELECT_BLOOD_GROUP' | translate}} --</option>
@@ -177,7 +178,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
             <!-- Date of Birth -->
             <div class="col-sm-6 col-md-4 col-lg-3">
               <label class="form-label required">{{'DOB' | translate}}  <span class="text-danger">*</span></label>
-    <input type="text" class="form-control"
+    <input type="text" class="form-control" appFilledOnValue
       [class.is-invalid]="demographicForm.get('PatientBirthDate')?.invalid && (demographicForm.get('PatientBirthDate')?.touched || isFormSubmitted)"
       formControlName="PatientBirthDate" data-provider="flatpickr" id="birthDate" placeholder="{{'SELECT_DATE' | translate}}" />
               <div class="invalid-feedback d-block"
@@ -189,7 +190,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
             <!-- Age -->
             <div class="col-sm-6 col-md-2 col-lg-2">
               <label class="form-label">{{'AGE' | translate}}</label>
-              <input type="text" class="form-control" formControlName="Age" placeholder="{{'AGE' | translate}}" readonly />
+              <input type="text" class="form-control" appFilledOnValue formControlName="Age" placeholder="{{'AGE' | translate}}" readonly />
             </div>
 
             <!-- VIP -->

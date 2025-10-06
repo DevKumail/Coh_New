@@ -2,11 +2,12 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-demographic-assignments',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe, FilledOnValueDirective],
   template: `
     <form [formGroup]="assignmentForm" class="d-flex justify-content-md-evenly">
       <!-- First Card -->
@@ -17,19 +18,19 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
         </div>
 
         <div class="mb-3">
-          <input type="text" class="form-control" placeholder="{{'ENTER_PROOF_OF_INCOME' | translate}}" formControlName="proofOfIncome" />
+          <input type="text" class="form-control" appFilledOnValue placeholder="{{'ENTER_PROOF_OF_INCOME' | translate}}" formControlName="proofOfIncome" />
         </div>
 
         <div class="row">
           <div class="col-md-6 mb-3">
-            <select class="form-select" formControlName="providerId">
+            <select class="form-select" appFilledOnValue formControlName="providerId">
               <option value="">{{'PROVIDER' | translate}}</option>
               <option *ngFor="let p of referred" [value]="p.id">{{ p.name }}</option>
             </select>
           </div>
 
           <div class="col-md-6 mb-3">
-            <select class="form-select" formControlName="feeScheduleId">
+            <select class="form-select" appFilledOnValue formControlName="feeScheduleId">
               <option value="">{{'FEE_SCHEDULE' | translate}}</option>
               <option *ngFor="let f of FeeSchedule" [value]="f.id">{{ f.name }}</option>
             </select>
@@ -38,14 +39,14 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
         <div class="row">
           <div class="col-md-6 mb-3">
-            <select class="form-select" formControlName="financialClassId">
+            <select class="form-select" appFilledOnValue formControlName="financialClassId">
               <option value="">{{'FINANCIAL_CLASS' | translate}}</option>
               <option *ngFor="let fc of FinancialClass" [value]="fc.id">{{ fc.name }}</option>
             </select>
           </div>
 
           <div class="col-md-6 mb-3">
-            <select class="form-select" formControlName="locationId">
+            <select class="form-select" appFilledOnValue formControlName="locationId">
               <option value="">{{'LOCATION' | translate}}</option>
               <option *ngFor="let l of location" [value]="l.id">{{ l.name }}</option>
             </select>
@@ -53,7 +54,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
         </div>
 
         <div class="mb-3">
-          <select class="form-select" formControlName="siteId">
+          <select class="form-select" appFilledOnValue formControlName="siteId">
             <option value="">{{'SITE' | translate}}</option>
             <option *ngFor="let s of Site" [value]="s.id">{{ s.name }}</option>
           </select>
@@ -77,12 +78,12 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
         <div class="mb-3">
           <label>{{'SIGNED' | translate}}</label>
-          <input type="date" class="form-control" formControlName="signedDate" />
+          <input type="date" class="form-control" appFilledOnValue formControlName="signedDate" />
         </div>
 
         <div class="mb-3">
           <label>{{'UNSIGNED' | translate}}</label>
-          <input type="date" class="form-control" formControlName="expiryDate" />
+          <input type="date" class="form-control" appFilledOnValue formControlName="expiryDate" />
         </div>
       </div>
 
@@ -91,21 +92,21 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
         <label class="fw-bold mb-2">{{'CONSENT_FORM' | translate}}</label>
 
         <div class="mb-3">
-          <select class="form-select" formControlName="entityTypeId">
+          <select class="form-select" appFilledOnValue formControlName="entityTypeId">
             <option value="">{{'ENTITY_TYPE' | translate}}</option>
             <option *ngFor="let e of EntityTypes" [value]="e.id">{{ e.name }}</option>
           </select>
         </div>
 
         <div class="mb-3">
-          <select class="form-select" formControlName="entityNameId">
+          <select class="form-select" appFilledOnValue formControlName="entityNameId">
             <option value="">{{'ENTITY_NAME' | translate}}</option>
             <option *ngFor="let e of Emirates" [value]="e.id">{{ e.name }}</option>
           </select>
         </div>
 
         <div class="mb-3">
-          <select class="form-select" formControlName="providerReferredId">
+          <select class="form-select" appFilledOnValue formControlName="providerReferredId">
             <option value="">{{'REFERRED_BY' | translate}}</option>
             <option *ngFor="let r of referred" [value]="r.id">{{ r.name }}</option>
           </select>

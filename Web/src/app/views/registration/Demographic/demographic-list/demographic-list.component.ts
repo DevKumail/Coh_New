@@ -198,13 +198,13 @@ export class DemographicListComponent {
   editPatient(patient: any) {
 
         // Derive a stable appointment id and persist as fallback for refresh
-    const mrNo: number = Number(patient?.mrNo ?? patient?.mrNo ?? 0);
-    if (mrNo) {
-      this.secureStorage.setItem('demographicEditId', String(mrNo));
+    const patientId: number = Number(patient?.patientId ?? patient?.patientId ?? 0);
+    if (patientId) {
+      this.secureStorage.setItem('demographicEditId', String(patientId));
     }
     // Navigate using Router state (hide id from URL) and include full object for convenience
     this.router.navigate(['/registration/demographic-create'], {
-      state: { mrNo, patient },
+      state: { patientId, patient },
     });
 
 

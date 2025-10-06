@@ -47,6 +47,7 @@ export interface Contact {
   cellPhone?: string;
   homePhone?: string;
   workPhone?: string;
+  dwellingNumber?: string;
   fax?: string;
   email?: string;
   tabsTypeId?: number

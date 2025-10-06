@@ -117,8 +117,17 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
     citie: any[] = [];
     Country: any;
     genders: any[] = [];
+    // Shared caches (keep, but not used for tab dropdown lists)
     states: any[] = [];
     city: any[] = [];
+    EmploymentTypes :any [ ] = [];
+    // Per-tab dropdown sources to avoid cross-tab interference
+    contactStates: any[] = [];
+    contactCities: any[] = [];
+    emergencyStates: any[] = [];
+    emergencyCities: any[] = [];
+    nextStates: any[] = [];
+    nextCities: any[] = [];
     relationships: any[] = [];
 
     qid: any;
@@ -163,10 +172,10 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
           // Prefer Router navigation state; fallback to window.history.state for refresh/reuse
   const nav = this.router.getCurrentNavigation();
   const navState: any = nav?.extras?.state ?? (window.history && (window.history.state as any)) ?? {};
-  const statemrNo = navState?.mrNo;
-  console.log('stateAppId =>',statemrNo);
+  const statemrNo = navState?.patientId;
+  console.log('statepatientId =>',statemrNo);
   const statepatient = navState?.patient;
-  console.log('stateAppId =>',statepatient);
+  console.log('statepatient =>',statepatient);
   if(statepatient){
       this.patientId = statepatient.patientId;
   }
@@ -215,34 +224,44 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
         });
     }
 
-    onEmergencyCountryChange() {
+    async onEmergencyCountryChange() {
         const countryId = this.emergencyContactForm.get('CountryId')?.value;
         if (countryId) {
-            this.registrationApi
+            await this.registrationApi
                 .getStateByCountry(countryId)
                 .then((res: any) => {
-                    this.states = res;
+                    this.emergencyStates = Array.isArray(res)
+                        ? res.map((item: any) => ({
+                            stateId: item?.stateId ?? item?.StateId ?? item?.code ?? null,
+                            name: item?.name ?? item?.StateName ?? item?.stateName ?? ''
+                        }))
+                        : [];
                     this.emergencyContactForm.get('StateId')?.setValue(null);
-                    this.city = [];
+                    this.emergencyCities = [];
                     this.emergencyContactForm.get('CityId')?.setValue(null);
                 });
         } else {
-            this.states = [];
-            this.city = [];
+            this.emergencyStates = [];
+            this.emergencyCities = [];
             this.emergencyContactForm.get('StateId')?.setValue(null);
             this.emergencyContactForm.get('CityId')?.setValue(null);
         }
     }
 
-    onEmergencyStateChange() {
+    async onEmergencyStateChange() {
         const stateId = this.emergencyContactForm.get('StateId')?.value;
         if (stateId) {
-            this.registrationApi.getCityByState(stateId).then((res: any) => {
-                this.city = res;
+            await this.registrationApi.getCityByState(stateId).then((res: any) => {
+                this.emergencyCities = Array.isArray(res)
+                    ? res.map((item: any) => ({
+                        cityId: item?.cityId ?? item?.CityId ?? item?.code ?? null,
+                        name: item?.name ?? item?.CityName ?? item?.cityName ?? ''
+                    }))
+                    : [];
                 this.emergencyContactForm.get('CityId')?.setValue(null);
             });
         } else {
-            this.city = [];
+            this.emergencyCities = [];
             this.emergencyContactForm.get('CityId')?.setValue(null);
         }
     }
@@ -589,20 +608,20 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
     }
 
     getFeeSchedule() {
-        this.DemographicApiServices.getAllFeeSchedule().subscribe((res) => {
-            this.FeeSchedule = res as any[];
+        this.DemographicApiServices.getAllFeeSchedule().subscribe((res: any) => {
+            this.FeeSchedule = res || [];
         });
     }
 
     getFinancialClass() {
-        this.DemographicApiServices.getAllFinancialClass().subscribe((res) => {
-            this.FinancialClass = res as any[];
+        this.DemographicApiServices.getAllFinancialClass().subscribe((res: any) => {
+            this.FinancialClass = res || [];
         });
     }
 
     getEntityTypes() {
-        this.DemographicApiServices.getAllEntityTypes().subscribe((res) => {
-            this.EntityTypes = res as any[];
+        this.DemographicApiServices.getAllEntityTypes().subscribe((res: any ) => {
+            this.EntityTypes = res || [];
         });
     }
 
@@ -615,7 +634,6 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
                 'RegEthnicityTypes',
                 'Language',
                 'RegGender',
-                'Emirates',
                 'RegMaritalStatus',
                 'Nationality',
                 'Religion',
@@ -625,6 +643,8 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
                 'RegRelationShip',
                 'RegLocationTypes',
                 'EmiratesIDN',
+                'RegLocations',
+                'RegEmploymentType',
             ],
         })
             .then((response: any) => {
@@ -694,12 +714,14 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
             'FullName'
         );
         console.log('referred',this.referred)
-        this.Emirates = this.mapToDropdown(json.Emirates, 'Emirate', 'Name');
-        console.log('Emirates from cache:', this.Emirates);
+        // this.Emirates = this.mapToDropdown(json.Emirates, 'Emirate', 'Name');
+        // console.log('Emirates from cache:', this.Emirates);
         let regcountries = JSON.parse(jParse).RegCountries;
         let reggender = JSON.parse(jParse).RegGender;
         let relationships = JSON.parse(jParse).RegRelationShip;
         let site = JSON.parse(jParse).RegLocationTypes;
+        let locations = JSON.parse(jParse).RegLocations;
+        let employmentType = JSON.parse(jParse).RegEmploymentType;
 
         if (regcountries) {
             regcountries = regcountries.map(
@@ -744,6 +766,18 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
             );
             this.relationships = relationships;
         }
+        if (locations) {
+            this.location = locations.map((item: { LocationId: any; Name: any }) => ({
+                id: item.LocationId,
+                name: item.Name,
+            }));
+        }
+        if (employmentType) {
+            this.EmploymentTypes = employmentType.map((item: { EmploymentTypeId: any; Name: any }) => ({
+                id: item.EmploymentTypeId,
+                name: item.Name,
+            }));
+        }
     }
 
     mapToDropdown(
@@ -759,84 +793,248 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
     }
 
 
-    async getDemographicsByMRNo(MrNo: string = '') {
+    async getDemographicsByMRNo(patientId: string = '') {
         this.Loader.show();
-        await this.DemographicApiServices.getDemographicsByMRNo(MrNo)
+        await this.DemographicApiServices.getDemographicsBypatientId(patientId)
             .then( async (demographics: any) => {
-                if (demographics?.table1?.length > 0) {
-                    console.log('responce', demographics.table1[0]);
+                const Table1 = demographics?.Table1 || demographics?.table1 || [];
+                const Table2 = demographics?.Table2 || demographics?.table2 || [];
+                if (Table1.length > 0) {
+                    const t1: any = Table1[0];
+                    console.log('response', t1);
 
-                    const data: DemographicDTO = demographics.table1[0];
+                    // Patch raw in case keys match
+                    this.demographicForm.patchValue(t1);
 
-                    this.demographicForm.patchValue(data);
-                    const gender = this.gender.find((e: any) => e.name == demographics?.table1[0]?.gender)?.code;
-                    const title = this.titles.find((e: any) => e.name == demographics?.table1[0]?.title)?.code;
-                    const maritalstatus = this.maritalstatus.find((e: any) => e.name == demographics?.table1[0]?.maritalStatus)?.code;
-                    const bloodGroup = this.bloodgroup.find((e: any) => e.name == demographics?.table1[0]?.bloodGroup)?.code;
-                    const ethinic = this.ethinic.find((e: any) => e.name == demographics?.table1[0]?.ethnicityType)?.code;
-                    const DOB = demographics?.table1[0]?.patientBirthDate;
-                    const emiratesIDN = this.Emirates.find((e: any) => e.code == demographics?.table1[0]?.emiratesIDN)?.code;
-                    const Nationality  =  this.nationality.find((e: any) => e.name == demographics?.table1[0]?.nationalityName)?.code;
-                    const genderIdentity = this.genderIdentity.find((e: any) => e.genderId == demographics?.table1[0]?.genderIdentity)?.genderId;
-                    const religionName = this.religion.find((e: any) => e.name == demographics?.table1[0]?.religionName)?.code;
-                    const languageName = this.language.find((e: any) => e.name == demographics?.table1[0]?.languageName)?.code;
-                    const primarycarephysicianPCP = this.referred.find((e: any) => e.code == demographics?.table1[0]?.primarycarephysicianPCP)?.code;
-                    const mediaChannel = this.MediaChannel.find((e: any) => e.name == demographics?.table1[0]?.mediaChannel)?.code;
-                    const mediaItem = this.MediaItem.find((e: any) => e.name == demographics?.table1[0]?.mediaItem)?.code;
-                    const CID = this.Country.find((e: any) => e.code == demographics?.table1[0]?.countryId)?.code;
-                    const cont = await this.onContactCountryChange(CID);
-                    const SID = this.states.find((e: any) => e.stateId == demographics?.table1[0]?.stateId)?.stateId;
-                    await this.onContactStateChange(SID);
-                    const CityId = this.city.find((e: any) => e.code == demographics?.table1[0]?.cityId)?.code;
+                    const genderName = t1.Gender ?? t1.gender;
+                    const titleName = t1.Title ?? t1.title;
+                    const maritalName = t1.MaritalStatus ?? t1.maritalStatus;
+                    const bloodGroupName = t1.BloodGroup ?? t1.bloodGroup;
+                    const ethnicityName = t1.EthnicityType ?? t1.ethnicityType;
+                    const DOB = t1.patientBirthDate ?? t1.PatientBirthDate;
+                    const emiratesIdCode = t1.emiratesIDN ?? t1.EmiratesIDN;
+                    const nationalityName = t1.NationalityName ?? t1.nationalityName;
+                    const genderIdentityId = t1.GenderIdentity ?? t1.genderIdentity;
+                    const religionNameVal = t1.ReligionName ?? t1.religionName;
+                    const languageNameVal = t1.LanguageName ?? t1.languageName;
+                    const pcpVal = t1.PrimarycarephysicianPCP ?? t1.primarycarephysicianPCP;
+                    const mediaChannelName = t1.MediaChannel ?? t1.mediaChannel;
+                    const mediaItemName = t1.MediaItem ?? t1.mediaItem;
+
+                    const gender = this.gender.find((e: any) => e.name == genderName)?.code;
+                    const title = this.titles.find((e: any) => e.name == titleName)?.code;
+                    const maritalstatus = this.maritalstatus.find((e: any) => e.name == maritalName)?.code;
+                    const bloodGroup = this.bloodgroup.find((e: any) => e.name == bloodGroupName)?.code;
+                    const ethinic = this.ethinic.find((e: any) => e.name == ethnicityName)?.code;
+                    const emiratesIDN = this.Emirates.find((e: any) => e.code == emiratesIdCode)?.code;
+                    const Nationality  =  this.nationality.find((e: any) => e.name == nationalityName)?.code;
+                    const genderIdentity = this.genderIdentity.find((e: any) => e.genderId == genderIdentityId)?.genderId;
+                    const religionName = this.religion.find((e: any) => e.name == religionNameVal)?.code;
+                    const languageName = this.language.find((e: any) => e.name == languageNameVal)?.code;
+                    const primarycarephysicianPCP = this.referred.find((e: any) => e.code == pcpVal)?.code;
+                    const mediaChannel = this.MediaChannel.find((e: any) => e.name == mediaChannelName)?.code;
+                    const mediaItem = this.MediaItem.find((e: any) => e.name == mediaItemName)?.code;
                     
                     this.demographicForm.patchValue({
-                        imageSrc: demographics?.table1[0]?.patientPicture,
+                        imageSrc: t1?.patientPicture,
                         PersonTitleId: title,
-                        PersonFirstName: demographics?.table1[0]?.personFirstName,
-                        PersonMiddleName: demographics?.table1[0]?.personMiddleName,
-                        PersonLastName: demographics?.table1[0]?.personLastName,
+                        PersonFirstName: (t1?.PersonFirstName ?? t1?.personFirstName) || '',
+                        PersonMiddleName: (t1?.PersonMiddleName ?? t1?.personMiddleName) || '',
+                        PersonLastName: (t1?.PersonLastName ?? t1?.personLastName) || '',
                         PersonSexId: gender,
-                        preferredName: demographics?.table1[0]?.preferredName,
+                        preferredName: t1?.PreferredName ?? t1?.preferredName,
                         genderIdentity: genderIdentity,
                         PersonMaritalStatus: maritalstatus,
                         PatientBloodGroupId: bloodGroup,
                         PatientBirthDate: this.formatToDMY(DOB) || null,
                         
-                        VIPPatient: demographics?.table1[0]?.vipPatient,
+                        VIPPatient: !!(t1?.vipPatient ?? t1?.VIPPatient),
                         // Identification
-                        personSocialSecurityNo: demographics?.table1[0]?.personSocialSecurityNo,
-                        LaborCardNo: demographics?.table1[0]?.laborCardNo,
+                        personSocialSecurityNo: (t1?.personSocialSecurityNo ?? t1?.PersonSocialSecurityNo) || '',
+                        LaborCardNo: (t1?.laborCardNo ?? t1?.LaborCardNo) || '',
                         Nationality: Nationality,
                         Religion: religionName,
                         PersonEthnicityTypeId: ethinic,
-                        PersonPassportNo: demographics?.table1[0]?.personPassportNo,
-                        PersonDriversLicenseNo: demographics?.table1[0]?.personDriversLicenseNo,
-                        ResidenceVisaNo: demographics?.table1[0]?.residenceVisaNo,
+                        PersonPassportNo: (t1?.personPassportNo ?? t1?.PersonPassportNo) || '',
+                        PersonDriversLicenseNo: (t1?.personDriversLicenseNo ?? t1?.PersonDriversLicenseNo) || '',
+                        ResidenceVisaNo: (t1?.residenceVisaNo ?? t1?.ResidenceVisaNo) || '',
                         PrimaryLanguage: languageName,
                         EmiratesIDN: emiratesIDN,
                         primarycarephysicianPcp: primarycarephysicianPCP,
                         MediaChannelId: mediaChannel,
                         MediaItemId: mediaItem,
-                        causeofDeath: demographics?.table1[0]?.causeofDeath,
-                        DeathDate: this.formatToDMY(demographics?.table1[0]?.dateofDeath) || null,
-                        BillingNote: demographics?.table1[0]?.billingNote,
-
-                        emails: demographics?.table1[0]?.email,
+                        causeofDeath: t1?.CauseofDeath ?? t1?.causeofDeath,
+                        DeathDate: this.formatToDMY(t1?.DateofDeath ?? t1?.dateofDeath) || null,
+                        BillingNote: t1?.BillingNote ?? t1?.billingNote,
                 });
                 this.calculateAgeOnChangeDOB();
-                this.contactForm.patchValue({
-                    streetName: demographics?.table1[0]?.streetName,
-                    dwellingNumber: demographics?.table1[0]?.dwellingNumber,
-                    faxNo: demographics?.table1[0]?.fax,
-                    postalCode: demographics?.table1[0]?.postalCode,
-                    homePhone: demographics?.table1[0]?.homePhone,
-                    cellPhone: demographics?.table1[0]?.cellPhone,
-                    workPhone: demographics?.table1[0]?.workPhone,
-                    email: demographics?.table1[0]?.email,
-                    CountryId: CID,
-                    StateId: SID,
-                    CityId: CityId,
-                })
+                
+                // ---------------- Bind Table2 to respective tabs ----------------
+                const table2 = Table2;
+                for (const row of table2) {
+                    const tabId = Number(row?.TabsTypeId ?? row?.tabsTypeId);
+                    switch (tabId) {
+                        case 1: { // Contact Residence
+                            // Resolve Country/State/City by names if provided
+                            const countryId = this.Country?.find((c: any) => (c?.name || '').toLowerCase() === ((row?.CountryName ?? row?.countryName) || '').toLowerCase())?.code ?? null;
+                            // Patch basic fields first
+                            this.contactForm.patchValue({
+                                streetName: (row?.StreetName ?? row?.streetName) || '',
+                                dwellingNumber: row?.dwellingNumber || '',
+                                faxNo: (row?.fax ?? row?.faxNo) || '',
+                                postalCode: row?.postalCode || '',
+                                homePhone: (row?.homePhone ?? row?.HomePhone) || '',
+                                cellPhone: (row?.CellPhone ?? row?.cellPhone) || '',
+                                workPhone: (row?.workPhone1 ?? row?.WorkPhone ?? row?.workPhone) || '',
+                                email: row?.email || '',
+                            });
+                            if (countryId) {
+                                this.contactForm.get('CountryId')?.setValue(countryId);
+                                await this.onContactCountryChange();
+                                // After states loaded, resolve state by name or id
+                                const stateId = this.contactStates?.find((s: any) =>
+                                    ((s?.name || s?.stateName || s?.StateName || '').toLowerCase() === ((row?.StateName ?? row?.stateName) || '').toLowerCase()) || (s?.stateId && s?.stateId === (row?.StateId ?? row?.stateId))
+                                )?.stateId ?? null;
+                                if (stateId) {
+                                    this.contactForm.get('StateId')?.setValue(stateId);
+                                    await this.onContactStateChange();
+                                    // After cities loaded, resolve city by name or id
+                                    const cityId = this.contactCities?.find((c: any) =>
+                                        ((c?.name || c?.cityName || c?.CityName || '').toLowerCase() === ((row?.CityName ?? row?.cityName) || '').toLowerCase()) || (c?.cityId && c?.cityId === (row?.CityId ?? row?.cityId))
+                                    )?.cityId ?? null;
+                                    if (cityId) {
+                                        this.contactForm.get('CityId')?.setValue(cityId);
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        case 4: { // Emergency Contact
+                            this.emergencyContactForm.patchValue({
+                                relationshipId: (row?.RelationshipId ?? row?.relationshipId) || '',
+                                firstName: (row?.FirstName ?? row?.firstName) || '',
+                                middleName: (row?.MiddleName ?? row?.middleName) || '',
+                                lastName: (row?.LastName ?? row?.lastName) || '',
+                                streetName: (row?.StreetName ?? row?.streetName) || '',
+                                postalCode: row?.postalCode || '',
+                                email: row?.email || '',
+                                cellPhone: (row?.CellPhone ?? row?.cellPhone) || '',
+                                homePhone: (row?.homePhone ?? row?.HomePhone) || '',
+                                workPhone: (row?.workPhone1 ?? row?.WorkPhone) || '',
+                            });
+                            // Country/State/City by names if present
+                            const eCountryId = this.Country?.find((c: any) => (c?.name || '').toLowerCase() === ((row?.CountryName ?? row?.countryName) || '').toLowerCase())?.code ?? null;
+                            if (eCountryId) {
+                                this.emergencyContactForm.get('CountryId')?.setValue(eCountryId);
+                                await this.onEmergencyCountryChange();
+                                const eStateId = this.emergencyStates?.find((s: any) => ((s?.name || s?.stateName || s?.StateName || '').toLowerCase() === ((row?.StateName ?? row?.stateName) || '').toLowerCase()))?.stateId ?? null;
+                                if (eStateId) {
+                                    this.emergencyContactForm.get('StateId')?.setValue(eStateId);
+                                    await this.onEmergencyStateChange();
+                                    const eCityId = this.emergencyCities?.find((c: any) => ((c?.name || c?.cityName || c?.CityName || '').toLowerCase() === ((row?.CityName ?? row?.cityName) || '').toLowerCase()))?.cityId ?? null;
+                                    if (eCityId) {
+                                        this.emergencyContactForm.get('CityId')?.setValue(eCityId);
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        case 5: { // Next Of Kin
+                            const relCode = this.relationships?.find((r: any) => (r?.name || '').toLowerCase() === ((row?.Relationship ?? row?.relationship) || '').toLowerCase())?.code
+                                ?? (row?.RelationshipId ?? row?.relationshipId ?? null);
+                            this.nextForm.patchValue({
+                                relationshipId: relCode,
+                                firstName: (row?.FirstName ?? row?.firstName) || '',
+                                middleName: (row?.MiddleName ?? row?.middleName) || '',
+                                lastName: (row?.LastName ?? row?.lastName) || '',
+                                streetName: (row?.StreetName ?? row?.streetName) || '',
+                                postalCode: row?.postalCode || '',
+                                email: row?.email || '',
+                                cellPhone: (row?.CellPhone ?? row?.cellPhone) || '',
+                                homePhone: (row?.homePhone ?? row?.HomePhone) || '',
+                                workPhone: (row?.workPhone1 ?? row?.WorkPhone) || '',
+                            });
+                            const nCountryId = this.Country?.find((c: any) => (c?.name || '').toLowerCase() === ((row?.CountryName ?? row?.countryName) || '').toLowerCase())?.code ?? null;
+                            if (nCountryId) {
+                                this.nextForm.get('CountryId')?.setValue(nCountryId);
+                                await this.onNFKCountryChange();
+                                const nStateId = this.nextStates?.find((s: any) => ((s?.name || s?.stateName || s?.StateName || '').toLowerCase() === ((row?.StateName ?? row?.stateName) || '').toLowerCase()))?.stateId ?? null;
+                                if (nStateId) {
+                                    this.nextForm.get('StateId')?.setValue(nStateId);
+                                    await this.onNFKStateChange();
+                                    const nCityId = this.nextCities?.find((c: any) => ((c?.name || c?.cityName || c?.CityName || '').toLowerCase() === ((row?.CityName ?? row?.cityName) || '').toLowerCase()))?.cityId ?? null;
+                                    if (nCityId) {
+                                        this.nextForm.get('CityId')?.setValue(nCityId);
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        case 6: { // Spouse
+                            // Prefer numeric GenderId; otherwise map gender name to code
+                            let spouseGenderId: any = null;
+                            if (row?.GenderId != null && row?.GenderId !== 0) {
+                                spouseGenderId = row?.GenderId;
+                            } else if (row?.gender != null || row?.Gender != null) {
+                                const gname = (row?.Gender ?? row?.gender ?? '').toString().toLowerCase();
+                                spouseGenderId = this.genders?.find((g: any) => (g?.name || '').toLowerCase() === gname)?.code ?? null;
+                            }
+                            this.spouseForm.patchValue({
+                                firstName: row?.FirstName || row?.firstName || '',
+                                middleName: row?.MiddleName || row?.middleName || '',
+                                lastName: row?.LastName || row?.lastName || '',
+                                Sex: spouseGenderId ?? null,
+                            });
+                            break;
+                        }
+                        case 7: { // Parent
+                            this.parentsInfo.patchValue({
+                                // Father fields (consider multiple possible shapes)
+                                fatherFirstName: (row?.Father_FirstName ?? row?.father_FirstName ?? row?.fatherFirstName ?? row?.FirstName ?? row?.firstName) || '',
+                                fatherMiddleName: (row?.Father_MiddleName ?? row?.father_MiddleName ?? row?.fatherMiddleName ?? row?.MiddleName ?? row?.middleName) || '',
+                                fatherLastName: (row?.Father_LastName ?? row?.father_LastName ?? row?.fatherLastName ?? row?.LastName ?? row?.lastName) || '',
+                                fatherHomePhone: (row?.Father_HomePhone ?? row?.father_HomePhone ?? row?.fatherHomePhone ?? row?.HomePhone ?? row?.homePhone) || '',
+                                fatherCellPhone: (row?.Father_CellPhone ?? row?.father_CellPhone ?? row?.fatherCellPhone ?? row?.CellPhone ?? row?.cellPhone) || '',
+                                fatherEmail: (row?.Father_Email ?? row?.father_Email ?? row?.fatherEmail ?? row?.Email ?? row?.email) || '',
+                                // Mother fields (match the API payload you shared, e.g., mother_FirstName)
+                                motherFirstName: (row?.Mother_FirstName ?? row?.mother_FirstName ?? row?.motherFirstName) || '',
+                                motherMiddleName: (row?.Mother_MiddleName ?? row?.mother_MiddleName ?? row?.motherMiddleName) || '',
+                                motherLastName: (row?.Mother_LastName ?? row?.mother_LastName ?? row?.motherLastName) || '',
+                                motherHomePhone: (row?.Mother_HomePhone ?? row?.mother_HomePhone ?? row?.motherHomePhone) || '',
+                                motherCellPhone: (row?.Mother_CellPhone ?? row?.mother_CellPhone ?? row?.motherCellPhone) || '',
+                                motherEmail: (row?.Mother_Email ?? row?.mother_Email ?? row?.motherEmail) || '',
+                            });
+                            break;
+                        }
+                        case 8: { // Assignments (if provided)
+                            this.assignmentForm.patchValue({
+                                proofOfIncome: row?.proofOfIncome || '',
+                                providerId: row?.ProviderId || row?.ProviderId1 || 0,
+                                feeScheduleId: row?.FeeScheduleId || 0,
+                                financialClassId: row?.FinancialClassId || 0,
+                                locationId: row?.LocationId || 0,
+                                siteId: row?.SiteId || 0,
+                                signedDate: row?.SignedDate ? this.formatToDMY(row?.SignedDate) : '',
+                                expiryDate: row?.UnSignedDate ? this.formatToDMY(row?.UnSignedDate) : '',
+                                entityTypeId: row?.EntityTypeId || 0,
+                                entityNameId: row?.EntityName_Id || 0,
+                                referredById: row?.ReferredBy_Id || 0,
+                            });
+                            break;
+                        }
+                        case 9: { // Family Members (if provided)
+                            this.familyForm.patchValue({
+                                mrNo: row?.mrNo || null,
+                                accountTypeId: row?.accountTypeId || null,
+                                masterMrNo: row?.master_MrNo || null,
+                                relationshipId: row?.relationshipId || '',
+                            });
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
 
                 this.Loader.hide();
             }
@@ -896,6 +1094,7 @@ onSubmit() {
         cellPhone: this.contactForm.get('cellPhone')?.value || '',
         homePhone: this.contactForm.get('homePhone')?.value || '',
         workPhone: this.contactForm.get('workPhone')?.value || '',
+        dwellingNumber: this.contactForm.get('dwellingNumber')?.value || '',
         fax: this.contactForm.get('faxNo')?.value || '',
         email: this.contactForm.get('email')?.value || '',
         tabsTypeId: 1,
@@ -959,6 +1158,7 @@ onSubmit() {
             mothermiddleName: this.parentsInfo.get('motherMiddleName')?.value || '',
             motherLastName: this.parentsInfo.get('motherLastName')?.value || '',
             motherHomePhone: this.parentsInfo.get('motherHomePhone')?.value || 0,
+            motherCellPhone: this.parentsInfo.get('motherCellPhone')?.value || 0,
             motherEmail: this.parentsInfo.get('motherEmail')?.value || '',
             TabsTypeId: 7,
         };
@@ -982,9 +1182,10 @@ onSubmit() {
         // Family Members (no corresponding RegPatientTabsType; do not send tabsTypeId)
         const FamilyMembers: FamilyMembersModel = {
             mrNo: this.familyForm.get('mrNo')?.value || 0,
-            accountTypeId: 0,
+            accountTypeId: this.familyForm.get('accountType')?.value || 0,
             masterMrNo: this.familyForm.get('masterMrNo')?.value || 0,
             relationshipId: this.familyForm.get('relationshipId')?.value || 0,
+            TabsTypeId: 9,
         };
 
         // Determine which tab's data is being sent (use last non-empty detail section)
@@ -1140,14 +1341,19 @@ onSubmit() {
           await  this.registrationApi
                 .getStateByCountry(countryId)
                 .then((res: any) => {
-                    this.states = res;
+                    this.nextStates = Array.isArray(res)
+                        ? res.map((item: any) => ({
+                            stateId: item?.stateId ?? item?.StateId ?? item?.code ?? null,
+                            name: item?.name ?? item?.StateName ?? item?.stateName ?? ''
+                        }))
+                        : [];
                     this.nextForm.get('StateId')?.setValue(null); // Reset State
-                    this.city = [];
+                    this.nextCities = [];
                     this.nextForm.get('CityId')?.setValue(null); // Reset City
                 });
         } else {
-            this.states = [];
-            this.city = [];
+            this.nextStates = [];
+            this.nextCities = [];
             this.nextForm.get('StateId')?.setValue(null);
             this.nextForm.get('CityId')?.setValue(null);
         }
@@ -1157,11 +1363,16 @@ onSubmit() {
         const stateId = this.nextForm.get('StateId')?.value;
         if (stateId) {
            await this.registrationApi.getCityByState(stateId).then((res: any) => {
-                this.city = res;
+                this.nextCities = Array.isArray(res)
+                    ? res.map((item: any) => ({
+                        cityId: item?.cityId ?? item?.CityId ?? item?.code ?? null,
+                        name: item?.name ?? item?.CityName ?? item?.cityName ?? ''
+                    }))
+                    : [];
                 this.nextForm.get('CityId')?.setValue(null); // Reset City
             });
         } else {
-            this.city = [];
+            this.nextCities = [];
             this.nextForm.get('CityId')?.setValue(null);
         }
     }
@@ -1172,14 +1383,19 @@ onSubmit() {
           await  this.registrationApi
                 .getStateByCountry(countryId)
                 .then((res: any) => {
-                    this.states = res;
+                    this.contactStates = Array.isArray(res)
+                        ? res.map((item: any) => ({
+                            stateId: item?.stateId ?? item?.StateId ?? item?.code ?? null,
+                            name: item?.name ?? item?.StateName ?? item?.stateName ?? ''
+                        }))
+                        : [];
                     this.contactForm.get('StateId')?.setValue(null); // Reset State
-                    this.city = [];
+                    this.contactCities = [];
                     this.contactForm.get('CityId')?.setValue(null); // Reset City
                 });
         } else {
-            this.states = [];
-            this.city = [];
+            this.contactStates = [];
+            this.contactCities = [];
             this.contactForm.get('StateId')?.setValue(null);
             this.contactForm.get('CityId')?.setValue(null);
         }
@@ -1189,11 +1405,16 @@ onSubmit() {
         const stateId = this.contactForm.get('StateId')?.value;
         if (stateId) {
            await this.registrationApi.getCityByState(stateId).then((res: any) => {
-                this.city = res;
+                this.contactCities = Array.isArray(res)
+                    ? res.map((item: any) => ({
+                        cityId: item?.cityId ?? item?.CityId ?? item?.code ?? null,
+                        name: item?.name ?? item?.CityName ?? item?.cityName ?? ''
+                    }))
+                    : [];
                 this.contactForm.get('CityId')?.setValue(null); // Reset City
             });
         } else {
-            this.city = [];
+            this.contactCities = [];
             this.contactForm.get('CityId')?.setValue(null);
         }
     }

@@ -73,8 +73,8 @@
                     contactTab
                     [contactForm]="contactForm"
                     [Country]="Country"
-                    [states]="states"
-                    [city]="city"
+                    [states]="contactStates"
+                    [city]="contactCities"
                     [isFormSubmitted]="isFormSubmitted"
                     (countryChange)="onContactCountryChange()"
                     (stateChange)="onContactStateChange()"
@@ -85,8 +85,8 @@
                     emergencyTab
                     [contactForm]="emergencyContactForm"
                     [Country]="Country"
-                    [states]="states"
-                    [city]="city"
+                    [states]="emergencyStates"
+                    [city]="emergencyCities"
                     [relationships]="relationships"
                     (countryChange)="onEmergencyCountryChange()"
                     (stateChange)="onEmergencyStateChange()"
@@ -97,8 +97,8 @@
                     nextOfKinTab
                     [nextForm]="nextForm"
                     [Country]="Country"
-                    [states]="states"
-                    [city]="city"
+                    [states]="nextStates"
+                    [city]="nextCities"
                     [relationships]="relationships"
                     (countryChange)="onNFKCountryChange()"
                     (stateChange)="onNFKStateChange()"
