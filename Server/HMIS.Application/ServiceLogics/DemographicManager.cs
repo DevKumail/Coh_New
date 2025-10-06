@@ -384,24 +384,25 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 DynamicParameters param = new DynamicParameters();
-                param.Add("@PatientId", PatientId, DbType.String);
+                param.Add("@PatientId", Convert.ToInt64(PatientId), DbType.Int64);
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("REG_GetDemographicById", param);
-                if (ds.Tables[0].Rows.Count == 0)
-                {
 
+                if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                {
                     return new DataSet();
-                    //                    throw new Exception("No data found");
                 }
 
-                return ds;  
+                return ds;
             }
             catch (Exception ex)
             {
+                // Optional: log exception if needed
                 return new DataSet();
             }
         }
-            
+
+
         public async Task<dynamic> InsertDemographicDB(RegInsert regInsert)
         {
             try

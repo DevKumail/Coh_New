@@ -26,9 +26,15 @@ export class ChargeCaptureService {
   GetDentalGroupbyProvider(ProviderId:number) {
       return this.api.get(`ChargeCapture/GetDentalGroupbyProvider?ProviderId=${ProviderId}`).toPromise();
   }
-  DiagnosisCodebyProvider(ICDVersionId:number ,DiagnosisStartCode:string ,DiagnosisEndCode:string, DescriptionFilter:string ) {
+  DiagnosisCodebyProvider(
+    ICDVersionId:number ,
+    PageNumber:any ,
+    PageSize:any,
+    DiagnosisStartCode:string ,
+    DiagnosisEndCode:string, 
+    DescriptionFilter:string ) {
       
-      return this.api.get(`ChargeCapture/DiagnosisCode?ICDVersionId=${ICDVersionId}&DiagnosisStartCode=${DiagnosisStartCode}&DiagnosisEndCode=${DiagnosisEndCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
+      return this.api.get(`ChargeCapture/DiagnosisCode?ICDVersionId=${ICDVersionId}&DiagnosisStartCode=${DiagnosisStartCode}&DiagnosisEndCode=${DiagnosisEndCode}&DescriptionFilter=${DescriptionFilter}&PageNumber=${PageNumber}&PageSize=${PageSize}`).toPromise();
   }
   MyCptCodebyProvider(ProviderId:number ,GroupId:number ) {
       //debugger

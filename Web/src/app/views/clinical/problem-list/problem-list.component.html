@@ -1,4 +1,4 @@
-<form [formGroup]="medicalForm">
+<form *ngIf="medicalForm" [formGroup]="medicalForm">
   <div class="card p-3 shadow rounded">
     <!-- FORM SECTION -->
     <!-- <div class="row">
@@ -97,7 +97,7 @@
       <div class="col-lg-3 ms-auto">
         <div class="d-flex justify-content-end gap-2 mt-2">
           <button type="button" class="btn btn-secondary" (click)="onClear()">{{ 'CLEAR' | translate }}</button>
-          <button type="submit" class="btn btn-success">{{ 'SUBMIT' | translate }}</button>
+          <button type="submit" class="btn btn-success" (click)="onSubmit()">{{ 'SUBMIT' | translate }}</button>
         </div>
       </div>
     </div>
@@ -105,7 +105,7 @@
     <!-- TABLE SECTION -->
     <div class="mt-4">
       <div class="table-responsive">
-        <table class="table table-bordered table-striped">
+        <table class="table table-bordered table-striped table-sm">
           <thead>
             <tr class="text-center">
               <th>{{ 'PROVIDER' | translate }}</th>
@@ -115,111 +115,106 @@
               <th>{{ 'STATUS' | translate }}</th>
               <th>{{ 'START_DATE' | translate }}</th>
               <th>{{ 'END_DATE' | translate }}</th>
+              <th>{{ 'ACTION' | translate }}</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="table-group-divider text-center">
             <tr *ngFor="let record of medicalHistoryData">
-              <td>{{ record.provider }}</td>
-              <td>{{ record.problem }}</td>
+              <td>{{ record.providerName }}</td>
+              <td>{{ record.icD9Description }}</td>
               <td>{{ record.comments }}</td>
               <td class="text-center">
                 <ng-icon [name]="record.confidential ? 'tablerCheck' : 'tablerX'"></ng-icon>
               </td>
               <td>{{ record.status }}</td>
-              <td>{{ record.startDate }}</td>
-              <td>{{ record.endDate }}</td>
+              <td>{{ record.startDate | date : "dd/MM/yyyy" }}</td>
+              <td>{{ record.endDate | date : "dd/MM/yyyy" }}</td>
+              <td>
+                <button
+                  class="btn btn-outline-info p-0 px-1 py-1 me-1"
+                  style="font-size: 0.75rem"
+                  (click)="onEdit(record)"
+                  title="Edit Appointment"
+                  >
+                  <ng-icon name="tablerEdit"></ng-icon>
+                </button>
+              </td>
             </tr>
+            <tr *ngIf="problemTotalItems === 0">
+              <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+          </tr>
           </tbody>
         </table>
-      </div>
-
-      <!-- PAGINATION -->
-      <div class="d-flex flex-column align-items-center mt-3 gap-2">
-        <div class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap">
-          <!-- Showing entries + dropdown -->
-          <div class="d-flex align-items-center gap-2 flex-wrap">
-            <div class="me-2">
-              Showing {{ start + 1 }} to {{ end }} of {{ medicalHistoryData.length }} entries
-            </div>
-            <div>
-              <select class="form-select form-select-sm" style="width: auto;" [(ngModel)]="pageSize"
-                [ngModelOptions]="{ standalone: true }" (change)="onPageSizeChange($event)">
-                <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Pagination Controls -->
-          <nav>
-            <ul class="pagination pagination-sm mb-0">
-              <li class="page-item" [class.disabled]="currentPage === 1">
-                <button class="page-link" (click)="prevPage()">Previous</button>
-              </li>
-              <li class="page-item" *ngFor="let page of pageNumbers" [class.active]="page === currentPage">
-                <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
-              </li>
-              <li class="page-item" [class.disabled]="currentPage === totalPages">
-                <button class="page-link" (click)="nextPage()">Next</button>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
+      </div> 
     </div>
+
+    <app-generic-pagination
+    [totalItems]="problemTotalItems"
+      [pageSize]="MHPaginationInfo?.RowsPerPage"
+      [currentPage]="MHPaginationInfo?.Page"
+      (pageChanged)="onProblemPageChanged($event)"
+    >
+    </app-generic-pagination>
+
   </div>
 </form>
 
-<ng-template #standardModal let-modal>
-  <form  *ngIf="FilterForm" [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
+<ng-template #standardModal let-modal> 
+  <style>
+    .modal {
+      max-height: 100vh;
+    }
+  </style> 
+  <form  *ngIf="FilterForm" [formGroup]="FilterForm">
     <div class="modal-header">
       <h5 class="modal-title">Search-Problem</h5>
       <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
     </div>
-
     <div class="modal-body">
       <div class="card shadow-sm rounded-3">
         <div class="card-body">
           <div class="">
             <div class="row g-3">
-              <div class="col-md-4 col-sm-12">
-                <label for="icdVersionId" class="form-label">ICD Versions:</label>
+              <div class="col-md-3 col-sm-12">
+                <label for="icdVersionId" class="form-label">{{ 'ICD_VERSION' |   translate }}:</label>
                 <select class="form-control" formControlName="icdVersionId" id="icdVersionId" required>
-                  <option value="">Select ICD Version</option>
+                  <option value="">{{ 'SELECT_ICD_VERSION' | translate }}</option>
                   <option *ngFor="let version of ICDVersions" [value]="version.code">
                     {{ version.name }}
                   </option>
                 </select>
               </div>
 
-              <div class="col-md-4 col-sm-12">
-                <label for="searchById" class="form-label">Search Code:</label>
-                <select class="form-control" formControlName="searchById" id="searchById" required
-                  (change)="onSearchByChange()">
-                  <option value="">Select Option</option>
+              <div class="col-md-3 col-sm-12">
+                <label for="searchById" class="form-label">{{ 'SEARCH_CODE' | translate }}:</label>
+                <select class="form-control" formControlName="searchById" id="searchById" required>
+                  <option value="">{{ 'SELECT_SEARCH_CODE' | translate }}</option>
                   <option *ngFor="let item of Searchby" [value]="item.code">
                     {{ item.name }}
                   </option>
                 </select>
               </div>
 
-              <div class="col-md-4 col-sm-12"  *ngIf="FilterForm.value.searchById != 3">
-                <label for="startingCode" class="form-label">Starting Code:</label>
+              <div class="col-md-3 col-sm-12"  *ngIf="FilterForm.value.searchById != 3">
+                <label for="startingCode" class="form-label">{{ 'STARTING_CODE' | translate }}:</label>
                 <input type="text" class="form-control" formControlName="startingCode" id="startingCode"
-                  placeholder="Enter Starting Code" />
+                  placeholder="{{ 'ENTER_STARTING_CODE' | translate }}" />
               </div>
                 <!-- <div class="row col-12"> -->
                   <!-- Ending Code -->
-                  <div class="col-md-4 col-sm-12" *ngIf="FilterForm.get('searchById')?.value == 2">
-                    <label for="endingCode">Ending Code</label>
-                    <input type="text" class="form-control" id="endingCode" formControlName="endingCode"
-                      placeholder="Ending Code" />
+
+                  <div class="col-md-3 col-sm-12" *ngIf="FilterForm.value.searchById != 3 && FilterForm.value.searchById != 1">
+                    <label for="endingCode" class="form-label">{{ 'ENDING_CODE' | translate }}:</label>
+                    <input type="text" class="form-control" formControlName="endingCode" id="endingCode"
+                      placeholder="{{ 'ENTER_ENDING_CODE' | translate }}" />
                   </div>
 
+
                   <!-- Description -->
-                  <div class="col-md-4 col-sm-12" *ngIf="FilterForm.get('searchById')?.value == 3">
-                    <label for="description">Description</label>
+                  <div class="col-md-3 col-sm-12" *ngIf="FilterForm.get('searchById')?.value == 3">
+                    <label for="description" class="form-label">{{ 'DESCRIPTION' | translate }}:</label>
                     <input type="text" class="form-control" id="description" formControlName="description"
-                      placeholder="Description" />
+                      placeholder="{{ 'ENTER_DESCRIPTION' | translate }}" />
                   </div>
 
                   <!-- Search Button -->
@@ -231,32 +226,42 @@
 
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="card shadow-sm rounded-3">
-      <table class="table table-sm table-striped table-bordered text-center align-middle">
+      <table class="table table-bordered table-striped table-sm mt-2">
         <thead>
-          <tr>
+          <tr class="text-center">
             <th style="font-size: 14px">Code</th>
             <th style="font-size: 14px">ICD Version</th>
             <th style="font-size: 14px">Description</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="table-group-divider text-center">
           <tr *ngFor="let diagnosis of DiagnosisCode" (click)="onRowSelect(diagnosis, modal)">
-            <td style="font-size: 12px">{{ diagnosis.icD9Code }}</td>
-            <td style="font-size: 12px">{{ diagnosis.icdVersion }}</td>
-            <td style="font-size: 12px">{{ diagnosis.descriptionFull }}</td>
+            <td style="font-size: 12px">{{ diagnosis?.icD9Code }}</td>
+            <td style="font-size: 12px">{{ diagnosis?.icdVersion }}</td>
+            <td style="font-size: 12px">{{ diagnosis?.descriptionFull }}</td>
           </tr>
+
+          <tr *ngIf="totalrecord === 0">
+            <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+        </tr>
         </tbody>
       </table>
     </div>
   </div>
+  
+  <app-generic-pagination
+  [totalItems]="totalrecord"
+    [pageSize]="PaginationInfo?.RowsPerPage"
+    [currentPage]="PaginationInfo?.Page"
+    (pageChanged)="onDiagnosisPageChanged($event)"
+  >
+  </app-generic-pagination>
 
-    <div class="modal-footer">
-      <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
-      <button type="submit" class="btn btn-primary" (click)="SearchDiagnosis()">Search</button>
-    </div>
-  </form>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
+    <button type="submit" class="btn btn-primary" (click)="SearchDiagnosis()">Search</button>
+  </div>
+  </div>
+  
+</form>
 </ng-template>

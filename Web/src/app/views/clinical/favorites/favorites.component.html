@@ -3,36 +3,52 @@
 
       <div class="row align-items-end">
         <!-- ICD Version Dropdown -->
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">{{'ICD_VERSION' | translate}}</label>
-            <select class="form-select" formControlName="icdVersion">
-              <option value="">{{'ALL' | translate}}</option>
-              <option *ngFor="let version of icdVersionList" [value]="version">{{ version }}</option>
+          <div class="col-md-3 col-sm-12">
+            <label for="icdVersionId" class="form-label">{{ 'ICD_VERSION' |   translate }}:</label>
+            <select class="form-control" formControlName="icdVersionId" id="icdVersionId" required>
+              <option value="">{{ 'SELECT_ICD_VERSION' | translate }}</option>
+              <option *ngFor="let version of ICDVersions" [value]="version.code">
+                {{ version.name }}
+              </option>
             </select>
           </div>
-        </div>
 
-        <!-- Search Code -->
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">{{'SEARCH_CODE' | translate}}</label>
-            <input type="text" class="form-control" formControlName="searchCode" placeholder="{{'SEARCH_CODE' | translate}}" />
+          <div class="col-md-2 col-sm-12">
+            <label for="searchById" class="form-label">{{ 'SEARCH_CODE' | translate }}:</label>
+            <select class="form-control" formControlName="searchById" id="searchById" required>
+              <option value="" disabled>{{ 'SELECT_SEARCH_CODE' | translate }}</option>
+              <option *ngFor="let item of Searchby" [value]="item.code">
+                {{ item.name }}
+              </option>
+            </select>
           </div>
-        </div>
 
-        <!-- Starting Code -->
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">{{'STARTING_CODE' | translate}}</label>
-            <input type="text" class="form-control" formControlName="startingCode" placeholder="{{'STARTING_CODE' | translate}}" />
+          <div class="col-md-2 col-sm-12"  *ngIf="favoritesForm.value.searchById != 3">
+            <label for="startingCode" class="form-label">{{ 'STARTING_CODE' | translate }}:</label>
+            <input type="text" class="form-control" formControlName="startingCode" id="startingCode"
+              placeholder="{{ 'ENTER_STARTING_CODE' | translate }}" />
           </div>
-        </div>
+            <!-- <div class="row col-12"> -->
+              <!-- Ending Code -->
+
+              <div class="col-md-2 col-sm-12" *ngIf="favoritesForm.value.searchById != 3 && favoritesForm.value.searchById != 1">
+                <label for="endingCode" class="form-label">{{ 'ENDING_CODE' | translate }}:</label>
+                <input type="text" class="form-control" formControlName="endingCode" id="endingCode"
+                  placeholder="{{ 'ENTER_ENDING_CODE' | translate }}" />
+              </div>
+
+
+              <!-- Description -->
+              <div class="col-md-2 col-sm-12" *ngIf="favoritesForm.get('searchById')?.value == 3">
+                <label for="description" class="form-label">{{ 'DESCRIPTION' | translate }}:</label>
+                <input type="text" class="form-control" id="description" formControlName="description"
+                  placeholder="{{ 'ENTER_DESCRIPTION' | translate }}" />
+              </div>
 
         <!-- Search Button -->
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <button type="button" class="btn btn-primary" (click)="onSearch()">{{'SEARCH' | translate}}</button>
+        <div class="col-md-2 col-sm-12 ">
+          <div class="mb-3 ">
+            <button type="button" class="btn btn-primary " (click)="onSearch()">{{'SEARCH' | translate}}</button>
           </div>
         </div>
       </div>

@@ -1,9 +1,10 @@
 ﻿using Dapper;
-using HMIS.Infrastructure.ORM;
-using HMIS.Core.Entities;
+using DocumentFormat.OpenXml.Wordprocessing;
 using HMIS.Application.DTOs.Clinical;
 using HMIS.Application.DTOs.ControlPanel;
 using HMIS.Application.Implementations;
+using HMIS.Core.Entities;
+using HMIS.Infrastructure.ORM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -37,13 +38,15 @@ namespace HMIS.Application.ServiceLogics
         //}
 
 
-        public async Task<DataSet> GetAllPatientProblems(string MRNo, long UserId )
+        public async Task<DataSet> GetAllPatientProblems(string MRNo, long UserId, int? PageNumber, int? PageSize)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@MRNo", MRNo);
                 param.Add("@UserId", UserId);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetPatientProblemsByUserIdAndMRNo", param);
                 if (ds.Tables[0].Rows.Count == 0)

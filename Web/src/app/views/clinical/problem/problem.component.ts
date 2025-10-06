@@ -142,6 +142,10 @@ problemPageSize: any;
 problemTotalItems: any;
 problemCurrentPage:any;
 
+MHPaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5
+};
 problemData: any[] = [];   // Full list of problems
 pagedProblems: any[] = [];
 
@@ -244,7 +248,9 @@ pagedProblems: any[] = [];
 
     await this.clinicalApiService.GetPatientProblemData(
       mrNo,
-      userId
+      userId,
+      this.MHPaginationInfo.Page,
+      this.MHPaginationInfo.RowsPerPage
     ).then((res: any) => {
       console.log('res', res);
       this.loader.hide();
@@ -346,9 +352,7 @@ const problemPayload: Partial<PatientProblemModel> = {
   activeStatus: 1,
   appointmentId: formData.appId,
   confidential: formData.confidential,
-  icdVersionValue: formData.problem,
   icd9: formData.code,
-  icd9code: formData.code,
   icd9description: formData.problem,
   // icdversionId: formData.icdVersion,
   providerId: formData.providerId,
@@ -549,7 +553,15 @@ const problemPayload: Partial<PatientProblemModel> = {
 
     debugger
     this.DiagnosisCode = [];
-    this.clinicalApiService.DiagnosisCodebyProvider(this.ICDVersionId, this.DiagnosisStartCode, this.DiagnosisEndCode, this.DescriptionFilter).then((response: any) => {
+    this.clinicalApiService.DiagnosisCodebyProvider(
+      this.ICDVersionId, 
+      this.currentPageDiagnoseCode,
+      this.pageSizeDiagnoseCode,
+      this.DiagnosisStartCode, 
+      this.DiagnosisEndCode, 
+      this.DescriptionFilter,
+    
+    ).then((response: any) => {
       this.DiagnosisCode = response.table1;
       this.totalDiagnosisData = Array( Math.ceil(this.DiagnosisCode.length / this.pageSizeDiagnoseCode)).fill(0);
       // this.totalDiagnosisData =  Array(this.totalDiagnosisData).fill(0);

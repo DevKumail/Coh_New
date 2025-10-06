@@ -1218,7 +1218,14 @@ get diagnosisCodePageNumbers(): (number | string)[] {
 
 SearchDiagnosis() {
   this.showSpinner = true;
-  this.service.DiagnosisCodebyProvider(this.ICDVersionId,this.DiagnosisStartCode,this.DiagnosisEndCode,this.DescriptionFilter).then((response: any) => {
+  this.service.DiagnosisCodebyProvider(
+    this.ICDVersionId,
+    this.diagnosisCodeCurrentPage,
+    this.diagnosisCodePageSize,
+    this.DiagnosisStartCode,
+    this.DiagnosisEndCode,
+    this.DescriptionFilter
+  ).then((response: any) => {
       this.DiagnosisCode = response.table1 || [];
 
         this.DiagnosisCode.map((e: any) => {

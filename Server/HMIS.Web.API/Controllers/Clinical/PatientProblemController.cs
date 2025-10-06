@@ -28,9 +28,9 @@ namespace HMIS.Web.Controllers.Clinical
         #endregion
 
         [HttpGet("GetPatientProblems")]
-        public async Task<ActionResult> GetPatientProblems(string MRNo, long UserId)
+        public async Task<ActionResult> GetPatientProblems(string MRNo, long UserId, int? PageNumber, int? PageSize)
         {
-            var patientProblems = await patientProblem.GetAllPatientProblems(MRNo , UserId);
+            var patientProblems = await patientProblem.GetAllPatientProblems(MRNo , UserId, PageNumber, PageSize);
             return Ok(new { patientProblems = patientProblems });
         }
 

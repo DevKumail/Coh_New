@@ -46,9 +46,15 @@ export class ClinicalApiService {
     //debugger
     return this.api.get(`ChargeCapture/MyHCPCSCode?ProviderId=${ProviderId}&GroupId=${GroupId}&HCPCSCode=${HCPCSCode}&DescriptionFilter=${DescriptionFilter}&PayerId=${PairId}`).toPromise();
   }
-  DiagnosisCodebyProvider(ICDVersionId: number, DiagnosisStartCode: string, DiagnosisEndCode: string, DescriptionFilter: string) {
-    debugger
-    return this.api.get(`ChargeCapture/DiagnosisCode?ICDVersionId=${ICDVersionId}&DiagnosisStartCode=${DiagnosisStartCode}&DiagnosisEndCode=${DiagnosisEndCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
+  DiagnosisCodebyProvider(
+    ICDVersionId: number, 
+    PageNumber: any, 
+    PageSize: any,
+    DiagnosisStartCode: string, 
+    DiagnosisEndCode: string, 
+    DescriptionFilter: string 
+  ) {
+    return this.api.get(`ChargeCapture/DiagnosisCode?ICDVersionId=${ICDVersionId}&DiagnosisStartCode=${DiagnosisStartCode}&DiagnosisEndCode=${DiagnosisEndCode}&DescriptionFilter=${DescriptionFilter}&PageNumber=${PageNumber}&PageSize=${PageSize}`).toPromise();
   }
   submitPatientAllergy(data: any): Observable<any> {
     // debugger
@@ -58,9 +64,9 @@ export class ClinicalApiService {
   GetRowDataOfPatientProblem(mrno: string, userId: number) {
     return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}`).toPromise();
   }
- GetPatientProblemData(mrno: string, userId: number) {
+ GetPatientProblemData(mrno: string, userId: number, pageNumber: number, pageSize: number) {
     // Unified to PatientProblem endpoint (Problem/GetProblemDetailsDB does not exist)
-    return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}`).toPromise();
+    return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}&pageNumber=${pageNumber}&pageSize=${pageSize}`).toPromise();
 }
 
   MyDiagnosisCodebyProvider(ProviderId: number, GroupId: number | null, ICDVersionId: number | null) {
