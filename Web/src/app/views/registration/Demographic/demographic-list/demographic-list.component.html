@@ -46,19 +46,19 @@
                                    <form (ngSubmit)="submitFilter()" class="row g-3 align-items-end">
         <div class="col-12 col-sm-6 col-lg-3">
           <label class="form-label">{{'MR_NO' | translate }}</label>
-          <input type="text" class="form-control" [(ngModel)]="FilterData.mrNo" name="mrNo" placeholder="{{ 'MR_NO' | translate }}" />
+          <input type="text" class="form-control" appFilledOnValue [(ngModel)]="FilterData.mrNo" name="mrNo" placeholder="{{ 'MR_NO' | translate }}" />
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
           <label class="form-label">{{'NAME' | translate }}</label>
-          <input type="text" class="form-control" [(ngModel)]="FilterData.name" name="name" placeholder="{{ 'NAME' | translate }}" />
+          <input type="text" class="form-control" appFilledOnValue [(ngModel)]="FilterData.name" name="name" placeholder="{{ 'NAME' | translate }}" />
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
           <label class="form-label">{{'PHONE' | translate }}</label>
-          <input type="text" class="form-control" [(ngModel)]="FilterData.phone" name="phone" placeholder="{{'PHONE' | translate }}" />
+          <input type="text" class="form-control" appFilledOnValue [(ngModel)]="FilterData.phone" name="phone" placeholder="{{'PHONE' | translate }}" />
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
           <label class="form-label">{{'GENDER' | translate }}</label>
-          <select class="form-select" [(ngModel)]="FilterData.genderId" name="genderId">
+          <select class="form-select" appFilledOnValue [(ngModel)]="FilterData.genderId" name="genderId">
               <option value="" disabled selected>-- {{ 'ALL' | translate }} --</option>
             <option *ngFor="let g of genders" [ngValue]="g.code">{{ g.name }}</option>
           </select>

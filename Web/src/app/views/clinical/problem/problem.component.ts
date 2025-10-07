@@ -16,6 +16,7 @@ import { number } from 'echarts';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { LoaderService } from '@core/services/loader.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-problem',
@@ -24,7 +25,8 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
     ReactiveFormsModule,
     NgIconComponent,
     NgbNavModule,
-  GenericPaginationComponent],
+  GenericPaginationComponent,
+  FilledOnValueDirective],
   templateUrl: './problem.component.html',
   styleUrl: './problem.component.scss'
 })

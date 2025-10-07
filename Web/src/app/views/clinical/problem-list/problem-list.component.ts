@@ -18,6 +18,7 @@ import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 
 @Component({
@@ -29,7 +30,8 @@ import { GenericPaginationComponent } from '@/app/shared/generic-pagination/gene
     NgbNavModule,
     NgIconComponent,
   TranslatePipe,
-  GenericPaginationComponent
+  GenericPaginationComponent,
+  FilledOnValueDirective
   ],
 
 

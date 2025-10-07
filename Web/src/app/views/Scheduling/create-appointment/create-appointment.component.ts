@@ -18,6 +18,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { SecureStorageService } from '@core/services/secure-storage.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 declare var flatpickr: any;
 
@@ -26,12 +27,13 @@ declare var flatpickr: any;
   standalone: true,
 
   imports: [
-            ReactiveFormsModule,
-            CommonModule,
-            RouterModule,
+        ReactiveFormsModule,
+        CommonModule,
+        RouterModule,
         NgbTimepickerModule,
         NgIconComponent,
-        TranslatePipe],
+        TranslatePipe,
+        FilledOnValueDirective],
 
   templateUrl: './create-appointment.component.html',
   styleUrl: './create-appointment.component.scss',

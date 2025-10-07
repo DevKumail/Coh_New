@@ -10,6 +10,7 @@ import { NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 import { FavoritesComponent } from '../favorites/favorites.component';
 import { ProblemListComponent } from '../problem-list/problem-list.component';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-medical-history',
@@ -18,7 +19,8 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
   FavoritesComponent,
   ProblemListComponent,
   NgbNavModule,
-  TranslatePipe],
+  TranslatePipe,
+  FilledOnValueDirective],
   templateUrl: './medical-history.component.html',
   styleUrl: './medical-history.component.scss'
 })

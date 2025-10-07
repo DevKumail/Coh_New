@@ -17,6 +17,7 @@ import {NgxMaskDirective, provideNgxMask} from 'ngx-mask'
 import { TempdemographicDto } from '@/app/shared/Models/registration/Tempdemo/Tempdemographic.model';
 import { SecureStorageService } from '@core/services/secure-storage.service';
 import { NgIconComponent } from '@ng-icons/core';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 declare var flatpickr: any;
 
@@ -33,7 +34,8 @@ declare var flatpickr: any;
     FilePondModule,
     NgbNavModule,
     NgIconComponent,
-    NgxMaskDirective
+    NgxMaskDirective,
+    FilledOnValueDirective
   ],
 
 

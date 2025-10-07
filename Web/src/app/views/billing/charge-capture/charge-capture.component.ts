@@ -15,6 +15,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { Subscription } from 'rxjs';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 // import { NgxPermissionsDirective } from 'ngx-permissions';
 
@@ -28,6 +29,7 @@ import { Subscription } from 'rxjs';
     IconsModule,
   TranslatePipe,
     FormsModule,
+    FilledOnValueDirective,
     // NgxPermissionsDirective
   ],
   standalone: true, 

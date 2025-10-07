@@ -35,6 +35,7 @@
                         <select
                             class="form-control form-select"
                             formControlName="facility"
+                            appFilledOnValue
                             (change)="GetSpecialitybyFacilityId(this.appointmentForm.get('facility')?.value)">
                             <option value="">-- {{ 'SELECT_FACILITY' | translate }} --</option>
                             <option *ngFor="let f of facilities"[value]="f.code">
@@ -51,6 +52,7 @@
                         <select
                             class="form-control form-select"
                             formControlName="speciality"
+                            appFilledOnValue
                             (change)="GetSitebySpecialityId(this.appointmentForm.get('speciality')?.value)">
                             <option value="">-- {{ 'SELECT_SPECIALITY' | translate }} --</option>
                             <option *ngFor="let s of specialities" [value]="s.specialtyId">
@@ -66,6 +68,7 @@
                         <label>{{ 'PROVIDER' | translate }} <span class="text-danger">*</span></label>
                         <select
                         class="form-control form-select"
+                        appFilledOnValue
                         formControlName="provider"
                         (change)="GetSpecialityByEmployeeId(appointmentForm.get('provider')?.value)">
                         <option value="">-- {{ 'SELECT_PROVIDER' | translate }} --</option>
@@ -85,6 +88,7 @@
                         <select
                             class="form-control form-select"
                             formControlName="site"
+                            appFilledOnValue
                             (change)="GetProviderbySiteId(this.appointmentForm.get('site')?.value)"
                         >
                             <option value="">-- {{ 'SELECT_SITE' | translate }} --</option>
@@ -100,6 +104,7 @@
                     <div class="col-sm-3 mb-2">
                         <label>{{ 'DATE' | translate }} <span class="text-danger">*</span></label>
                         <input
+                        appFilledOnValue
                             type="text"
                             class="form-control date"
                             formControlName="date"
@@ -118,6 +123,7 @@
                         <select
                             class="form-control form-select scrollable-select"
                             formControlName="time"
+                            appFilledOnValue
                             style="max-height: 50px !important;
                             /* Approx 3-4 options height */ 
                             overflow-y: auto !important;"
@@ -179,6 +185,7 @@
                         >
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedPurpose"
                         >
                             <option value="" disabled selected>-- {{ 'SELECT_PURPOSE' | translate }} --</option>
@@ -198,6 +205,7 @@
                         >
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedVisitType"
                         >
                             <option value="" disabled selected>-- {{ 'SELECT_VISIT_TYPE' | translate }} --</option>
@@ -220,6 +228,7 @@
                         >
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedReferredBy"
                         >
                             <option value="" disabled selected>-- {{ 'SELECT_REFERRED_BY' | translate }} --</option>
@@ -236,6 +245,7 @@
                         <label>{{ 'TYPE' | translate }} <span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedType"
                         >
                             <option value="" disabled selected>-- {{ 'SELECT_TYPE' | translate }} --</option>
@@ -254,6 +264,7 @@
                         >
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedDuration"
                         >
                             <option value="" disabled selected>-- {{ 'SELECT_DURATION' | translate }} --</option>
@@ -272,6 +283,7 @@
                         >
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedLocation"
                         >
                             <option value="" disabled selected>-- {{ 'SELECT_LOCATION' | translate }} --</option>
@@ -288,6 +300,7 @@
                         <label>{{ 'APPOINTMENT_CRITERIA' | translate }}<span class="text-danger">*</span></label>
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedCriteria"
                         >
                             <option value="" disabled selected>-- {{ 'SELECT_CRITERIA' | translate }} --</option>
@@ -307,6 +320,7 @@
                         >
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedNotified"
                         >
                             <option value="" disabled selected>-- {{ 'SELECT' | translate }} --</option>
@@ -326,9 +340,10 @@
                         >
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedStatus"
                         >
-                            <option value="">-- {{ 'SELECT' | translate }} --</option>
+                            <option value="" disabled selected>-- {{ 'SELECT' | translate }} --</option>
                             <option *ngFor="let s of status" [value]="s.code">
                                 {{ s.name }}
                             </option>
@@ -345,6 +360,7 @@
                         >
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedPayer"
                         >
                             <option value="" disabled selected>-- {{ 'SELECT' | translate }} --</option>
@@ -361,6 +377,7 @@
                         <label>{{ 'PAYER_PLAN' | translate }}</label>
                         <select
                             class="form-control form-select"
+                            appFilledOnValue
                             formControlName="selectedPayerplan"
                         >
                             <option value="" disabled selected>-- {{ 'SELECT_PAYER_PLAN' | translate }} --</option>
@@ -377,6 +394,7 @@
                         <label>{{ 'APPOINTMENT_NOTE' | translate }}</label>
                         <input
                             type="text"
+                            appFilledOnValue
                             class="form-control"
                             formControlName="AppointmentNote"
                             placeholder="{{ 'APPOINTMENT_NOTE' | translate }}"
@@ -387,6 +405,7 @@
                         <label>{{ 'PATIENT_BALANCE' | translate }}</label>
                         <input
                             type="text"
+                            appFilledOnValue
                             class="form-control"
                             formControlName="PatientBalance"
                             placeholder="{{ 'PATIENT_BALANCE' | translate }}"
@@ -397,6 +416,7 @@
                         <label>{{ 'PLAN_BALANCE' | translate }}</label>
                         <input
                             type="text"
+                            appFilledOnValue
                             class="form-control"
                             formControlName="PlanBalance"
                             placeholder="{{ 'PLAN_BALANCE' | translate }}"
@@ -407,6 +427,7 @@
                         <label>{{ 'PLAN_COPAY' | translate }}</label>
                         <input
                             type="text"
+                            appFilledOnValue
                             class="form-control"
                             formControlName="PlanCopay"
                             placeholder="{{ 'PLAN_COPAY' | translate }}"

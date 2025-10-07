@@ -30,6 +30,7 @@ import { filter, distinctUntilChanged } from 'rxjs/operators';
 import { OnDestroy } from '@angular/core';
 import { LoaderService } from '@core/services/loader.service';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 declare var flatpickr: any;
 
@@ -43,6 +44,7 @@ declare var flatpickr: any;
         NgIconComponent,
         TranslatePipe,
         FilePondModule,NgxMaskDirective,
+        FilledOnValueDirective,
     ],
     providers: [provideNgxMask()],
 

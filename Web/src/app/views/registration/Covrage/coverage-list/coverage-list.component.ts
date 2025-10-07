@@ -20,6 +20,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { NgIconComponent } from '@ng-icons/core';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-coverage-list',
@@ -34,7 +35,8 @@ import { GenericPaginationComponent } from '@/app/shared/generic-pagination/gene
     LucideAngularModule,
     NgIconComponent,
     TranslatePipe,
-    GenericPaginationComponent
+    GenericPaginationComponent,
+    FilledOnValueDirective
   ]
 })
 

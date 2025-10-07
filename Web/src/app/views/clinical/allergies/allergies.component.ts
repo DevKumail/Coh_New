@@ -15,6 +15,7 @@ import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { AllergyDto} from '@/app/shared/Models/Clinical/allergy.model'
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 declare var flatpickr: any;
 
@@ -26,7 +27,8 @@ declare var flatpickr: any;
     FormsModule,
     NgIcon,
     LucideAngularModule,
-    TranslatePipe],
+    TranslatePipe,
+    FilledOnValueDirective],
   templateUrl: './allergies.component.html',
   styleUrl: './allergies.component.scss'
 })

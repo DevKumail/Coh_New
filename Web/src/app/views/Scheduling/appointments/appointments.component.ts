@@ -18,6 +18,7 @@ import { StepsModule } from 'primeng/steps';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import moment from 'moment';
 import { LucideAngularModule, LucideUserPlus } from 'lucide-angular';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
     selector: 'app-appointments',
@@ -30,7 +31,8 @@ import { LucideAngularModule, LucideUserPlus } from 'lucide-angular';
     StepsModule,
     FormsModule,
     TranslatePipe,
-    LucideAngularModule
+    LucideAngularModule,
+    FilledOnValueDirective
     ],
     templateUrl: './appointments.component.html',
     // styleUrl: './appointments.component.scss',

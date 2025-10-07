@@ -17,6 +17,7 @@ declare var flatpickr: any;
 import { AlertType } from '@/app/shared/Models/Clinical/alert-type.model';
 import { NgIconComponent } from '@ng-icons/core';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 
 @Component({
@@ -30,7 +31,8 @@ import { GenericPaginationComponent } from '@/app/shared/generic-pagination/gene
   NgIconComponent,
   NgbTooltip,
   TranslatePipe,
-  GenericPaginationComponent
+  GenericPaginationComponent,
+  FilledOnValueDirective
   ],
   templateUrl: './alert.component.html',
   styleUrl: './alert.component.scss'

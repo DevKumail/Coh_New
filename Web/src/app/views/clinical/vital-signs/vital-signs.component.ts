@@ -35,6 +35,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 
 
@@ -52,7 +53,8 @@ declare var flatpickr: any;
         FilePondModule,
         NgbNavModule,
   GenericPaginationComponent,
-  TranslatePipe
+  TranslatePipe,
+  FilledOnValueDirective
     ],
     templateUrl: './vital-signs.component.html',
     styleUrl: './vital-signs.component.scss',

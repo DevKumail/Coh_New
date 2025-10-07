@@ -26,7 +26,7 @@ import { LucideAngularModule, LucideHome, LucideChevronRight, LucideUsers, Lucid
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { SecureStorageService } from '@core/services/secure-storage.service';
-
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 
 @Component({
@@ -41,7 +41,8 @@ import { SecureStorageService } from '@core/services/secure-storage.service';
         TranslatePipe,
         LucideAngularModule,
         HasPermissionDirective,
-        GenericPaginationComponent
+        GenericPaginationComponent,
+        FilledOnValueDirective
     ],
     templateUrl: './demographic-list.component.html',
     styleUrl: './demographic-list.component.scss',

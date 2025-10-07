@@ -44,6 +44,7 @@ import { DemographicTabsComponent } from './components/demographic-tabs.componen
 import { DemographicDTO } from '@/app/shared/Models/registration/Demographics/Demographic.type.model';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { SecureStorageService } from '@core/services/secure-storage.service';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
     selector: 'app-demographic-create',
@@ -66,7 +67,8 @@ import { SecureStorageService } from '@core/services/secure-storage.service';
         DemographicParentsComponent,
         DemographicAssignmentsComponent,
         DemographicFamilyComponent,
-        DemographicTabsComponent
+        DemographicTabsComponent,
+        FilledOnValueDirective
     ],
     providers: [provideNgxMask()],
 
