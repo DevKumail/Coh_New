@@ -1,9 +1,9 @@
 
 import { ClinicalApiService } from './../clinical.api.service';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { PageTitleComponent} from '@app/components/page-title.component';
 import { UiCardComponent} from '@app/components/ui-card.component';
 import { NgIcon} from '@ng-icons/core';
@@ -11,12 +11,14 @@ import { NgbModal, NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 // import { ProblemListComponent } from '../problem-list/problem-list.component';
 import { FavoritesComponent } from '../favorites/favorites.component';
 import Swal from 'sweetalert2';
-import {PatientProblemModel} from '@/app/shared/models/clinical/problemlist.model';
+import {PatientProblemModel} from '@/app/shared/Models/Clinical/problemlist.model';
 import { number } from 'echarts';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { LoaderService } from '@core/services/loader.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { distinctUntilChanged, filter, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-problem',
@@ -26,25 +28,18 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
     NgIconComponent,
     NgbNavModule,
   GenericPaginationComponent,
-  FilledOnValueDirective],
+  FilledOnValueDirective,
+  TranslatePipe],
   templateUrl: './problem.component.html',
   styleUrl: './problem.component.scss'
 })
 export class ProblemComponent {
+    private patientDataSubscription!: Subscription;
+  datePipe = new DatePipe('en-US');
   favoritesForm!: FormGroup;
-  icdVersionList: string[] = ['ICD-9-CM', 'ICD-10-CM', 'SNOMED'];
+  icdVersionList: string[] = [];
   searchResults: any[] = [];
-  selectedYear!: number;
-  selectedProduct:any;
-  searchText: string = '';
-  selectedCode: string = '';
-  selectedVersion: string = '';
-  selectedStartCode: string = '';
-  years: number[] = [];
-  currentPage: number = 1;
-  ProviderId: number = 0;
-  pageSize: number = 10;
-  pageSizes = [5, 10, 25, 50];
+
   pageNumbers: number[] = [];
   totalPages: number = 0;
   totalDiagnosisData : number[] = [];
@@ -53,9 +48,9 @@ export class ProblemComponent {
   medicalForm!: FormGroup;
   medicalHistoryData: any[] = [];
   modalService = new NgbModal();
-  FilterForm!: FormGroup;
+  ModalFilterForm!: FormGroup;
   // @ViewChild('problemModal') problemModal: any;
-
+  id: any;
   // DescriptionFilter: any;
   providerList: any[] = [];
   buttonText:any;
@@ -70,6 +65,7 @@ export class ProblemComponent {
   ProblemGrid: any = [];
   Mrno: any;
   userid: any;
+  currentUser: any = 0;
   MyDiagnosisData: any = [];
   filteredDiagnosisData = [];
   diagnosisList: any;
@@ -80,33 +76,10 @@ export class ProblemComponent {
   iCDVersion: any;
   ICT9GroupId: any;
   checked:any;
-  // DiagnosisStartCode: any;
-  // DiagnosisEndCode: any;
-  MyCPTCode: any;
-  CPTGroupId: any;
-  PairId: any;
-  HCPCSCode: any;
-  MyHCPSGroupId: any;
-  MyHCPCSCode: any;
-  filteredProblemData:any;
 
-
-  AllCPTCode: any = 0;
-  CPTStartCode: any = '2';
-  CPTEndCode: any = '0';
-  Description: any = '0';
-
-  AllCode: any = 0;
-  UCStartCode: any = '1';
-  ServiceStartCode: any = '1';
-
-  HCPCSCodeGrid: any = [];
-  UnclassifiedService: any = [];
-  ServiceItems: any = [];
 
   cacheItems: string[] = [
     'Provider',
-    'BLUniversalToothCodes',
     'BLICDVersion',
   ];
 
@@ -128,7 +101,7 @@ export class ProblemComponent {
 
   activeTabId = 1;
   selectedRowIndex: any;
-  favoritesData: any;
+  favoritesTotalItems: number = 0;
   start: any;
   end: any;
   totalPagesDiagnoseCode:any;
@@ -140,19 +113,30 @@ export class ProblemComponent {
   ICDVersionId: number = 0;
   active_Index: any;
   showModal: any;
-problemPageSize: any;
+problemPageSize: number = 5;
 problemTotalItems: any;
-problemCurrentPage:any;
-
+problemCurrentPage: number = 1;
 MHPaginationInfo: any = {
   Page: 1,
   RowsPerPage: 5
 };
-problemData: any[] = [];   // Full list of problems
-pagedProblems: any[] = [];
+  problemData: any[] = [];   // Full list of problems
+  pagedProblems: any[] = [];
+
+  // Favorites/Search (inline) state
+  SearchList: any[] = [];
+  searchTotalItems: number = 0;
+  PaginationInfo: any = {
+    Page: 1,
+    RowsPerPage: 5
+  };
+  favPaginationInfo: any = {
+    Page: 1,
+    RowsPerPage: 5
+  };
+  favoritesTabActive: boolean = false;
 
   // add 4 aug
-
 
   constructor(
     private fb: FormBuilder,
@@ -164,231 +148,294 @@ pagedProblems: any[] = [];
 
 
   async ngOnInit() {
-    this.GetPatientProblemData();
-    this.getRowData();
-    this.getRowdatapatientproblem();
+    this.currentUser = sessionStorage.getItem('userId') || 0;
 
-    this.FillDropDown
+    this.patientDataSubscription = this.PatientData.patientData$
+          .pipe(
+            filter((data: any) => !!data?.table2?.[0]?.mrNo),
+            distinctUntilChanged((prev, curr) => 
+              prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+            )
+          )
+          .subscribe((data: any) => {
+            this.SearchPatientData = data;
+            // Set MRNO from banner
+            this.Mrno = this.SearchPatientData?.table2?.[0]?.mrNo || '';
+            // After assigning, load problems
+            this.GetPatientProblemData();
+            const mrno = this.Mrno;
+    
+    
+          });
 
-    // this.medicalForm = this.fb.group({
-    //   // provider: [''],
-    //   providerId: [null],
-    //   providerName: [''],
-    //   code: [''],
-    //   problem: [''],
-    //   icdVersion: [''],
-    //   confidential: [false],
-    //   startDate: [''],
-    //   endDate: [''],
-    //   comments: [''],
-    //   status: [''],
-    //   isProviderCheck: [false]
-    // });
     this.medicalForm = this.fb.group({
-  providerId: [null],
-  providerName: [''],
-  code: [''],
-  problem: [''],
-  icdVersion: [null],
-  icdVersionValue: [''],
-  startDate: [null],
-  endDate: [null],
-  status: [null],
-  comments: [''],
-  confidential: [false],
-  appointmentId: [null],
-  // icD9Code:null,
-  icdVersionId:null,
-  icd9:null,
-  icd9code:null,
-});
+      providerId: ['', Validators.required],
+      problem: ['', Validators.required],
+      comments: ['', Validators.required],
+      status: ['', Validators.required],  
+      startDate: ['', Validators.required],
+      endDate: ['', Validators.required],
+      providerName: [''], 
+      providerDescription:[''],
+      isConfidentential: [false],
+      isProviderCheck: [false] 
+    });
 
 
-    this.FilterForm = this.fb.group({
+    this.ModalFilterForm = this.fb.group({
       icdVersionId: [''],
-      searchById: [''],
+      searchById: ['1'],
       startingCode: [''],
       diagnosisEndCode: [''],
       descriptionFilter: ['']
-
     });
 
     this.favoritesForm = this.fb.group({
-      icdVersion: [''],
-      searchCode: [''],
-      startingCode: ['']
+      icdVersionId: [''],
+      searchById: ['1'],
+      startingCode: [''],
+      endingCode: [''],
+      description: ['']
     });
-
-    this.loadYears();
-    console.log(this.FilterForm)
-    this.FillDropDown
-
-    // this.getRowdatapatientproblem()
     this.Problems.ActiveStatus = 1
-    // this.loadData();
-
-    this.getRowData();
-    this.fetchProviders();
+ 
     this.FillCache();
+    this.GetPatientProblemData();    
 
+    // Enforce endDate rules based on status and startDate (UI + Reactive validation)
+const endDateCtrl = this.medicalForm.get('endDate');
+const startDateCtrl = this.medicalForm.get('startDate');
+const statusCtrl = this.medicalForm.get('status');
+
+const applyStatusRules = (val: string) => {
+  if (val === 'Inactive') {
+    endDateCtrl?.enable({ emitEvent: false });
+    endDateCtrl?.setValidators([
+      Validators.required,
+      this.minDateValidator('startDate')
+    ]);
+  } else {
+    endDateCtrl?.reset('', { emitEvent: false });
+    endDateCtrl?.clearValidators();
+    endDateCtrl?.disable({ emitEvent: false });
   }
-    async GetPatientProblemData() {
-    // this.loader.show();
-  
-    const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo;
-    const userIdStr = sessionStorage.getItem('userId');
-    const userId = userIdStr ? Number(userIdStr) : 0;
+  endDateCtrl?.updateValueAndValidity({ onlySelf: true });
+};
+
+// Initialize and subscribe
+applyStatusRules(statusCtrl?.value);
+statusCtrl?.valueChanges.subscribe((val: string) => applyStatusRules(val));
+startDateCtrl?.valueChanges.subscribe(() => {
+  endDateCtrl?.updateValueAndValidity({ onlySelf: true });
+});
+
+startDateCtrl?.valueChanges.subscribe(() => {
+  // Clear end date whenever start date changes, then revalidate
+  endDateCtrl?.setValue('', { emitEvent: false });
+  endDateCtrl?.updateValueAndValidity({ onlySelf: true });
+});
+  }
+
+  // Validator to enforce endDate >= startDate
+minDateValidator(otherControlName: string) {
+  return (control: any) => {
+    if (!control || !control.parent) return null;
+    const endValue = control.value;
+    const startValue = control.parent.get(otherControlName)?.value;
+    if (!endValue || !startValue) return null;
+    return endValue < startValue ? { minDate: true } : null;
+  };
+}
+
+// // // // PROBLEM WORK START // // // // 
+  async GetPatientProblemData() {
+  this.loader.show();
+  this.medicalHistoryData = [];
+  this.problemTotalItems = 0;
+  const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo;
+  const userIdStr = sessionStorage.getItem('userId');
+  const userId = userIdStr ? Number(userIdStr) : 0;
     if (!mrNo || !userId) {
       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       this.loader.hide();
       return;
     }
-
-    this.loader.show();
-    debugger;
-    console.log('mrNo =>', mrNo);
-
-    await this.clinicalApiService.GetPatientProblemData(
-      mrNo,
-      userId,
-      this.MHPaginationInfo.Page,
-      this.MHPaginationInfo.RowsPerPage
-    ).then((res: any) => {
-      console.log('res', res);
-      this.loader.hide();
-  
-      this.medicalHistoryData = res.problems?.table1 || [];
-      this.problemTotalItems = this.medicalHistoryData.length;
-      this.onProblemPageChanged(1); 
-      this.filteredProblemData = this.medicalHistoryData || [];
-  
-      console.log('this.medicalHistoryData', this.medicalHistoryData);
-    });
-  
+  this.loader.show();
+  await this.clinicalApiService.GetPatientProblemData(
+    false,
+    mrNo,
+    userId,
+    this.MHPaginationInfo.Page,
+    this.MHPaginationInfo.RowsPerPage
+  ).then((res: any) => {
     this.loader.hide();
-  }
-  loadYears(): void {
-    const currentYear = new Date().getFullYear();
-    this.years = Array.from({ length: 10 }, (_, i) => currentYear - i);
-  }
-  onSubmit(): void {
-    debugger
-    if (this.medicalForm.invalid) {
+    this.medicalHistoryData = res.patientProblems?.table1 || [];
+    this.problemTotalItems = res.patientProblems?.table2?.[0]?.totalCount || 0;
+  });
+  this.loader.hide();
+}
 
+onMedicalPageChanged(page: number){
+  this.MHPaginationInfo.Page = page;
+  this.GetPatientProblemData();
+}
+
+editproblem(record: any) {
+  this.id = record?.id,
+  this.selectedDiagnosis = {
+    icD9Code :  record?.icD9,
+    descriptionFull : record?.icD9Description,
+    icdVersionId : record?.icdVersionID,
+  }    
+    this.medicalForm.patchValue(
+      {
+        providerId: record?.providerId,
+        problem: record?.icD9Description,
+        comments: record?.comments,
+        isConfidentential: record?.confidential,
+        startDate: this.datePipe.transform(record?.startDate, 'yyyy-MM-dd') || '',
+        endDate: this.datePipe.transform(record?.endDate, 'yyyy-MM-dd') || '',
+      }
+    );
+    if(record?.status == "Active"){
+      this.medicalForm.get('status')?.setValue('Active');
+    }else{
+      this.medicalForm.get('status')?.setValue('Inactive');
+    }
+}
+
+onPROBSubmit() {
+    if (this.medicalForm.invalid) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Error',
+        text: 'Form is invalid. Please fill in all required fields.',
+      });
+      // this.submitted = true;
+      this.medicalForm.markAllAsTouched();
+      // try { this.focusFirstInvalidControl(); } catch {}
       return;
     }
 
+    if(!this.SearchPatientData?.table2?.[0]?.mrNo){
+      Swal.fire({
+        icon: 'warning',
+        title: 'Validation Error',
+        text: 'MrNo is a required field. Please load a patient.',
+      });
+      return;
+    }
+    debugger
+
     const formData = this.medicalForm.value;
+    console.log('medicalForm =>',this.medicalForm.value);
+    var status;
+    if(formData.status == "Active" ){
+      status = 1
+    } else if(formData.status == "Inactive"){
+      status = 2
+    }
 
-    // const problemPayload:PatientProblemModel = {
+    const problemPayload: PatientProblemModel = {
+      id: this.id,
+      appointmentId:formData.appId,
+      providerId: formData.providerId,
+      icd9: this.selectedDiagnosis.icD9Code,
+      icd9description: this.selectedDiagnosis.descriptionFull,
+      icdversionId: this.selectedDiagnosis.icdVersionId,
+      confidential: formData.isConfidentential || false,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      comments: formData.comments,
+      status: status || 0,
+      createdBy: this.currentUser || 0,
+      updatedBy: this.currentUser || 0,
+      mrno:  this.SearchPatientData?.table2?.[0]?.mrNo || 0,                           
+      patientId: this.SearchPatientData?.table2?.[0]?.patientId || 0,
+      activeStatus: 1,
+      active: true,
+      updatedDate: new Date(),
+      createdDate: new Date(),
+      diagnosisPriority: 'Primary',
+      diagnosisType: 'Diagnosis',
+      socialHistory: false,
+      outsideClinic: 'No',
+      isHl7msgCreated: false,
+      isMedicalHistory: false,
+      caseId: null,
+      errorReason: '',
+      oldMrno: '',
+      isDeleted: false,
+      startstrdate: formData.startDate ? formData.startDate.split('T')[0] : '',
+      endstrdate: formData.endDate ? formData.endDate.split('T')[0] : '',
+      providerDescription: formData.providerDescription  || ''
+    };
 
-    //   providerId: formData.providerId,
-    //   providerName: formData.providerName,
-    //   code: formData.code,
-    //   icd9description: formData.problem,
-    //   icdversionId: formData.icdVersion,
-    //   confidential: formData.confidential,
-    //   startDate: formData.startDate,
-    //   endDate: formData.endDate,
-    //   comments: formData.comments,
-    //   status: formData.status,
-    //   createdBy: 1,
-    //   updatedBy: 1,
-    //   mrno: '1006',
-    //   patientId: 1,
-    //   id: 0,
-    //   icd9code: '',
-    //   icdVersionValue: '',
-    //   activeStatus: 0,
-    //   icd9: '',
-    //   active: false,
-    //   updatedDate: undefined,
-    //   createdDate: undefined,
-    //   diagnosisPriority: '',
-    //   diagnosisType: '',
-    //   outsideClinic: '',
-    //   errorReason: '',
-    //   oldMrno: '',
-    //   isDeleted: false,
-    //   startstrdate: '',
-    //   endstrdate: '',
-    //   providerDescription: ''
-    // };
-//     const problemPayload: PatientProblemModel = {
-//   id: 0,
-//   appointmentId: formData.appointmentId,
-//   providerId: formData.providerId,
-//   icd9: formData.code,
-//   icd9code: formData.code,
-//   icd9description: formData.problem,
-//   comments: formData.comments,
-//   icdversionId: formData.icdVersion,
-//   icdVersionValue: formData.icdVersionValue,
-//   startDate: formData.startDate,
-//   endDate: formData.endDate,
-//   status: formData.status,
-//   activeStatus: 1,
-//   active: true,
-//   confidential: formData.confidential,
-//   createdBy: 2,
-//   updatedBy: 2,
-//   mrno: '1006',
-//   patientId: 6,
-//   updatedDate: new Date(),
-//   createdDate: new Date(),
-//   diagnosisPriority: '',
-//   diagnosisType: '',
-//   outsideClinic: '',
-//   errorReason: '',
-//   oldMrno: '',
-//   isDeleted: false,
-//   startstrdate: '',
-//   endstrdate: '',
-//   providerDescription: '',
-//   socialHistory: false,
-//   isHl7msgCreated: false,
-//   isMedicalHistory: false,
-//   caseId: null,
-// };
-const problemPayload: Partial<PatientProblemModel> = {
-  activeStatus: 1,
-  appointmentId: formData.appId,
-  confidential: formData.confidential,
-  icd9: formData.code,
-  icd9description: formData.problem,
-  // icdversionId: formData.icdVersion,
-  providerId: formData.providerId,
-  comments: formData.comments,
-  createdBy: 2,
-  mrno: '1006',
-  patientId: 6,
-  startDate: formData.startDate,
-  status: 1,
-  updatedBy: 2
-};
-
+    console.log('Submitting Patient Problem Payload:', problemPayload);
 
     this.clinicalApiService.SubmitPatientProblem(problemPayload).then((res: any) => {
-      this.getRowData();
-      this.onClear();
-        Swal.fire({
-    icon: 'success',
-    title: 'Submitted Successfully',
-    text: 'Patient problem has been submitted.',
-    confirmButtonText: 'OK'
-  });
-
+      console.log("my payload", res);
+      Swal.fire({
+        icon: 'success',
+        title: 'Submitted Successfully',
+        text: 'Patient problem has been submitted.',
+      });
+      this.id = 0;
+      this.GetPatientProblemData();
+      this.onPROBClear();
     }).catch((error: any) => {
-
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Error',
+        text: 'An error occurred while submitting the patient problem.',
+      });
+      console.error('Submission error:', error);
     });
   }
-  onClear(): void {
-    this.medicalForm.reset();
+
+onPROBClear(){
+  this.medicalForm.patchValue({
+    providerId: '',
+    problem: '',
+    comments: '',
+    status: '',
+    startDate: '',
+    endDate: '',
+    providerName: '', 
+    isConfidentential: false,
+    isProviderCheck: false 
+  })
+    //this.submitted = false;
   }
-  async FillCache() {
+
+  deleteproblem(Id:number) {
+    debugger
+    this.clinicalApiService.DeletePatientProblem(Id).subscribe({
+      next: (res: any) => {
+  
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Patient Problem Successfully Deleted',
+          confirmButtonText: 'OK'
+        });
+      },
+      error: (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error?.message || 'Something went wrong',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
+// // // // PROBLEM WORK END // // // // 
 
 
-    
+
+// // // // DROPDOWN WORK // // // // 
+  async FillCache() { 
     await this.clinicalApiService.getCacheItems({ entities: this.cacheItems }).then((response: any) => {
       if (response.cache != null) {
         this.FillDropDown(response);
@@ -407,9 +454,6 @@ const problemPayload: Partial<PatientProblemModel> = {
     debugger
     let jParse = JSON.parse(JSON.stringify(response)).cache;
     let provider = JSON.parse(jParse).Provider;
-
-    // 31july
-    let universaltoothcode = JSON.parse(jParse).BLUniversalToothCodes;
     let iCDVersion = JSON.parse(jParse).BLICDVersion;
     console.log(iCDVersion, 'jp')
     if (provider) {
@@ -422,19 +466,6 @@ const problemPayload: Partial<PatientProblemModel> = {
       this.hrEmployees = provider;
       console.log(this.hrEmployees);
 
-    }
-    if (universaltoothcode) {
-      debugger;
-      universaltoothcode = universaltoothcode.map(
-        (item: { ToothCode: any; Tooth: any }) => {
-          return {
-            name: item.Tooth,
-            code: item.ToothCode,
-          };
-        });
-      this.universaltoothid = universaltoothcode[0].code
-      this.universaltoothcodearray = universaltoothcode;
-      console.log(this.universaltoothcodearray, 'universal tooth code');
     }
     if (iCDVersion) {
       iCDVersion = iCDVersion.map(
@@ -455,344 +486,92 @@ const problemPayload: Partial<PatientProblemModel> = {
       console.log(this.ICDVersions);
     }
   }
-
-  getRowData() {
-    const mrno = this.SearchPatientData?.table2?.[0]?.mrNo || this.Mrno; 
-    const userIdStr = sessionStorage.getItem('userId');
-    const userId = userIdStr ? Number(userIdStr) : 0;
-    if (!mrno || !userId) { return; }
-
-    this.clinicalApiService.GetRowDataOfPatientProblem(mrno, userId).then((res: any) => {
-      debugger
-      const problems = res?.patientProblems?.table1 || [];
-      this.medicalHistoryData = problems.map((item: any) => ({
-        provider: item.providerName,
-        problem: item.icD9Description,
-        comments: item.comments,
-        confidential: item.confidential ? true : false,
-        status: item.status,
-        startDate: item.startDate,
-        endDate: item.endDate,
-        id:item.id
-      }));
-
-      this.totalPages = Math.ceil(this.medicalHistoryData.length / this.pageSize);
-      this.pageNumbers = Array(this.totalPages).fill(0).map((_, i) => i + 1);
-    });
-  }
-
-  fetchProviders() {
-
-    this.providerList = [
-      { id: 1, name: 'Dr. Ali' },
-      { id: 2, name: 'Dr. Sara' }
-    ];
-  }
-
-  getRowdatapatientproblem() {
-
-    let mrno = this.Mrno
-    let UserId = this.userid
-    this.ProblemGrid = []
-    var flag = 1;
-    this.clinicalApiService.GetRowDataOfPatientProblem(mrno, UserId).then((res: any) => {
-      debugger
-      console.log('getRowdatapatientproblem res', res);
-      let length = res.patientProblems.table1.length
-      let data = res.patientProblems.table1
-      for (let i = 0; i < length; i++) {
-        let array: any = []
-        array.comments = data[i].comments
-        array.ICDVersionValue = data[i].icD9Description
-        array.startDate = data[i].startDate
-        array.endDate = data[i].endDate
-        array.ProviderID = data[i].providerName
-        array.code = data[i].icD9
-        array.icdVersion = data[i].icdVersionID
-        array.confidential = data[i].confidential
-        if (array.confidential == false) {
-          array.confidential = 'No'
-        }
-        else {
-          array.confidential = 'Yes'
-        }
-        array.status = data[i].status
-        array.providername = data[i].providerId
-        array.id = data[i].id
-        array.icdVersion = data[i].icdVersion
-        this.ProblemGrid.push(array)
-      }
-      this.MyDiagnosisData = this.ProblemGrid
-      this.filteredDiagnosisData = this.MyDiagnosisData
-      debugger
-      console.log('MyDiagnosisData', this.ProblemGrid)
-      this.onStatusChange()
-    })
-  }
-
-  onStatusChange() {
-    throw new Error('Method not implemented.');
-  }
-
-  onCheckboxChange() {
-    console.log();
-    
-  }
-
-  // ClickFilter(modalRef: TemplateRef<any>) {
-
-  //   this.activeTabId = 2;
-  //   this.modalService.open(modalRef, {
-  //     backdrop: 'static',
-  //     size: 'xl',
-  //     centered: true
-  //   });
-  // }
-  selectRow() { }
-
-  SearchDiagnosis() {
-    console.log(this.FilterForm.value)
-
-    debugger
-    this.DiagnosisCode = [];
-    this.clinicalApiService.DiagnosisCodebyProvider(
-      this.ICDVersionId, 
-      this.currentPageDiagnoseCode,
-      this.pageSizeDiagnoseCode,
-      this.DiagnosisStartCode, 
-      this.DiagnosisEndCode, 
-      this.DescriptionFilter,
-    
-    ).then((response: any) => {
-      this.DiagnosisCode = response.table1;
-      this.totalDiagnosisData = Array( Math.ceil(this.DiagnosisCode.length / this.pageSizeDiagnoseCode)).fill(0);
-      // this.totalDiagnosisData =  Array(this.totalDiagnosisData).fill(0);
-      this.DiagnosisSearched = true;
-      this.currentPageDiagnoseCode = 1;
-      this.loadPaginatedData();
-      console.log(this.DiagnosisCode, 'this.DiagnosisCode');
-
-    })
-  }
-
-  loadPaginatedData() {
-    const start = (this.currentPageDiagnoseCode - 1) * this.pageSizeDiagnoseCode;
-    const end = start + this.pageSizeDiagnoseCode;
-    this.paginatedDiagnosisCode = this.DiagnosisCode.slice(start, end);
-  }
-
-  goToPage(page: number) {
-    this.currentPageDiagnoseCode = page;
-    this.loadPaginatedData();
-  }
+// // // // DROPDOWN WORK END // // // // 
 
 
-
-
-  openProblemModal() {
-
-  }
-  onSearch() {
-
-  }
-  onSearchByChange() {
-
-  }
-  // add 4aug
-  calculateTotalPages() {
-  const total = Math.ceil(this.DiagnosisCode.length / this.pageSize);
-  this.totalPagesDiagnoseCode = Array.from({ length: total }, (_, i) => i + 1);
+// // // // MODAL WORK START // // // //
+modalRefInstance: any;
+modaltotalrecord: any = 0;
+ModalPaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5,
+};
+ModalSearchDiagnosis() {
+  this.DiagnosisCode = [];
+  this.loader.show();
+  this.clinicalApiService.DiagnosisCodebyProvider(
+    this.ModalFilterForm.value.icdVersionId || 0,
+    this.ModalPaginationInfo.Page,
+    this.ModalPaginationInfo.RowsPerPage,
+    this.ModalFilterForm.value.startingCode, 
+    this.ModalFilterForm.value.diagnosisEndCode, 
+    this.ModalFilterForm.value.descriptionFilter,
+  ).then((response: any) => {
+    this.DiagnosisCode = response?.table1 || [];
+    this.modaltotalrecord = response?.table2?.[0]?.totalRecords || 0;
+    this.loader.hide();
+  })
+  this.loader.hide();
 }
-onRowSelect(diagnosis: any, modal: any) {
-  modal.close(diagnosis); 
-  console.log("diagnosis waleed",diagnosis)
-
-}
-// onRowSelect(diagnosis: any, modal: any) {
-//   // Pura object bhej rahe hain taake parent component sab fields use kar sake
-//   modal.close({
-//     descriptionFull: diagnosis.descriptionFull,
-//     icD9Code: diagnosis.icD9Code,
-//     icdVersion: diagnosis.icdVersion
-//   });
-// }
-
-
 ClickFilter(modalRef: TemplateRef<any>) {
-  const modalRefInstance = this.modalService.open(modalRef, {
-    size: 'xl',
+  this.DiagnosisCode = [];
+  this.modaltotalrecord = 0;
+  this.modalRefInstance = this.modalService.open(modalRef, {
     backdrop: 'static',
+    size: 'xl',
     centered: true
   });
-
-  modalRefInstance.result.then((result: any) => {
+  this.modalRefInstance.result.then((result: any) => {
     if (result) {
-      console.log('waleed result',result);
-      
-      this.medicalForm.patchValue({ problem: result.descriptionFull});  
-        this.medicalForm.patchValue({icD9Code : result.icD9Code });
-          this.medicalForm.patchValue({ icdVersion: result.icdVersion });
-          this.medicalForm.patchValue({ icdVersionId: result.icdVersionId });
-
     }
   }).catch(() => {
-    console.log("Modal dismissed");
   });
 }
-  DiagnosisRows() {
-    debugger
-    let data: any = [];
-    this.MyDiagnosisData = null
-    this.MyDiagnosisData = []
-    
-    for (let i = 0; i < this.selectedProduct.length; i++) {
-      let oldData = {
-
-        ICDCode: undefined,
-        version: undefined,
-        description: undefined,
-        typeofDiagnosis: '',
-        yearofOnset: '',
-        versionId: 0,
-
-      };
-
-      oldData.ICDCode = this.selectedDiagnosis[i].icD9Code;
-      oldData.version = this.selectedDiagnosis[i].icdVersion;
-      oldData.versionId = this.selectedDiagnosis[i].icdVersionId;
-      oldData.description = this.selectedDiagnosis[i].providerDescription;
-      oldData.typeofDiagnosis = '';
-      oldData.yearofOnset = '';
-      data.push(oldData);
-
-    }
-    this.MyDiagnosisData = data;
-
-    for (let i = 0; i < this.selectedallDiagnosis.length; i++) {
-      let oldData = {
-
-        ICDCode: undefined,
-        version: undefined,
-        description: undefined,
-        typeofDiagnosis: '',
-        yearofOnset: '',
-        versionId: 0,
-
-      };
-      oldData.ICDCode = this.selectedallDiagnosis[i].icD9Code;
-      oldData.version = this.selectedallDiagnosis[i].icdVersion;
-      oldData.versionId = this.selectedallDiagnosis[i].icdVersionId;
-      oldData.description = this.selectedallDiagnosis[i].descriptionFull;
-      oldData.typeofDiagnosis = '';
-      oldData.yearofOnset = '';
-      this.MyDiagnosisData.push(oldData);
-
-    }
-
-  }
-  stateChange(user: any, $event: any) {
-    for (let i = 0; i < this.DiagnosisCode.length; i++) {
-      if (user != this.DiagnosisCode[i]) {
-        this.DiagnosisCode[i].isChecked = false;
-      }
-      this.DiagnosisRows()
-    }
-  }
-  // onProblemPageChanged(page:number){}
-  async onProblemPageChanged(page: number) {
-  this.problemCurrentPage = page;
-  this.setPagedProblemData();
-  // Agar API call se data lana ho to yahan call kar sakte ho
-  // await this.GetProblemData();
+onRowSelect(diagnosis: any, modal: any) {
+  this.medicalForm.patchValue({ problem: diagnosis?.descriptionFull });
+  this.selectedDiagnosis = diagnosis;
+  modal.close(diagnosis); 
 }
-
-setPagedProblemData() {
-  const startIndex = (this.problemCurrentPage - 1) * this.problemPageSize;
-  const endIndex = startIndex + this.problemPageSize;
-  this.pagedProblems = this.problemData.slice(startIndex, endIndex);
+onModalDiagnosisPageChanged(page: number){
+  this.PaginationInfo.Page = page;
+  this.ModalSearchDiagnosis();
 }
+// // // // MODAL WORK END // // // //
 
-  // editproblem(a: any){
-  //   this.buttonText = 'Update';
-  //   this.Problems.comments = a.comments
-  //   this.Problems.ICDVersionValue = a.ICDVersionValue
-  //   this.Problems.startDate = new Date (a.startDate)
-  //   this.Problems.endDate = new Date (a.endDate)
-  //   this.Problems.Status = a.Status
-  //   this.Problems.ProviderId = a.providername
 
-  //   // console.log("ICDVersionValue", this.iCDVersion);
-  //   this.active_Index = 0
-  //   if(a.status=='Active')
-  //     {
-  //       this.Problems.Status = 1
-  //     }
-  //     else
-  //     {
-  //       this.Problems.Status = 2
-  //     }
-  //     this.showModal = false
-  
+// // // // FAV WORK START // // // // 
+async onFAVSearch() {
+  this.loader.show();
+  const ICDVersionId = this.favoritesForm.value.icdVersionId || 0;
+  const DiagnosisStartCode = this.favoritesForm.value.startingCode || '';
+  const DiagnosisEndCode = this.favoritesForm.value.endingCode || '';
+  const DescriptionFilter = this.favoritesForm.value.description || '';
+  const PageNumber = this.PaginationInfo.Page || 1; 
+  const PageSize = this.PaginationInfo.RowsPerPage || 5;
 
-  // }
-  editproblem(a: any) {
-  this.buttonText = 'Update';
-  this.showModal = false;
-  this.active_Index = 0;
-
-  this.medicalForm.patchValue({
-    providerId: a.providername || null,
-    problem: a.problem || '',
-    comments: a.comments || '',
-    confidential: a.confidential || false,
-    status: a.status === 'Active' ? 'Active' : 'Inactive',
-    startDate: this.formatDateForInput(a.startDate),
-    endDate: this.formatDateForInput(a.endDate),
+  await this.clinicalApiService.DiagnosisCodebyProvider(ICDVersionId, PageNumber, PageSize, DiagnosisStartCode, DiagnosisEndCode, DescriptionFilter).then((response: any) => {
+    this.SearchList = response?.table1 || [];
+    this.searchTotalItems = response?.table2[0]?.totalRecords || 0;
+    console.log(this.SearchList, 'this.SearchList');
+    this.loader.hide();
+  })
+  this.loader.hide();
+}
+async onsearchlistPageChanged(page: number) {
+  this.PaginationInfo.Page = page;
+  await this.onFAVSearch();
+}
+async onFAVClear(){
+  this.favoritesForm.patchValue({
+    icdVersionId: '',
+    searchById: '1',
+    startingCode: '',
+    endingCode: '',
+    description: ''
   });
+  this.PaginationInfo.Page = 1;
+  this.PaginationInfo.RowsPerPage = 5;
+  await this.onFAVSearch();
 }
-formatDateForInput(dateString: string): string | null {
-  if (!dateString) return null;
-  const date = new Date(dateString);
-  return date.toISOString().split('T')[0]; 
+// // // // FAV WORK END // // // // 
 }
-
-   DropFilled (){
-    this.Problems.ProviderId = ""
-    this.Problems.ICDVersionValue = ""
-    this.Problems.comments = ""
-    this.Problems.startDate = ""
-    this.Problems.endDate = ""
-    this.Problems.status = ""
-    this.checked = ""
-    this.Problems.providerDescription=""
-    this.isProviderCheck=false;
-
-  }
- deleteproblem(Id:number) {
-  debugger
-  this.clinicalApiService.DeletePatientProblem(Id).subscribe({
-    next: (res: any) => {
-      this.DropFilled();
-      this.getRowdatapatientproblem();
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Patient Problem Successfully Deleted',
-        confirmButtonText: 'OK'
-      });
-    },
-    error: (error) => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error?.message || 'Something went wrong',
-        confirmButtonText: 'OK'
-      });
-    }
-  });
-}
-
-  }
-  
-

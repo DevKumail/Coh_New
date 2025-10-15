@@ -298,8 +298,9 @@ namespace HMIS.Application.ServiceLogics
                     Dndeductible = regInsert.Deductibles,
                     Opcopay = regInsert.OpCopay,
                     Mrno = regInsert.MRNo,
-                    CoverageOrder = regInsert.CoverageOrder,
+                    PayerPackageId = regInsert.PayerPackageId,
                     IsSelected = regInsert.IsSelected,
+                    CoverageOrder = 0,
                     EntryDate = DateTime.Now,
                     IsDeleted = false,
                 };
@@ -880,6 +881,7 @@ namespace HMIS.Application.ServiceLogics
                     chkResult.Inactive = regUpdate.Inactive;
                     chkResult.EnteredBy = regUpdate.EnteredBy;
                     chkResult.Verified = regUpdate.Verified;
+                    chkResult.PayerPackageId = regUpdate.PayerPackageId;
                     chkResult.ChkDeductibles = regUpdate.ChkDeductible;
                     chkResult.Deductibles = regUpdate.Deductibles;
                     chkResult.Dndeductible = regUpdate.DNDeductible;
@@ -1004,5 +1006,44 @@ namespace HMIS.Application.ServiceLogics
                 return (ex.Message);
             }
         }
+
+
+        public async Task<string> UpdateCoverageOrder(CoverageOrderRequest request)
+        {
+            try
+            {
+                if (request.CoverageOrder == 1)
+                {
+                    var existingCoverageOnes = await _context.InsuredSubscriber
+                        .Where(x => x.Mrno == request.MRNo && x.CoverageOrder == 1 && x.IsDeleted == false)
+                        .ToListAsync();
+
+                    foreach (var item in existingCoverageOnes)
+                    {
+                        item.CoverageOrder = 2;
+                        _context.Entry(item).State = EntityState.Modified;
+                    }
+                }
+
+                var targetRecord = await _context.InsuredSubscriber
+                    .FirstOrDefaultAsync(x => x.Mrno == request.MRNo && x.SubscriberId == request.SubscriberId && x.IsDeleted == false);
+
+                if (targetRecord != null)
+                {
+                    targetRecord.CoverageOrder = (byte?)request.CoverageOrder;
+                    _context.Entry(targetRecord).State = EntityState.Modified;
+
+                    await _context.SaveChangesAsync();
+                    return "OK";
+                }
+
+                return "Record not found";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
     }
 }

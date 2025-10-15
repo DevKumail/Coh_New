@@ -1,10 +1,11 @@
 ﻿using HMIS.Application.DTOs.Coverage;
 using HMIS.Application.DTOs.SpLocalModel;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,8 @@ namespace HMIS.Application.Implementations
         Task<string> InsertSubscriberDB(InsuranceSubscriber regInsert);
         Task<string> UpdateSubscriberDB(InsuranceSubscriber regUpdate);
         Task<InsurenceEligibility> ReadImage(IFormFile imageFile, long PayerId);
-
         Task<object> GetInsuranceRelation();
+        Task<string> UpdateCoverageOrder([FromBody] CoverageOrderRequest request); 
+            
     }
 }

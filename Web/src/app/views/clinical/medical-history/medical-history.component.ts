@@ -30,27 +30,9 @@ export class MedicalHistoryComponent implements OnInit {
     medicalForm!: FormGroup;
 
     activeTabId = 1;
+    editedFavorite: any = null;
 
-    medicalHistoryData = [
-      {
-        provider: 1,
-        problem: 'Hypertension',
-        comments: 'Patient needs regular monitoring',
-        confidential: true,
-        status: 'Active',
-        startDate: '2024-01-01',
-        endDate: '2024-12-31'
-      },
-      {
-        provider: 2,
-        problem: 'Diabetes',
-        comments: 'Monthly insulin checkup',
-        confidential: false,
-        status: 'Inactive',
-        startDate: '2023-05-10',
-        endDate: '2023-12-15'
-      }
-    ];
+
 
     constructor(private fb: FormBuilder) {}
 
@@ -80,6 +62,13 @@ export class MedicalHistoryComponent implements OnInit {
     // ✅ Reset form
     onClear(): void {
       this.medicalForm.reset();
+    }
+
+
+    // ✅ Receive edited row from Favorites and switch to Problem tab
+    onFavoriteEdit(record: any): void {
+      this.editedFavorite = record;
+      this.activeTabId = 1;
     }
 
 

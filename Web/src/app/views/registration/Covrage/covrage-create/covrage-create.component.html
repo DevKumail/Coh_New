@@ -29,7 +29,7 @@
             <div class="row p-2">
                 <!-- Type -->
                 <div class="col-3">
-                    <label>{{'TYPE' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'TYPE' | translate}}</label><span class="text-danger"> *</span>
                    <select
                         class="form-select no-invalid-icon"
                         formControlName="CompanyOrIndividual"
@@ -50,7 +50,7 @@
 
                 <!-- Relationship Dropdown (Show only if isRelation == true) -->
                 <div class="col-3">
-                    <label>{{'RELATIONSHIP' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'RELATIONSHIP' | translate}}</label><span class="text-danger"> *</span>
                     <select
                         class="form-select no-invalid-icon"
                         formControlName="InsuranceRel"
@@ -73,11 +73,11 @@
 
                 <!-- Title -->
                 <div class="col-3">
-                    <label>{{'TITLE' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'TITLE' | translate}}</label><span class="text-danger"> *</span>
                     <select class="form-select no-invalid-icon" formControlName="Suffix"
                         [class.is-invalid]="subscriberForm.get('Suffix')?.invalid && (subscriberForm.get('Suffix')?.touched || isSubmitted)">
                         <option value="">{{'SELECT_TITLE' | translate}}</option>
-                        <option *ngFor="let t of titles" [value]="t.code">
+                        <option *ngFor="let t of titles" [value]="t.name">
                             {{ t.name }}
                         </option>
                     </select>
@@ -88,7 +88,7 @@
 
                 <!-- First Name -->
                 <div class="col-3">
-                    <label>{{'FIRST_NAME' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'FIRST_NAME' | translate}}</label><span class="text-danger"> *</span>
                     <input
                         type="text"
                         class="form-control no-invalid-icon"
@@ -114,7 +114,7 @@
 
                 <!-- Last Name -->
                 <div class="col-3">
-                    <label>{{'LAST_NAME' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'LAST_NAME' | translate}}</label><span class="text-danger"> *</span>
                     <input
                         type="text"
                         class="form-control no-invalid-icon"
@@ -129,7 +129,7 @@
 
                 <!-- Phone -->
                 <div class="col-3">
-                    <label>{{'CELL_PHONE' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'CELL_PHONE' | translate}}</label><span class="text-danger"> *</span>
 
                     <input
                         type="text"
@@ -145,7 +145,7 @@
                 </div>
 
                 <div class="col-3">
-                    <label>{{'DOB' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'DOB' | translate}}</label><span class="text-danger"> *</span>
                     <input
                         type="text"
                         class="form-control date no-invalid-icon"
@@ -162,8 +162,9 @@
 
                 <!-- Address -->
                 <div class="col-3">
-                    <label>{{'ADDRESS' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'ADDRESS' | translate}}</label><span class="text-danger"> *</span>
                     <textarea
+                        style="height: 36px;"
                         class="form-control no-invalid-icon"
                         formControlName="Address1"
                         placeholder="{{'ENTER_ADDRESS' | translate}}"
@@ -176,7 +177,7 @@
 
                 <!-- Country -->
                 <div class="col-3">
-                    <label>{{'COUNTRY' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'COUNTRY' | translate}}</label><span class="text-danger"> *</span>
                     <select
                         class="form-select no-invalid-icon"
                         formControlName="CountryId"
@@ -195,7 +196,7 @@
 
                 <!-- State -->
                 <div class="col-3">
-                    <label>{{'STATE' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'STATE' | translate}}</label><span class="text-danger"> *</span>
                     <select
                         class="form-select no-invalid-icon"
                         formControlName="StateId"
@@ -214,7 +215,7 @@
 
                 <!-- City -->
                 <div class="col-3">
-                    <label>{{'CITY' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'CITY' | translate}}</label><span class="text-danger"> *</span>
                     <select class="form-select no-invalid-icon" formControlName="CityId"
                         [class.is-invalid]="subscriberForm.get('CityId')?.invalid && (subscriberForm.get('CityId')?.touched || isSubmitted)">
                         <option value="">{{'SELECT_CITY' | translate}}</option>
@@ -229,7 +230,7 @@
 
                 <!-- Zip -->
                 <div class="col-3">
-                    <label>{{'ZIP_CODE' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'ZIP_CODE' | translate}}</label><span class="text-danger"> *</span>
                     <input
                         type="text"
                         class="form-control no-invalid-icon"
@@ -247,7 +248,7 @@
                 <!-- Insurance Carrier -->
                 <div class="col-3">
                     <label>{{'INSURANCE_CARRIER' | translate}}</label
-                    ><span class="danger"> *</span>
+                    ><span class="text-danger"> *</span>
                     <select
                         class="form-select no-invalid-icon"
                         formControlName="CarrierId"
@@ -265,7 +266,7 @@
                 </div>
 
                 <div class="col-3">
-                    <label>{{'POLICY_PLAN' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'POLICY_PLAN' | translate}}</label><span class="text-danger"> *</span>
                     <select
                         class="form-select policy-select no-invalid-icon"
                         formControlName="selectedBLPayerPlan"
@@ -287,7 +288,7 @@
 
                 <!-- Package -->
                 <div class="col-3">
-                    <label>{{'PACKAGE' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'PACKAGE' | translate}}</label><span class="text-danger"> *</span>
                     <select
                         class="form-select no-invalid-icon"
                         formControlName="selectedBLPayerPackage"
@@ -308,11 +309,11 @@
 
                 <!-- Gender -->
                 <div class="col-3">
-                    <label>{{'GENDER' | translate}}</label><span class="danger"> *</span>
+                    <label>{{'GENDER' | translate}}</label><span class="text-danger"> *</span>
                     <select class="form-select no-invalid-icon" formControlName="Sex"
                         [class.is-invalid]="subscriberForm.get('Sex')?.invalid && (subscriberForm.get('Sex')?.touched || isSubmitted)">
                         <option value="">{{'SELECT_GENDER' | translate}}</option>
-                        <option *ngFor="let g of genders" [value]="g.code">
+                        <option *ngFor="let g of genders" [value]="g.name">
                             {{ g.name }}
                         </option>
                     </select>
@@ -325,7 +326,7 @@
                 <!-- Insured ID -->
                 <div class="col-3">
                     <label>{{'MEMBER_ID_EMP_ID' | translate}}</label
-                    ><span class="danger"> *</span>
+                    ><span class="text-danger"> *</span>
                     <input
                         type="text"
                         class="form-control no-invalid-icon"
@@ -340,12 +341,12 @@
 
                 <!-- Active -->
                 <div class="col-3 d-flex align-items-center mt-4">
-                    <label class="form-check-label ms-2">{{'ACTIVE' | translate}}</label>
                     <input
                         type="checkbox"
-                        class="form-check-input"
+                        class="form-check-input mb-1"
                         formControlName="Inactive"
-                    />
+                        />
+                        <label class="form-check-label ms-2">{{'ACTIVE' | translate}}</label>
                 </div>
             </div>
             <div class="row">

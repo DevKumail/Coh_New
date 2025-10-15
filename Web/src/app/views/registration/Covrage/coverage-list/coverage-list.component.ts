@@ -200,6 +200,7 @@ async onStatusChange(row: any, newValue: number | null) {
       coverageOrder: newValue
     });
     Swal.fire({ icon: 'success', title: 'Updated', text: 'Status updated successfully.', timer: 1200, showConfirmButton: false });
+    this.GetCoverageData();
   } catch (error: any) {
     // Revert UI on failure
     if ('coverageOrder' in row) row.coverageOrder = oldValue;

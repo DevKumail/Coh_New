@@ -1,8 +1,9 @@
+ 
 import { Patient } from './../../Scheduling/appointment-dashboard/appointment-dashboard.component';
 import { ClinicalApiService } from './../clinical.api.service';
 // import Swal from 'sweetalert2';
 
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, TemplateRef, ViewChild, Input, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -11,7 +12,7 @@ import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FavoritesComponent } from '../favorites/favorites.component';
 //import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import Swal from 'sweetalert2';
-import {PatientProblemModel} from '@/app/shared/models/clinical/problemlist.model';
+import {PatientProblemModel} from '@/app/shared/Models/Clinical/problemlist.model';
 import { LoaderService } from '@core/services/loader.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
@@ -23,9 +24,11 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
 
 @Component({
   selector: 'app-problem-list',
+  standalone: true,
 
   imports: [CommonModule,
     ReactiveFormsModule,
+    
     FormsModule,
     NgbNavModule,
     NgIconComponent,
@@ -38,7 +41,7 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
   templateUrl: './problem-list.component.html',
   styleUrl: './problem-list.component.scss'
 })
-export class ProblemListComponent implements OnInit {
+export class ProblemListComponent implements OnInit, OnChanges, OnDestroy {
   datePipe = new DatePipe('en-US');
   medicalForm!: FormGroup;
   submitted: boolean = false;
@@ -52,6 +55,9 @@ export class ProblemListComponent implements OnInit {
   modalService = new NgbModal();
   FilterForm!: FormGroup;
   @ViewChild('problemModal') problemModal: any;
+  @Input() editData: any;
+  private pendingEditRecord: any;
+  private providerToggleSub?: Subscription;
 
   DescriptionFilter: any;
   ProviderId: any = 0;
@@ -118,7 +124,6 @@ PatientId:any;
   Searchby: any = [{ code: 1, name: 'Diagnosis Code' }, { code: 2, name: 'Diagnosis Code Range' }, { code: 3, name: 'Description' }]
   Active = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }, { id: 0, name: "In Error" }];
   DiagnosisForm: any;
-isConfidentential:any;
   checked:any;
 isProviderCheck:any;
 appId:any;
@@ -134,6 +139,26 @@ appId:any;
         firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
     } catch {}
+  }
+
+  private updateProviderValidators(isOutside: boolean): void {
+    const providerIdCtrl = this.medicalForm?.get('providerId');
+    const providerDescCtrl = this.medicalForm?.get('providerDescription');
+    if (!providerIdCtrl || !providerDescCtrl) { return; }
+
+    if (isOutside) {
+      providerIdCtrl.clearValidators();
+      providerDescCtrl.setValidators([Validators.required]);
+    } else {
+      providerIdCtrl.setValidators([Validators.required]);
+      providerDescCtrl.clearValidators();
+    }
+    providerIdCtrl.updateValueAndValidity({ emitEvent: false });
+    providerDescCtrl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  ngOnDestroy(): void {
+    try { this.providerToggleSub?.unsubscribe(); } catch {}
   }
 
 
@@ -162,8 +187,6 @@ appId:any;
         // After assigning, load problems
         this.GetPatientProblemData();
         const mrno = this.Mrno;
-
-
       });
 
     
@@ -179,13 +202,21 @@ appId:any;
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
       providerName: [''], 
-      confidential: [false],
+      providerDescription:[''],
+      isConfidentential: [false],
       isProviderCheck: [false] 
     });
 
+    // Toggle validators based on provider outside clinic checkbox
+    try {
+      this.updateProviderValidators(this.medicalForm.get('isProviderCheck')?.value);
+      this.providerToggleSub = this.medicalForm.get('isProviderCheck')?.valueChanges
+        .subscribe((isOutside: boolean) => this.updateProviderValidators(isOutside));
+    } catch {}
+
     this.FilterForm = this.fb.group({
       icdVersionId: [''],
-      searchById: [''],
+      searchById: ['1'],
       startingCode: [''],
       endingCode: [''],
       description: ['']
@@ -204,6 +235,93 @@ appId:any;
     await this.GetPatientProblemData();
     await this.FillCache();
 
+    // Apply any pending edit received before init
+    if (this.pendingEditRecord) {
+      try { this.applyEditRecord(this.pendingEditRecord); } catch {}
+      this.pendingEditRecord = null;
+    }
+
+
+       // Enforce endDate rules based on status and startDate (UI + Reactive validation)
+    const endDateCtrl = this.medicalForm.get('endDate');
+    const startDateCtrl = this.medicalForm.get('startDate');
+    const statusCtrl = this.medicalForm.get('status');
+    
+    const applyStatusRules = (val: string) => {
+      if (val === 'Inactive') {
+        endDateCtrl?.enable({ emitEvent: false });
+        endDateCtrl?.setValidators([
+          Validators.required,
+          this.minDateValidator('startDate')
+        ]);
+      } else {
+        endDateCtrl?.reset('', { emitEvent: false });
+        endDateCtrl?.clearValidators();
+        endDateCtrl?.disable({ emitEvent: false });
+      }
+      endDateCtrl?.updateValueAndValidity({ onlySelf: true });
+    };
+    
+    // Initialize and subscribe
+    applyStatusRules(statusCtrl?.value);
+    statusCtrl?.valueChanges.subscribe((val: string) => applyStatusRules(val));
+    startDateCtrl?.valueChanges.subscribe(() => {
+      endDateCtrl?.updateValueAndValidity({ onlySelf: true });
+    });
+    
+    startDateCtrl?.valueChanges.subscribe(() => {
+      // Clear end date whenever start date changes, then revalidate
+      endDateCtrl?.setValue('', { emitEvent: false });
+      endDateCtrl?.updateValueAndValidity({ onlySelf: true });
+    });
+
+
+  }
+
+    // Validator to enforce endDate >= startDate
+minDateValidator(otherControlName: string) {
+  return (control: any) => {
+    if (!control || !control.parent) return null;
+    const endValue = control.value;
+    const startValue = control.parent.get(otherControlName)?.value;
+    if (!endValue || !startValue) return null;
+    return endValue < startValue ? { minDate: true } : null;
+  };
+}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['editData'] && changes['editData'].currentValue) {
+      const record = changes['editData'].currentValue;
+      if (this.medicalForm) {
+        this.applyEditRecord(record);
+      } else {
+        this.pendingEditRecord = record;
+      }
+    }
+  }
+
+  private applyEditRecord(record: any): void {
+    // If record has icd fields, reuse existing onEdit handler
+    if (record?.icD9Description || record?.icD9) {
+      this.onEdit(record);
+      return;
+    }
+    // Fallback mapping for favorites payload shape
+    try {
+      this.id = record?.id ?? this.id;
+      this.medicalForm.patchValue({
+        problem: record?.problem || '',
+        comments: record?.comments || '',
+        startDate: record?.startDate ? this.datePipe.transform(record.startDate, 'yyyy-MM-dd') : '',
+        endDate: record?.endDate ? this.datePipe.transform(record.endDate, 'yyyy-MM-dd') : '',
+      });
+      const statusVal = (record?.status || '').toString().toLowerCase();
+      if (statusVal.includes('active')) {
+        this.medicalForm.get('status')?.setValue('Active');
+      } else if (statusVal.includes('inactive')) {
+        this.medicalForm.get('status')?.setValue('Inactive');
+      }
+    } catch {}
   }
 
 
@@ -230,6 +348,7 @@ appId:any;
   console.log('mrNo =>', mrNo);
 
   await this.clinicalApiService.GetPatientProblemData(
+    true,
     mrNo,
     userId,
     this.MHPaginationInfo.Page,
@@ -251,7 +370,18 @@ appId:any;
 
   // ✅ Clear form
   onClear(): void {
-  this.medicalForm.reset();
+  //this.medicalForm.reset();
+  this.medicalForm.patchValue({
+    providerId: '',
+    problem: '',
+    comments: '',
+    status: '',
+    startDate: '',
+    endDate: '',
+    providerName: '', 
+    isConfidentential: false,
+    isProviderCheck: false 
+  })
   this.submitted = false;
   }
     DropFilled (){
@@ -310,7 +440,7 @@ onSubmit() {
     icd9: this.selectedDiagnosis.icD9Code,
     icd9description: this.selectedDiagnosis.descriptionFull,
     icdversionId: this.selectedDiagnosis.icdVersionId,
-    confidential: formData.confidential || false,
+    confidential: formData.isConfidentential || false,
     startDate: formData.startDate,
     endDate: formData.endDate,
     comments: formData.comments,
@@ -331,14 +461,14 @@ onSubmit() {
     outsideClinic: 'No',
     // confidential: formData.confidential,
     isHl7msgCreated: false,
-    isMedicalHistory: false,
+    isMedicalHistory: true,
     caseId: null,
     errorReason: '',
     oldMrno: '',
     isDeleted: false,
     startstrdate: formData.startDate ? formData.startDate.split('T')[0] : '',
     endstrdate: formData.endDate ? formData.endDate.split('T')[0] : '',
-    providerDescription: formData.providerName || ''
+    providerDescription: formData.providerDescription  || ''
   };
 
   console.log('Submitting Patient Problem Payload:', problemPayload);
@@ -367,7 +497,6 @@ onSubmit() {
 
   modalRefInstance: any;
   ClickFilter(modalRef: TemplateRef<any>) {
-
     this.DiagnosisCode = [];
     this.totalrecord = 0;
     this.modalRefInstance = this.modalService.open(modalRef, {
@@ -375,7 +504,6 @@ onSubmit() {
       size: 'xl',
       centered: true
     });
-
     this.modalRefInstance.result.then((result: any) => {
       if (result) {
         console.log('Modal returned:', result);
@@ -384,8 +512,6 @@ onSubmit() {
       // Modal dismissed without selecting
       console.log('Modal dismissed');
     });
-
-
   }
 
 
@@ -547,6 +673,7 @@ onSubmit() {
             providerId: record?.providerId,
             problem: record?.icD9Description,
             comments: record?.comments,
+            isConfidentential: record?.confidential,
             startDate: this.datePipe.transform(record?.startDate, 'yyyy-MM-dd') || '',
             endDate: this.datePipe.transform(record?.endDate, 'yyyy-MM-dd') || '',
           }

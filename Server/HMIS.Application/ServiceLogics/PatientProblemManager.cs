@@ -38,11 +38,12 @@ namespace HMIS.Application.ServiceLogics
         //}
 
 
-        public async Task<DataSet> GetAllPatientProblems(string MRNo, long UserId, int? PageNumber, int? PageSize)
+        public async Task<DataSet> GetAllPatientProblems(bool? IsMedicalHistory, string MRNo, long UserId, int? PageNumber, int? PageSize)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
+                param.Add("@IsMedicalHistory", IsMedicalHistory);
                 param.Add("@MRNo", MRNo);
                 param.Add("@UserId", UserId);
                 param.Add("@PageNumber", PageNumber);

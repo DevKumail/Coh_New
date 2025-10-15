@@ -61,12 +61,12 @@ export class ClinicalApiService {
     return this.api.post('/Alergy/SubmitPatientAlergy', data);
   }
 
-  GetRowDataOfPatientProblem(mrno: string, userId: number) {
-    return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}`).toPromise();
+  GetRowDataOfPatientProblem(IsMedicalHistory:boolean,mrno: string, userId: number, pageNumber: number = 1, pageSize: number = 10) {
+    return this.api.get(`PatientProblem/GetPatientProblems?IsMedicalHistory=${IsMedicalHistory}&MRNo=${mrno}&UserId=${userId}&pageNumber=${pageNumber}&pageSize=${pageSize}`).toPromise();
   }
- GetPatientProblemData(mrno: string, userId: number, pageNumber: number, pageSize: number) {
+ GetPatientProblemData(IsMedicalHistory:boolean, mrno: string, userId: number, pageNumber: number, pageSize: number) {
     // Unified to PatientProblem endpoint (Problem/GetProblemDetailsDB does not exist)
-    return this.api.get(`PatientProblem/GetPatientProblems?MRNo=${mrno}&UserId=${userId}&pageNumber=${pageNumber}&pageSize=${pageSize}`).toPromise();
+    return this.api.get(`PatientProblem/GetPatientProblems?IsMedicalHistory=${IsMedicalHistory}&MRNo=${mrno}&UserId=${userId}&pageNumber=${pageNumber}&pageSize=${pageSize}`).toPromise();
 }
 
   MyDiagnosisCodebyProvider(ProviderId: number, GroupId: number | null, ICDVersionId: number | null) {

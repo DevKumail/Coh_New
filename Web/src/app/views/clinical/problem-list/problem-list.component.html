@@ -26,10 +26,18 @@
       </div>
 
       <div class="col-lg-3">
-        <div class="mb-3">
+
+        <div class="mb-3" *ngIf="medicalForm.get('isProviderCheck')?.value == true">
+          <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }}</label>
+          <input type="text" class="form-control" formControlName="providerDescription" placeholder="{{ 'ENTER_PROVIDER' | translate }}" />
+         <div class="text-danger small" *ngIf="(medicalForm.get('providerDescription')?.touched || submitted) && medicalForm.get('providerDescription')?.invalid">{{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
+       </div>
+
+
+        <div class="mb-3" *ngIf="medicalForm.get('isProviderCheck')?.value == false">
            <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }}</label>
           <select class="form-select" formControlName="providerId">
-            <option [ngValue]="" disabled>{{'SELECT_PROVIDER' | translate}}</option>
+            <option [ngValue]="" disabled selected>{{'SELECT_PROVIDER' | translate}}</option>
             <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}</option>
           </select>
           <div class="text-danger small" *ngIf="(medicalForm.get('providerId')?.touched || submitted) && medicalForm.get('providerId')?.invalid">{{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
@@ -62,7 +70,15 @@
         </div>
       </div>
 
+      <div class="col-lg-3">
 
+        <div class="form-check mt-4">
+          <input type="checkbox" class="form-check-input" formControlName="isConfidentential" id="confidential" style="height: 20px; width: 20px;" />
+          <label class="form-check-label me-2 ms-2" for="confidential" >
+            {{ 'CONFIDENTIAL' | translate }}
+          </label>
+        </div>
+      </div>
     </div>
 
     <div class="row">
@@ -89,8 +105,17 @@
       <div class="col-lg-3">
         <div class="mb-3">
           <label class="form-label">{{ 'END_DATE' | translate }}</label>
-          <input type="date" class="form-control" formControlName="endDate" />
-          <div class="text-danger small" *ngIf="(medicalForm.get('endDate')?.touched || submitted) && medicalForm.get('endDate')?.invalid">{{ 'END_DATE_REQUIRED' | translate }}</div>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="endDate"
+            [attr.min]="medicalForm.get('startDate')?.value || null"
+            [disabled]="medicalForm.get('status')?.value !== 'Inactive'"
+          />
+          <div class="text-danger small" *ngIf="medicalForm.get('endDate')?.touched && medicalForm.get('endDate')?.invalid">{{ 'END_DATE_REQUIRED' | translate }}</div>
+          <div class="text-danger small" *ngIf="medicalForm.get('endDate')?.touched && medicalForm.get('startDate')?.value && medicalForm.get('endDate')?.value && (medicalForm.get('endDate')?.value < medicalForm.get('startDate')?.value)">
+            {{ 'END_DATE_NOT_LESS_THAN_START' | translate }}
+          </div>
         </div>
       </div>
 
@@ -120,15 +145,15 @@
           </thead>
           <tbody class="table-group-divider text-center">
             <tr *ngFor="let record of medicalHistoryData">
-              <td>{{ record.providerName }}</td>
-              <td>{{ record.icD9Description }}</td>
-              <td>{{ record.comments }}</td>
+              <td>{{ record.providerName || 'N/A' }}</td>
+              <td>{{ record.icD9Description || 'N/A' }}</td>
+              <td>{{ record.comments || 'N/A' }}</td>
               <td class="text-center">
                 <ng-icon [name]="record.confidential ? 'tablerCheck' : 'tablerX'"></ng-icon>
               </td>
-              <td>{{ record.status }}</td>
-              <td>{{ record.startDate | date : "dd/MM/yyyy" }}</td>
-              <td>{{ record.endDate | date : "dd/MM/yyyy" }}</td>
+              <td>{{ record.status || 'N/A' }}</td>
+              <td>{{ record.startDate || 'N/A' | date : "dd/MM/yyyy"  }}</td>
+              <td>{{ record.endDate || 'N/A' | date : "dd/MM/yyyy"  }}</td>
               <td>
                 <button
                   class="btn btn-outline-info p-0 px-1 py-1 me-1"
@@ -167,7 +192,7 @@
   </style> 
   <form  *ngIf="FilterForm" [formGroup]="FilterForm">
     <div class="modal-header">
-      <h5 class="modal-title">Search-Problem</h5>
+      <h5 class="modal-title">{{'SEARCH_PROBLEM' | translate}}</h5>
       <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
     </div>
     <div class="modal-body">
@@ -178,7 +203,7 @@
               <div class="col-md-3 col-sm-12">
                 <label for="icdVersionId" class="form-label">{{ 'ICD_VERSION' |   translate }}:</label>
                 <select class="form-control" formControlName="icdVersionId" id="icdVersionId" required>
-                  <option value="">{{ 'SELECT_ICD_VERSION' | translate }}</option>
+                  <option value="" disabled selected>{{ 'SELECT_ICD_VERSION' | translate }}</option>
                   <option *ngFor="let version of ICDVersions" [value]="version.code">
                     {{ version.name }}
                   </option>
@@ -188,7 +213,7 @@
               <div class="col-md-3 col-sm-12">
                 <label for="searchById" class="form-label">{{ 'SEARCH_CODE' | translate }}:</label>
                 <select class="form-control" formControlName="searchById" id="searchById" required>
-                  <option value="">{{ 'SELECT_SEARCH_CODE' | translate }}</option>
+                  <option value="" disabled selected>{{ 'SELECT_SEARCH_CODE' | translate }}</option>
                   <option *ngFor="let item of Searchby" [value]="item.code">
                     {{ item.name }}
                   </option>
@@ -229,16 +254,16 @@
       <table class="table table-bordered table-striped table-sm mt-2">
         <thead>
           <tr class="text-center">
-            <th style="font-size: 14px">Code</th>
-            <th style="font-size: 14px">ICD Version</th>
-            <th style="font-size: 14px">Description</th>
+            <th style="font-size: 14px">{{'CODE' | translate}}</th>
+            <th style="font-size: 14px">{{'ICD_VERSION' | translate}}</th>
+            <th style="font-size: 14px">{{'DESCRIPTION' | translate}}</th>
           </tr>
         </thead>
         <tbody class="table-group-divider text-center">
           <tr *ngFor="let diagnosis of DiagnosisCode" (click)="onRowSelect(diagnosis, modal)">
-            <td style="font-size: 12px">{{ diagnosis?.icD9Code }}</td>
-            <td style="font-size: 12px">{{ diagnosis?.icdVersion }}</td>
-            <td style="font-size: 12px">{{ diagnosis?.descriptionFull }}</td>
+            <td style="font-size: 12px">{{ diagnosis?.icD9Code || 'N/A' }}</td>
+            <td style="font-size: 12px">{{ diagnosis?.icdVersion || 'N/A' }}</td>
+            <td style="font-size: 12px">{{ diagnosis?.descriptionFull || 'N/A' }}</td>
           </tr>
 
           <tr *ngIf="totalrecord === 0">
