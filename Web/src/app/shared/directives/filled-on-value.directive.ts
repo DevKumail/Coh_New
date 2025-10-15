@@ -3,7 +3,7 @@ import { NgControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 @Directive({
-  selector: '[appFilledOnValue], input[formControlName], select[formControlName], textarea[formControlName], input[formControl], select[formControl], textarea[formControl], input[ngModel], select[ngModel], textarea[ngModel]',
+  selector: '[appFilledOnValue], input[formControlName]:not([type=checkbox]), select[formControlName], textarea[formControlName], input[formControl]:not([type=checkbox]), select[formControl], textarea[formControl], input[ngModel]:not([type=checkbox]), select[ngModel], textarea[ngModel]',
   standalone: true,
 })
 export class FilledOnValueDirective {

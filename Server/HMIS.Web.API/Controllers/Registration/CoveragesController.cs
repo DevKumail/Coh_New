@@ -256,5 +256,71 @@ namespace HMIS.Web.Controllers.Registration
                 throw ex;
             }
         }
+
+        [HttpPost("UpdateCoverageOrder")]
+        public async Task<IActionResult> UpdateCoverageOrder([FromBody] CoverageOrderRequest request)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            var requestMessage = JsonConvert.SerializeObject(request);
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+
+            if (!ModelState.IsValid)
+            {
+                elapsed = timerElapsed.StopTimer();
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject("Invalid payload");
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+
+                logger.Information(
+                    "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+                    method, path, statusCode, elapsed, requestMessage, responseMessage);
+
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var result = await _coverageManager.UpdateCoverageOrder(request);
+
+                elapsed = timerElapsed.StopTimer();
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(result);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+
+                logger.Information(
+                    "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+                    method, path, statusCode, elapsed, requestMessage, responseMessage);
+
+                if (result == "OK")
+                {
+                    return Ok(new { Success = true });
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                elapsed = timerElapsed.StopTimer();
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+
+                logger.Information(
+                    "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+                    method, path, statusCode, elapsed, requestMessage, responseMessage);
+
+                return BadRequest(ex.Message);
+            }
+        }
+
+
     }
 }

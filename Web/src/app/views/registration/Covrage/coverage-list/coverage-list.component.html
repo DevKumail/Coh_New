@@ -36,7 +36,7 @@
         <!-- <div class="card mt-3">
     <div class="card-body"> -->
         <div class="table-responsive">
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped table-sm">
                 <thead>
                     <tr class="text-center">
                         <th>{{'NAME' | translate}}</th>
@@ -48,7 +48,7 @@
                         <th>{{'ACTION' | translate}}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="table-group-divider text-center">
                     <tr *ngFor="let inssub of pagedCoverages">
                         <td>{{ inssub.subscriberName }}</td>
                         <td class="text-center">{{ inssub.mrNo }}</td>

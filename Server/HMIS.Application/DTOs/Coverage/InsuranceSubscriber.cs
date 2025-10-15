@@ -26,7 +26,7 @@ namespace HMIS.Application.DTOs.Coverage
         public string Suffix { get; set; }
         //[Required(ErrorMessage = "Enter First Name.")]
         public string FirstName { get; set; }
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; }
         //[Required(ErrorMessage = "Enter Last Name.")]
         public string LastName { get; set; }
         //[Required(ErrorMessage = "Enter Date Of Birth.")]
@@ -41,7 +41,7 @@ namespace HMIS.Application.DTOs.Coverage
         // public string SSN { get; set; }
         // public string EmployerOrSchoolName { get; set; }
         public string Address1 { get; set; }
-        public string Address2 { get; set; }
+        public string? Address2 { get; set; }
         public string ZipCode { get; set; }
         public int CityId { get; set; }
         public int StateId { get; set; }
@@ -54,7 +54,7 @@ namespace HMIS.Application.DTOs.Coverage
         public decimal? Deductibles { get; set; }
         public decimal? DNDeductible { get; set; }
         public decimal? OpCopay { get; set; }
-        // public long PayerPackageId { get; set; }
+         public long PayerPackageId { get; set; }
 
         public string? MRNo { get; set; }
         public Byte? CoverageOrder { get; set; }
@@ -66,6 +66,14 @@ namespace HMIS.Application.DTOs.Coverage
         public List<Deduct>? regDeduct { get; set; }
 
 
+    }
+
+
+    public class CoverageOrderRequest
+    {
+        public int SubscriberId { get; set; }
+        public string MRNo { get; set; }
+        public int CoverageOrder { get; set; }
     }
 
 }

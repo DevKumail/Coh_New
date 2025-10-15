@@ -7,105 +7,101 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import Swal from 'sweetalert2';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { LoaderService } from '@core/services/loader.service';
+import { distinctUntilChanged, filter, Subscription } from 'rxjs';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, NgIconComponent, FormsModule,TranslatePipe ],
+  imports: [
+    ReactiveFormsModule, 
+    CommonModule, 
+    NgIconComponent, 
+    FormsModule,
+    TranslatePipe, 
+    FilledOnValueDirective,
+    GenericPaginationComponent ],
   templateUrl: './favorites.component.html',
   styleUrl: './favorites.component.scss',
 
 })
 export class FavoritesComponent implements OnInit {
   favoritesForm!: FormGroup;
-  @Output() searchICD9Code = new EventEmitter<any>();
-  @Output() selectIcdCode = new EventEmitter<any>();
-
+  @Output() editRecord = new EventEmitter<any>();
+  private patientDataSubscription!: Subscription;
   ICDVersions: any[] = [];
-  universaltoothcodearray: any [] = [];
-  searchResults: any[] = [];
+  SearchList: any[] = [];
   favoritesData: any = [];
+  favoritesTotalItems: any = 0;
+  searchTotalItems: number = 0;
+  SearchPatientData:any;
+  Mrno:any;
+  currentUser:any;
   Searchby: any = [
     { code: 1, name: 'Diagnosis Code' }, 
     { code: 2, name: 'Diagnosis Code Range' }, 
     { code: 3, name: 'Description' }
   ];
   cacheItems: string[] = [
-    'BLUniversalToothCodes',
     'BLICDVersion',
   ];
-  selectedYear!: number;
-  searchText: string = '';
-  selectedCode: string = '';
-  selectedVersion: string = '';
-  selectedStartCode: string = '';
-  years: number[] = [];
-  currentPage: number = 1;
-  ProviderId: any=0;
-  pageSize: number = 10;
-  pageSizes = [5, 10, 25, 50];
- pageNumbers: number[] = [];
-  totalPages: number = 0;
-    ICT9Group: any[] = [];
 
+    PaginationInfo: any = {
+      Page: 1,
+      RowsPerPage: 5
+    };
+    favPaginationInfo: any = {
+      Page: 1,
+      RowsPerPage: 5
+    };
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private clinicalApiService: ClinicalApiService, 
+    constructor(
+      private fb: FormBuilder,
+      private router: Router,
+      private clinicalApiService: ClinicalApiService, 
+      private loader: LoaderService,
+      private PatientData: PatientBannerService,
+    ) {}
 
-  ) {}
+  async ngOnInit() {
+    this.currentUser = sessionStorage.getItem('userId') || 0;
+     this.patientDataSubscription = this.PatientData.patientData$
+      .pipe(
+        filter((data: any) => !!data?.table2?.[0]?.mrNo),
+        distinctUntilChanged((prev, curr) => 
+          prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+        )).subscribe((data: any) => {
+        this.SearchPatientData = data;
+        this.Mrno = this.SearchPatientData?.table2?.[0]?.mrNo || '';
+        this.getFAVORITELIST(this.Mrno,this.currentUser)
+      });
 
-  ngOnInit(): void {
     this.favoritesForm = this.fb.group({
       icdVersionId: [''],
-      searchById: [''],
+      searchById: ['1'],
       startingCode: [''],
       endingCode: [''],
       description: ['']
     });
 
-    this.loadYears();
+    await this.FillCache();
+    await this.getFAVORITELIST(this.Mrno,this.currentUser)
   }
-
   async FillCache() {
-
     await this.clinicalApiService.getCacheItems({ entities: this.cacheItems }).then((response: any) => {
       if (response.cache != null) {
         this.FillDropDown(response);
       }
     })
-      .catch((error: any) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: error.message || 'Something went wrong!',
-          confirmButtonColor: '#d33'
-        })
-      })
   }
   FillDropDown(response: any) {
-    debugger
     let jParse = JSON.parse(JSON.stringify(response)).cache;
     let iCDVersion = JSON.parse(jParse).BLICDVersion;
-    let universaltoothcode = JSON.parse(jParse).BLUniversalToothCodes;
 
-
-    if (universaltoothcode) {
-      debugger;
-      universaltoothcode = universaltoothcode.map(
-        (item: { ToothCode: any; Tooth: any }) => {
-          return {
-            name: item.Tooth,
-            code: item.ToothCode,
-          };
-        });
-      // this.universaltoothid = universaltoothcode[0].code
-      this.universaltoothcodearray = universaltoothcode;
-      console.log(this.universaltoothcodearray, 'universal tooth code');
-    }
     if (iCDVersion) {
-      debugger;
       iCDVersion = iCDVersion.map(
         (item: { ICDVersionId: any; ICDVersion: any }) => {
           return {
@@ -113,7 +109,6 @@ export class FavoritesComponent implements OnInit {
             code: item.ICDVersionId,
           };
         });
-      debugger
       const item = {
         name: 'ALL',
         code: 0,
@@ -121,54 +116,63 @@ export class FavoritesComponent implements OnInit {
       iCDVersion.push(item);
       this.ICDVersions = iCDVersion;
       console.log(this.ICDVersions);
-
-
     }
   }
+  async onSearch() {
+    this.loader.show();
+    const ICDVersionId = this.favoritesForm.value.icdVersionId || 0;
+    const DiagnosisStartCode = this.favoritesForm.value.startingCode || '';
+    const DiagnosisEndCode = this.favoritesForm.value.endingCode || '';
+    const DescriptionFilter = this.favoritesForm.value.description || '';
+    const PageNumber = this.PaginationInfo.Page || 1; 
+    const PageSize = this.PaginationInfo.RowsPerPage || 5;
 
-  loadYears(): void {
-    const currentYear = new Date().getFullYear();
-    this.years = Array.from({ length: 10 }, (_, i) => currentYear - i);
+    await this.clinicalApiService.DiagnosisCodebyProvider(ICDVersionId, PageNumber, PageSize, DiagnosisStartCode, DiagnosisEndCode, DescriptionFilter).then((response: any) => {
+      this.SearchList = response?.table1 || [];
+      this.searchTotalItems = response?.table2[0]?.totalRecords || 0;
+      console.log(this.SearchList, 'this.SearchList');
+      this.loader.hide();
+    })
+    this.loader.hide();
+  }
+  async onsearchlistPageChanged(page: number) {
+    this.PaginationInfo.Page = page;
+    await this.onSearch();
+  }
+  async onClear(){
+    this.favoritesForm.patchValue({
+      icdVersionId: '',
+      searchById: '1',
+      startingCode: '',
+      endingCode: '',
+      description: ''
+    });
+    this.PaginationInfo.Page = 1;
+    this.PaginationInfo.RowsPerPage = 5;
+    await this.onSearch();
   }
 
-  onSearch(): void {
-
-
+  async getFAVORITELIST(mrno:any = this.Mrno,currentUser:any = 0){
+    this.loader.show();
+    const PageNumber = this.favPaginationInfo?.Page || 1;
+    const PageSize = this.favPaginationInfo?.RowsPerPage || 5;
+    await this.clinicalApiService.GetRowDataOfPatientProblem(true,mrno,currentUser,PageNumber,PageSize)
+      .then((response: any) => {
+        this.favoritesData = response?.patientProblems?.table1 || [];
+        this.favoritesTotalItems = response?.patientProblems?.table2?.[0]?.totalRecords || 0;
+        console.log(this.favoritesData, 'favoritesData');
+      })
+      .finally(() => this.loader.hide());
   }
 
-  onSelectCode(code: string): void {
-    this.selectIcdCode.emit(code);
+  onEdit(record: any) {
+    this.editRecord.emit(record);
   }
 
-  get start(): number {
-    return (this.currentPage - 1) * this.pageSize;
+  async onfavPageChanged(page: number) {
+    this.favPaginationInfo.Page = page;
+    await this.getFAVORITELIST(this.Mrno,this.currentUser)
   }
 
-  get end(): number {
-    const endValue = this.start + this.pageSize;
-    return endValue > this.favoritesData.length ? this.favoritesData.length : endValue;
-  }
-
-  get paginatedData() {
-    return this.favoritesData.slice(this.start, this.end);
-  }
-
-  onPageSizeChange(event: any) {
-    this.pageSize = +event.target.value;
-    this.currentPage = 1;
-  }
-
-  prevPage() {
-    if (this.currentPage > 1) this.currentPage--;
-  }
-
-  nextPage() {
-    if (this.end < this.favoritesData.length) this.currentPage++;
-  }
-
-  goToPage(page: number) {
-    this.currentPage = page;
-  }
-
-
+  
 }

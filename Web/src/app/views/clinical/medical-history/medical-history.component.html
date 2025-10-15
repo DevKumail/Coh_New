@@ -24,7 +24,7 @@
         <li [ngbNavItem]="1">
           <a ngbNavLink href="javascript:void(0)">{{ 'PROBLEM' | translate }}</a>
           <ng-template ngbNavContent>
-            <app-problem-list></app-problem-list>
+            <app-problem-list [editData]="editedFavorite"></app-problem-list>
           </ng-template>
         </li>
 
@@ -32,7 +32,7 @@
         <li [ngbNavItem]="2">
           <a ngbNavLink href="javascript:void(0)">{{ 'FAVORITES' | translate }}</a>
           <ng-template ngbNavContent>
-            <app-favorites></app-favorites>
+            <app-favorites (editRecord)="onFavoriteEdit($event)"></app-favorites>
           </ng-template>
         </li>
       </ul>

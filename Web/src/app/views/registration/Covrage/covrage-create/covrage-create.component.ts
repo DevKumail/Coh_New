@@ -181,6 +181,7 @@ export class CovrageCreateComponent implements OnInit {
 
     initForm() {
         this.subscriberForm = this.fb.group({
+            subscribedId: [''],
             CompanyOrIndividual: ['2', Validators.required],
             InsuranceRel: [''], // will set required conditionally in showRelation()
             Address1: ['', Validators.required],
@@ -690,104 +691,6 @@ export class CovrageCreateComponent implements OnInit {
         this.copayTable.removeAt(index);
     }
 
-    // insertsubscriber() {
-    //     debugger
-    //     if (this.subscriberForm.invalid) {
-    //         Swal.fire('Error', 'Please fill all required fields', 'error');
-    //         this.subscriberForm.markAllAsTouched();
-    //         return;
-    //     }
-
-    //     const username = sessionStorage.getItem('userName');
-
-    //     this.subscriberForm.patchValue({
-    //         EnteredBy: username,
-    //     });
-
-    //     const data = this.subscriberForm.value;
-
-    //     this.registrationApi
-    //         .InsertSubscriber(data)
-    //         .then((res: any) => {
-    //             if (res.success) {
-    //                 Swal.fire({
-    //                     position: 'center',
-    //                     icon: 'success',
-    //                     title: 'Subscriber inserted successfully',
-    //                     showConfirmButton: false,
-    //                     timer: 2000,
-    //                 });
-    //                 this.subscriberForm.reset();
-    //             } else {
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: 'Error',
-    //                     text: res?.message || 'Failed to insert subscriber',
-    //                 });
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Error',
-    //                 text:
-    //                     error?.error?.message ||
-    //                     error?.message ||
-    //                     'Something went wrong',
-    //             });
-    //         });
-    // }
-
-    // insertsubscriber() {
-    // debugger;
-    // if (this.subscriberForm.invalid) {
-    //     Swal.fire('Error', 'Please fill all required fields', 'error');
-    //     this.subscriberForm.markAllAsTouched();
-    //     return;
-    // }
-
-    // const username = sessionStorage.getItem('userName');
-
-    // this.subscriberForm.patchValue({
-    //     EnteredBy: username,
-    // });
-
-    // const dto: InsuranceSubscriberDTO = {
-    //     ...this.subscriberForm.value,
-    //     BirthDate: this.subscriberForm.value.BirthDate // ensure it’s in string format (e.g. ISO)
-    //         ? new Date(this.subscriberForm.value.BirthDate).toISOString()
-    //         : '',
-    //     policyList: this.patient?.policyList || [],
-    // };
-
-    // this.registrationApi.InsertSubscriber(dto)
-    //     .then((res: any) => {
-    //         if (res.success) {
-    //             Swal.fire({
-    //                 position: 'center',
-    //                 icon: 'success',
-    //                 title: 'Subscriber inserted successfully',
-    //                 showConfirmButton: false,
-    //                 timer: 2000,
-    //             });
-    //             this.subscriberForm.reset();
-    //         } else {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Error',
-    //                 text: res?.message || 'Failed to insert subscriber',
-    //             });
-    //         }
-    //     })
-    //     .catch((error) => {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Error',
-    //             text: error?.error?.message || error?.message || 'Something went wrong',
-    //         });
-    //     });
-    // }
-
     insertsubscriber() {
         debugger;
         this.isSubmitted = true;
@@ -811,16 +714,25 @@ export class CovrageCreateComponent implements OnInit {
         const IGPN = this.BLPayerPlan.find((e: any) => e.code == this.subscriberForm.value.selectedBLPayerPlan);
         const f = this.subscriberForm.value;
         const regInsert = (this.patient?.policyList || []).map((p: any) => ({
-            effectiveDate: p.effectiveDate,
-            terminationDate: p.terminationDate,
-            groupNo: p.groupNo || '',
-            noOfVisits: Number(p.noOfVisits) || 0,
-            amount: Number(p.amount) || 0,
-            status: p.status || ''
+            EffectiveDate: p?.effectiveDate ? new Date(p.effectiveDate).toISOString() : null,
+            TerminationDate: p?.terminationDate ? new Date(p.terminationDate).toISOString() : null,
+            GroupNo: p?.groupNo || null,
+            NoOfVisits: p?.noOfVisits != null && p.noOfVisits !== '' ? Number(p.noOfVisits) : null,
+            Amount: p?.amount != null && p.amount !== '' ? Number(p.amount) : null,
+            Status: typeof p?.status === 'boolean'
+                ? p.status
+                : (p?.status === 1 || p?.status === '1' || (p?.status || '').toString().toLowerCase() === 'active')
+                    ? true
+                    : (p?.status === 0 || p?.status === '0' || (p?.status || '').toString().toLowerCase() === 'inactive')
+                        ? false
+                        : null,
+            SubscriberId: Number(f.subscribedId) || 0,
+            IsDeleted: false,
+            InsuredPolicyId: 0,
         }));
 
         const dto: any = {
-            SubscriberID: Number(f.SubscriberID) || 0,
+            SubscriberID: Number(f.subscribedId) || 0,
             CarrierId: Number(f.CarrierId) || 0,
             InsuredIDNo: f.InsuredIdNo || '',
             InsuranceTypeCode: f.InsuranceTypeCode || '',
@@ -837,11 +749,12 @@ export class CovrageCreateComponent implements OnInit {
             InsuredPhone: f.InsuredPhone || '',
             OtherPhone: f.OtherPhone || '',
             Address1: f.Address1 || '',
-            Address2: f.Address2 || '',
+            Address2: f.Address2 || null,
             ZipCode: f.ZipCode || '',
             CityId: Number(f.CityId) || 0,
             StateId: Number(f.StateId) || 0,
             CountryId: Number(f.CountryId) || 0,
+            PayerPackageId:  Number(f.selectedBLPayerPackage) || 0, 
             Inactive: !!f.Inactive,
             EnteredBy: f.EnteredBy || username || '',
             Verified: !!f.Verified,
@@ -849,11 +762,12 @@ export class CovrageCreateComponent implements OnInit {
             Deductibles: Number(f.Deductibles) || 0,
             DNDeductible: Number(f.DNDeductible) || 0,
             OpCopay: Number(f.OpCopay) || 0,
-            MRNo: this.SearchPatientData?.table2[0]?.mrNo || 0,
+            MRNo: (this.SearchPatientData?.table2?.[0]?.mrNo != null ? String(this.SearchPatientData.table2[0].mrNo) : '') || '',
             CoverageOrder: Number(f.CoverageOrder) || 0,
             IsSelected: !!f.IsSelected,
-            PayerPackageId: Number(f.selectedBLPayerPackage) || null,
-            regInsert,
+            regInsurancePolicy: null ,
+            // regInsert
+            regDeduct: null,
         };
         debugger
 
@@ -1031,71 +945,104 @@ export class CovrageCreateComponent implements OnInit {
 
 
 async GetCoverageById(subscribedId: number) {
-    debugger
-  if (subscribedId != null) {
-    const sid = subscribedId
-    await this.CoveragesApiService.GetCoverageById(subscribedId)
-      .then(async (response: any) => {
-        if (response) {
-            const data = response?.table1[0];
-            this.subscriberForm.patchValue(data);
-
-            debugger
-            const surffix =this.titles.find((e: any) => e.code == data?.suffix)?.code;
-
-            const carrierCode = this.BLPayer.find((e: any) => e.name == data?.carrierName)?.code;
-            const CountryId = this.Country.find((e: any) => e.name == data?.countryName)?.code;
-            if(CountryId){
-                await this.registrationApi.getStateByCountry(CountryId).then((res: any) => {
-                    this.states = res;
-                });
-            }
-            const StateId = this.states.find((e: any) => e.name == data?.stateName)?.stateId;
-            if(StateId){
-                await this.registrationApi.getCityByState(StateId).then((res: any) => {
-                this.city = res;
-                });
-            }
-            const cityId = this.city.find((e: any) => e.name == data?.cityName)?.cityId;
-            const selectedBLPayerPlan = this.BLPayerPlan.find((e: any) => e.name == data?.insuredGroupOrPolicyName)?.code;
-            const BLPayerPackage = this.BLPayerPackage.find((e: any) => e.name == data?.payerPackageName)?.code;
-            const InsuranceRelation = this.InsuranceRelation.find((e: any) => e.name == data?.insuranceRel)?.id;
-
+    if (subscribedId != null) {
 
         this.subscriberForm.patchValue({
-            type: data?.type,
-            FirstName: data?.firstName,
-            MiddleName: data?.middleName,
-            LastName: data?.lastName,
-            Suffix: data?.suffix,
-            CompanyOrIndividual: data?.companyOrIndividual,
-            InsuredPhone: data?.insuredPhone,
-            // BirthDate: data?.birthDate ? new Date(data?.birthDate) : null,
-            BirthDate: data?.birthDate ? new Date(data.birthDate).toISOString().slice(0, 10) : null,
+            subscribedId: subscribedId,
+        });
+        
+        const sid = subscribedId
+        await this.CoveragesApiService.GetCoverageById(subscribedId)
+        .then(async (response: any) => {
+            if (response) {
+                const data = response?.table1?.[0] || {};
+                debugger
+            // Resolve Suffix (Title) code by name or code
+            const suffixCode = (() => {
+              const raw = data?.suffix || '';
+              const byCode = this.titles?.find((t: any) => t.code == raw)?.name;
+              if (byCode) return byCode;
+              const byName = this.titles?.find((t: any) => (t.name || '').toLowerCase() === (raw || '').toLowerCase())?.name;
+              return byName || null;
+            })();
 
-            Address1: data?.address1,
-            selectedBLPayerPlan: selectedBLPayerPlan || null,
-            Sex: data?.sex,
-            CarrierId: carrierCode || null,
-            CountryId: CountryId || null,
-            CityId: cityId || null,
-            StateId: StateId || null,
-            InsuranceRelation: InsuranceRelation || null,
-            selectedBLPayerPackage: BLPayerPackage || null,
+            // Resolve Gender code by name
+            const sexCode = (() => {
+              const raw = data?.sex || '';
+              const byCode = this.genders?.find((g: any) => g.code == raw)?.name;
+              if (byCode) return byCode;
+              const byName = this.genders?.find((g: any) => (g.name || '').toLowerCase() === (raw || '').toLowerCase())?.name;
+              return byName || null;
+            })();   
 
-            InsuredIdNo: data?.insuredIdNo,
-            OpCopay: data?.opCopay,
-            IpCopay: data?.ipCopay,
-            ZipCode: data?.zipCode,
-            InsuranceRel: data?.insuranceRel,
-            SubscriberId: data?.subscriberId,
-            InsuredIDNo: data?.insuredIDNo,
-            InsuranceTypeCode: data?.insuranceTypeCode,
-            InsuredGroupOrPolicyNo: data?.insuredGroupOrPolicyNo,
-            Relationship: data?.relationship,
+            // Resolve Carrier by name -> code
+            const carrierCode = this.BLPayer?.find((e: any) => (e.name || '').toLowerCase() === (data?.carrierName || '').toLowerCase())?.code || null;
 
+            // Country -> States -> Cities resolution
+            const CountryId = this.Country?.find((e: any) => (e.name || '').toLowerCase() === (data?.countryName || '').toLowerCase())?.code || null;
+            let StateId: number | null = null;
+            let CityId: number | null = null;
+            if (CountryId) {
+              await this.registrationApi.getStateByCountry(CountryId).then((res: any) => {
+                this.states = res || [];
+              });
+              StateId = this.states?.find((e: any) => (e.name || '').toLowerCase() === (data?.stateName || '').toLowerCase())?.stateId || null;
+              if (StateId) {
+                await this.registrationApi.getCityByState(StateId).then((res: any) => {
+                  this.city = res || [];
+                });
+                CityId = this.city?.find((e: any) => (e.name || '').toLowerCase() === (data?.cityName || '').toLowerCase())?.cityId || null;
+              }
+            }
 
-          });
+            // Plan and package codes
+            const selectedBLPayerPlan = this.BLPayerPlan?.find((e: any) => (e.name || '').toLowerCase() === (data?.insuredGroupOrPolicyName || '').toLowerCase())?.code || null;
+            const selectedBLPayerPackage = this.BLPayerPackage?.find((e: any) => (e.code) === (data?.payerPackageId ))?.code || null;
+
+            // Relationship id by name
+            const relationId = this.InsuranceRelation?.find((e: any) => (e.name || '').toLowerCase() === (data?.insuranceRel || '').toLowerCase())?.id || null;
+
+            // CompanyOrIndividual mapping (fallback)
+            // UI expects '1' Self, '2' Relationship; API sends 'Person' or 'Company'
+            const companyOrIndividual = (() => {
+              const raw = (data?.companyOrIndividual || '').toString().toLowerCase();
+              if (raw === 'person') return '2';
+              if (raw === 'company') return '1';
+              return this.subscriberForm.get('CompanyOrIndividual')?.value || '2';
+            })();
+
+            // Normalize BirthDate -> yyyy-MM-dd
+            const birthDate = data?.birthDate ? new Date(data.birthDate).toISOString().slice(0, 10) : null;
+
+            // Member/Insured ID normalization
+            const insuredId = (data?.insuredIDNo || data?.insuredIdNo || '').toString();
+
+            // Patch the form with resolved IDs and values
+            this.subscriberForm.patchValue({
+              FirstName: data?.firstName || '',
+              MiddleName: data?.middleName || '',
+              LastName: data?.lastName || '',
+              Suffix: suffixCode,
+              CompanyOrIndividual: companyOrIndividual,
+              InsuranceRel: relationId,
+              InsuredPhone: data?.insuredPhone || '',
+              BirthDate: birthDate,
+              Address1: data?.address1 || '',
+              ZipCode: (data?.zipCode || '').trim(),
+              Sex: sexCode,
+              CarrierId: carrierCode,
+              CountryId: CountryId,
+              StateId: StateId,
+              CityId: CityId,
+              selectedBLPayerPlan: selectedBLPayerPlan,
+              selectedBLPayerPackage: selectedBLPayerPackage,
+              Inactive: data?.inactive || false,
+              InsuredIdNo: insuredId,
+              OpCopay: data?.opCopay ?? null,
+              Deductibles: data?.deductibles ?? null,
+              Copay: data?.copay ?? null,
+              DNDeductible: data?.dnDeductible ?? null,
+            });
         }
       })
       .catch((error: any) => {
