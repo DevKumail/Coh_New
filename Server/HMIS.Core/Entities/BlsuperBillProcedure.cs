@@ -194,9 +194,9 @@ public partial class BlsuperBillProcedure
     public long? AppointmentId { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("BlsuperBillProcedures")]
+    [InverseProperty("BlsuperBillProcedure")]
     public virtual SchAppointment? Appointment { get; set; }
 
     [InverseProperty("Procedure")]
-    public virtual ICollection<PatientBill> PatientBills { get; set; } = new List<PatientBill>();
+    public virtual ICollection<PatientBill> PatientBill { get; set; } = new List<PatientBill>();
 }

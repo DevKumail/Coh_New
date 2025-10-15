@@ -3,6 +3,7 @@ import { LoaderComponent } from './../../../../components/loader/loader.componen
 import { Demographic } from './../../../../shared/Models/registration/Demographics/Demographic.model';
 import { DemographicApiServices } from './../../../../shared/Services/Demographic/demographic.api.serviec';
 import { Component } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 import {
     FormBuilder,
     FormGroup,
@@ -21,7 +22,11 @@ import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { HasPermissionDirective } from '@/app/shared/directives/has-permission.directive';
-
+import { LucideAngularModule, LucideHome, LucideChevronRight, LucideUsers, LucideFilter, LucideFilterX, LucideUserPlus, LucideEdit, LucideTrash2 } from 'lucide-angular';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { SecureStorageService } from '@core/services/secure-storage.service';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 
 @Component({
@@ -33,10 +38,26 @@ import { HasPermissionDirective } from '@/app/shared/directives/has-permission.d
         RouterModule,
         NgIconComponent,
         NgIcon,
+        TranslatePipe,
+        LucideAngularModule,
         HasPermissionDirective,
+        GenericPaginationComponent,
+        FilledOnValueDirective
     ],
     templateUrl: './demographic-list.component.html',
     styleUrl: './demographic-list.component.scss',
+    animations: [
+      trigger('slideFade', [
+        transition(':enter', [
+          style({ height: 0, opacity: 0, overflow: 'hidden' }),
+          animate('250ms ease-out', style({ height: '*', opacity: 1 }))
+        ]),
+        transition(':leave', [
+          style({ height: '*', opacity: 1, overflow: 'hidden' }),
+          animate('200ms ease-in', style({ height: 0, opacity: 0 }))
+        ])
+      ])
+    ]
 })
 
 export class DemographicListComponent {
@@ -44,14 +65,26 @@ export class DemographicListComponent {
     public router: Router,
     public DemographicApiServices: DemographicApiServices,
     public Loader : LoaderService,
+    private secureStorage: SecureStorageService,
+    
   ) {}
+
+  // lucide-angular icons for breadcrumb, heading and actions
+  protected readonly homeIcon = LucideHome;
+  protected readonly chevronRightIcon = LucideChevronRight;
+  protected readonly headingIcon = LucideUsers;
+  protected readonly filterIcon = LucideFilter;
+  protected readonly filterOffIcon = LucideFilterX;
+  protected readonly addIcon = LucideUserPlus;
+  protected readonly editIcon = LucideEdit;
+  protected readonly deleteIcon = LucideTrash2;
 
   Patient: any[] = [];
   pagedPatients: any[] = [];
   RegPatient: any[] = [];
   genders: any[] = [];
   loader: any
-
+  isAppointmentFiltered: boolean = false;
   pageSize = 25;
   currentPage = 1;
   totalRecord = 0;
@@ -67,6 +100,8 @@ export class DemographicListComponent {
   cancelpopup: boolean = false;
   position: string = '';
   selectedGender: any | undefined;
+  DemographicsPagedData: any[] = [];
+  DemographicsTotalItems: any;
 
   FilterData: any = {
     mrNo: '',
@@ -76,7 +111,7 @@ export class DemographicListComponent {
   };
 
   PaginationInfo: any = {
-    RowsPerPage: 5,
+    RowsPerPage: 10,
     Page: 1,
   };
 
@@ -103,16 +138,6 @@ export class DemographicListComponent {
     // this.GetCoverageAndRegPatient(this.FilterData);
   }
 
-  // reloadData() {
-  //   const Demographicsinfo = localStorage.getItem('Demographics');
-  //   if (Demographicsinfo) {
-  //     const Demographics = JSON.parse(Demographicsinfo);
-  //     this.mrNo = Demographics.table2[0]?.mrNo || '';
-  //   }
-  //   this.GetAllRegPatient(this.mrNo);
-  //   this.clearFilter();
-  // }
-
   GetAllRegPatient(MRNo: string) {
     this.DemographicApiServices.GetRegPatientList()
       .then((res: any) => {
@@ -124,34 +149,6 @@ export class DemographicListComponent {
         Swal.fire({ icon: 'error', title: 'Rejected', text: error.message });
       });
   }
-
-//   GetCoverageAndRegPatient(req: any) {
-//     this.load = true;
-//     this.PaginationInfo.RowsPerPage = this.pageSize;
-//     this.PaginationInfo.Page = this.currentPage;
-
-//     this.DemographicApiServices.GetAllDemographicsData(
-//       req,
-//       this.PaginationInfo
-//     ).subscribe({
-//       next: (demographics: any) => {
-//         if (demographics?.table1) {
-//           this.Patient = demographics.table1;
-//           this.pagedPatients = this.Patient; // backend returns current page
-//           this.totalRecord = demographics.table2?.[0]?.totalCount || 0;
-//           this.RegPatient = demographics.table2 || [];
-//         }
-
-//         this.updatePagination();
-//         this.load = false;
-//       },
-//       error: (error: any) => {
-//         this.load = false;
-//         Swal.fire({ icon: 'error', title: 'Rejected', text: error.message });
-//       },
-//     });
-//   }
-
 
   clearFilter() {
     this.FilterData = {
@@ -200,10 +197,23 @@ export class DemographicListComponent {
   }
 
   editPatient(patient: any) {
-    this.router.navigate(['/registration/demographic-create'], //{
-    {
-    state: { patient },
-  });
+
+        // Derive a stable appointment id and persist as fallback for refresh
+    const patientId: number = Number(patient?.patientId ?? patient?.patientId ?? 0);
+    if (patientId) {
+      this.secureStorage.setItem('demographicEditId', String(patientId));
+    }
+    // Navigate using Router state (hide id from URL) and include full object for convenience
+    this.router.navigate(['/registration/demographic-create'], {
+      state: { patientId, patient },
+    });
+
+
+
+  //   this.router.navigate(['/registration/demographic-create'], //{
+  //   {
+  //   state: { patient },
+  // });
   }
 
   Remove(e: Event, Id: number, position: string) {
@@ -240,73 +250,18 @@ export class DemographicListComponent {
   }
 
 
-DemographicsPagedData: any[] = [];
-DemographicsCurrentPage = 1;
-DemographicsPageSize = 10;
-DemographicsTotalItems = 0;
-
-get DemographicsTotalPages(): number {
-  return Math.ceil(this.DemographicsTotalItems / this.DemographicsPageSize);
-}
-
-get DemographicsStart(): number {
-  return (this.DemographicsCurrentPage - 1) * this.DemographicsPageSize;
-}
-
-get DemographicsEnd(): number {
-  return Math.min(this.DemographicsStart + this.DemographicsPageSize, this.DemographicsTotalItems);
-}
-
-get DemographicsPageNumbers(): (number | string)[] {
-  const total = this.DemographicsTotalPages;
-  const current = this.DemographicsCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1);
-  if (left > 2) range.push('...');
-  for (let i = left; i <= right; i++) range.push(i);
-  if (right < total - 1) range.push('...');
-  if (total > 1) range.push(total);
-
-  return range;
-}
-
-DemographicsGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.DemographicsTotalPages) return;
-  this.DemographicsCurrentPage = page;
-  this.DemographicsFetchData(this.FilterData);
-}
-
-DemographicsNextPage() {
-  if (this.DemographicsCurrentPage < this.DemographicsTotalPages) {
-    this.DemographicsCurrentPage++;
-    this.DemographicsFetchData(this.FilterData);
-  }
-}
-
-DemographicsPrevPage() {
-  if (this.DemographicsCurrentPage > 1) {
-    this.DemographicsCurrentPage--;
-    this.DemographicsFetchData(this.FilterData);
-  }
-}
 
 async DemographicsFetchData(req: any) {
     debugger
   this.Loader.show();
-  const paginationInfo = {
-    Page: this.DemographicsCurrentPage,
-    RowsPerPage: this.DemographicsPageSize
-  };
 
-  await this.DemographicApiServices.GetAllDemographicsData(req, paginationInfo).subscribe({
+ // Set filter flag based on FilterData
+  this.isAppointmentFiltered = Object.values(this.FilterData).some(
+    (value) => value !== '' && value !== null && value !== undefined
+  );
+  await this.DemographicApiServices.GetAllDemographicsData(req, this.PaginationInfo).subscribe({
     next: (response: any) => {
       this.DemographicsPagedData = response?.table1 || [];
-      console.log( 'this.DemographicsPagedData =>',this.DemographicsPagedData);
 
       this.DemographicsTotalItems = response?.table2?.[0]?.totalCount || 0;
       this.RegPatient = response.table2 || [];
@@ -319,12 +274,19 @@ async DemographicsFetchData(req: any) {
   });
 }
 
-onDemographicsPageSizeChange(event: any) {
-  this.DemographicsPageSize = +event.target.value;
-  this.DemographicsCurrentPage = 1; // Reset to first page
-  debugger
-  this.DemographicsFetchData(this.FilterData);
-}
+
+  get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
+  }
+
+   async onDemographicPageChanged(page: number) {
+    this.PaginationInfo.Page = page;
+    this.DemographicsFetchData(this.FilterData);
+    }
 
 }
 

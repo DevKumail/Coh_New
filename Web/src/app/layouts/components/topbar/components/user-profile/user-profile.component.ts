@@ -6,6 +6,7 @@ import {NgIcon} from '@ng-icons/core';
 import Swal from 'sweetalert2';
 
 import { AuthService } from '@core/services/auth.service';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 @Component({
   selector: 'app-user-profile-topbar',
@@ -14,7 +15,8 @@ import { AuthService } from '@core/services/auth.service';
     NgbDropdownMenu,
     NgbDropdownToggle,
     RouterLink,
-    NgIcon
+    NgIcon,
+    TranslatePipe
   ],
   templateUrl: './user-profile.component.html'
 })
@@ -61,6 +63,11 @@ export class UserProfileComponent {
         allowOutsideClick: false
     }).then((result) => {
         if (result.isConfirmed) {
+          caches.keys().then(names => {
+            return Promise.all(
+              names.map(name => caches.delete(name))
+            );
+          });
             this.executeLogout();
         }
     });

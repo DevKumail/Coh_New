@@ -1,0 +1,16 @@
+export enum Roles {
+  Provider = 1,
+  Administrator = 2,
+  FrontDesk = 3,
+  Biller = 4,
+  Accountant = 5,
+  Scheduler = 6,
+  Nurse = 7,
+  Transcriptionist = 8,
+  Anesthetist = 9,
+  MedicalRecord = 10,
+  WebPortal = 11,
+  RCM = 12,
+  Pharmacist = 13,
+  Technical = 14,
+}

@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [PrimaryKey("Mrno", "RelationCode", "SubscriberId", "CoverageOrder")]
-[Table("InsuredCoverage")]
 public partial class InsuredCoverage
 {
     [Key]

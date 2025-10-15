@@ -3,51 +3,61 @@
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
                 <ng-icon name="tablerSmartHome"></ng-icon>
-                Clinical
+                {{ 'CLINICAL' | translate }}
             </a>
         </li>
         <li
             class="d-flex align-items-center text-muted mx-1"
             aria-current="page"
         >
-            <ng-icon name="tablerChevronRight"></ng-icon>
+         <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
         </li>
-        <li class="breadcrumb-item active" aria-current="page">Vital Sings</li>
+    <li class="breadcrumb-item active" aria-current="page">{{ 'VITAL_SIGNS' | translate }}</li>
     </ol>
 </nav>
 
-<div class="card p-4 shadow">
-    <form [formGroup]="vitalSignsForm" (ngSubmit)="onSubmit()">
+    <form *ngIf="vitalSignsForm" [formGroup]="vitalSignsForm" (ngSubmit)="onSubmit()">
+          <div class="card shadow-lg rounded-3 border-0">
+          <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
+        <lucide-angular [img]="headingIcon" class="fs-5"></lucide-angular>
+  <span>{{ 'VITAL_SIGNS' | translate }}</span>
+      </h5>
+      <i class="bi bi-heart-pulse fs-4"></i>
+    </div>
+        <div class="card-body">
         <div class="row">
             <div class="col-sm-3">
-                <label>Date <span class="text-danger">*</span></label>
+                <label>{{ 'ENTERED_DATE' | translate }} <span class="text-danger">*</span></label>
                 <input
                     type="text"
                     class="form-control"
                     formControlName="entryDate"
                     id="entryDate"
-                    placeholder="Select date"
+                    placeholder="{{ 'SELECT_DATE' | translate }}"
                     data-provider="flatpickr"
                 />
+                <div class="text-danger small" *ngIf="vitalSignsForm.get('entryDate')?.touched && vitalSignsForm.get('entryDate')?.invalid">
+                {{'ENTERED_DATE_IS_REQUIRED' | translate }}
+                </div>
             </div>
 
             <!-- Daily Start Time -->
             <div class="col-sm-3">
-                <label
-                    >Daily Start Time <span class="text-danger">*</span></label
-                >
+                <label>{{ 'DAILY_START_TIME' | translate }} <span class="text-danger">*</span></label>
                 <input
                     type="time"
                     class="form-control"
                     formControlName="dailyStartTime"
                 />
+                <div class="text-danger small" *ngIf="vitalSignsForm.get('dailyStartTime')?.touched && vitalSignsForm.get('dailyStartTime')?.invalid">
+                    {{'DAILY_START_TIME_IS_REQUIRED' | translate }}
+                </div>
             </div>
 
             <!-- Systolic -->
             <div class="col-sm-3">
-                <label
-                    >Systolic (mmHg) <span class="text-danger">*</span></label
-                >
+                <label>{{ 'SYSTOLIC' | translate }} (mmHg) <span class="text-danger">*</span></label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -55,15 +65,16 @@
                         formControlName="bpSystolic"
                         min="0"
                         max="300"
+                        placeholder="{{ 'ENTER_SYSTOLIC' | translate }}"
                     />
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('bpSystolic')?.touched && vitalSignsForm.get('bpSystolic')?.invalid">
+                        {{ 'SYSTOLIC_REQUIRED' | translate }}</div>
                 </div>
             </div>
 
             <!-- Diastolic -->
             <div class="col-sm-3">
-                <label
-                    >Diastolic (mmHg) <span class="text-danger">*</span></label
-                >
+                <label>{{ 'DIASTOLIC' | translate }} (mmHg) <span class="text-danger">*</span></label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -71,16 +82,16 @@
                         formControlName="bpDiastolic"
                         min="0"
                         max="200"
+                        placeholder="{{ 'ENTER_DIASTOLIC' | translate }}"
                     />
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('bpDiastolic')?.touched && vitalSignsForm.get('bpDiastolic')?.invalid">
+                        {{ 'DIASTOLIC_REQUIRED' | translate }}</div>
                 </div>
             </div>
 
             <!-- Heart Rate -->
             <div class="col-sm-3">
-                <label
-                    >Heart Rate (Beats/minute)
-                    <span class="text-danger">*</span></label
-                >
+                <label>{{ 'HEART_RATE' | translate }} (Beats/minute) <span class="text-danger">*</span></label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -88,15 +99,16 @@
                         formControlName="heartRate"
                         min="0"
                         max="200"
+                        placeholder="{{ 'ENTER_HEART_RATE' | translate }}"
                     />
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('heartRate')?.touched && vitalSignsForm.get('heartRate')?.invalid">
+                        {{ 'HEART_RATE_REQUIRED' | translate }}</div>
                 </div>
             </div>
 
             <!-- Respiration Rate -->
             <div class="col-sm-3">
-                <label
-                    >Respiration Rate <span class="text-danger">*</span></label
-                >
+                <label>{{ 'RESPIRATION_RATE' | translate }} <span class="text-danger">*</span></label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -104,15 +116,16 @@
                         formControlName="respirationRate"
                         min="0"
                         max="100"
+                        placeholder="{{ 'ENTER_RESPIRATION_RATE' | translate }}"
                     />
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('respirationRate')?.touched && vitalSignsForm.get('respirationRate')?.invalid">
+                        {{ 'RESPIRATION_RATE_REQUIRED' | translate }}</div>
                 </div>
             </div>
 
             <!-- Temperature -->
             <div class="col-sm-3">
-                <label
-                    >Temperature (°F) <span class="text-danger">*</span></label
-                >
+                <label>{{ 'TEMPERATURE' | translate }} (°F) <span class="text-danger">*</span></label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -120,13 +133,16 @@
                         formControlName="temperature"
                         min="0"
                         max="150"
+                        placeholder="{{ 'ENTER_TEMPERATURE' | translate }}"
                     />
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('temperature')?.touched && vitalSignsForm.get('temperature')?.invalid">
+                        {{ 'TEMPERATURE_REQUIRED' | translate }}</div>
                 </div>
             </div>
 
             <!-- Weight -->
             <div class="col-sm-3">
-                <label>Weight (kgs) <span class="text-danger">*</span></label>
+                <label>{{ 'WEIGHT' | translate }} (kgs) <span class="text-danger">*</span></label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -134,13 +150,16 @@
                         formControlName="weight"
                         min="0"
                         max="300"
+                        placeholder="{{ 'ENTER_WEIGHT' | translate }}"
                     />
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('weight')?.touched && vitalSignsForm.get('weight')?.invalid">
+                        {{ 'WEIGHT_REQUIRED' | translate }}</div>
                 </div>
             </div>
 
             <!-- Height -->
             <div class="col-sm-3">
-                <label>Height (cms) <span class="text-danger">*</span></label>
+                <label>{{ 'HEIGHT' | translate }} (cms) <span class="text-danger">*</span></label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -148,13 +167,16 @@
                         formControlName="height"
                         min="0"
                         max="300"
+                        placeholder="{{ 'ENTER_HEIGHT' | translate }}"
                     />
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('height')?.touched && vitalSignsForm.get('height')?.invalid">
+                        {{ 'HEIGHT_REQUIRED' | translate }}</div>
                 </div>
             </div>
 
             <!-- BMI -->
             <div class="col-sm-3">
-                <label>BMI <span class="text-danger">*</span></label>
+                <label>{{ 'BMI' | translate }} <span class="text-danger">*</span></label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -162,13 +184,16 @@
                         formControlName="bmi"
                         min="0"
                         max="100"
+                        placeholder="{{ 'ENTER_BMI' | translate }}"
                     />
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('bmi')?.touched && vitalSignsForm.get('bmi')?.invalid">
+                        {{ 'BMI_REQUIRED' | translate }}</div>
                 </div>
             </div>
 
             <!-- SPO2 -->
             <div class="col-sm-3">
-                <label>SPO2 (%) <span class="text-danger">*</span></label>
+                <label>{{ 'SPO2' | translate }} (%) <span class="text-danger">*</span></label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -176,15 +201,16 @@
                         formControlName="spo2"
                         min="0"
                         max="100"
+                        placeholder="{{ 'ENTER_SPO2' | translate }}"
                     />
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('spo2')?.touched && vitalSignsForm.get('spo2')?.invalid">
+                        {{ 'SPO2_REQUIRED' | translate }}</div>
                 </div>
             </div>
 
             <!-- Glucose -->
             <div class="col-sm-3">
-                <label
-                    >Glucose (mg/dl) <span class="text-danger">*</span></label
-                >
+                <label>{{ 'GLUCOSE' | translate }} (mg/dl) <span class="text-danger">*</span></label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -192,68 +218,77 @@
                         formControlName="glucose"
                         min="0"
                         max="400"
+                        placeholder="{{ 'ENTER_GLUCOSE' | translate }}"
                     />
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('glucose')?.touched && vitalSignsForm.get('glucose')?.invalid">
+                        {{ 'GLUCOSE_REQUIRED' | translate }}</div>
                 </div>
             </div>
 
             <!-- Comment -->
             <div class="col-sm-3 mb-3">
-                <label>Comment <span class="text-danger">*</span></label>
+                <label>{{ 'COMMENT' | translate }} <span class="text-danger">*</span></label>
                 <input
                     type="text"
                     class="form-control"
                     formControlName="comment"
-                    placeholder="Enter your comment"
+                    placeholder="{{ 'ENTER_COMMENT_HERE...' | translate }}"
                 />
+                <div class="text-danger small" *ngIf="vitalSignsForm.get('comment')?.touched && vitalSignsForm.get('comment')?.invalid">{{ 'COMMENT_REQUIRED' | translate }}</div>
             </div>
         </div>
+        <!-- buttons on their own row -->
+        <div class="row">
+            <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+              <button
+                  class="btn btn-primary"
+                  type="submit"
+                  [disabled]="isSubmitting"
+              >
+                      <span *ngIf="isSubmitting">
+                      <span
+                          class="spinner-border spinner-border-sm me-1 ms-1"
+                          role="status"
+                          aria-hidden="true"
+                      ></span>
+                      {{ 'SUBMITTING' | translate }}
+                  </span>
+                  <span *ngIf="!isSubmitting">{{ 'SUBMIT' | translate }}</span>
+              </button>
 
-        <button
-            class="btn btn-primary mt-3"
-            type="submit"
-            [disabled]="isSubmitting"
-        >
-            <span *ngIf="isSubmitting">
-                <span
-                    class="spinner-border spinner-border-sm me-1"
-                    role="status"
-                    aria-hidden="true"
-                ></span>
-                Submitting...
-            </span>
-            <span *ngIf="!isSubmitting">Submit</span>
-        </button>
+              <button type="button" class="btn btn-light" (click)="clearForm()" [disabled]="isSubmitting">
+                  {{ 'CLEAR' | translate }}
+              </button>
+            </div>
+        </div>
+        </div>
+        </div>
     </form>
-</div>
 <!-- 👇 Grid/Card Starts -->
 <div class="card p-3 mt-4 shadow-sm">
-    <div class="card-header">
-        <h5 class="mb-0">Vital Signs List</h5>
-    </div>
-
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered table-hover">
-                <thead class="table-light">
+                <thead>
                     <tr>
-                        <th>Date</th>
+                        <th>{{ 'DATE' | translate }}</th>
                         <!-- <th>Time</th> -->
-                        <th>Temp (°F)</th>
-                        <th>Pulse</th>
-                        <th>Resp. Rate</th>
-                        <th>BP (Sys/Dia)</th>
-                        <th>O2 Sat (%)</th>
-                        <th>Height (cm)</th>
-                        <th>Weight (kg)</th>
+                        <th>{{ 'TEMP_F' | translate }}</th>
+                        <th>{{ 'PULSE' | translate }}</th>
+                        <th>{{ 'RESP_RATE' | translate }}</th>
+                        <th>{{ 'BP_SYS_DIA' | translate }}</th>
+                        <th>{{ 'O2_SAT' | translate }}</th>
+                        <th>{{ 'HEIGHT_CM' | translate }}</th>
+                        <th>{{ 'WEIGHT_KG' | translate }}</th>
                         <!-- <th>BMI</th>
                          <th>Glucose</th> -->
                         <!-- <th>Comment</th> -->
-                        <th>Action</th>
+                        <th>{{ 'ACTION' | translate }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let vital of pagedvital; let i = index">
-                        <td>{{ vital.entryDate }}</td>
+                        <td>{{ vital.entryDate | date: 'dd/MM/yyyy' }}</td>
                         <!-- <td>{{ vital.dailyStartTime }}</td> -->
                         <td>{{ vital.temperature || "N/A" }}</td>
                         <td>{{ vital.heartRate || "N/A" }}</td>

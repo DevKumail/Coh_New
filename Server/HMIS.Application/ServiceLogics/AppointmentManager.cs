@@ -40,65 +40,99 @@ namespace HMIS.Application.ServiceLogics
             Configuration = configuration;
         }
 
-        public async Task<DataSet> SearchAppointmentDB(DateTime FromDate, DateTime ToDate, int? ProviderID, int? LocationID, int? SpecialityID, int? SiteID, int? FacilityID, int? ReferredProviderId, long? PurposeOfVisitId, int? AppTypeId, int? VisitTypeId, string? LastUpdatedBy, List<int> AppStatusId, int? Page, int? Size)
+        public async Task<DataSet> SearchAppointmentDB(
+             DateTime? FromDate,
+             DateTime? ToDate,
+             int? ProviderID,
+             int? LocationID,
+             int? SpecialityID,
+             int? SiteID,
+             int? FacilityID,
+             int? ReferredProviderId,
+             long? PurposeOfVisitId,
+             int? AppTypeId,
+             int? VisitTypeId,
+             string? LastUpdatedBy,
+             //[FromQuery(Name = "ids")] 
+             [FromQuery] List<int>? AppStatusIds,
+             bool? ShowScheduledAppointmentOnly,
+             int? Page, int? Size)
         {
             try
             {
-                ProviderID = -1;
-                LocationID = -1;
-                SpecialityID = -1;
-                SiteID = -1;
-                FacilityID = -1;
-                ReferredProviderId = -1;
-                PurposeOfVisitId = -1;
-                AppTypeId = -1;
-                Page = 0;
-                Size = 200;
+                // ✅ Handle Null/Numeric Params (default = -1)
+                ProviderID ??= -1;
+                LocationID ??= -1;
+                SpecialityID ??= -1;
+                SiteID ??= -1;
+                FacilityID ??= -1;
+                ReferredProviderId ??= -1;
+                PurposeOfVisitId ??= -1;
+                AppTypeId ??= -1;
+                VisitTypeId ??= -1;
 
+                // ✅ Handle Paging
+                Page ??= 1;
+                Size ??= 10;
 
-
-                //DataTable AppStatusIdDT = new DataTable();
-                //AppStatusIdDT.Columns.Add("ID", typeof(int));
-
-                //// Populate the DataTable with the list values
-                //foreach (int id in AppStatusId)
-                //{
-                //    AppStatusIdDT.Rows.Add(id);
-                //}
-
+                // ✅ Convert Status IDs to comma separated string
+                string? statusIdsCsv = (AppStatusIds != null && AppStatusIds.Any())
+                    ? string.Join(",", AppStatusIds)
+                    : null;
 
                 DynamicParameters param = new DynamicParameters();
-                //param.Add("@FromDate", FromDate, DbType.DateTime);
-                //param.Add("@ToDate", ToDate, DbType.DateTime);
+
+                string FROMD = FromDate?.ToString("yyyy-MM-dd");
+                
+                DateTime CFROMD = Convert.ToDateTime(FROMD);
+
+                // ✅ Date Handling
+                if (FromDate == DateTime.MinValue || FromDate == null)
+                    param.Add("@FromDate", DBNull.Value, DbType.DateTime);
+                else
+                    param.Add("@FromDate", FromDate, DbType.DateTime);
+
+                if (ToDate == DateTime.MinValue || ToDate == null)
+
+                    param.Add("@ToDate", DBNull.Value, DbType.DateTime);
+                else
+                ToDate = ToDate.Value.Date.AddDays(1).AddSeconds(-1); // 23:59:59
+                param.Add("@ToDate", ToDate, DbType.DateTime);
+
+                // ✅ Normal Params
                 param.Add("@ProviderId", ProviderID, DbType.Int64);
                 param.Add("@LocationId", LocationID, DbType.Int64);
                 param.Add("@SpecialityId", SpecialityID, DbType.Int64);
                 param.Add("@SiteId", SiteID, DbType.Int64);
                 param.Add("@FacilityID", FacilityID, DbType.Int64);
-
                 param.Add("@ReferredProviderId", ReferredProviderId, DbType.Int64);
                 param.Add("@PurposeOfVisitId", PurposeOfVisitId, DbType.Int64);
                 param.Add("@AppTypeId", AppTypeId, DbType.Int64);
                 param.Add("@VisitTypeId", VisitTypeId, DbType.Int64);
-                param.Add("@AppTypeId", AppTypeId, DbType.Int64);
                 param.Add("@LastUpdatedBy", LastUpdatedBy, DbType.String);
-                //param.Add("@AppStatusIdTypeVar", AppStatusIdDT.AsTableValuedParameter("dbo.AppStatusIdTableType"));
-                param.Add("@PagingSize", Size, DbType.Int64);
-                param.Add("@OffsetValue", Page, DbType.Int64);
+
+                // ✅ New Params (IDs as string & ShowScheduled flag)
+                param.Add("@AppStatusIds", statusIdsCsv, DbType.String);
+                param.Add("@ShowScheduledAppointmentOnly", ShowScheduledAppointmentOnly ?? false, DbType.Boolean);
+
+                // ✅ Paging
+                param.Add("@PagingSize", Size, DbType.Int32);
+                param.Add("@OffsetValue", (Page - 1) * Size, DbType.Int32);
+
+                // ✅ Call SP
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("SchAppointmentsLoad", param);
+
                 if (ds.Tables[0].Rows.Count == 0)
-                {
                     throw new Exception("No data found");
-                }
 
                 return ds;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new DataSet();
             }
-
         }
+
 
         public async Task<DataSet> GetAppointmentDetailsDB(long VisitAccountNo)
         {
@@ -163,11 +197,11 @@ namespace HMIS.Application.ServiceLogics
                 {
 
                     long? getPlanId = null;
-                    var getpurposeofvisit = _context.ProblemLists.Where(x => x.ProblemId == schApp.PurposeOfVisitId).FirstOrDefault().ProblemName;
-                    var EmployeeId = _context.Hremployees.Where(x => x.UserName == schApp.EmployeeId).FirstOrDefault();
+                    var getpurposeofvisit = _context.ProblemList.Where(x => x.ProblemId == schApp.PurposeOfVisitId).FirstOrDefault().ProblemName;
+                    var EmployeeId = _context.Hremployee.Where(x => x.EmployeeId == schApp.EmployeeId).FirstOrDefault();
                     if (schApp.PlanId != null)
                     {
-                        getPlanId = _context.BlpayerPlans.Where(x => x.PlanId == schApp.PlanId.ToString()).FirstOrDefault().Id;
+                        getPlanId = _context.BlpayerPlan.Where(x => x.PlanId == schApp.PlanId.ToString()).FirstOrDefault().Id;
                     }
 
                     Core.Entities.SchAppointment schAppointment = new Core.Entities.SchAppointment();
@@ -176,7 +210,13 @@ namespace HMIS.Application.ServiceLogics
                     schAppointment.Mrno = schApp.MRNo;
                     schAppointment.VisitTypeId = schApp.VisitTypeId;
                     schAppointment.AppId = (long)schApp.AppId;
-                    schAppointment.AppDateTime = Convert.ToDateTime(schApp.date + " " + schApp.time); //schApp.AppDateTime,
+                    //schAppointment.AppDateTime = schApp.AppDateTime; // Convert.ToDateTime(schApp.date + " " + schApp.time);  
+                    string dateTimeString = schApp.date + " " + schApp.time;
+                    schAppointment.AppDateTime = DateTime.ParseExact(
+                        dateTimeString,
+                        "yyyy-MM-dd hh:mm tt",
+                        CultureInfo.InvariantCulture
+                    );
                     schAppointment.Duration = schApp.Duration;
                     schAppointment.AppNote = schApp.AppNote;
                     schAppointment.SiteId = schApp.SiteId;
@@ -205,7 +245,6 @@ namespace HMIS.Application.ServiceLogics
                     schAppointment.UserCheckOut = schApp.UserCheckOut;
                     schAppointment.PurposeOfVisitId = schApp.PurposeOfVisitId;
                     schAppointment.PurposeOfVisit = getpurposeofvisit;
-
                     schAppointment.PatientNotifiedId = schApp.PatientNotifiedId;
                     schAppointment.RescheduledId = schApp.RescheduledID;
                     schAppointment.ByProvider = schApp.ByProvider;
@@ -218,16 +257,24 @@ namespace HMIS.Application.ServiceLogics
                     schAppointment.PatientBalance = schApp.PatientBalance;
                     schAppointment.PlanBalance = schApp.PlanBalance;
                     schAppointment.PlanCopay = schApp.PlanCopay;
-                    schAppointment.EmployeeId = EmployeeId.EmployeeId;
+                    schAppointment.EmployeeId = schApp.EmployeeId;
                     schAppointment.PlanId = getPlanId;
                     schAppointment.PatientId = schApp.PatientId;
                     schAppointment.PayerId = schApp.PayerId;
+                    schAppointment.AppDate = schApp.AppDateTime;
+                    schAppointment.IsConsultationVisit = schApp.IsConsultationVisit;
+
+                    //    DateTime.ParseExact(
+                    //    "yyyy-MM-dd hh:mm:ss tt",
+                    //    CultureInfo.InvariantCulture
+                    //);
+
 
 
 
                     string visitAcc = "";
                     string visitAccCode = "";
-                    var chkAppointmentCount = await Task.Run(() => _context.SchAppointments.Where(x => x.Mrno == schApp.MRNo && x.AppDateTime.Date.ToString() == schApp.date && x.IsDeleted == false).Count());
+                    var chkAppointmentCount = await Task.Run(() => _context.SchAppointment.Where(x => x.Mrno == schApp.MRNo && x.AppDateTime.Date.ToString() == schApp.date && x.IsDeleted == false).Count());
                     if (schApp.VisitTypeId == 2)
                     {
                         visitAccCode = "IP";
@@ -319,7 +366,7 @@ namespace HMIS.Application.ServiceLogics
                     //    IsDeleted = false,
                     //};
                     //blpatientVisit.PatientVisitStatuses.Add(patientVisitStatus);
-                    var result = await _context.SchAppointments.AddAsync(schAppointment);
+                    var result = await _context.SchAppointment.AddAsync(schAppointment);
                     //this.AddBLPatientVisit();
 
                     await _context.SaveChangesAsync();
@@ -400,8 +447,11 @@ namespace HMIS.Application.ServiceLogics
                 if (schApp.PlanId==null) 
                 {
                     planId = "0";
+                } else
+                {
+                    planId = Convert.ToString(schApp.PlanId);
                 }
-                var getPlanId = _context.BlpayerPlans.Where(x => x.PlanId == planId).FirstOrDefault();
+                    var getPlanId = _context.BlpayerPlan.Where(x => x.PlanId == planId).FirstOrDefault().Id;
                 long? pId = null;
                 if (getPlanId == null)
                 {
@@ -409,12 +459,12 @@ namespace HMIS.Application.ServiceLogics
                 }
                 else
                 {
-                    pId = getPlanId.Id;
+                    pId = getPlanId;
                 }
                 DateTime Dt = Convert.ToDateTime(schApp.date).Date;
                 string Date = Dt.ToShortDateString();
-                var chkResult = await Task.Run(() => _context.SchAppointments.Where(x => x.AppId.Equals(schApp.AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
-                var EmployeeId = _context.Hremployees.Where(x => x.UserName == schApp.EmployeeId).FirstOrDefault();
+                var chkResult = await Task.Run(() => _context.SchAppointment.Where(x => x.AppId.Equals(schApp.AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
+                var EmployeeId = _context.Hremployee.Where(x => x.EmployeeId == schApp.EmployeeId).FirstOrDefault();
                 if (chkResult != null && chkResult.AppId > 0)
                 {
                     //chkResult.AppId = schApp.AppId;
@@ -422,9 +472,17 @@ namespace HMIS.Application.ServiceLogics
                     //chkResult.Mrno = schApp.MRNo;
                     //chkResult.VisitTypeId = schApp.VisitTypeId;
                     chkResult.AppId = (long)schApp.AppId;
-                    string dateString = Date + schApp.time;
-                    DateTime parsedDateTime = DateTime.ParseExact(dateString, "M/d/yyyyh:mm:ss tt", CultureInfo.InvariantCulture);
-                    chkResult.AppDateTime = parsedDateTime; //schApp.AppDateTime;
+                    //string dateString = Date + schApp.time;
+                    //DateTime parsedDateTime = DateTime.ParseExact(dateString, "M/d/yyyyh:mm:ss tt", CultureInfo.InvariantCulture);
+                    //chkResult.AppDateTime = parsedDateTime; //schApp.AppDateTime;
+
+                    string dateTimeString = schApp.date + " " + schApp.time;
+                    chkResult.AppDateTime = DateTime.ParseExact(
+                        dateTimeString,
+                        "yyyy-MM-dd hh:mm tt",
+                        CultureInfo.InvariantCulture
+                    );
+                    chkResult.AppDate = schApp.AppDateTime;
                     chkResult.Duration = schApp.Duration;
                     chkResult.AppNote = schApp.AppNote;
                     chkResult.SiteId = schApp.SiteId;
@@ -468,11 +526,13 @@ namespace HMIS.Application.ServiceLogics
                     chkResult.EmployeeId = EmployeeId.EmployeeId;
                     chkResult.PlanId = pId;
                     chkResult.PatientId = schApp.PatientId;
+                    chkResult.IsConsultationVisit = schApp.IsConsultationVisit;
                     chkResult.PayerId = schApp.PayerId;
-                    _context.SchAppointments.Update(chkResult);
+                    _context.SchAppointment.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return true;
                 }
+           
                 //DynamicParameters parameters = new DynamicParameters();
                 //parameters.Add("AppId", schApp.AppId, DbType.Int64);
                 //parameters.Add("ProviderId", schApp.ProviderId, DbType.Int64);
@@ -567,7 +627,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var chkResult = await Task.Run(() => _context.SchAppointments.Where(x => x.AppId.Equals(AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
+                var chkResult = await Task.Run(() => _context.SchAppointment.Where(x => x.AppId.Equals(AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
                 if (chkResult != null && chkResult.AppId > 0)
                 {
                     chkResult.AppStatusId = AppStatusId;
@@ -577,7 +637,7 @@ namespace HMIS.Application.ServiceLogics
                     chkResult.RescheduledId = RescheduledId;
 
                     //await _context.SchAppointments.AddAsync(chkResult);
-                     _context.SchAppointments.Update(chkResult);
+                     _context.SchAppointment.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return true;
                 }
@@ -667,7 +727,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var chkResult = await Task.Run(() => _context.SchAppointments.Where(x => x.AppId.Equals(appId) && x.IsDeleted == false).FirstOrDefaultAsync());
+                var chkResult = await Task.Run(() => _context.SchAppointment.Where(x => x.AppId.Equals(appId) && x.IsDeleted == false).FirstOrDefaultAsync());
                 if (chkResult != null && chkResult.AppId > 0)
                 {
                     chkResult.PatientStatusId = patientStatusId;
@@ -703,9 +763,9 @@ namespace HMIS.Application.ServiceLogics
                         patientVisitStatus.StatusId = patientStatusId;
                         patientVisitStatus.VisitStatusId = null;
                         patientVisitStatus.IsDeleted = false;
-                        _context.PatientVisitStatuses.Add(patientVisitStatus);
+                        _context.PatientVisitStatus.Add(patientVisitStatus);
                     }
-                    _context.SchAppointments.Update(chkResult);
+                    _context.SchAppointment.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return true;
                 }
@@ -776,7 +836,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 //var chkResult = await Task.Run(() => _context.SchAppointments.Where(x => x.AppId == (schApp.AppId) && x.IsDeleted == false).FirstOrDefaultAsync());
-                var chkResult = await _context.SchAppointments.Where(x => x.AppId == schReschedule.AppId && (x.IsDeleted == false)).FirstOrDefaultAsync();
+                var chkResult = await _context.SchAppointment.Where(x => x.AppId == schReschedule.AppId && (x.IsDeleted == false)).FirstOrDefaultAsync();
                 if (chkResult != null && chkResult.AppId > 0)
                 {
                     chkResult.AppId = schReschedule.AppId;
@@ -788,7 +848,7 @@ namespace HMIS.Application.ServiceLogics
                     chkResult.LocationId = schReschedule.LocationId;
                     chkResult.AppStatusId = schReschedule.AppStatusId;
                     //chkResult.Reason = schReschedule.Reason;
-                    _context.SchAppointments.Update(chkResult);
+                    _context.SchAppointment.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return true;
                 }
@@ -830,7 +890,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 //regPatient.PatientId = (long)sp.PatientId;
-                var patid = await _context.RegPatients.Where(x => x.Mrno == sp.Mrno).Select(x => x.PatientId).FirstOrDefaultAsync();
+                var patid = await _context.RegPatient.Where(x => x.Mrno == sp.Mrno).Select(x => x.PatientId).FirstOrDefaultAsync();
                 RegPatient regPatient = new RegPatient();
                 regPatient.PatientId = patid; regPatient.Mrno = sp.Mrno;
                 Core.Entities.SpeechToText speech = new Core.Entities.SpeechToText()
@@ -850,7 +910,7 @@ namespace HMIS.Application.ServiceLogics
 
                 };
                 //Problem is here
-                await _context.SpeechToTexts.AddAsync(speech);
+                await _context.SpeechToText.AddAsync(speech);
                 await _context.SaveChangesAsync();
                 return true;
 
@@ -887,7 +947,7 @@ namespace HMIS.Application.ServiceLogics
                 //    AppointmentClassification = sc.AppointmentClassification,
                 //});
 
-                IQueryable<Core.Entities.SchAppointment> appointment1 = (IQueryable<Core.Entities.SchAppointment>)_context.SchAppointments.Where(x => x.AppId == appId);
+                IQueryable<Core.Entities.SchAppointment> appointment1 = (IQueryable<Core.Entities.SchAppointment>)_context.SchAppointment.Where(x => x.AppId == appId);
 
                 Core.Entities.SchAppointment result = appointment1.FirstOrDefault();
 
@@ -924,6 +984,9 @@ namespace HMIS.Application.ServiceLogics
                     appointment.PatientBalance = result.PatientBalance;
                     appointment.PlanBalance = result.PlanBalance;
                     appointment.PlanCopay = result.PlanCopay;
+                    appointment.AppNote = result.AppNote;
+                    appointment.PlanId = result.PlanId;
+                    appointment.IsConsultationVisit = result.IsConsultationVisit;
 
                 }
                 return appointment;
@@ -942,7 +1005,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSpecialitybyFacilityids.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSpecialitybyFacilityid.ToList());
                 if (FacilityId != 0)
                 {
                     list = list.Where(x => x.FacilityId == FacilityId).ToList();
@@ -958,7 +1021,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSitebySpecialityids.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSitebySpecialityid.ToList());
                 if (SpecialtyId != 0)
                 {
                     list = list.Where(x => x.SpecialtyId == SpecialtyId).ToList();
@@ -974,7 +1037,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwProviderbySiteids.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwProviderbySiteid.ToList());
                 if (SiteId != 0)
                 {
                     list = list.Where(x => x.TypeId == SiteId).ToList();
@@ -990,7 +1053,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwProviderByFacilityIds.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwProviderByFacilityId.ToList());
                 if (FacilityId != 0)
                 {
                     list = list.Where(x => x.FacilityId == FacilityId).ToList();
@@ -1006,7 +1069,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSpecialityByEmployeeIds.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSpecialityByEmployeeId.ToList());
                 if (EmployeeId != 0)
                 {
                     list = list.Where(x => x.EmployeeId == EmployeeId).ToList();
@@ -1022,7 +1085,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSiteByproviderIds.ToList());
+                var list = await System.Threading.Tasks.Task.Run(() => _context.VwSiteByproviderId.ToList());
                 if (providerId != 0)
                 {
                     list = list.Where(x => x.EmployeeId == providerId).ToList();
@@ -1055,7 +1118,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
 
-                var Data = await System.Threading.Tasks.Task.Run(() => _context.ProviderSchedules.Where(x =>
+                var Data = await System.Threading.Tasks.Task.Run(() => _context.ProviderSchedule.Where(x =>
                 x.FacilityId == FacilityId &&
                 x.SiteId == SiteId && x.ProviderId == ProviderId && x.IsDeleted==false).ToList());
                 switch (Days)
@@ -1114,10 +1177,17 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 var Data = await System.Threading.Tasks.Task.Run(() => _context.VwRegPatientAndAppointmentdetails.Where(x => x.IsDeleted == false).ToList());
-                if (!string.IsNullOrEmpty(Date))
+                if (!(string.IsNullOrEmpty(Date)))
                 {
-                    Data = Data.Where(x => x.AppDateTime.Date == Convert.ToDateTime(Date).Date).ToList();
+                    var dt = Convert.ToDateTime(Date).Date;
+                    Data = Data.Where(x => x.AppDateTime.Date == dt).ToList();
                 }
+                //if (!string.IsNullOrEmpty(Date))
+                //{
+                //    var dt = Convert.ToDateTime(Date).Date;
+                //    Data = Data.Where(x => x.AppDateTime.Date == dt);
+                //}
+
                 if (SiteId != 0)
                 {
                     Data = Data.Where(x => x.SiteId == SiteId).ToList();
@@ -1131,12 +1201,18 @@ namespace HMIS.Application.ServiceLogics
                     Data = Data.Where(x => x.SpecialtyId == SpecialityId).ToList();
                 }
                 return Data;
+
+                //return new List<VwRegPatientAndAppointmentdetails>();
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
+
+
+
+
 
         //public async Task<string> AddBLPatientVisit(string Mrno,string Date,string user)
         //{
@@ -1256,7 +1332,7 @@ namespace HMIS.Application.ServiceLogics
         public async Task<bool> InsertSpeech(ClinicalNoteObj note)
         {
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
-            var patid = await _context.RegPatients.Where(x => x.Mrno == note.Mrno).Select(x => x.PatientId).FirstOrDefaultAsync();
+            var patid = await _context.RegPatient.Where(x => x.Mrno == note.Mrno).Select(x => x.PatientId).FirstOrDefaultAsync();
             RegPatient regPatient = new RegPatient();
             regPatient.PatientId = patid; regPatient.Mrno = note.Mrno;
             var query = @"
@@ -1296,6 +1372,89 @@ namespace HMIS.Application.ServiceLogics
                 return rows > 0;
             }
 
+        }
+
+        public async Task<DataSet> DashboardSearchAppointmentDB(
+               DateTime? FromDate,
+               DateTime? ToDate,
+               int? ProviderID,
+               int? LocationID,
+               int? SpecialityID,
+               int? SiteID,
+               int? FacilityID,
+               int? ReferredProviderId,
+               long? PurposeOfVisitId,
+               int? AppTypeId,
+               int? VisitTypeId,
+               string? LastUpdatedBy,
+               //[FromQuery(Name = "ids")] 
+               [FromQuery] List<int>? AppStatusIds,
+               bool? ShowScheduledAppointmentOnly,
+               int? Page, int? Size)
+        {
+            try
+            {
+                // ✅ Handle Null/Numeric Params (default = -1)
+                ProviderID ??= -1;
+                LocationID ??= -1;
+                SpecialityID ??= -1;
+                SiteID ??= -1;
+                FacilityID ??= -1;
+                ReferredProviderId ??= -1;
+                PurposeOfVisitId ??= -1;
+                AppTypeId ??= -1;
+                VisitTypeId ??= -1;
+
+                // ✅ Handle Paging
+                Page ??= 1;
+                Size ??= 10;
+
+                // ✅ Convert Status IDs to comma separated string
+                string? statusIdsCsv = (AppStatusIds != null && AppStatusIds.Any())
+                    ? string.Join(",", AppStatusIds)
+                    : null;
+
+                DynamicParameters param = new DynamicParameters();
+
+
+                // ✅ Date Handling
+                if (FromDate == DateTime.MinValue || FromDate == null)
+                    param.Add("@AppDate", DBNull.Value, DbType.DateTime);
+                else
+                    param.Add("@AppDate", FromDate, DbType.DateTime);
+
+                // ✅ Normal Params
+                param.Add("@ProviderId", ProviderID, DbType.Int64);
+                param.Add("@LocationId", LocationID, DbType.Int64);
+                param.Add("@SpecialityId", SpecialityID, DbType.Int64);
+                param.Add("@SiteId", SiteID, DbType.Int64);
+                param.Add("@FacilityID", FacilityID, DbType.Int64);
+                param.Add("@ReferredProviderId", ReferredProviderId, DbType.Int64);
+                param.Add("@PurposeOfVisitId", PurposeOfVisitId, DbType.Int64);
+                param.Add("@AppTypeId", AppTypeId, DbType.Int64);
+                param.Add("@VisitTypeId", VisitTypeId, DbType.Int64);
+                param.Add("@LastUpdatedBy", LastUpdatedBy, DbType.String);
+
+                // ✅ New Params (IDs as string & ShowScheduled flag)
+                param.Add("@AppStatusIds", statusIdsCsv, DbType.String);
+                param.Add("@ShowScheduledAppointmentOnly", ShowScheduledAppointmentOnly ?? false, DbType.Boolean);
+
+                // ✅ Paging
+                param.Add("@PagingSize", Size, DbType.Int32);
+                param.Add("@OffsetValue", (Page - 1) * Size, DbType.Int32);
+
+                // ✅ Call SP
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("DashboardSchAppointmentsLoad", param);
+
+                if (ds.Tables[0].Rows.Count == 0)
+                    throw new Exception("No data found");
+
+                return ds;
+            }
+            catch (Exception)
+            {
+                return new DataSet();
+            }
         }
 
     }

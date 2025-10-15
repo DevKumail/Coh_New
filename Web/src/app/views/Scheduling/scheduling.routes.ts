@@ -59,10 +59,10 @@ export const Scheduling_ROUTES: Routes = [
           data: { module: 'Scheduling', component: 'Appointment Dashboard', title: 'Appointment Dashboard' }
         },
         {
-            path: 'create-appointment',
+            path: 'appointment booking',
             component: CreateAppointmentComponent,
             canActivate: [modulePermissionGuard],
-            data: { module: 'Scheduling', component: 'Create Appointment', title: 'Create Appointment' }
+            data: { module: 'Scheduling', component: 'Appointment Booking', title: 'Appointment Booking' }
         },
         ]
       }

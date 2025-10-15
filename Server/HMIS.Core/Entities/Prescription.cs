@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("Prescription")]
 public partial class Prescription
 {
     [Key]
@@ -170,14 +169,14 @@ public partial class Prescription
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("Prescriptions")]
+    [InverseProperty("Prescription")]
     public virtual SchAppointment? Appointment { get; set; }
 
     [ForeignKey("DrugId")]
-    [InverseProperty("Prescriptions")]
+    [InverseProperty("Prescription")]
     public virtual TabDrugsName? Drug { get; set; }
 
     [ForeignKey("ProviderId")]
-    [InverseProperty("Prescriptions")]
+    [InverseProperty("Prescription")]
     public virtual Hremployee? Provider { get; set; }
 }

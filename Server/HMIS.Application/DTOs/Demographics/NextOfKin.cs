@@ -33,6 +33,7 @@ namespace HMIS.Application.DTOs.Demographics
         public int? homePhone { get; set; }
 
         public int?  workPhone { get; set; }
+        public string? email { get; set; }
 
         public int? TabsTypeId { get; set; }
 

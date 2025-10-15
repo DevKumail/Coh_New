@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("AuditLog")]
+[Index("ActionTime", Name = "IX_AuditLog_ActionTime")]
 public partial class AuditLog
 {
     [Key]
@@ -49,10 +49,10 @@ public partial class AuditLog
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("ActionId")]
-    [InverseProperty("AuditLogs")]
+    [InverseProperty("AuditLog")]
     public virtual Action? Action { get; set; }
 
     [ForeignKey("UserLoginHistoryId")]
-    [InverseProperty("AuditLogs")]
+    [InverseProperty("AuditLog")]
     public virtual LoginUserHistory? UserLoginHistory { get; set; }
 }

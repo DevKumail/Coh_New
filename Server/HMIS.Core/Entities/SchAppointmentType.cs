@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("SchAppointmentType")]
 public partial class SchAppointmentType
 {
     [Key]
@@ -23,8 +22,8 @@ public partial class SchAppointmentType
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("AppType")]
-    public virtual ICollection<CptbyAppType> CptbyAppTypes { get; set; } = new List<CptbyAppType>();
+    public virtual ICollection<CptbyAppType> CptbyAppType { get; set; } = new List<CptbyAppType>();
 
     [InverseProperty("AppType")]
-    public virtual ICollection<ProviderScheduleByAppType> ProviderScheduleByAppTypes { get; set; } = new List<ProviderScheduleByAppType>();
+    public virtual ICollection<ProviderScheduleByAppType> ProviderScheduleByAppType { get; set; } = new List<ProviderScheduleByAppType>();
 }

@@ -50,12 +50,12 @@ public partial class BlpayerPackage
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("PayerPackage")]
-    public virtual ICollection<InsuredSubscriber> InsuredSubscribers { get; set; } = new List<InsuredSubscriber>();
+    public virtual ICollection<Insured> Insured { get; set; } = new List<Insured>();
 
     [InverseProperty("PayerPackage")]
-    public virtual ICollection<Insured> Insureds { get; set; } = new List<Insured>();
+    public virtual ICollection<InsuredSubscriber> InsuredSubscriber { get; set; } = new List<InsuredSubscriber>();
 
     [ForeignKey("PayerId")]
-    [InverseProperty("BlpayerPackages")]
+    [InverseProperty("BlpayerPackage")]
     public virtual Blpayer? Payer { get; set; }
 }

@@ -1,8 +1,7 @@
-import { Api } from 'datatables.net';
-import { TemporaryPatientDemographicListComponent } from './../../../views/registration/Temporary Patient Demographics/temporary-patient-demographic-list/temporary-patient-demographic-list.component';
+ 
 import { Injectable } from '@angular/core';
 import { ApiService } from '@/app/core/services/api.service';
-import { Observable } from 'rxjs';
+ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })

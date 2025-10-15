@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("FinancialClass")]
 public partial class FinancialClass
 {
     [Key]

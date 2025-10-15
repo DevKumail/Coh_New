@@ -1,0 +1,136 @@
+.patient-banner {
+  font-size: 0.9rem;
+  line-height: 1.1;
+  backdrop-filter: saturate(120%) blur(2px);
+
+  .banner-name {
+    font-size: 0.95rem;
+  }
+
+  .details {
+    gap: .25rem .75rem;
+
+    i {
+      color: black;
+      font-size: .9rem;
+    }
+
+    // .sep {
+    //   color: black;
+    // }
+  }
+
+  // Close button should be on the side opposite to layout start
+  .banner-close {
+    top: .25rem !important;      // match m-1
+    right: .25rem !important;    // default LTR places it on the right
+    left: auto !important;
+  }
+}
+
+// Flip to left when app is RTL
+:host-context([dir='rtl']) .patient-banner .banner-close {
+  right: auto !important;
+  left: .25rem !important;
+}
+
+tr.high-rated{ 
+  background-color: bisque; 
+  color: black; 
+}
+
+.info-badge {
+  // background: #fff7ef; /* soft peach */
+  background: rgb(255, 255, 255) ;
+  border: 1px solid rgb(231, 233, 235);;
+  border-radius: 12px;
+  padding: 6px 12px 4px 12px;
+  min-width: 140px;
+  max-width: 320px;
+  color: #333;
+  min-height: 52px;
+  // margin-top: 5px;
+
+  .badge-title {
+    font-size: 11px;
+    color: #7a7f85;
+    margin-bottom: 5px;
+  }
+
+  .badge-value {
+    font-size: 11px;
+    // font-weight: 500;
+    display: inline-block;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .badge-date {
+    font-size: 11px;
+    // font-weight: 500;
+    margin-top: -2px;
+    // display: inline-block;
+    // max-width: 220px;
+    // white-space: nowrap;
+    // overflow: hidden;
+    // text-overflow: ellipsis;
+  }
+}
+
+.info-badge-wide {
+  .badge-value {
+    max-width: 280px;
+  }
+}
+
+/* Blink animation for KDA icon */
+.kda-blink {
+  /* Themeable colors */
+  --kda-on: #f59e0b;   /* Orange 500 */
+  --kda-off: #facc15;  /* Yellow 400 */
+
+  animation: kdaBlink 1.1s ease-in-out infinite;
+  color: var(--kda-on); /* drives fill via currentColor */
+  filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+
+  /* ensure the SVG uses the animated color */
+  path { fill: currentColor !important; }
+}
+
+@keyframes kdaBlink {
+  0%   { opacity: 1;   color: var(--kda-on);  filter: drop-shadow(0 0 2px rgba(245,158,11,.55)); }
+  50%  { opacity: .95; color: var(--kda-off); filter: drop-shadow(0 0 2px rgba(250,204,21,.45)); }
+  100% { opacity: 1;   color: var(--kda-on);  filter: drop-shadow(0 0 2px rgba(245,158,11,.55)); }
+}
+
+/* Optional presets if you want to switch quickly
+.kda-blink.blue   { --kda-off: #2563eb; }  // Indigo/Blue
+.kda-blink.purple { --kda-off: #7c3aed; }  // Deep Purple
+.kda-blink.slate  { --kda-off: #0f172a; }  // Slate/Navy
+*/
+
+/* Text variant (black/gray, no glow) */
+.kda-blink.kda-text {
+  --kda-on: #111827;  /* near-black */
+  --kda-off: #6b7280; /* gray-500 */
+  filter: none;       /* remove glow on text */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kda-blink { animation: none; }
+}
+
+/* Custom tooltip styling for allergies */
+:host ::ng-deep .tooltip-allergy .tooltip-inner {
+  text-align: left;
+  max-width: 260px;
+  white-space: normal;
+  font-size: 12px;
+  line-height: 1.2;
+  padding: 8px 10px;
+}
+
+:host ::ng-deep .tooltip-allergy .tooltip-inner hr {
+  border-top: 1px dashed rgba(0,0,0,.25);
+}

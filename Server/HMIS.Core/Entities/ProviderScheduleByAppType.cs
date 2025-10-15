@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("ProviderScheduleByAppType")]
 public partial class ProviderScheduleByAppType
 {
     [Key]
@@ -25,10 +24,10 @@ public partial class ProviderScheduleByAppType
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("AppTypeId")]
-    [InverseProperty("ProviderScheduleByAppTypes")]
+    [InverseProperty("ProviderScheduleByAppType")]
     public virtual SchAppointmentType? AppType { get; set; }
 
     [ForeignKey("Psid")]
-    [InverseProperty("ProviderScheduleByAppTypes")]
+    [InverseProperty("ProviderScheduleByAppType")]
     public virtual ProviderSchedule Ps { get; set; } = null!;
 }

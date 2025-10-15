@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("SecModule")]
 public partial class SecModule
 {
     [Key]
@@ -35,5 +34,5 @@ public partial class SecModule
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("Module")]
-    public virtual ICollection<SecModuleForm> SecModuleForms { get; set; } = new List<SecModuleForm>();
+    public virtual ICollection<SecModuleForm> SecModuleForm { get; set; } = new List<SecModuleForm>();
 }

@@ -26,12 +26,12 @@ namespace HMIS.Application.ServiceLogics
         public async Task<List<RegPatient>> GetPatientsWithAppointments_WRONG()
         {
             // 1 query for patients
-            var patients = await _context.RegPatients.Take(10).ToListAsync();
+            var patients = await _context.RegPatient.Take(10).ToListAsync();
 
             foreach (var patient in patients)
             {
                 // 10 separate queries - BAHUT SLOW!
-                var appointments = await _context.SchAppointments
+                var appointments = await _context.SchAppointment
                     .Where(a => a.Mrno == patient.Mrno)
                     .ToListAsync();
             }
@@ -50,8 +50,8 @@ namespace HMIS.Application.ServiceLogics
         public async Task<List<RegPatient>> GetPatientsWithAppointments_OPTIMIZED()
         {
             // Single optimized query with Include
-            var patients = await _context.RegPatients
-                .Include(p => p.SchAppointments.Take(5)) // Latest 5 appointments only
+            var patients = await _context.RegPatient
+                .Include(p => p.SchAppointment.Take(5)) // Latest 5 appointments only
                 .Include(p => p.RegPatientDetails)
                 .Where(p => p.IsDeleted != true)
                 .Take(10)
@@ -67,15 +67,15 @@ namespace HMIS.Application.ServiceLogics
         /// </summary>
         public async Task<List<object>> GetPatientAppointmentSummary_PROJECTION()
         {
-            var result = await _context.RegPatients
+            var result = await _context.RegPatient
                 .Where(p => p.IsDeleted != true)
                 .Select(p => new
                 {
                     PatientId = p.PatientId,
                     MRNo = p.Mrno,
                     PatientName = p.PersonFirstName + " " + p.PersonLastName,
-                    TotalAppointments = p.SchAppointments.Count(),
-                    LatestAppointment = p.SchAppointments
+                    TotalAppointments = p.SchAppointment.Count(),
+                    LatestAppointment = p.SchAppointment
                         .OrderByDescending(a => a.AppDateTime)
                         .Select(a => new
                         {
@@ -98,7 +98,7 @@ namespace HMIS.Application.ServiceLogics
         public async Task<List<SchAppointment>> GetAppointmentsByProviders_BATCH(List<long> providerIds)
         {
             // Single query for multiple providers
-            var appointments = await _context.SchAppointments
+            var appointments = await _context.SchAppointment
                 .Where(a => providerIds.Contains(a.ProviderId))
                 .Include(a => a.Patient)
                 .Where(a => a.AppDateTime >= DateTime.Today)
@@ -115,11 +115,11 @@ namespace HMIS.Application.ServiceLogics
         /// </summary>
         public async Task<List<RegPatient>> GetPatientsWithComplexData_SPLIT()
         {
-            var patients = await _context.RegPatients
+            var patients = await _context.RegPatient
                 .AsSplitQuery() // Multiple optimized queries instead of huge JOIN
-                .Include(p => p.SchAppointments.Take(3))
-                .Include(p => p.PatientProblems.Take(5))
-                .Include(p => p.Insureds.Take(2))
+                .Include(p => p.SchAppointment.Take(3))
+                .Include(p => p.PatientProblem.Take(5))
+                .Include(p => p.Insured.Take(2))
                 .Where(p => p.IsDeleted != true)
                 .Take(20)
                 .AsNoTracking()
@@ -138,8 +138,8 @@ namespace HMIS.Application.ServiceLogics
         /// </summary>
         private static readonly Func<HMISDbContext, string, Task<RegPatient?>> GetPatientByMRNo =
             EF.CompileAsyncQuery((HMISDbContext context, string mrno) =>
-                context.RegPatients
-                    .Include(p => p.SchAppointments.Take(5))
+                context.RegPatient
+                    .Include(p => p.SchAppointment.Take(5))
                     .AsNoTracking()
                     .FirstOrDefault(p => p.Mrno == mrno));
 
@@ -185,8 +185,8 @@ namespace HMIS.Application.ServiceLogics
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-            var patients = await _context.RegPatients
-                .Include(p => p.SchAppointments)
+            var patients = await _context.RegPatient
+                .Include(p => p.SchAppointment)
                 .Take(10)
                 .AsNoTracking()
                 .ToListAsync();
@@ -219,8 +219,8 @@ namespace HMIS.Application.ServiceLogics
         public async Task<(List<RegPatient> Patients, int TotalCount)> GetPatientsPagedAsync(
             int pageNumber, int pageSize, string? searchTerm = null)
         {
-            var query = _context.RegPatients
-                .Include(p => p.SchAppointments.OrderByDescending(a => a.AppDateTime).Take(3))
+            var query = _context.RegPatient
+                .Include(p => p.SchAppointment.OrderByDescending(a => a.AppDateTime).Take(3))
                 .Where(p => p.IsDeleted != true);
 
             if (!string.IsNullOrEmpty(searchTerm))

@@ -1,10 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { NgIcon } from '@ng-icons/core';
+import { DirIconPipe } from '@/app/shared/pipes/dir-icon.pipe';
 
 @Component({
   selector: 'app-generic-pagination',
   imports: [
-    CommonModule
+    CommonModule,
+    NgIcon,
+    DirIconPipe
   ],
   templateUrl: './generic-pagination.component.html',
   styleUrl: './generic-pagination.component.scss'

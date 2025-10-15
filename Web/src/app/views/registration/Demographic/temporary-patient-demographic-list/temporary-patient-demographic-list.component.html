@@ -1,0 +1,174 @@
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-light bg-opacity-50 p-2">
+    <li class="breadcrumb-item">
+      <a href="javascript:void(0);">
+        <lucide-angular [img]="homeIcon" class="fs-6"></lucide-angular>
+        {{'CLINICAL' | translate}}
+      </a>
+    </li>
+    <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
+        <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">
+      {{'TEMPORARY_DEMOGRAPHICS' | translate}}
+    </li>
+  </ol>
+</nav>
+
+<div class="card shadow">
+  <div class="accordion" id="Appointmentaccordion">
+    <div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <div class="d-flex w-100 align-items-center">
+            <button #appointmentToggler class="accordion-button collapsed d-flex no-accordion-caret flex-grow-1"
+              type="button" data-bs-toggle="collapse" data-bs-target="#collapseAppointment" aria-expanded="false"
+              aria-controls="collapseAppointment">
+              <lucide-angular class="me-1 ms-1" [img]="headingIcon" aria-hidden="true"></lucide-angular>
+              {{'TEMPORARY_DEMOGRAPHICS' | translate}}
+            </button>
+            <button type="button" class="btn btn-link p-0 mb-1" title="Filter" (click)="appointmentToggler?.click()"
+              [style.marginInlineStart]="'auto'">
+              <ng-icon style="color: orange;" [name]="isTempDemoFiltered ? 'tablerFilterFill' : 'tablerFilter'"
+                [ngClass]="{ 'blink': isTempDemoFiltered }"></ng-icon>
+            </button>
+            <button style="width: 100px;" class="btn btn-success ms-1 me-1"
+              (click)="router.navigate(['/registration/temporary-patient-demographics-create'])">
+              <ng-icon style="margin-bottom: 1px;" class="me-1 ms-1" name='tablerPlus'></ng-icon>
+              <span class="me-1">
+                {{'ADD' | translate}}
+              </span>
+            </button>
+          </div>
+        </h2>
+        <div id="collapseAppointment" class="accordion-collapse collapse" data-bs-parent="#Appointmentaccordion">
+          <div class="accordion-body">
+            <div class="card shadow-sm rounded-3">
+              <div class="card-body">
+
+                <form (ngSubmit)="submitFilter()" class="row g-3 align-items-end">
+                  <div class="col-12 col-sm-6 col-lg-3">
+                    <label class="form-label">{{ 'MR_NO' | translate }}</label>
+                    <input type="number" class="form-control" [(ngModel)]="FilterData.tempId" name="tempId"
+                      placeholder="{{ 'ENTER_MR_NO' | translate }}" />
+                  </div>
+                  <div class="col-12 col-sm-6 col-lg-3">
+                    <label class="form-label">{{ 'NAME' | translate }}</label>
+                    <input type="text" class="form-control" [(ngModel)]="FilterData.name" name="name"
+                      placeholder="{{ 'ENTER_NAME' | translate }}" />
+                  </div>
+                  <div class="col-12 col-sm-6 col-lg-3">
+                    <label class="form-label">{{ 'DOB' | translate }}</label>
+                    <input type="date" class="form-control" [(ngModel)]="FilterData.dob" name="dob" />
+                  </div>
+                  <div class="col-12 col-sm-6 col-lg-3">
+                    <label class="form-label">{{ 'GENDER' | translate }}</label>
+                    <select class="form-select" [(ngModel)]="FilterData.gender" name="gender">
+                      <option [ngValue]="null"> --{{ 'ALL' | translate }}--</option>
+                      <option [ngValue]="0">{{ 'MALE' }}</option>
+                      <option [ngValue]="1">{{ 'FEMALE' }}</option>
+                      <option [ngValue]="2">{{ 'OTHER' }}</option>
+                    </select>
+                  </div>
+                  <div class="col-12 d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-light" (click)="clearFilter()">
+                      {{ 'CLEAR' | translate }}
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      {{ 'SUBMIT' | translate }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive">
+    <table class="table align-middle mb-0 table-striped">
+      <thead class="thead-sm">
+        <tr class="text-uppercase text-center">
+          <th>{{'MR_NO' | translate}}</th>
+          <th>{{'NAME' | translate}}</th>
+          <th>{{'DOB' | translate}}</th>
+          <th>{{'GENDER' | translate}}</th>
+          <th class="text-center" style="width: 100px;">{{'ACTION' | translate}}</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider text-center">
+        <tr *ngFor="let temp of pagedTemps">
+          <td>{{ temp.tempId || 'N/A' }}</td>
+          <td>{{ temp.personFullName || 'N/A'}}</td>
+          <td>{{ temp.patientBirthDate || 'N/A' | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ genderLabel(temp.personSex) }}</td>
+          <td class="text-center align-middle actions-cell">
+            <div class="d-inline-flex justify-content-center align-items-center gap-2 text-nowrap actions-wrap">
+              <lucide-angular *hasPermission="'Registration:Temporary Patient Demographics:Edit'" [img]="editIcon"
+                title="Update" aria-label="Update" class="text-primary fs-5 action-icon" style="cursor: pointer;"
+                (click)="editTemp(temp)"></lucide-angular>
+              <lucide-angular *hasPermission="'Registration:Temporary Patient Demographics:Delete'" [img]="deleteIcon"
+                title="Delete" aria-label="Delete" class="text-danger fs-5 action-icon" style="cursor: pointer;"
+                (click)="Remove(temp.tempId)"></lucide-angular>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="pagedTemps?.length === 0">
+          <td colspan="5" class="text-center">{{'NO_DATA_FOUND' | translate}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Section -->
+
+            <!-- Pagination -->
+               <app-generic-pagination
+                    [totalItems]="TotalTempCount"
+                    [pageSize]="PaginationInfo.RowsPerPage"
+                    [currentPage]="PaginationInfo.Page"
+                    (pageChanged)="onTEMPDEMOPageChanged($event)"
+                >
+                </app-generic-pagination>
+
+  <!-- <div class="d-flex flex-column align-items-center mt-3 gap-2">
+    <div class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap">
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <div class="me-2">
+          Showing {{ start + 1 }} to
+          {{ end > totalRecord ? totalRecord : end }} of
+          {{ totalRecord }} entries
+        </div>
+        <div>
+          <select class="form-select form-select-sm" style="width: auto" [(ngModel)]="pageSize"
+            [ngModelOptions]="{ standalone: true }" (change)="onPageSizeChange($event)">
+            <option *ngFor="let size of pageSizes" [value]="size">
+              {{ size }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="prevPage()">Previous</button>
+          </li>
+          <li class="page-item" *ngFor="let page of pageNumbers" [class.active]="page === currentPage">
+            <button class="page-link" (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="nextPage()">Next</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div> -->
+</div>
+<!-- </div> -->

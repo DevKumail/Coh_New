@@ -1,10 +1,8 @@
 export interface PatientProblemModel {
   id: number;
-   providerName?: string;
-   icd9code: string;
+  providerName?: string;
   appointmentId?: number;
-  icdVersionValue: string;
- activeStatus: number;
+  activeStatus: number;
   icd9: string;
   icd9description: string;
   comments: string;

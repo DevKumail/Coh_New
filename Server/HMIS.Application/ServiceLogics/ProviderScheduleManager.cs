@@ -231,7 +231,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
 
-                var chkPriority = await Task.Run(() => _context.ProviderSchedules.Where(x => x.ProviderId.Equals(ps.ProviderId)).OrderByDescending(x => x.Psid).Select(x => x.Priority).FirstOrDefaultAsync());
+                var chkPriority = await Task.Run(() => _context.ProviderSchedule.Where(x => x.ProviderId.Equals(ps.ProviderId)).OrderByDescending(x => x.Psid).Select(x => x.Priority).FirstOrDefaultAsync());
                 if (chkPriority != null) { ps.Priority = chkPriority + 1; }
                 else { ps.Priority = 0; }
                 Core.Entities.ProviderSchedule providerSchedule = new Core.Entities.ProviderSchedule()
@@ -273,10 +273,10 @@ namespace HMIS.Application.ServiceLogics
                             CptgroupId = item.CPTGroupId,
                             Duration = item.Duration,
                         };
-                        providerSchedule.ProviderScheduleByAppTypes.Add(psa);
+                        providerSchedule.ProviderScheduleByAppType.Add(psa);
                     }
                 }
-                await _context.ProviderSchedules.AddAsync(providerSchedule);
+                await _context.ProviderSchedule.AddAsync(providerSchedule);
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -291,7 +291,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var chkResult = await Task.Run(() => _context.ProviderSchedules.Include(c => c.ProviderScheduleByAppTypes).Where(x => x.Psid == ps.PSId && x.IsDeleted == false).FirstOrDefaultAsync());
+                var chkResult = await Task.Run(() => _context.ProviderSchedule.Include(c => c.ProviderScheduleByAppType).Where(x => x.Psid == ps.PSId && x.IsDeleted == false).FirstOrDefaultAsync());
                 if (chkResult != null && chkResult.Psid > 0)
                 {
 
@@ -322,7 +322,7 @@ namespace HMIS.Application.ServiceLogics
                     chkResult.Saturday = ps.Saturday;
                     chkResult.IsDeleted = false;
                     chkResult.SpecialityId = ps.SpecialityId;
-                    var allExisitingProvidingSheduleByAppType = chkResult.ProviderScheduleByAppTypes.Where(x => x.IsDeleted == false).ToList();
+                    var allExisitingProvidingSheduleByAppType = chkResult.ProviderScheduleByAppType.Where(x => x.IsDeleted == false).ToList();
                     if (allExisitingProvidingSheduleByAppType != null && allExisitingProvidingSheduleByAppType.Count > 0)
                     {
 
@@ -350,7 +350,7 @@ namespace HMIS.Application.ServiceLogics
                     {
                         foreach (var item in ps.providerScheduleByAppType)
                         {
-                            var exisitingProvidingSheduleByAppType = chkResult.ProviderScheduleByAppTypes.SingleOrDefault(x => x.Id.Equals(item.Id) && x.IsDeleted == false && x.CptgroupId.Equals(item.CPTGroupId) && x.AppTypeId.Equals(item.AppTypeId) && x.Duration.Equals(item.Duration) && x.Psid.Equals(item.PSID));
+                            var exisitingProvidingSheduleByAppType = chkResult.ProviderScheduleByAppType.SingleOrDefault(x => x.Id.Equals(item.Id) && x.IsDeleted == false && x.CptgroupId.Equals(item.CPTGroupId) && x.AppTypeId.Equals(item.AppTypeId) && x.Duration.Equals(item.Duration) && x.Psid.Equals(item.PSID));
 
                             if (exisitingProvidingSheduleByAppType != null)
                             {
@@ -370,11 +370,11 @@ namespace HMIS.Application.ServiceLogics
                                     CptgroupId = item.CPTGroupId,
                                     Duration = item.Duration,
                                 };
-                                chkResult.ProviderScheduleByAppTypes.Add(psa);
+                                chkResult.ProviderScheduleByAppType.Add(psa);
                             }
                         }
                     }
-                    _context.ProviderSchedules.Update(chkResult);
+                    _context.ProviderSchedule.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return true;
                 }
@@ -422,17 +422,17 @@ namespace HMIS.Application.ServiceLogics
 
         public async Task<bool> DeleteProviderSchedule(long PSId)
         {
-            var chkResult = await Task.Run(() => _context.ProviderSchedules.Include(c => c.ProviderScheduleByAppTypes).Where(x => x.Psid == PSId && x.IsDeleted == false).FirstOrDefaultAsync());
+            var chkResult = await Task.Run(() => _context.ProviderSchedule.Include(c => c.ProviderScheduleByAppType).Where(x => x.Psid == PSId && x.IsDeleted == false).FirstOrDefaultAsync());
             if (chkResult != null && chkResult.Psid > 0)
             {
                 chkResult.IsDeleted = true;
-                var allExisitingProvidingSheduleByAppType = chkResult.ProviderScheduleByAppTypes.ToList();
+                var allExisitingProvidingSheduleByAppType = chkResult.ProviderScheduleByAppType.ToList();
                 foreach (var item in allExisitingProvidingSheduleByAppType)
                 {
                     item.IsDeleted = true;
                     _context.Entry(item).State = EntityState.Modified;
                 }
-                _context.ProviderSchedules.Update(chkResult);
+                _context.ProviderSchedule.Update(chkResult);
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -463,12 +463,12 @@ namespace HMIS.Application.ServiceLogics
             {
                 foreach (var item in prioritySet)
                 {
-                    var chkRecord = await Task.Run(() => _context.ProviderSchedules.Where(x => x.Psid.Equals(item.PSId) && x.IsDeleted == false && x.ProviderId.Equals(item.ProviderId)).FirstOrDefaultAsync());
+                    var chkRecord = await Task.Run(() => _context.ProviderSchedule.Where(x => x.Psid.Equals(item.PSId) && x.IsDeleted == false && x.ProviderId.Equals(item.ProviderId)).FirstOrDefaultAsync());
                     if(chkRecord != null)
                     {
                         chkRecord.Priority = item.Priority;
                         _context.Entry(chkRecord).State = EntityState.Modified;
-                        _context.ProviderSchedules.Update(chkRecord);
+                        _context.ProviderSchedule.Update(chkRecord);
                        
                     }
                     //param.Add("@PSId", item.PSId, DbType.Int64);
@@ -495,7 +495,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
 
-                var Data = await System.Threading.Tasks.Task.Run(() => _context.VwGetDurationTimeSlots.Where(x => x.FacilityId == FacilityId && x.SiteId == SiteId && x.ProviderId == ProviderId && x.IsDeleted==false).ToList());
+                var Data = await System.Threading.Tasks.Task.Run(() => _context.VwGetDurationTimeSlot.Where(x => x.FacilityId == FacilityId && x.SiteId == SiteId && x.ProviderId == ProviderId && x.IsDeleted==false).ToList());
                 switch (Days)
                 {
                     case "Monday":

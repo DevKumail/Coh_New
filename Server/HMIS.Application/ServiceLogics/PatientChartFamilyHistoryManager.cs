@@ -77,12 +77,12 @@ namespace HMIS.Application.ServiceLogics
                     prob.Confidential = false;
                     //prob.EndDate = model.endDate;
 
-                    _context.PatientProblems.Add(prob);
+                    _context.PatientProblem.Add(prob);
                      
                 }
 
 
-            _context.PatientChartSocialHistories.Add(patient);
+            _context.PatientChartSocialHistory.Add(patient);
             _context.SaveChangesAsync();
             return "Save Successfully";
             }
@@ -94,7 +94,7 @@ namespace HMIS.Application.ServiceLogics
 
         public async Task<bool> DeleteSocialHistoryByShId(long shid)
         {
-            var CheckData = _context.PatientChartSocialHistories.Where(x => x.Shid == shid).SingleOrDefault();
+            var CheckData = _context.PatientChartSocialHistory.Where(x => x.Shid == shid).SingleOrDefault();
             if (CheckData != null)
             {
                 _context.Remove(CheckData);
@@ -155,7 +155,7 @@ namespace HMIS.Application.ServiceLogics
 
 
 
-                _context.PatientChartFamilyHistories.Add(patient);
+                _context.PatientChartFamilyHistory.Add(patient);
                 _context.SaveChangesAsync();
                 return "Save Successfully";
 
@@ -168,7 +168,7 @@ namespace HMIS.Application.ServiceLogics
 
         public async Task<bool> DeleteFamilyHistoryByFHID(long fhid)
         {
-            var CheckData = _context.PatientChartFamilyHistories.Where(x => x.Fhid == fhid).SingleOrDefault();
+            var CheckData = _context.PatientChartFamilyHistory.Where(x => x.Fhid == fhid).SingleOrDefault();
             if (CheckData != null)
             {
                 _context.Remove(CheckData);

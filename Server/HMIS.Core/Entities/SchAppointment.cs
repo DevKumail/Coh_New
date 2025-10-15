@@ -6,7 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("SchAppointment")]
+[Index("AppDateTime", Name = "IX_SchAppointment_AppDateTime")]
+[Index("AppStatusId", Name = "IX_SchAppointment_AppStatusId")]
+[Index("IsDeleted", "AppDateTime", "ProviderId", "FacilityId", "SiteId", "SpecialtyId", "LocationId", "AppStatusId", "AppCriteriaId", "VisitTypeId", Name = "IX_SchAppointment_Filters")]
+[Index("Mrno", Name = "IX_SchAppointment_MRNo")]
+[Index("Mrno", "AppDateTime", Name = "IX_SchAppointment_MRNo_Date")]
+[Index("ProviderId", Name = "IX_SchAppointment_ProviderId")]
+[Index("ProviderId", "AppDateTime", Name = "IX_SchAppointment_Provider_Date")]
+[Index("SiteId", Name = "IX_SchAppointment_SiteId")]
+[Index("AppStatusId", "AppDateTime", Name = "IX_SchAppointment_Status_Date")]
 public partial class SchAppointment
 {
     [Key]
@@ -288,6 +296,8 @@ public partial class SchAppointment
 
     public long? PlanId { get; set; }
 
+
+
     [StringLength(50)]
     [Unicode(false)]
     public string? PatientBalance { get; set; }
@@ -301,107 +311,107 @@ public partial class SchAppointment
     public string? PlanCopay { get; set; }
 
     [ForeignKey("AppCriteriaId")]
-    [InverseProperty("SchAppointments")]
-    public virtual SchAppointmentCriterion? AppCriteria { get; set; }
+    [InverseProperty("SchAppointment")]
+    public virtual SchAppointmentCriteria? AppCriteria { get; set; }
 
     [ForeignKey("AppStatusId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual SchAppointmentStatus AppStatus { get; set; } = null!;
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<BleligibilityLog> BleligibilityLogs { get; set; } = new List<BleligibilityLog>();
+    public virtual ICollection<BleligibilityLog> BleligibilityLog { get; set; } = new List<BleligibilityLog>();
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<BlpatientVisit> BlpatientVisits { get; set; } = new List<BlpatientVisit>();
+    public virtual ICollection<BlpatientVisit> BlpatientVisit { get; set; } = new List<BlpatientVisit>();
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<BlsuperBillDiagnosis> BlsuperBillDiagnoses { get; set; } = new List<BlsuperBillDiagnosis>();
+    public virtual ICollection<BlsuperBillDiagnosis> BlsuperBillDiagnosis { get; set; } = new List<BlsuperBillDiagnosis>();
+
+    [InverseProperty("Appointment")]
+    public virtual ICollection<BlsuperBillProcedure> BlsuperBillProcedure { get; set; } = new List<BlsuperBillProcedure>();
 
     [InverseProperty("Appointent")]
-    public virtual ICollection<BlsuperBillProcedureInvoice> BlsuperBillProcedureInvoices { get; set; } = new List<BlsuperBillProcedureInvoice>();
-
-    [InverseProperty("Appointment")]
-    public virtual ICollection<BlsuperBillProcedure> BlsuperBillProcedures { get; set; } = new List<BlsuperBillProcedure>();
+    public virtual ICollection<BlsuperBillProcedureInvoice> BlsuperBillProcedureInvoice { get; set; } = new List<BlsuperBillProcedureInvoice>();
 
     [InverseProperty("Visit")]
-    public virtual ICollection<EligibilityLog> EligibilityLogs { get; set; } = new List<EligibilityLog>();
+    public virtual ICollection<EligibilityLog> EligibilityLog { get; set; } = new List<EligibilityLog>();
 
     [ForeignKey("EmployeeId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual Hremployee? Employee { get; set; }
 
     [ForeignKey("FacilityId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual RegFacility? Facility { get; set; }
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<InsuranceEligibility> InsuranceEligibilities { get; set; } = new List<InsuranceEligibility>();
+    public virtual ICollection<InsuranceEligibility> InsuranceEligibility { get; set; } = new List<InsuranceEligibility>();
 
     [ForeignKey("PatientId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual RegPatient? Patient { get; set; }
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<PatientAllergy> PatientAllergies { get; set; } = new List<PatientAllergy>();
+    public virtual ICollection<PatientAllergy> PatientAllergy { get; set; } = new List<PatientAllergy>();
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<PatientBillInvoice> PatientBillInvoices { get; set; } = new List<PatientBillInvoice>();
+    public virtual ICollection<PatientBillInvoice> PatientBillInvoice { get; set; } = new List<PatientBillInvoice>();
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<PatientImmunization> PatientImmunizations { get; set; } = new List<PatientImmunization>();
+    public virtual ICollection<PatientImmunization> PatientImmunization { get; set; } = new List<PatientImmunization>();
 
     [ForeignKey("PatientNotifiedId")]
-    [InverseProperty("SchAppointments")]
-    public virtual PatientNotifiedOption? PatientNotified { get; set; }
+    [InverseProperty("SchAppointment")]
+    public virtual PatientNotifiedOptions? PatientNotified { get; set; }
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<PatientProblem> PatientProblems { get; set; } = new List<PatientProblem>();
+    public virtual ICollection<PatientProblem> PatientProblem { get; set; } = new List<PatientProblem>();
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<PatientProcedure> PatientProcedures { get; set; } = new List<PatientProcedure>();
+    public virtual ICollection<PatientProcedure> PatientProcedure { get; set; } = new List<PatientProcedure>();
 
     [ForeignKey("PatientStatusId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual SchPatientStatus PatientStatus { get; set; } = null!;
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<PatientVisitStatus> PatientVisitStatuses { get; set; } = new List<PatientVisitStatus>();
+    public virtual ICollection<PatientVisitStatus> PatientVisitStatus { get; set; } = new List<PatientVisitStatus>();
 
     [ForeignKey("PayerId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual Blpayer? Payer { get; set; }
 
     [ForeignKey("PlanId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual BlpayerPlan? Plan { get; set; }
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<Prescription> Prescriptions { get; set; } = new List<Prescription>();
+    public virtual ICollection<Prescription> Prescription { get; set; } = new List<Prescription>();
 
     [ForeignKey("PurposeOfVisitId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual ProblemList? PurposeOfVisitNavigation { get; set; }
 
     [ForeignKey("RescheduledId")]
-    [InverseProperty("SchAppointments")]
-    public virtual ReschedulingReason? Rescheduled { get; set; }
+    [InverseProperty("SchAppointment")]
+    public virtual ReschedulingReasons? Rescheduled { get; set; }
 
     [ForeignKey("SiteId")]
-    [InverseProperty("SchAppointments")]
-    public virtual RegLocationType Site { get; set; } = null!;
+    [InverseProperty("SchAppointment")]
+    public virtual RegLocationTypes Site { get; set; } = null!;
 
     [ForeignKey("SubscriberId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual InsuredSubscriber? Subscriber { get; set; }
 
     [ForeignKey("VisitStatusId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual VisitStatus? VisitStatus { get; set; }
 
     [ForeignKey("VisitTypeId")]
-    [InverseProperty("SchAppointments")]
+    [InverseProperty("SchAppointment")]
     public virtual VisitType? VisitType { get; set; }
 
     [InverseProperty("Appointment")]
-    public virtual ICollection<VitalSign> VitalSigns { get; set; } = new List<VitalSign>();
+    public virtual ICollection<VitalSigns> VitalSigns { get; set; } = new List<VitalSigns>();
 }

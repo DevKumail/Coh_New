@@ -25,3 +25,21 @@
   max-height: 50px !important;         /* Approx 3-4 options height */
   overflow-y: auto !important;
 }
+
+tr.high-rated{ 
+  background-color: bisque; 
+  color: black; 
+}
+
+/* Fixed-height scroll area for timeslots table */
+.timeslots-scroll {
+  min-height: 52vh;
+  max-height: 52vh; /* adjust as needed: e.g., 400px or 70vh */
+  overflow-y: auto;
+}
+
+/* Selected time row highlight */
+tr.time-selected {
+  background-color: #ffe8cc !important; /* light orange */
+  border-left: 3px solid #ffb566;       /* accent */
+}

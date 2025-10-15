@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("RegPatientEmployer")]
 public partial class RegPatientEmployer
 {
     [Key]
@@ -32,14 +31,14 @@ public partial class RegPatientEmployer
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("EmploymentOccupationId")]
-    [InverseProperty("RegPatientEmployers")]
+    [InverseProperty("RegPatientEmployer")]
     public virtual RegOccupation? EmploymentOccupation { get; set; }
 
     [ForeignKey("EmploymentTypeId")]
-    [InverseProperty("RegPatientEmployers")]
+    [InverseProperty("RegPatientEmployer")]
     public virtual RegEmploymentType? EmploymentType { get; set; }
 
     [ForeignKey("PatientId")]
-    [InverseProperty("RegPatientEmployers")]
+    [InverseProperty("RegPatientEmployer")]
     public virtual RegPatient? Patient { get; set; }
 }

@@ -9,10 +9,11 @@ import { scrollToElement } from '@/app/utils/layout-utils';
 import { menuItems } from '@layouts/components/data';
 import { LayoutStoreService } from '@core/services/layout-store.service';
 import { PermissionService } from '@core/services/permission.service';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 @Component({
   selector: 'app-menu',
-  imports: [NgIcon, NgbCollapse, RouterLink, CommonModule],
+  imports: [NgIcon, NgbCollapse, RouterLink, CommonModule, TranslatePipe],
   templateUrl: './app-menu.component.html'
 })
 export class AppMenuComponent implements OnInit, OnDestroy {
@@ -86,6 +87,17 @@ export class AppMenuComponent implements OnInit, OnDestroy {
     return this.router.url === item.url;
   }
 
+  // Normalize labels like "Patient Chart" -> "PATIENT_CHART" for translation keys
+  normalizeKey(input: any): string {
+    if (input == null) { return ''; }
+    return input
+      .toString()
+      .replace(/[^A-Za-z0-9]+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .toUpperCase();
+  }
+
   scrollToActiveLink(): void {
     const activeItem = document.querySelector('[data-active-link="true"]') as HTMLElement;
     const scrollContainer = document.querySelector("#sidenav .simplebar-content-wrapper") as HTMLElement;
@@ -105,6 +117,8 @@ export class AppMenuComponent implements OnInit, OnDestroy {
     const menuMap = new Map<string, MenuItemType>();
     const validModules = new Set<string>();
     const validComponentsPerModule = new Map<string, Set<string>>();
+    // Map of module -> (component label -> url) pulled from static menu config
+    const childUrlLookup = new Map<string, Map<string, string>>();
     const iconLookup = new Map<string, string>();
 
     for (const item of staticMenu) {
@@ -118,9 +132,15 @@ export class AppMenuComponent implements OnInit, OnDestroy {
       }
 
       if (item.children) {
+        // Build lookup of child label -> url for each module
+        const childMap = childUrlLookup.get(module) || new Map<string, string>();
         for (const child of item.children) {
           validComponentsPerModule.get(module)?.add(child.label);
+          if (child.label && child.url) {
+            childMap.set(child.label, child.url);
+          }
         }
+        childUrlLookup.set(module, childMap);
       }
 
       if (item.icon) {
@@ -152,9 +172,15 @@ export class AppMenuComponent implements OnInit, OnDestroy {
       if (componentName && componentName !== moduleName) {
         const alreadyExists = parent.children!.some(child => child.label === componentName);
         if (!alreadyExists) {
+          // Prefer the exact url from static menu if available, else slugify the label
+          const staticUrl = childUrlLookup.get(moduleName)?.get(componentName);
+          const safeSlug = componentName
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-');
           parent.children!.push({
             label: componentName,
-            url: `/${moduleName.toLowerCase()}/${componentName.toLowerCase()}`
+            url: staticUrl || `/${moduleName.toLowerCase()}/${safeSlug}`
           });
         }
       }

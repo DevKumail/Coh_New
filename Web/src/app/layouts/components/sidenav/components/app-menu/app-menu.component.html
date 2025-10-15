@@ -2,7 +2,7 @@
     @for (item of menuItems; track $index) {
 
         @if (item.isTitle) {
-            <li class="side-nav-title">{{ item.label }}</li>
+            <li class="side-nav-title">{{ normalizeKey(item.label) | translate }}</li>
         }
 
         @if (!item.isTitle) {
@@ -28,9 +28,9 @@
             @if (item.icon) {
                 <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
             }
-            <span class="menu-text">{{ item.label }}</span>
+            <span class="menu-text">{{ normalizeKey(item.label) | translate }}</span>
             @if (item.badge) {
-                <span [class]="`badge bg-${item.badge.variant}`">{{ item.badge.text }}</span>
+                <span [class]="`badge bg-${item.badge.variant}`">{{ item.badge.text | translate }}</span>
             }
             @if (!item.badge) {
                 <span class="menu-arrow">
@@ -68,10 +68,10 @@
                 @if (item.icon) {
                     <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
                 }
-                <span class="menu-text">{{ item.label }}</span>
+                <span class="menu-text">{{ normalizeKey(item.label) | translate }}</span>
                 @if (item.badge) {
                     <span class="badge text-bg-{{item.badge.variant}} opacity-50"
-                          [innerHTML]="item.badge.text"></span>
+                          [innerHTML]="(item.badge.text | translate)"></span>
                 }
             </a>
         }

@@ -3,76 +3,102 @@
 
       <div class="row align-items-end">
         <!-- ICD Version Dropdown -->
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">ICD Versions:</label>
-            <select class="form-select" formControlName="icdVersion">
-              <option value="">ALL</option>
-              <option *ngFor="let version of icdVersionList" [value]="version">{{ version }}</option>
+          <div class="col-md-3 col-sm-12">
+            <label for="icdVersionId" class="form-label">{{ 'ICD_VERSION' |   translate }}:</label>
+            <select class="form-control" formControlName="icdVersionId" id="icdVersionId" required>
+              <option value="">{{ 'SELECT_ICD_VERSION' | translate }}</option>
+              <option *ngFor="let version of ICDVersions" [value]="version.code">
+                {{ version.name }}
+              </option>
             </select>
           </div>
-        </div>
 
-        <!-- Search Code -->
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">Search Code:</label>
-            <input type="text" class="form-control" formControlName="searchCode" placeholder="Search Code / Description" />
+          <div class="col-md-2 col-sm-12">
+            <label for="searchById" class="form-label">{{ 'SEARCH_CODE' | translate }}:</label>
+            <select class="form-control" formControlName="searchById" id="searchById" required>
+              <option value="" disabled>{{ 'SELECT_SEARCH_CODE' | translate }}</option>
+              <option *ngFor="let item of Searchby" [value]="item.code">
+                {{ item.name }}
+              </option>
+            </select>
           </div>
-        </div>
 
-        <!-- Starting Code -->
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <label class="form-label">Starting Code:</label>
-            <input type="text" class="form-control" formControlName="startingCode" placeholder="Starting Code" />
+          <div class="col-md-2 col-sm-12"  *ngIf="favoritesForm.value.searchById != 3">
+            <label for="startingCode" class="form-label">{{ 'STARTING_CODE' | translate }}:</label>
+            <input type="text" class="form-control" formControlName="startingCode" id="startingCode"
+              placeholder="{{ 'ENTER_STARTING_CODE' | translate }}" />
           </div>
-        </div>
+            <!-- <div class="row col-12"> -->
+              <!-- Ending Code -->
+
+              <div class="col-md-2 col-sm-12" *ngIf="favoritesForm.value.searchById != 3 && favoritesForm.value.searchById != 1">
+                <label for="endingCode" class="form-label">{{ 'ENDING_CODE' | translate }}:</label>
+                <input type="text" class="form-control" formControlName="endingCode" id="endingCode"
+                  placeholder="{{ 'ENTER_ENDING_CODE' | translate }}" />
+              </div>
+
+
+              <!-- Description -->
+              <div class="col-md-2 col-sm-12" *ngIf="favoritesForm.get('searchById')?.value == 3">
+                <label for="description" class="form-label">{{ 'DESCRIPTION' | translate }}:</label>
+                <input type="text" class="form-control" id="description" formControlName="description"
+                  placeholder="{{ 'ENTER_DESCRIPTION' | translate }}" />
+              </div>
 
         <!-- Search Button -->
-        <div class="col-lg-3">
-          <div class="mb-3">
-            <button type="button" class="btn btn-primary" (click)="onSearch()">Search</button>
+        <div class="col-md-2 col-sm-12 ">
+          <div class="mb-3 ">
+            <button type="button" class="btn btn-primary " (click)="onSearch()">{{'SEARCH' | translate}}</button>
           </div>
         </div>
       </div>
 
       <!-- Results Table -->
       <div class="table-responsive mt-3">
+        <div class="card mt-3 shadow rounded">
+          <div class="card-body">
+            <h5>{{'SEARCH_LIST' | translate}}</h5>
+            <div class="table-responsive">
         <table class="table table-bordered table-striped mb-0">
           <thead>
             <tr class="text-center">
-              <th>Code</th>
-              <th>ICD Version</th>
-              <th>Description</th>
+              <th>{{'CODE' | translate}}</th>
+              <th>{{'ICD_VERSION' | translate}}</th>
+              <th>{{'DESCRIPTION' | translate}}</th>
             </tr>
           </thead>
-          <tbody>
-            <tr *ngIf="searchResults.length === 0">
-              <td colspan="3" class="text-center">No Diagnosis Code found.</td>
-            </tr>
+          <tbody class="table-group-divider">
             <tr *ngFor="let result of searchResults">
               <td>{{ result.code }}</td>
               <td>{{ result.icdVersion }}</td>
               <td>{{ result.description }}</td>
             </tr>
           </tbody>
+            <div *ngIf="searchResults.length === 0">
+              <span class="text-center">{{'NO_DATA_FOUND' | translate}}</span>
+            </div>
         </table>
+      </div>
+      </div>
+      </div>
+
+      <div class="divider"></div>
 
         <!-- Medical History Records Table -->
         <div class="card mt-3 shadow rounded">
           <div class="card-body">
+            <h5>FAVORITE_LIST</h5>
             <div class="table-responsive">
               <table class="table table-bordered table-striped">
                 <thead>
                   <tr class="text-center">
-                    <th>Provider</th>
-                    <th>Problem</th>
-                    <th>Comments</th>
-                    <th>Confidential</th>
-                    <th>Status</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
+                    <th>{{'PROVIDER' | translate}}</th>
+                    <th>{{'PROBLEM' | translate}}</th>
+                    <th>{{'COMMENT' | translate}}</th>
+                    <th>{{'CONFIDENTIAL' | translate}}</th>
+                    <th>{{'STATUS' | translate}}</th>
+                    <th>{{'START_DATE' | translate}}</th>
+                    <th>{{'END_DATE' | translate}}</th>
                   </tr>
                 </thead>
                 <tbody class="table-group-divider">

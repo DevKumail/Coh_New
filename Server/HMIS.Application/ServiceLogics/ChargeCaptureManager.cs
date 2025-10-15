@@ -84,7 +84,7 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<DataSet> CC_DiagnosisCodeDB(int? ICDVersionId, string? DiagnosisStartCode, string DiagnosisEndCode, string DescriptionFilter)
+        public async Task<DataSet> CC_DiagnosisCodeDB(int? ICDVersionId, string? DiagnosisStartCode, string? DiagnosisEndCode, string? DescriptionFilter, int? @PageNumber, int? PageSize)
         {
             try
             {
@@ -94,6 +94,8 @@ namespace HMIS.Application.ServiceLogics
                 param.Add("@DiagnosisStartCode", DiagnosisStartCode);
                 param.Add("@DiagnosisEndCode", DiagnosisEndCode);
                 param.Add("@DescriptionFilter", DescriptionFilter);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("BL_CC_DiagnosisCodeGet", param);
                 if (ds.Tables.Count == 0)
@@ -481,7 +483,7 @@ namespace HMIS.Application.ServiceLogics
         public async Task<List<Blicd9cmgroup>> GetICD9CMGroupByProvider(long? Id)
         {
             var result = new Blicd9cmgroup();
-            var DbData = await Task.Run(() => _dbContext.Blicd9cmgroups.Where(x => x.ProviderId == Id).OrderByDescending(x => x.GroupId).ToListAsync());
+            var DbData = await Task.Run(() => _dbContext.Blicd9cmgroup.Where(x => x.ProviderId == Id).OrderByDescending(x => x.GroupId).ToListAsync());
 
             return DbData;
         }
@@ -541,7 +543,7 @@ namespace HMIS.Application.ServiceLogics
 
                 List<BLSupperBillDiagnosisModel> bLSupperBillDiagnosis = _mapper.Map<List<BLSupperBillDiagnosisModel>>(input.BLSupperBillDiagnosisModel);
 
-                var updateComment = _dbContext.SchAppointments.SingleOrDefault(e => e.AppId == input.AppointmentId);
+                var updateComment = _dbContext.SchAppointment.SingleOrDefault(e => e.AppId == input.AppointmentId);
 
                 if (blSuperBillProcedures.Count > 0)
                 {
@@ -549,7 +551,7 @@ namespace HMIS.Application.ServiceLogics
                     foreach (var BillProcedure in blSuperBillProcedures)
                     {
                         BillProcedure.TypeOfService = Convert.ToString(
-                            await _dbContext.TypeOfServiceMasters
+                            await _dbContext.TypeOfServiceMaster
                             .Where(x => x.Name == BillProcedure.ProcedureType)
                             .Select(x => x.ServiceTypeId)
                             .FirstOrDefaultAsync()
@@ -580,11 +582,11 @@ namespace HMIS.Application.ServiceLogics
                             Modifier4 = BillProcedure.Modifier4
                         };
                         ls.Add(bLSuperBill);
-                        _dbContext.BlsuperBillProcedures.Add(bLSuperBill);
+                        _dbContext.BlsuperBillProcedure.Add(bLSuperBill);
 
                         if (BillProcedure.ProcedureType == "CPT")
                         {
-                            var getCptId = await _dbContext.ProcedureTypes.Where(x => x.Type == BillProcedure.ProcedureType).Select(x => x.Id).FirstOrDefaultAsync();
+                            var getCptId = await _dbContext.ProcedureType.Where(x => x.Type == BillProcedure.ProcedureType).Select(x => x.Id).FirstOrDefaultAsync();
                             PatientProcedure patientProcedure = new PatientProcedure()
                             {
                                 ProviderId = Convert.ToInt64(BillProcedure.CreatedBy),
@@ -604,7 +606,7 @@ namespace HMIS.Application.ServiceLogics
                                 IsLabTest = BillProcedure.IsLabTest
 
                             };
-                            _dbContext.PatientProcedures.Add(patientProcedure);
+                            _dbContext.PatientProcedure.Add(patientProcedure);
                         }
                     }
                     if (updateComment != null)
@@ -622,7 +624,7 @@ namespace HMIS.Application.ServiceLogics
                         //var message = await ValidateChargeCapture(new List<BlsuperBillDiagnosis> { Diagnosis }, input.VisitAccountNo, input.EmployeeId);
 
                         //_dbContext.BlsuperBillDiagnoses.Add(Diagnosis);
-                        var EmpName = await _dbContext.Hremployees.Where(x => x.EmployeeId == Convert.ToInt64(Diagnosis.CreatedBy)).FirstOrDefaultAsync();
+                        var EmpName = await _dbContext.Hremployee.Where(x => x.EmployeeId == Convert.ToInt64(Diagnosis.CreatedBy)).FirstOrDefaultAsync();
 
                         BlsuperBillDiagnosis blsuperBillDiagnosis = new BlsuperBillDiagnosis()
                         {
@@ -641,7 +643,7 @@ namespace HMIS.Application.ServiceLogics
                             LastUpdatedDate = DateTime.Now,
                             AppointmentId = Diagnosis.VisitAccountNo
                         };
-                        _dbContext.BlsuperBillDiagnoses.Add(blsuperBillDiagnosis);
+                        _dbContext.BlsuperBillDiagnosis.Add(blsuperBillDiagnosis);
                     }
                     await _dbContext.SaveChangesAsync();
                     //return "OK";
@@ -734,7 +736,7 @@ namespace HMIS.Application.ServiceLogics
                 if (procedureType == 3) //CPT
                 {
                     // Get base price from CPT Master Table
-                    var cpt = await _dbContext.BlmasterCpts.FirstOrDefaultAsync(x => x.Cptcode == procedureCode);
+                    var cpt = await _dbContext.BlmasterCpt.FirstOrDefaultAsync(x => x.Cptcode == procedureCode);
                     if (cpt != null && cpt.Price.HasValue)
                     {
                         price = Convert.ToDouble(cpt.Price.Value);
@@ -742,9 +744,9 @@ namespace HMIS.Application.ServiceLogics
                     // If payerId is given
                     if (payerId > 0)
                     {
-                        var groupIds = await _dbContext.Blcptgroups.Where(x => x.ProviderId == providerId).Select(x => x.GroupId).ToListAsync();
+                        var groupIds = await _dbContext.Blcptgroup.Where(x => x.ProviderId == providerId).Select(x => x.GroupId).ToListAsync();
                         // Try to get specific payer-based price
-                        var cptPayer = await _dbContext.BlcptgroupCodes.FirstOrDefaultAsync(x => groupIds.Contains(x.GroupId) && x.Cptcode == procedureCode && x.PayerId == payerId);
+                        var cptPayer = await _dbContext.BlcptgroupCode.FirstOrDefaultAsync(x => groupIds.Contains(x.GroupId) && x.Cptcode == procedureCode && x.PayerId == payerId);
                         if (cptPayer != null && cptPayer.UnitPrice.HasValue)
                         {
                             price = Convert.ToDouble(cptPayer.UnitPrice.Value);
@@ -762,9 +764,9 @@ namespace HMIS.Application.ServiceLogics
                     // If payerId is given
                     if (payerId > 0)
                     {
-                        var groupIds = await _dbContext.Blhcpcsgroups.Where(x => x.ProviderId == providerId).Select(x => x.GroupId).ToListAsync();
+                        var groupIds = await _dbContext.Blhcpcsgroup.Where(x => x.ProviderId == providerId).Select(x => x.GroupId).ToListAsync();
                         // Try to get specific payer-based price
-                        var cptPayer = await _dbContext.BlhcpcsgroupCodes.FirstOrDefaultAsync(x => groupIds.Contains(x.GroupId) && x.Hcpcscode == procedureCode && x.PayerId == payerId);
+                        var cptPayer = await _dbContext.BlhcpcsgroupCode.FirstOrDefaultAsync(x => groupIds.Contains(x.GroupId) && x.Hcpcscode == procedureCode && x.PayerId == payerId);
                         if (cptPayer != null && cptPayer.UnitPrice.HasValue)
                         {
                             price = Convert.ToDouble(cptPayer.UnitPrice.Value);
@@ -782,9 +784,9 @@ namespace HMIS.Application.ServiceLogics
                     // If payerId is given
                     if (payerId > 0)
                     {
-                        var groupIds = await _dbContext.BldentalGroups.Where(x => x.ProviderId == providerId).Select(x => x.GroupId).ToListAsync();
+                        var groupIds = await _dbContext.BldentalGroup.Where(x => x.ProviderId == providerId).Select(x => x.GroupId).ToListAsync();
                         // Try to get specific payer-based price
-                        var cptPayer = await _dbContext.BldentalGroupCodes.FirstOrDefaultAsync(x => groupIds.Contains(x.GroupId) && x.DentalCode == procedureCode && x.PayerId == payerId);
+                        var cptPayer = await _dbContext.BldentalGroupCode.FirstOrDefaultAsync(x => groupIds.Contains(x.GroupId) && x.DentalCode == procedureCode && x.PayerId == payerId);
                         if (cptPayer != null && cptPayer.UnitPrice.HasValue)
                         {
                             price = Convert.ToDouble(cptPayer.UnitPrice.Value);
@@ -819,7 +821,7 @@ namespace HMIS.Application.ServiceLogics
                 string ErrorMessage = "";
 
                 // Check if an invoice is already generated for the visit
-                int InvoiceGeneratedCount = await _dbContext.SchAppointments
+                int InvoiceGeneratedCount = await _dbContext.SchAppointment
                     .Where(x => x.VisitAccountNo == VisitAccountNo && x.IsInvoiceGenerated == true)
                     .CountAsync();
 
@@ -830,14 +832,14 @@ namespace HMIS.Application.ServiceLogics
                 }
 
                 // Check if patient status is Checked-In
-                int PatientStatusId = await _dbContext.SchAppointments
+                int PatientStatusId = await _dbContext.SchAppointment
                     // .Where(x => x.VisitAccountNo == VisitAccountNo)
                     .Select(x => x.PatientStatusId)
                     .FirstOrDefaultAsync();
 
                 if (PatientStatusId != 0) // Assuming 0 is not a valid PatientStatusId
                 {
-                    string PatientStatusValue = await _dbContext.SchPatientStatuses
+                    string PatientStatusValue = await _dbContext.SchPatientStatus
                         .Where(x => x.PatientStatusId == PatientStatusId)
                         .Select(x => x.PatientStatus)
                         .FirstOrDefaultAsync();
@@ -850,7 +852,7 @@ namespace HMIS.Application.ServiceLogics
                         if (EmployeeAllowedChgCap)
                         {
                             // Check if the appointment date is within 10 days of today's date
-                            DateTime AppointmentDate = await _dbContext.SchAppointments
+                            DateTime AppointmentDate = await _dbContext.SchAppointment
                                 // .Where(x => x.VisitAccountNo == VisitAccountNo)
                                 .Select(x => x.AppDateTime)
                                 .FirstOrDefaultAsync();
@@ -901,7 +903,7 @@ namespace HMIS.Application.ServiceLogics
         private async Task<bool> IsEmployeeAllowedToMakeChargeCaptureAsync(long EmployeeId)
         {
             // Check if the employee is allowed to make charge capture
-            bool EmployeeAllowedChgCap = (bool)await _dbContext.Hremployees
+            bool EmployeeAllowedChgCap = (bool)await _dbContext.Hremployee
                 .Where(e => e.EmployeeId == EmployeeId)
                 .Select(e => e.AllowChgCap)
                 .FirstOrDefaultAsync();
@@ -919,7 +921,7 @@ namespace HMIS.Application.ServiceLogics
         private bool RequiresYearOfOnSet(string icd9Code)
         {
             // Check if the diagnosis requires YearOfOnSet by querying BLMasterICD9CM
-            bool isOnsetDx = (bool)_dbContext.BlmasterIcd9cms.Where(x => x.Icd9code == icd9Code).Select(x => x.IsOnsetDx).FirstOrDefault();
+            bool isOnsetDx = (bool)_dbContext.BlmasterIcd9cm.Where(x => x.Icd9code == icd9Code).Select(x => x.IsOnsetDx).FirstOrDefault();
 
             return isOnsetDx;
         }
@@ -928,7 +930,7 @@ namespace HMIS.Application.ServiceLogics
         public async Task<List<Blcptgroup>> GetCPTByProvider(long? Id)
         {
             var result = new Blcptgroup();
-            var DbData = await Task.Run(() => _dbContext.Blcptgroups.Where(x => x.ProviderId == Id).OrderByDescending(x => x.GroupId).ToListAsync());
+            var DbData = await Task.Run(() => _dbContext.Blcptgroup.Where(x => x.ProviderId == Id).OrderByDescending(x => x.GroupId).ToListAsync());
 
             return DbData;
         }

@@ -4,13 +4,13 @@
       <li class="breadcrumb-item">
         <a href="javascript:void(0);">
           <ng-icon name="tablerSmartHome"></ng-icon>
-          Billing
+          {{ 'BILLING' | translate }}
         </a>
       </li>
       <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
-        <ng-icon name="tablerChevronRight"></ng-icon>
+          <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
       </li>
-      <li class="breadcrumb-item active" aria-current="page">Charge Capture</li>
+  <li class="breadcrumb-item active" aria-current="page">{{ 'CHARGE_CAPTURE' | translate }}</li>
     </ol>
   </nav>
 
@@ -18,9 +18,9 @@
   <div class="card shadow rounded">
     <div class="card-body">
      <div class="col-lg-3">
-          <label class="form-label">Provider / Nurse Name:</label>
+          <label class="form-label">{{ 'PROVIDER_NURSE_NAME' | translate }}:</label>
           <select class="form-select" [(ngModel)]="ProviderId" name="ProviderId" (change)="provider($event)">
-            <option value="">Select Provider</option>
+            <!-- <option value="">Select Provider</option> -->
             <option *ngFor="let item of Provider" [value]="item.code">
               {{ item.name }}
             </option>
@@ -30,7 +30,7 @@
 
        <div class="col-12 d-flex justify-content-between" style="margin-bottom: -5px; margin-top: -8px;">
         <div class="col-md-4">
-          <h3 style="font-weight: bold">Diagnosis</h3>
+          <h3 style="font-weight: bold">{{ 'DIAGNOSIS' | translate }}</h3>
         </div>
         <div class="col-md-2 col-sm-4 col-12 d-flex">
           <div class="col-md-1"></div>
@@ -40,7 +40,7 @@
               style="margin-bottom: 5px;"
               name="tablerChevronDown"
               class="avatar-xxs me-1"/>
-              Add Diagnosis
+              {{ 'ADD' | translate }}
           </button>
 
           <button (click)="DGridShow()" *ngIf="Dshow == true" type="button" class="btn btn-info" style="width: 150px; height: 35px; margin-left: 10px;">
@@ -48,31 +48,31 @@
               style="margin-bottom: 5px;"
               name="tablerChevronRight"
               class="avatar-xxs me-1"/>
-              Add Diagnosis
+              {{ 'ADD' | translate }}
           </button>
         </div>
       </div>
   <ng-container *ngIf="Diagnosis">
-      <ul ngbNav  #nav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs">
+      <ul ngbNav  #nav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs mb-2">
         <!-- My Diagnosis Code -->
         <li [ngbNavItem]="1">
-          <a ngbNavLink href="javascript:void(0)">My Diagnosis Code</a>
+          <a ngbNavLink href="javascript:void(0)">{{ 'MY_DIAGNOSIS_CODE' | translate }}</a>
           <ng-template ngbNavContent>
 
               <div class="row">
                   <div class="col-md-2 col-sm-4 col-12">
-                    <label  for="">Code</label>
+                    <label  for="">{{'CODE' | translate}}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       (input)="filter($event)"
-                      placeholder="Code"
+                      placeholder="{{ 'ENTER_CODE' | translate }}"
                       />
                   </div>
 
                   <div class="col-md-2 col-sm-4 col-12">
-                    <label for="">ICD Version</label>
+                    <label for="">{{'ICD_VERSION' | translate}}</label>
                     <select class="form-select" [(ngModel)]="ICDVersionId" name="ICDVersionId" (change)="filteVersion('ICD')">
                       <option *ngFor="let item of ICDVersions" [value]="item.code">
                         {{ item.name }}
@@ -82,21 +82,21 @@
 
 
                   <div class="col-md-2 col-sm-4 col-12">
-                  <label for="">Description</label>
+                  <label for="">{{'DESCRIPTION' | translate}}</label>
                   <input
                     type="text"
                     class="form-control"
                     name="description"
                     (input)="filter($event)"
-                    placeholder="Description"
+                    placeholder="{{ 'ENTER_DESCRIPTION' | translate }}"
                   />
                 </div>
 
 
                 <div class="col-md-2 col-sm-4 col-12">
-                  <label for="">Group Name</label>
+                  <label for="">{{'GROUP_NAME' | translate}}</label>
                   <select class="form-select" [(ngModel)]="ICT9GroupId" name="ICT9GroupId" (change)="filteVersion('Group')">
-                    <option value="">Select Group</option>
+                    <option value="">{{'SELECT_GROUP' | translate}}</option>
                     <option *ngFor="let item of ICT9Group" [value]="item.code">
                       {{ item.name }}
                     </option>
@@ -112,9 +112,9 @@
                   <thead class="align-middle thead-sm">
                     <tr>
                       <th></th>
-                      <th>Code</th>
-                      <th>ICD Version</th>
-                      <th>Description</th>
+                      <th>{{ 'CODE' | translate }}</th>
+                        <th>{{ 'ICD_VERSION' | translate }}</th>
+                        <th>{{ 'DESCRIPTION' | translate }}</th>
                     </tr>
                   </thead>
                   <tbody class="table-group-divider">
@@ -144,7 +144,7 @@
                     </tr>
 
                     <tr *ngIf="MyDiagnosisCode.length === 0">
-                      <td colspan="4">No My Diagnosis Code found.</td>
+                      <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -156,7 +156,7 @@
            <div class="d-flex flex-column align-items-center mt-3 gap-2">
               <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
 
-                <div>
+                  <div>
                   Showing {{ MyDiagnosisCodeStart + 1 }} to {{ MyDiagnosisCodeEnd }} of {{ MyDiagnosisCodeTotalItems }} entries
                 </div>
 
@@ -176,7 +176,7 @@
                       [class.active]="page === MyDiagnosisCodeCurrentPage"
                       [class.disabled]="page === '...'">
                       
-                      <button
+                        <button
                         class="page-link"
                         *ngIf="page !== '...'"
                         (click)="MyDiagnosisCodeGoToPage(+page)">
@@ -203,26 +203,26 @@
 
         <!-- Old Problem -->
         <li [ngbNavItem]="2">
-          <a ngbNavLink href="javascript:void(0)">Old Problem</a>
+          <a ngbNavLink href="javascript:void(0)">{{ 'OLD_PROBLEM' | translate }}</a>
           <ng-template ngbNavContent>
           <div >
 
              <div class="row">
                   <div class="col-md-2 col-sm-4 col-12">
-                    <label  for="">Address</label>
+                    <label  for="">{{ 'ADDRESS' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
-                      placeholder="Address"
+                      placeholder="{{ 'ENTER_ADDRESS' | translate }}"
                       [required]="true"
                       />
                   </div>
 
                   <div class="col-md-2 col-sm-4 col-12">
-                    <label for="">Marital Status</label>
+                    <label for="">{{ 'MARITAL_STATUS' | translate }}</label>
                     <select class="form-select"  name="ICDVersionId">
-                      <option value="">Select Marital Status</option>
+                      <option value="">{{ 'SELECT_MARITAL_STATUS' | translate }}</option>
                       <option *ngFor="let item of maritalstatus" [value]="item.code">
                         {{ item.name }}
                       </option>
@@ -231,20 +231,20 @@
 
 
                   <div class="col-md-2 col-sm-4 col-12">
-                  <label for="">Email</label>
+                  <label for="">{{ 'EMAIL' | translate }}</label>
                   <input
                     type="text"
                     class="form-control"
                     name="description"
-                    placeholder="Email"
+                    placeholder="{{ 'ENTER_EMAIL_ADDRESS' | translate }}"
                     />
                 </div>
 
 
                 <div class="col-md-2 col-sm-4 col-12">
-                  <label for="">Group Name</label>
+                  <label for="">{{ 'GROUP_NAME' | translate }}</label>
                   <select class="form-select"  name="">
-                    <option value="">Select Group</option>
+                    <option value="">{{ 'SELECT_GROUP' | translate }}</option>
                     <option *ngFor="let item of maritalstatus" [value]="item.code">
                       {{ item.name }}
                     </option>
@@ -259,10 +259,10 @@
                   <tr>
                     <th>
                     </th>
-                    <th>Code</th>
-                    <th>ICD Version</th>
-                    <th>YearofOnset</th>                    
-                    <th>Description</th>
+                    <th>{{ 'CODE' | translate }}</th>
+                    <th>{{ 'ICD_VERSION' | translate }}</th>
+                    <th>{{ 'YEAROFONSET' | translate }}</th>                    
+                    <th>{{ 'DESCRIPTION' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -292,7 +292,7 @@
                   </tr>
 
                   <tr *ngIf="status.length === 0">
-                    <td colspan="4">No Old Problems found.</td>
+                    <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -301,9 +301,9 @@
           </ng-template>
         </li>
 
-        <!-- Diagnosis Code -->
-        <li [ngbNavItem]="3">
-            <a ngbNavLink href="javascript:void(0)">Diagnosis Code</a>
+    <!-- Diagnosis Code -->
+    <li [ngbNavItem]="3">
+      <a ngbNavLink href="javascript:void(0)">{{ 'DIAGNOSIS_CODE' | translate }}</a>
             <ng-template ngbNavContent>
           <div >
 
@@ -311,9 +311,8 @@
                   
 
                   <div class="col-md-2 col-sm-4 col-12">
-                    <label for="">ICD Version</label>
+                    <label for="">{{ 'ICD_VERSION' | translate }}</label>
                     <select class="form-select" [(ngModel)]="ICDVersionId" name="ICDVersionId">
-                      <option value="">Select ICD Version</option>
                       <option *ngFor="let item of ICDVersions" [value]="item.code">
                         {{ item.name }}
                       </option>
@@ -322,9 +321,9 @@
 
 
                 <div class="col-md-2 col-sm-4 col-12">
-                  <label for="">Search Code</label>
+                  <label for="">{{ 'SEARCH_CODE' | translate }}</label>
                   <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (change)="searchBy($event)">
-                    <option value="">Select Group</option>
+                    <option value="">{{ 'SELECT_CODE' | translate }}</option>
                     <option *ngFor="let item of Searchby" [value]="item.code">
                       {{ item.name }}
                     </option>
@@ -332,35 +331,35 @@
                 </div>
 
                 <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById != 3">
-                    <label  for="">Starting Code</label>
+                    <label  for="">{{ 'STARTING_CODE' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       [(ngModel)]="DiagnosisStartCode"
                       type="text"
-                      placeholder="Starting Code"
+                      placeholder="{{ 'ENTER_STARTING_CODE' | translate }}"
                       />
                   </div>
 
                   <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2">
-                    <label  for="">Ending Code</label>
-                    <input
+                    <label  for="">{{ 'ENDING_CODE' | translate }}</label>
+                      <input
                       pInputText
                       class="form-control"
                       [(ngModel)]="DiagnosisEndCode"
                       type="text"
-                      placeholder="Ending Code"
+                      placeholder="{{ 'ENTER_ENDING_CODE' | translate }}"
                       />
                   </div>
 
                   <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 3">
-                    <label  for="">Description</label>
+                    <label  for="">{{ 'DESCRIPTION' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       [(ngModel)]="DescriptionFilter"
                       type="text"
-                      placeholder="Description"
+                      placeholder="{{ 'ENTER_DESCRIPTION' | translate }}"
                       />
                   </div>
 
@@ -368,7 +367,7 @@
                        <button (click)="SearchDiagnosis()" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
                           <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
                           aria-hidden="true"></span>
-                          Search
+                          {{ 'SEARCH' | translate }}
                       </button>
                     </div>
             </div>
@@ -380,9 +379,9 @@
                 <thead class="align-middle thead-sm">
                   <tr>
                     <th></th>
-                    <th>Code</th>
-                    <th>ICD Version</th>
-                    <th>Description</th>
+                    <th>{{ 'CODE' | translate }}</th>
+                    <th>{{ 'ICD_VERSION' | translate }}</th>
+                    <th>{{ 'DESCRIPTION' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody class="table-group-divider">
@@ -411,7 +410,7 @@
                     </td>
                   </tr>
                   <tr *ngIf="DiagnosisCode.length === 0">
-                    <td colspan="4">No Diagnosis Code found.</td>
+                    <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -486,11 +485,11 @@
               <table class="table align-middle mb-0">
                 <thead class="align-middle thead-sm">
                   <tr>
-                    <th>ICD Code</th>
-                    <th>ICD Version</th>
-                    <th>YearofOnset</th>
-                    <th>Description</th>
-                    <th>Type</th>
+                    <th>{{'ICD_CODE' | translate}}</th>
+                    <th>{{'ICD_VERSION' | translate}}</th>
+                    <th> {{'YEAR_OF_ON_SET' | translate}}</th>
+                    <th>{{'DESCRIPTION' | translate}}</th>
+                    <th>{{'TYPE' | translate}}</th>
                   </tr>
                 </thead>
                 <tbody class="table-group-divider">
@@ -530,14 +529,14 @@
                       </option>
                     </select>
                     <div *ngIf="this.validation && !MyDiagnosisData.typeofDiagnosis" class="text-danger">
-                      Type is required
+                      {{'TYPE_IS_REQUIRED' | translate}}
                     </div>
                   </div>
                     </td>
                   </tr>
 
                   <tr *ngIf="MyDiagnosisData.length === 0">
-                    <td colspan="4">No Data found.</td>
+                    <td colspan="4">{{'NO_DATA_FOUND' | translate}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -584,7 +583,7 @@
       <!-- Button For hide and show grid -->
        <div class="col-12 d-flex justify-content-between" style="margin-bottom: -5px; margin-top: -8px;">
         <div class="col-md-4">
-          <h3 style="font-weight: bold">Service</h3>
+          <h3 style="font-weight: bold">{{'SERVICE' | translate}}</h3>
         </div>
         <div class="col-md-2 col-sm-4 col-12 d-flex">
           <div class="col-md-1"></div>
@@ -594,7 +593,7 @@
               style="margin-bottom: 5px;" 
               name="tablerChevronDown"
               class="avatar-xxs me-1"/>
-              Add Service
+              {{ 'ADD' | translate }}
           </button>
 
           <button (click)="SGridShow()" *ngIf="SShow == true" type="button" class="btn btn-info" style="width: 150px; height: 35px; margin-left: 20px;">
@@ -602,45 +601,46 @@
               style="margin-bottom: 5px;"
               name="tablerChevronRight"
               class="avatar-xxs me-1"/>
-              Add Service
+              {{ 'ADD' | translate }}
           </button>
         </div>
       </div>
     <!-- hide Service gride -->
       <ng-container *ngIf="Services">
-          <ul ngbNav  #nav="ngbNav" [(activeId)]="activeServiceTabId" class="nav nav-tabs mb-3">
+          <ul ngbNav  #nav="ngbNav" [(activeId)]="activeServiceTabId" class="nav nav-tabs mb-2">
             <!-- My CPT Code -->
             <li [ngbNavItem]="1">
-              <a ngbNavLink href="javascript:void(0)">My CPT Code</a>
+              <a ngbNavLink href="javascript:void(0)">{{'MY_CPT_CODE' | translate}}</a>
               <ng-template ngbNavContent>
 
                   <div class="row">
                       <div class="col-md-2 col-sm-4 col-12">
-                        <label  for="">Code</label>
+                        <label  for="">{{'CODE' | translate}}</label>
                         <input
                           pInputText
                           class="form-control"
                           type="text"
                           (input)="filterCPT($event)"
-                          placeholder="Code"
+                          placeholder="{{ 'ENTER_CODE' | translate }}"
                           />
                       </div>
 
                       <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Description</label>
+                      <label for="">{{'DESCRIPTION' | translate}}</label>
                       <input
                         type="text"
                         class="form-control"
                         name="description"
                         (input)="filterCPT($event)"
-                        placeholder="Description"
+                        placeholder="{{ 'ENTER_DESCRIPTION' | translate }}"
                       />
                     </div>
 
 
                     <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Group Name</label>
+                      <label for="">{{'GROUP_NAME' | translate}}</label>
                       <select class="form-select" [(ngModel)]="CPTGroupId" name="ICT9GroupId" (onChange)="filteCPTGroup($event)">
+                        <option value="">{{'SELECT_GROUP' | translate}}</option>
                         <option *ngFor="let item of CPTGroups" [value]="item.code">
                           {{ item.name }}
                         </option>
@@ -655,8 +655,8 @@
                 <thead class="align-middle thead-sm">
                       <tr>
                         <th></th>
-                        <th>Code</th>
-                        <th>Description</th>
+                        <th>{{'CODE' | translate}}</th>
+                        <th>{{'DESCRIPTION' | translate}}</th>
                       </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -673,7 +673,7 @@
                       </tr>
 
                       <tr *ngIf="pagedMyCptCode.length === 0">
-                        <td colspan="3">No My CPT Code found.</td>
+                        <td colspan="3">{{'NO_DATA_FOUND' | translate}}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -730,37 +730,38 @@
 
             <!-- My HCPCS Code -->
             <li [ngbNavItem]="2">
-              <a ngbNavLink href="javascript:void(0)">My HCPCS Code</a>
+              <a ngbNavLink href="javascript:void(0)">{{'MY_HCPCS_CODE' | translate}}</a>
               <ng-template ngbNavContent>
 
 
                        <div class="row">
                       <div class="col-md-2 col-sm-4 col-12">
-                        <label  for="">Code</label>
+                        <label  for="">{{ 'CODE' | translate }}</label>
                         <input
                           pInputText
                           class="form-control"
                           type="text"
                           (input)="filterMyHCPS($event)"
-                          placeholder="Code"
+                          placeholder="{{ 'ENTER_CODE' | translate }}"
                           />
                       </div>
 
                       <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Description</label>
+                      <label for="">{{ 'DESCRIPTION' | translate }}</label>
                       <input
                         type="text"
                         class="form-control"
                         name="description"
                         (input)="filterMyHCPS($event)"
-                        placeholder="Description"
+                        placeholder="{{ 'ENTER_DESCRIPTION' | translate }}"
                       />
                     </div>
 
 
                     <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Group Name</label>
+                      <label for="">{{ 'GROUP_NAME' | translate }}</label>
                       <select class="form-select" [(ngModel)]="MyHCPSGroupId" name="ICT9GroupId" (onChange)="filteHCPCSGroup($event)">
+                        <option value="">{{ 'SELECT_GROUP' | translate }}</option>
                         <option *ngFor="let item of MYHCPCSGroups" [value]="item.code">
                           {{ item.name }}
                         </option>
@@ -777,8 +778,8 @@
                       <tr>
                         <th>
                         </th>
-                        <th>Code</th>                 
-                        <th>Description</th>
+                        <th>{{ 'CODE' | translate }}</th>                 
+                        <th>{{ 'DESCRIPTION' | translate }}</th>
                       </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -803,7 +804,7 @@
                       </tr>
 
                       <tr *ngIf="pagedMyHCPCSCode.length === 0">
-                        <td colspan="4">No My HCPCS Code found.</td>
+                        <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -860,40 +861,40 @@
               </ng-template>
             </li>
 
-            <!-- My Dental Code -->
-            <li [ngbNavItem]="3">
-                <a ngbNavLink href="javascript:void(0)">My Dental Code</a>
+      <!-- My Dental Code -->
+      <li [ngbNavItem]="3">
+        <a ngbNavLink href="javascript:void(0)">{{ 'MY_DENTAL_CODE' | translate }}</a>
                 <ng-template ngbNavContent>
 
 
                     <div class="row">
                       <div class="col-md-2 col-sm-4 col-12">
-                        <label  for="">Code</label>
+                        <label  for="">{{ 'CODE' | translate }}</label>
                         <input
                           pInputText
                           class="form-control"
                           type="text"
                           (input)="filterMyDental($event)"
-                          placeholder="Code"
+                          placeholder="{{ 'ENTER_CODE' | translate }}"
                           />
                       </div>
 
                       <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Description</label>
+                      <label for="">{{ 'DESCRIPTION' | translate }}</label>
                       <input
                         type="text"
                         class="form-control"
                         name="description"
                         (input)="filterMyDental($event)"
-                        placeholder="Description"
+                        placeholder="{{ 'ENTER_DESCRIPTION' | translate }}"
                       />
                     </div>
 
 
                     <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Group Name</label>
+                      <label for="">{{ 'GROUP_NAME' | translate }}</label>
                       <select class="form-select" [(ngModel)]="MyDentalGroupId" name="MyDentalGroups" (onChange)="filteDentalGroup($event)">
-                        <option value="">Select Group</option>
+                        <option value="">{{ 'SELECT_GROUP' | translate }}</option>
                         <option *ngFor="let item of MyDentalGroups" [value]="item.code">
                           {{ item.name }}
                         </option>
@@ -909,8 +910,8 @@
                 <thead class="align-middle thead-sm">
                         <tr>
                           <th></th>
-                          <th>Code</th>
-                          <th>Description</th>
+                          <th>{{ 'CODE' | translate }}</th>
+                          <th>{{ 'DESCRIPTION' | translate }}</th>
                         </tr>
                       </thead>
                       <tbody class="table-group-divider">
@@ -935,7 +936,7 @@
                         </tr>
 
                         <tr *ngIf="pagedMyDentalCode.length === 0">
-                          <td colspan="3">No My Dental Code found.</td>
+                          <td colspan="3">{{ 'NO_DATA_FOUND' | translate }}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -992,13 +993,13 @@
 
             </ng-template>
               </li>
-            <!-- CPT Code -->
-            <li [ngbNavItem]="4">
-                <a ngbNavLink href="javascript:void(0)">CPT Code</a>
+      <!-- CPT Code -->
+      <li [ngbNavItem]="4">
+        <a ngbNavLink href="javascript:void(0)">{{ 'CPT_CODE' | translate }}</a>
                 <ng-template ngbNavContent>
                     <div class="row">
                       <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Search CPT Code</label>
+            <label for="">{{ 'SEARCH_CPT_CODE' | translate }}</label>
                       <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">
                         <!-- <option value="">Select Group</option> -->
                         <option *ngFor="let item of SearchCPTby" [value]="item.code">
@@ -1008,42 +1009,42 @@
                     </div>
 
                      <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2 || SearchById == 3">
-                    <label  for="">Starting Code</label>
+                    <label  for="">{{ 'STARTING_CODE' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="ProcedureStartCode"
-                      placeholder="Starting Code"
+                      placeholder="{{ 'STARTING_CODE' | translate }}"
                       />
                   </div>
 
                   <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 3">
-                    <label  for="">Ending Code</label>
+                    <label  for="">{{ 'ENDING_CODE' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="ProcedureEndCode"
-                      placeholder="Ending Code"
+                      placeholder="{{ 'ENDING_CODE' | translate }}"
                       />
                   </div>   
 
                   <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 4">
-                    <label  for="">Description</label>
+                    <label  for="">{{ 'DESCRIPTION' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="DescriptionFilter"
-                      placeholder="Description"
+                      placeholder="{{ 'ENTER_DESCRIPTION' | translate }}"
                       />
                   </div>
                     <div class="col-md-2 col-sm-12 col-12"> 
-                       <button (click)="SearchProcedure(1)" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
+                <button (click)="SearchProcedure(1)" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
                           <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
                           aria-hidden="true"></span>
-                          Search
+                  {{ 'SEARCH' | translate }}
                       </button>
                     </div>
                 </div>
@@ -1054,8 +1055,8 @@
                 <thead class="align-middle thead-sm">
                         <tr>
                           <th></th>
-                          <th>CPT Code</th>
-                          <th>Description</th>
+                          <th>{{'CPT_CODE' | translate}}</th>
+                          <th>{{ 'DESCRIPTION' | translate }}</th>
                         </tr>
                       </thead>
                       <tbody class="table-group-divider">
@@ -1080,7 +1081,7 @@
                         </tr>
 
                         <tr *ngIf="pagedCPT.length === 0">
-                          <td colspan="3">No My CPT Code found.</td>
+                          <td colspan="3">{{ 'NO_DATA_FOUND' | translate }}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -1139,11 +1140,11 @@
 
           <!-- HCPCS Code -->
               <li [ngbNavItem]="5">
-                <a ngbNavLink href="javascript:void(0)">HCPCS Code</a>
+                <a ngbNavLink href="javascript:void(0)">{{ 'HCPCS_CODE' | translate }}</a>
                 <ng-template ngbNavContent>
                     <div class="row">
                       <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Search HCPCS</label>
+                      <label for="">{{ 'SEARCH_HCPCS' | translate }}</label>
                       <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">
                         <!-- <option value="">Select Group</option> -->
                         <option *ngFor="let item of SearchHCPSby" [value]="item.code">
@@ -1153,42 +1154,42 @@
                     </div>
 
                       <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2 || SearchById == 3">
-                    <label  for="">Starting Code</label>
-                    <input
-                      pInputText
-                      class="form-control"
-                      type="text"
-                      [(ngModel)]="ProcedureStartCode"
-                      placeholder="Starting Code"
-                      />
-                  </div>
+                      <label  for="">{{ 'STARTING_CODE' | translate }}</label>
+                      <input
+                        pInputText
+                        class="form-control"
+                        type="text"
+                        [(ngModel)]="ProcedureStartCode"
+                        placeholder="{{ 'STARTING_CODE' | translate }}"
+                        />
+                    </div>
 
                   <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 3">
-                    <label  for="">Ending Code</label>
+                    <label  for="">{{ 'ENDING_CODE' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="ProcedureEndCode"
-                      placeholder="Ending Code"
+                      placeholder="{{ 'ENDING_CODE' | translate }}"
                       />
-                  </div>   
+                  </div>
 
                   <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 4">
-                    <label  for="">Description</label>
+                    <label  for="">{{'DESCRIPTION' | translate}}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="DescriptionFilter"
-                      placeholder="Description"
+                      placeholder="{{ 'ENTER_DESCRIPTION' | translate }}"
                       />
                   </div>
                     <div class="col-md-2 col-sm-12 col-12"> 
                        <button (click)="SearchProcedure(2)" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
                           <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
                           aria-hidden="true"></span>
-                          Search
+                          {{'SEARCH' | translate }}
                       </button>
                     </div>
                 </div>
@@ -1200,8 +1201,8 @@
                       <tr>
                         <th>
                         </th>
-                        <th>HCPCS Code</th>
-                        <th>Description</th>
+                        <th>{{ 'HCPCS_CODE' | translate }}</th>
+                        <th>{{ 'DESCRIPTION' | translate }}</th>
                       </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -1226,7 +1227,7 @@
                       </tr>
 
                       <tr *ngIf="pagedHCPCS.length === 0">
-                        <td colspan="4">No HCPSC Codes found.</td>
+                        <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1282,11 +1283,11 @@
               </li>
 
                <li [ngbNavItem]="6">
-                <a ngbNavLink href="javascript:void(0)">Dental Code</a>
+                <a ngbNavLink href="javascript:void(0)">{{ 'DENTAL_CODE' | translate }}</a>
                 <ng-template ngbNavContent>
                     <div class="row">
                       <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Search Dental Code:</label>
+                      <label for="">{{ 'SEARCH_DENTAL_CODE' | translate }}</label>
                       <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">
                         <!-- <option value="">Select Group</option> -->
                         <option *ngFor="let item of SearchDentalby" [value]="item.code">
@@ -1296,35 +1297,35 @@
                     </div>
 
                      <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2 || SearchById == 3">
-                    <label  for="">Starting Code</label>
+                    <label  for="">{{ 'STARTING_CODE' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="ProcedureStartCode"
-                      placeholder="Starting Code"
+                      placeholder="{{ 'ENTER_STARTING_CODE' | translate }}"
                       />
                   </div>
 
                   <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 3">
-                    <label  for="">Ending Code</label>
+                    <label  for="">{{ 'ENDING_CODE' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="ProcedureEndCode"
-                      placeholder="Ending Code"
+                      placeholder="{{ 'ENTER_ENDING_CODE' | translate }}"
                       />
                   </div>   
 
                   <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 4">
-                    <label  for="">Description</label>
+                    <label  for="">{{'DESCRIPTION' | translate}}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="DescriptionFilter"
-                      placeholder="Description"
+                      placeholder="{{ 'ENTER_DESCRIPTION' | translate }}"
                       />
                   </div>
                     
@@ -1332,7 +1333,7 @@
                        <button (click)="SearchProcedure(3)" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
                           <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
                           aria-hidden="true"></span>
-                          Search
+                          {{ 'SEARCH' | translate }}
                       </button>
                     </div>
                 </div>
@@ -1344,8 +1345,8 @@
                       <tr>
                         <th>
                         </th>
-                        <th>Dental Code</th>
-                        <th>Description</th>
+                        <th>{{'DENTAL_CODE' | translate}}</th>
+                        <th>{{'DESCRIPTION' | translate}}</th>
                       </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -1370,7 +1371,7 @@
                       </tr>
 
                       <tr *ngIf="pagedDental.length === 0">
-                        <td colspan="4">No Dental Code found.</td>
+                        <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1427,11 +1428,11 @@
               </li>
 
               <li [ngbNavItem]="7">
-                <a ngbNavLink href="javascript:void(0)">Unclassified Service</a>
+                <a ngbNavLink href="javascript:void(0)">{{ 'UNCLASSIFIED_SERVICE' | translate }}</a>
                 <ng-template ngbNavContent>
                     <div class="row">
                       <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Search Unclassified:</label>
+                      <label for="">{{ 'SEARCH_UNCLASSIFIED' | translate }}:</label>
                       <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">
                         <option *ngFor="let item of SearchUnclassifiedby" [value]="item.code">
                           {{ item.name }}
@@ -1440,24 +1441,24 @@
                     </div>
 
                     <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2 || SearchById == 3">
-                    <label  for="">Code</label>
+                    <label  for="">{{ 'CODE' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="ProcedureStartCode"
-                      placeholder="Code"
+                      placeholder="{{ 'ENTER_CODE' | translate }}"
                       />
                   </div>
 
                   <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 4">
-                    <label  for="">Description</label>
+                    <label  for="">{{ 'DESCRIPTION' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="ProcedureStartCode"
-                      placeholder="Description"
+                      placeholder="{{ 'ENTER_DESCRIPTION' | translate }}"
                       />
                   </div>
 
@@ -1465,7 +1466,7 @@
                        <button (click)="SearchProcedure(4)" *ngIf=" SHide == true" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
                           <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
                           aria-hidden="true"></span>
-                          Search
+                          {{ 'SEARCH' | translate }}
                       </button>
                     </div>
                 </div>
@@ -1477,9 +1478,9 @@
                       <tr>
                         <th>
                         </th>
-                        <th>Code</th>
-                        <th>Type</th>
-                        <th>Description</th>
+                        <th>{{ 'CODE' | translate }}</th>
+                        <th>{{ 'TYPE' | translate }}</th>
+                        <th>{{ 'DESCRIPTION' | translate }}</th>
                       </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -1509,7 +1510,7 @@
                       </tr>
 
                       <tr *ngIf="pagedUnclassifiedService.length === 0">
-                        <td colspan="4">No Unclassified Service Codes found.</td>
+                        <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1567,26 +1568,26 @@
 
           <!-- Dental Code -->
               <li [ngbNavItem]="8">
-                <a ngbNavLink href="javascript:void(0)">Comment</a>
+                <a ngbNavLink href="javascript:void(0)">{{'COMMENT' | translate}}</a>
                 <ng-template ngbNavContent>
               <div class="col-md-2 col-sm-12 col-12"></div>
               <div class="col-md-2 col-sm-12 col-12">
-                <label for="">Comments:</label>
+                <label for="">{{'COMMENT' | translate}}</label>
               </div>
               <div class="col-md-5 col-sm-12 col-12">
                 <textarea rows="10" cols="70" [(ngModel)]="comment" name="comment" form="usrform">
-                  Enter comment here...</textarea>
+                  {{'ENTER_COMMENT_HERE...' | translate}}</textarea>
               </div>
               <div class="col-md-3 col-sm-12 col-12"></div>
                 </ng-template>
                 </li>
 
                  <li [ngbNavItem]="9">
-                <a ngbNavLink href="javascript:void(0)">Service Item</a>
+                <a ngbNavLink href="javascript:void(0)">{{ 'SERVICE_ITEM' | translate }}</a>
                 <ng-template ngbNavContent>
                     <div class="row">
                       <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">Search Unclassified:</label>
+                      <label for="">{{ 'SEARCH_UNCLASSIFIED' | translate }}:</label>
                       <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">                        <option *ngFor="let item of SearchUnclassifiedby" [value]="item.code">
                           {{ item.name }}
                         </option>
@@ -1594,24 +1595,24 @@
                     </div>
 
                       <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 2 || SearchById == 3">
-                    <label  for="">Code</label>
+                    <label  for="">{{ 'CODE' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="ProcedureStartCode"
-                      placeholder="Code"
+                      placeholder="{{ 'CODE' | translate }}"
                       />
                   </div>
 
                   <div class="col-md-2 col-sm-4 col-12" *ngIf="SearchById == 4">
-                    <label  for="">Description</label>
+                    <label  for="">{{ 'DESCRIPTION' | translate }}</label>
                     <input
                       pInputText
                       class="form-control"
                       type="text"
                       [(ngModel)]="ProcedureStartCode"
-                      placeholder="Description"
+                      placeholder="{{ 'ENTER_DESCRIPTION' | translate }}"
                       />
                   </div>
 
@@ -1619,7 +1620,7 @@
                        <button (click)="SearchProcedure(5)" type="button" class="btn btn-info" style="width: 180px; margin-top: 18px; margin-left: 10px;">
                           <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"
                           aria-hidden="true"></span>
-                          Search
+                          {{ 'SEARCH' | translate }}
                       </button>
                     </div>
                 </div>
@@ -1631,8 +1632,8 @@
                       <tr>
                         <th>
                         </th>
-                        <th>Code</th>
-                        <th>Description</th>
+                        <th>{{ 'CODE' | translate }}</th>
+                        <th>{{ 'DESCRIPTION' | translate }}</th>
                       </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -1657,7 +1658,7 @@
                       </tr>
 
                       <tr *ngIf="pagedServiceItem.length === 0">
-                        <td colspan="4">No Service Item found.</td>
+                        <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1731,15 +1732,15 @@
               <table class="table align-middle mb-0">
                 <thead class="align-middle thead-sm">
                   <tr>
-                    <th style="width: 10%">Type</th>
-                    <th style="width: 10%">Code</th>
-                    <th style="width: 10%">Unit</th>
-                    <th style="width: 40%">Description</th>
-                    <th style="width: 10%" *ngIf="serviceToothCode">Tooth Code</th>
-                    <th style="width: 5%" *ngIf="ServiceM" >M1</th>
-                    <th style="width: 5%" *ngIf="ServiceM">M2</th>
-                    <th style="width: 5%" *ngIf="ServiceM">M3</th>
-                    <th style="width: 5%" *ngIf="ServiceM">M4</th>
+                    <th style="width: 10%">{{ 'TYPE' | translate }}</th>
+                    <th style="width: 10%">{{ 'CODE' | translate }}</th>
+                    <th style="width: 10%">{{ 'UNIT' | translate }}</th>
+                    <th style="width: 40%">{{ 'DESCRIPTION' | translate }}</th>
+                    <th style="width: 10%" *ngIf="serviceToothCode">{{ 'TOOTH_CODE' | translate }}</th>
+                    <th style="width: 5%" *ngIf="ServiceM" >{{ 'M1' | translate }}</th>
+                    <th style="width: 5%" *ngIf="ServiceM">{{ 'M2' | translate }}</th>
+                    <th style="width: 5%" *ngIf="ServiceM">{{ 'M3' | translate }}</th>
+                    <th style="width: 5%" *ngIf="ServiceM">{{ 'M4' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody class="table-group-divider">
@@ -1757,7 +1758,7 @@
                           class="form-control"
                           type="number"
                           [(ngModel)]="MyServicesData.Unit"
-                          placeholder="Unit"
+                          placeholder="{{ 'UNIT' | translate }}"
                           />
                      </div>
                     </td>
@@ -1781,7 +1782,7 @@
                           class="form-control"
                           type="text"
                           [(ngModel)]="MyServicesData.M1"
-                          placeholder="M1"
+                          placeholder="{{ 'M1' | translate }}"
                           [disabled]="MyServicesData?.type != 'HCPCS'"
                           type="number"
                           />
@@ -1794,7 +1795,7 @@
                           class="form-control"
                           type="text"
                           [(ngModel)]="MyServicesData.M2"
-                          placeholder="M2"
+                          placeholder="{{ 'M2' | translate }}"
                           [disabled]="MyServicesData?.type != 'HCPCS'"
                           type="number"
                           />
@@ -1807,7 +1808,7 @@
                           class="form-control"
                           type="text"
                           [(ngModel)]="MyServicesData.M3"
-                          placeholder="M3"
+                          placeholder="{{ 'M3' | translate }}"
                           [disabled]="MyServicesData?.type != 'HCPCS'"
                           type="number"
                           />
@@ -1821,7 +1822,7 @@
                           class="form-control"
                           type="text"
                           [(ngModel)]="MyServicesData.M4"
-                          placeholder="M4"
+                          placeholder="{{ 'M4' | translate }}"
                           [disabled]="MyServicesData?.type != 'HCPCS'"
                           type="number"
                           />
@@ -1830,7 +1831,7 @@
                   </tr>
 
                   <tr *ngIf="pagedAllService.length === 0">
-                    <td colspan="4">No Data found.</td>
+                    <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -1890,7 +1891,7 @@
 
        <div class="row col-12">
         <div class="col-12 mb-2">
-          <button style="float: right" (click)="submit()" type="button" class="btn btn-info">Save</button>
-           <button style="float: right; margin-right: 5px;" (click)="delete()" type="button" class="btn btn-danger">Delete</button>
+          <button style="float: right" (click)="submit()" type="button" class="btn btn-info">{{ 'SAVE' | translate }}</button>
+           <button style="float: right; margin-right: 5px;" (click)="delete()" type="button" class="btn btn-danger">{{ 'DELETE' | translate }}</button>
         </div>
        </div>

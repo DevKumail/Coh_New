@@ -148,7 +148,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_AllDiagnosisCode
         [HttpGet("DiagnosisCode")]
-        public async Task<IActionResult> CC_DiagnosisCode(int ICDVersionId, string DiagnosisStartCode, string DiagnosisEndCode, string DescriptionFilter)
+        public async Task<IActionResult> CC_DiagnosisCode(int? ICDVersionId, string? DiagnosisStartCode, string? DiagnosisEndCode, string? DescriptionFilter, int? @PageNumber, int? PageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -160,7 +160,7 @@ namespace HMIS.Web.Controllers.Billing
             timerElapsed.StartTimer();
             try
             {
-                DataSet result = await _chargeCaptureManager.CC_DiagnosisCodeDB(ICDVersionId, DiagnosisStartCode, DiagnosisEndCode, DescriptionFilter);
+                DataSet result = await _chargeCaptureManager.CC_DiagnosisCodeDB(ICDVersionId, DiagnosisStartCode, DiagnosisEndCode, DescriptionFilter, PageNumber, PageSize);
 
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)

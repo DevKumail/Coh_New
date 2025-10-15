@@ -36,6 +36,6 @@ public partial class BlcptgroupCode
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("GroupId")]
-    [InverseProperty("BlcptgroupCodes")]
+    [InverseProperty("BlcptgroupCode")]
     public virtual Blcptgroup Group { get; set; } = null!;
 }

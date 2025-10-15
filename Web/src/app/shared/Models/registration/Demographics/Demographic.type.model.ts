@@ -1,4 +1,3 @@
-import { number } from 'echarts';
 import { Assignments, Contact, Demographic, FamilyMembers, NextOfKin, Parent } from './Demographic.model';
 
 export class DemographicDTO implements Demographic {
@@ -62,7 +61,6 @@ export class DemographicDTO implements Demographic {
 
 }
 
-
 export class ContactDTO implements Contact {
   streetName?: string;
   dwellingNumber?: string;
@@ -77,7 +75,6 @@ export class ContactDTO implements Contact {
   email?: string;
   tabsTypeId?: number
 }
-
 export class NextOfKinDTO implements NextOfKin {
   relationshipId?: number;
   firstName?: string;
@@ -94,8 +91,6 @@ export class NextOfKinDTO implements NextOfKin {
   workPhone?:number;
   TabsTypeId?:number;
 }
-
-
 export class ParentDTO implements Parent {
 
   firstName?: string;
@@ -127,6 +122,7 @@ export class AssignmentsDTO implements Assignments {
   entityNameId?: number;
   referredById?: number;
   TabsTypeId?: number;
+  tabsTypeId?: number;
 }
 
 export class FamilyMembersDTO implements FamilyMembers {

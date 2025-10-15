@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '@/app/core/services/api.service';
 import { Observable } from 'rxjs';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class SchedulingApiService {
@@ -122,6 +123,11 @@ export class SchedulingApiService {
         return this.api.get('Common/GetEmployeeFacilityFromCache').toPromise();
     }
     
+    UpdateAppointmentStatus(appId: number, PatientStatusId: number, appVisitId: number) {
+    
+      const body={appId:appId, patientStatusId:PatientStatusId, appVisitId:appVisitId}
+      return this.api.put(`Appointment/UpdateAppointmentStatus?appId=${appId}&patientStatusId=${PatientStatusId}&appVisitid=${appVisitId}`,body).toPromise();
+    }
 
     cancelBooking(AppId:number,AppStatusId:number ,ByProvider:boolean,RescheduledId:number) {
       if(!RescheduledId){
@@ -129,5 +135,77 @@ export class SchedulingApiService {
       }
         return this.api.get(`Appointment/CancelOrRescheduleAppointment?AppId=${AppId}&AppStatusId=${AppStatusId}&ByProvider=${ByProvider}&RescheduledId=${RescheduledId}`).toPromise();
     }
+
+    UpdateRescheduleById( schReschedule: any) {
+      
+      return this.api.put(`Appointment/UpdateRescheduleById`, schReschedule).toPromise();
+    }
+
+    submitappointmentbooking(schApp: any) {
+      return this.api.post('Appointment/InsertAppointment', schApp).toPromise();
+    }
+
+    UpdateByAppId(schApp: any) {
+      return this.api.put(`Appointment/UpdateAppointment`,schApp).toPromise();
+    }
+
+      getEligibilitydata(mrno:any) {
+    return this.api.get(`Eligibility/getEligibilityLog?mrno=${mrno}`).toPromise();
+  }
+  
+  SearchDashboardAppointment(data: any) {
+    let params = new HttpParams();
+  
+    if (data.FromDate) params = params.set('FromDate', data.FromDate);
+    if (data.ToDate) params = params.set('ToDate', data.ToDate);
+    if (data.ProviderID) params = params.set('ProviderID', data.ProviderID);
+    if (data.FacilityID) params = params.set('FacilityID', data.FacilityID);
+    if (data.SiteID) params = params.set('SiteID', data.SiteID);
+    // if (data.AppStatusIds && data.AppStatusIds.length > 0) {
+    //   params = params.set('AppStatusIds', data.AppStatusIds.toString());
+    // }
+    if (data.AppStatusIds && data.AppStatusIds.length > 0) {
+      data.AppStatusIds.forEach((id: number) => {
+        params = params.append('AppStatusIds', id.toString());
+      });
+    }
+    if (data.showScheduledAppointmentOnly !== undefined) {
+      params = params.set('showScheduledAppointmentOnly', String(data.showScheduledAppointmentOnly));
+    }
+    if (data.Page) params = params.set('Page', data.Page);
+    if (data.Size) params = params.set('Size', data.Size);
+    // Pass HttpParams directly; ApiService.get already wraps into { params }
+    return this.api.get(`Appointment/DashboardSearchAppointmentDB`, params).toPromise();
+  }
+
+
+  EditAppoimentByAppId( AppId: number) {
+    debugger
+    // return this.app.put(`Appointment/EditAppoimentByAppId`,{AppId}).toPromise();
+    // const body={AppId:AppId}
+    return this.api.get(`Appointment/EditAppoimentByAppId?appId=${AppId}`).toPromise();
+  }
+
+  InsertEligibility(mrno: any) {
+    return this.api.post(`Eligibility/InsertEligibility?mrno=${mrno}`, {}).toPromise();
+  }
+
+  // SearchDashboardAppointment(data:any) {
+
+  //   return this.api.get(
+  //     `Appointment/SearchAppointment?FromDate=${data.FromDate}&ToDate=${data.ToDate}&ProviderID=${data.ProviderID}&FacilityID=${data.FacilityID}&SiteID=${data.SiteID}&AppStatusIds=${data.AppStatusIds}&showScheduledAppointmentOnly=${data.showScheduledAppointmentOnly}&Page=${data.Page}&Size=${data.Size}`
+  //   ).toPromise();
+    
+    // return this.api.get(`Appointment/SearchAppointment
+    //   ?FromDate=${data.FromDate}
+    //   &ToDate=${data.ToDate}
+    //   &ProviderID=${data.ProviderID}
+    //   &FacilityID=${data.FacilityID}
+    //   &SiteID=${data.SiteID}
+    //   &AppStatusIds=${data.AppStatusIds}
+    //   &showScheduledAppointmentOnly=${data.showScheduledAppointmentOnly}
+    //   &Page=${data.Page}
+    //   &Size=${data.Size}`).toPromise();
+    //  }
 
 }

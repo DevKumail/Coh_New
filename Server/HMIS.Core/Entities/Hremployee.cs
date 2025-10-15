@@ -317,56 +317,56 @@ public partial class Hremployee
     public string? BusEnitity { get; set; }
 
     [InverseProperty("CreatedByNavigation")]
-    public virtual ICollection<BlmasterProcedure> BlmasterProcedureCreatedByNavigations { get; set; } = new List<BlmasterProcedure>();
+    public virtual ICollection<BlmasterProcedures> BlmasterProceduresCreatedByNavigation { get; set; } = new List<BlmasterProcedures>();
 
     [InverseProperty("UpdatedByNavigation")]
-    public virtual ICollection<BlmasterProcedure> BlmasterProcedureUpdatedByNavigations { get; set; } = new List<BlmasterProcedure>();
+    public virtual ICollection<BlmasterProcedures> BlmasterProceduresUpdatedByNavigation { get; set; } = new List<BlmasterProcedures>();
 
     [InverseProperty("Requestedby")]
-    public virtual ICollection<EligibilityLog> EligibilityLogs { get; set; } = new List<EligibilityLog>();
+    public virtual ICollection<EligibilityLog> EligibilityLog { get; set; } = new List<EligibilityLog>();
 
     [InverseProperty("Employee")]
-    public virtual ICollection<HremployeeFacility> HremployeeFacilities { get; set; } = new List<HremployeeFacility>();
+    public virtual ICollection<HremployeeFacility> HremployeeFacility { get; set; } = new List<HremployeeFacility>();
 
     [InverseProperty("Employee")]
-    public virtual ICollection<HrlicenseInfo> HrlicenseInfos { get; set; } = new List<HrlicenseInfo>();
+    public virtual ICollection<HrlicenseInfo> HrlicenseInfo { get; set; } = new List<HrlicenseInfo>();
 
     [InverseProperty("CreatedByNavigation")]
-    public virtual ICollection<PatientAllergy> PatientAllergyCreatedByNavigations { get; set; } = new List<PatientAllergy>();
+    public virtual ICollection<PatientAllergy> PatientAllergyCreatedByNavigation { get; set; } = new List<PatientAllergy>();
 
     [InverseProperty("Provider")]
-    public virtual ICollection<PatientAllergy> PatientAllergyProviders { get; set; } = new List<PatientAllergy>();
+    public virtual ICollection<PatientAllergy> PatientAllergyProvider { get; set; } = new List<PatientAllergy>();
 
     [InverseProperty("UpdatedByNavigation")]
-    public virtual ICollection<PatientAllergy> PatientAllergyUpdatedByNavigations { get; set; } = new List<PatientAllergy>();
+    public virtual ICollection<PatientAllergy> PatientAllergyUpdatedByNavigation { get; set; } = new List<PatientAllergy>();
 
     [InverseProperty("CreatedByNavigation")]
-    public virtual ICollection<PatientImmunization> PatientImmunizationCreatedByNavigations { get; set; } = new List<PatientImmunization>();
+    public virtual ICollection<PatientImmunization> PatientImmunizationCreatedByNavigation { get; set; } = new List<PatientImmunization>();
 
     [InverseProperty("Provider")]
-    public virtual ICollection<PatientImmunization> PatientImmunizationProviders { get; set; } = new List<PatientImmunization>();
+    public virtual ICollection<PatientImmunization> PatientImmunizationProvider { get; set; } = new List<PatientImmunization>();
 
     [InverseProperty("UpdatedByNavigation")]
-    public virtual ICollection<PatientImmunization> PatientImmunizationUpdatedByNavigations { get; set; } = new List<PatientImmunization>();
+    public virtual ICollection<PatientImmunization> PatientImmunizationUpdatedByNavigation { get; set; } = new List<PatientImmunization>();
 
     [InverseProperty("CreatedByNavigation")]
-    public virtual ICollection<PatientProcedure> PatientProcedureCreatedByNavigations { get; set; } = new List<PatientProcedure>();
+    public virtual ICollection<PatientProcedure> PatientProcedureCreatedByNavigation { get; set; } = new List<PatientProcedure>();
 
     [InverseProperty("UpdatedByNavigation")]
-    public virtual ICollection<PatientProcedure> PatientProcedureUpdatedByNavigations { get; set; } = new List<PatientProcedure>();
+    public virtual ICollection<PatientProcedure> PatientProcedureUpdatedByNavigation { get; set; } = new List<PatientProcedure>();
 
     [InverseProperty("Provider")]
-    public virtual ICollection<Prescription> Prescriptions { get; set; } = new List<Prescription>();
+    public virtual ICollection<Prescription> Prescription { get; set; } = new List<Prescription>();
 
     [InverseProperty("CreatedBy")]
-    public virtual ICollection<RegCompany> RegCompanies { get; set; } = new List<RegCompany>();
+    public virtual ICollection<RegCompany> RegCompany { get; set; } = new List<RegCompany>();
 
     [InverseProperty("Provider")]
-    public virtual ICollection<RegPatientDetail> RegPatientDetails { get; set; } = new List<RegPatientDetail>();
+    public virtual ICollection<RegPatientDetails> RegPatientDetails { get; set; } = new List<RegPatientDetails>();
 
     [InverseProperty("Employee")]
-    public virtual ICollection<SchAppointment> SchAppointments { get; set; } = new List<SchAppointment>();
+    public virtual ICollection<SchAppointment> SchAppointment { get; set; } = new List<SchAppointment>();
 
     [InverseProperty("Employee")]
-    public virtual ICollection<SecEmployeeRole> SecEmployeeRoles { get; set; } = new List<SecEmployeeRole>();
+    public virtual ICollection<SecEmployeeRole> SecEmployeeRole { get; set; } = new List<SecEmployeeRole>();
 }

@@ -13,10 +13,10 @@ namespace HMIS.Application.Implementations
     {
         //Task<List<PatientProblem>> GetAllPatientProblems(string MRNo, long UserId);
         //   Task<PatientProblem> GetPatientProblem(long id);
-        Task<DataSet> GetAllPatientProblems(string MRNo, long UserId);
+        Task<DataSet> GetAllPatientProblems(string MRNo, long UserId, int? PageNumber, int? PageSize);
         Task<bool> InsertOrUpdatePatientProblem(PatientProblemModel patientProblem);
 
         Task<bool> DeletePatientProblem(long Id);
       //  Task<bool> UpdatePatientProblem(PatientProblem patientProblem);
-    }
+    } 
 }

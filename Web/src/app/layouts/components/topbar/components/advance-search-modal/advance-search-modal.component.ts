@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angul
 import { IconsModule } from '@/app/shared/icons.module';
 import { DataTableDirective, DataTablesModule } from 'angular-datatables';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { UiCardComponent } from '@app/components/ui-card.component';
 import { Subject } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -15,7 +16,7 @@ import { ModalTriggerService } from '@core/services/modal-trigger.service';
 declare var bootstrap: any;
 @Component({
   selector: 'app-advance-search-modal',
-  imports: [FormsModule, IconsModule, CommonModule, UiCardComponent, ReactiveFormsModule, DataTablesModule, LoaderComponent],
+  imports: [FormsModule, IconsModule, CommonModule, UiCardComponent, ReactiveFormsModule, DataTablesModule, LoaderComponent, TranslatePipe],
   templateUrl: './advance-search-modal.component.html',
   styleUrl: './advance-search-modal.component.scss'
 })
@@ -104,6 +105,15 @@ export class AdvanceSearchModalComponent implements AfterViewInit {
 
   closeModal() {
     this.hiddenCloseBtn.nativeElement.click();
+  }
+
+
+     get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
   }
 
 }

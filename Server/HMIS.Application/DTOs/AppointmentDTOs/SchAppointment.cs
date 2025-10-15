@@ -74,8 +74,11 @@ namespace HMIS.Application.DTOs.AppointmentDTOs
         public string PatientBalance { get; set; }
         public string PlanBalance { get; set; }
         public string PlanCopay { get; set; }
-        public string? EmployeeId { get; set; }
+        public long? EmployeeId { get; set; }
         public long? PlanId { get; set; }
+
+        public bool? IsConsultationVisit { get; set; }
+
         public long? PatientId { get; set; }
         public string? date { get; set; }
         public string? time { get; set; }

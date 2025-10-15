@@ -62,7 +62,7 @@ namespace HMIS.Application.ServiceLogics
                 //param.Add("@Name", string.IsNullOrEmpty(name) ? null : name, DbType.String);
                 //param.Add("@InsuranceID", string.IsNullOrEmpty(insuranceId) ? null : insuranceId, DbType.String);
 
-                DataSet ds = await DapperHelper.GetDataSetBySP("CoverageListGetAll", parameters);
+                DataSet ds = await DapperHelper.GetDataSetBySP("GetCoverageList", parameters);
                 if (ds.Tables[0].Rows.Count == 0)
                 {
                     throw new Exception("No data found");
@@ -319,7 +319,7 @@ namespace HMIS.Application.ServiceLogics
                             SubscriberId = item.SubscriberId,
                             Amount = item.Amount,
                         };
-                        insuredSubscriber.InsuredPolicies.Add(ip);
+                        insuredSubscriber.InsuredPolicy.Add(ip);
                     }
                 }
                 if (regInsert.regDeduct != null && regInsert.regDeduct.Count > 0)
@@ -333,10 +333,10 @@ namespace HMIS.Application.ServiceLogics
                             ServiceType = item.ServiceType,
                             Deductible = item.Deductible,
                         };
-                        insuredSubscriber.DeductiblePercents.Add(dp);
+                        insuredSubscriber.DeductiblePercent.Add(dp);
                     }
                 }
-                await _context.InsuredSubscribers.AddAsync(insuredSubscriber);
+                await _context.InsuredSubscriber.AddAsync(insuredSubscriber);
                 await _context.SaveChangesAsync();
                 return "OK";
                 //DataTable RegInsurancePolicyDT = ConversionHelper.ToDataTable(regInsert.regInsurancePolicy);
@@ -853,7 +853,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var chkResult = await Task.Run(() => _context.InsuredSubscribers.Include(c => c.InsuredPolicies).Include(c => c.DeductiblePercents).Where(x => x.SubscriberId == regUpdate.SubscriberID && x.IsDeleted == false).FirstOrDefaultAsync());
+                var chkResult = await Task.Run(() => _context.InsuredSubscriber.Include(c => c.InsuredPolicy).Include(c => c.DeductiblePercent).Where(x => x.SubscriberId == regUpdate.SubscriberID && x.IsDeleted == false).FirstOrDefaultAsync());
                 if (chkResult != null && chkResult.SubscriberId > 0)
                 {
                     chkResult.SubscriberId = regUpdate.SubscriberID;
@@ -887,7 +887,7 @@ namespace HMIS.Application.ServiceLogics
                     chkResult.Mrno = regUpdate.MRNo;
                     chkResult.CoverageOrder = regUpdate.CoverageOrder;
                     chkResult.IsSelected = regUpdate.IsSelected;
-                    var allExisitingRegInsurancePolicy = chkResult.InsuredPolicies.Where(x => x.IsDeleted == false).ToList();
+                    var allExisitingRegInsurancePolicy = chkResult.InsuredPolicy.Where(x => x.IsDeleted == false).ToList();
                     if (allExisitingRegInsurancePolicy != null && allExisitingRegInsurancePolicy.Count > 0)
                     {
                         foreach (var item in allExisitingRegInsurancePolicy)
@@ -912,7 +912,7 @@ namespace HMIS.Application.ServiceLogics
                     {
                         foreach (var item in regUpdate.regInsurancePolicy)
                         {
-                            var exisitingInsuredPolicies = chkResult.InsuredPolicies.SingleOrDefault(x => x.InsuredPolicyId.Equals(item.InsuredPolicyId) && x.IsDeleted == false && x.Amount.Equals(item.Amount) && x.EffectiveDate.Equals(item.EffectiveDate) && x.GroupNo.Equals(item.GroupNo) && x.NoOfVisits.Equals(item.NoOfVisits) && x.Status.Equals(item.Status) && x.TerminationDate.Equals(item.TerminationDate) && x.SubscriberId.Equals(item.SubscriberId));
+                            var exisitingInsuredPolicies = chkResult.InsuredPolicy.SingleOrDefault(x => x.InsuredPolicyId.Equals(item.InsuredPolicyId) && x.IsDeleted == false && x.Amount.Equals(item.Amount) && x.EffectiveDate.Equals(item.EffectiveDate) && x.GroupNo.Equals(item.GroupNo) && x.NoOfVisits.Equals(item.NoOfVisits) && x.Status.Equals(item.Status) && x.TerminationDate.Equals(item.TerminationDate) && x.SubscriberId.Equals(item.SubscriberId));
                             if (exisitingInsuredPolicies != null)
                             {
                                 exisitingInsuredPolicies.IsDeleted = item.IsDeleted;
@@ -940,11 +940,11 @@ namespace HMIS.Application.ServiceLogics
                                     TerminationDate = item.TerminationDate,
                                     Status = item.Status,
                                 };
-                                chkResult.InsuredPolicies.Add(IP);
+                                chkResult.InsuredPolicy.Add(IP);
                             }
                         }
                     }
-                    var allExisitingRegDeduct = chkResult.DeductiblePercents.Where(x => x.IsDeleted == false).ToList();
+                    var allExisitingRegDeduct = chkResult.DeductiblePercent.Where(x => x.IsDeleted == false).ToList();
                     if (allExisitingRegDeduct != null && allExisitingRegDeduct.Count > 0)
                     {
                         foreach (var item in allExisitingRegDeduct)
@@ -969,7 +969,7 @@ namespace HMIS.Application.ServiceLogics
                     {
                         foreach (var item in regUpdate.regDeduct)
                         {
-                            var exisitingDeductiblePercents = chkResult.DeductiblePercents.SingleOrDefault(x => x.DeductibleId.Equals(item.DeductibleId) && x.IsDeleted == false && x.ServiceType.Equals(item.ServiceType) && x.SubscriberId.Equals(item.SubscriberId) && x.Deductible.Equals(item.Deductible));
+                            var exisitingDeductiblePercents = chkResult.DeductiblePercent.SingleOrDefault(x => x.DeductibleId.Equals(item.DeductibleId) && x.IsDeleted == false && x.ServiceType.Equals(item.ServiceType) && x.SubscriberId.Equals(item.SubscriberId) && x.Deductible.Equals(item.Deductible));
                             if (exisitingDeductiblePercents != null)
                             {
                                 exisitingDeductiblePercents.IsDeleted = item.IsDeleted;
@@ -989,11 +989,11 @@ namespace HMIS.Application.ServiceLogics
                                     ServiceType = item.ServiceType,
                                     Deductible = item.Deductible,
                                 };
-                                chkResult.DeductiblePercents.Add(DP);
+                                chkResult.DeductiblePercent.Add(DP);
                             }
                         }
                     }
-                    _context.InsuredSubscribers.Update(chkResult);
+                    _context.InsuredSubscriber.Update(chkResult);
                     await _context.SaveChangesAsync();
                     return "OK";
                 }

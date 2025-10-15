@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("VisitStatus")]
 public partial class VisitStatus
 {
     [Key]
@@ -24,8 +23,8 @@ public partial class VisitStatus
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("VisitStatus")]
-    public virtual ICollection<PatientVisitStatus> PatientVisitStatuses { get; set; } = new List<PatientVisitStatus>();
+    public virtual ICollection<PatientVisitStatus> PatientVisitStatus { get; set; } = new List<PatientVisitStatus>();
 
     [InverseProperty("VisitStatus")]
-    public virtual ICollection<SchAppointment> SchAppointments { get; set; } = new List<SchAppointment>();
+    public virtual ICollection<SchAppointment> SchAppointment { get; set; } = new List<SchAppointment>();
 }

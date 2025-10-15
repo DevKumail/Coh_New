@@ -20,6 +20,6 @@ public partial class CptsInCptbyAppType
     public string Cptcode { get; set; } = null!;
 
     [ForeignKey("GroupId")]
-    [InverseProperty("CptsInCptbyAppTypes")]
+    [InverseProperty("CptsInCptbyAppType")]
     public virtual CptbyAppType Group { get; set; } = null!;
 }

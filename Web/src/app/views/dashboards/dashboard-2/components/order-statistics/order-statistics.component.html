@@ -1,99 +1,366 @@
-<div class="card">
-    <div class="card-header border-dashed card-tabs d-flex align-items-center">
-        <div class="flex-grow-1">
-            <h4 class="card-title">Orders Statistics</h4>
-        </div>
-        <ul ngbNav #nav="ngbNav" class="nav nav-tabs nav-justified card-header-tabs nav-bordered">
-            <li ngbNavItem class="nav-item">
-                <a ngbNavLink class="nav-link">
-                    <ng-icon name="tablerHome" class="d-md-none d-block"/>
-                    <span class="d-none d-md-block">Today</span>
-                </a>
-                <ng-template ngbNavContent></ng-template> <!--tab content goes here-->
-            </li>
-            <li ngbNavItem class="nav-item">
-                <a ngbNavLink class="nav-link">
-                    <ng-icon name="tablerUserCircle" class="d-md-none d-block"/>
-                    <span class="d-none d-md-block">Monthly</span>
-                </a>
-                <ng-template ngbNavContent></ng-template> <!--tab content goes here-->
-            </li>
-            <li ngbNavItem class="nav-item">
-                <a ngbNavLink class="nav-link">
-                    <ng-icon name="tablerSettings" class="d-md-none d-block"/>
-                    <span class="d-none d-md-block">Annual</span>
-                </a>
-                <ng-template ngbNavContent></ng-template> <!--tab content goes here-->
-            </li>
-        </ul>
-    </div>
-    <div class="card-body p-0">
-        <div class="row g-0">
-            <div class="col-xxl-8 border-end border-dashed">
-                <app-echart [getOptions]="orderStatisticsChartOptions" height="405px"/>
-            </div>
-            <div class="col-xxl-4">
-
-                <div [ngbNavOutlet]="nav"></div>
-
-                <div class="p-3 bg-light-subtle border-bottom border-dashed">
-                    <div class="row">
-                        <div class="col">
-                            <h4 class="fs-sm mb-1">Would you like the full report?</h4>
-                            <small class="text-muted fs-xs mb-0">
-                                All 120 orders have been successfully delivered
-                            </small>
-                        </div>
-                        <div class="col-auto align-self-center">
-                            <button type="button" class="btn btn-sm btn-default rounded-circle btn-icon" placement="top"
-                                    ngbTooltip="Download">
-                                <ng-icon name="tablerDownload" class="fs-xl"/>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="row row-cols-xxl-2 row-cols-md-2 row-cols-1 g-1 p-1">
-
-                    @for (item of orderStatistics; track $index) {
-                        <div class="col">
-                            <div class="card rounded-0 border shadow-none border-dashed mb-0">
-                                <div class="card-body">
-                                    <div class="mb-3 d-flex justify-content-between align-items-center">
-                                        <h5 class="fs-xl mb-0">{{ item.prefix }}{{ item.value }}{{ item.suffix }}</h5>
-                                        <span>{{ item.growth }}%
-                                            @if (item.growth > 20) {
-                                                <ng-icon name="tablerBolt"
-                                                         class="text-success"/>
-                                            }
-                                            @if (item.growth > 0 && item.growth < 20) {
-                                                <ng-icon name="tablerArrowUp"
-                                                         class="text-success"/>
-                                            }
-                                            @if (item.growth < 0) {
-                                                <ng-icon name="tablerArrowDown"
-                                                         class="text-danger"/>
-                                            }
-                                    </span>
-                                    </div>
-                                    <p class="text-muted mb-2"><span>{{ item.description }}</span></p>
-
-                                    <ngb-progressbar height="5px" type="secondary" [value]="Math.abs(item.growth)"
-                                                     class="mb-0"/>
-                                </div>
+<!-- <div class="card"> -->
+<div class="row d-flex">
+    <div class="col-6">
+        <div class="card">
+            <div class="accordion" id="Notificationaccordion">
+                <div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button #notificationToggler class="accordion-button collapsed d-flex align-items-center justify-content-between no-accordion-caret w-100 gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotification" aria-expanded="false" aria-controls="collapseNotification">
+                            <span>{{ 'NOTIFICATION' | translate }}</span>
+                            <ng-icon style="color: orange;" [name]="isNotificationFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isNotificationFiltered }"></ng-icon>
+                          </button>
+                        </h2>
+                        <div id="collapseNotification" class="accordion-collapse collapse" data-bs-parent="#Notificationaccordion">
+                          <div class="accordion-body">
+                        <form *ngIf="NotificationFilterForm" [formGroup]="NotificationFilterForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>{{ 'FROM_DATE' | translate }}</label>
+                                <input type="date" class="form-control"formControlName="fromDate" />
+                            </div>
+                      
+                            <div class="col-md-6">
+                                <label>{{ 'TO_DATE' | translate }}</label>
+                                <input type="date" class="form-control"formControlName="toDate" />
+                            </div>
+                            <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearNotification()">{{ 'CLEAR' | translate }}</button>
+                                <button type="button" class="btn btn-primary btn-sm" (click)="onSearchNotification()">{{ 'SEARCH' | translate }}</button>
                             </div>
                         </div>
-                    }
+                        </form>
+                          </div>
+                        </div>
+                      </div>
                 </div>
-
-                <div class="text-center my-3">
-                    <a routerLink="/apps/chat"
-                       class="link-reset text-decoration-underline fw-semibold link-offset-3 d-flex align-items-center gap-1 justify-content-center">
-                        View all Reports
-                        <ng-icon name="tablerSend2"/>
-                    </a>
+                </div> 
+        <div class="table-responsive">
+            <table class="table table-custom align-middle mb-0 table-striped">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>{{ 'DATE' | translate }}</th>
+                        <th>{{ 'SUBJECT' | translate }}</th>
+                        <th>{{ 'PATIENT_NAME_MR_NO' | translate }}</th>
+                        <th>{{ 'SENDER' | translate }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let appointment of other">
+                        <td>
+                            {{ appointment.appDateTime | date : "dd/MM/yyyy h:mm a" }}
+                        </td>
+                        <td>{{ appointment.subject }}</td>
+                        <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
+                        <td>{{ appointment.sender }}</td>
+                    </tr>
+                    <tr *ngIf="appointments.length === 0">
+                        <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- <hr class="table-group-divider"> -->
+    <div class="card mt-2" *ngIf="canShowNotes">
+        <div class="accordion" id="Notesaccordion">
+            <div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button #notesToggler class="accordion-button collapsed d-flex align-items-center justify-content-between no-accordion-caret w-100 gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotes" aria-expanded="false" aria-controls="collapseNotes">
+                        <span>{{ 'NOTES' | translate }}</span>
+                        <ng-icon style="color: orange;" [name]="isNotesFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isNotesFiltered }"></ng-icon>
+                      </button>
+                    </h2>
+                    <div id="collapseNotes" class="accordion-collapse collapse" data-bs-parent="#Notesaccordion">
+                      <div class="accordion-body">
+                    <form *ngIf="NotesFilterForm" [formGroup]="NotesFilterForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>{{ 'FROM_DATE' | translate }}</label>
+                            <input type="date" class="form-control" formControlName="fromDate"/>
+                        </div>
+                  
+                        <div class="col-md-6">
+                            <label>{{ 'TO_DATE' | translate }}</label>
+                            <input type="date" class="form-control" formControlName="toDate"/>
+                        </div>
+                        <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearNotes()">{{ 'CLEAR' | translate }}</button>
+                            <button type="button" class="btn btn-primary btn-sm" (click)="onSearchNotes()">{{ 'SEARCH' | translate }}</button>
+                        </div>
+                    </div>
+                    </form>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            </div> 
+        <div class="table-responsive">
+            <table class="table table-custom align-middle mb-0 table-striped">
+                <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                    <tr class="text-uppercase fs-xxs">
+                        <th>{{ 'DATE' | translate }}</th>
+                        <th>{{ 'SUBJECT' | translate }}</th>
+                        <th>{{ 'PATIENT_NAME_MR_NO' | translate }}</th>
+                        <th>{{ 'SENDER' | translate }}</th>
+                    </tr>
+                </thead>
+                <tbody >
+                    <tr *ngFor="let appointment of other">
+                        <td>
+                            {{ appointment.appDateTime | date : "dd/MM/yyyy h:mm a" }}
+                        </td>
+                        <td>{{ appointment.subject }}</td>
+                        <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
+                        <td>{{ appointment.sender }}</td>
+                    </tr>
+                    <tr *ngIf="appointments.length === 0">
+                        <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        </div>  
+        <!-- <hr class="table-group-divider"> -->
+        <div class="card mt-2" *ngIf="canShowBilled">
+            <div class="accordion" id="Billedaccordion">
+                <div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button #billedToggler class="accordion-button collapsed d-flex align-items-center justify-content-between no-accordion-caret w-100 gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBilled" aria-expanded="false" aria-controls="collapseBilled">
+                            <span>{{ 'BILLED' | translate }}</span>
+                            <ng-icon style="color: orange;" [name]="isBilledFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isBilledFiltered }"></ng-icon>
+    
+                          </button>
+                        </h2>
+                        <div id="collapseBilled" class="accordion-collapse collapse" data-bs-parent="#Billedaccordion">
+                          <div class="accordion-body">
+                        <form *ngIf="BilledFilterForm" [formGroup]="BilledFilterForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>{{ 'FROM_DATE' | translate }}</label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    formControlName="fromDate"
+                                />
+                            </div>
+                      
+                            <div class="col-md-6">
+                                <label>{{ 'TO_DATE' | translate }}</label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    formControlName="toDate"
+                                />
+                            </div>
+                            <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearBilled()">{{ 'CLEAR' | translate }}</button>
+                                <button type="button" class="btn btn-primary btn-sm" (click)="onSearchBilled()">{{ 'SEARCH' | translate }}</button>
+                            </div>
+                        </div>
+                        </form>
+                          </div>
+                        </div>
+                      </div>
                 </div>
+                </div> 
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0 table-striped">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                        <th>{{ 'DATE' | translate }}</th>
+                        <th>{{ 'SUBJECT' | translate }}</th>
+                        <th>{{ 'PATIENT_NAME_MR_NO' | translate }}</th>
+                        <th>{{ 'SENDER' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let appointment of other">
+                            <td>
+                                {{ appointment.appDateTime | date : "dd/MM/yyyy h:mm a" }}
+                            </td>
+                            <td>{{ appointment.subject }}</td>
+                            <td>{{ appointment.patient_FName }} ({{ appointment.mrNo }})</td>
+                            <td>{{ appointment.sender }}</td>
+                        </tr>
+                        <tr *ngIf="appointments.length === 0">
+                            <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
+    </div>
+    <div class="col-6">
+        <div class="card">
+        <div class="accordion" id="Appointmentaccordion">
+            <div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button #appointmentToggler class="accordion-button collapsed d-flex align-items-center justify-content-between no-accordion-caret w-100 gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAppointment" aria-expanded="false" aria-controls="collapseAppointment">
+                        <span>{{ 'APPOINTMENT' | translate }}</span>
+                        <ng-icon style="color: orange;" [name]="isAppointmentFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
+                      </button>
+                    </h2>
+                    <div id="collapseAppointment" class="accordion-collapse collapse" data-bs-parent="#Appointmentaccordion">
+                      <div class="accordion-body">
+                          <form *ngIf="AppointmentFilterForm" [formGroup]="AppointmentFilterForm">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>{{ 'PROVIDER' | translate }}</label>
+                            <select class="form-control" formControlName="providerId">
+                                <option value="">-- {{ 'PROVIDER' | translate }} --</option>
+                                <option *ngFor="let item of providers" [value]="item.code">
+                                    {{ item.name }}
+                                </option>
+                            </select>
+                        </div>
+                  
+                        <div class="col-md-4">
+                            <label>{{ 'FACILITY' | translate }}</label>
+                            <select class="form-control form-select" formControlName="facility">
+                                <option value="">-- {{ 'FACILITY' | translate }} --</option>
+                                <option *ngFor="let f of facilities" [value]="f.code">
+                                    {{ f.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>{{ 'SITE' | translate }}</label>
+                            <select class="form-control" formControlName="sitesId">
+                                <option value="">-- {{ 'SITE' | translate }} --</option>
+                                <option *ngFor="let item of sites" [value]="item.code">
+                                    {{ item.name }}
+                                </option>
+                            </select>
+                        </div>
 
+                        
+                        <div class="col-md-4">
+                            <label>{{ 'APPOINTMENT_DATE' | translate }}</label>
+                            <input type="date" class="form-control" formControlName="appDate">
+                        </div>
+
+
+                        <div class="col-md-4">
+                            <label>{{ 'STATUS' | translate }}</label>
+                            <select #statusesSel class="form-select" choicesSelect [options]="{ removeItemButton: true, placeholder: true, placeholderValue: 'Select Status' }"
+                                 formControlName="statuses" name="choices-multiple-remove-button" multiple>
+                                <option *ngFor="let s of statusOptions" [value]="s.id">{{ s.name }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" style="margin-top: 16px;">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="chkScheduledOnly" formControlName="showScheduledAppointmentOnly">
+                                <label class="form-check-label" for="chkScheduledOnly">
+                                    {{ 'SCHEDULED_APPOINMENT' | translate }}
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="chkChargePending" formControlName="showChargeCapturePending">
+                                <label class="form-check-label" for="chkChargePending">
+                                    {{ 'CHARGE_CAPTURE_PENDING' | translate }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-md-4">
+                        </div> -->
+
+                        <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClearAppointment()">{{ 'CLEAR' | translate }}</button>
+                            <button type="button" class="btn btn-primary btn-sm" (click)="onSearchAppointment()">{{ 'SEARCH' | translate }}</button>
+                        </div>
+                    </div>
+                    </form>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            </div>
+
+
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0 table-striped">
+                    <thead class="bg-light align-middle bg-opacity-25 thead-sm">
+                        <tr class="text-uppercase fs-xxs">
+                            <th>{{ 'APP_DATE' | translate }}</th>
+                            <th>{{ 'NAME' | translate }}</th>
+                            <th>{{ 'STATUS' | translate }}</th>
+                            <th>{{ 'SITE' | translate }}</th>
+                            <th>{{ 'ACTION' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        <tr class="text-nowrap" *ngFor="let appointment of appointments">
+                            <td>
+                                {{ appointment.appDateTime | date : "dd/MM/yyyy h:mm a"}}
+                            </td>
+                            <td>{{ appointment.patient_FName }} <br> ({{ appointment.mrNo }})</td>
+                            <td>{{ appointment.appointment_PatientStatus }} <br> 
+                                <span *ngIf="appointment.patientStatusId == 3">({{ appointment.visitStatusName }})</span></td>
+                            <td>{{ appointment.appointment_SiteName }}</td>
+                            <td class="d-flex flex-nowrap align-items-center">
+                                <div class="dropdown">
+                                  <button class="btn p-0 px-1 py-1 me-1" style="font-size: 0.75rem; color: orange;" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Actions">
+                                    <ng-icon name="tablerDotsVertical"></ng-icon>
+                                  </button>
+                                  <ul class="dropdown-menu dropdown-menu-end">
+                                    <li style="cursor: pointer;">
+                                      <button class="dropdown-item" (click)="onEditAppointment(appointment)">
+                                        {{ 'EDIT_APPOINTMENT' | translate }}
+                                      </button>
+                                    </li>
+                                    <!-- *ngIf="appointment.appStatusId == 2" -->
+                                    <li class="dropdown-submenu" >
+                                      <button class="dropdown-item dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        {{ 'CHANGE_STATUS' | translate }}
+                                      </button>
+                                      <ul class="dropdown-menu">
+                                        <li *ngFor="let s of tableStatus">
+                                          <button class="dropdown-item" type="button" (click)="onChangeAppointmentStatus(appointment, s.id)">
+                                            {{ s.name }}
+                                          </button>
+                                        </li>
+                                      </ul>
+                                    </li>
+                                  </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="appointments.length === 0">
+                        <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <app-generic-pagination
+                    [totalItems]="appointmentstotaldata"
+                    [pageSize]="PaginationInfo.RowsPerPage"
+                    [currentPage]="PaginationInfo.Page"
+                    (pageChanged)="onappointmentsPageChanged($event)"
+                >
+                </app-generic-pagination>
             </div>
         </div>
     </div>
 </div>
+<!-- </div> -->
+
+<style>
+    .blink {
+      /* No blink; emphasize with darker color and bold weight */
+      color: #d97706 !important; /* darker orange */
+      font-weight: 900;
+    }
+    /* Nested dropdown positioning */
+    .dropdown-submenu { position: relative; }
+    .dropdown-submenu > .dropdown-menu {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      margin-left: .1rem;
+      margin-right: .1rem;
+    }
+  </style>

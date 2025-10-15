@@ -56,11 +56,14 @@ namespace HMIS.Web.Controllers.UserAuthentication
                     long empId = result.User.EmployeeId;
                     var permissions = await _permissionService.GetPermissionByEmpIdandUserId(empId, username);
                     var tokenString = _authenticateUserToken.GenerateTokenJWT(user.Name, result.User.EmployeeId.ToString(), permissions?.Roles == null ? new List<Roles>() : permissions?.Roles);
+                   
+                    
                     LoginUserHistory userlogin = new LoginUserHistory()
                     {
 
                         Token = tokenString,
                         LoginUserName = user.Name,
+                        //EmployeeTypeId= result.User.EmployeeType,
                         LogoffTime = null,
                         Ipaddress = remoteIpAddress.ToString(),
                         UpdatedOn = DateTime.Now,
@@ -78,7 +81,7 @@ namespace HMIS.Web.Controllers.UserAuthentication
                     var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
                     logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
         method, path, statusCode, elapsed, requestMessage, responseMessage);
-                    return Ok(new { token = tokenString, allowscreens = permissions?.Permissions, userId = empId, userName = user.Name, empId = permissions?.employeeType, success = true, facilities = permissions?.Facility });
+                    return Ok(new { token = tokenString, allowscreens = permissions?.Permissions, userId = empId, userName = user.Name, empId = permissions?.employeeType, success = true, facilities = permissions?.Facility , employeeTypeId= result.User.EmployeeType });
                 }
                 else
                 {

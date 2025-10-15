@@ -69,8 +69,8 @@ html[data-layout="topnav"] {
                 line-height: $sidenav-item-font-size;
                 font-size: $sidenav-item-font-size;
                 font-weight: $sidenav-item-font-weight;
-                padding: calc($sidenav-item-padding-y * 1.25) calc($sidenav-item-padding-x * 1.5);
-
+                // Slimmer navbar: reduce vertical padding
+                padding: calc($sidenav-item-padding-y * 0.6) calc($sidenav-item-padding-x * 1.2);
 
                 .menu-icon {
                     margin-right: calc($sidenav-item-icon-size * 0.5);
@@ -86,7 +86,6 @@ html[data-layout="topnav"] {
                         width: $sidenav-item-icon-size;
                     }
                 }
-
 
                 .menu-arrow {
                     margin-left: calc($sidenav-item-icon-size * 0.5);
@@ -208,7 +207,8 @@ html[data-layout="topnav"] {
 
             .navbar-nav {
                 .nav-link {
-                    padding: calc($sidenav-item-padding-y * 0.8) calc($sidenav-item-padding-x * 2);
+                    // Slimmer navbar on smaller screens as well
+                    padding: calc($sidenav-item-padding-y * 0.5) calc($sidenav-item-padding-x * 1.5);
                 }
             }
 

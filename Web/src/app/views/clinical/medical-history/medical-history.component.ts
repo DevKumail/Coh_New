@@ -9,14 +9,18 @@ import { NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 // import { ProblemListComponent } from '../problem-list/problem-list.component';
 import { FavoritesComponent } from '../favorites/favorites.component';
 import { ProblemListComponent } from '../problem-list/problem-list.component';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-medical-history',
   standalone: true,
   imports: [ CommonModule,ReactiveFormsModule,NgIconComponent,
-    FavoritesComponent,
-    ProblemListComponent,
-    NgbNavModule],
+  FavoritesComponent,
+  ProblemListComponent,
+  NgbNavModule,
+  TranslatePipe,
+  FilledOnValueDirective],
   templateUrl: './medical-history.component.html',
   styleUrl: './medical-history.component.scss'
 })
@@ -64,6 +68,14 @@ export class MedicalHistoryComponent implements OnInit {
         status: ['']
       });
     }
+
+      get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
+  }
 
     // ✅ Reset form
     onClear(): void {

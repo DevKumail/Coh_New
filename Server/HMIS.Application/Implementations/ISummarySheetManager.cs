@@ -15,10 +15,10 @@ namespace HMIS.Application.Implementations
 
         //Vital Signs
 
-        Task<DataSet> GetAllVitalSigns(long MRNo,long VisitAccountNo);
+        Task<DataSet> GetAllVitalSigns(long MRNo, long VisitAccountNo);
         Task<DataSet> GetVitalSigns(long id, long VisitAccountNo);
-        Task<bool> VSInsert(VitalSigns vitalSigns);
-        Task<bool> VSUpdate(VitalSigns vitalSigns);
+        Task<bool> VSInsert(VitalSign vitalSigns);
+        Task<bool> VSUpdate(VitalSign vitalSigns);
 
 
         Task<DataSet> SS_GetMedicationsList(long MRNo);

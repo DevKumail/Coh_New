@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("TypeOfServiceMaster")]
 public partial class TypeOfServiceMaster
 {
     [Key]
@@ -21,5 +20,5 @@ public partial class TypeOfServiceMaster
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("ServiceType")]
-    public virtual ICollection<BlcptmasterRange> BlcptmasterRanges { get; set; } = new List<BlcptmasterRange>();
+    public virtual ICollection<BlcptmasterRanges> BlcptmasterRanges { get; set; } = new List<BlcptmasterRanges>();
 }

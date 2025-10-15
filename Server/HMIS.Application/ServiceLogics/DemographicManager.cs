@@ -74,16 +74,16 @@ namespace HMIS.Application.ServiceLogics
 
         public async Task<bool> DeleteDemographicDB(int PatientId)
         {
-            var findResult = await Task.Run(() => _context.RegPatients.Include(x => x.RegPatientEmployers).Include(x => x.RegAccounts).Include(x => x.RegPatientDetails).Where(x => x.PatientId.Equals(PatientId) && x.IsDeleted == false).FirstOrDefaultAsync());
+            var findResult = await Task.Run(() => _context.RegPatient.Include(x => x.RegPatientEmployer).Include(x => x.RegAccount).Include(x => x.RegPatientDetails).Where(x => x.PatientId.Equals(PatientId) && x.IsDeleted == false).FirstOrDefaultAsync());
             if (findResult != null)
             {
                 findResult.IsDeleted = true;
-                foreach (var item in findResult.RegPatientEmployers)
+                foreach (var item in findResult.RegPatientEmployer)
                 {
                     item.IsDeleted = true;
                     //findResult.RegPatientEmployers.Add(item);
                 }
-                foreach (var item1 in findResult.RegAccounts)
+                foreach (var item1 in findResult.RegAccount)
                 {
                     item1.IsDeleted = false;
                     //findResult.RegAccounts.Add(item1);
@@ -93,7 +93,7 @@ namespace HMIS.Application.ServiceLogics
                     item2.IsDeleted = false;
                     //findResult.RegPatientDetails.Add(item2);
                 }
-                _context.RegPatients.Update(findResult);
+                _context.RegPatient.Update(findResult);
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -105,7 +105,7 @@ namespace HMIS.Application.ServiceLogics
             try
 
             {
-                var findResult = await Task.Run(() => _context.RegPatients.Include(x=>x.RegPatientEmployers).Include(x=>x.RegAccounts).Include(x=>x.RegPatientDetails).Where(x => x.PatientId.Equals(regUpdate.PatientId) && x.IsDeleted == false).FirstOrDefaultAsync());
+                var findResult = await Task.Run(() => _context.RegPatient.Include(x=>x.RegPatientEmployer).Include(x=>x.RegAccount).Include(x=>x.RegPatientDetails).Where(x => x.PatientId.Equals(regUpdate.PatientId) && x.IsDeleted == false).FirstOrDefaultAsync());
 
                 if (findResult != null)
                 {
@@ -161,7 +161,7 @@ namespace HMIS.Application.ServiceLogics
                             IsDeleted = false,
 
                         };
-                        findResult.RegPatientEmployers.Add(regPatientEmployer);
+                        findResult.RegPatientEmployer.Add(regPatientEmployer);
                     }
                     foreach (var item1 in regUpdate.regAccount)
                     {
@@ -174,136 +174,336 @@ namespace HMIS.Application.ServiceLogics
                             RelationshipId = item1.RelationshipId,
                             IsDeleted = false,
                         };
-                        findResult.RegAccounts.Add(regAccount);
+                        findResult.RegAccount.Add(regAccount);
                     }
 
-                    //foreach (var item2 in regUpdate.regPatientDetails)
-                    //{
-                    Core.Entities.RegPatientDetail contact = new Core.Entities.RegPatientDetail()
-                    {
+                    // 🔹 Contact
+                    var existingContact = findResult.RegPatientDetails
+                        .FirstOrDefault(x => x.TabsTypeId == regUpdate.Contact.TabsTypeId && x.IsDeleted == false);
 
-                        StreetName = regUpdate.Contact.StreetName,
-                        DwellingNumber = regUpdate.Contact.DwellingNumber,
-                        CountryId = regUpdate.Contact.CountryId,
-                        StateId = regUpdate.Contact.StateId,
-                        CityId = regUpdate.Contact.CityId,
-                        PostalCode = regUpdate.Contact.PostalCode,
-                        CellPhone = regUpdate.Contact.CellPhone,
-                        HomePhone = regUpdate.Contact.HomePhone,
-                        WorkPhone = regUpdate.Contact.WorkPhone,
-                        Email = regUpdate.Contact.Email,
-                        Fax = regUpdate.Contact.Fax,
-                        IsDeleted = false,
-                        TabsTypeId = regUpdate.Contact.TabsTypeId,
+                    if (existingContact != null)
+                    {
+                        // Update existing contact
+                        existingContact.StreetName = regUpdate.Contact.StreetName;
+                        existingContact.DwellingNumber = regUpdate.Contact.DwellingNumber;
+                        existingContact.CountryId = regUpdate.Contact.CountryId;
+                        existingContact.StateId = regUpdate.Contact.StateId;
+                        existingContact.CityId = regUpdate.Contact.CityId;
+                        existingContact.PostalCode = regUpdate.Contact.PostalCode;
+                        existingContact.CellPhone = regUpdate.Contact.CellPhone;
+                        existingContact.HomePhone = regUpdate.Contact.HomePhone;
+                        existingContact.WorkPhone = regUpdate.Contact.WorkPhone;
+                        existingContact.Email = regUpdate.Contact.Email;
+                        existingContact.Fax = regUpdate.Contact.Fax;
+                    }
+                    else
+                    {
+                        // Insert new if not exist
+                        Core.Entities.RegPatientDetails contact = new Core.Entities.RegPatientDetails()
+                        {
+                            StreetName = regUpdate.Contact.StreetName,
+                            DwellingNumber = regUpdate.Contact.DwellingNumber,
+                            CountryId = regUpdate.Contact.CountryId,
+                            StateId = regUpdate.Contact.StateId,
+                            CityId = regUpdate.Contact.CityId,
+                            PostalCode = regUpdate.Contact.PostalCode,
+                            CellPhone = regUpdate.Contact.CellPhone,
+                            HomePhone = regUpdate.Contact.HomePhone,
+                            WorkPhone = regUpdate.Contact.WorkPhone,
+                            Email = regUpdate.Contact.Email,
+                            Fax = regUpdate.Contact.Fax,
+                            TabsTypeId = regUpdate.Contact.TabsTypeId,
+                            IsDeleted = false
                         };
                         findResult.RegPatientDetails.Add(contact);
+                    }
 
-                    Core.Entities.RegPatientDetail employment = new Core.Entities.RegPatientDetail()
+
+                    //Core.Entities.RegPatientDetails employment = new Core.Entities.RegPatientDetails()
+                    //Core.Entities.RegPatientDetails employment = new Core.Entities.RegPatientDetails();
+                    //if(regUpdate.Employment != null)
+                    //{
+                    //    employment.Company = regUpdate.Employment.company;
+                    //    employment.SectorOccupationId = regUpdate.Employment.sector_occupationId;
+                    //    employment.EmploymentStatusId = regUpdate.Employment.employmentsStatusId;
+                    //    employment.EmploymentTypeId = regUpdate.Employment.employmentTypeId;
+                    //    employment.TabsTypeId = regUpdate.Employment.TabsTypeId;
+
+                    //findResult.RegPatientDetails.Add(employment);
+                    //};
+
+                    // ✅ EMPLOYMENT
+                    if (regUpdate.Employment != null)
                     {
-                        Company = regUpdate.Employment.company,
-                        SectorOccupationId = regUpdate.Employment.sector_occupationId,
-                        EmploymentStatusId = regUpdate.Employment.employmentsStatusId,
-                        EmploymentTypeId = regUpdate.Employment.employmentTypeId,
-                        TabsTypeId = regUpdate.Employment.TabsTypeId,
-                       
-                    };
-                    findResult.RegPatientDetails.Add(employment);
+                        var existingEmployment = findResult.RegPatientDetails
+                            .FirstOrDefault(x => x.TabsTypeId == regUpdate.Employment.TabsTypeId);
 
-                    Core.Entities.RegPatientDetail emergencycontact = new Core.Entities.RegPatientDetail()
+                        if (existingEmployment != null)
+                        {
+                            // Update existing
+                            existingEmployment.Company = regUpdate.Employment.company;
+                            existingEmployment.SectorOccupationId = regUpdate.Employment.sector_occupationId;
+                            existingEmployment.EmploymentStatusId = regUpdate.Employment.employmentsStatusId;
+                            existingEmployment.EmploymentTypeId = regUpdate.Employment.employmentTypeId;
+                        }
+                        else
+                        {
+                            // Insert new
+                            var employment = new Core.Entities.RegPatientDetails
+                            {
+                                Company = regUpdate.Employment.company,
+                                SectorOccupationId = regUpdate.Employment.sector_occupationId,
+                                EmploymentStatusId = regUpdate.Employment.employmentsStatusId,
+                                EmploymentTypeId = regUpdate.Employment.employmentTypeId,
+                                TabsTypeId = regUpdate.Employment.TabsTypeId
+                            };
+                            findResult.RegPatientDetails.Add(employment);
+                        }
+                    }
+
+
+                    // ------------------- Emergency Contact -------------------
+                    if (regUpdate.EmergencyContact != null)
                     {
-                        RelationshipId = regUpdate.EmergencyContact.relationshipId,
-                        FirstName = regUpdate.EmergencyContact.firstName,
-                        MiddleName = regUpdate.EmergencyContact.middleName,
-                        LastName = regUpdate.EmergencyContact.lastName,
-                        StreetName = regUpdate.EmergencyContact.streetName,
-                        DwellingNumber = regUpdate.EmergencyContact.dwellingNumber,
-                        CountryId = regUpdate.EmergencyContact.countryId,
-                        StateId = regUpdate.EmergencyContact.stateId,
-                        CityId = regUpdate.EmergencyContact.cityId,
-                        PostalCode = regUpdate.EmergencyContact.postalCode,
-                        CellPhone = regUpdate.EmergencyContact.cellPhone.ToString(),
-                        HomePhone = regUpdate.EmergencyContact.homePhone.ToString(),
-                        WorkPhone = regUpdate.EmergencyContact.workPhone.ToString(),
-                        TabsTypeId = regUpdate.EmergencyContact.TabsTypeId,
-                    };
-                    findResult.RegPatientDetails.Add(emergencycontact);
+                        var existingEmergency = findResult.RegPatientDetails
+                            .FirstOrDefault(x => x.TabsTypeId == regUpdate.EmergencyContact.TabsTypeId);
 
-                    Core.Entities.RegPatientDetail nextOfKin = new Core.Entities.RegPatientDetail()
+                        if (existingEmergency != null)
+                        {
+                            // Update existing
+                            existingEmergency.RelationshipId = regUpdate.EmergencyContact.relationshipId;
+                            existingEmergency.FirstName = regUpdate.EmergencyContact.firstName;
+                            existingEmergency.MiddleName = regUpdate.EmergencyContact.middleName;
+                            existingEmergency.LastName = regUpdate.EmergencyContact.lastName;
+                            existingEmergency.StreetName = regUpdate.EmergencyContact.streetName;
+                            existingEmergency.CountryId = regUpdate.EmergencyContact.countryId;
+                            existingEmergency.StateId = regUpdate.EmergencyContact.stateId;
+                            existingEmergency.CityId = regUpdate.EmergencyContact.cityId;
+                            existingEmergency.PostalCode = regUpdate.EmergencyContact.postalCode;
+                            existingEmergency.CellPhone = regUpdate.EmergencyContact.cellPhone.ToString();
+                            existingEmergency.HomePhone = regUpdate.EmergencyContact.homePhone.ToString();
+                            existingEmergency.WorkPhone = regUpdate.EmergencyContact.workPhone.ToString();
+                            existingEmergency.Email = regUpdate.EmergencyContact.email;
+                        }
+                        else
+                        {
+                            // Insert new
+                            var emergency = new Core.Entities.RegPatientDetails
+                            {
+                                RelationshipId = regUpdate.EmergencyContact.relationshipId,
+                                FirstName = regUpdate.EmergencyContact.firstName,
+                                MiddleName = regUpdate.EmergencyContact.middleName,
+                                LastName = regUpdate.EmergencyContact.lastName,
+                                StreetName = regUpdate.EmergencyContact.streetName,
+                                CountryId = regUpdate.EmergencyContact.countryId,
+                                StateId = regUpdate.EmergencyContact.stateId,
+                                CityId = regUpdate.EmergencyContact.cityId,
+                                PostalCode = regUpdate.EmergencyContact.postalCode,
+                                CellPhone = regUpdate.EmergencyContact.cellPhone.ToString(),
+                                HomePhone = regUpdate.EmergencyContact.homePhone.ToString(),
+                                WorkPhone = regUpdate.EmergencyContact.workPhone.ToString(),
+                                Email = regUpdate.EmergencyContact.email,
+                                TabsTypeId = regUpdate.EmergencyContact.TabsTypeId
+                            };
+                            findResult.RegPatientDetails.Add(emergency);
+                        }
+                    };
+
+
+
+
+                    // ------------------- Next Of Kin -------------------
+                    if (regUpdate.NextOfKin != null)
                     {
-                        RelationshipId = regUpdate.NextOfKin.relationshipId,
-                        FirstName = regUpdate.NextOfKin.firstName,
-                        MiddleName = regUpdate.NextOfKin.middleName,
-                        LastName = regUpdate.NextOfKin.lastName,
-                        StreetName = regUpdate.NextOfKin.streetName,
-                        DwellingNumber = regUpdate.NextOfKin.NokdwellingNumber.ToString(),
-                        CountryId = regUpdate.NextOfKin.countryId,
-                        StateId = regUpdate.NextOfKin.stateId,
-                        CityId = regUpdate.NextOfKin.cityId,
-                        PostalCode = regUpdate.NextOfKin.postalCode.ToString(),
-                        CellPhone = regUpdate.NextOfKin.cellPhone.ToString(),
-                        HomePhone = regUpdate.NextOfKin.homePhone.ToString(),
-                        WorkPhone = regUpdate.NextOfKin.workPhone.ToString(),
-                        TabsTypeId = regUpdate.NextOfKin.TabsTypeId,
-                    };
-                     findResult.RegPatientDetails.Add(nextOfKin);
+                        var existingNextOfKin = findResult.RegPatientDetails
+                            .FirstOrDefault(x => x.TabsTypeId == regUpdate.NextOfKin.TabsTypeId);
 
-                    Core.Entities.RegPatientDetail spouse = new Core.Entities.RegPatientDetail()
+                        if (existingNextOfKin != null)
+                        {
+                            // Update existing
+                            existingNextOfKin.RelationshipId = regUpdate.NextOfKin.relationshipId;
+                            existingNextOfKin.FirstName = regUpdate.NextOfKin.firstName;
+                            existingNextOfKin.MiddleName = regUpdate.NextOfKin.middleName;
+                            existingNextOfKin.LastName = regUpdate.NextOfKin.lastName;
+                            existingNextOfKin.StreetName = regUpdate.NextOfKin.streetName;
+                            existingNextOfKin.Email = regUpdate.NextOfKin.email;
+                            existingNextOfKin.CountryId = regUpdate.NextOfKin.countryId;
+                            existingNextOfKin.StateId = regUpdate.NextOfKin.stateId;
+                            existingNextOfKin.CityId = regUpdate.NextOfKin.cityId;
+                            existingNextOfKin.PostalCode = regUpdate.NextOfKin.postalCode.ToString();
+                            existingNextOfKin.CellPhone = regUpdate.NextOfKin.cellPhone.ToString();
+                            existingNextOfKin.HomePhone = regUpdate.NextOfKin.homePhone.ToString();
+                            existingNextOfKin.WorkPhone = regUpdate.NextOfKin.workPhone.ToString();
+                        }
+                        else
+                        {
+                            // Insert new
+                            var nextOfKin = new Core.Entities.RegPatientDetails
+                            {
+                                RelationshipId = regUpdate.NextOfKin.relationshipId,
+                                FirstName = regUpdate.NextOfKin.firstName,
+                                MiddleName = regUpdate.NextOfKin.middleName,
+                                LastName = regUpdate.NextOfKin.lastName,
+                                StreetName = regUpdate.NextOfKin.streetName,
+                                Email = regUpdate.NextOfKin.email,
+                                CountryId = regUpdate.NextOfKin.countryId,
+                                StateId = regUpdate.NextOfKin.stateId,
+                                CityId = regUpdate.NextOfKin.cityId,
+                                PostalCode = regUpdate.NextOfKin.postalCode.ToString(),
+                                CellPhone = regUpdate.NextOfKin.cellPhone.ToString(),
+                                HomePhone = regUpdate.NextOfKin.homePhone.ToString(),
+                                WorkPhone = regUpdate.NextOfKin.workPhone.ToString(),
+                                TabsTypeId = regUpdate.NextOfKin.TabsTypeId
+                            };
+                            findResult.RegPatientDetails.Add(nextOfKin);
+                        }
+                    }
+
+
+
+                    // ------------------- Spouse -------------------
+                    if (regUpdate.Spouse != null)
                     {
-                        FirstName = regUpdate.Spouse.firstName,
-                        MiddleName = regUpdate.Spouse.middleName,
-                        LastName = regUpdate.Spouse.lastName,
-                        GenderId = regUpdate.Spouse.genderId,
-                        TabsTypeId = regUpdate.Spouse.TabsTypeId,
+                        var existingSpouse = findResult.RegPatientDetails
+                            .FirstOrDefault(x => x.TabsTypeId == regUpdate.Spouse.TabsTypeId);
 
-                    };
-                    findResult.RegPatientDetails.Add(spouse);
+                        if (existingSpouse != null)
+                        {
+                            existingSpouse.FirstName = regUpdate.Spouse.firstName;
+                            existingSpouse.MiddleName = regUpdate.Spouse.middleName;
+                            existingSpouse.LastName = regUpdate.Spouse.lastName;
+                            existingSpouse.GenderId = regUpdate.Spouse.genderId;
+                        }
+                        else
+                        {
+                            var spouse = new Core.Entities.RegPatientDetails
+                            {
+                                FirstName = regUpdate.Spouse.firstName,
+                                MiddleName = regUpdate.Spouse.middleName,
+                                LastName = regUpdate.Spouse.lastName,
+                                GenderId = regUpdate.Spouse.genderId,
+                                TabsTypeId = regUpdate.Spouse.TabsTypeId
+                            };
+                            findResult.RegPatientDetails.Add(spouse);
+                        }
+                    }
 
-                    Core.Entities.RegPatientDetail parent = new Core.Entities.RegPatientDetail()
+
+
+                    // ------------------- Parent -------------------
+                    if (regUpdate.Parent != null)
                     {
-                        FirstName = regUpdate.Parent.firstName,
-                        MiddleName = regUpdate.Parent.middleName,
-                        LastName = regUpdate.Parent.lastName,
-                        HomePhone = regUpdate.Parent.homePhone.ToString(),
-                        CellPhone = regUpdate.Parent.cellPhone.ToString(),
-                        Email = regUpdate.Parent.email,
-                        MotherFirstName = regUpdate.Parent.motherFirstName,
-                        MotherMiddleName = regUpdate.Parent.mothermiddleName,
-                        MotherLastName = regUpdate.Parent.motherLastName,
-                        MotherHomePhone = regUpdate.Parent.motherHomePhone.ToString(),
-                        MotherCellPhone = regUpdate.Parent.motherCellPhone.ToString(),
-                        MotherEmail = regUpdate.Parent.motherEmail.ToString(),
-                        TabsTypeId = regUpdate.Parent.TabsTypeId,
-                    };
-                    findResult.RegPatientDetails.Add(parent);
+                        var existingParent = findResult.RegPatientDetails
+                            .FirstOrDefault(x => x.TabsTypeId == regUpdate.Parent.TabsTypeId);
 
-                    Core.Entities.RegPatientDetail assigment = new Core.Entities.RegPatientDetail()
+                        if (existingParent != null)
+                        {
+                            existingParent.FirstName = regUpdate.Parent.firstName;
+                            existingParent.MiddleName = regUpdate.Parent.middleName;
+                            existingParent.LastName = regUpdate.Parent.lastName;
+                            existingParent.HomePhone = regUpdate.Parent.homePhone.ToString();
+                            existingParent.CellPhone = regUpdate.Parent.cellPhone.ToString();
+                            existingParent.Email = regUpdate.Parent.email;
+                            existingParent.MotherFirstName = regUpdate.Parent.motherFirstName;
+                            existingParent.MotherMiddleName = regUpdate.Parent.mothermiddleName;
+                            existingParent.MotherLastName = regUpdate.Parent.motherLastName;
+                            existingParent.MotherHomePhone = regUpdate.Parent.motherHomePhone.ToString();
+                            existingParent.MotherCellPhone = regUpdate.Parent.motherCellPhone.ToString();
+                            existingParent.MotherEmail = regUpdate.Parent.motherEmail.ToString();
+                        }
+                        else
+                        {
+                            var parent = new Core.Entities.RegPatientDetails
+                            {
+                                FirstName = regUpdate.Parent.firstName,
+                                MiddleName = regUpdate.Parent.middleName,
+                                LastName = regUpdate.Parent.lastName,
+                                HomePhone = regUpdate.Parent.homePhone.ToString(),
+                                CellPhone = regUpdate.Parent.cellPhone.ToString(),
+                                Email = regUpdate.Parent.email,
+                                MotherFirstName = regUpdate.Parent.motherFirstName,
+                                MotherMiddleName = regUpdate.Parent.mothermiddleName,
+                                MotherLastName = regUpdate.Parent.motherLastName,
+                                MotherHomePhone = regUpdate.Parent.motherHomePhone.ToString(),
+                                MotherCellPhone = regUpdate.Parent.motherCellPhone.ToString(),
+                                MotherEmail = regUpdate.Parent.motherEmail.ToString(),
+                                TabsTypeId = regUpdate.Parent.TabsTypeId
+                            };
+                            findResult.RegPatientDetails.Add(parent);
+                        }
+                    }
+
+
+
+                    // ------------------- Assignment -------------------
+                    if (regUpdate.Assignments != null)
                     {
-                        ProofOfIncome = regUpdate.Assignments.proofOfIncome,
-                        ProviderId = regUpdate.Assignments.providerId,
-                        FinancialClassId = regUpdate.Assignments.financialClassId,
-                        LocationId = regUpdate.Assignments.locationId,
-                        SiteId = regUpdate.Assignments.siteId,
-                        SignedDate = regUpdate.Assignments.signedDate,
-                        UnSignedDate = regUpdate.Assignments.unsignedDate,
-                        EntityTypeId = regUpdate.Assignments.entityTypeId,
-                        EntityNameId = regUpdate.Assignments.entityNameId,
-                        ReferredById = regUpdate.Assignments.referredById,
-                        TabsTypeId = regUpdate.Assignments.TabsTypeId,
-                    };
-                    findResult.RegPatientDetails.Add(assigment);
+                        var existingAssignment = findResult.RegPatientDetails
+                            .FirstOrDefault(x => x.TabsTypeId == regUpdate.Assignments.TabsTypeId);
 
-                    Core.Entities.RegPatientDetail familyMember = new Core.Entities.RegPatientDetail()
+                        if (existingAssignment != null)
+                        {
+                            existingAssignment.ProofOfIncome = regUpdate.Assignments.proofOfIncome;
+                            existingAssignment.ProviderId = regUpdate.Assignments.providerId;
+                            existingAssignment.FinancialClassId = regUpdate.Assignments.financialClassId;
+                            existingAssignment.LocationId = regUpdate.Assignments.locationId;
+                            existingAssignment.SiteId = regUpdate.Assignments.siteId;
+                            existingAssignment.SignedDate = regUpdate.Assignments.signedDate;
+                            existingAssignment.UnSignedDate = regUpdate.Assignments.unsignedDate;
+                            existingAssignment.EntityTypeId = regUpdate.Assignments.entityTypeId;
+                            existingAssignment.EntityNameId = regUpdate.Assignments.entityNameId;
+                            existingAssignment.ReferredById = regUpdate.Assignments.referredById;
+                        }
+                        else
+                        {
+                            var assignment = new Core.Entities.RegPatientDetails
+                            {
+                                ProofOfIncome = regUpdate.Assignments.proofOfIncome,
+                                ProviderId = regUpdate.Assignments.providerId,
+                                FinancialClassId = regUpdate.Assignments.financialClassId,
+                                LocationId = regUpdate.Assignments.locationId,
+                                SiteId = regUpdate.Assignments.siteId,
+                                SignedDate = regUpdate.Assignments.signedDate,
+                                UnSignedDate = regUpdate.Assignments.unsignedDate,
+                                EntityTypeId = regUpdate.Assignments.entityTypeId,
+                                EntityNameId = regUpdate.Assignments.entityNameId,
+                                ReferredById = regUpdate.Assignments.referredById,
+                                TabsTypeId = regUpdate.Assignments.TabsTypeId
+                            };
+                            findResult.RegPatientDetails.Add(assignment);
+                        }
+                    }
+
+                    // ------------------- Family Member -------------------
+                    if (regUpdate.FamilyMembers != null)
                     {
-                        MrNo = regUpdate.FamilyMembers.mrNo.ToString(),
-                        AccountTypeId = regUpdate.FamilyMembers.accountTypeId,
-                        MasterMrNo = regUpdate.FamilyMembers.masterMrNo.ToString(),
-                        RelationshipId = regUpdate.FamilyMembers.relationshipId,
-                        TabsTypeId = regUpdate.FamilyMembers.TabsTypeId,
-                    };
-                    findResult.RegPatientDetails.Add(familyMember);
+                        var existingFamily = findResult.RegPatientDetails
+                            .FirstOrDefault(x => x.TabsTypeId == regUpdate.FamilyMembers.TabsTypeId);
 
-                };
-                _context.RegPatients.Update(findResult);
+                        if (existingFamily != null)
+                        {
+                            existingFamily.MrNo = regUpdate.FamilyMembers.mrNo.ToString();
+                            existingFamily.AccountTypeId = regUpdate.FamilyMembers.accountTypeId;
+                            existingFamily.MasterMrNo = regUpdate.FamilyMembers.masterMrNo.ToString();
+                            existingFamily.RelationshipId = regUpdate.FamilyMembers.relationshipId;
+                        }
+                        else
+                        {
+                            var family = new Core.Entities.RegPatientDetails
+                            {
+                                MrNo = regUpdate.FamilyMembers.mrNo.ToString(),
+                                AccountTypeId = regUpdate.FamilyMembers.accountTypeId,
+                                MasterMrNo = regUpdate.FamilyMembers.masterMrNo.ToString(),
+                                RelationshipId = regUpdate.FamilyMembers.relationshipId,
+                                TabsTypeId = regUpdate.FamilyMembers.TabsTypeId
+                            };
+                            findResult.RegPatientDetails.Add(family);
+                        }
+                    }
+
+                }
+                ;
+                _context.RegPatient.Update(findResult);
                     await _context.SaveChangesAsync();
                     return true;
                 
@@ -374,24 +574,25 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 DynamicParameters param = new DynamicParameters();
-                param.Add("@PatientId", PatientId, DbType.String);
+                param.Add("@PatientId", Convert.ToInt64(PatientId), DbType.Int64);
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("REG_GetDemographicById", param);
-                if (ds.Tables[0].Rows.Count == 0)
-                {
 
+                if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                {
                     return new DataSet();
-                    //                    throw new Exception("No data found");
                 }
 
-                return ds;  
+                return ds;
             }
             catch (Exception ex)
             {
+                // Optional: log exception if needed
                 return new DataSet();
             }
         }
-            
+
+
         public async Task<dynamic> InsertDemographicDB(RegInsert regInsert)
         {
             try
@@ -401,7 +602,7 @@ namespace HMIS.Application.ServiceLogics
                 var getLastMRNO = new RegLastMrno();
                 if (regInsert != null && regInsert.PatientId == 0)
                 {
-                    getLastMRNO = await Task.Run(() => _context.RegLastMrnos.FirstOrDefaultAsync());
+                    getLastMRNO = await Task.Run(() => _context.RegLastMrno.FirstOrDefaultAsync());
                     getLastMRNO.LastMrno = getLastMRNO.LastMrno + 1;
                     _context.Entry(getLastMRNO).State = EntityState.Modified;
                 }
@@ -450,7 +651,7 @@ namespace HMIS.Application.ServiceLogics
                 };
 
 
-                Core.Entities.RegPatientDetail contact = new Core.Entities.RegPatientDetail()
+                Core.Entities.RegPatientDetails contact = new Core.Entities.RegPatientDetails()
                 {
 
                     StreetName = regInsert.Contact.StreetName,
@@ -467,9 +668,9 @@ namespace HMIS.Application.ServiceLogics
                     IsDeleted = false,
                     TabsTypeId = regInsert.Contact.TabsTypeId,
                 };
-                //regPat.RegPatientDetails.Add(contact);
+                regPat.RegPatientDetails.Add(contact);
 
-                Core.Entities.RegPatientDetail employment = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails employment = new Core.Entities.RegPatientDetails();
 
                 if (regInsert.Employment != null)
                 {
@@ -482,7 +683,7 @@ namespace HMIS.Application.ServiceLogics
                 }
 
 
-                Core.Entities.RegPatientDetail emergencycontact = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails emergencycontact = new Core.Entities.RegPatientDetails();
                 if (regInsert.EmergencyContact != null) 
                 { 
                 emergencycontact.RelationshipId = regInsert.EmergencyContact.relationshipId;
@@ -490,7 +691,6 @@ namespace HMIS.Application.ServiceLogics
                 emergencycontact.MiddleName = regInsert.EmergencyContact.middleName;
                 emergencycontact.LastName = regInsert.EmergencyContact.lastName;
                 emergencycontact.StreetName = regInsert.EmergencyContact.streetName;
-                emergencycontact.DwellingNumber = regInsert.EmergencyContact.dwellingNumber;
                 emergencycontact.CountryId = regInsert.EmergencyContact.countryId;
                 emergencycontact.StateId = regInsert.EmergencyContact.stateId;
                 emergencycontact.CityId = regInsert.EmergencyContact.cityId;
@@ -498,11 +698,12 @@ namespace HMIS.Application.ServiceLogics
                 emergencycontact.CellPhone = regInsert.EmergencyContact.cellPhone.ToString();
                 emergencycontact.HomePhone = regInsert.EmergencyContact.homePhone.ToString();
                 emergencycontact.WorkPhone = regInsert.EmergencyContact.workPhone.ToString();
+                emergencycontact.Email = regInsert.EmergencyContact.email;
                 emergencycontact.TabsTypeId = regInsert.EmergencyContact.TabsTypeId;
                 regPat.RegPatientDetails.Add(emergencycontact);
                 }
 
-                Core.Entities.RegPatientDetail nextOfKin = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails nextOfKin = new Core.Entities.RegPatientDetails();
                  if(regInsert.NextOfKin != null)
                 {
                     nextOfKin.RelationshipId = regInsert.NextOfKin.relationshipId;
@@ -510,19 +711,19 @@ namespace HMIS.Application.ServiceLogics
                     nextOfKin.MiddleName = regInsert.NextOfKin.middleName;
                     nextOfKin.LastName = regInsert.NextOfKin.lastName;
                     nextOfKin.StreetName = regInsert.NextOfKin.streetName;
-                    nextOfKin.DwellingNumber = regInsert.NextOfKin.NokdwellingNumber.ToString();
                     nextOfKin.CountryId = regInsert.NextOfKin.countryId;
                     nextOfKin.StateId = regInsert.NextOfKin.stateId;
                     nextOfKin.CityId = regInsert.NextOfKin.cityId;
                     nextOfKin.PostalCode = regInsert.NextOfKin.postalCode.ToString();
                     nextOfKin.CellPhone = regInsert.NextOfKin.cellPhone.ToString();
                     nextOfKin.HomePhone = regInsert.NextOfKin.homePhone.ToString();
+                    emergencycontact.Email = regInsert.EmergencyContact.email;
                     nextOfKin.WorkPhone = regInsert.NextOfKin.workPhone.ToString();
                     nextOfKin.TabsTypeId = regInsert.NextOfKin.TabsTypeId;
                     regPat.RegPatientDetails.Add(nextOfKin);
                 };
 
-                Core.Entities.RegPatientDetail spouse = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails spouse = new Core.Entities.RegPatientDetails();
                 if(regInsert.Spouse != null) 
                 {
                     spouse.FirstName = regInsert.Spouse.firstName;
@@ -533,7 +734,7 @@ namespace HMIS.Application.ServiceLogics
                     regPat.RegPatientDetails.Add(spouse);
                 };
 
-                Core.Entities.RegPatientDetail parent = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails parent = new Core.Entities.RegPatientDetails();
                 if(regInsert.Parent != null) 
                 {
                     parent.FirstName = regInsert.Parent.firstName;
@@ -552,7 +753,7 @@ namespace HMIS.Application.ServiceLogics
                     regPat.RegPatientDetails.Add(parent);
                 };
 
-                Core.Entities.RegPatientDetail assigment = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails assigment = new Core.Entities.RegPatientDetails();
                 if(regInsert.Assignments != null)
                 {
                     assigment.ProofOfIncome = regInsert.Assignments.proofOfIncome;
@@ -569,7 +770,7 @@ namespace HMIS.Application.ServiceLogics
                     regPat.RegPatientDetails.Add(assigment);
                 };
 
-                Core.Entities.RegPatientDetail familyMember = new Core.Entities.RegPatientDetail();
+                Core.Entities.RegPatientDetails familyMember = new Core.Entities.RegPatientDetails();
                 if(regInsert.FamilyMembers != null)
                 {
                     familyMember.MrNo = regInsert.FamilyMembers.mrNo.ToString();
@@ -657,7 +858,7 @@ namespace HMIS.Application.ServiceLogics
             //    regPat.RegPatientDetails.Add(regPatientDetail);
             //}
             ////Core.Entities.em regPatientDetail = new Core.Entities.RegPatientDetail()
-            await _context.RegPatients.AddAsync(regPat);
+            await _context.RegPatient.AddAsync(regPat);
                 await _context.SaveChangesAsync();
                 return "insert successfully";
 

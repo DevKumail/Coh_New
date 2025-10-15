@@ -11,7 +11,7 @@ export class DemographicApiServices {
 
     constructor(private api: ApiService, private http: HttpClient) {}
 
-    getDemographicsByMRNo(MRNo: string) {
+    getDemographicsBypatientId(MRNo: string) {
         return this.api
             .get(`Demographic/GetDemographicsById?PatientId=${MRNo}`)
             .toPromise();

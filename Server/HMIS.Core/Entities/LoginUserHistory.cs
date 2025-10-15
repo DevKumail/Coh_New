@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("LoginUserHistory")]
 public partial class LoginUserHistory
 {
     [Key]
@@ -53,5 +52,5 @@ public partial class LoginUserHistory
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("UserLoginHistory")]
-    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+    public virtual ICollection<AuditLog> AuditLog { get; set; } = new List<AuditLog>();
 }

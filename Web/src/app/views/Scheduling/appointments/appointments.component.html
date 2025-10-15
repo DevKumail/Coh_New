@@ -1,56 +1,250 @@
-<!-- <div class="container-fluid"> -->
-    <div class="card">
-        <div
-            class="card-header d-flex justify-content-between align-items-center"
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2">
+        <li class="breadcrumb-item">
+            <a href="javascript:void(0);">
+                <ng-icon name="tablerSmartHome"></ng-icon>
+                {{'SCHEDULING' | translate}}
+            </a>
+        </li>
+        <li
+            class="d-flex align-items-center text-muted mx-1"
+            aria-current="page"
         >
-            <h4>Appointments</h4>
+            <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            {{'APPOINTMENT' | translate}}
+        </li>
+    </ol>
+</nav>
+ <!-- <div class="container-fluid"> -->
+    <div class="card">
+        <div class="accordion" id="Appointmentaccordion">
             <div>
-                <div class="d-flex gap-2">
-                    <button
-                        class="btn btn-secondary flex-fill"
-                        (click)="ClearFilter()"
-                    >
-                        Clear
-                    </button>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <div class="d-flex w-100 align-items-center">
+                        <button #appointmentToggler class="accordion-button collapsed d-flex no-accordion-caret flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAppointment" aria-expanded="false" aria-controls="collapseAppointment">
+                          {{'APPOINTMENT' | translate}}
+                        </button>
+                        <button type="button" class="btn btn-link p-0 mb-1" title="Filter"
+                                (click)="appointmentToggler?.click()"
+                                [style.marginInlineStart]="'auto'">
+                                <ng-icon style="color: orange;" [name]="isAppointmentFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isAppointmentFiltered }"></ng-icon>
+                            </button>
+                            <button style="width: 100px;" class="btn btn-success ms-2 me-2" (click)="buttonRoute('/scheduling/appointment booking')"> 
+                                <ng-icon style="margin-bottom: 1px;" class="me-2 ms-1" name='tablerPlus'></ng-icon>
+                                <span class="me-1">
+                                    {{'BOOKING' | translate}} 
+                                </span>
+                            </button>
+                      </div>
+                    </h2>
+                    <div id="collapseAppointment" class="accordion-collapse collapse" data-bs-parent="#Appointmentaccordion">
+                      <div class="accordion-body">
+                        <div class="card shadow-sm rounded-3">
+                            <form *ngIf="FilterForm" [formGroup]="FilterForm">
+                            <div class="card-body">
+                                <!-- <div class="container-fluid"> -->
+                                    <!-- Row 1 -->
+                                    <div class="row">
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'FROM_DATE' | translate }}</label>
+                                            <input
+                                                type="date"
+                                                appFilledOnValue
+                                                class="form-control"
+                                                formControlName="fromDate"
+                                            />
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'TO_DATE' | translate }}</label>
+                                            <input
+                                                type="date"
+                                                appFilledOnValue
+                                                class="form-control"
+                                                formControlName="toDate"
+                                            />
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'PROVIDER' | translate }}</label>
+                                            <select
+                                                appFilledOnValue
+                                                class="form-control form-select"
+                                                formControlName="providerId"
+                                            >
+                                                <option value="" disabled selected>-- {{ 'SELECT_PROVIDER' | translate }} --</option>
+                                                <option
+                                                    *ngFor="let item of providers"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                  
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'FACILITY' | translate }}</label>
+                                            <select
+                                                appFilledOnValue
+                                                class="form-control form-select"
+                                                formControlName="facilityId"
+                                            >
+                                                <option value="" disabled selected>-- {{ 'SELECT_FACILITY' | translate }} --</option>
+                                                <option
+                                                    *ngFor="let f of facilities"
+                                                    [value]="f.code"
+                                                >
+                                                    {{ f.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'SITE' | translate }}</label>
+                                            <select
+                                                appFilledOnValue
+                                                class="form-control form-select"
+                                                formControlName="sitesId"
+                                            >
+                                                <option value="" disabled selected>-- {{ 'SELECT_SITE' | translate }} --</option>
+                                                <option
+                                                    *ngFor="let item of sites"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'SPECIALITY' | translate }}</label>
+                                            <select
+                                                appFilledOnValue
+                                                class="form-control form-select"
+                                                formControlName="specialityId"
+                                            >
+                                                <option value="" disabled selected>-- {{ 'SELECT_SPECIALITY' | translate }} --</option>
+                                                <option
+                                                    *ngFor="let item of speciality"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                              
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'CRITERIA' | translate }}</label>
+                                            <select
+                                                appFilledOnValue
+                                                class="form-control form-select"
+                                                formControlName="criteriaId"
+                                            >
+                                                <option value="" disabled selected>-- {{ 'SELECT_CRITERIA' | translate }} --</option>
+                                                <option
+                                                    *ngFor="let item of appointmentcriteria"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'VISIT_TYPE' | translate }}</label>
 
-                    <button
-                        class="btn btn-primary flex-fill"
-                        (click)="ClickFilter(standardModal)"
-                    >
-                        <i class="bi bi-filter"></i> Filter
-                    </button>
+                                            <div class="row g-4 align-items-end">
+                                                <div class="input-group">
+                                                    <select
+                                                        appFilledOnValue
+                                                        class="form-select"
+                                                        formControlName="visitTypeId"
+                                                        id="visitTypeId"
+                                                    >
+                                                        <option value="" disabled selected>-- {{ 'SELECT_VISIT_TYPE' | translate }} --</option>
+                                                        <option
+                                                            *ngFor="let item of visitType"
+                                                            [value]="item.code"
+                                                        >
+                                                            {{ item.name }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'LOCATION' | translate }}</label>
+                                            <select
+                                                appFilledOnValue
+                                                class="form-control form-select"
+                                                formControlName="locationId"
+                                            >
+                                                <option value="" disabled selected>-- {{ 'SELECT_LOCATION' | translate }} --</option>
+                                                <option
+                                                    *ngFor="let l of locations"
+                                                    [value]="l.code"
+                                                >
+                                                    {{ l.name }}
+                                                </option>
+                                            </select>
+                                        </div>
 
-                    <button
-                        class="btn btn-success flex-fill"
-                        (click)="buttonRoute('/scheduling/create-appointment')"
-                    >
-                        Create
-                    </button>
-                </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'APPOINTMENT_TYPE' | translate }}</label>
+                                            <select
+                                                appFilledOnValue
+                                                class="form-control form-select"
+                                                formControlName="appointmentId"
+                                            >
+                                                <option value="" disabled selected>-- {{ 'SELECT_APPOINTMENT_TYPE' | translate }} --</option>
+                                                <option
+                                                    *ngFor="let item of appointmentType"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-2"> 
+
+                                        </div>
+
+                                        <div class="col-md-3 px-2" style="margin-top: 20px; text-align: right;">
+                                            <button type="button" class="btn btn-light me-2" (click)="ClearFilter()">{{ 'CLEAR' | translate }}</button>
+                                            <button type="submit" (click)="FilterAppoinment()" class="btn btn-primary">{{ 'SEARCH' | translate }}</button>
+                                        </div>
+                                    </div>
+                                <!-- </div> -->
+                            </div>
+                            </form>
+
+                           
+                        </div>
+                      </div>
+                    </div>
+                  </div>
             </div>
-        </div>
+            </div>
 
         <div class="card-body">
             <table class="table table-bordered table-striped table-sm">
                 <thead>
                     <tr>
-                        <th>Visit Account Display</th>
-                        <th>Patient Name</th>
-                        <th>App Date</th>
-                        <th>Site Name</th>
-                        <th>Appointment Type</th>
-                        <th>Purpose</th>
-                        <th>App Status</th>
-                        <th>Patient Status</th>
-                        <th>Action</th>
+                        <th>{{ 'VISIT_ACCOUNT_NO' | translate }}</th>
+                        <th>{{ 'PATIENT_NAME' | translate }}</th>
+                        <th>{{ 'APP_DATE' | translate }}</th>
+                        <th>{{ 'SITE_NAME' | translate }}</th>
+                        <th>{{ 'APPOINTMENT_TYPE' | translate }}</th>
+                        <th>{{ 'PURPOSE_OF_VISIT' | translate }}</th>
+                        <th>{{ 'APP_STATUS' | translate }}</th>
+                        <th>{{ 'PATIENT_STATUS' | translate }}</th>
+                        <th>{{ 'ACTION' | translate }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="table-group-divider text-center">
                     <tr *ngFor="let appointment of appointments">
-                        <td>{{ appointment.visitAccDisplay }}</td>
+                        <td>{{ appointment.visitAccDisplay || 'N/A' }}</td>
                         <td>{{ appointment.patient_FName }}</td>
                         <td>
-                            {{ appointment.appDateTime | date : "MM/dd/yyyy" }}
+                            {{ appointment.appDateTime | date : "dd/MM/yyyy h:mm a" }}
                         </td>
                         <td>{{ appointment.appointment_SiteName }}</td>
                         <td>{{ appointment.appType }}</td>
@@ -61,279 +255,211 @@
                         <td>{{ appointment.appointment_PatientStatus }}</td>
                         <td class="d-flex flex-nowrap align-items-center">
                             <button
-                                class="btn btn-outline-info p-0 px-1 me-1"
+                                class="btn btn-outline-info p-0 px-1 py-1 me-1"
                                 style="font-size: 0.75rem"
-                                [routerLink]="[
-                                    '/scheduling/appointment/create'
-                                ]"
-                                [queryParams]="{
-                                    id: appointment.appointment_Id
-                                }"
-                                title="Edit"
-                            >
-                                <i class="bi bi-pencil-square"></i>
+                                (click)="PatientEdit(appointment)"
+                                title="Edit Appointment"
+                                >
+                                <ng-icon name="tablerEdit"></ng-icon>
                             </button>
 
                             <button
-                                class="btn btn-outline-success p-0 px-1 me-1"
-                                style="font-size: 0.75rem"
-                                (click)="
-                                    PatientStatus($event, appointment, 'bottom')
-                                "
-                                title="Status"
+                            class="btn btn-outline-success p-0 px-1 py-1 me-1"
+                            style="font-size: 0.75rem"
+                            (click)="PatientStatus(appointment.appointment_Id,appointment.patient_FName,appointment.mrNo, patientStatusModal)"
+                            title="Patient Status"
                             >
-                                <i class="bi bi-person-lines-fill"></i>
+                            <ng-icon name="tablerSearch"></ng-icon>
                             </button>
 
                             <button
-                                class="btn btn-outline-danger p-0 px-1 me-1"
+                                class="btn btn-outline-danger p-0 px-1 py-1 me-1"
                                 style="font-size: 0.75rem"
-                                (click)="
-                                    confirmCancel($event, appointment, 'bottom')
-                                "
+                                (click)="confirmCancel(cancelAppointmentModal, appointment.appointment_Id)"
                                 title="Cancel"
                             >
-                                <i class="bi bi-x-circle"></i>
+                                <ng-icon name="tablerX"></ng-icon>
                             </button>
 
                             <button
-                                class="btn btn-outline-warning p-0 px-1 me-1"
+                                class="btn btn-outline-warning p-0 px-1 py-1 me-1"
                                 style="font-size: 0.75rem"
-                                (click)="
-                                    Reschedule($event, appointment, 'bottom')
-                                "
-                                title="Reschedule"
+                                (click)="Reschedule(rescheduleAppointmentModal,appointment)"
+                                title="Reschedule Appointment"
                             >
-                                <i class="bi bi-arrow-repeat"></i>
+                                <ng-icon name="tablerRefresh"></ng-icon>
                             </button>
 
                             <button
-                                class="btn btn-outline-secondary p-0 px-1"
+                                class="btn btn-outline-secondary p-0 py-1 px-1"
                                 style="font-size: 0.75rem"
-                                [routerLink]="[
-                                    '/scheduling/appointment/history'
-                                ]"
+                                [routerLink]="['/scheduling/appointment/history']"
                                 [queryParams]="{ mrNo: appointment.mrNo }"
                                 title="History"
-                            >
-                                <i class="bi bi-clock-history"></i>
+                                >
+                                <ng-icon name="tablerHistory"></ng-icon>
                             </button>
                         </td>
                     </tr>
                     <tr *ngIf="appointments.length === 0">
-                        <td colspan="9">No appointment found.</td>
+                        <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-<!-- </div> -->
-
-<ng-template #standardModal let-modal>
-    <form [formGroup]="FilterForm" (ngSubmit)="onSubmit()">
-        <div class="modal-header">
-            <h5 class="modal-title">Filter Appointments</h5>
-            <button
-                type="button"
-                class="btn-close"
-                (click)="modal.dismiss()"
-            ></button>
-        </div>
-
-        <div class="modal-body">
-            <div class="card shadow-sm rounded-3">
-                <div class="card-body">
-                    <div class="container-fluid">
-                        <!-- Row 1 -->
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label>From Date</label>
-                                <input
-                                    type="date"
-                                    class="form-control"
-                                    formControlName="fromDate"
-                                />
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>To Date</label>
-                                <input
-                                    type="date"
-                                    class="form-control"
-                                    formControlName="toDate"
-                                />
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>Provider</label>
-                                <select
-                                    class="form-control"
-                                    formControlName="providerId"
-                                >
-                                    <option value="">Select Provider</option>
-                                    <option
-                                        *ngFor="let item of providers"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Row 2 -->
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label>Facility</label>
-                                <select
-                                    class="form-control form-select"
-                                    formControlName="facility"
-                                >
-                                    <option value="">Select Facility</option>
-                                    <option
-                                        *ngFor="let f of facilities"
-                                        [value]="f.code"
-                                    >
-                                        {{ f.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>Site</label>
-                                <select
-                                    class="form-control"
-                                    formControlName="sitesId"
-                                >
-                                    <option value="">Select Site</option>
-                                    <option
-                                        *ngFor="let item of sites"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>Speciality</label>
-                                <select
-                                    class="form-control"
-                                    formControlName="specialityId"
-                                >
-                                    <option value="">Select Speciality</option>
-                                    <option
-                                        *ngFor="let item of speciality"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Row 3 -->
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label>Criteria</label>
-                                <select
-                                    class="form-control"
-                                    formControlName="criteriaId"
-                                >
-                                    <option value="">Select Criteria</option>
-                                    <option
-                                        *ngFor="let item of appointmentcriteria"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>Visit Type</label>
-
-                                <div class="row g-4 align-items-end">
-                                    <div class="input-group">
-                                        <select
-                                            class="form-select"
-                                            formControlName="visitTypeId"
-                                            id="visitTypeId"
-                                        >
-                                            <option value="">
-                                                Select Visit Type
-                                            </option>
-                                            <option
-                                                *ngFor="let item of visitType"
-                                                [value]="item.code"
-                                            >
-                                                {{ item.name }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label>Location</label>
-                                <!-- <select
-                                    class="form-control"
-                                    formControlName="locationId"
-                                >
-                                    <option value="">Select Location</option>
-                                    <option
-                                        *ngFor="let item of locations"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select> -->
-                                <select
-                                    class="form-control form-select"
-                                    formControlName="location"
-                                >
-                                    <option value="">Select Location</option>
-                                    <option
-                                        *ngFor="let l of locations"
-                                        [value]="l.code"
-                                    >
-                                        {{ l.name }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label>Appointment Type</label>
-                                <select
-                                    class="form-control"
-                                    formControlName="appointmentId"
-                                >
-                                    <option value="">
-                                        Select Appointment Type
-                                    </option>
-                                    <option
-                                        *ngFor="let item of appointmentType"
-                                        [value]="item.code"
-                                    >
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- <div class="mb-3">
-      <label for="message-text" class="col-form-label">Message:</label>
-      <textarea class="form-control" id="message-text"></textarea>
-    </div> -->
-            </div>
-
-            <div class="modal-footer">
-                <button
-                    type="button"
-                    class="btn btn-light"
-                    (click)="modal.dismiss()"
+                <app-generic-pagination
+                    [totalItems]="totalRecord"
+                    [pageSize]="PaginationInfo.RowsPerPage"
+                    [currentPage]="PaginationInfo.Page"
+                    (pageChanged)="onappointmentsPageChanged($event)"
                 >
-                    Close
-                </button>
-                <button type="submit" class="btn btn-primary">Search</button>
+                </app-generic-pagination>
+
+<!-- Bootstrap Modal with p-steps -->
+<ng-template #patientStatusModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">Patient Status</h5>
+      <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+  
+    <div class="modal-body">
+      <!-- Patient Info -->
+      <div class="row justify-content-center mb-2">
+        <div class="col-md-3"><b><u>MR No:</u></b></div>
+        <div class="col-md-4"><b><u>Appointment No:</u></b></div>
+        <div class="col-md-4"><b><u>Patient Name:</u></b></div>
+      </div>
+      <div class="row justify-content-center mb-3">
+        <div class="col-md-3">{{ mrNO }}</div>
+        <div class="col-md-4">{{ appId }}</div>
+        <div class="col-md-4">{{ patient_FName }}</div>
+      </div>
+  
+      <!-- PrimeNG Steps -->
+      <p-steps
+        [model]="items"
+        [readonly]="false"
+        [activeIndex]="activeIndex"
+        (activeIndexChange)="onActiveIndexChange($event)">
+      </p-steps>
+  
+      <!-- Child Steps -->
+      <div class="mt-3" *ngIf="showDiv">
+        <p-steps
+          [model]="itemsChild"
+          [readonly]="false"
+          [activeIndex]="ChildactiveIndex"
+          (activeIndexChange)="onActiveChildIndexChange($event)">
+        </p-steps>
+      </div>
+    </div>
+  
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
+    </div>
+  </ng-template>
+
+
+  <!-- Cancel Appointment Modal -->
+    <ng-template #cancelAppointmentModal let-modal>
+        <div class="modal-header">
+          <h5 class="modal-title" id="cancelAppointmentLabel">Cancel Appointment</h5>
+          <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+        </div>
+  
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Facility</label>
+                    <select class="form-control form-select" [(ngModel)]="selectedReschedulingReasons">
+                        <option value="" disabled selected>-- Select Facility --</option>
+                        <option *ngFor="let f of ReschedulingReasons" [value]="f.code">
+                            {{ f.name }}
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
-    </form>
-</ng-template>
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+          <button type="button" class="btn btn-danger" (click)="cancelApp()">Cancel Appointment</button>
+        </div>
+  </ng-template>
+  
+
+  <!-- Reschedule Appointment Modal -->
+<ng-template #rescheduleAppointmentModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title" id="rescheduleAppointmentLabel">Reschedule Appointment</h5>
+      <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+  
+    <div class="modal-body">
+      <div class="row g-3">
+        <!-- Provider -->
+        <div class="col-md-3">
+          <label class="form-label">Provider</label>
+          <select class="form-control form-select" [(ngModel)]="selectedProviders">
+            <option value="" disabled selected>-- Select Provider --</option>
+            <option *ngFor="let p of providers" [value]="p.code">{{ p.name }}</option>
+          </select>
+        </div>
+  
+        <!-- Location -->
+        <div class="col-md-3">
+          <label class="form-label">Location</label>
+          <select class="form-control form-select" [(ngModel)]="selectedLocations">
+            <option value="" disabled selected>-- Select Location --</option>
+            <option *ngFor="let l of locations" [value]="l.code">{{ l.name }}</option>
+          </select>
+        </div>
+  
+        <!-- Facility -->
+        <div class="col-md-3">
+          <label class="form-label">Facility</label>
+          <select class="form-control form-select" [(ngModel)]="selectedFacility">
+            <option value="" disabled selected>-- Select Facility --</option>
+            <option *ngFor="let f of facilities" [value]="f.code">{{ f.name }}</option>
+          </select>
+        </div>
+  
+        <!-- Sites -->
+        <div class="col-md-3">
+          <label class="form-label">Sites</label>
+          <select class="form-control form-select" [(ngModel)]="selectedSites">
+            <option value="" disabled selected>-- Select Site --</option>
+            <option *ngFor="let s of sites" [value]="s.code">{{ s.name }}</option>
+          </select>
+        </div>
+  
+        <!-- Date -->
+        <div class="col-md-3">
+          <label class="form-label">Date</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="date"
+            placeholder="Select Date"
+            [min]="minDate" />
+        </div>
+  
+        <!-- Reason -->
+        <div class="col-md-6">
+          <label class="form-label">Reason</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="reason"
+            placeholder="Reason" />
+        </div>
+      </div>
+    </div>
+  
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+      <button type="button" class="btn btn-success" (click)="ReScheduleApp(appointments)">Reschedule Appointment</button>
+    </div>
+  </ng-template>
+  

@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("RegPatientTemp")]
 public partial class RegPatientTemp
 {
     [Key]
@@ -145,34 +144,34 @@ public partial class RegPatientTemp
     public string? DwellingNumber { get; set; }
 
     [ForeignKey("NokcityId")]
-    [InverseProperty("RegPatientTempNokcities")]
-    public virtual RegCity? Nokcity { get; set; }
+    [InverseProperty("RegPatientTempNokcity")]
+    public virtual RegCities? Nokcity { get; set; }
 
     [ForeignKey("NokcountryId")]
-    [InverseProperty("RegPatientTempNokcountries")]
-    public virtual RegCountry? Nokcountry { get; set; }
+    [InverseProperty("RegPatientTempNokcountry")]
+    public virtual RegCountries? Nokcountry { get; set; }
 
     [ForeignKey("NokstateId")]
-    [InverseProperty("RegPatientTempNokstates")]
-    public virtual RegState? Nokstate { get; set; }
+    [InverseProperty("RegPatientTempNokstate")]
+    public virtual RegStates? Nokstate { get; set; }
 
     [ForeignKey("PersonCityId")]
-    [InverseProperty("RegPatientTempPersonCities")]
-    public virtual RegCity? PersonCity { get; set; }
+    [InverseProperty("RegPatientTempPersonCity")]
+    public virtual RegCities? PersonCity { get; set; }
 
     [ForeignKey("PersonCountryId")]
-    [InverseProperty("RegPatientTempPersonCountries")]
-    public virtual RegCountry? PersonCountry { get; set; }
+    [InverseProperty("RegPatientTempPersonCountry")]
+    public virtual RegCountries? PersonCountry { get; set; }
 
     [ForeignKey("PersonNationalityId")]
-    [InverseProperty("RegPatientTemps")]
+    [InverseProperty("RegPatientTemp")]
     public virtual Nationality? PersonNationality { get; set; }
 
     [ForeignKey("PersonStateId")]
-    [InverseProperty("RegPatientTempPersonStates")]
-    public virtual RegState? PersonState { get; set; }
+    [InverseProperty("RegPatientTempPersonState")]
+    public virtual RegStates? PersonState { get; set; }
 
     [ForeignKey("PersonTitleId")]
-    [InverseProperty("RegPatientTemps")]
+    [InverseProperty("RegPatientTemp")]
     public virtual RegTitle? PersonTitle { get; set; }
 }

@@ -4,14 +4,14 @@
     <li class="breadcrumb-item">
       <a href="javascript:void(0);">
         <ng-icon name="tablerSmartHome"></ng-icon>
-        Registration
+    {{'REGISTRATION' | translate}}
       </a>
     </li>
     <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
-      <ng-icon name="tablerChevronRight"></ng-icon>
+        <ng-icon class="me-1 ms-1"  [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
     </li>
     <li class="breadcrumb-item active" aria-current="page">
-      Coverage
+    {{'COVERAGES' | translate}}
     </li>
   </ol>
 </nav>
@@ -21,38 +21,44 @@
     <div class="card shadow-lg p-2 rounded">
         <!-- 🔷 Optional Breadcrumb -->
         <div class="d-flex justify-content-between align-items-center p-2">
-            <h4 class="fw-bold mb-0">Add Subscriber</h4>
+            <h4 class="fw-bold mb-0">{{'ADD_SUBSCRIBER' | translate}}</h4>
         </div>
 
         <!-- 📝 Reactive Form Starts -->
-        <form [formGroup]="subscriberForm">
+        <form [formGroup]="subscriberForm" novalidate class="no-invalid-icon">
             <div class="row p-2">
                 <!-- Type -->
                 <div class="col-3">
-                    <label>Type</label><span class="danger"> *</span>
+                    <label>{{'TYPE' | translate}}</label><span class="danger"> *</span>
                    <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="CompanyOrIndividual"
                         (change)="showRelation()"
+                        [class.is-invalid]="subscriberForm.get('CompanyOrIndividual')?.invalid && (subscriberForm.get('CompanyOrIndividual')?.touched || subscriberForm.touched)"
                     >
-                        <option value="">-- Select Type --</option>
+                        <option value="">{{'SELECT_TYPE' | translate}}</option>
                         <option *ngFor="let t of type" [value]="t.value" >
                             {{ t.label }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CompanyOrIndividual')?.invalid && (subscriberForm.get('CompanyOrIndividual')?.touched || subscriberForm.touched)">
+                        {{'TYPE_IS_REQUIRED' | translate}}
+                        
+                    </div>
 
                 </div>
 
                 <!-- Relationship Dropdown (Show only if isRelation == true) -->
                 <div class="col-3">
-                    <label>Relation</label><span class="danger"> *</span>
+                    <label>{{'RELATIONSHIP' | translate}}</label><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="InsuranceRel"
                         id="InsuranceRel"
                         [disabled]="!isRelation"
+                        [class.is-invalid]="subscriberForm.get('InsuranceRel')?.invalid && (subscriberForm.get('InsuranceRel')?.touched || subscriberForm.touched)"
                     >
-                        <option value="">-- Select Relation --</option>
+                        <option value="">{{'SELECT_RELATIONSHIP' | translate}}</option>
                         <option
                             *ngFor="let t of InsuranceRelation"
                             [value]="t.id"
@@ -60,166 +66,212 @@
                             {{ t.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('InsuranceRel')?.invalid && (subscriberForm.get('InsuranceRel')?.touched || subscriberForm.touched)">
+                        {{ 'RELATION_IS_REQUIRED' | translate }}
+                    </div>
                 </div>
 
                 <!-- Title -->
                 <div class="col-3">
-                    <label>Title</label><span class="danger"> *</span>
-                    <select class="form-select" formControlName="Suffix">
-                        <option value="">-- Select Title --</option>
+                    <label>{{'TITLE' | translate}}</label><span class="danger"> *</span>
+                    <select class="form-select no-invalid-icon" formControlName="Suffix"
+                        [class.is-invalid]="subscriberForm.get('Suffix')?.invalid && (subscriberForm.get('Suffix')?.touched || isSubmitted)">
+                        <option value="">{{'SELECT_TITLE' | translate}}</option>
                         <option *ngFor="let t of titles" [value]="t.code">
                             {{ t.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('Suffix')?.invalid && (subscriberForm.get('Suffix')?.touched || isSubmitted)">
+                        {{'TITLE_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- First Name -->
                 <div class="col-3">
-                    <label>First Name</label><span class="danger"> *</span>
+                    <label>{{'FIRST_NAME' | translate}}</label><span class="danger"> *</span>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="FirstName"
-                        placeholder="First Name"
+                        placeholder="{{'ENTER_FIRST_NAME' | translate}}"
+                        [class.is-invalid]="subscriberForm.get('FirstName')?.invalid && (subscriberForm.get('FirstName')?.touched || isSubmitted)"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('FirstName')?.invalid && (subscriberForm.get('FirstName')?.touched || isSubmitted)">
+                        {{'FIRST_NAME_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- Middle Name -->
                 <div class="col-3">
-                    <label>Middle Name</label>
+                    <label>{{'MIDDLE_NAME' | translate}}</label>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="MiddleName"
-                        placeholder="Middle Name"
+                        placeholder="{{'ENTER_MIDDLE_NAME' | translate}}"
                     />
                 </div>
 
                 <!-- Last Name -->
                 <div class="col-3">
-                    <label>Last Name</label><span class="danger"> *</span>
+                    <label>{{'LAST_NAME' | translate}}</label><span class="danger"> *</span>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="LastName"
-                        placeholder="Last Name"
+                        placeholder="{{'ENTER_LAST_NAME' | translate}}"
+                        [class.is-invalid]="subscriberForm.get('LastName')?.invalid && (subscriberForm.get('LastName')?.touched || isSubmitted)"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('LastName')?.invalid && (subscriberForm.get('LastName')?.touched || isSubmitted)">
+                        {{'LAST_NAME_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- Phone -->
                 <div class="col-3">
-                    <label>Cell Phone</label><span class="danger"> *</span>
+                    <label>{{'CELL_PHONE' | translate}}</label><span class="danger"> *</span>
 
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="InsuredPhone"
-                        placeholder="(00) 0000-0000"
+                        placeholder="{{'ENTER_CELL_PHONE' | translate}}"
                         [mask]="'(00) 0000-0000'"
+                        [class.is-invalid]="subscriberForm.get('InsuredPhone')?.invalid && (subscriberForm.get('InsuredPhone')?.touched || isSubmitted)"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('InsuredPhone')?.invalid && (subscriberForm.get('InsuredPhone')?.touched || isSubmitted)">
+                        {{'CELL_PHONE_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <div class="col-3">
-                    <label>Date of Birth</label><span class="danger"> *</span>
+                    <label>{{'DOB' | translate}}</label><span class="danger"> *</span>
                     <input
                         type="text"
-                        class="form-control date"
+                        class="form-control date no-invalid-icon"
                         formControlName="BirthDate"
                         data-provider="flatpickr"
                         id="BirthDate"
-                        placeholder="Select date"
+                        placeholder="{{'SELECT_DATE' | translate}}"
+                        [class.is-invalid]="subscriberForm.get('BirthDate')?.invalid && (subscriberForm.get('BirthDate')?.touched || isSubmitted)"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('BirthDate')?.invalid && (subscriberForm.get('BirthDate')?.touched || isSubmitted)">
+                        {{'DOB_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- Address -->
                 <div class="col-3">
-                    <label>Address</label><span class="danger"> *</span>
+                    <label>{{'ADDRESS' | translate}}</label><span class="danger"> *</span>
                     <textarea
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="Address1"
-                        placeholder="Address"
+                        placeholder="{{'ENTER_ADDRESS' | translate}}"
+                        [class.is-invalid]="subscriberForm.get('Address1')?.invalid && (subscriberForm.get('Address1')?.touched || subscriberForm.touched)"
                     ></textarea>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('Address1')?.invalid && (subscriberForm.get('Address1')?.touched || subscriberForm.touched)">
+                        {{'ADDRESS_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- Country -->
                 <div class="col-3">
-                    <label>Country</label><span class="danger"> *</span>
+                    <label>{{'COUNTRY' | translate}}</label><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="CountryId"
                         (change)="onCountryChange()"
+                        [class.is-invalid]="subscriberForm.get('CountryId')?.invalid && (subscriberForm.get('CountryId')?.touched || isSubmitted)"
                     >
-                        <option value="">-- Select Country --</option>
+                        <option value="">{{'SELECT_COUNTRY' | translate}}</option>
                         <option *ngFor="let c of Country" [value]="c.code">
                             {{ c.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CountryId')?.invalid && (subscriberForm.get('CountryId')?.touched || isSubmitted)">
+                        {{'COUNTRY_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- State -->
                 <div class="col-3">
-                    <label>State</label><span class="danger"> *</span>
+                    <label>{{'STATE' | translate}}</label><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="StateId"
                         (change)="onStateChange()"
+                        [class.is-invalid]="subscriberForm.get('StateId')?.invalid && (subscriberForm.get('StateId')?.touched || isSubmitted)"
                     >
-                        <option value="">-- Select State --</option>
+                        <option value="">{{'SELECT_STATE' | translate}}</option>
                         <option *ngFor="let s of states" [value]="s.stateId">
                             {{ s.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('StateId')?.invalid && (subscriberForm.get('StateId')?.touched || isSubmitted)">
+                        {{'STATE_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- City -->
                 <div class="col-3">
-                    <label>City</label><span class="danger"> *</span>
-                    <select class="form-select" formControlName="CityId">
-                        <option value="">-- Select City --</option>
+                    <label>{{'CITY' | translate}}</label><span class="danger"> *</span>
+                    <select class="form-select no-invalid-icon" formControlName="CityId"
+                        [class.is-invalid]="subscriberForm.get('CityId')?.invalid && (subscriberForm.get('CityId')?.touched || isSubmitted)">
+                        <option value="">{{'SELECT_CITY' | translate}}</option>
                         <option *ngFor="let c of city" [value]="c.cityId">
                             {{ c.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CityId')?.invalid && (subscriberForm.get('CityId')?.touched || isSubmitted)">
+                        {{'CITY_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- Zip -->
                 <div class="col-3">
-                    <label>Zip Code</label><span class="danger"> *</span>
+                    <label>{{'ZIP_CODE' | translate}}</label><span class="danger"> *</span>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="ZipCode"
-                        placeholder="Zip Code"
+                        placeholder="{{'ENTER_ZIP_CODE' | translate}}"
                         [mask]="'00000'"
+                        [class.is-invalid]="subscriberForm.get('ZipCode')?.invalid && (subscriberForm.get('ZipCode')?.touched || isSubmitted)"
                     />
-                    <!-- <input
-                        type="text"
-                        class="form-control"
-                        formControlName="ZipCode"
-                    /> -->
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('ZipCode')?.invalid && (subscriberForm.get('ZipCode')?.touched || isSubmitted)">
+                        {{'ZIP_CODE_IS_REQUIRED' | translate}}
+                        Zip code is required.
+                    </div>
                 </div>
 
                 <!-- Insurance Carrier -->
                 <div class="col-3">
-                    <label>Insurance Carrier</label
+                    <label>{{'INSURANCE_CARRIER' | translate}}</label
                     ><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="CarrierId"
                         (change)="onCarrierChange()"
+                        [class.is-invalid]="subscriberForm.get('CarrierId')?.invalid && (subscriberForm.get('CarrierId')?.touched || isSubmitted)"
                     >
+                        <option value="">{{'SELECT_INSURANCE_CARRIER' | translate}}</option>
                         <option *ngFor="let p of BLPayer" [value]="p.code">
                             {{ p.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('CarrierId')?.invalid && (subscriberForm.get('CarrierId')?.touched || isSubmitted)">
+                        {{'INSURANCE_CARRIER_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <div class="col-3">
-                    <label>Policy Plan</label><span class="danger"> *</span>
+                    <label>{{'POLICY_PLAN' | translate}}</label><span class="danger"> *</span>
                     <select
-                        class="form-select policy-select"
+                        class="form-select policy-select no-invalid-icon"
                         formControlName="selectedBLPayerPlan"
+                        [class.is-invalid]="subscriberForm.get('selectedBLPayerPlan')?.invalid && (subscriberForm.get('selectedBLPayerPlan')?.touched || isSubmitted)"
                     >
+                        <option value="">{{'SELECT_POLICY_PLAN' | translate}}</option>
                         <option
                             *ngFor="let plan of BLPayerPlan"
                             [value]="plan.code"
@@ -228,15 +280,20 @@
                             {{ plan.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('selectedBLPayerPlan')?.invalid && (subscriberForm.get('selectedBLPayerPlan')?.touched || isSubmitted)">
+                        {{'POLICY_PLAN_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- Package -->
                 <div class="col-3">
-                    <label>Package</label><span class="danger"> *</span>
+                    <label>{{'PACKAGE' | translate}}</label><span class="danger"> *</span>
                     <select
-                        class="form-select"
+                        class="form-select no-invalid-icon"
                         formControlName="selectedBLPayerPackage"
+                        [class.is-invalid]="subscriberForm.get('selectedBLPayerPackage')?.invalid && (subscriberForm.get('selectedBLPayerPackage')?.touched || isSubmitted)"
                     >
+                        <option value="">{{'SELECT_PACKAGE' | translate}}</option>
                         <option
                             *ngFor="let pack of BLPayerPackage"
                             [value]="pack.code"
@@ -244,65 +301,78 @@
                             {{ pack.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('selectedBLPayerPackage')?.invalid && (subscriberForm.get('selectedBLPayerPackage')?.touched || isSubmitted)">
+                        {{'PACKAGE_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- Gender -->
                 <div class="col-3">
-                    <label>Gender</label><span class="danger"> *</span>
-                    <select class="form-select" formControlName="Sex">
+                    <label>{{'GENDER' | translate}}</label><span class="danger"> *</span>
+                    <select class="form-select no-invalid-icon" formControlName="Sex"
+                        [class.is-invalid]="subscriberForm.get('Sex')?.invalid && (subscriberForm.get('Sex')?.touched || isSubmitted)">
+                        <option value="">{{'SELECT_GENDER' | translate}}</option>
                         <option *ngFor="let g of genders" [value]="g.code">
                             {{ g.name }}
                         </option>
                     </select>
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('Sex')?.invalid && (subscriberForm.get('Sex')?.touched || isSubmitted)">
+                        {{'GENDER_IS_REQUIRED' | translate}}
+                        
+                    </div>
                 </div>
 
                 <!-- Insured ID -->
                 <div class="col-3">
-                    <label>Member Id / Emp Id</label
+                    <label>{{'MEMBER_ID_EMP_ID' | translate}}</label
                     ><span class="danger"> *</span>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control no-invalid-icon"
                         formControlName="InsuredIdNo"
-                        placeholder="Member Id / Emp Id"
+                        placeholder="{{'ENTER_MEMBER_ID_EMP_ID' | translate}}"
+                        [class.is-invalid]="subscriberForm.get('InsuredIdNo')?.invalid && (subscriberForm.get('InsuredIdNo')?.touched || isSubmitted)"
                     />
+                    <div class="invalid-feedback d-block" *ngIf="subscriberForm.get('InsuredIdNo')?.invalid && (subscriberForm.get('InsuredIdNo')?.touched || isSubmitted)">
+                        {{'MEMBER_ID_EMP_ID_IS_REQUIRED' | translate}}
+                    </div>
                 </div>
 
                 <!-- Active -->
                 <div class="col-3 d-flex align-items-center mt-4">
+                    <label class="form-check-label ms-2">{{'ACTIVE' | translate}}</label>
                     <input
                         type="checkbox"
                         class="form-check-input"
                         formControlName="Inactive"
                     />
-                    <label class="form-check-label ms-2">Active</label>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="card mt-4">
                         <b>
-                            <a
-                                class="nav-item nav-link active mt-2"
-                                style="color: rgb(8, 8, 167); margin-left: 20px"
-                            >
-                                Copay Flat Rate (%)
-                            </a>
+                                <a
+                                    class="nav-item nav-link active mt-2"
+                                    style="color: rgb(8, 8, 167); margin-left: 20px"
+                                >
+                                    {{'COPAY_FLAT_RATE' | translate}}
+                                </a>
                         </b>
                         <div class="row mt-2 mb-2 mx-2">
                             <div class="col-6">
                                 <input
                                     type="number"
-                                    class="form-control w-100"
-                                    placeholder="OP"
+                                    class="form-control w-100 no-invalid-icon"
+                                    placeholder="{{'OP' | translate}}"
                                     formControlName="OpCopay"
                                 />
                             </div>
                             <div class="col-6">
                                 <input
                                     type="number"
-                                    class="form-control w-100"
-                                    placeholder="IP"
+                                    class="form-control w-100 no-invalid-icon"
+                                    placeholder="{{ 'IP' | translate}}"
                                     formControlName="Deductibles"
                                 />
                             </div>
@@ -313,27 +383,27 @@
                 <div class="col-md-6">
                     <div class="card mt-4">
                         <b>
-                            <a
-                                class="nav-item nav-link active mt-2"
-                                style="color: rgb(8, 8, 167); margin-left: 20px"
-                            >
-                                Deductable (Amount)
-                            </a>
+                                <a
+                                    class="nav-item nav-link active mt-2"
+                                    style="color: rgb(8, 8, 167); margin-left: 20px"
+                                >
+                                    {{'DEDUCTABLE_AMOUNT' | translate}}
+                                </a>
                         </b>
                         <div class="row mt-2 mb-2 mx-2">
                             <div class="col-6">
                                 <input
                                     type="number"
-                                    class="form-control w-100"
-                                    placeholder="PC"
+                                    class="form-control w-100 no-invalid-icon"
+                                    placeholder="{{'PC' | translate}}"
                                     formControlName="Copay"
                                 />
                             </div>
                             <div class="col-6">
                                 <input
                                     type="number"
-                                    class="form-control w-100"
-                                    placeholder="DN"
+                                    class="form-control w-100 no-invalid-icon"
+                                    placeholder="{{ 'DN' | translate}}"
                                     formControlName="DNDeductible"
                                 />
                             </div>
@@ -348,14 +418,14 @@
                         class="nav nav-tabs mb-3"
                     >
                         <li [ngbNavItem]="1">
-                            <a ngbNavLink>Policy Info</a>
+                            <a ngbNavLink>{{'POLICY_INFO' | translate}}</a>
                             <ng-template ngbNavContent>
                                 <!-- ✅ Add Policy Button -->
                                 <button
                                     class="btn btn-sm btn-primary mb-2"
                                     (click)="openPolicyModal(modalLg)"
                                 >
-                                    + Add Policy
+                                    + {{'ADD_POLICY' | translate}}
                                 </button>
 
                                 <!-- ✅ Table -->
@@ -365,12 +435,12 @@
                                             <tr
                                                 class="text-uppercase text-center"
                                             >
-                                                <th>Effective Date</th>
-                                                <th>Termination Date</th>
-                                                <th>Group No</th>
-                                                <th>No of Visits</th>
-                                                <th>Amount</th>
-                                                <th>Status</th>
+                                                <th>{{'EFFECTIVE_DATE' | translate}}</th>
+                                                <th>{{'TERMINATION_DATE' | translate}}</th>
+                                                <th>{{'POLICY_NO' | translate}}</th>
+                                                <th>{{'NO_OF_VISITS' | translate}}</th>
+                                                <th>{{'AMOUNT' | translate}}</th>
+                                                <th>{{'STATUS' | translate}}</th>
                                             </tr>
                                         </thead>
                                         <tbody class="text-center">
@@ -383,14 +453,14 @@
                                                     {{
                                                         policy.effectiveDate
                                                             | date
-                                                                : "MM/dd/yyyy"
+                                                                : "dd/MM/yyyy h:mm a"
                                                     }}
                                                 </td>
                                                 <td>
                                                     {{
                                                         policy.terminationDate
                                                             | date
-                                                                : "MM/dd/yyyy"
+                                                                : "dd/MM/yyyy h:mm a"
                                                     }}
                                                 </td>
                                                 <td>
@@ -405,12 +475,10 @@
                                                     }}
                                                 </td>
                                                 <td>
-                                                    {{
-                                                        policy.amount | currency
-                                                    }}
+                                                    {{ policy.amount | currency }}
                                                 </td>
                                                 <td>
-                                                    {{ policy.status || "N/A" }}
+                                                    {{ policy.status === 1 ? 'Active' : policy.status === 0 ? 'InActive' : (policy.status || 'N/A') }}
                                                 </td>
                                             </tr>
                                             <tr
@@ -420,7 +488,7 @@
                                                 "
                                             >
                                                 <td colspan="6">
-                                                    No policy data available.
+                                                    {{'NO_DATA_FOUND' | translate}}
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -435,7 +503,7 @@
                                     >
                                         <div class="modal-header">
                                             <h5 class="modal-title">
-                                                Add Policy
+                                                {{'ADD_POLICY' | translate}}
                                             </h5>
                                             <button
                                                 type="button"
@@ -449,7 +517,7 @@
                                             <div class="row">
                                                 <div class="col-4">
                                                     <label
-                                                        >Effective Date</label
+                                                        >{{'EFFECTIVE_DATE' | translate}}</label
                                                     >
                                                     <input
                                                         type="date"
@@ -459,7 +527,7 @@
                                                 </div>
                                                 <div class="col-4">
                                                     <label
-                                                        >Termination Date</label
+                                                        >{{'TERMINATION_DATE' | translate}}</label
                                                     >
                                                     <input
                                                         type="date"
@@ -468,39 +536,42 @@
                                                     />
                                                 </div>
                                                 <div class="col-4">
-                                                    <label>Group No</label>
+                                                    <label>{{'POLICY_NO' | translate}}</label>
                                                     <input
                                                         type="text"
                                                         class="form-control"
                                                         formControlName="groupNo"
+                                                        placeholder="{{'ENTER_POLICY_NO' | translate}}"
                                                     />
                                                 </div>
                                             </div>
 
                                             <div class="row mt-2">
                                                 <div class="col-4">
-                                                    <label>No of Visits</label>
+                                                    <label>{{'NO_OF_VISITS' | translate}}</label>
                                                     <input
                                                         type="number"
                                                         class="form-control"
                                                         formControlName="noOfVisits"
+                                                        placeholder="{{'ENTER_NO_OF_VISITS' | translate}}"
                                                     />
                                                 </div>
                                                 <div class="col-4">
-                                                    <label>Amount</label>
+                                                    <label>{{'AMOUNT' | translate}}</label>
                                                     <input
                                                         type="number"
                                                         class="form-control"
                                                         formControlName="amount"
+                                                        placeholder="{{'ENTER_AMOUNT' | translate}}"
                                                     />
                                                 </div>
                                                 <div class="col-4">
-                                                    <label>Status</label>
-                                                    <input
-                                                        type="text"
-                                                        class="form-control"
-                                                        formControlName="status"
-                                                    />
+                                                    <label>{{'STATUS' | translate}}</label>
+                                                    <select class="form-select" formControlName="status">
+                                                        <option [ngValue]="null">{{'SELECT_STATUS' | translate}}</option>
+                                                        <option [ngValue]="1">{{'ACTIVE'}}</option>
+                                                        <option [ngValue]="0">{{'INACTIVE'}}</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -511,32 +582,32 @@
                                                 type="button"
                                                 (click)="modal.dismiss()"
                                             >
-                                                Cancel
+                                                {{'CANCEL' | translate}}
                                             </button>
                                             <button
                                                 class="btn btn-primary"
                                                 type="submit"
                                                 [disabled]="policyForm1.invalid"
                                             >
-                                                Save
+                                                {{'SAVE' | translate}}
                                             </button>
                                         </div> -->
                                         <div
                                             class="modal-footer justify-content-end"
                                         >
                                             <button
-                                                class="btn btn-secondary"
+                                                class="btn btn-secondary me-1 ms-1"
                                                 type="button"
                                                 (click)="modal.dismiss()"
                                             >
-                                                Cancel
+                                                {{'CLOSE' | translate}}
                                             </button>
                                             <button
                                                 class="btn btn-primary"
                                                 type="submit"
                                                 [disabled]="policyForm1.invalid"
                                             >
-                                                Save
+                                                {{'SUBMIT' | translate}}
                                             </button>
                                         </div>
                                     </form>
@@ -546,24 +617,25 @@
 
                         <!-- 🟠 Tab 2: Copay Info -->
                         <li [ngbNavItem]="2">
-                            <a ngbNavLink>Copay Info</a>
+                            <a ngbNavLink>{{'COPAY_INFO' | translate}}</a>
                             <ng-template ngbNavContent>
                                 <form [formGroup]="copayForm" class="row g-3">
                                     <div class="col-6">
-                                        <label>Type of Service</label>
+                                        <label>{{'TYPE_OF_SERVICE' | translate}}</label>
                                         <input
                                             type="number"
                                             class="form-control w-100"
-                                            placeholder=""
+                                            placeholder="{{'ENTER_TYPE_OF_SERVICE' | translate}}"
                                             formControlName="serviceType"
                                         />
                                     </div>
                                     <div class="col-md-6">
-                                        <label>Copay (%)</label>
+                                        <label>{{'COPAY_PERCENTAGE' | translate}}</label>
                                         <input
                                             type="number"
-                                            class="form-control"
+                                            class="form-control no-invalid-icon"
                                             formControlName="copayPercentage"
+                                            placeholder="{{'ENTER_COPAY_PERCENTAGE' | translate}}"
                                         />
                                     </div>
                                 </form>
@@ -584,7 +656,7 @@
                         class="btn btn-info"
                         (click)="openLargeModal(modalLg)"
                     >
-                        Add Card
+                        {{'ADD_CARD' | translate}}
                     </button>
                 </div>
 
@@ -592,24 +664,24 @@
                 <div>
                     <button
                         type="submit"
-                        class="btn btn-success"
+                        class="btn btn-success me-1 ms-1"
                         (click)="insertsubscriber()"
                     >
-                        Save
+                        {{'SUBMIT' | translate}}
                     </button>
                     <button
                         type="button"
                         class="btn btn-secondary ms-2"
                         (click)="cancel()"
                     >
-                        Cancel
+                        {{'BACK' | translate}}
                     </button>
 
                 </div>
             </div>
             <ng-template #modalLg let-modal>
                 <div class="modal-header">
-                    <h4 class="modal-title">Upload Image</h4>
+                    <h4 class="modal-title">{{'UPLOAD_IMAGE' | translate}}</h4>
                     <button
                         type="button"
                         class="btn-close"
@@ -620,7 +692,7 @@
 
                 <div class="modal-body">
                     <div class="d-flex flex-column align-items-start">
-                        <label class="form-label mb-2">Select Image</label>
+                        <label class="form-label mb-2">{{'SELECT_IMAGE' | translate}}</label>
 
                         <div class="avatar-xxl">
                             <file-pond
@@ -637,7 +709,7 @@
                             type="button"
                             class="btn btn-primary mt-3"
                         >
-                            Read Image
+                            {{'READ_IMAGE' | translate}}
                         </button>
                     </div>
 
@@ -651,7 +723,7 @@
                             class="btn btn-primary"
                             (click)="modal.close()"
                         >
-                            Close
+                            {{'CLOSE' | translate}}
                         </button>
                     </div>
                 </div>

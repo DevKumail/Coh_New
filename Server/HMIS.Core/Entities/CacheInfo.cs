@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("CacheInfo")]
 [Index("ObjectName", Name = "UQ__CacheInf__5B8F1484D0CE0499", IsUnique = true)]
 public partial class CacheInfo
 {

@@ -33,7 +33,7 @@ namespace HMIS.Application.ServiceLogics
             {
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@MRNo", Convert.ToInt16(mrno));
-                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("", param);
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetPatientAlertsByMRNO", param);
                 if (ds.Tables[0].Rows.Count == 0)
                 {
                     return new DataSet();
@@ -53,29 +53,118 @@ namespace HMIS.Application.ServiceLogics
             var Alert = _context.PatientAlerts.Find(id);
             return Alert != null;
         }
+        //public async Task<bool> InsertOrUpdateAlert(Alerts_Model alertModel)
+        //{
+        //    try
+        //    {
+        //        bool exit = Exist(alertModel.AlertId);
+        //        if (!exit)
+        //        {
+        //            var newPatientAlert = new PatientAlert();
+
+        //            //newPatientAlert.AlertId = alertModel.AlertId;  
+        //            newPatientAlert.RuleId = alertModel.RuleId;
+        //            newPatientAlert.Mrno = alertModel.Mrno;
+        //            newPatientAlert.AlertMessage = alertModel.AlertMessage;
+        //            newPatientAlert.Active = alertModel.Active;
+
+        //            // Fix for CS0029: Convert string to DateTime?  
+
+        //            // Fix for CS0029: Convert string to DateTime?  
+        //            newPatientAlert.EnteredDate = string.IsNullOrWhiteSpace(alertModel.EnteredDate)
+        //                                        ? null
+        //                                        : DateTime.Parse(alertModel.EnteredDate);
+        //            newPatientAlert.RepeatDate = string.IsNullOrWhiteSpace(alertModel.RepeatDate)
+        //                                        ? null
+        //                                        : DateTime.Parse(alertModel.RepeatDate);
+
+
+        //            newPatientAlert.IsFinished = alertModel.IsFinished;
+        //            newPatientAlert.EnteredBy = alertModel.EnteredBy;
+        //            newPatientAlert.UpdatedBy = alertModel.UpdatedBy;
+        //            newPatientAlert.AppointmentId = alertModel.AppointmentId;
+        //            newPatientAlert.AlertTypeId = alertModel.AlertTypeId;
+        //            newPatientAlert.Comments = alertModel.Comments;
+        //            newPatientAlert.HasChild = alertModel.HasChild;
+        //            newPatientAlert.OldMrno = alertModel.OldMrno;
+        //            newPatientAlert.IsDeleted = alertModel.IsDeleted;
+        //            newPatientAlert.StartDate = alertModel.StartDate;
+        //            _context.PatientAlerts.Add(newPatientAlert);
+        //            await _context.SaveChangesAsync();
+        //            return true;
+
+        //        }
+        //        else if (exit)
+        //        {
+        //            var patient = _context.PatientAlerts
+        //                .Where(x => x.AlertId.Equals(alertModel.AlertId)).FirstOrDefault();
+
+        //            if (patient != null)
+        //            {
+        //                patient.RuleId = alertModel.RuleId;
+        //                patient.Mrno = alertModel.Mrno;
+        //                patient.AlertMessage = alertModel.AlertMessage;
+        //                patient.Active = alertModel.Active;
+        //                patient.EnteredDate = string.IsNullOrWhiteSpace(alertModel.EnteredDate)
+        //                                        ? null
+        //                                        : DateTime.Parse(alertModel.EnteredDate);
+        //                patient.RepeatDate = string.IsNullOrWhiteSpace(alertModel.RepeatDate)
+        //                                        ? null
+        //                                        : DateTime.Parse(alertModel.RepeatDate);
+        //                patient.IsFinished = alertModel.IsFinished;
+        //                patient.EnteredBy = alertModel.EnteredBy;
+        //                patient.UpdatedBy = alertModel.UpdatedBy;
+        //                patient.AppointmentId = alertModel.AppointmentId;
+        //                patient.AlertTypeId = alertModel.AlertTypeId;
+        //                patient.Comments = alertModel.Comments;
+        //                patient.HasChild = alertModel.HasChild;
+        //                patient.OldMrno = alertModel.OldMrno;
+        //                patient.IsDeleted = alertModel.IsDeleted;
+        //                patient.StartDate = alertModel.StartDate;
+
+        //                _context.PatientAlerts.Update(patient);
+
+        //                await _context.SaveChangesAsync();
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                return false;
+        //            }
+
+        //        }
+        //        return false;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //}
+
         public async Task<bool> InsertOrUpdateAlert(Alerts_Model alertModel)
-       {
+        {
             try
             {
                 bool exit = Exist(alertModel.AlertId);
                 if (!exit)
                 {
-                    var newPatientAlert = new PatientAlert();
+                    var newPatientAlert = new PatientAlerts();
 
-                    newPatientAlert.AlertId = alertModel.AlertId;
                     newPatientAlert.RuleId = alertModel.RuleId;
                     newPatientAlert.Mrno = alertModel.Mrno;
                     newPatientAlert.AlertMessage = alertModel.AlertMessage;
                     newPatientAlert.Active = alertModel.Active;
 
-                    newPatientAlert.EnteredDate = alertModel.EnteredDate;
+                    newPatientAlert.EnteredDate = string.IsNullOrWhiteSpace(alertModel.EnteredDate)
+                                                ? null
+                                                : DateTime.Parse(alertModel.EnteredDate);
 
-                    newPatientAlert.RepeatDate = alertModel.RepeatDate;
+                    newPatientAlert.RepeatDate = string.IsNullOrWhiteSpace(alertModel.RepeatDate)
+                                                ? null
+                                                : DateTime.Parse(alertModel.RepeatDate);
 
-                    //newPatientAlert.RepeatDate = alertModel.RepeatDate;
                     newPatientAlert.IsFinished = alertModel.IsFinished;
                     newPatientAlert.EnteredBy = alertModel.EnteredBy;
-                    //newPatientAlert.EnteredDate = alertModel.EnteredDate;
                     newPatientAlert.UpdatedBy = alertModel.UpdatedBy;
                     newPatientAlert.AppointmentId = alertModel.AppointmentId;
                     newPatientAlert.AlertTypeId = alertModel.AlertTypeId;
@@ -83,36 +172,54 @@ namespace HMIS.Application.ServiceLogics
                     newPatientAlert.HasChild = alertModel.HasChild;
                     newPatientAlert.OldMrno = alertModel.OldMrno;
                     newPatientAlert.IsDeleted = alertModel.IsDeleted;
+                    newPatientAlert.StartDate = alertModel.StartDate;
+
+                    // Set UpdateDate on insert: choose one of the two lines below based on your requirement
+                    // 1) Keep null (only track on updates)
+                    newPatientAlert.UpdateDate = null;
+                    // 2) Or, if you want to also stamp creation time:
+                    // newPatientAlert.UpdateDate = alertModel.UpdateDate ?? DateTime.UtcNow;
 
                     _context.PatientAlerts.Add(newPatientAlert);
                     await _context.SaveChangesAsync();
                     return true;
-
                 }
-                else if (exit)
+                else
                 {
                     var patient = _context.PatientAlerts
-                        .Where(x => x.AlertId.Equals(alertModel.AlertId)).FirstOrDefault();
+                        .Where(x => x.AlertId.Equals(alertModel.AlertId))
+                        .FirstOrDefault();
 
                     if (patient != null)
                     {
-                        patient.AlertId = alertModel.AlertId;
-                        //patient.RuleId = alertModel.RuleId;
-                        //patient.Mrno = alertModel.Mrno;
-                        //patient.AlertMessage = alertModel.AlertMessage;
-                        //patient.Active = alertModel.Active;
-                        //patient.RepeatDate = alertModel.RepeatDate;
-                        //patient.IsFinished = alertModel.IsFinished;
-                        //patient.EnteredBy = alertModel.EnteredBy;
-                        //patient.EnteredDate = alertModel.EnteredDate;
-                        //patient.UpdatedBy = alertModel.UpdatedBy;
-                        //patient.AppointmentId = alertModel.AppointmentId;
-                        //patient.AlertTypeId = alertModel.AlertTypeId;
+                        patient.RuleId = alertModel.RuleId;
+                        patient.Mrno = alertModel.Mrno;
+                        patient.AlertMessage = alertModel.AlertMessage;
+                        patient.Active = alertModel.Active;
+
+                        patient.EnteredDate = string.IsNullOrWhiteSpace(alertModel.EnteredDate)
+                                                ? null
+                                                : DateTime.Parse(alertModel.EnteredDate);
+
+                        patient.RepeatDate = string.IsNullOrWhiteSpace(alertModel.RepeatDate)
+                                                ? null
+                                                : DateTime.Parse(alertModel.RepeatDate);
+
+                        patient.IsFinished = alertModel.IsFinished;
+                        patient.EnteredBy = alertModel.EnteredBy;
+                        patient.UpdatedBy = alertModel.UpdatedBy;
+                        patient.AppointmentId = alertModel.AppointmentId;
+                        patient.AlertTypeId = alertModel.AlertTypeId;
                         patient.Comments = alertModel.Comments;
                         patient.HasChild = alertModel.HasChild;
                         patient.OldMrno = alertModel.OldMrno;
                         patient.IsDeleted = alertModel.IsDeleted;
+                        patient.StartDate = alertModel.StartDate;
 
+                        // Stamp UpdateDate on update (prefer UTC)
+                        patient.UpdateDate = alertModel.UpdateDate ?? DateTime.UtcNow;
+
+                        _context.PatientAlerts.Update(patient);
                         await _context.SaveChangesAsync();
                         return true;
                     }
@@ -120,13 +227,11 @@ namespace HMIS.Application.ServiceLogics
                     {
                         return false;
                     }
-
                 }
-                return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 

@@ -1,0 +1,397 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
+        <li class="breadcrumb-item">
+            <a href="javascript:void(0);">
+                <lucide-angular [img]="homeIcon" class="fs-6"></lucide-angular>
+                {{'CLINICAL' | translate }}
+            </a>
+        </li>
+        <li
+            class="d-flex align-items-center text-muted mx-1"
+            aria-current="page"
+        >
+        <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            {{ 'TEMPORARY_DEMOGRAPHIC_CREATE' | translate }}
+        </li>
+    </ol>
+</nav>
+
+<!-- <div class="container-fluid w-100"> -->
+    <div class="card p-3 shadow mt-2">
+        <h3 class="card-title mb-3 fw-bold heading-title">
+            <lucide-angular [img]="headingIcon" aria-hidden="true"></lucide-angular>
+            <span>{{ 'TEMPORARY_DEMOGRAPHIC_CREATE' | translate }}</span>
+        </h3>
+        <form [formGroup]="temporaryForm" (ngSubmit)="onSubmit()" novalidate class="no-invalid-icon">
+            <div class="row">
+                <!-- Title -->
+                <div class="col-md-3">
+                    <label>{{ 'TITLE' | translate }}</label>
+                    <select class="form-select" formControlName="personTitleId">
+                        <option [ngValue]="null" disabled>
+                            {{ 'SELECT_TITLE' | translate }}
+                        </option>
+                        <option *ngFor="let t of titles" [value]="t.code">
+                            {{ t.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- First Name -->
+                <div class="col-md-3">
+                    <label>{{ 'FIRST_NAME' | translate }} <span class="text-danger">*</span></label>
+                    <input
+                        type="text"
+                        class="form-control no-invalid-icon"
+                        [class.is-invalid]="temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched || temporaryForm.touched)"
+                        formControlName="personFirstName"
+                        placeholder="{{ 'ENTER_FIRST_NAME' | translate }}"
+                    />
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched || temporaryForm.touched)">
+                        {{ 'FIRST_NAME_REQUIRED' | translate }}
+                    </div>
+                </div>
+
+                <!-- Middle Name -->
+                <div class="col-md-3">
+                    <label>{{ 'MIDDLE_NAME' | translate }}</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personMiddleName"
+                        placeholder="{{ 'ENTER_MIDDLE_NAME' | translate }}"
+                    />
+                </div>
+
+                <!-- Last Name -->
+                <div class="col-md-3">
+                    <label>{{ 'LAST_NAME' | translate }}</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        [class.is-invalid]="temporaryForm.get('personLastName')?.invalid && (temporaryForm.get('personLastName')?.touched || temporaryForm.touched)"
+                        formControlName="personLastName"
+                        placeholder="{{ 'ENTER_LAST_NAME' | translate }}"
+                    />
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personLastName')?.invalid && (temporaryForm.get('personLastName')?.touched || temporaryForm.touched)">
+                        {{ 'LAST_NAME_REQUIRED' | translate }}
+                    </div>
+                </div>
+
+                <!-- Gender -->
+                <div class="col-md-3">
+                    <label>{{ 'GENDER' | translate }} <span class="text-danger">*</span></label>
+                    <select class="form-select" formControlName="personSex"
+                            [class.is-invalid]="temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched || temporaryForm.touched)">
+                        <option *ngFor="let g of personSexId" [value]="g.code">
+                            {{ g.name }}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched || temporaryForm.touched)">
+                        {{ 'GENDER_REQUIRED' | translate }}
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label>{{ 'DOB' | translate }} <span class="text-danger">*</span></label>
+                    <input
+                        type="text"
+                        class="form-control date"
+                        [class.is-invalid]="temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched || temporaryForm.touched)"
+                        formControlName="patientBirthDate"
+                        data-provider="flatpickr"
+                        id="birthDate"
+                        placeholder="{{ 'DATE_PLACEHOLDER' | translate }}"
+                    />
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched || temporaryForm.touched)">
+                        {{ 'DOB_REQUIRED' | translate }}
+                    </div>
+                </div>
+
+                <!-- Age -->
+                <div class="col-md-3">
+                    <label>{{ 'AGE' | translate }}</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        formControlName="personAge"
+                        placeholder="{{ 'AGE' | translate }}"
+                    />
+                </div>
+
+                <!-- Home Phone -->
+                <div class="col-md-3">
+                    <label>{{ 'HOME_PHONE' | translate }}</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personHomePhone1"
+                        placeholder="(00) 0000-0000"
+                        [mask]="'(00) 0000-0000'"
+                        [validation]="false"
+                    />
+                </div>
+
+                <!-- Work Phone -->
+                <div class="col-md-3">
+                    <label>{{ 'WORK_PHONE' | translate }}</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personWorkPhone1"
+                        placeholder="(00) 0000-0000"
+                        [mask]="'(00) 0000-0000'"
+                        [validation]="false"
+                    />
+                </div>
+
+                <!-- Street Number -->
+                <div class="col-md-3">
+                    <label>{{ 'STREET_NUMBER' | translate }}</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="streetNumber"
+                        placeholder="{{ 'ENTER_STREET_NUMBER' | translate }}"
+                        [mask]="'0000'"
+                        [validation]="false"
+                    />
+                </div>
+
+                <!-- Dwelling Number -->
+                <div class="col-md-3">
+                    <label>{{ 'DWELLING_NUMBER' | translate }}</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="dwellingNumber"
+                        placeholder="{{ 'DWELLING_NUMBER' | translate }}"
+                    />
+                </div>
+
+                <!-- Zip Code -->
+                <div class="col-md-3">
+                    <label>{{ 'ZIP_CODE' | translate }}</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="personZipCode"
+                        placeholder="{{ 'ZIP_CODE' | translate }}"
+                        [mask]="'00000'"
+                        [validation]="false"
+                    />
+                </div>
+
+                <!-- Country -->
+                <div class="col-md-3">
+                    <label>{{ 'SELECT_COUNTRY' | translate }}</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedCountry"
+                        (change)="onCountryChange()"
+                    >
+                        <option [ngValue]="null" disabled>
+                            {{ 'SELECT_COUNTRY' | translate }}
+                        </option>
+                        <option *ngFor="let c of countries" [value]="c.code">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- State -->
+                <div class="col-md-3">
+                    <label>{{ 'SELECT_STATE' | translate }}</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedState"
+                        (change)="onStateChange()"
+                    >
+                        <option [ngValue]="null" disabled>
+                            {{ 'SELECT_STATE' | translate }}
+                        </option>
+                        <option *ngFor="let s of states" [value]="s.code">
+                            {{ s.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- City -->
+                <div class="col-md-3">
+                    <label>{{ 'SELECT_CITY' | translate }}</label>
+                    <select class="form-select" formControlName="selectedCity">
+                        <option [ngValue]="null" disabled>
+                            {{ 'SELECT_CITY' | translate }}
+                        </option>
+                        <option *ngFor="let c of cities" [value]="c.code">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Nationality -->
+                <div class="col-md-3">
+                    <label>{{ 'SELECT_NATIONALITY' | translate }}</label>
+                    <select class="form-select" formControlName="nationality">
+                        <option [ngValue]="null" disabled>
+                            {{ 'SELECT_NATIONALITY' | translate }}
+                        </option>
+                        <option
+                            *ngFor="let n of nationality"
+                            [value]="n.code"
+                        >
+                            {{ n.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Cell Phone -->
+                <div class="col-md-3">
+                    <label>{{ 'CELL_PHONE' | translate }} <span class="text-danger">*</span></label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        [class.is-invalid]="temporaryForm.get('personCellPhone')?.invalid && (temporaryForm.get('personCellPhone')?.touched || temporaryForm.touched)"
+                        formControlName="personCellPhone"
+                        placeholder="(00) 0000-0000"
+                        [mask]="'(00) 0000-0000'"
+                    />
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personCellPhone')?.invalid && (temporaryForm.get('personCellPhone')?.touched || temporaryForm.touched)">
+                        {{ 'CELL_PHONE_REQUIRED' | translate }}
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-3">
+                    <label>{{ 'EMAIL' | translate }}</label>
+                    <input
+                        type="email"
+                        class="form-control"
+                        formControlName="personEmail"
+                        placeholder="{{ 'ENTER_EMAIL_ADDRESS' | translate }}"
+                    />
+                </div>
+
+                <!-- Kin Name -->
+                <!-- <div class="col-md-3">
+                    <label>Kin Name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nokFirstName"
+                        placeholder="Kin Name"
+                    />
+                </div> -->
+
+                <!-- Kin SSN -->
+                <!-- <div class="col-md-3">
+                    <label>Kin Social Security</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nokSocialSecurityNo"
+                        placeholder="999-99-9999"
+                    />
+                </div> -->
+
+                <!-- Kin Zip -->
+                <!-- <div class="col-md-3">
+                    <label>Kin Zip Code</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nokZipCode"
+                        placeholder="Zip Code"
+                    />
+                </div> -->
+
+                <!-- Kin Home Phone -->
+                <!-- <div class="col-md-3">
+                    <label>Kin Home Phone</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nokHomePhone"
+                        placeholder="Kin Home Phone"
+                    />
+                </div> -->
+
+                <!-- Kin Address -->
+                <!-- <div class="col-md-3">
+                    <label>Kin Address</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nokAddress1"
+                        placeholder="Kin Address"
+                    />
+                </div> -->
+
+                <!-- Kin Country -->
+                <!-- <div class="col-md-3">
+                    <label>Kin Country</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedCountryNOK"
+                    >
+                        <option *ngFor="let c of countries" [ngValue]="c.code">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div> -->
+
+                <!-- Kin State -->
+                <!-- <div class="col-md-3">
+                    <label>Kin State</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedStateNOK"
+                    >
+                        <option *ngFor="let s of states" [ngValue]="s.code">
+                            {{ s.name }}
+                        </option>
+                    </select>
+                </div> -->
+
+                <!-- Kin City -->
+                <!-- <div class="col-md-3">
+                    <label>Kin City</label>
+                    <select
+                        class="form-select"
+                        formControlName="selectedCityNOK"
+                    >
+                        <option *ngFor="let c of cities" [ngValue]="c.code">
+                            {{ c.name }}
+                        </option>
+                    </select>
+                </div>
+ -->
+                <!-- Comment -->
+                <div class="col-md-3">
+                    <label>{{ 'COMMENT' | translate }}</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="comments"
+                        placeholder="{{ 'COMMENT' | translate }}"
+                    />
+                </div>
+            </div>
+
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-info">
+                    {{ 'SUBMIT' | translate }}
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-danger me-1 ms-1"
+                    (click)="onCancel()"
+                >
+                    {{ 'BACK' | translate }}
+                </button>
+            </div>
+        </form>
+    </div>
+<!-- </div> -->

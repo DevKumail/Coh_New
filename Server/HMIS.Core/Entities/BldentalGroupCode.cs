@@ -36,10 +36,10 @@ public partial class BldentalGroupCode
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("DentalCode")]
-    [InverseProperty("BldentalGroupCodes")]
-    public virtual BlmasterDentalCode DentalCodeNavigation { get; set; } = null!;
+    [InverseProperty("BldentalGroupCode")]
+    public virtual BlmasterDentalCodes DentalCodeNavigation { get; set; } = null!;
 
     [ForeignKey("GroupId")]
-    [InverseProperty("BldentalGroupCodes")]
+    [InverseProperty("BldentalGroupCode")]
     public virtual BldentalGroup Group { get; set; } = null!;
 }

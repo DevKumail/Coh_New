@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("TaskForwarding")]
 public partial class TaskForwarding
 {
     [Key]
@@ -54,6 +53,6 @@ public partial class TaskForwarding
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("ReceiverRoleId")]
-    [InverseProperty("TaskForwardings")]
+    [InverseProperty("TaskForwarding")]
     public virtual SecRole ReceiverRole { get; set; } = null!;
 }

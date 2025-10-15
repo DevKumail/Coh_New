@@ -4,13 +4,13 @@
       <li class="breadcrumb-item">
         <a href="javascript:void(0);">
           <ng-icon name="tablerSmartHome"></ng-icon>
-          Clinical
+            {{ 'CLINICAL' | translate }}
         </a>
       </li>
       <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
-        <ng-icon name="tablerChevronRight"></ng-icon>
+         <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
       </li>
-      <li class="breadcrumb-item active" aria-current="page">Medical History</li>
+  <li class="breadcrumb-item active" aria-current="page">{{ 'MEDICAL_HISTORY' | translate }}</li>
     </ol>
   </nav>
 
@@ -22,7 +22,7 @@
       <ul ngbNav #nav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs mb-3">
         <!-- Problem Tab -->
         <li [ngbNavItem]="1">
-          <a ngbNavLink href="javascript:void(0)">Problem</a>
+          <a ngbNavLink href="javascript:void(0)">{{ 'PROBLEM' | translate }}</a>
           <ng-template ngbNavContent>
             <app-problem-list></app-problem-list>
           </ng-template>
@@ -30,7 +30,7 @@
 
         <!-- Favorites Tab -->
         <li [ngbNavItem]="2">
-          <a ngbNavLink href="javascript:void(0)">Favorites</a>
+          <a ngbNavLink href="javascript:void(0)">{{ 'FAVORITES' | translate }}</a>
           <ng-template ngbNavContent>
             <app-favorites></app-favorites>
           </ng-template>

@@ -21,6 +21,13 @@ export const CLINICAL_ROUTES: Routes = [
         canActivate: [modulePermissionGuard],
         data: { module: 'Clinical', component: 'Medical History', title: 'Medical History' }
       },
+      // Alias for hyphenated path
+      {
+        path: 'medical-history',
+        component: MedicalHistoryComponent,
+        canActivate: [modulePermissionGuard],
+        data: { module: 'Clinical', component: 'Medical History', title: 'Medical History' }
+      },
       {
         path: 'favorites',
         component: FavoritesComponent,
@@ -29,6 +36,19 @@ export const CLINICAL_ROUTES: Routes = [
       },
       {
         path: 'problem list',
+        component: ProblemComponent,
+        canActivate: [modulePermissionGuard],
+        data: { module: 'Clinical', component: 'Problem', title: 'Problem List' }
+      },
+      // Aliases for problem list
+      {
+        path: 'problem',
+        component: ProblemComponent,
+        canActivate: [modulePermissionGuard],
+        data: { module: 'Clinical', component: 'Problem', title: 'Problem List' }
+      },
+      {
+        path: 'problem-list',
         component: ProblemComponent,
         canActivate: [modulePermissionGuard],
         data: { module: 'Clinical', component: 'Problem', title: 'Problem List' }
@@ -46,8 +66,22 @@ export const CLINICAL_ROUTES: Routes = [
         component: VitalSignsComponent,
         data: { module: 'Clinical', component: 'Vital Signs', title: 'Vital Signs' }
       },
+      // Alias for hyphenated vital-signs
+      {
+        path: 'vital-signs',
+        canActivate: [modulePermissionGuard],
+        component: VitalSignsComponent,
+        data: { module: 'Clinical', component: 'Vital Signs', title: 'Vital Signs' }
+      },
       {
         path:'immunization',
+        canActivate:[modulePermissionGuard],
+        component:ImmunizationsComponent
+      }
+      ,
+      // Alias plural for immunizations
+      {
+        path:'immunizations',
         canActivate:[modulePermissionGuard],
         component:ImmunizationsComponent
       }

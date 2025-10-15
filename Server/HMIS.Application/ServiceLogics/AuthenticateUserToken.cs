@@ -100,7 +100,7 @@ namespace HMIS.Application.ServiceLogics
         //}
         public async Task<AuthenticateUserResponse> ValidarUser(AuthernticateUserToken loginDetails)
         {
-            var user = await _HMISdbContext.Hremployees
+            var user = await _HMISdbContext.Hremployee
                 .Where(x => x.UserName == loginDetails.Name && x.IsDeleted == false && x.Active == true)
                 .SingleOrDefaultAsync();
 
@@ -114,7 +114,8 @@ namespace HMIS.Application.ServiceLogics
                     var dto = new HMIS.Application.DTOs.ControlPanel.Hremployee
                     {
                         EmployeeId = user.EmployeeId,
-                        UserName = user.UserName
+                        UserName = user.UserName,
+                        EmployeeType=user.EmployeeType
                         // map other fields as needed
                     };
 

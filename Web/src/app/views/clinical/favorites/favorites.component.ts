@@ -1,15 +1,17 @@
-import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
+import { ClinicalApiService } from './../clinical.api.service';
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, NgIconComponent, FormsModule],
+  imports: [ReactiveFormsModule, CommonModule, NgIconComponent, FormsModule,TranslatePipe ],
   templateUrl: './favorites.component.html',
   styleUrl: './favorites.component.scss',
 
@@ -19,22 +21,19 @@ export class FavoritesComponent implements OnInit {
   @Output() searchICD9Code = new EventEmitter<any>();
   @Output() selectIcdCode = new EventEmitter<any>();
 
-  icdVersionList: string[] = ['ICD-9-CM', 'ICD-10-CM', 'SNOMED'];
+  ICDVersions: any[] = [];
+  universaltoothcodearray: any [] = [];
   searchResults: any[] = [];
-  favoritesData = [
-    {
-      providerName: 'Dr. Ahmed Ali',
-      code: '002.0',
-      problem: 'Typhoid fever',
-      icdVersion: 'ICD-9-CM',
-      confidential: true,
-      status: 'Active',
-      startDate: '2024-06-12',
-      endDate: '2024-06-15',
-      comments: 'comments123'
-    }
+  favoritesData: any = [];
+  Searchby: any = [
+    { code: 1, name: 'Diagnosis Code' }, 
+    { code: 2, name: 'Diagnosis Code Range' }, 
+    { code: 3, name: 'Description' }
   ];
-
+  cacheItems: string[] = [
+    'BLUniversalToothCodes',
+    'BLICDVersion',
+  ];
   selectedYear!: number;
   searchText: string = '';
   selectedCode: string = '';
@@ -53,42 +52,79 @@ export class FavoritesComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private ClinicalApiService: ClinicalApiService // Assuming you have a ClinicalService to handle API calls
+    private clinicalApiService: ClinicalApiService, 
 
   ) {}
 
   ngOnInit(): void {
     this.favoritesForm = this.fb.group({
-      icdVersion: [''],
-      searchCode: [''],
-      startingCode: ['']
+      icdVersionId: [''],
+      searchById: [''],
+      startingCode: [''],
+      endingCode: [''],
+      description: ['']
     });
 
     this.loadYears();
   }
 
-loadICD9Group() {
-  this.ClinicalApiService.GetICD9CMGroupByProvider(this.ProviderId).then((response) => {
-    console.log(response, 'Group');
+  async FillCache() {
 
-    this.ICT9Group = response as { groupId: any; groupName: any }[];
+    await this.clinicalApiService.getCacheItems({ entities: this.cacheItems }).then((response: any) => {
+      if (response.cache != null) {
+        this.FillDropDown(response);
+      }
+    })
+      .catch((error: any) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.message || 'Something went wrong!',
+          confirmButtonColor: '#d33'
+        })
+      })
+  }
+  FillDropDown(response: any) {
+    debugger
+    let jParse = JSON.parse(JSON.stringify(response)).cache;
+    let iCDVersion = JSON.parse(jParse).BLICDVersion;
+    let universaltoothcode = JSON.parse(jParse).BLUniversalToothCodes;
 
-    this.ICT9Group = this.ICT9Group.map((item) => {
-      return {
-        name: item.groupName,
-        code: item.groupId,
+
+    if (universaltoothcode) {
+      debugger;
+      universaltoothcode = universaltoothcode.map(
+        (item: { ToothCode: any; Tooth: any }) => {
+          return {
+            name: item.Tooth,
+            code: item.ToothCode,
+          };
+        });
+      // this.universaltoothid = universaltoothcode[0].code
+      this.universaltoothcodearray = universaltoothcode;
+      console.log(this.universaltoothcodearray, 'universal tooth code');
+    }
+    if (iCDVersion) {
+      debugger;
+      iCDVersion = iCDVersion.map(
+        (item: { ICDVersionId: any; ICDVersion: any }) => {
+          return {
+            name: item.ICDVersion,
+            code: item.ICDVersionId,
+          };
+        });
+      debugger
+      const item = {
+        name: 'ALL',
+        code: 0,
       };
-    });
+      iCDVersion.push(item);
+      this.ICDVersions = iCDVersion;
+      console.log(this.ICDVersions);
 
-    const item = {
-      name: 'ALL',
-      code: 0,
-    };
-    this.ICT9Group.push(item);
-  }).catch(error => {
-    //this.ClinicalApiService.add({ severity: 'error', summary: 'Error', detail: error.message });
-  });
-}
+
+    }
+  }
 
   loadYears(): void {
     const currentYear = new Date().getFullYear();
@@ -96,21 +132,8 @@ loadICD9Group() {
   }
 
   onSearch(): void {
-    const formData = this.favoritesForm.value;
-    this.searchICD9Code.emit({
-      version: formData.icdVersion,
-      code: formData.searchCode,
-      startCode: formData.startingCode
-    });
 
-    // Dummy search result to simulate API response
-    this.searchResults = [
-      {
-        code: '002.0',
-        icdVersion: formData.icdVersion || 'ICD-9-CM',
-        description: 'Typhoid fever'
-      }
-    ];
+
   }
 
   onSelectCode(code: string): void {

@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("InsuredSubscriber")]
 public partial class InsuredSubscriber
 {
     [Key]
@@ -156,34 +155,34 @@ public partial class InsuredSubscriber
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("Subscriber")]
-    public virtual ICollection<BlpatientVisit> BlpatientVisits { get; set; } = new List<BlpatientVisit>();
+    public virtual ICollection<BlpatientVisit> BlpatientVisit { get; set; } = new List<BlpatientVisit>();
 
     [ForeignKey("CarrierId")]
-    [InverseProperty("InsuredSubscribers")]
+    [InverseProperty("InsuredSubscriber")]
     public virtual Blpayer? Carrier { get; set; }
 
     [ForeignKey("CityId")]
-    [InverseProperty("InsuredSubscribers")]
-    public virtual RegCity City { get; set; } = null!;
+    [InverseProperty("InsuredSubscriber")]
+    public virtual RegCities City { get; set; } = null!;
 
     [ForeignKey("CountryId")]
-    [InverseProperty("InsuredSubscribers")]
-    public virtual RegCountry Country { get; set; } = null!;
+    [InverseProperty("InsuredSubscriber")]
+    public virtual RegCountries Country { get; set; } = null!;
 
     [InverseProperty("Subscriber")]
-    public virtual ICollection<DeductiblePercent> DeductiblePercents { get; set; } = new List<DeductiblePercent>();
+    public virtual ICollection<DeductiblePercent> DeductiblePercent { get; set; } = new List<DeductiblePercent>();
 
     [InverseProperty("Subscriber")]
-    public virtual ICollection<InsuredPolicy> InsuredPolicies { get; set; } = new List<InsuredPolicy>();
+    public virtual ICollection<InsuredPolicy> InsuredPolicy { get; set; } = new List<InsuredPolicy>();
 
     [ForeignKey("PayerPackageId")]
-    [InverseProperty("InsuredSubscribers")]
+    [InverseProperty("InsuredSubscriber")]
     public virtual BlpayerPackage? PayerPackage { get; set; }
 
     [InverseProperty("Subscriber")]
-    public virtual ICollection<SchAppointment> SchAppointments { get; set; } = new List<SchAppointment>();
+    public virtual ICollection<SchAppointment> SchAppointment { get; set; } = new List<SchAppointment>();
 
     [ForeignKey("StateId")]
-    [InverseProperty("InsuredSubscribers")]
-    public virtual RegState State { get; set; } = null!;
+    [InverseProperty("InsuredSubscriber")]
+    public virtual RegStates State { get; set; } = null!;
 }

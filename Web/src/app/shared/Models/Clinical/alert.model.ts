@@ -1,16 +1,21 @@
 export interface AlertDTO {
   alertId: number;
-  mrno: string;
-  alertMessage: string;
+  ruleId: number;
+  mrno: string | null;
+  alertMessage: string | null;
+  active: boolean;
   repeatDate: Date;
   startDate: Date;
-  enteredBy: string;
+  isFinished: boolean;
+  enteredBy: string | null;
   enteredDate: Date;
-  updatedBy: string;
+  updatedBy: string | null;
+  updatedDate?: Date | string | null;
+  appointmentId: number;
   alertTypeId: number;
-  active: number;
-  isDeleted: boolean;
-  comments: string;
+  comments: string | null;
   hasChild: boolean;
-  oldMrno: string | null;
+  oldMrno: string | number | null;
+  isDeleted: boolean;
+  updateDate: Date;
 }

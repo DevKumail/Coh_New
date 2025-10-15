@@ -16,6 +16,7 @@ import { number } from 'echarts';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { LoaderService } from '@core/services/loader.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-problem',
@@ -24,7 +25,8 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
     ReactiveFormsModule,
     NgIconComponent,
     NgbNavModule,
-  GenericPaginationComponent],
+  GenericPaginationComponent,
+  FilledOnValueDirective],
   templateUrl: './problem.component.html',
   styleUrl: './problem.component.scss'
 })
@@ -142,6 +144,10 @@ problemPageSize: any;
 problemTotalItems: any;
 problemCurrentPage:any;
 
+MHPaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5
+};
 problemData: any[] = [];   // Full list of problems
 pagedProblems: any[] = [];
 
@@ -229,18 +235,24 @@ pagedProblems: any[] = [];
     async GetPatientProblemData() {
     // this.loader.show();
   
-    if (!this.SearchPatientData.table2[0].mrNo) {
+    const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo;
+    const userIdStr = sessionStorage.getItem('userId');
+    const userId = userIdStr ? Number(userIdStr) : 0;
+    if (!mrNo || !userId) {
       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       this.loader.hide();
       return;
     }
-  
+
     this.loader.show();
     debugger;
-    console.log('mrNo =>', this.SearchPatientData.table2[0].mrNo);
-  
+    console.log('mrNo =>', mrNo);
+
     await this.clinicalApiService.GetPatientProblemData(
-      this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0
+      mrNo,
+      userId,
+      this.MHPaginationInfo.Page,
+      this.MHPaginationInfo.RowsPerPage
     ).then((res: any) => {
       console.log('res', res);
       this.loader.hide();
@@ -342,9 +354,7 @@ const problemPayload: Partial<PatientProblemModel> = {
   activeStatus: 1,
   appointmentId: formData.appId,
   confidential: formData.confidential,
-  icdVersionValue: formData.problem,
   icd9: formData.code,
-  icd9code: formData.code,
   icd9description: formData.problem,
   // icdversionId: formData.icdVersion,
   providerId: formData.providerId,
@@ -447,8 +457,10 @@ const problemPayload: Partial<PatientProblemModel> = {
   }
 
   getRowData() {
-    const mrno = '1004'; 
-    const userId = 1;
+    const mrno = this.SearchPatientData?.table2?.[0]?.mrNo || this.Mrno; 
+    const userIdStr = sessionStorage.getItem('userId');
+    const userId = userIdStr ? Number(userIdStr) : 0;
+    if (!mrno || !userId) { return; }
 
     this.clinicalApiService.GetRowDataOfPatientProblem(mrno, userId).then((res: any) => {
       debugger
@@ -543,7 +555,15 @@ const problemPayload: Partial<PatientProblemModel> = {
 
     debugger
     this.DiagnosisCode = [];
-    this.clinicalApiService.DiagnosisCodebyProvider(this.ICDVersionId, this.DiagnosisStartCode, this.DiagnosisEndCode, this.DescriptionFilter).then((response: any) => {
+    this.clinicalApiService.DiagnosisCodebyProvider(
+      this.ICDVersionId, 
+      this.currentPageDiagnoseCode,
+      this.pageSizeDiagnoseCode,
+      this.DiagnosisStartCode, 
+      this.DiagnosisEndCode, 
+      this.DescriptionFilter,
+    
+    ).then((response: any) => {
       this.DiagnosisCode = response.table1;
       this.totalDiagnosisData = Array( Math.ceil(this.DiagnosisCode.length / this.pageSizeDiagnoseCode)).fill(0);
       // this.totalDiagnosisData =  Array(this.totalDiagnosisData).fill(0);
@@ -584,10 +604,10 @@ const problemPayload: Partial<PatientProblemModel> = {
   this.totalPagesDiagnoseCode = Array.from({ length: total }, (_, i) => i + 1);
 }
 onRowSelect(diagnosis: any, modal: any) {
-   modal.close(diagnosis); 
-   console.log("diagnosis waleed",diagnosis)
+  modal.close(diagnosis); 
+  console.log("diagnosis waleed",diagnosis)
 
- }
+}
 // onRowSelect(diagnosis: any, modal: any) {
 //   // Pura object bhej rahe hain taake parent component sab fields use kar sake
 //   modal.close({

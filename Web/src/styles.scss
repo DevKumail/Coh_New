@@ -21,3 +21,58 @@
 @use 'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css';
 
 @use "./assets/scss/app.scss";
+
+/* Remove default accordion caret so custom filter icon can align at far right */
+.accordion-button.no-accordion-caret::after {
+  display: none !important;
+}
+
+/* Hide Bootstrap invalid background icon inside inputs while keeping borders and feedback */
+.no-invalid-icon .form-control.is-invalid,
+.no-invalid-icon.was-validated .form-control:invalid {
+  background-image: none !important;
+  padding-right: .75rem !important; /* remove extra space reserved for the icon */
+}
+
+/* Preserve the default select arrow but remove invalid overlay icon */
+.no-invalid-icon .form-select.is-invalid,
+.no-invalid-icon.was-validated .form-select:invalid {
+  background-image: var(--bs-form-select-bg-img) !important;
+}
+
+/* Ensure date inputs (e.g., flatpickr bound fields) also hide the icon */
+.no-invalid-icon .form-control.date.is-invalid,
+.no-invalid-icon.was-validated .form-control.date:invalid {
+  background-image: none !important;
+}
+
+/* Normalize lucide-angular icons app-wide so they don't break layout */
+lucide-angular {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle; /* align with adjacent text */
+  color: currentColor; /* inherit text color */
+}
+
+/* Make inner SVGs of lucide-angular scale with the element's font-size
+   and override any generic svg sizing rules from component styles */
+lucide-angular svg {
+  width: 1em !important;
+  height: 1em !important;
+  stroke: currentColor;
+}
+
+/* Common placements */
+.breadcrumb lucide-angular { margin: 0 .25rem; }
+.btn lucide-angular { margin-right: .25rem; }
+
+/* Consistent heading with icon utility */
+.heading-title {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem; /* spacing between icon and text */
+}
+
+.heading-title lucide-angular {
+  font-size: 1.25rem; /* similar to fs-4 */
+}

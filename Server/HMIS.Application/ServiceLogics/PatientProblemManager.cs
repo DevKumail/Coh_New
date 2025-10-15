@@ -1,9 +1,10 @@
 ﻿using Dapper;
-using HMIS.Infrastructure.ORM;
-using HMIS.Core.Entities;
+using DocumentFormat.OpenXml.Wordprocessing;
 using HMIS.Application.DTOs.Clinical;
 using HMIS.Application.DTOs.ControlPanel;
 using HMIS.Application.Implementations;
+using HMIS.Core.Entities;
+using HMIS.Infrastructure.ORM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -37,13 +38,15 @@ namespace HMIS.Application.ServiceLogics
         //}
 
 
-        public async Task<DataSet> GetAllPatientProblems(string MRNo, long UserId )
+        public async Task<DataSet> GetAllPatientProblems(string MRNo, long UserId, int? PageNumber, int? PageSize)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@MRNo", MRNo);
                 param.Add("@UserId", UserId);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetPatientProblemsByUserIdAndMRNo", param);
                 if (ds.Tables[0].Rows.Count == 0)
@@ -67,7 +70,7 @@ namespace HMIS.Application.ServiceLogics
         private bool Exist(long id)
         {
           
-            var patient = _context.PatientProblems.Find(id);
+            var patient = _context.PatientProblem.Find(id);
             return patient != null;
         }
         public async Task<bool> InsertOrUpdatePatientProblem(PatientProblemModel patientProblem)
@@ -124,13 +127,13 @@ namespace HMIS.Application.ServiceLogics
                     
 
 
-                    _context.PatientProblems.Add(newPatientProblem);
+                    _context.PatientProblem.Add(newPatientProblem);
                     await _context.SaveChangesAsync();
                     return true;
                 }
                 else if (exist)
                 {
-                    var patient = _context.PatientProblems
+                    var patient = _context.PatientProblem
                         .Where(x => x.Id.Equals(patientProblem.Id)).FirstOrDefault();
 
 
@@ -193,7 +196,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var data = _context.PatientProblems.Where(x => x.Id == Id).FirstOrDefault();
+                var data = _context.PatientProblem.Where(x => x.Id == Id).FirstOrDefault();
                 if (data != null)
                 {
                     data.IsDeleted = true;

@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("InsuranceRequestType")]
 public partial class InsuranceRequestType
 {
     [Key]

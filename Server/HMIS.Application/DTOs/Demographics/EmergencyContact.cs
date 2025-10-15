@@ -11,6 +11,8 @@ namespace HMIS.Application.DTOs.Demographics
         public int? relationshipId { get; set; }
 
         public string? firstName { get; set; }
+        public string? email { get; set; }
+
 
         public string? middleName { get; set; }
 

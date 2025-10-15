@@ -40,7 +40,6 @@ export interface Demographic {
 
 export interface Contact {
   streetName?: string;
-  dwellingNumber?: string;
   countryId?: number;
   stateId?: number;
   cityId?: number;
@@ -48,6 +47,7 @@ export interface Contact {
   cellPhone?: string;
   homePhone?: string;
   workPhone?: string;
+  dwellingNumber?: string;
   fax?: string;
   email?: string;
   tabsTypeId?: number
@@ -61,7 +61,7 @@ export interface NextOfKin {
   middleName?: string,
   lastName?: string,
   streetName?: string,
-  NokdwellingNumber?: number,
+  email?: string,
   countryId?:number,
   stateId?:number,
   cityId?:number,

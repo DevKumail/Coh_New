@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("RegRelationShip")]
 public partial class RegRelationShip
 {
     [Key]
@@ -18,11 +17,11 @@ public partial class RegRelationShip
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("RelationShip")]
-    public virtual ICollection<PatientChartFamilyHistory> PatientChartFamilyHistories { get; set; } = new List<PatientChartFamilyHistory>();
+    public virtual ICollection<PatientChartFamilyHistory> PatientChartFamilyHistory { get; set; } = new List<PatientChartFamilyHistory>();
 
     [InverseProperty("Relationship")]
-    public virtual ICollection<RegAccount> RegAccounts { get; set; } = new List<RegAccount>();
+    public virtual ICollection<RegAccount> RegAccount { get; set; } = new List<RegAccount>();
 
     [InverseProperty("Relationship")]
-    public virtual ICollection<RegPatientDetail> RegPatientDetails { get; set; } = new List<RegPatientDetail>();
+    public virtual ICollection<RegPatientDetails> RegPatientDetails { get; set; } = new List<RegPatientDetails>();
 }

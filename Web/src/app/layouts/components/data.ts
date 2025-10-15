@@ -17,41 +17,26 @@ export interface ExtendedMenuItemType extends MenuItemType {
 
 export const userDropdownItems: UserDropdownItemType[] = [
     {
-        label: 'Welcome back!',
+        label: 'WELCOME_BACK!',
         isHeader: true,
     },
     {
-        label: 'Profile',
+        label: 'PROFILE',
         icon: 'tablerUserCircle',
         url: 'pages-profile.html',
     },
     {
-        label: 'Notifications',
-        icon: 'tablerBellRinging',
-        url: '#',
-    },
-    {
-        label: 'Balance: $985.25',
-        icon: 'tablerCreditCard',
-        url: '#',
-    },
-    {
-        label: 'Account Settings',
+        label: 'ACCOUNT_SETTINGS',
         icon: 'tablerSettings2',
         url: '#',
     },
     {
-        label: 'Support Center',
+        label: 'SUPPORT_CENTER',
         icon: 'tablerHeadset',
         url: '#',
     },
     {
         isDivider: true,
-    },
-    {
-        label: 'Lock Screen',
-        icon: 'tablerLock',
-        url: 'auth-lock-screen.html',
     },
     {
         // label: 'Log Out',
@@ -60,7 +45,7 @@ export const userDropdownItems: UserDropdownItemType[] = [
         // class: 'text-danger fw-semibold',
         // action: 'logout'
 
-        label: 'Log Out',
+        label: 'LOG_OUT',
         icon: 'tablerLogout2',
         url: '', // Remove the #
         class: 'text-danger fw-semibold',
@@ -81,12 +66,14 @@ export const menuItems: ExtendedMenuItemType[] = [
             { label: 'Alerts', url: '/clinical/alerts' },
             { label: 'Allergies', url: '/clinical/allergies' },
             { label: 'Problem List', url: '/clinical/problem' },
-            { label: 'Medical History', url: '/clinical/medical history' },
-            { label: 'Problem', url: '/clinical/problem list' },
+            { label: 'Medical History', url: '/clinical/medical-history' },
+            { label: 'Problem', url: '/clinical/problem' },
         ],
     },
 
     { label: 'Menu', isTitle: true },
+
+    
     {
         label: 'Registration',
         icon: 'tablerIdBadge2',
@@ -144,13 +131,8 @@ export const menuItems: ExtendedMenuItemType[] = [
                 children: [
                     { label: 'Alerts', url: '/clinical/alerts' },
                     { label: 'Allergies', url: '/clinical/allergies' },
-                    //   { label: 'Problem List', url: '/clinical/problem-list'},
                     { label: 'Problem List', url: '/clinical/problem' },
-                    {
-                        label: 'Medical History',
-                        url: '/clinical/medical-history',
-                    },
-                    //{ label: 'Favorites', url: '/clinical/favorites'}
+                    { label: 'Medical History', url: '/clinical/medical-history' },
                     { label: 'Problem', url: '/clinical/problem' },
                     { label: 'Vital Signs', url: '/clinical/vital-signs' },
                 ],
@@ -167,7 +149,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 isCollapsed: true,
                 children: [
                     { label: 'Alerts', url: '/registration/alerts' },
-                    { label: 'Coverages', url: '/registration/coverage-list' },
+                    { label: 'Coverages', url: '/registration/coverages' },
                     {
                         label: 'Coverage Create',
                         url: '/registration/covrage-create',
@@ -182,7 +164,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 isCollapsed: true,
                 children: [
                     { label: 'Alerts', url: '/registration/alerts' },
-                    { label: 'Coverages', url: '/registration/coverage-list' },
+                    { label: 'Coverages', url: '/registration/coverages' },
                     {
                         label: 'Coverage Create',
                         url: '/registration/covrage-create',
@@ -198,7 +180,7 @@ export const menuItems: ExtendedMenuItemType[] = [
                 ],
             },
             { label: 'Alerts', url: '/registration/alerts' },
-            { label: 'Coverages', url: '/registration/coverage-list' },
+            { label: 'Coverages', url: '/registration/coverages' },
             { label: 'Coverage Create', url: '/registration/covrage-create' },
             { label: 'Demographics', url: '/registration/demographics' },
             {
@@ -207,7 +189,7 @@ export const menuItems: ExtendedMenuItemType[] = [
             },
             {
                 label: 'Demographic List',
-                url: '/registration/demographic-list',
+                url: '/registration/demographics',
             },
             {
                 label: 'Temporary Patient Demographics',
@@ -239,7 +221,7 @@ export const menuItems: ExtendedMenuItemType[] = [
         icon: 'tablerHeartbeat',
         module: 'Billing', // 👈 this is used by PermissionService
         isCollapsed: true,
-        children: [{ label: 'Charge Capture', url: '/billing/charge-capture' }],
+        children: [{ label: 'Charge Capture', url: '/billing/charge capture' }],
     },
 
     { label: 'Apps', isTitle: true },
@@ -753,11 +735,7 @@ export const horizontalMenuItems: MenuItemType[] = [
     //     label: 'Dashboards',
     //     icon: 'tablerLayoutDashboard',
     //     children: [
-    //         { label: 'Dashboard v.1', url: '/dashboards/dashboard-1' },
-    //         { label: 'Dashboard v.2', url: '/dashboards/dashboard-2' },
-    //         { label: 'Dashboard v.3', url: '/dashboards/dashboard-3' },
-    //         { label: 'Dashboard v.4', url: '#!' },
-    //         { label: 'Dashboard v.5', url: '#!' },
+    //         { label: 'Dashboard', url: '/dashboards/dashboard-2' },
     //     ]
     // },
     {
@@ -777,12 +755,12 @@ export const horizontalMenuItems: MenuItemType[] = [
             // },
             {
                 label: 'Coverages',
-                icon: 'tablerBell',
-                url: '/registration/coverage-list',
+                icon: 'tablerIdBadge2',
+                url: '/registration/coverages',
             },
             {
                 label: 'Demographics',
-                icon: 'tablerBell',
+                icon: 'tablerUsers',
                 url: '/registration/demographics',
             },
 
@@ -793,8 +771,8 @@ export const horizontalMenuItems: MenuItemType[] = [
             },
             {
                 label: 'Temporary Patient Demographics',
-                icon: 'tablerUserPlus', // 👈 icon optional — koi bhi use kar sakte ho
-                url: '/registration/temporary patient demographics',
+                icon: 'tablerUserPlus',
+                url: '/registration/temporary-patient-demographics',
             },
         ],
     },
@@ -806,12 +784,12 @@ export const horizontalMenuItems: MenuItemType[] = [
         children: [
             {
                 label: 'Alerts',
-                icon: 'tablerBell', // Choose a relevant icon
+                icon: 'tablerBell',
                 url: '/clinical/alerts',
             },
             {
                 label: 'Allergies',
-                icon: 'tablerAlertTriangle', // Choose a relevant icon
+                icon: 'tablerAlertTriangle',
                 url: '/clinical/allergies',
             },
             {
@@ -821,7 +799,7 @@ export const horizontalMenuItems: MenuItemType[] = [
             },
             {
                 label: 'Medical History',
-                icon: 'tablerHeartbeat', // Choose a relevant icon
+                icon: 'tablerHeartbeat',
                 url: '/clinical/medical-history',
             },
             {
@@ -831,12 +809,13 @@ export const horizontalMenuItems: MenuItemType[] = [
             },
             {
                 label: 'Vital Signs',
-                icon: 'tablerClipboardText',
-                url: 'clinical/vital signs',
+                icon: 'tablerHeartbeat',
+                url: '/clinical/vital-signs',
                 // url: '/clinical/vital-signs'
             },
             {
                 label:'immunizations',
+                icon: 'tablerSyringe',
                 url:'/clinical/immunizations'
 
             }
@@ -845,20 +824,15 @@ export const horizontalMenuItems: MenuItemType[] = [
 
     {
         label: 'Billing',
-        icon: 'tablerHeartbeat',
-        module: 'Billing',
+        icon: 'tablerReceipt', // Use receipt icon for billing module
+        module: 'Billing', // this is used by PermissionService
         isCollapsed: true,
         children: [
             {
                 label: 'Charge Capture',
-                icon: 'tablerBell',
+                icon: 'tablerReceipt',
                 url: '/billing/charge capture',
             },
-            // {
-            //     label: 'Bill Generator',
-            //     icon: 'tablerBell',
-            //     url: '/billing/bill generator',
-            // },
         ],
     },
 

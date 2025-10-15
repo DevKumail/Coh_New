@@ -35,7 +35,7 @@ namespace HMIS.Application
             services.AddScoped<IPatientProcedure, PatientProcedureManager>();
             services.AddScoped<IAlergyManager, AlergyManager >();
             services.AddScoped<IPatientChartFamilyHistoryManager, PatientChartFamilyHistoryManager>();
-
+            services.AddScoped<ILocalizationSpService, LocalizationSpService>();
             services.AddScoped<IPrescription, PrescriptionManager>();
             services.AddScoped<IAlertManager, AlertManager >();
 

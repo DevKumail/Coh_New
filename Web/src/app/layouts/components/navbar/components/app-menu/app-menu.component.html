@@ -1,9 +1,15 @@
 <div class="collapse navbar-collapse d-flex justify-content-between" id="topnav-menu-content">
     <ul class="navbar-nav">
         <li class="nav-item">
+            <a href="javascript:void(0)" class="nav-link" (click)="onDashboardClick()">
+                <ng-icon name="tablerUser" class="menu-icon"></ng-icon>
+                <span class="menu-text">{{ 'DASHBOARD' | translate }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
             <a href="javascript:void(0)" class="nav-link" (click)="onPatientSummaryClick()">
                 <ng-icon name="tablerUser" class="menu-icon"></ng-icon>
-                <span class="menu-text">Patient Chart</span>
+                <span class="menu-text">{{ 'PATIENT_CHART' | translate }}</span>
             </a>
         </li>
         @for (item of menuItems; track $index) {
@@ -27,18 +33,18 @@
 <ng-template #MenuItemWithChildren let-item="item" let-wrapperClass="wrapperClass" let-togglerClass="togglerClass">
     <li ngbDropdown [class]="wrapperClass" class="dropdown" [class.active]="isChildActive(item)">
         <a ngbDropdownToggle [class]="togglerClass" class="dropdown-toggle drop-arrow-none" role="button">
-            @if (item.icon) {
-            <span>
-                <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
-            </span>
-            }
-            <span class="menu-text"> {{ item.label }} </span>
+                @if (item.icon) {
+                <span>
+                    <lucide-angular class="menu-icon" [img]="getIcon(item.icon)"></lucide-angular>
+                </span>
+                }
+                <span class="menu-text"> {{ normalizeKey(item.label) | translate }} </span>
             @if (item.badge) {
             <span [class]="`badge bg-${item.badge.variant}`">{{ item.badge.text }}</span>
             }
             @if (!item.badge) {
             <span class="menu-arrow">
-                <ng-icon name="tablerChevronDown"></ng-icon>
+                <lucide-angular [img]="getIcon('tablerChevronDown')"></lucide-angular>
             </span>
             }
         </a>
@@ -59,16 +65,49 @@
     </li>
 </ng-template>
 
+<style>
+  /* Direction-aware spacing for navbar icons */
+  .menu-icon {
+    /* LTR default: space after icon */
+    margin-inline-end: .5rem;
+    margin-inline-start: 0;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+  }
+  [dir='rtl'] .menu-icon {
+    /* RTL: space before icon */
+    margin-inline-start: .5rem;
+    margin-inline-end: 0;
+  }
+  /* Larger size for PARENT (top-level) menu icons only */
+  .navbar-nav > .nav-item > .nav-link .menu-icon,
+  .navbar-nav > .nav-item > .nav-link .menu-icon svg,
+  .navbar-nav > .nav-item > .nav-link .menu-icon ng-icon,
+  .navbar-nav > .nav-item > .nav-link .menu-icon lucide-angular {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 1.75rem;
+  }
+  .menu-text { white-space: nowrap; }
+  .menu-arrow {
+    display: inline-flex;
+    align-items: center;
+    /* Space between text and chevron in both LTR/RTL */
+    margin-inline-start: .25rem;
+  }
+</style>
+
 <ng-template #MenuItem let-item="item" let-linkClass="linkClass">
     @if (item.url) {
     <a [routerLink]="item.url" [target]="item.target" [class]="linkClass" [class.active]="isActive(item)"
         [class.disabled]="item.isDisabled" [class.special-menu]="item.isSpecial">
         @if (item.icon) {
         <span>
-            <ng-icon class="menu-icon" [name]="item.icon"></ng-icon>
+            <lucide-angular class="menu-icon" [img]="getIcon(item.icon)"></lucide-angular>
         </span>
         }
-        <span class="menu-text">{{ item.label }}</span>
+    <span class="menu-text">{{ normalizeKey(item.label) | translate }}</span>
         @if (item.badge) {
         <span class="badge text-bg-{{item.badge.variant}} opacity-50" [innerHTML]="item.badge.text"></span>
         }

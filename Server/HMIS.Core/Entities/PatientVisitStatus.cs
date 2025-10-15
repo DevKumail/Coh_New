@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("PatientVisitStatus")]
 public partial class PatientVisitStatus
 {
     [Key]
@@ -31,14 +30,14 @@ public partial class PatientVisitStatus
     public long? AppointmentId { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("PatientVisitStatuses")]
+    [InverseProperty("PatientVisitStatus")]
     public virtual SchAppointment? Appointment { get; set; }
 
     [ForeignKey("StatusId")]
-    [InverseProperty("PatientVisitStatuses")]
+    [InverseProperty("PatientVisitStatus")]
     public virtual SchPatientStatus? Status { get; set; }
 
     [ForeignKey("VisitStatusId")]
-    [InverseProperty("PatientVisitStatuses")]
+    [InverseProperty("PatientVisitStatus")]
     public virtual VisitStatus? VisitStatus { get; set; }
 }

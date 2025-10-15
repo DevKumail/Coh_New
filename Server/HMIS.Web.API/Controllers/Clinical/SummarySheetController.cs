@@ -118,7 +118,7 @@ namespace HMIS.Web.Controllers.Clinical
         }
 
         [HttpPost("VitalSignInsert")]
-        public async Task<IActionResult> VitalSignInsert(VitalSigns vitalSigns)
+        public async Task<IActionResult> VitalSignInsert(VitalSign vitalSigns)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -160,7 +160,7 @@ namespace HMIS.Web.Controllers.Clinical
         }
 
         [HttpPut("VitalSignUpdate")]
-        public async Task<IActionResult> VitalSignUpdate(VitalSigns vitalSigns)
+        public async Task<IActionResult> VitalSignUpdate(VitalSign vitalSigns)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;

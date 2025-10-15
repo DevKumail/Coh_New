@@ -11,9 +11,9 @@ import {
   PinOff,
   Pencil,
   RefreshCcw,
-  Search
-
-
+  Search,
+  AlertCircle,
+  CheckCircle
 } from 'lucide-angular';
 
 const icons = {
@@ -27,8 +27,9 @@ const icons = {
   PinOff,
   Pencil,
   RefreshCcw,
-  Search
-
+  Search,
+  AlertCircle,
+  CheckCircle
 };
 @NgModule({
   imports: [LucideAngularModule.pick(icons)],

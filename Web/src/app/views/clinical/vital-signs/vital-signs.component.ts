@@ -26,14 +26,16 @@ import { ViewChild } from '@angular/core';
 import { NgxDaterangepickerBootstrapDirective } from 'ngx-daterangepicker-bootstrap';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { CounterDirective } from '@core/directive/counter.directive';
-import { vitalsingsDto } from '@/app/shared/models/clinical/vitalsings.model';
+import { vitalsingsDto } from '@/app/shared/Models/Clinical/vitalsings.model';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { LoaderService } from '@core/services/loader.service';
 import { error } from 'console';
-import { TheaterIcon } from 'lucide-angular';
+import { LucideAlertTriangle, LucideAngularModule, TheaterIcon } from 'lucide-angular';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 
 
@@ -45,11 +47,14 @@ declare var flatpickr: any;
         CommonModule,
         ReactiveFormsModule,
         FormsModule,
+        LucideAngularModule,
         RouterModule,
         NgIconComponent,
         FilePondModule,
         NgbNavModule,
-        GenericPaginationComponent
+  GenericPaginationComponent,
+  TranslatePipe,
+  FilledOnValueDirective
     ],
     templateUrl: './vital-signs.component.html',
     styleUrl: './vital-signs.component.scss',
@@ -59,6 +64,7 @@ export class VitalSignsComponent implements OnInit {
   vitalSignsForm!: FormGroup;
   SearchPatientData: any;
   patientDataSubscription!: Subscription;
+  protected readonly headingIcon = LucideAlertTriangle;
 
   vitalSignsPagedData: any[] = [];
   VitalCurrentPage = 1;
@@ -80,6 +86,16 @@ bpSystolic = 0;
 
   get VitalTotalPages(): number {
     return Math.ceil(this.VitalTotalItems / this.VitalPageSize);
+  }
+
+  private focusFirstInvalidControl(): void {
+    try {
+      setTimeout(() => {
+        const firstInvalid = document.querySelector('.is-invalid, .ng-invalid.ng-touched') as HTMLElement | null;
+        firstInvalid?.focus({ preventScroll: true } as any);
+        firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    } catch {}
   }
 
   constructor(
@@ -110,17 +126,17 @@ bpSystolic = 0;
       entryDate: [null, Validators.required],
       dailyStartTime: [null, Validators.required],
       bpArm: ['left', Validators.required],
-      comment: [''],
-      bpSystolic: [null],
-      bpDiastolic: [null],
-      heartRate: [null],
-      respirationRate: [null],
-      temperature: [null],
-      weight: [null],
-      height: [null],
-      bmi: [null],
-      spo2: [null],
-      glucose: [null],
+      comment: ['', Validators.required],
+      bpSystolic: [null, Validators.required],
+      bpDiastolic: [null, Validators.required],
+      heartRate: [null, Validators.required],
+      respirationRate: [null, Validators.required],
+      temperature: [null, Validators.required],
+      weight: [null, Validators.required],
+      height: [null, Validators.required],
+      bmi: [null, Validators.required],
+      spo2: [null, Validators.required],
+      glucose: [null, Validators.required],
     });
 
     flatpickr('#entryDate', {
@@ -141,11 +157,7 @@ onSubmit() {
 
       if (this.vitalSignsForm.invalid) {
         this.vitalSignsForm.markAllAsTouched();
-        Swal.fire({
-          icon: 'warning',
-          title: 'Form Incomplete',
-          text: 'Please fill all required fields.',
-        });
+        this.focusFirstInvalidControl();
         this.isSubmitting = false;
         return;
       }
@@ -174,18 +186,19 @@ onSubmit() {
 
       this.ClinicalApiService.VitalSignInsert(payload)
         .then(() => {
+          this.isSubmitting = false; // stop spinner on success
           Swal.fire({
             icon: 'success',
             title: 'Saved',
             text: 'Vital signs saved successfully!',
             confirmButtonText: 'OK'
           }).then(() => {
-             this.vitalSignsForm.reset();
+            this.clearForm();
             this.vitalSign(this.SearchPatientData?.table2[0]?.mrNo || '' );
           });
         })
         .catch((err: any) => {
-          this.isSubmitting = false; // ✅ Stop loading if error occurs
+          this.isSubmitting = false; // stop spinner on error
           Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -229,6 +242,14 @@ onSubmit() {
 
     }
 
+    get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
+  }
+
   ngOnDestroy(): void {
     if (this.patientDataSubscription) {
       this.patientDataSubscription.unsubscribe();
@@ -253,4 +274,27 @@ debugger
         glucose: vital?.glucose,
     });
 }
+
+  clearForm() {
+    try {
+      this.vitalSignsForm.reset({
+        entryDate: null,
+        dailyStartTime: null,
+        bpArm: 'left',
+        comment: '',
+        bpSystolic: null,
+        bpDiastolic: null,
+        heartRate: null,
+        respirationRate: null,
+        temperature: null,
+        weight: null,
+        height: null,
+        bmi: null,
+        spo2: null,
+        glucose: null,
+      });
+      this.vitalSignsForm.markAsPristine();
+      this.vitalSignsForm.markAsUntouched();
+    } catch {}
+  }
 }

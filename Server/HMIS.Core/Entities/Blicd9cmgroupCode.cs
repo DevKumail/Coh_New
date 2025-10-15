@@ -33,10 +33,10 @@ public partial class Blicd9cmgroupCode
     public bool? IsDeleted { get; set; }
 
     [ForeignKey("GroupId")]
-    [InverseProperty("Blicd9cmgroupCodes")]
+    [InverseProperty("Blicd9cmgroupCode")]
     public virtual Blicd9cmgroup Group { get; set; } = null!;
 
     [ForeignKey("Icd9code")]
-    [InverseProperty("Blicd9cmgroupCodes")]
+    [InverseProperty("Blicd9cmgroupCode")]
     public virtual BlmasterIcd9cm Icd9codeNavigation { get; set; } = null!;
 }

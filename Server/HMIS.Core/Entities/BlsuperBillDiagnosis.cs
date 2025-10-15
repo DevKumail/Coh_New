@@ -65,14 +65,14 @@ public partial class BlsuperBillDiagnosis
     public long? AppointmentId { get; set; }
 
     [ForeignKey("AppointmentId")]
-    [InverseProperty("BlsuperBillDiagnoses")]
+    [InverseProperty("BlsuperBillDiagnosis")]
     public virtual SchAppointment? Appointment { get; set; }
 
     [ForeignKey("Icd9code")]
-    [InverseProperty("BlsuperBillDiagnoses")]
+    [InverseProperty("BlsuperBillDiagnosis")]
     public virtual BlmasterIcd9cm? Icd9codeNavigation { get; set; }
 
     [ForeignKey("IcdversionId")]
-    [InverseProperty("BlsuperBillDiagnoses")]
+    [InverseProperty("BlsuperBillDiagnosis")]
     public virtual Blicdversion? Icdversion { get; set; }
 }

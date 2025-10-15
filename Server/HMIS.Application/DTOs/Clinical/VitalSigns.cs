@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HMIS.Application.DTOs.Clinical
 {
-    public class VitalSigns
+    public class VitalSign
     {
         public long ID { get;set; }
         public string MRNo { get; set; }

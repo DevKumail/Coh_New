@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("ProviderSchedule")]
+[Index("ProviderId", Name = "IX_ProviderSchedule_ProviderId")]
 public partial class ProviderSchedule
 {
     [Key]
@@ -88,13 +88,13 @@ public partial class ProviderSchedule
     public int? SpecialityId { get; set; }
 
     [ForeignKey("FacilityId")]
-    [InverseProperty("ProviderSchedules")]
+    [InverseProperty("ProviderSchedule")]
     public virtual RegFacility? Facility { get; set; }
 
     [InverseProperty("Ps")]
-    public virtual ICollection<ProviderScheduleByAppType> ProviderScheduleByAppTypes { get; set; } = new List<ProviderScheduleByAppType>();
+    public virtual ICollection<ProviderScheduleByAppType> ProviderScheduleByAppType { get; set; } = new List<ProviderScheduleByAppType>();
 
     [ForeignKey("SpecialityId")]
-    [InverseProperty("ProviderSchedules")]
+    [InverseProperty("ProviderSchedule")]
     public virtual ProviderSpecialty? Speciality { get; set; }
 }

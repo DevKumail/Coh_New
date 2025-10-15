@@ -24,7 +24,7 @@ import { NavbarComponent } from "../navbar/navbar.component";
 import { AdvanceSearchModalComponent } from "./components/advance-search-modal/advance-search-modal.component";
 import Swal from 'sweetalert2';
 import { LoaderService } from '@core/services/loader.service';
-
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 
 @Component({
   selector: 'app-topbar',
@@ -41,7 +41,8 @@ import { LoaderService } from '@core/services/loader.service';
     PatientHeaderPanelComponent,
     FormsModule,
     NavbarComponent,
-    AdvanceSearchModalComponent
+    AdvanceSearchModalComponent,
+    TranslatePipe
   ],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
@@ -195,6 +196,13 @@ export class TopbarComponent implements OnInit {
       //   this.AppointmentDetail();
       // }
     })
+  }
+
+  // Layout helper: true when current document is RTL
+  get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch { return false; }
   }
 
 }

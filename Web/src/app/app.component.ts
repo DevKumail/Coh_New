@@ -4,17 +4,20 @@ import * as tablerIcons from '@ng-icons/tabler-icons';
 import * as tablerIconsFill from '@ng-icons/tabler-icons/fill';
 import { provideIcons } from '@ng-icons/core';
 import { Title } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 import { filter, map, mergeMap } from 'rxjs/operators';
+import { TranslationService } from '@/app/shared/i18n/translation.service';
 import { HealthCheckService } from '@core/services/health-check.service';
 import { LoaderComponent } from "./components/loader/loader.component";
 import { CommonModule } from '@angular/common';
 import { LoaderService } from '@core/services/loader.service';
 import { environment } from '../environments/environment';
+import { ChangeDetectorRef } from '@angular/core';
 
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, LoaderComponent, CommonModule],
+    imports: [RouterOutlet, LoaderComponent, CommonModule, HttpClientModule],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
     viewProviders: [provideIcons({ ...tablerIcons, ...tablerIconsFill })]
@@ -26,13 +29,48 @@ export class AppComponent implements OnInit {
     private healthCheck = inject(HealthCheckService);
     private loadingService = inject(LoaderService);
 
-    isLoading = this.loadingService.loading$;
-
-    constructor() {
-        this.healthCheck.startMonitoring();
+    isLoading: boolean = false;
+    constructor(
+        private cdr: ChangeDetectorRef
+    ) {
+        // Start periodic health monitoring only in production
+        if (environment.production) {
+            this.healthCheck.startMonitoring();
+        }
 
     }
     ngOnInit(): void {
+        this.loadingService.loading$.subscribe(val => {
+            this.isLoading = val;
+            this.cdr.detectChanges(); // force refresh
+        });
+        // Apply global direction (RTL/LTR) as early as possible
+        try {
+            let storedLang = (sessionStorage.getItem('uiLang') as 'en' | 'ar') || 'en';
+            let storedDir = (sessionStorage.getItem('uiDir') as 'rtl' | 'ltr') || '' as any;
+
+            // If direction not set, derive from language (ar -> rtl, en -> ltr)
+            if (!storedDir) {
+                storedDir = storedLang === 'ar' ? 'rtl' : 'ltr';
+                sessionStorage.setItem('uiDir', storedDir);
+            }
+
+            // If language not set but direction exists, derive language from dir
+            if (!storedLang) {
+                storedLang = storedDir === 'rtl' ? 'ar' : 'en';
+                sessionStorage.setItem('uiLang', storedLang);
+            }
+
+            document.documentElement.setAttribute('dir', storedDir);
+            document.documentElement.setAttribute('lang', storedLang);
+            document.body.classList.toggle('rtl', storedDir === 'rtl');
+
+            // Initialize language from storage
+            const i18n = inject(TranslationService);
+            // fire and forget; UI will update via pipe when loaded
+            i18n.load(storedLang);
+        } catch {}
+
         this.router.events
             .pipe(
                 filter(event => event instanceof NavigationEnd),

@@ -34,9 +34,9 @@ public partial class CptbyAppType
     public string UpdatedBy { get; set; } = null!;
 
     [ForeignKey("AppTypeId")]
-    [InverseProperty("CptbyAppTypes")]
+    [InverseProperty("CptbyAppType")]
     public virtual SchAppointmentType AppType { get; set; } = null!;
 
     [InverseProperty("Group")]
-    public virtual ICollection<CptsInCptbyAppType> CptsInCptbyAppTypes { get; set; } = new List<CptsInCptbyAppType>();
+    public virtual ICollection<CptsInCptbyAppType> CptsInCptbyAppType { get; set; } = new List<CptsInCptbyAppType>();
 }

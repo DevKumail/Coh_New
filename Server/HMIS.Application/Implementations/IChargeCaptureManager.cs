@@ -13,7 +13,7 @@ namespace HMIS.Application.Implementations
     {
         Task<DataSet> CC_MyCptCodeGetDB(long ProviderId, long? GroupId, long? PayerId);
         Task<DataSet> CC_MyDiagnosisCodeDB(long ProviderId, long? GroupId, long? ICDVersionId);
-        Task<DataSet> CC_DiagnosisCodeDB(int? ICDVersionId, string? DiagnosisStartCode, string? DiagnosisEndCode, string? DescriptionFilter);
+        Task<DataSet> CC_DiagnosisCodeDB(int? ICDVersionId, string? DiagnosisStartCode, string? DiagnosisEndCode, string? DescriptionFilter, int? @PageNumber, int? PageSize);
         Task<DataSet> CC_CPTCodeDB(int? AllCPTCode, string? CPTStartCode, string? CPTEndCode, string? Description);
         Task<DataSet> CC_MyDentalCodeDB(long ProviderId, long? GroupId, string? ProviderDescription, string? DentalCode, long? PayerId);
         Task<DataSet> CC_DentalCodeDB(int? AllDentalCode, string? DentalStartCode, string? DentalEndCode, string? DescriptionFilter);

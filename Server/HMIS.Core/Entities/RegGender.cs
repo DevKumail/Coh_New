@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("RegGender")]
 public partial class RegGender
 {
     [Key]
@@ -21,5 +20,5 @@ public partial class RegGender
     public string? GenderCode { get; set; }
 
     [InverseProperty("Gender")]
-    public virtual ICollection<RegPatientDetail> RegPatientDetails { get; set; } = new List<RegPatientDetail>();
+    public virtual ICollection<RegPatientDetails> RegPatientDetails { get; set; } = new List<RegPatientDetails>();
 }

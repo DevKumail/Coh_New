@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { IconsModule } from '@/app/shared/icons.module';
-import { PaginationComponent } from './pagination/pagination.component';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import Swal from 'sweetalert2'; 
 import { ChargeCaptureService } from '@/app/shared/Services/Charge-Capture/charge-capture.service';
 import { EventEmitter } from '@angular/core';
@@ -15,6 +15,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { Subscription } from 'rxjs';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 // import { NgxPermissionsDirective } from 'ngx-permissions';
 
@@ -25,9 +26,10 @@ import { Subscription } from 'rxjs';
     ReactiveFormsModule,
     NgIconComponent,
     NgbNavModule,
-    PaginationComponent,
     IconsModule,
+  TranslatePipe,
     FormsModule,
+    FilledOnValueDirective,
     // NgxPermissionsDirective
   ],
   standalone: true, 
@@ -503,7 +505,7 @@ async filterMyDental(e: any){
         });
 
         const item = {
-          name: "--- Select Provider ---",
+          name: "-- Select Provider --",
           code: 0,
         };
         hremploeevar.push(item);
@@ -1218,7 +1220,14 @@ get diagnosisCodePageNumbers(): (number | string)[] {
 
 SearchDiagnosis() {
   this.showSpinner = true;
-  this.service.DiagnosisCodebyProvider(this.ICDVersionId,this.DiagnosisStartCode,this.DiagnosisEndCode,this.DescriptionFilter).then((response: any) => {
+  this.service.DiagnosisCodebyProvider(
+    this.ICDVersionId,
+    this.diagnosisCodeCurrentPage,
+    this.diagnosisCodePageSize,
+    this.DiagnosisStartCode,
+    this.DiagnosisEndCode,
+    this.DescriptionFilter
+  ).then((response: any) => {
       this.DiagnosisCode = response.table1 || [];
 
         this.DiagnosisCode.map((e: any) => {
@@ -2068,4 +2077,12 @@ async GetAllService(Data: any) {
 }
 //#endregion
 
+
+   get isRtl(): boolean {
+    try {
+      return (document?.documentElement?.getAttribute('dir') || '') === 'rtl';
+    } catch {
+      return false;
+    }
+  }
 }

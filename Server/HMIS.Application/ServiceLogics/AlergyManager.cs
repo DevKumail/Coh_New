@@ -31,7 +31,7 @@ namespace HMIS.Application.ServiceLogics
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@MRNo", mrno);
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetAllergies",param);
-                if (ds.Tables[1].Rows.Count == 0)
+                if (ds == null)
                 {
 
                     return new DataSet();
@@ -48,7 +48,7 @@ namespace HMIS.Application.ServiceLogics
 
         private bool Exist(long id)
         {
-            var patient = _context.PatientAllergies.Find(id);
+            var patient = _context.PatientAllergy.Find(id);
             return patient != null;
         }
          
@@ -90,14 +90,14 @@ namespace HMIS.Application.ServiceLogics
                     newPatientAlergy.AppointmentId = alergyModel.AppointmentId;
                     //newPatientAlergy.OutsideClinic = alergyModel.providerDescription;
 
-                    _context.PatientAllergies.Add(newPatientAlergy);
+                    _context.PatientAllergy.Add(newPatientAlergy);
                     await _context.SaveChangesAsync();
                     return true;
 
                 }
                 else if (exist)
                 {
-                    var patient = _context.PatientAllergies
+                    var patient = _context.PatientAllergy
                         .Where(x => x.AllergyId.Equals(alergyModel.AllergyId)).FirstOrDefault();
 
                     if (patient != null)
@@ -154,7 +154,7 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                var data = _context.PatientAllergies.Where(x => x.AllergyId == Id).FirstOrDefault();
+                var data = _context.PatientAllergy.Where(x => x.AllergyId == Id).FirstOrDefault();
                 if (data != null)
                 {
                     data.IsDeleted = true;

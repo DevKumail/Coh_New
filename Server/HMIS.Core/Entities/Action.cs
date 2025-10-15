@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("Action")]
 public partial class Action
 {
     [Key]
@@ -33,5 +32,5 @@ public partial class Action
     public bool? IsDeleted { get; set; }
 
     [InverseProperty("Action")]
-    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+    public virtual ICollection<AuditLog> AuditLog { get; set; } = new List<AuditLog>();
 }

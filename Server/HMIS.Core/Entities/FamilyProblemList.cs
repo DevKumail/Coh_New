@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("FamilyProblemList")]
 public partial class FamilyProblemList
 {
     [Key]
