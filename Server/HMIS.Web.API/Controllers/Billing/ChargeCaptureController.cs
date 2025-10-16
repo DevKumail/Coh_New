@@ -197,7 +197,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_AllCPTCode
         [HttpGet("CPTCode")]
-        public async Task<IActionResult> CC_CPTCode(int? AllCPTCode, string? CPTStartCode, string? CPTEndCode, string? Description)
+        public async Task<IActionResult> CC_CPTCode(int? AllCPTCode, string? CPTStartCode, string? CPTEndCode, string? Description, int? pageNumber, int? pageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -209,7 +209,7 @@ namespace HMIS.Web.Controllers.Billing
             timerElapsed.StartTimer();
             try
             {
-                DataSet result = await _chargeCaptureManager.CC_CPTCodeDB(AllCPTCode, CPTStartCode, CPTEndCode, Description);
+                DataSet result = await _chargeCaptureManager.CC_CPTCodeDB(AllCPTCode, CPTStartCode, CPTEndCode, Description, pageNumber, pageSize);
 
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)

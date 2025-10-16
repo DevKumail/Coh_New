@@ -28,7 +28,7 @@
             <div class="row">
                 <!-- Title -->
                 <div class="col-md-3">
-                    <label>{{ 'TITLE' | translate }}</label>
+                    <label>{{ 'TITLE' | translate }} <span class="text-danger">*</span></label>
                     <select class="form-select" formControlName="personTitleId">
                         <option [ngValue]="null" disabled>
                             {{ 'SELECT_TITLE' | translate }}
@@ -37,6 +37,10 @@
                             {{ t.name }}
                         </option>
                     </select>
+                    <div
+                        class="invalid-feedback d-block" *ngIf=" temporaryForm.get('personTitleId')?.invalid && (temporaryForm.get('personTitleId')?.touched)">
+                        {{ 'TITLE_REQUIRED' | translate }}
+                    </div>
                 </div>
 
                 <!-- First Name -->
@@ -45,11 +49,10 @@
                     <input
                         type="text"
                         class="form-control no-invalid-icon"
-                        [class.is-invalid]="temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched || temporaryForm.touched)"
                         formControlName="personFirstName"
                         placeholder="{{ 'ENTER_FIRST_NAME' | translate }}"
                     />
-                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched || temporaryForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personFirstName')?.invalid && (temporaryForm.get('personFirstName')?.touched )">
                         {{ 'FIRST_NAME_REQUIRED' | translate }}
                     </div>
                 </div>
@@ -67,15 +70,14 @@
 
                 <!-- Last Name -->
                 <div class="col-md-3">
-                    <label>{{ 'LAST_NAME' | translate }}</label>
+                    <label>{{ 'LAST_NAME' | translate }} <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control"
-                        [class.is-invalid]="temporaryForm.get('personLastName')?.invalid && (temporaryForm.get('personLastName')?.touched || temporaryForm.touched)"
                         formControlName="personLastName"
                         placeholder="{{ 'ENTER_LAST_NAME' | translate }}"
                     />
-                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personLastName')?.invalid && (temporaryForm.get('personLastName')?.touched || temporaryForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personLastName')?.invalid && (temporaryForm.get('personLastName')?.touched )">
                         {{ 'LAST_NAME_REQUIRED' | translate }}
                     </div>
                 </div>
@@ -84,12 +86,12 @@
                 <div class="col-md-3">
                     <label>{{ 'GENDER' | translate }} <span class="text-danger">*</span></label>
                     <select class="form-select" formControlName="personSex"
-                            [class.is-invalid]="temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched || temporaryForm.touched)">
+                            >
                         <option *ngFor="let g of personSexId" [value]="g.code">
                             {{ g.name }}
                         </option>
                     </select>
-                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched || temporaryForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personSex')?.invalid && (temporaryForm.get('personSex')?.touched )">
                         {{ 'GENDER_REQUIRED' | translate }}
                     </div>
                 </div>
@@ -99,13 +101,12 @@
                     <input
                         type="text"
                         class="form-control date"
-                        [class.is-invalid]="temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched || temporaryForm.touched)"
                         formControlName="patientBirthDate"
                         data-provider="flatpickr"
                         id="birthDate"
                         placeholder="{{ 'DATE_PLACEHOLDER' | translate }}"
                     />
-                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched || temporaryForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('patientBirthDate')?.invalid && (temporaryForm.get('patientBirthDate')?.touched)">
                         {{ 'DOB_REQUIRED' | translate }}
                     </div>
                 </div>
@@ -123,7 +124,7 @@
 
                 <!-- Home Phone -->
                 <div class="col-md-3">
-                    <label>{{ 'HOME_PHONE' | translate }}</label>
+                    <label>{{ 'HOME_PHONE' | translate }} <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control"
@@ -132,6 +133,10 @@
                         [mask]="'(00) 0000-0000'"
                         [validation]="false"
                     />
+                    <div 
+                        class="invalid-feedback d-block" *ngIf="temporaryForm.get('personHomePhone1')?.invalid && (temporaryForm.get('personHomePhone1')?.touched)">
+                        {{ 'HOME_PHONE_REQUIRED' | translate }}
+                    </div>
                 </div>
 
                 <!-- Work Phone -->
@@ -149,7 +154,7 @@
 
                 <!-- Street Number -->
                 <div class="col-md-3">
-                    <label>{{ 'STREET_NUMBER' | translate }}</label>
+                    <label>{{ 'STREET_NUMBER' | translate }} <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control"
@@ -158,6 +163,10 @@
                         [mask]="'0000'"
                         [validation]="false"
                     />
+                   <div 
+                        class="invalid-feedback d-block" *ngIf="temporaryForm.get('streetNumber')?.invalid && (temporaryForm.get('streetNumber')?.touched)">
+                        {{ 'STREET_NUMBER_REQUIRED' | translate }}
+                    </div>
                 </div>
 
                 <!-- Dwelling Number -->
@@ -173,7 +182,7 @@
 
                 <!-- Zip Code -->
                 <div class="col-md-3">
-                    <label>{{ 'ZIP_CODE' | translate }}</label>
+                    <label>{{ 'ZIP_CODE' | translate }} <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control"
@@ -182,11 +191,15 @@
                         [mask]="'00000'"
                         [validation]="false"
                     />
+                    <div 
+                        class="invalid-feedback d-block" *ngIf="temporaryForm.get('personZipCode')?.invalid && (temporaryForm.get('personZipCode')?.touched)">
+                        {{ 'ZIP_CODE_REQUIRED' | translate }}
+                    </div>
                 </div>
 
                 <!-- Country -->
                 <div class="col-md-3">
-                    <label>{{ 'SELECT_COUNTRY' | translate }}</label>
+                    <label>{{ 'SELECT_COUNTRY' | translate }} <span class="text-danger">*</span></label>
                     <select
                         class="form-select"
                         formControlName="selectedCountry"
@@ -199,11 +212,15 @@
                             {{ c.name }}
                         </option>
                     </select>
+                    <div 
+                        class="invalid-feedback d-block" *ngIf="temporaryForm.get('selectedCountry')?.invalid && (temporaryForm.get('selectedCountry')?.touched)">
+                        {{ 'SELECT_COUNTRY_REQUIRED' | translate }}
+                    </div> 
                 </div>
 
                 <!-- State -->
                 <div class="col-md-3">
-                    <label>{{ 'SELECT_STATE' | translate }}</label>
+                    <label>{{ 'SELECT_STATE' | translate }} <span class="text-danger">*</span></label>
                     <select
                         class="form-select"
                         formControlName="selectedState"
@@ -216,11 +233,15 @@
                             {{ s.name }}
                         </option>
                     </select>
+                    <div 
+                        class="invalid-feedback d-block" *ngIf="temporaryForm.get('selectedState')?.invalid && (temporaryForm.get('selectedState')?.touched)">
+                        {{ 'SELECT_STATE_REQUIRED' | translate }}
+                    </div>
                 </div>
 
                 <!-- City -->
                 <div class="col-md-3">
-                    <label>{{ 'SELECT_CITY' | translate }}</label>
+                    <label>{{ 'SELECT_CITY' | translate }} <span class="text-danger">*</span></label>
                     <select class="form-select" formControlName="selectedCity">
                         <option [ngValue]="null" disabled>
                             {{ 'SELECT_CITY' | translate }}
@@ -229,11 +250,15 @@
                             {{ c.name }}
                         </option>
                     </select>
+                    <div 
+                        class="invalid-feedback d-block" *ngIf="temporaryForm.get('selectedCity')?.invalid && (temporaryForm.get('selectedCity')?.touched)">
+                        {{ 'SELECT_CITY_REQUIRED' | translate }}
+                    </div>
                 </div>
 
                 <!-- Nationality -->
                 <div class="col-md-3">
-                    <label>{{ 'SELECT_NATIONALITY' | translate }}</label>
+                    <label>{{ 'SELECT_NATIONALITY' | translate }} <span class="text-danger">*</span></label>
                     <select class="form-select" formControlName="nationality">
                         <option [ngValue]="null" disabled>
                             {{ 'SELECT_NATIONALITY' | translate }}
@@ -245,6 +270,10 @@
                             {{ n.name }}
                         </option>
                     </select>
+                    <div 
+                        class="invalid-feedback d-block" *ngIf="temporaryForm.get('nationality')?.invalid && (temporaryForm.get('nationality')?.touched)">
+                        {{ 'SELECT_NATIONALITY_REQUIRED' | translate }}
+                    </div>
                 </div>
 
                 <!-- Cell Phone -->
@@ -253,25 +282,28 @@
                     <input
                         type="text"
                         class="form-control"
-                        [class.is-invalid]="temporaryForm.get('personCellPhone')?.invalid && (temporaryForm.get('personCellPhone')?.touched || temporaryForm.touched)"
                         formControlName="personCellPhone"
                         placeholder="(00) 0000-0000"
                         [mask]="'(00) 0000-0000'"
                     />
-                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personCellPhone')?.invalid && (temporaryForm.get('personCellPhone')?.touched || temporaryForm.touched)">
+                    <div class="invalid-feedback d-block" *ngIf="temporaryForm.get('personCellPhone')?.invalid && (temporaryForm.get('personCellPhone')?.touched)">
                         {{ 'CELL_PHONE_REQUIRED' | translate }}
                     </div>
                 </div>
 
                 <!-- Email -->
                 <div class="col-md-3">
-                    <label>{{ 'EMAIL' | translate }}</label>
+                    <label>{{ 'EMAIL' | translate }} <span class="text-danger">*</span></label>
                     <input
                         type="email"
                         class="form-control"
                         formControlName="personEmail"
                         placeholder="{{ 'ENTER_EMAIL_ADDRESS' | translate }}"
                     />
+                    <div 
+                        class="invalid-feedback d-block" *ngIf="temporaryForm.get('personEmail')?.invalid && (temporaryForm.get('personEmail')?.touched)">
+                        {{ 'EMAIL_REQUIRED' | translate }}
+                    </div>
                 </div>
 
                 <!-- Kin Name -->
