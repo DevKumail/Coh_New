@@ -13,6 +13,7 @@ using HMIS.Application.Implementations;
 using HMIS.Application.DTOs.ChargeCaptureDTOs;
 using HMIS.Infrastructure.Helpers;
 using Emgu.CV.Ocl;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace HMIS.Application.ServiceLogics
 {
@@ -112,7 +113,7 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<DataSet> CC_CPTCodeDB(int? AllCPTCode, string? CPTStartCode, string? CPTEndCode, string? Description)
+        public async Task<DataSet> CC_CPTCodeDB(int? AllCPTCode, string? CPTStartCode, string? CPTEndCode, string? Description, int? pageNumber, int? pageSize)
         {
             try
             {
@@ -127,6 +128,8 @@ namespace HMIS.Application.ServiceLogics
                     param.Add("@CPTStartCode", CPTStartCode);
                     param.Add("@EndCodeRange", CPTEndCode);
                     param.Add("@DescriptionFilter", Description);
+                    param.Add("@PageNumber", pageNumber);
+                    param.Add("@PageSize", pageSize);
 
                 }
 

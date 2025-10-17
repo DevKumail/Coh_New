@@ -24,7 +24,7 @@
     <div class="row">
       <div [ngClass]="getFormColClass()">
         <div class="mb-3">
-          <label class="form-label">{{'ALERT_TYPE' | translate}}</label>
+          <label class="form-label">{{'ALERT_TYPE' | translate}} <span class="text-danger">*</span></label>
           <select class="form-select" formControlName="alertType">
             <option [ngValue]="null" disabled>{{'SELECT_ALERT_TYPE' | translate}}</option>
             <option *ngFor="let alert of getAlert" [value]="alert.typeId">{{ alert.name }}</option>
@@ -37,7 +37,7 @@
 
       <div [ngClass]="getFormColClass()">
         <div class="mb-3">
-          <label class="form-label">{{'START_DATE' | translate}}</label>
+          <label class="form-label">{{'START_DATE' | translate}} <span class="text-danger">*</span></label>
           <input id="alertStartDate" type="text" class="form-control" formControlName="startDate" placeholder="{{'ENTER_DATE' | translate}}" data-provider="flatpickr" />
           <div class="text-danger small" *ngIf="alertForm.get('startDate')?.touched && alertForm.get('startDate')?.invalid">
             {{'START_DATE_REQUIRED' | translate}}
@@ -74,7 +74,7 @@
     <div class="row">
       <div class="col-12">
         <div class="mb-3">
-          <label class="form-label">{{'MESSAGE' | translate}}</label>
+          <label class="form-label">{{'MESSAGE' | translate}} <span class="text-danger">*</span></label>
           <input type="text" class="form-control" formControlName="message" placeholder="{{'ENTER_MESSAGE' | translate}}" />
           <div class="text-danger small" *ngIf="alertForm.get('message')?.touched && alertForm.get('message')?.invalid">
             {{'MESSAGE_REQUIRED' | translate}}
