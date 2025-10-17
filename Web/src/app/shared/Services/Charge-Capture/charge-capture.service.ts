@@ -13,8 +13,8 @@ export class ChargeCaptureService {
 	return this.api.get(`ChargeCapture/GetICD9CMGroupByProvider?ProviderId=${ProviderId}`).toPromise();
   }
 
-  MyDiagnosisCodebyProvider(ProviderId:number,GroupId:number |null ,ICDVersionId:number | null) {
-    return this.api.get(`ChargeCapture/MyDiagnosisCode?ProviderId=${ProviderId}&GroupId=${GroupId}&ICDVersionId=${ICDVersionId}`).toPromise();
+  MyDiagnosisCodebyProvider(ProviderId:number,GroupId:number |null ,ICDVersionId:number | null, PageNumber: any ,PageSize: any, ) {
+    return this.api.get(`ChargeCapture/MyDiagnosisCode?ProviderId=${ProviderId}&GroupId=${GroupId}&ICDVersionId=${ICDVersionId}&PageNumber=${PageNumber}&PageSize=${PageSize}`).toPromise();
   }
 
   GetCPTByProvider(ProviderId:number) {
@@ -81,9 +81,9 @@ export class ChargeCaptureService {
     return this.api.get(`ChargeCapture/HCPCSCode?AllHCPCSCode=${AllHCPCSCode}&HCPCStartCode=${HCPCStartCode}&HCPCSEndCode=${HCPCSEndCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
   }
 
-    GetAllCPTCode(AllCPTCode:any ,CPTStartCode:any ,CPTEndCode:any, Description:any ) {
+    GetAllCPTCode(AllCPTCode:any ,CPTStartCode:any ,CPTEndCode:any, Description:any, page:any, rowsPerPage:any ) {
       //debugger
-      return this.api.get(`ChargeCapture/CPTCode?AllCPTCode=${AllCPTCode}&CPTStartCode=${CPTStartCode}&CPTEndCode=${CPTEndCode}&Description=${Description}`).toPromise();
+      return this.api.get(`ChargeCapture/CPTCode?AllCPTCode=${AllCPTCode}&CPTStartCode=${CPTStartCode}&CPTEndCode=${CPTEndCode}&Description=${Description}&PageNumber=${page}&PageSize=${rowsPerPage}`).toPromise();
     }
 
     

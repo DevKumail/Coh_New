@@ -1,6 +1,7 @@
-﻿using HMIS.Core.Entities;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
 using HMIS.Application.DTOs.ChargeCaptureDTOs;
 using HMIS.Application.Implementations;
+using HMIS.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -90,7 +91,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_UserDiagnosisCode
         [HttpGet("MyDiagnosisCode")]
-        public async Task<IActionResult> CC_MyDiagnosisCode(long ProviderId, long? GroupId, long? ICDVersionId)
+        public async Task<IActionResult> CC_MyDiagnosisCode(long ProviderId, long? GroupId, long? ICDVersionId, int? PageNumber, int? PageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -111,7 +112,7 @@ namespace HMIS.Web.Controllers.Billing
                     ICDVersionId = null;
                 }
 
-                DataSet result = await _chargeCaptureManager.CC_MyDiagnosisCodeDB(ProviderId, GroupId, ICDVersionId);
+                DataSet result = await _chargeCaptureManager.CC_MyDiagnosisCodeDB(ProviderId, GroupId, ICDVersionId, PageNumber, PageSize);
 
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)

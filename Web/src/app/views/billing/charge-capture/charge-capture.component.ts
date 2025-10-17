@@ -16,6 +16,7 @@ import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { Subscription } from 'rxjs';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 
 // import { NgxPermissionsDirective } from 'ngx-permissions';
 
@@ -30,6 +31,7 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
   TranslatePipe,
     FormsModule,
     FilledOnValueDirective,
+    GenericPaginationComponent
     // NgxPermissionsDirective
   ],
   standalone: true, 
@@ -102,10 +104,10 @@ export class ChargeCaptureComponent {
 
 
   //All Grid Fill by this array
-  MyDiagnosisCode: any = [];
-  DiagnosisCode: any = [];
+  MyDiagnosisCode: any [] = [];
+  DiagnosisCode: any [] = [];
   MyCPTCode: any = [];
-  CPTCode: any = [];
+  CPTCode: any [] = [];
   MyDentalCode: any = [];
   AllMyDentalCode: any = [];
   DentalCodeGridData: any= [];
@@ -356,15 +358,15 @@ async loadHCPCSGroup() {
       );
     });
     this.MyDiagnosisCode = [...data];
-    this.MyDiagnosisCodeTotalItems = this.MyDiagnosisCode.length;
-    this.MyDiagnosisCodeCurrentPage = 1;
-    this.MyDiagnosisCodeSetPagedData();
 }
 
   async filteVersion(e: any) {
-      
-      const response: any = await this.service.MyDiagnosisCodebyProvider(this.ProviderId, this.ICT9GroupId, this.ICDVersionId);
+      this.MyDiagnosisCodeTotalItems = 0;
+      this.MyDiagnosisCode = [];
+      this.MyDiagnosisCodePaginationInfo.Page = 1;
+      const response: any = await this.service.MyDiagnosisCodebyProvider(this.ProviderId, this.ICT9GroupId, this.ICDVersionId , this.MyDiagnosisCodePaginationInfo.Page, this.MyDiagnosisCodePaginationInfo.RowsPerPage);
       this.AllMyDiagnosisCode = response?.table1 || [];
+      this.MyDiagnosisCodeTotalItems = response?.table2[0]?.totalRecords || 0;
 
       this.AllMyDiagnosisCode.map((e: any) => {
         const isSelected = this.MyDiagnosisData.some((item: any) => item.ICDCode  === e.icD9Code); 
@@ -377,9 +379,6 @@ async loadHCPCSGroup() {
 
 
   this.MyDiagnosisCode = [...this.AllMyDiagnosisCode];
-  this.MyDiagnosisCodeTotalItems = this.MyDiagnosisCode.length;
-  this.MyDiagnosisCodeCurrentPage = 1;
-  this.MyDiagnosisCodeSetPagedData();
   }
 
 
@@ -1170,60 +1169,24 @@ searchingName:string='Starting Code';
 
 //#region DiagnosisCode Pagination Start
 
-pagedDiagnosisCode: any[] = [];
-diagnosisCodeCurrentPage = 1;
-diagnosisCodePageSize = 5;
+DiagnosisCodePaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5
+};
 diagnosisCodeTotalItems = 0;
  
-get diagnosisCodeTotalPages(): number {
-  return Math.ceil(this.diagnosisCodeTotalItems / this.diagnosisCodePageSize);
+onDiagnosisCodePageChanged(page: number) {
+  this.DiagnosisCodePaginationInfo.Page = page;
+  this.SearchDiagnosis();
 }
 
-get diagnosisCodeStart(): number {
-  return (this.diagnosisCodeCurrentPage - 1) * this.diagnosisCodePageSize;
-}
-
-get diagnosisCodeEnd(): number {
-  return Math.min(this.diagnosisCodeStart + this.diagnosisCodePageSize, this.diagnosisCodeTotalItems);
-}
-
-// ✅ Smart page numbers with ellipsis
-get diagnosisCodePageNumbers(): (number | string)[] {
-  const total = this.diagnosisCodeTotalPages;
-  const current = this.diagnosisCodeCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1); // Always show first page
-
-  if (left > 2) {
-    range.push('...');
-  }
-
-  for (let i = left; i <= right; i++) {
-    range.push(i);
-  }
-
-  if (right < total - 1) {
-    range.push('...');
-  }
-
-  if (total > 1) {
-    range.push(total); // Always show last page
-  }
-
-  return range;
-}
 
 SearchDiagnosis() {
   this.showSpinner = true;
   this.service.DiagnosisCodebyProvider(
     this.ICDVersionId,
-    this.diagnosisCodeCurrentPage,
-    this.diagnosisCodePageSize,
+    this.DiagnosisCodePaginationInfo.Page,
+    this.DiagnosisCodePaginationInfo.RowsPerPage,
     this.DiagnosisStartCode,
     this.DiagnosisEndCode,
     this.DescriptionFilter
@@ -1239,114 +1202,31 @@ SearchDiagnosis() {
         }
       });
       
-      this.diagnosisCodeTotalItems = this.DiagnosisCode.length;
-      this.diagnosisCodeCurrentPage = 1;
-      this.diagnosisCodeSetPagedData();
+      this.diagnosisCodeTotalItems = response.table2[0]?.totalRecords || 0;
       this.showSpinner = false;
     });
-}
-
-diagnosisCodeSetPagedData() {
-  const startIndex = (this.diagnosisCodeCurrentPage - 1) * this.diagnosisCodePageSize;
-  const endIndex = startIndex + this.diagnosisCodePageSize;
-  this.pagedDiagnosisCode = this.DiagnosisCode.slice(startIndex, endIndex);
-}
-
-diagnosisCodeGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.diagnosisCodeTotalPages) return;
-  this.diagnosisCodeCurrentPage = page;
-  this.diagnosisCodeSetPagedData();
-}
-
-diagnosisCodeNextPage() {
-  if (this.diagnosisCodeCurrentPage < this.diagnosisCodeTotalPages) {
-    this.diagnosisCodeCurrentPage++;
-    this.diagnosisCodeSetPagedData();
-  }
-}
-
-diagnosisCodePrevPage() {
-  if (this.diagnosisCodeCurrentPage > 1) {
-    this.diagnosisCodeCurrentPage--;
-    this.diagnosisCodeSetPagedData();
-  }
-}
-
-trackByCode(index: number, item: any) {
-  return item.icD9Code;
 }
 //#endregion
 
 //#region MyDiagnosisCode Pagination Start
-pagedMyDiagnosisCode: any[] = [];
-MyDiagnosisCodeCurrentPage = 1;
-MyDiagnosisCodePageSize = 5;
+
+MyDiagnosisCodePaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5
+};
 MyDiagnosisCodeTotalItems = 0;
 
-get MyDiagnosisCodeTotalPages(): number {
-  return Math.ceil(this.MyDiagnosisCodeTotalItems / this.MyDiagnosisCodePageSize);
-}
+    async onMyDiagnosisCodePageChanged(page: number) {
+    this.MyDiagnosisCodePaginationInfo.Page = page;
+    await this.AllDignosisApis();
+    }
 
-get MyDiagnosisCodeStart(): number {
-  return (this.MyDiagnosisCodeCurrentPage - 1) * this.MyDiagnosisCodePageSize;
-}
-
-get MyDiagnosisCodeEnd(): number {
-  return Math.min(this.MyDiagnosisCodeStart + this.MyDiagnosisCodePageSize, this.MyDiagnosisCodeTotalItems);
-}
-
-get MyDiagnosisCodePageNumbers(): (number | string)[] {
-  const total = this.MyDiagnosisCodeTotalPages;
-  const current = this.MyDiagnosisCodeCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1);
-
-  if (left > 2) range.push('...');
-  for (let i = left; i <= right; i++) range.push(i);
-  if (right < total - 1) range.push('...');
-  if (total > 1) range.push(total);
-
-  return range;
-}
 
 async AllDignosisApis() {
-  const response: any = await this.service.MyDiagnosisCodebyProvider(this.ProviderId, this.ICT9GroupId, this.ICDVersionId);
+  const response: any = await this.service.MyDiagnosisCodebyProvider(this.ProviderId, this.ICT9GroupId, this.ICDVersionId, this.MyDiagnosisCodePaginationInfo.Page, this.MyDiagnosisCodePaginationInfo.RowsPerPage);
   this.AllMyDiagnosisCode = response?.table1 || [];
   this.MyDiagnosisCode = [...this.AllMyDiagnosisCode];
-  this.MyDiagnosisCodeTotalItems = this.MyDiagnosisCode.length;
-  this.MyDiagnosisCodeCurrentPage = 1;
-  this.MyDiagnosisCodeSetPagedData();
-}
-
-MyDiagnosisCodeSetPagedData() {
-  const startIndex = (this.MyDiagnosisCodeCurrentPage - 1) * this.MyDiagnosisCodePageSize;
-  const endIndex = startIndex + this.MyDiagnosisCodePageSize;
-  this.pagedMyDiagnosisCode = this.MyDiagnosisCode.slice(startIndex, endIndex);
-}
-
-MyDiagnosisCodeGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.MyDiagnosisCodeTotalPages) return;
-  this.MyDiagnosisCodeCurrentPage = page;
-  this.MyDiagnosisCodeSetPagedData();
-}
-
-MyDiagnosisCodeNextPage() {
-  if (this.MyDiagnosisCodeCurrentPage < this.MyDiagnosisCodeTotalPages) {
-    this.MyDiagnosisCodeCurrentPage++;
-    this.MyDiagnosisCodeSetPagedData();
-  }
-}
-
-MyDiagnosisCodePrevPage() {
-  if (this.MyDiagnosisCodeCurrentPage > 1) {
-    this.MyDiagnosisCodeCurrentPage--;
-    this.MyDiagnosisCodeSetPagedData();
-  }
+  this.MyDiagnosisCodeTotalItems = response?.table2[0]?.totalRecords || 0;
 }
 //#endregion
 
@@ -1626,78 +1506,23 @@ async MyDentalCodebyProvider() {
 //#endregion
 
 //#region CPTCode Pagination start
-pagedCPT: any[] = [];
-CPTCurrentPage = 1;
-CPTPageSize = 5;
 CPTTotalItems = 0;
-
-get CPTTotalPages(): number {
-  return Math.ceil(this.CPTTotalItems / this.CPTPageSize);
-}
-
-get CPTStart(): number {
-  return (this.CPTCurrentPage - 1) * this.CPTPageSize;
-}
-
-get CPTEnd(): number {
-  return Math.min(this.CPTStart + this.CPTPageSize, this.CPTTotalItems);
-}
-
-get CPTPageNumbers(): (number | string)[] {
-  const total = this.CPTTotalPages;
-  const current = this.CPTCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1); // always show first page
-
-  if (left > 2) range.push('...');
-  for (let i = left; i <= right; i++) range.push(i);
-  if (right < total - 1) range.push('...');
-  if (total > 1) range.push(total); // always show last page
-
-  return range;
-}
-
-CPTSetPagedData() {
-  const startIndex = (this.CPTCurrentPage - 1) * this.CPTPageSize;
-  const endIndex = startIndex + this.CPTPageSize;
-  this.pagedCPT = this.CPTCode.slice(startIndex, endIndex);
-}
-
-CPTGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.CPTTotalPages) return;
-  this.CPTCurrentPage = page;
-  this.CPTSetPagedData();
-}
-
-CPTNextPage() {
-  if (this.CPTCurrentPage < this.CPTTotalPages) {
-    this.CPTCurrentPage++;
-    this.CPTSetPagedData();
-  }
-}
-
-CPTPrevPage() {
-  if (this.MyDentalCodeCurrentPage > 1) {
-    this.MyDentalCodeCurrentPage--;
-    this.CPTSetPagedData();
-  }
-}
+CPTPaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5
+};
+    async onCPTPageChanged(page: number) {
+    this.CPTPaginationInfo.Page = page;
+    await this.GetAllCPT();
+    }
 
 // API Call
 async GetAllCPT() {
-
-   await this.service.GetAllCPTCode(this.AllCPTCode, this.CPTStartCode, this.CPTEndCode, this.Description).then((response: any) => {
-      this.CPTCode = response.table1;
-      this.CPTTotalItems = this.CPTCode.length;      
-      this.CPTCurrentPage = 1;
-      this.CPTSetPagedData();
+   this.CPTTotalItems = 0;
+   await this.service.GetAllCPTCode(this.AllCPTCode, this.CPTStartCode, this.CPTEndCode, this.Description, this.CPTPaginationInfo.page, this.CPTPaginationInfo.RowsPerPage ).then((response: any) => {
+      this.CPTCode = response?.table1 || [];
+      this.CPTTotalItems = response?.table2[0]?.totalRecords || 0;      
       console.log(this.CPTCode, 'this.CPTCode');
-
     })
 }
 //#endregion
