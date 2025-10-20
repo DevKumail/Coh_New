@@ -1,19 +1,20 @@
-﻿using Dapper;
+﻿using AutoMapper;
+using Dapper;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Emgu.CV.Ocl;
+using HMIS.Application.DTOs.ChargeCaptureDTOs;
+using HMIS.Application.Implementations;
+using HMIS.Core.Entities;
+using HMIS.Infrastructure.Helpers;
 using HMIS.Infrastructure.ORM;
 using HMIS.Infrastructure.Repository;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
-using HMIS.Core.Entities;
 using Task = System.Threading.Tasks.Task;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using HMIS.Application.Implementations;
-using HMIS.Application.DTOs.ChargeCaptureDTOs;
-using HMIS.Infrastructure.Helpers;
-using Emgu.CV.Ocl;
-using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace HMIS.Application.ServiceLogics
 {
@@ -180,7 +181,7 @@ namespace HMIS.Application.ServiceLogics
             }
 
         }
-        public async Task<DataSet> CC_DentalCodeDB(int? AllDentalCode, string? DentalStartCode, string? DentalEndCode, string? DescriptionFilter)
+        public async Task<DataSet> CC_DentalCodeDB(int? AllDentalCode, string? DentalStartCode, string? DentalEndCode, string? DescriptionFilter, int? pageNumber, int? pageSize)
         {
             try
             {
@@ -195,6 +196,9 @@ namespace HMIS.Application.ServiceLogics
                     param.Add("@DentalStartCode", DentalStartCode);
                     param.Add("@EndCodeRange", DentalEndCode);
                     param.Add("@DescriptionFilter", DescriptionFilter);
+                    param.Add("@PageNumber", pageNumber);
+                    param.Add("@PageSize", pageSize);
+
 
                 }
 
@@ -246,7 +250,7 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<DataSet> CC_HCPCSCodeDB(int? AllHCPCSCode, string? HCPCStartCode, string? HCPCSEndCode, string? DescriptionFilter)
+        public async Task<DataSet> CC_HCPCSCodeDB(int? AllHCPCSCode, string? HCPCStartCode, string? HCPCSEndCode, string? DescriptionFilter, int? pageNumber, int? pageSize)
         {
             try
             {
@@ -261,6 +265,8 @@ namespace HMIS.Application.ServiceLogics
                     param.Add("@HCPCStartCode", HCPCStartCode);
                     param.Add("@EndCodeRange", HCPCSEndCode);
                     param.Add("@DescriptionFilter", DescriptionFilter);
+                    param.Add("@PageNumber", pageNumber);
+                    param.Add("@PageSize", pageSize);
 
                 }
 
@@ -279,7 +285,7 @@ namespace HMIS.Application.ServiceLogics
             }
         }
 
-        public async Task<DataSet> CC_UnclassifiedServiceDB(int? AllCode, string? UCStartCode, string? DescriptionFilter)
+        public async Task<DataSet> CC_UnclassifiedServiceDB(int? AllCode, string? UCStartCode, string? DescriptionFilter, int? pageNumber, int? pageSize)
         {
             try
             {
@@ -293,6 +299,8 @@ namespace HMIS.Application.ServiceLogics
                 {
                     param.Add("@UCStartCode", UCStartCode);
                     param.Add("@DescriptionFilter", DescriptionFilter);
+                    param.Add("@PageNumber", pageNumber);
+                    param.Add("@PageSize", pageSize);
 
                 }
 
@@ -311,7 +319,7 @@ namespace HMIS.Application.ServiceLogics
             }
         }
 
-        public async Task<DataSet> CC_ServiceItemsDB(int? AllCode, string? ServiceStartCode, string? DescriptionFilter)
+        public async Task<DataSet> CC_ServiceItemsDB(int? AllCode, string? ServiceStartCode, string? DescriptionFilter, int? pageNumber, int? pageSize)
         {
             try
             {
@@ -325,6 +333,9 @@ namespace HMIS.Application.ServiceLogics
                 {
                     param.Add("@ServiceStartCode", ServiceStartCode);
                     param.Add("@DescriptionFilter", DescriptionFilter);
+                    param.Add("@PageNumber", pageNumber);
+                    param.Add("@PageSize", pageSize);
+
 
                 }
 
