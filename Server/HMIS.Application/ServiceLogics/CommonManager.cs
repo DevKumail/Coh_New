@@ -129,22 +129,12 @@ namespace HMIS.Application.ServiceLogics
                 // Call stored procedure (returns Table1 + Table2)
                 DataSet ds = await DapperHelper.GetAppointmentDetails("GetAppointmentDetailByMRNo", param);
 
-                // Check if SP returned data
-                if (ds == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
-                    return new DataSet();
-
-                // ✅ Attach total count in ExtendedProperties
-                if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0)
+                if (ds.Tables[0].Rows.Count == 0)
                 {
-                    ds.Tables[0].ExtendedProperties["TotalRecords"] = Convert.ToInt32(ds.Tables[1].Rows[0]["TotalRecords"]);
-                }
-                else
-                {
-                    ds.Tables[0].ExtendedProperties["TotalRecords"] = 0;
+                    throw new Exception("No data found");
                 }
 
                 return ds;
-
             }
             catch (Exception ex)
             {
