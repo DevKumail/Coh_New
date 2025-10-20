@@ -58,17 +58,17 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<DataSet> CC_MyDiagnosisCodeDB(long ProviderId, long? GroupId, long? ICDVersionId)
+        public async Task<DataSet> CC_MyDiagnosisCodeDB(long ProviderId, long? GroupId, long? ICDVersionId, int? PageNumber, int? PageSize)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
 
                 param.Add("@ProviderId", ProviderId);
-
                 param.Add("@GroupId", GroupId);
-
                 param.Add("@ICDVersionId", ICDVersionId);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
 
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("BL_CC_MyDiagnosisCodeGet", param);
