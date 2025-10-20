@@ -268,7 +268,7 @@
 <div class="card p-3 mt-4 shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-striped table-sm text-center">
                 <thead>
                     <tr>
                         <th>{{ 'DATE' | translate }}</th>
@@ -286,27 +286,25 @@
                         <th>{{ 'ACTION' | translate }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="table-group-divider text-center align-middle">
                     <tr *ngFor="let vital of pagedvital; let i = index">
                         <td>{{ vital.entryDate | date: 'dd/MM/yyyy' }}</td>
                         <!-- <td>{{ vital.dailyStartTime }}</td> -->
                         <td>{{ vital.temperature || "N/A" }}</td>
-                        <td>{{ vital.heartRate || "N/A" }}</td>
+                        <td>{{ vital.pulseRate || "N/A" }}</td>
                         <td>{{ vital.respirationRate || "N/A" }}</td>
                         <td>
                             {{ vital.bpSystolic || "N/A" }}/{{
                                 vital.bpDiastolic || "N/A"
                             }}
                         </td>
-                        <td>{{ vital.spo2 || "N/A" }}</td>
+                        <td>{{ vital.spO2 || "N/A" }}</td>
                         <td>{{ vital.height || "N/A" }}</td>
                         <td>{{ vital.weight || "N/A" }}</td>
                         <td>
-                            <ng-icon
-                                name="tablerEdit"
-                                class="me-1"
-                                (click)="editVital(vital)"
-                            ></ng-icon>
+                            <button type="button" class="btn btn-outline-info p-0 px-1 py-1" (click)="editVital(vital)">
+                          <ng-icon name="tablerEdit"></ng-icon>
+                        </button>
                         </td>
                     </tr>
                 </tbody>

@@ -156,10 +156,18 @@
               <td>{{ record.endDate || 'N/A' | date : "dd/MM/yyyy"  }}</td>
               <td>
                 <button
+                  class="btn btn-outline-danger p-0 px-1 py-1 me-1"
+                  style="font-size: 0.75rem"
+                  (click)="onDelete(record?.id)"
+                  title="Delete"
+                  >
+                  <ng-icon name="tablerTrash"></ng-icon>
+                </button>
+                <button
                   class="btn btn-outline-info p-0 px-1 py-1 me-1"
                   style="font-size: 0.75rem"
                   (click)="onEdit(record)"
-                  title="Edit Appointment"
+                  title="Edit"
                   >
                   <ng-icon name="tablerEdit"></ng-icon>
                 </button>

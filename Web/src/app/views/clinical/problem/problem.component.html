@@ -272,6 +272,14 @@
                       <td>{{ record.startDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
                       <td>{{ record.endDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
                       <td class="text-center">
+                            <button
+                  class="btn btn-outline-danger p-0 px-1 py-1 me-1"
+                  style="font-size: 0.75rem"
+                  (click)="deleteproblem(record?.id)"
+                  title="Delete"
+                  >
+                  <ng-icon name="tablerTrash"></ng-icon>
+                </button>
                         <button type="button" class="btn btn-outline-info p-0 px-1 py-1" (click)="editproblem(record)">
                           <ng-icon name="tablerEdit"></ng-icon>
                         </button>

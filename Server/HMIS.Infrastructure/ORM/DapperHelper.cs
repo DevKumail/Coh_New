@@ -177,36 +177,74 @@ namespace HMIS.Infrastructure.ORM
         }
 
         
-        public static async Task<DataSet> GetAppointmentDetails(string spName, DynamicParameters parameters)
+        //public static async Task<DataSet> GetAppointmentDetails(string spName, DynamicParameters parameters)
+        //{
+        //    try
+        //    {
+        //        var connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
+
+
+
+        //        DbConnection cnn = new SqlConnection(connectionString);
+        //        cnn.Open();
+        //        var storedprocedure = spName;
+
+        //        //    param.Add("@userId", UserId);
+        //        var list = await cnn.ExecuteReaderAsync(storedprocedure, parameters, commandType: CommandType.StoredProcedure);
+
+
+
+        //        DataSet dataSet = new DataSet();
+
+        //        // Load data into the DataSet
+        //        dataSet.Load(list, LoadOption.OverwriteChanges, "Table");
+
+        //        return dataSet;
+        //        var dataset = ConvertDataReaderToDataSet(list);
+
+        //        return dataset;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var sb = new StringBuilder();
+        //        if (parameters != null)
+        //        {
+        //            foreach (var name in parameters.ParameterNames)
+        //            {
+        //                var pValue = parameters.Get<dynamic>(name);
+        //                sb.AppendFormat("{0}={1}\n", name, pValue.ToString());
+        //            }
+        //        }
+
+
+        //        //FILE BASED
+        //        //NLogHelper.WriteLog(new LogParameter() { Message = ex.Message, ActionDetails = $"GetDataSetBySP > spName = {spName} , params > {sb.ToString()}", ActionId = 1, ActionTime = DateTime.Now, FormName = "N/A", ModuleName = "DapperHelper.cs", UserName = "System", TablesReadOrModified = 0, UserLoginHistoryId = 17 }, (short)NLog.LogLevel.Info.Ordinal, "Exception from GetDataSetBySP");
+        //        return new DataSet();
+        //    }
+        //}
+
+
+
+        public static async Task<DataSet> GetAppointmentDetails(string SP, DynamicParameters parameters)
         {
             try
             {
                 var connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
+                DataSet dataset;
 
+                using (var connection = new SqlConnection(connectionString))
+                {
 
-
-                DbConnection cnn = new SqlConnection(connectionString);
-                cnn.Open();
-                var storedprocedure = spName;
-
-                //    param.Add("@userId", UserId);
-                var list = await cnn.ExecuteReaderAsync(storedprocedure, parameters, commandType: CommandType.StoredProcedure);
-
-
-
-                DataSet dataSet = new DataSet();
-
-                // Load data into the DataSet
-                dataSet.Load(list, LoadOption.OverwriteChanges, "Table");
-
-                return dataSet;
-                var dataset = ConvertDataReaderToDataSet(list);
+                    var list = await SqlMapper.ExecuteReaderAsync(connection, SP, parameters, commandType: CommandType.StoredProcedure);
+                    dataset = ConvertDataReaderToDataSet(list);
+                }
 
                 return dataset;
             }
             catch (Exception ex)
             {
                 var sb = new StringBuilder();
+
                 if (parameters != null)
                 {
                     foreach (var name in parameters.ParameterNames)
@@ -216,10 +254,11 @@ namespace HMIS.Infrastructure.ORM
                     }
                 }
 
-
                 //FILE BASED
-                //NLogHelper.WriteLog(new LogParameter() { Message = ex.Message, ActionDetails = $"GetDataSetBySP > spName = {spName} , params > {sb.ToString()}", ActionId = 1, ActionTime = DateTime.Now, FormName = "N/A", ModuleName = "DapperHelper.cs", UserName = "System", TablesReadOrModified = 0, UserLoginHistoryId = 17 }, (short)NLog.LogLevel.Info.Ordinal, "Exception from GetDataSetBySP");
+                //NLogHelper.WriteLog(new LogParameter() { Message = ex.Message, ActionDetails = $"GetDataSetBySPWithParams > sql = {SP} , params > {sb.ToString()}", ActionId = 1, ActionTime = DateTime.Now, FormName = "N/A", ModuleName = "DapperHelper.cs", UserName = "System", TablesReadOrModified = 0, UserLoginHistoryId = 17 }, (short)NLog.LogLevel.Info.Ordinal, "Exception from GetDataSetBySPWithParams");
+
                 return new DataSet();
+
             }
         }
 

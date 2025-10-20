@@ -68,6 +68,11 @@ export class ClinicalApiService {
             .post(`SummarySheet/VitalSignInsert`, object)
             .toPromise();
     }
+      VitalSignUpdate(object: any) {
+        return this.api
+            .put(`SummarySheet/VitalSignUpdate`, object)
+            .toPromise();
+    }
 
     SubmitPatientProblem(object: any) {
         debugger;

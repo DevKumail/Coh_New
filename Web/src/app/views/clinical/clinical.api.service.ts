@@ -173,8 +173,8 @@ export class ClinicalApiService {
 //   DeletePatientProblem(Id: number): Observable<any> {
 //   return this.api.delete(`PatientProblem/DeletePatientProblem/${Id}`);
 // }
-DeletePatientProblem(Id: number): Observable<any> {
-  return this.api.delete(`PatientProblem/DeletePatientProblem?Id=${Id}`);
+DeletePatientProblem(Id: number){
+  return this.api.delete(`PatientProblem/DeletePatientProblem?Id=${Id}`).toPromise();;
 }
 
 

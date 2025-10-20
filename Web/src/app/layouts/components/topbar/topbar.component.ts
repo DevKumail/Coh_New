@@ -115,13 +115,13 @@ export class TopbarComponent implements OnInit {
 
   handleSearchResults(results: any[]) {
     this.allPatients = results;
-    console.log('Patients received from modal:', results);
   }
 
   ngOnInit() {
     this.patientBannerService.patientData$.subscribe(data => {
       this.patientData = data;
     });
+    this.mrNo = this.patientData?.table2?.[0]?.mrNo;
   }
 
   mrNo: any;
@@ -133,15 +133,14 @@ export class TopbarComponent implements OnInit {
     } else {
       this.patientBannerService.setPatientData(null);
       this.patientBannerService.setVisitAppointments(null);
-      console.log("data becomes null")
     }
   }
 
-  onClearInput() {
-    this.mrNo = "";
-    this.showPatientBanner = false;
-    this.onSearchClick();
-  }
+  // onClearInput() {
+  //   this.mrNo = "";
+  //   this.showPatientBanner = false;
+  //   this.onSearchClick();
+  // }
 
   searchPatient(mrNo: string, context?: string) {
     if (context === 'patient-summary') {
@@ -157,6 +156,7 @@ export class TopbarComponent implements OnInit {
       next: (res: any) => {
         if (res?.table2?.length > 0) {
           this.patientBannerService.setPatientData(res);
+          console.log('topbar Patient Data:', res);
           this.showPatientBanner = true;
     this.demographicapi
         } else {
@@ -166,36 +166,32 @@ export class TopbarComponent implements OnInit {
         }
       },
       error: err => {
-        console.error('API Error:', err);
         this.patientBannerService.setPatientData(null);
       }
     });
   }
 
+  paginationInfo: any={
+    currentPage: 1,
+    pageSize: 10,
+  };
+
   async searchAppointment(mrNo: any){
     this.loader.show();
-      await this.demographicapi.GetAppointmentByMRNO(mrNo).subscribe((Response: any)=>{
-      console.log("Load Visit new work =>", Response);
-      if (Object.keys(Response).length > 0){
-        this.patientBannerService.setVisitAppointments(Response);
-        this.patientBannerService.setSelectedVisit(Response?.table[0]);
+    if(mrNo){
+      await this.demographicapi.GetAppointmentByMRNO(mrNo,this.paginationInfo.currentPage,this.paginationInfo.pageSize).subscribe((Response: any)=>{
+      console.log("topbar Load Visit =>", Response);
+      if (Response?.table1?.length > 0){
+        this.patientBannerService.setVisitAppointments(Response?.table1);
+        this.patientBannerService.setSelectedVisit(Response?.table1[0]);
         this.loader.hide();
       } else{
         this.patientBannerService.setVisitAppointments(null);
         this.patientBannerService.setSelectedVisit(null);
         this.loader.hide();
       }
-      // this.dropdownOptions =  Response.table.map((item: any) => {
-      // this.dateOfBirth =  Response.table[0].age.slice(0,8)
-      // const formattedDate = this.datePipe.transform(item.appDateTime, 'dd-MM-yyyy');
-      // const providerName = formattedDate + ' - ' + item.fullName ;
-      // return { label: providerName, value: item.appointmentId }
-      // });
-      // if (this.dropdownOptions.length > 0){
-      //   this.selectedAppointmentId = this.dropdownOptions[0].value;
-      //   this.AppointmentDetail();
-      // }
     })
+    }
   }
 
   // Layout helper: true when current document is RTL
