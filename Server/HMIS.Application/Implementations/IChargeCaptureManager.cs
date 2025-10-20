@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Sieve.Extensions.MethodInfoExtended;
 
 namespace HMIS.Application.Implementations
 {
@@ -17,11 +18,11 @@ namespace HMIS.Application.Implementations
         Task<DataSet> CC_DiagnosisCodeDB(int? ICDVersionId, string? DiagnosisStartCode, string? DiagnosisEndCode, string? DescriptionFilter, int? @PageNumber, int? PageSize);
         Task<DataSet> CC_CPTCodeDB(int? AllCPTCode, string? CPTStartCode, string? CPTEndCode, string? Description, int? pageNumber, int? pageSize);
         Task<DataSet> CC_MyDentalCodeDB(long ProviderId, long? GroupId, string? ProviderDescription, string? DentalCode, long? PayerId);
-        Task<DataSet> CC_DentalCodeDB(int? AllDentalCode, string? DentalStartCode, string? DentalEndCode, string? DescriptionFilter);
+        Task<DataSet> CC_DentalCodeDB(int? AllDentalCode, string? DentalStartCode, string? DentalEndCode, string? DescriptionFilter, int? pageNumber, int? pageSize);
         Task<DataSet> CC_MyHCPCSCodeDB(long ProviderId, long? GroupId, string? HCPCSCode, string? DescriptionFilter, long? PayerId);
-        Task<DataSet> CC_HCPCSCodeDB(int? AllHCPCSCode, string? HCPCStartCode, string? HCPCSEndCode, string? DescriptionFilter);
-        Task<DataSet> CC_UnclassifiedServiceDB(int? AllCode, string? UCStartCode, string? DescriptionFilter);
-        Task<DataSet> CC_ServiceItemsDB(int? AllCode, string? ServiceStartCode, string? DescriptionFilter);
+        Task<DataSet> CC_HCPCSCodeDB(int? AllHCPCSCode, string? HCPCStartCode, string? HCPCSEndCode, string? DescriptionFilter, int? pageNumber, int? pageSize);
+        Task<DataSet> CC_UnclassifiedServiceDB(int? AllCode, string? UCStartCode, string? DescriptionFilter, int? pageNumber, int? pageSize);
+        Task<DataSet> CC_ServiceItemsDB(int? AllCode, string? ServiceStartCode, string? DescriptionFilter, int? pageNumber, int? pageSize);
         Task<bool> InsertMyDiagnosisCodeGridDB(List<BLSuperBillDiagnosis> bl);
         Task<bool> InsertAllGridDB(List<BLSuperBillProcedure> sb);
         Task<DataSet> CC_GridDataDB(long VisitAccountNo);
