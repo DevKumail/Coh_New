@@ -221,7 +221,7 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<DataSet> FilterPrescriptions(string keyword)
+        public async Task<DataSet> FilterPrescriptions(string? keyword, int? PageNumber, int? PageSize)
         {
             try
             {
@@ -232,6 +232,8 @@ namespace HMIS.Application.ServiceLogics
                     keyword = null;
                 }
                 parameter.Add("@keyword", keyword);
+                parameter.Add("@PageNumber", PageNumber);
+                parameter.Add("@PageSize", PageSize);
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("SearchPrescriptionsByParams", parameter);
                 if (ds.Tables[0].Rows.Count == 0)

@@ -101,7 +101,7 @@ export class TemporaryDemographicsComponent implements OnInit {
 
     this.FillCache();
 
-   debugger
+    
         // Prefer Router navigation state; fallback to window.history.state for refresh/reuse
         const nav = this.router.getCurrentNavigation();
         const navState: any = nav?.extras?.state ?? (window.history && (window.history.state as any)) ?? {};
@@ -141,24 +141,24 @@ export class TemporaryDemographicsComponent implements OnInit {
   initializeForm() {
     this.temporaryForm = this.fb.group({
       tempId: [{ value: '', disabled: true }],
-      personTitleId: [null],
+      personTitleId: ['', Validators.required],
       personFirstName: ['', Validators.required],
       personMiddleName: [''],
       personLastName: ['', Validators.required],
       personSex: [null, Validators.required],
       patientBirthDate: [null, Validators.required],
       personAge: [''],
-      personHomePhone1: [''],
+      personHomePhone1: ['', Validators.required],
       personWorkPhone1: [''],
-      streetNumber: [''],
+      streetNumber: ['', Validators.required],
       dwellingNumber: [''],
-      personZipCode: [''],
-      selectedCountry: [null],
-      selectedState: [null],
-      selectedCity: [null],
-      nationality: [null],
+      personZipCode: ['', Validators.required],
+      selectedCountry: ['', Validators.required],
+      selectedState: ['', Validators.required],
+      selectedCity: ['', Validators.required],
+      nationality: ['', Validators.required],
       personCellPhone: ['', Validators.required],
-      personEmail: [''],
+      personEmail: ['', [Validators.required]], //, Validators.email
       nokFirstName: [''],
       nokMiddleName: [''],
       nokLastName: [''],

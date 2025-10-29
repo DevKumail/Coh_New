@@ -126,6 +126,57 @@
 
 </ng-template>
 
+
+ 
+
+<!-- Single Event Details Modal -->
+<ng-template #eventDetailsModal let-modal>
+  <div class="appt-modal">
+    <div class="modal-header">
+      <h4 class="modal-title">Appointment Details</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <div class="details-grid">
+        <div *ngIf="selectedEvent?.appId">
+          <strong>Appointment Id:</strong>
+          <span class="ms-1">{{ selectedEvent?.appId }}</span>
+        </div>
+        <div *ngIf="selectedEvent?.mrno">
+          <strong>MRNo:</strong>
+          <span class="ms-1">{{ selectedEvent?.mrno }}</span>
+        </div>
+        <div>
+          <strong>Provider:</strong>
+          <span class="ms-1">{{ selectedEvent?.provider || 'N/A' }}</span>
+        </div>
+        <div>
+          <strong>Patient:</strong>
+          <span class="ms-1">{{ selectedEvent?.fullName || 'N/A' }}</span>
+        </div>
+        <div>
+          <strong>Date/Time:</strong>
+          <span class="ms-1">{{ selectedEvent?.date | date: 'medium' }}</span>
+        </div>
+        <div>
+          <strong>Purpose:</strong>
+          <span class="ms-1">{{ selectedEvent?.purposeOfVisit || 'N/A' }}</span>
+        </div>
+        <div>
+          <strong>Type:</strong>
+          <span class="ms-1 appt-badge">{{ selectedEvent?.title || 'N/A' }}</span>
+        </div>
+        <div>
+          <strong>Status:</strong>
+          <span class="ms-1 appt-badge">{{ selectedEvent?.PatientStatus || 'N/A' }} | {{selectedEvent?.visitStatusName}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
+    </div>
+  </div>
+</ng-template>
 <ng-template #appointmentModal let-modal>
   <div class="modal-header">
     <h4 class="modal-title">Appointment Action</h4>

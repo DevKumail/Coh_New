@@ -152,62 +152,69 @@ bpSystolic = 0;
 
 
 onSubmit() {
-      this.isSubmitting = true;
+  this.isSubmitting = true;
+
+  if (this.vitalSignsForm.invalid) {
+    this.vitalSignsForm.markAllAsTouched();
+    this.focusFirstInvalidControl();
+    this.isSubmitting = false;
+    return;
+  }
+
+  const payload: vitalsingsDto = {
+    ID: this.Id || 0,
+    MRNo: this.SearchPatientData?.table2?.[0]?.mrNo || '',
+    EntryDate: this.vitalSignsForm?.value?.entryDate,
+    UpdateDate: new Date(),
+    UpdateBy: 'admin',
+    BPSystolic: this.vitalSignsForm?.value?.bpSystolic,
+    BPDiastolic: this.vitalSignsForm?.value?.bpDiastolic,
+    BPArm: this.vitalSignsForm?.value.bpArm === 'right' ? 1 : 0,
+    PulseRate: this.vitalSignsForm?.value.heartRate,
+    HeartRate: this.vitalSignsForm?.value.heartRate,
+    RespirationRate: this.vitalSignsForm?.value.respirationRate,
+    Temperature: this.vitalSignsForm?.value.temperature,
+    Weight: this.vitalSignsForm?.value.weight,
+    Height: this.vitalSignsForm?.value.height,
+    BMI: this.vitalSignsForm?.value.bmi,
+    SPO2: this.vitalSignsForm?.value.spo2,
+    Glucose: this.vitalSignsForm?.value.glucose,
+    Comment: this.vitalSignsForm?.value.comment,
+  };
 
 
-      if (this.vitalSignsForm.invalid) {
-        this.vitalSignsForm.markAllAsTouched();
-        this.focusFirstInvalidControl();
-        this.isSubmitting = false;
-        return;
-      }
+  // ✅ Corrected: properly set API call
+  let apiCall: Promise<any>;
+  if (this.Id && this.Id !== 0) {
+    apiCall = this.ClinicalApiService.VitalSignUpdate(payload);
+  } else {
+    apiCall = this.ClinicalApiService.VitalSignInsert(payload);
+  }
 
-      const payload: vitalsingsDto = {
-        MRNo: this.SearchPatientData.table2[0].mrNo || '',
-        EntryDate: this.vitalSignsForm?.value?.entryDate,
-        UpdateDate: new Date(),
-        UpdateBy: 'admin',
-        BPSystolic: this.vitalSignsForm?.value?.bpSystolic,
-        BPDiastolic: this.vitalSignsForm?.value?.bpDiastolic,
-        BPArm: this.vitalSignsForm.value.bpArm === 'right' ? 1 : 0,
-        PulseRate: this.vitalSignsForm.value.heartRate,
-        HeartRate: this.vitalSignsForm.value.heartRate,
-        RespirationRate: this.vitalSignsForm.value.respirationRate,
-        Temperature: this.vitalSignsForm.value.temperature,
-        Weight: this.vitalSignsForm.value.weight,
-        Height: this.vitalSignsForm.value.height,
-        BMI: this.vitalSignsForm.value.bmi,
-        SPO2: this.vitalSignsForm.value.spo2,
-        Glucose: this.vitalSignsForm.value.glucose,
-        Comment: this.vitalSignsForm.value.comment,
-      };
+  apiCall.then(() => {
+      this.isSubmitting = false;
+      Swal.fire({
+        icon: 'success',
+        title: 'Saved',
+        text: 'Vital signs saved successfully!',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        this.clearForm();
+        this.vitalSign(this.SearchPatientData?.table2?.[0]?.mrNo || '');
+      });
+    })
+    .catch((err: any) => {
+      this.isSubmitting = false;
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err?.message || 'Failed to save vital signs.',
+      });
+    });
+}
 
-      console.log('🚀 Submitting payload:', payload);
-
-      this.ClinicalApiService.VitalSignInsert(payload)
-        .then(() => {
-          this.isSubmitting = false; // stop spinner on success
-          Swal.fire({
-            icon: 'success',
-            title: 'Saved',
-            text: 'Vital signs saved successfully!',
-            confirmButtonText: 'OK'
-          }).then(() => {
-            this.clearForm();
-            this.vitalSign(this.SearchPatientData?.table2[0]?.mrNo || '' );
-          });
-        })
-        .catch((err: any) => {
-          this.isSubmitting = false; // stop spinner on error
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: err?.message || 'Failed to save vital signs.',
-          });
-        });
-    }
   vitalSign(mrNo:string){
-    debugger
+     
     this.vitalSignsPagedData = [];
     this.vitalTotalItems = this.vitalSignsPagedData.length;
     this.onvitalPageChanged(1);
@@ -255,9 +262,11 @@ onSubmit() {
       this.patientDataSubscription.unsubscribe();
     }
   }
+  Id: any;
 
   editVital(vital: any) {
-debugger
+ 
+    this.Id = vital?.id;
     this.vitalSignsForm.patchValue({
         entryDate: vital?.entryDate?.split('T')[0],
         dailyStartTime: vital?.dailyStartTime,

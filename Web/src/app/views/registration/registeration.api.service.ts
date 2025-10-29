@@ -30,14 +30,14 @@
 //         return this.api.delete(`/api/patients/${id}`);
 //     }
 //     SubmitAlertType(data: any): Observable<any> {
-//         // debugger
-//          // debugger
+//         //  
+//          //  
 //         return this.api.post(`Alert/SubmitAlertType`, data);
 //     }
 
 
 //    getAlertType(): Promise<{ result: AlertType[] } | undefined> {
-//     debugger
+//      
 //   return this.api.get<{ result: AlertType[] }>(`AllDropdowns/GetAlertType`).toPromise();
 // }
 

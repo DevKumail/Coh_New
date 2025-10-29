@@ -20,6 +20,7 @@ import { Subscription } from 'rxjs';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { S } from 'node_modules/@angular/cdk/scrolling-module.d-ud2XrbF8';
 
 
 @Component({
@@ -171,7 +172,7 @@ appId:any;
   ) { }
 
   async ngOnInit() {
-    debugger
+     
     // Wait for patient banner to provide MRNO before loading data
      this.patientDataSubscription = this.PatientData.patientData$
       .pipe(
@@ -344,7 +345,7 @@ minDateValidator(otherControlName: string) {
   }
 
   this.loader.show();
-  debugger;
+   ;
   console.log('mrNo =>', mrNo);
 
   await this.clinicalApiService.GetPatientProblemData(
@@ -422,7 +423,7 @@ onSubmit() {
     });
     return;
   }
-  debugger
+   
 
   const formData = this.medicalForm.value;
   console.log('medicalForm =>',this.medicalForm.value);
@@ -522,7 +523,7 @@ onSubmit() {
   ];
 
   onRowSelect(diagnosis: any, modal: any) {
-    debugger
+     
     this.medicalForm.patchValue({ problem: diagnosis?.descriptionFull });
     this.selectedDiagnosis = diagnosis;
     modal.close(diagnosis); 
@@ -546,7 +547,7 @@ onSubmit() {
       })
   }
   FillDropDown(response: any) {
-    debugger
+     
     let jParse = JSON.parse(JSON.stringify(response)).cache;
     let provider = JSON.parse(jParse).Provider;
     let iCDVersion = JSON.parse(jParse).BLICDVersion;
@@ -566,7 +567,7 @@ onSubmit() {
 
     }
     if (universaltoothcode) {
-      debugger;
+       ;
       universaltoothcode = universaltoothcode.map(
         (item: { ToothCode: any; Tooth: any }) => {
           return {
@@ -579,7 +580,7 @@ onSubmit() {
       console.log(this.universaltoothcodearray, 'universal tooth code');
     }
     if (iCDVersion) {
-      debugger;
+       ;
       iCDVersion = iCDVersion.map(
         (item: { ICDVersionId: any; ICDVersion: any }) => {
           return {
@@ -587,7 +588,7 @@ onSubmit() {
             code: item.ICDVersionId,
           };
         });
-      debugger
+       
       const item = {
         name: 'ALL',
         code: 0,
@@ -600,7 +601,7 @@ onSubmit() {
     }
   }
   SearchDiagnosis() {
-    debugger
+     
     this.DiagnosisCode = [];
     this.totalrecord = 0;
     this.loader.show();
@@ -659,7 +660,7 @@ onSubmit() {
 
 
       onEdit(record: any) {
-        debugger
+         
       this.id = record?.id,
       this.selectedDiagnosis = {
         icD9Code :  record?.icD9,
@@ -684,5 +685,39 @@ onSubmit() {
           this.medicalForm.get('status')?.setValue('Inactive');
         }
       }
+
+    onDelete(id: any){
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover this record!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loader.show();
+      this.clinicalApiService.DeletePatientProblem(id).then((response: any) => {
+        this.GetPatientProblemData();
+    Swal.fire({
+      icon: 'success',
+      title: 'Deleted Successfully',
+    })  
+    this.loader.hide();
+      console.log(this.DiagnosisCode, 'this.DiagnosisCode');
+
+    })      
+  } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire(
+          'Cancelled',
+          'Your record is safe :)',
+          'error'
+        );
+      }
+    })
+
+    this.loader.hide();
+    }
 
 }

@@ -593,7 +593,7 @@ namespace HMIS.Application.ServiceLogics
 
 
 
-        public async Task<DataSet> SearchAppointmentHistoryDB(string MRNo, int? ProviderId, int? PatientStatusId, int? AppStatusId, int? Page, int? Size, string? SortColumn, string? SortOrder)
+        public async Task<DataSet> SearchAppointmentHistoryDB(string MRNo, int? ProviderId, int? PatientStatusId, int? AppStatusId, int? Page, int? Size)
         {
             try
             {
@@ -604,14 +604,12 @@ namespace HMIS.Application.ServiceLogics
                 param.Add("@AppStatusId", AppStatusId, DbType.Int64);
                 param.Add("@Page", Page, DbType.Int64);
                 param.Add("@Size", Size, DbType.Int64);
-                param.Add("@SortColumn", SortColumn, DbType.String);
-                param.Add("@SortOrder", SortOrder, DbType.String);
 
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("[SchAppointmentHistoryMain]", param);
-                if (ds.Tables[0].Rows.Count == 0)
+                if (ds == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
                 {
-                    throw new Exception("No data found");
+                    return null;
                 }
 
                 return ds;

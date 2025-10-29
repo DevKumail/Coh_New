@@ -12,6 +12,9 @@ export const modulePermissionGuard: CanActivateFn = (
   const module = route.data['module'];
   const component = route.data['component'];
 
+   
+  console.log( 'permissionService' ,module, component);
+
   if (!module || !permissionService.hasModuleAccess(module)) {
     router.navigate(['/unauthorized']);
     return false;

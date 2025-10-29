@@ -1,9 +1,10 @@
 ﻿using Dapper;
-using HMIS.Infrastructure.ORM;
-using HMIS.Core.Entities;
+using DocumentFormat.OpenXml.Wordprocessing;
 using HMIS.Application.DTOs;
 using HMIS.Application.DTOs.Clinical;
 using HMIS.Application.Implementations;
+using HMIS.Core.Entities;
+using HMIS.Infrastructure.ORM;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -257,13 +258,16 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<DataSet> SS_GetMedicalHistory(long MRNo)
+        public async Task<DataSet> SS_GetMedicalHistory(long MRNo, int? PageNumber, int? PageSize)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
 
                 param.Add("@MRNo", MRNo);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
+
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("SS_GetMedicalHistory", param);
                 if (ds.Tables[0].Rows.Count == 0)
                 {
@@ -277,13 +281,16 @@ namespace HMIS.Application.ServiceLogics
             }
 
         }
-        public async Task<DataSet> SS_GetPatientProblem(long MRNo)
+        public async Task<DataSet> SS_GetPatientProblem(long MRNo, int? PageNumber, int? PageSize)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
 
                 param.Add("@MRNo", MRNo);
+                param.Add("@PageNumber", MRNo);
+                param.Add("@PageSize", MRNo);
+
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("SS_GetPatientProblems", param);
                 if (ds.Tables[0].Rows.Count == 0)
                 {
