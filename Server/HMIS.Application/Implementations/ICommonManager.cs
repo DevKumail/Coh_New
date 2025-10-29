@@ -16,6 +16,6 @@ namespace HMIS.Application.Implementations
         Task<DataSet> GetRegPatientDB();
         Task<DataSet> GetInsurrancePayerInfo(long MRNo);
         Task<DataSet> GetDemographicDB(string VisitAccountDisplay);
-        Task<DataSet> GetAppointmentDetailsByMRNo(string MRNo);
+        Task<DataSet> GetAppointmentDetailsByMRNo(int? PageNumber, int? PageSize, string MRNo);
     }
 }

@@ -20,6 +20,7 @@ import { Subscription } from 'rxjs';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { S } from 'node_modules/@angular/cdk/scrolling-module.d-ud2XrbF8';
 
 
 @Component({
@@ -684,5 +685,39 @@ onSubmit() {
           this.medicalForm.get('status')?.setValue('Inactive');
         }
       }
+
+    onDelete(id: any){
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover this record!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loader.show();
+      this.clinicalApiService.DeletePatientProblem(id).then((response: any) => {
+        this.GetPatientProblemData();
+    Swal.fire({
+      icon: 'success',
+      title: 'Deleted Successfully',
+    })  
+    this.loader.hide();
+      console.log(this.DiagnosisCode, 'this.DiagnosisCode');
+
+    })      
+  } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire(
+          'Cancelled',
+          'Your record is safe :)',
+          'error'
+        );
+      }
+    })
+
+    this.loader.hide();
+    }
 
 }

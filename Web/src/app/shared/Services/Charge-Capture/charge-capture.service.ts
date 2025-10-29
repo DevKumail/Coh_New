@@ -37,9 +37,9 @@ export class ChargeCaptureService {
       
       return this.api.get(`ChargeCapture/DiagnosisCode?ICDVersionId=${ICDVersionId}&DiagnosisStartCode=${DiagnosisStartCode}&DiagnosisEndCode=${DiagnosisEndCode}&DescriptionFilter=${DescriptionFilter}&PageNumber=${PageNumber}&PageSize=${PageSize}`).toPromise();
   }
-  MyCptCodebyProvider(ProviderId:number ,GroupId:number ) {
+  MyCptCodebyProvider(ProviderId:number ,GroupId:number, pageNumber:any, pageSize:any) {
       //debugger
-      return this.api.get(`ChargeCapture/MyCptCode?ProviderId=${ProviderId}&GroupId=${GroupId}`).toPromise();
+      return this.api.get(`ChargeCapture/MyCptCode?ProviderId=${ProviderId}&GroupId=${GroupId}&PageNumber=${pageNumber}&PageSize=${pageSize}`).toPromise();
   }
 
 

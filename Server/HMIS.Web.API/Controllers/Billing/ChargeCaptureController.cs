@@ -35,7 +35,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_UserCPT_Code
         [HttpGet("MyCptCode")]
-        public async Task<IActionResult> CC_MyCptCodeGet(long ProviderId, long? GroupId, long? PayerId)
+        public async Task<IActionResult> CC_MyCptCodeGetDB(long ProviderId, long? GroupId, long? PayerId, int? PageNumber, int? PageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -55,7 +55,7 @@ namespace HMIS.Web.Controllers.Billing
                 {
                     PayerId = 0;
                 }
-                DataSet result = await _chargeCaptureManager.CC_MyCptCodeGetDB(ProviderId, GroupId, PayerId);
+                DataSet result = await _chargeCaptureManager.CC_MyCptCodeGetDB(ProviderId, GroupId, PayerId, PageNumber,PageSize);
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)
                 {

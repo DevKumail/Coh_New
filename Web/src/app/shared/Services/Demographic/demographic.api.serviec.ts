@@ -107,8 +107,8 @@ export class DemographicApiServices {
     return this.api.get(`Common/GetCoverageAndRegPatientDBByMrNo?MRNo=${mrNo}`);
   }
 
-    GetAppointmentByMRNO(MRNo:any) {
-	return this.api.get(`Common/GetAppointmentInfoByMRNo?MRNo=${MRNo}`);
+    GetAppointmentByMRNO(MRNo:any,currentPage:any,pageSize:any) {
+	return this.api.get(`Common/GetAppointmentInfoByMRNo?PageNumber=${currentPage}&PageSize=${pageSize}&MRNo=${MRNo}`);
 
   }
 

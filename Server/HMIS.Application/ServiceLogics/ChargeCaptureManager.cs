@@ -30,7 +30,7 @@ namespace HMIS.Application.ServiceLogics
 
 
 
-        public async Task<DataSet> CC_MyCptCodeGetDB(long ProviderId, long? GroupId, long? PayerId)
+        public async Task<DataSet> CC_MyCptCodeGetDB(long ProviderId, long? GroupId, long? PayerId, int?PageNumber, int? PageSize)
         {
             try
             {
@@ -41,6 +41,10 @@ namespace HMIS.Application.ServiceLogics
                 param.Add("@GroupId", GroupId);
 
                 param.Add("@PayerId", PayerId);
+
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
+
 
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("BL_CC_MyCPTCodeGet", param);

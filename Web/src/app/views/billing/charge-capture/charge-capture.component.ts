@@ -391,8 +391,6 @@ AllMyCPTCode: any [] = [];
   if (!input) {
         this.MyCPTCode = [...this.AllMyCPTCode];
         this.MyCptCodeTotalItems = this.MyCPTCode.length;
-        this.MyCptCodeCurrentPage = 1;
-        this.MyCptCodeSetPagedData();
         return;
       }
 
@@ -405,12 +403,10 @@ AllMyCPTCode: any [] = [];
 
   this.MyCPTCode = [...data];
   this.MyCptCodeTotalItems = this.MyCPTCode.length;
-  this.MyCptCodeCurrentPage = 1;
-  this.MyCptCodeSetPagedData();
 }
 
   filteCPTGroup(e: any) {
-    this.service.MyCptCodebyProvider(this.ProviderId, this.CPTGroupId).then((response: any) => {
+    this.service.MyCptCodebyProvider(this.ProviderId, this.CPTGroupId,this.MyCptCodePaginationInfo.Page,this.MyCptCodePaginationInfo.RowsPerPage).then((response: any) => {
       this.MyCPTCode = response.table1 || [];
 
        this.MyCPTCode.map((e: any) => {
@@ -568,15 +564,13 @@ async filterMyDental(e: any){
     this.loader.hide();
   }
   async MyCptCodebyProvider(){
-      await this.service.MyCptCodebyProvider(this.ProviderId, this.CPTGroupId).then((response: any) => {
+    this.MyCptCodeTotalItems = 0
+      await this.service.MyCptCodebyProvider(this.ProviderId, this.CPTGroupId, this.MyCptCodePaginationInfo.Page,this.MyCptCodePaginationInfo.RowsPerPage ).then((response: any) => {
       console.log('response =>',response);
       if(response){
         this.MyCPTCode = response?.table1 || [];
-        this.AllMyCPTCode = response?.table1 || [];
+        this.MyCptCodeTotalItems = response?.table2[0]?.totalRecords || 0;
         console.log(this.MyCPTCode, 'this.MyCPTCode');
-        this.MyCptCodeTotalItems = this.MyCPTCode.length;
-        this.MyCptCodeCurrentPage = 1;
-        this.MyCptCodeSetPagedData();
       }
     })
   }
@@ -1285,67 +1279,17 @@ async AllDignosisApis() {
 
 //#region MyCPTCode Pagination Start
 // MyCPTCode Pagination Start
-pagedMyCptCode: any[] = [];
-MyCptCodeCurrentPage = 1;
-MyCptCodePageSize = 5;
+MyCptCodePaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5
+};
 MyCptCodeTotalItems = 0;
 
-get MyCptCodeTotalPages(): number {
-  return Math.ceil(this.MyCptCodeTotalItems / this.MyCptCodePageSize);
-}
+    async onMyCptCodePageChanged(page: number) {
+    this.CPTPaginationInfo.Page = page;
+    await this.GetAllCPT();
+    }
 
-get MyCptCodeStart(): number {
-  return (this.MyCptCodeCurrentPage - 1) * this.MyCptCodePageSize;
-}
-
-get MyCptCodeEnd(): number {
-  return Math.min(this.MyCptCodeStart + this.MyCptCodePageSize, this.MyCptCodeTotalItems);
-}
-
-get MyCptCodePageNumbers(): (number | string)[] {
-  const total = this.MyCptCodeTotalPages;
-  const current = this.MyCptCodeCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1); // always show first page
-
-  if (left > 2) range.push('...');
-  for (let i = left; i <= right; i++) range.push(i);
-  if (right < total - 1) range.push('...');
-  if (total > 1) range.push(total); // always show last page
-
-  return range;
-}
-
-MyCptCodeSetPagedData() {
-  const startIndex = (this.MyCptCodeCurrentPage - 1) * this.MyCptCodePageSize;
-  const endIndex = startIndex + this.MyCptCodePageSize;
-  this.pagedMyCptCode = this.MyCPTCode.slice(startIndex, endIndex);
-}
-
-MyCptCodeGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.MyCptCodeTotalPages) return;
-  this.MyCptCodeCurrentPage = page;
-  this.MyCptCodeSetPagedData();
-}
-
-MyCptCodeNextPage() {
-  if (this.MyCptCodeCurrentPage < this.MyCptCodeTotalPages) {
-    this.MyCptCodeCurrentPage++;
-    this.MyCptCodeSetPagedData();
-  }
-}
-
-MyCptCodePrevPage() {
-  if (this.MyCptCodeCurrentPage > 1) {
-    this.MyCptCodeCurrentPage--;
-    this.MyCptCodeSetPagedData();
-  }
-}
 // MyCPTCode Pagination End
 //#endregion
 
@@ -1519,9 +1463,7 @@ CPTPaginationInfo: any = {
 // API Call
 async GetAllCPT() {
    this.CPTTotalItems = 0;
-   const data = { AllCPTCode: this.AllCPTCode, CPTStartCode: this.CPTStartCode, CPTEndCode: this.CPTEndCode, DescriptionFilter: this.DescriptionFilter, page: this.CPTPaginationInfo.Page, rowsPerPage: this.CPTPaginationInfo.RowsPerPage };
-
-   await this.service.GetAllCPTCode(data).then((response: any) => {
+   await this.service.GetAllCPTCode(this.AllCPTCode, this.CPTStartCode, this.CPTEndCode, this.Description, this.CPTPaginationInfo.Page, this.CPTPaginationInfo.RowsPerPage ).then((response: any) => {
       this.CPTCode = response?.table1 || [];
       this.CPTTotalItems = response?.table2[0]?.totalRecords || 0;      
       console.log(this.CPTCode, 'this.CPTCode');
