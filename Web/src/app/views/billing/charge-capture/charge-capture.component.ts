@@ -64,7 +64,7 @@ export class ChargeCaptureComponent {
   comment: any;
   ICT9Group:any[]=[];
   ICT9GroupId:number=0;
-  DescriptionFilter: any = '';
+  DescriptionFilter: any ;
   DiagnosisEndCode: any = '';
   DiagnosisStartCode: any = '';
   ICDVersionId: number=0;
@@ -88,19 +88,19 @@ export class ChargeCaptureComponent {
 
   //DentalCode parameter
   AllDentalCode: any = 0;
-  DentalStartCode: any = '1';
-  DentalEndCode: any = '0';
+  DentalStartCode: any ;
+  DentalEndCode: any ;
 
   //HCPCSCode parameter
   HCPCSCode: any  = '';
   AllHCPCSCode: any = 0;
-  HCPCStartCode: any = '1';
-  HCPCSEndCode: any = '0';
+  HCPCStartCode: any ;
+  HCPCSEndCode: any ;
 
   //UnclassifiedService parameter
   AllCode: any = 0;
-  UCStartCode: any = '1';
-  ServiceStartCode: any = '1';
+  UCStartCode: any ;
+  ServiceStartCode: any ;
 
 
   //All Grid Fill by this array
@@ -1471,304 +1471,102 @@ async GetAllCPT() {
 }
 //#endregion
 
-//#region HCPCSCode Pagination start
-pagedHCPCS: any[] = [];
-HCPCSCurrentPage = 1;
-HCPCSPageSize = 5;
-HCPCSTotalItems = 0;
-
-get HCPCSTotalPages(): number {
-  return Math.ceil(this.HCPCSTotalItems / this.HCPCSPageSize);
-}
-
-get HCPCSStart(): number {
-  return (this.HCPCSCurrentPage - 1) * this.HCPCSPageSize;
-}
-
-get HCPCSEnd(): number {
-  return Math.min(this.HCPCSStart + this.HCPCSPageSize, this.HCPCSTotalItems);
-}
-
-get HCPCSPageNumbers(): (number | string)[] {
-  const total = this.HCPCSTotalPages;
-  const current = this.HCPCSCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1); // always show first page
-
-  if (left > 2) range.push('...');
-  for (let i = left; i <= right; i++) range.push(i);
-  if (right < total - 1) range.push('...');
-  if (total > 1) range.push(total); // always show last page
-
-  return range;
-}
-
-HCPCSSetPagedData() {
-  const startIndex = (this.HCPCSCurrentPage - 1) * this.HCPCSPageSize;
-  const endIndex = startIndex + this.HCPCSPageSize;
-  this.pagedHCPCS = this.HCPCSCodeGrid.slice(startIndex, endIndex);
-}
-
-HCPCSGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.HCPCSTotalPages) return;
-  this.HCPCSCurrentPage = page;
-  this.HCPCSSetPagedData();
-}
-
-HCPCSNextPage() {
-  if (this.HCPCSCurrentPage < this.HCPCSTotalPages) {
-    this.HCPCSCurrentPage++;
-    this.HCPCSSetPagedData();
-  }
-}
-
-HCPCSPrevPage() {
-  if (this.HCPCSCurrentPage > 1) {
-    this.HCPCSCurrentPage--;
-    this.HCPCSSetPagedData();
-  }
-}
+//#region HCPCSCode Pagination Start
+HCPCSCodeTotalItems = 0;
+HCPCSCodePaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5
+};
+    async onHCPCSCodePageChanged(page: number) {
+    this.HCPCSCodePaginationInfo.Page = page;
+    await this.GetAllHCPCS();
+    }
 
 // API Call
 async GetAllHCPCS() {
-   await this.service.GetAllHCPCSCode(this.AllCPTCode, this.CPTStartCode, this.CPTEndCode, this.Description).then((response: any) => {
-      this.HCPCSCodeGrid = response?.table1 || [];
-      this.HCPCSTotalItems = this.HCPCSCodeGrid?.length;      
-      this.HCPCSCurrentPage = 1;
-      this.HCPCSSetPagedData();
-      console.log(this.HCPCSCodeGrid, 'this.HCPCSCode');
+   this.HCPCSCodeTotalItems = 0;
 
-    })
+   const data = { AllHCPCSCode: this.AllHCPCSCode, HCPCStartCode: this.HCPCStartCode, HCPCSEndCode: this.HCPCSEndCode, DescriptionFilter: this.DescriptionFilter, page: this.HCPCSCodePaginationInfo.Page, rowsPerPage: this.HCPCSCodePaginationInfo.RowsPerPage };
+
+    await this.service.GetAllHCPCSCode(data).then((response: any) => {
+    this.HCPCSCodeGrid = response?.table1 || [];
+    this.HCPCSCodeTotalItems = response?.table2?.[0]?.totalRecords || 0;
+    console.log(this.HCPCSCodeGrid, 'this.HCPCSCodeGrid');
+    });
 }
 //#endregion
 
-//#region DentalCode Pagination start
-pagedDental: any[] = [];
-DentalCurrentPage = 1;
-DentalPageSize = 5;
-DentalTotalItems = 0;
+//#region DentalCode Pagination Start
+DentalCodeTotalItems = 0;
+DentalCodePaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5
+};
+    async onDentalCodePageChanged(page: number) {
+    this.DentalCodePaginationInfo.Page = page;
+    await this.GetAllDental();
+    }
 
-get DentalTotalPages(): number {
-  return Math.ceil(this.DentalTotalItems / this.DentalPageSize);
-}
-
-get DentalStart(): number {
-  return (this.DentalCurrentPage - 1) * this.DentalPageSize;
-}
-
-get DentalEnd(): number {
-  return Math.min(this.DentalStart + this.DentalPageSize, this.DentalTotalItems);
-}
-
-get DentalPageNumbers(): (number | string)[] {
-  const total = this.DentalTotalPages;
-  const current = this.DentalCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1); // always show first page
-
-  if (left > 2) range.push('...');
-  for (let i = left; i <= right; i++) range.push(i);
-  if (right < total - 1) range.push('...');
-  if (total > 1) range.push(total); // always show last page
-
-  return range;
-}
-
-DentalSetPagedData() {
-  const startIndex = (this.DentalCurrentPage - 1) * this.DentalPageSize;
-  const endIndex = startIndex + this.DentalPageSize;
-  this.pagedDental = this.DentalCodeGridData.slice(startIndex, endIndex);
-}
-
-DentalGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.DentalTotalPages) return;
-  this.DentalCurrentPage = page;
-  this.DentalSetPagedData();
-}
-
-DentalNextPage() {
-  if (this.DentalCurrentPage < this.DentalTotalPages) {
-    this.DentalCurrentPage++;
-    this.DentalSetPagedData();
-  }
-}
-
-DentalPrevPage() {
-  if (this.DentalCurrentPage > 1) {
-    this.DentalCurrentPage--;
-    this.DentalSetPagedData();
-  }
-}
-
+// API Call
 async GetAllDental() {
-   await this.service.GetAllDentalCode(this.AllCPTCode, this.CPTStartCode, this.CPTEndCode, this.Description).then((response: any) => {
-      this.DentalCodeGridData = response?.table1 || [];
-      this.DentalTotalItems = this.DentalCodeGridData?.length;      
-      this.DentalCurrentPage = 1;
-      this.DentalSetPagedData();
-      console.log(this.DentalCodeGridData, 'this.DentalCode');
+   this.DentalCodeTotalItems = 0;
 
-    })
+   const data = { AllDentalCode: this.AllDentalCode, DentalStartCode: this.DentalStartCode, DentalEndCode: this.DentalEndCode, DescriptionFilter: this.DescriptionFilter, page: this.DentalCodePaginationInfo.Page, rowsPerPage: this.DentalCodePaginationInfo.RowsPerPage };
+
+    await this.service.GetAllDentalCode(data).then((response: any) => {
+    this.AllMyDentalCode = response?.table1 || [];
+    this.DentalCodeTotalItems = response?.table2?.[0]?.totalRecords || 0;
+    console.log(this.AllMyDentalCode, 'this.AllMyDentalCode');
+});
 }
 //#endregion
 
-//#region UnclassifiedService Pagination start
-pagedUnclassifiedService: any[] = [];
-UnclassifiedServiceCurrentPage = 1;
-UnclassifiedServicePageSize = 5;
-UnclassifiedServiceTotalItems = 0;
-
-get UnclassifiedServiceTotalPages(): number {
-  return Math.ceil(this.UnclassifiedServiceTotalItems / this.UnclassifiedServicePageSize);
-}
-
-get UnclassifiedServiceStart(): number {
-  return (this.UnclassifiedServiceCurrentPage - 1) * this.UnclassifiedServicePageSize;
-}
-
-get UnclassifiedServiceEnd(): number {
-  return Math.min(this.UnclassifiedServiceStart + this.UnclassifiedServicePageSize, this.UnclassifiedServiceTotalItems);
-}
-
-get UnclassifiedServicePageNumbers(): (number | string)[] {
-  const total = this.UnclassifiedServiceTotalPages;
-  const current = this.UnclassifiedServiceCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1); // always show first page
-
-  if (left > 2) range.push('...');
-  for (let i = left; i <= right; i++) range.push(i);
-  if (right < total - 1) range.push('...');
-  if (total > 1) range.push(total); // always show last page
-
-  return range;
-}
-
-UnclassifiedServiceSetPagedData() {
-  const startIndex = (this.UnclassifiedServiceCurrentPage - 1) * this.UnclassifiedServicePageSize;
-  const endIndex = startIndex + this.UnclassifiedServicePageSize;
-  this.pagedUnclassifiedService = this.UnclassifiedService.slice(startIndex, endIndex);
-}
-
-UnclassifiedServiceGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.UnclassifiedServiceTotalPages) return;
-  this.UnclassifiedServiceCurrentPage = page;
-  this.UnclassifiedServiceSetPagedData();
-}
-
-UnclassifiedServiceNextPage() {
-  if (this.UnclassifiedServiceCurrentPage < this.UnclassifiedServiceTotalPages) {
-    this.UnclassifiedServiceCurrentPage++;
-    this.UnclassifiedServiceSetPagedData();
-  }
-}
-
-UnclassifiedServicePrevPage() {
-  if (this.UnclassifiedServiceCurrentPage > 1) {
-    this.UnclassifiedServiceCurrentPage--;
-    this.UnclassifiedServiceSetPagedData();
-  }
-}
+//#region UnclassifiedService Pagination Start
+UnclassifiedServiceTotalItem = 0;
+UnclassifiedServicePaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5
+};
+    async onUnclassifiedServicePageChanged(page: number) {
+    this.UnclassifiedServicePaginationInfo.Page = page;
+    await this.GetAllUnclassifiedService();
+    }
 
 // API Call
 async GetAllUnclassifiedService() {
-   await this.service.GetAllUnclassifiedService(this.AllCode, this.UCStartCode, this.DescriptionFilter).then((response: any) => {
+   this.UnclassifiedServiceTotalItem = 0;
+
+   const data = { AllCode: this.AllCode, UCStartCode: this.UCStartCode, DescriptionFilter: this.DescriptionFilter, page: this.UnclassifiedServicePaginationInfo.Page, rowsPerPage: this.UnclassifiedServicePaginationInfo.RowsPerPage }
+
+   await this.service.GetAllUnclassifiedService(data).then((response: any) => {
       this.UnclassifiedService = response?.table1 || [];
-      this.UnclassifiedServiceTotalItems = this.UnclassifiedService?.length;
-      this.UnclassifiedServiceCurrentPage = 1;
-      this.UnclassifiedServiceSetPagedData();
+      this.UnclassifiedServiceTotalItem = response?.table2[0]?.totalRecords || 0;      
       console.log(this.UnclassifiedService, 'this.UnclassifiedService');
     })
 }
 //#endregion
 
-//#region Service Item
-
-pagedServiceItem: any[] = [];
-ServiceItemCurrentPage = 1;
-ServiceItemPageSize = 5;
-ServiceItemTotalItems = 0;
-
-get ServiceItemTotalPages(): number {
-  return Math.ceil(this.ServiceItemTotalItems / this.ServiceItemPageSize);
-}
-
-get ServiceItemStart(): number {
-  return (this.ServiceItemCurrentPage - 1) * this.ServiceItemPageSize;
-}
-
-get ServiceItemEnd(): number {
-  return Math.min(this.ServiceItemStart + this.ServiceItemPageSize, this.ServiceItemTotalItems);
-}
-
-get ServiceItemPageNumbers(): (number | string)[] {
-  const total = this.ServiceItemTotalPages;
-  const current = this.ServiceItemCurrentPage;
-  const delta = 2;
-
-  const range: (number | string)[] = [];
-  const left = Math.max(2, current - delta);
-  const right = Math.min(total - 1, current + delta);
-
-  range.push(1); // always show first page
-
-  if (left > 2) range.push('...');
-  for (let i = left; i <= right; i++) range.push(i);
-  if (right < total - 1) range.push('...');
-  if (total > 1) range.push(total); // always show last page
-
-  return range;
-}
-
-ServiceItemSetPagedData() {
-  const startIndex = (this.ServiceItemCurrentPage - 1) * this.ServiceItemPageSize;
-  const endIndex = startIndex + this.ServiceItemPageSize;
-  this.pagedServiceItem = this.ServiceItems.slice(startIndex, endIndex);
-}
-
-ServiceItemGoToPage(page: number) {
-  if (typeof page !== 'number' || page < 1 || page > this.ServiceItemTotalPages) return;
-  this.ServiceItemCurrentPage = page;
-  this.ServiceItemSetPagedData();
-}
-
-ServiceItemNextPage() {
-  if (this.ServiceItemCurrentPage < this.ServiceItemTotalPages) {
-    this.ServiceItemCurrentPage++;
-    this.ServiceItemSetPagedData();
-  }
-}
-
-ServiceItemPrevPage() {
-  if (this.ServiceItemCurrentPage > 1) {
-    this.ServiceItemCurrentPage--;
-    this.ServiceItemSetPagedData();
-  }
-}
+//#region ServiceItem Pagination start
+ServiceItemsTotalItems = 0;
+ServiceItemsPaginationInfo: any = {
+  Page: 1,
+  RowsPerPage: 5
+};
+    async onServiceItemsPageChanged(page: number) {
+    this.ServiceItemsPaginationInfo.Page = page;
+    await this.GetAllServiceItem();
+    }
 
 // API Call
 async GetAllServiceItem() {
-   await this.service.GetAllServiceItems(this.AllCode, this.ServiceStartCode, this.DescriptionFilter).then((response: any) => {
-      this.ServiceItems = response?.table1 || [];
-      this.ServiceItemTotalItems = this.ServiceItems?.length;
-      this.ServiceItemCurrentPage = 1;
-      this.ServiceItemSetPagedData();
-      console.log(this.ServiceItems, 'this.ServiceItem');
+   this.ServiceItemsTotalItems = 0;
+
+   const data = { AllCode: this.AllCode, ServiceStartCode: this.ServiceStartCode, DescriptionFilter: this.DescriptionFilter, page: this.ServiceItemsPaginationInfo.Page, rowsPerPage: this.ServiceItemsPaginationInfo.RowsPerPage }
+
+   await this.service.GetAllServiceItems(data).then((response: any) => {
+      this.ServicesGrid = response?.table1 || [];
+      this.ServiceItemsTotalItems = response?.table2[0]?.totalRecords || 0;      
+      console.log(this.ServicesGrid, 'this.ServicesGrid');
     })
 }
 //#endregion
@@ -1830,7 +1628,7 @@ AllServiceNextPage() {
 }
 
 AllServicePrevPage() {
-  if (this.ServiceItemCurrentPage > 1) {
+  if (this.AllServiceCurrentPage > 1) {
     this.AllServiceCurrentPage--;
     this.AllServiceSetPagedData();
   }
