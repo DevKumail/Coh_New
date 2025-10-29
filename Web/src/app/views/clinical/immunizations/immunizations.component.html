@@ -1,1 +1,150 @@
-<p>immunizations works!</p>
+<div class="card">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <h3 class="mb-0">Immunization</h3>
+  </div>
+
+  <div class="card-body">
+    <div class="container-fluid">
+      <div class="row g-3">
+        <div class="col-12 d-flex align-items-center">
+          <input type="checkbox" class="form-check-input" id="providerOutside" [(ngModel)]="isProviderCheck" (change)="onCheckboxChange2()" />
+          <label class="form-check-label ms-2" for="providerOutside">Provider Outside Clinic</label>
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12">
+          <label class="form-label">Provider</label>
+          <select class="form-select" *ngIf="!isProviderCheck" [(ngModel)]="immunization.providerId" (change)="onProviderChange($event)">
+            <option [ngValue]="null">Provider</option>
+            <option *ngFor="let p of hrEmployees" [ngValue]="p.providerId">{{ p.name }}</option>
+          </select>
+          <input *ngIf="isProviderCheck" class="form-control" type="text" placeholder="Enter Provider / Nurse Name" [(ngModel)]="immunization.providerDescription" />
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12">
+          <label class="form-label">Type</label>
+          <select class="form-select" [(ngModel)]="immunization.immTypeId">
+            <option [ngValue]="null">Type</option>
+            <option *ngFor="let t of getImmunization" [ngValue]="t.immTypeId">{{ t.immTypeName }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12">
+          <label class="form-label">Comments</label>
+          <input [(ngModel)]="immunization.comments" class="form-control" type="text" placeholder="Comments" />
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12" *ngIf="!isProviderCheck">
+          <label class="form-label">Dose</label>
+          <input class="form-control" type="text" [(ngModel)]="immunization.dose" placeholder="Dose" />
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12">
+          <label class="form-label">Manufacturer Name</label>
+          <input class="form-control" type="text" [(ngModel)]="immunization.manufacturerName" placeholder="Manufacturer Name" />
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12" *ngIf="!isProviderCheck">
+          <label class="form-label">Lot No. of Medication</label>
+          <input [(ngModel)]="immunization.lotNumber" class="form-control" type="text" placeholder="No. of Medication" />
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12" *ngIf="!isProviderCheck">
+          <label class="form-label">Immunization Start Date</label>
+          <input type="date" class="form-control" [(ngModel)]="immunization.startDate" />
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12" *ngIf="!isProviderCheck">
+          <label class="form-label">Expiry Date</label>
+          <input type="date" class="form-control" [(ngModel)]="immunization.expiryDate" />
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12" *ngIf="!isProviderCheck">
+          <label class="form-label">Next Immunization Date</label>
+          <input type="date" class="form-control" [(ngModel)]="immunization.nextInjectionDate" />
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12">
+          <label class="form-label">Description</label>
+          <input type="text" class="form-control" placeholder="Description" />
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12" *ngIf="!isProviderCheck">
+          <label class="form-label" for="site">Site Immunization</label>
+          <select class="form-select" [(ngModel)]="immunization.SiteInjection">
+            <option [ngValue]="null">Select Site</option>
+            <option *ngFor="let s of siteOptions" [ngValue]="s.siteId">{{ s.siteName }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12" *ngIf="!isProviderCheck">
+          <label class="form-label">Route</label>
+          <select class="form-select" [(ngModel)]="immunization.routeId">
+            <option [ngValue]="null">Route</option>
+            <option *ngFor="let r of RouteOptions" [ngValue]="r.routeId">{{ r.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3 col-sm-4 col-12">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="immunization.status">
+            <option [ngValue]="null">Status</option>
+            <option *ngFor="let st of Active" [ngValue]="st.id">{{ st.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mt-4">
+        <button class="btn btn-success" (click)="submit()">{{ buttonText }}</button>
+        <button class="btn btn-secondary ms-2" (click)="DropFilled()">Clear</button>
+      </div>
+    </div>
+
+    <div class="container-fluid mt-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-auto">
+          <label class="form-label" for="statusFilter">Status</label>
+          <select id="statusFilter" class="form-select" [(ngModel)]="immunization.ActiveStatus" (change)="onStatusChange()">
+            <option *ngFor="let st of ActiveStatus" [ngValue]="st.id">{{ st.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive mt-3">
+        <table class="table table-striped table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Provider Name</th>
+              <th>Manufacturer Name</th>
+              <th>Lot Number</th>
+              <th>Expiry Date</th>
+              <th>Immunization Date</th>
+              <th>Next Immunization</th>
+              <th>Site Immunization</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of filteredDiagnosisData">
+              <td>{{ data.providerName }}</td>
+              <td>{{ data.manufacturerName }}</td>
+              <td>{{ data.lotNumber }}</td>
+              <td>{{ data.expiryDate | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ data.startDate | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ data.nextInjectionDate | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ data.siteName }}</td>
+              <td>{{ data.status }}</td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-info me-2" (click)="onRowSelect(data)">Edit</button>
+                <button class="btn btn-sm btn-danger" (click)="delete(data.id)">Delete</button>
+              </td>
+            </tr>
+            <tr *ngIf="!filteredDiagnosisData || filteredDiagnosisData.length === 0">
+              <td colspan="9" class="text-center">No Data found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
