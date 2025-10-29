@@ -325,7 +325,7 @@ onPROBSubmit() {
       });
       return;
     }
-    debugger
+     
 
     const formData = this.medicalForm.value;
     console.log('medicalForm =>',this.medicalForm.value);
@@ -461,7 +461,7 @@ onPROBClear(){
       })
   }
   FillDropDown(response: any) {
-    debugger
+     
     let jParse = JSON.parse(JSON.stringify(response)).cache;
     let provider = JSON.parse(jParse).Provider;
     let iCDVersion = JSON.parse(jParse).BLICDVersion;
@@ -485,7 +485,7 @@ onPROBClear(){
             code: item.ICDVersionId,
           };
         });
-      debugger
+       
       const item = {
         name: 'ALL',
         code: 0,

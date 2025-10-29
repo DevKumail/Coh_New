@@ -1,47 +1,29 @@
-import { Component, OnInit,inject, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import moment from 'moment';
 import { Router } from '@angular/router';
 import { SchedulingApiService } from '../scheduling.api.service';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import {NgbModal, NgbModalModule, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { NgIcon, NgIconComponent } from '@ng-icons/core';
+import {NgbModal, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
-import { IconsModule } from '@/app/shared/icons.module';
 import Swal from 'sweetalert2';
 import {FlatpickrDirective, provideFlatpickrDefaults} from 'angularx-flatpickr';
-import {ColorChromeModule} from 'ngx-color/chrome';
-import {ColorSketchModule} from 'ngx-color/sketch';
-import {ColorSliderModule} from 'ngx-color/slider';
-import {ColorTwitterModule} from 'ngx-color/twitter';
-import {NgxDaterangepickerBootstrapDirective} from "ngx-daterangepicker-bootstrap";
 import { FlatpickrModule } from 'angularx-flatpickr';
 @Component({
   selector: 'app-appointment-dashboard',
    imports: [
     CommonModule,
-    ReactiveFormsModule,
     NgbNavModule,
-    IconsModule,
     FormsModule,
     FlatpickrModule,
     FullCalendarModule,
     FlatpickrDirective,
-    ColorSketchModule,
-    ColorChromeModule,
-    ColorSliderModule,
-    ColorTwitterModule,
-    // PageTitleComponent,
-    // NgIcon,
-    // NgxDaterangepickerBootstrapDirective
-    // NgxDaterangepickerBootstrapDirective
-    // NgxPermissionsDirective
   ],
   providers: [provideFlatpickrDefaults()],
   templateUrl: './appointment-dashboard.component.html',
@@ -58,9 +40,8 @@ export class AppointmentDashboardComponent implements OnInit {
   @ViewChild('fullWidthModal', { static: true }) fullWidthModal!: TemplateRef<HTMLElement>;
   @ViewChild('cancelAppointmentModal') cancelAppointmentModal!: TemplateRef<any>;
   @ViewChild('rescheduleAppointmentModal', { static: true }) rescheduleAppointmentModal!: TemplateRef<any>;
+  @ViewChild('eventDetailsModal') eventDetailsModal!: TemplateRef<any>;
 
-  actions: AppointmentActions[] = [];
-  selectedAction?: AppointmentActions;
   action = false;
   filter = false;
   reschpopup = false;
@@ -74,27 +55,230 @@ export class AppointmentDashboardComponent implements OnInit {
 
 
   calendarOptions: CalendarOptions = {
-    plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin],
+    plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+    },
+    buttonText: {
+      today: 'Today',
+      month: 'Month',
+      week: 'Week',
+      day: 'Day',
+      list: 'List'
     },
     initialView: 'dayGridMonth',
     weekends: true,
     selectable: true,
     selectMirror: true,
-    dayMaxEvents: true,
+    dayMaxEvents: 3,
     themeSystem: 'standard',
+    
+    businessHours: {
+      daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
+      startTime: '08:00',
+      endTime: '20:00'
+    },
+    nowIndicator: true,
+    stickyHeaderDates: true,
+    height: 'auto',
+    expandRows: true,
+    slotMinTime: '07:00:00',
+    slotMaxTime: '21:00:00',
+    slotDuration: '00:30:00',
+    slotEventOverlap: false,
+    eventOverlap: false,
+    eventMaxStack: 2,
+    eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: true },
+    eventDisplay: 'block',
+    moreLinkClick: 'popover',
+    eventClassNames: (arg) => ['appt-orange'],
+    datesSet: (_arg) => {
+      this.slotGroups.clear();
+    },
+    eventContent: (arg) => {
+      const xp: any = arg.event.extendedProps || {};
+      const mrno = xp.mrno || xp.MRNo || xp.mrNo || '';
+      const provider = xp.provider || xp.providerName || xp.ProviderName || xp.provider_name || '';
+      // const patient = xp.fullName || xp.patientName || xp.PatientName || '';
+      const viewType = (arg.view as any)?.type as string;
+
+      // Build content per view
+      let inner = '';
+      if (viewType === 'dayGridMonth' || viewType === 'listWeek') {
+        // Month/List: MRNO | Provider
+        inner = `
+          <div class="fc-event-inner fc-chip fc-chip--month">
+            <span class="fc-chip-icon" title="Details" style="cursor: pointer;">👁️</span>
+            <span class="fc-event-meta">
+              <span class="fc-mrno"><b>${mrno || 'N/A'}</b></span>
+              <span class="fc-sep">|</span>
+              <span class="fc-provider">${provider || 'N/A'}</span>
+            </span>
+          </div>`;
+      } else if (viewType === 'timeGridWeek') {
+        // Week: MRNO | Patient Name
+        inner = `
+          <div class="fc-event-inner fc-chip fc-chip--week" >
+            <span class="fc-chip-icon" title="Details" style="cursor: pointer;">👁️</span>
+            <span class="fc-event-meta">
+              <span class="fc-mrno"><b>${mrno || 'N/A'}</b></span>
+      
+            </span>
+          </div>`;
+      } else if (viewType === 'timeGridDay') {
+        // Day: MRNO only
+        inner = `
+          <div class="fc-event-inner fc-chip">
+            <span class="fc-chip-icon" title="Details" style="cursor: pointer;" >👁️</span>
+            <span class="fc-event-meta" >
+              <span class="fc-mrno"><b>${mrno || 'N/A'}</b></span>
+              <span class="fc-sep">|</span>
+              <span class="fc-provider">${provider || 'N/A'}</span>
+            </span>
+          </div>`;
+      } else {
+        // Fallback
+        inner = `
+          <div class="fc-event-inner fc-chip">
+            <span class="fc-chip-icon" title="Details" style="cursor: pointer;">👁️</span>
+            <span class="fc-event-meta">
+              <span class="fc-mrno"><b>${mrno || 'N/A'}</b></span>
+              <span class="fc-sep">|</span>
+              <span class="fc-provider">${provider || 'N/A'}</span>
+            </span>
+          </div>`;
+      }
+      return { html: inner } as any;
+    },
     dateClick: this.handleDateClick.bind(this),
     eventClick: this.handleEventClick.bind(this),
-    events: [
-    {
-      title: 'Consultation',
-      start: '2025-07-30',
-      color: '#ff9900' // orange event
-    }
-    ]
+    eventDidMount: (info) => {
+      const xp: any = info.event.extendedProps || {};
+      const mrno = xp.mrno || xp.MRNo || xp.mrNo || '';
+      const provider = xp.provider || xp.providerName || xp.ProviderName || xp.provider_name || '';
+      const patient = xp.fullName || xp.patientName || xp.PatientName || '';
+      const viewType = (info.view as any)?.type as string;
+      const time = info.timeText ? `\n${info.timeText}` : '';
+      // Tooltip per view
+      let tip = '';
+      if (viewType === 'dayGridMonth' || viewType === 'listWeek') {
+        tip = `${mrno || ''}${mrno && provider ? ' | ' : ''}${provider || ''}`;
+      } else if (viewType === 'timeGridWeek') {
+        tip = `${mrno || ''}${mrno && provider ? ' | ' : ''}${provider || ''}`;
+      } else if (viewType === 'timeGridDay') {
+        tip = `${mrno || ''}${mrno && provider ? ' | ' : ''}${provider || ''}`;
+      } else {
+        tip = `${mrno || ''}${mrno && provider ? ' | ' : ''}${provider || ''}`;
+      }
+      info.el.setAttribute('title', `${tip}${time}`);
+      const icon = info.el.querySelector('.fc-chip-icon');
+      if (icon) {
+        icon.addEventListener('click', (e: Event) => {
+          e.stopPropagation();
+          this.openEventDetails(info.event);
+        });
+      }
+
+      // Custom top-2 inline for Week view only
+      if (viewType === 'timeGridWeek') {
+        const start = info.event.start as Date | null;
+        if (start) {
+          // Bucket by 30-minute slot so near starts align in one row
+          const slotMs = 30 * 60 * 1000; // keep in sync with slotDuration '00:30:00'
+          const bucket = new Date(Math.floor(start.getTime() / slotMs) * slotMs);
+          const key = `${viewType}|${bucket.toISOString()}`;
+          let group = this.slotGroups.get(key);
+          if (!group) {
+            group = { expanded: false, events: [], moreEl: null };
+            this.slotGroups.set(key, group);
+          }
+          group.events.push(info.el as HTMLElement);
+
+          // Hide beyond top 2 if not expanded
+          if (!group.expanded && group.events.length > 2) {
+            (info.el as HTMLElement).style.display = 'none';
+          }
+
+          // Apply pack classes to visible items to control content density
+          const applyPackClasses = () => {
+            const visibleCount = group!.expanded ? group!.events.length : Math.min(2, group!.events.length);
+            // Determine baseline top from first visible element
+            let baseTop: string | null = null;
+            group!.events.forEach((el, idx) => {
+              el.classList.remove('fc-pack-1', 'fc-pack-2', 'fc-pack-3');
+              if (group!.expanded) {
+                // when expanded, keep default (no pack) for readability
+                el.style.display = '';
+                return;
+              }
+              if (idx < visibleCount) {
+                el.style.display = '';
+                el.classList.add(`fc-pack-${visibleCount}`);
+                // establish common baseline top
+                if (!baseTop) {
+                  const cs = (el.ownerDocument.defaultView || window).getComputedStyle(el);
+                  baseTop = cs.top || el.style.top || '0px';
+                }
+                el.style.top = baseTop as string; // align to same row
+                // natural height for better readability
+                el.style.height = '';
+                // el.style.width = '100px';
+              } else {
+                // hide everything beyond top-2 when collapsed
+                (el as HTMLElement).style.display = 'none';
+              }
+            });
+          };
+          applyPackClasses();
+
+          // Ensure a '+N more' chip within the same harness container
+          const container = info.el.parentElement as HTMLElement | null;
+          if (container) {
+            const ensureMoreEl = () => {
+              const hiddenCount = Math.max(0, group!.events.length - 2);
+              const anchorEl = group!.events[0] as HTMLElement | undefined;
+              // Always enforce top-2 visibility when collapsed
+              if (!group!.expanded) {
+                group!.events.forEach((el, idx) => {
+                  (el as HTMLElement).style.display = idx > 1 ? 'none' : '';
+                });
+              }
+              if (hiddenCount <= 0) {
+                if (group!.moreEl) { group!.moreEl.remove(); group!.moreEl = null; }
+                return;
+              }
+              if (!anchorEl) return;
+              if (!group!.moreEl) {
+                const more = document.createElement('span');
+                more.className = 'fc-slot-more-badge';
+                more.textContent = `+${hiddenCount}`;
+                more.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  group!.expanded = !group!.expanded;
+                  if (group!.expanded) {
+                    group!.events.forEach((el) => (el.style.display = ''));
+                    more.textContent = '−';
+                  } else {
+                    group!.events.forEach((el, idx) => (el.style.display = idx > 1 ? 'none' : ''));
+                    more.textContent = `+${Math.max(0, group!.events.length - 2)}`;
+                  }
+                  applyPackClasses();
+                });
+                anchorEl.style.position = anchorEl.style.position || 'relative';
+                anchorEl.appendChild(more);
+                group!.moreEl = more as unknown as HTMLElement;
+              } else {
+                group!.moreEl.textContent = `+${hiddenCount}`;
+              }
+            };
+            ensureMoreEl();
+          }
+        }
+      }
+    },
+    events: []
   };
 
   // Dropdown Options
@@ -121,6 +305,12 @@ export class AppointmentDashboardComponent implements OnInit {
   selectedvisitType: any;
   selectedReschedulingReasons: any;
 
+  // UI State for details
+  selectedEvent: any = null;
+
+  // TimeGrid overflow groups (week/day): key = ISO start time
+  private slotGroups = new Map<string, { expanded: boolean; events: HTMLElement[]; moreEl: HTMLElement | null }>();
+
   cacheItems: string[] = [
     'ReschedulingReasons', 'RegLocations', 'RegLocationTypes', 'Provider',
     'providerspecialty', 'RegFacility', 'SchAppointmentStatus',
@@ -138,7 +328,6 @@ export class AppointmentDashboardComponent implements OnInit {
   }
 
   handleDateClick(clickInfo: DateClickArg) {
-    debugger
     this.appId = 0;
     this.fullName = 'N/A'
     this.appointment = ''
@@ -148,7 +337,6 @@ export class AppointmentDashboardComponent implements OnInit {
   }
 
   handleEventClick(clickInfo: EventClickArg) {
-    debugger
     const extProp: any = clickInfo.event.extendedProps;
     this.appointment = ''
     this.appId = extProp.appId || 0;
@@ -206,14 +394,18 @@ export class AppointmentDashboardComponent implements OnInit {
     this.schedulingService.searchAppointment(from, to, ProviderID, LocationID, SpecialityID, SiteID, FacilityID, Page, Size)
       .then((appointment: any) => {
         if (appointment.table1?.length) {
+          console.log('appointment.table1', appointment.table1);
           const events = appointment.table1.map((app: any) => ({
-            date: app.appointment_Date,
+            start: app.appointment_Date,
             title: app.appType,
-            color: '#ffafff',
-            backgroundColor: 'red',
             extendedProps: {
               appId: app.appointment_Id,
-              fullName: `${app.patient_FName} ${app.patient_MName} ${app.patient_LName}`
+              mrno: app.mrNo ?? '',
+              provider: app.fullName ?? '',
+              purposeOfVisit: app.purposeOfVisit ?? '',
+              fullName: `${app.patient_FName ?? ''} ${app.patient_MName ?? ''} ${app.patient_LName ?? ''}`.trim(),
+              PatientStatus: app.appointment_PatientStatus ?? '',
+              visitStatusName: app.visitStatusName ?? '',
             }
           }));
           this.calendarOptions.events = events;
@@ -254,7 +446,7 @@ export class AppointmentDashboardComponent implements OnInit {
   }
 
   SubmitAction() {
-    debugger
+     
     switch (+this.appointment) {
       case 0:
         this.router.navigateByUrl(`/scheduling/appointment/create?date=${this.dateSelected}`);
@@ -274,6 +466,26 @@ export class AppointmentDashboardComponent implements OnInit {
         break;
     }
     this.action = false;
+  }
+
+  openEventDetails(event: any) {
+    this.selectedEvent = null;
+    const evtDate: any = event?.start || (event as any)?.date || null;
+    this.selectedEvent = {
+      title: event?.title,
+      date: evtDate,
+      timeText: (event as any)?._context?.viewApi?.calendar?.formatDate
+        ? (event as any)?._context.viewApi.calendar.formatDate(evtDate, { hour: '2-digit', minute: '2-digit', hour12: true })
+        : '',
+      fullName: event?.extendedProps?.fullName,
+      appId: event?.extendedProps?.appId,
+      mrno: event?.extendedProps?.mrno,
+      provider: event?.extendedProps?.provider,
+      purposeOfVisit: event?.extendedProps?.purposeOfVisit,
+      PatientStatus: event?.extendedProps?.PatientStatus,
+      visitStatusName: event?.extendedProps?.visitStatusName,
+    };
+    this.modalService.open(this.eventDetailsModal, { size: 'lg' });
   }
 
   // confirmCancel(position: string) {
@@ -326,9 +538,7 @@ export class AppointmentDashboardComponent implements OnInit {
   }
 
   changeAppointmentStatus(AppId: number, AppStatusId: number, ByProvider: boolean, RescheduledId: number, isCancel: boolean = true) {
-    debugger
     this.cancelpopup = false;
-    this.modalService.dismissAll();
     this.reschpopup = false;
     this.modalService.dismissAll();
     this.schedulingService.cancelBooking(AppId, AppStatusId, ByProvider, RescheduledId)
@@ -349,7 +559,6 @@ export class AppointmentDashboardComponent implements OnInit {
   }
 
   openModal(content: TemplateRef<HTMLElement>, options: NgbModalOptions) {
-    debugger
     this.modalService.open(content, options);
     this.appId = 0;
     this.fullName = 'N/A';
@@ -357,10 +566,6 @@ export class AppointmentDashboardComponent implements OnInit {
 }
 
 // Interfaces
-export interface AppointmentActions {
-  name: string;
-  code: number;
-}
 
 export interface Patient {
   memberId: string;

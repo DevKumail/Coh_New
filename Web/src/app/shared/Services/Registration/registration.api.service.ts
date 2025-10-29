@@ -30,7 +30,7 @@ export class RegistrationApiService {
     //     return this.api.delete(/api/patients/${id});
     // }
     // SubmitAlertType(data: any): Observable<any> {
-    //     // debugger
+    //     //  
     //     return this.api.post(Alert/SubmitAlertType, data);
     // }
     deletePatient(id: string): Observable<any> {
@@ -53,7 +53,7 @@ export class RegistrationApiService {
 
   GetSearch( CompanyOrIndividual?:any,  LastName?:string, SSN?: string, InsuredIDNo? : string, MRNo?:any,   PageNumber?:number, PageSize?:number) {
 
-    debugger
+     
 
 
     return this.api.get(`Coverages/GetSearch?CompanyOrIndividual=${CompanyOrIndividual}&LastName=${LastName}&SSN=${SSN}&InsuredIDNo=${InsuredIDNo}&MRNo=${MRNo}&PageNumber=${PageNumber}&PageSize=${PageSize}`).toPromise();
@@ -66,7 +66,7 @@ export class RegistrationApiService {
 
 
   GetCoverage(MRNo:string) {
-    debugger
+     
     return this.api.get(`Coverages/GetCoverage?MRNo=${MRNo}`).toPromise();
   }
 
@@ -87,7 +87,7 @@ const obj={CoverageListReq,PaginationInfo}
     return this.api.post('Coverages/InsertCoverage', object).toPromise();
   }
 //   FetchImageData(obj:FormData) {
-//     // debugger
+//     //  
 //   return this.api.imagepost(`Coverages/GetImageData`,obj).toPromise();
 //   }
 
@@ -96,7 +96,7 @@ GetInsuranceRelation() {
 }
 
 getCityByState(ProviderId:any) {
-// debugger
+//  
 
   return this.api.get(`AllDropdowns/GetCityByState?ProviderId=${ProviderId}`).toPromise();
 }
@@ -111,7 +111,7 @@ getStateByCountry(countryId:any) {
     }
 
 //    getAlertType(): Promise<{ result: AlertType[] } | undefined> {
-//     debugger
+//      
 //   return this.api.get<{ result: AlertType[] }>(`AllDropdowns/GetAlertType`).toPromise();
 // }
 }

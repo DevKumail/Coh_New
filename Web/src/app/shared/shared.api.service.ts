@@ -10,7 +10,7 @@ export class SharedApiService {
   constructor(private api: ApiService) { }
 
   submitPatientAllergy(data: any): Observable<any> {
-    debugger
+     
     return this.api.post('/Alergy/SubmitPatientAlergy', data);
   }
 

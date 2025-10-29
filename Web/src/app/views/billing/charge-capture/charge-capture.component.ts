@@ -163,7 +163,8 @@ MyDentalGroups:any[]=[];
     private service: ChargeCaptureService,
     private router: Router,
     private loader: LoaderService,
-    private PatientData: PatientBannerService
+    private PatientData: PatientBannerService,
+    
   ) {  }
   SearchCPTby: any = [
     { code: 1, name: 'All' },
@@ -195,7 +196,7 @@ MyDentalGroups:any[]=[];
   id: any;
   selectedId: any;
   ProceduresData:any = [];
-
+  insuranceInfo:any = [];
   async ngOnInit() {
  
         this.patientDataSubscription = this.PatientData.patientData$
@@ -224,14 +225,13 @@ MyDentalGroups:any[]=[];
           }
       }); 
       
-    // var visitAccountDetail=localStorage.getItem("LoadvisitDetail");  
-    // if(!(visitAccountDetail==undefined)  && !(visitAccountDetail=="") && !(visitAccountDetail==null))
-    // {
-    //   this.visitDetail=JSON.parse(localStorage.getItem("LoadvisitDetail") || "");
-    //   console.log(this.visitDetail);
-    //   this.VisitAccountNO=  this.visitDetail.visitAccountNo;
-    //   this.MrNo=  this.visitDetail.mrNo;
-    // }
+      this.PatientData.patientData$.subscribe((data: any) => {
+        const patientData = data;
+        if (patientData) {
+          this.insuranceInfo = patientData?.table1?.[0] || [];
+
+          }
+      });
 
     await this.FillCache();
     await this.populateYearDropdown();
@@ -620,7 +620,7 @@ async filterMyDental(e: any){
       VisitAccountNo:parseInt(this.VisitAccountNO) || null,
       MrNo: this.SearchPatientData?.table2?.[0]?.mrNo || null,
       Comment: this.comment || null,
-      PayerId: this.visitDetail.payerId || null,
+      PayerId: this.insuranceInfo?.payerId || null,
       EmployeeId: this.currentUser || null,
       AppointmentId: parseInt(this.VisitAccountNO) || null,
       BLSupperBillDiagnosisModel: [],
@@ -699,7 +699,7 @@ async filterMyDental(e: any){
       return; // Function stop ho jayega
     }
 
-    debugger
+     
  
         this.service.SaveChargeCapture(ChargCaptureModel).then((response: any) => {
           if (response.success) {

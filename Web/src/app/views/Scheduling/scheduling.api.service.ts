@@ -180,7 +180,7 @@ export class SchedulingApiService {
 
 
   EditAppoimentByAppId( AppId: number) {
-    debugger
+     
     // return this.app.put(`Appointment/EditAppoimentByAppId`,{AppId}).toPromise();
     // const body={AppId:AppId}
     return this.api.get(`Appointment/EditAppoimentByAppId?appId=${AppId}`).toPromise();
@@ -188,6 +188,11 @@ export class SchedulingApiService {
 
   InsertEligibility(mrno: any) {
     return this.api.post(`Eligibility/InsertEligibility?mrno=${mrno}`, {}).toPromise();
+  }
+
+
+  searchAppointmentHistory(MRNo:string,RowsPerPage:number,Page:number) {
+    return this.api.get(`Appointment/SearchAppointmentHistory?MRNo=${MRNo}&Size=${RowsPerPage}&Page=${Page}`).toPromise();
   }
 
   // SearchDashboardAppointment(data:any) {

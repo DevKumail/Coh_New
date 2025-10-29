@@ -224,7 +224,7 @@ export class OrderStatisticsComponent {
         let EmpId = sessionStorage.getItem('empId');
         console.log('UserId =>',UserId);
         console.log('EmpId =>',EmpId);
-        debugger
+         
         if(EmpId != null && EmpId != "" && EmpId != undefined && EmpId != "0" && EmpId == "1"){
             this.AppointmentFilterForm.patchValue({ providerId: UserId });
         }
@@ -492,7 +492,7 @@ export class OrderStatisticsComponent {
     }
 
     onEditAppointment(appointment: any) {
-        debugger 
+          
         // Derive a stable appointment id and persist as fallback for refresh
         const appId: number = Number(appointment?.appointment_Id ?? appointment?.appId ?? 0);
         if (appId) {

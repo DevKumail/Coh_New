@@ -758,6 +758,7 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
       return;
     }
     var userId = sessionStorage.getItem('userId');
+    var userName =  sessionStorage.getItem('userName');
     // var currentUser = JSON.parse(sessionStorage.getItem('userName') || '');
     
     this.mrNo = this.SearchPatientData?.table2[0]?.mrNo;;
@@ -778,6 +779,7 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
       this.AppoinmentBooking.AppId = this.qid;
     } else {
       this.AppoinmentBooking.AppId = 0;
+      this.AppoinmentBooking.PatientStatusId = 1;
     }
 
     const formdata = this.appointmentForm.value;
@@ -787,7 +789,7 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
     this.AppoinmentBooking.time = this.appointmentForm.get('time')?.value;
     this.AppoinmentBooking.AppDateTime = this.appointmentForm.get('date')?.value;
     this.AppoinmentBooking.Duration = this.appointmentForm.get('selectedDuration')?.value;
-    this.AppoinmentBooking.AppNote = 'This is Appointment Note';
+    this.AppoinmentBooking.AppNote = this.appointmentForm.get('AppointmentNote')?.value;
     this.AppoinmentBooking.SiteId = this.appointmentForm.get('site')?.value;
     this.AppoinmentBooking.FacilityId = this.appointmentForm.get('facility')?.value;
     this.AppoinmentBooking.LocationId = this.appointmentForm.get('selectedLocation')?.value;
@@ -798,7 +800,7 @@ async GetSpecialitybyFacilityId(FacilityId: any) {
     this.AppoinmentBooking.ReferredProviderId = this.appointmentForm.get('selectedReferredBy')?.value;
     this.AppoinmentBooking.IsPatientNotified = true;
     this.AppoinmentBooking.IsActive = true;
-    this.AppoinmentBooking.EnteredBy = 'JohnDoe';
+    this.AppoinmentBooking.EnteredBy = userName || '';
     this.AppoinmentBooking.VisitTypeId = this.appointmentForm.get('selectedVisitType')?.value;
     this.AppoinmentBooking.EntryDateTime = new Date();
     this.AppoinmentBooking.PurposeOfVisitId = this.appointmentForm.get('selectedPurpose')?.value;

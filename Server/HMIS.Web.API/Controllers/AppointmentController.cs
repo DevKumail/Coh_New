@@ -264,7 +264,7 @@ namespace HMIS.Web.Controllers
         }
 
         [HttpGet("SearchAppointmentHistory")]
-        public async Task<IActionResult> SearchAppointmentHistory(string MRNo, int? ProviderId, int? PatientStatusId, int? AppStatusId, int? Page, int? Size, string? SortColumn, string? SortOrder)
+        public async Task<IActionResult> SearchAppointmentHistory(string MRNo, int? ProviderId, int? PatientStatusId, int? AppStatusId, int? Page, int? Size)
         {
 
 
@@ -277,7 +277,7 @@ namespace HMIS.Web.Controllers
 
 
 
-            DataSet result = await _appointmentManager.SearchAppointmentHistoryDB(MRNo, ProviderId, PatientStatusId, AppStatusId, Page, Size, SortColumn, SortOrder);
+            DataSet result = await _appointmentManager.SearchAppointmentHistoryDB(MRNo, ProviderId, PatientStatusId, AppStatusId, Page, Size);
 
 
             //FILE BASED

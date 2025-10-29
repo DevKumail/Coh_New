@@ -307,7 +307,7 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
       return;
     }
     this.loader.show();
-    debugger
+     
     console.log( 'mrNo =>',this.SearchPatientData.table2[0].mrNo);
 
     await this.ClinicalApiService.GetPatientAllergyData
@@ -492,7 +492,7 @@ submit() {
 
 
   onCheckboxChange2() {
-    debugger;
+     ;
     this.isProviderCheck
     const isChecked = this.isProviderCheck; // Get the checked state
     this.isProviderCheck = isChecked;
@@ -562,7 +562,7 @@ submit() {
 
 
 editAllergy(allergy: any) {
-  debugger
+   
   console.log('Editing Allergy:', allergy);
   this.buttonText = 'Update';
   this.id = allergy.allergyId;

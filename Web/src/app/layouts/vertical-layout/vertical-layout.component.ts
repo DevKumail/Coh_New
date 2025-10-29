@@ -29,15 +29,15 @@ export class VerticalLayoutComponent implements OnInit, OnDestroy {
 
 
         this.DataStorage.searchData$.subscribe((data) => {
-        debugger
+         
         if (data) {
           var patient = data.table2[0];
            console.log( 'patient => ',patient);
         }
         if(patient){
-            debugger
+             
             this.DataStorage.show$.subscribe(value => {
-                debugger
+                 
                 this.isPinned = value;
             console.log( 'this.isPinned => ',this.isPinned);
             

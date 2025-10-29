@@ -101,7 +101,7 @@ export class TemporaryDemographicsComponent implements OnInit {
 
     this.FillCache();
 
-   debugger
+    
         // Prefer Router navigation state; fallback to window.history.state for refresh/reuse
         const nav = this.router.getCurrentNavigation();
         const navState: any = nav?.extras?.state ?? (window.history && (window.history.state as any)) ?? {};

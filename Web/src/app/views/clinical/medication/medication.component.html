@@ -1,0 +1,413 @@
+<form *ngIf="MedicationForm" [formGroup]="MedicationForm">
+    <div class="card p-3 shadow rounded">
+        <div class="row">
+            <div class="row">
+                <div class="col-12 mt-1 mb-2">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" formControlName="isProviderCheck"
+                            id="isProviderCheck" style="height: 20px; width: 20px;" />
+                        <label class="form-check-label me-2 ms-2 mt-1" for="isProviderCheck">
+                            {{ 'PROVIDER_OUTSIDE_CLINIC' | translate }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1" *ngIf="MedicationForm.get('isProviderCheck')?.value == true">
+                    <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }}</label>
+                    <input type="text" class="form-control" formControlName="providerDescription"
+                        placeholder="{{ 'ENTER_PROVIDER' | translate }}" />
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('providerDescription')?.touched || submitted) && MedicationForm.get('providerDescription')?.invalid">
+                        {{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
+                </div>
+
+
+                <div class="mb-1" *ngIf="MedicationForm.get('isProviderCheck')?.value == false">
+                    <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }}</label>
+                    <select class="form-select" formControlName="providerId">
+                        <option [ngValue]="null" disabled>{{'SELECT_PROVIDER' | translate}}</option>
+                        <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('providerId')?.touched || submitted) && MedicationForm.get('providerId')?.invalid">
+                        {{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{'RX' | translate}}</label>
+
+                    <div class="input-group">
+                        <input type="text" class="form-control" formControlName="rx"
+                            placeholder="{{ 'ENTER_RX' | translate }}" />
+                        <button class="btn btn-success" type="button" (click)="ClickRx(standardModal)">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('rx')?.touched || submitted) && MedicationForm.get('rx')?.invalid">
+                        {{ 'RX_IS_REQUIRED' | translate }}</div>
+
+                </div>
+            </div>
+
+
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'DOSE' | translate }}</label>
+                    <input type="text" class="form-control" formControlName="dose"
+                        placeholder="{{ 'ENTER_DOSE' | translate }}" />
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('dose')?.touched || submitted) && MedicationForm.get('dose')?.invalid">
+                        {{ 'DOSE_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'ROUTE' | translate }}</label>
+                    <select class="form-select" formControlName="route">
+                        <option [ngValue]="null" disabled>{{'SELECT_ROUTE' | translate}}</option>
+                        <option *ngFor="let route of GetRoute" [value]="route.routeId">{{ route.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('route')?.touched || submitted) && MedicationForm.get('route')?.invalid">
+                        {{ 'ROUTE_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'START_DATE' | translate }}</label>
+                    <input type="date" class="form-control" formControlName="startDate" />
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('startDate')?.touched || submitted) && MedicationForm.get('startDate')?.invalid">
+                        {{ 'START_DATE_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'STOP_DATE' | translate }}</label>
+                    <input type="date" class="form-control" formControlName="stopDate"
+                        [attr.min]="MedicationForm.get('startDate')?.value || null"
+                        [disabled]="MedicationForm.get('status')?.value !== 'Inactive'" />
+                    <div class="text-danger small"
+                        *ngIf="MedicationForm.get('stopDate')?.touched && MedicationForm.get('stopDate')?.invalid">{{
+                        'STOP_DATE_REQUIRED' | translate }}</div>
+                    <div class="text-danger small"
+                        *ngIf="MedicationForm.get('stopDate')?.touched && MedicationForm.get('startDate')?.value && MedicationForm.get('stopDate')?.value && (MedicationForm.get('stopDate')?.value < MedicationForm.get('startDate')?.value)">
+                        {{ 'STOP_DATE_NOT_LESS_THAN_START' | translate }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'DURATION_DAYS' | translate }}</label>
+                    <input type="text" class="form-control" formControlName="durationDays"
+                        placeholder="{{ 'ENTER_DURATION_DAYS' | translate }}" />
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('durationDays')?.touched || submitted) && MedicationForm.get('durationDays')?.invalid">
+                        {{ 'DURATION_DAYS_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'FREQUENCY' | translate }}</label>
+                    <select class="form-select" formControlName="frequency">
+                        <option [ngValue]="null" disabled>{{'SELECT_FREQUENCY' | translate}}</option>
+                        <option *ngFor="let frequency of getfrequency" [value]="frequency.frequencyId">{{
+                            frequency.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('frequency')?.touched || submitted) && MedicationForm.get('frequency')?.invalid">
+                        {{ 'FREQUENCY_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'WEIGHT' | translate }}</label>
+                    <input type="text" class="form-control" formControlName="weight"
+                        placeholder="{{ 'ENTER_WEIGHT' | translate }}" />
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('weight')?.touched || submitted) && MedicationForm.get('weight')?.invalid">
+                        {{ 'WEIGHT_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'GIVEN_BY' | translate }}</label>
+                    <select class="form-select" formControlName="givenBy">
+                        <option [ngValue]="null" disabled>{{'SELECT_GIVEN_BY' | translate}}</option>
+                        <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('givenBy')?.touched || submitted) && MedicationForm.get('givenBy')?.invalid">
+                        {{ 'GIVEN_BY_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'GIVEN_DATE' | translate }}</label>
+                    <input type="date" class="form-control" formControlName="givenDate" />
+                    <div class="text-danger small"
+                        *ngIf="MedicationForm.get('givenDate')?.touched && MedicationForm.get('givenDate')?.invalid">{{
+                        'GIVEN_DATE_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'CHECKED_BY' | translate }}</label>
+                    <select class="form-select" formControlName="checkedBy">
+                        <option [ngValue]="null" disabled>{{'SELECT_CHECKED_BY' | translate}}</option>
+                        <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('checkedBy')?.touched || submitted) && MedicationForm.get('checkedBy')?.invalid">
+                        {{ 'CHECKED_BY_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'CHECKED_DATE' | translate }}</label>
+                    <input type="date" class="form-control" formControlName="checkedDate" />
+                    <div class="text-danger small"
+                        *ngIf="MedicationForm.get('checkedDate')?.touched && MedicationForm.get('checkedDate')?.invalid">
+                        {{
+                        'CHECKED_DATE_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'COMMENTS' | translate }}</label>
+                    <select class="form-select" formControlName="comments">
+                        <option [ngValue]="null" disabled>{{'SELECT_COMMENTS' | translate}}</option>
+                        <option *ngFor="let comment of getComments" [value]="comment.id">{{ comment.name
+                            }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('comments')?.touched || submitted) && MedicationForm.get('comments')?.invalid">
+                        {{ 'COMMENTS_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 ms-auto mt-3">
+                <div class="d-flex justify-content-end gap-2 mt-2">
+                    <button type="button" class="btn btn-secondary" (click)="onClear()">{{ 'CLEAR' | translate
+                        }}</button>
+                    <button type="submit" class="btn btn-success" (click)="onSubmit()">{{ 'SUBMIT' | translate
+                        }}</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card mt-4">
+            <h4 class="p-2">{{ 'CURRENT_MEDICATION' | translate }}</h4>
+        <div >
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-sm">
+                    <thead>
+                        <tr class="text-center">
+                            <th>{{ 'PROVIDER' | translate }}</th>
+                            <th>{{ 'RX' | translate }}</th>
+                            <th>{{ 'DOSE' | translate }}</th>
+                            <th>{{ 'DURATION_DAYS' | translate }}</th>  
+                            <th>{{ 'START_DATE' | translate }}</th>
+                            <th>{{ 'STOP_DATE' | translate }}</th>
+                            <th>{{ 'ROUTE' | translate }}</th>
+                            <th>{{ 'FREQUENCY' | translate }}</th>
+                            <th>{{ 'GIVEN_DATE' | translate }}</th>
+                            <th>{{ 'CHECKED_DATE' | translate }}</th>
+                            <th>{{ 'COMMENTS' | translate }}</th>
+                            <th>{{ 'ACTION' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider text-center">
+                        <tr *ngFor="let record of currentMedicationData">
+                            <td>{{ record.providerName || 'N/A' }}</td>
+                            <td>{{ record.rx || 'N/A' }}</td>
+                            <td>{{ record.dose || 'N/A' }}</td>
+                            <td>{{ record.duration || 'N/A' }} Day</td>
+                            <td>{{ record.startDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
+                            <td>{{ record.stopDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
+                            <td>{{ record.route || 'N/A' }}</td>
+                            <td>{{ record.frequency || 'N/A' }}</td>
+                            <td>{{ record.givenDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
+                            <td>{{ record.checkedDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
+                            <td>{{ record.comments || 'N/A' }}</td>
+                            <td>
+                                <button class="btn btn-outline-danger p-0 px-1 py-1 me-1" style="font-size: 0.75rem"
+                                    (click)="onDelete(record?.id)" title="Delete">
+                                    <ng-icon name="tablerTrash"></ng-icon>
+                                </button>
+                                <button class="btn btn-outline-info p-0 px-1 py-1 me-1" style="font-size: 0.75rem"
+                                    (click)="onEdit(record)" title="Edit">
+                                    <ng-icon name="tablerEdit"></ng-icon>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="currentMedicationData.length === 0">
+                            <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <app-generic-pagination [totalItems]="currentMedicationTotalItems" [pageSize]="currentMedicationPaginationInfo?.RowsPerPage"
+            [currentPage]="currentMedicationPaginationInfo?.Page" (pageChanged)="onCurrentMedicationPageChanged($event)">
+        </app-generic-pagination>
+        </div>
+
+
+        
+        <div class="card mt-4">
+            <h4 class="p-2">{{ 'PAST_MEDICATION' | translate }}</h4>
+        <div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-sm">
+                    <thead>
+                        <tr class="text-center">
+                            <th>{{ 'PROVIDER' | translate }}</th>
+                            <th>{{ 'RX' | translate }}</th>
+                            <th>{{ 'DOSE' | translate }}</th>
+                            <th>{{ 'DURATION_DAYS' | translate }}</th>  
+                            <th>{{ 'START_DATE' | translate }}</th>
+                            <th>{{ 'STOP_DATE' | translate }}</th>
+                            <th>{{ 'ROUTE' | translate }}</th>
+                            <th>{{ 'FREQUENCY' | translate }}</th>
+                            <th>{{ 'GIVEN_DATE' | translate }}</th>
+                            <th>{{ 'CHECKED_DATE' | translate }}</th>
+                            <th>{{ 'COMMENTS' | translate }}</th>
+                            <th>{{ 'ACTION' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider text-center">
+                        <tr *ngFor="let record of PastMedicationData">
+                            <td>{{ record.providerName || 'N/A' }}</td>
+                            <td style="width: 200px; word-break: break-all;">{{ record.rx || 'N/A' }}</td>
+                            <td>{{ record.dose || 'N/A' }}</td>
+                            <td>{{ record.duration || 'N/A' }} Day</td>
+                            <td>{{ record.startDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
+                            <td>{{ record.stopDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
+                            <td>{{ record.route || 'N/A' }}</td>
+                            <td>{{ record.frequency || 'N/A' }}</td>
+                            <td>{{ record.givenDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
+                            <td>{{ record.checkedDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
+                            <td>{{ record.comments || 'N/A' }}</td>
+                            <td>
+                                <button class="btn btn-outline-danger p-0 px-1 py-1 me-1" style="font-size: 0.75rem"
+                                    (click)="onDelete(record?.id)" title="Delete">
+                                    <ng-icon name="tablerTrash"></ng-icon>
+                                </button>
+                                <button class="btn btn-outline-info p-0 px-1 py-1 me-1" style="font-size: 0.75rem"
+                                    (click)="onEdit(record)" title="Edit">
+                                    <ng-icon name="tablerEdit"></ng-icon>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="PastMedicationData.length === 0">
+                            <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <app-generic-pagination [totalItems]="PastMedicationTotalItems" [pageSize]="PastMedicationPaginationInfo?.RowsPerPage"
+            [currentPage]="PastMedicationPaginationInfo?.Page" (pageChanged)="onPastMedicationPageChanged($event)">
+        </app-generic-pagination>
+        </div>
+
+    </div>
+</form>
+
+
+
+
+<ng-template #standardModal let-modal>
+    <style>
+        .modal {
+            max-height: 100vh;
+        }
+    </style>
+    <form *ngIf="DrugFilterForm" [formGroup]="DrugFilterForm">
+        <div class="modal-header">
+            <h5 class="modal-title">{{'SEARCH_DRUG' | translate}}</h5>
+            <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+        </div>
+        <div class="modal-body">
+            <div class="card shadow-sm rounded-3">
+                <div class="card-body">
+                    <div class="">
+                        <div class="row g-3">
+                            <div class="col-md-4 col-sm-12">
+                                <label class="form-label fw-semibold">{{ 'SEARCH' | translate }}:</label>
+                                <input type="text" class="form-control" placeholder="{{ 'SEARCH' | translate }}" formControlName="search" />
+                            </div>
+                            <div class="col-md-2 col-sm-12 col-12 ms-auto mt-4">
+                                <button class="btn btn-info mt-3 w-100" type="button"
+                                    (click)="SearchDrug()">{{ 'SEARCH' | translate }}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-striped table-sm mt-2">
+                        <thead>
+                            <tr class="text-center">
+                                <th style="font-size: 14px">{{'TRADE_NAME' | translate}}</th>
+                                <th style="font-size: 14px">{{'DOSE' | translate}}</th>
+                                <th style="font-size: 14px">{{'FORM' | translate}}</th>
+                                <th style="font-size: 14px">{{'GENERIC_NAME' | translate}}</th>
+                                <th style="font-size: 14px">{{'DRUG_CODE' | translate}}</th>
+
+                            </tr>
+                        </thead>
+                        <tbody class="table-group-divider text-center">
+                            <tr *ngFor="let data of DrugList" (click)="onDrugSelect(data, modal)">
+                                <td>{{data.tradeName}}</td>
+                                <td style="font-size: 12px">{{data.dose || 'N/A'}}</td>
+                                <td style="font-size: 12px">{{data.form || 'N/A'}}</td>
+                                <td style="font-size: 12px">{{data.genericName || 'N/A'}}</td>
+                                <td style="font-size: 12px">{{data.drugCode || 'N/A'}}</td>
+                            </tr>
+
+                            <tr *ngIf="DrugTotalItems === 0">
+                                <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <app-generic-pagination [totalItems]="DrugTotalItems" [pageSize]="DrugPaginationInfo?.RowsPerPage"
+                [currentPage]="DrugPaginationInfo?.Page" (pageChanged)="onDrugPageChanged($event)">
+            </app-generic-pagination>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" (click)="modal.dismiss()">{{ 'CLOSE' | translate }}</button>
+                <button type="submit" class="btn btn-primary" (click)="SearchDrug()">{{ 'SEARCH' | translate }}</button>
+            </div>
+        </div>
+
+    </form>
+</ng-template>

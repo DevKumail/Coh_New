@@ -47,7 +47,7 @@ namespace HMIS.Application.DTOs.ChargeCaptureDTOs
         public string MrNo { get; set; }
         public long EmployeeId { get; set; }
         public int AppointmentId { get; set; }
-        public int PayerId { get; set; }
+        public int? PayerId { get; set; }
         public string? Comment { get; set; }
         public List<BLSupperBillDiagnosisModel> BLSupperBillDiagnosisModel { get; set; }
         public List<BlSuperBillProcedureModel> blSuperBillProcedureModel { get; set; }

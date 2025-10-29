@@ -214,7 +214,7 @@ onSubmit() {
 }
 
   vitalSign(mrNo:string){
-    debugger
+     
     this.vitalSignsPagedData = [];
     this.vitalTotalItems = this.vitalSignsPagedData.length;
     this.onvitalPageChanged(1);
@@ -265,7 +265,7 @@ onSubmit() {
   Id: any;
 
   editVital(vital: any) {
-debugger
+ 
     this.Id = vital?.id;
     this.vitalSignsForm.patchValue({
         entryDate: vital?.entryDate?.split('T')[0],

@@ -1,24 +1,36 @@
-<div class="mx-1 mt-1">
-  <div class="row">
+<div class="mx-1 mt-1" [style.--patient-summary-offset.px]="offset">
+  <div class="row layout-relative">
 
-    <div class="col-10">
+    <!-- Toggle Handles -->
+    <button type="button" class="toggle-btn left" (click)="toggleLeft()" [attr.aria-expanded]="!leftCollapsed">
+      {{ leftCollapsed ? '›' : '‹' }}
+    </button>
+    <button type="button" class="toggle-btn right" (click)="toggleRight()" [attr.aria-expanded]="!rightCollapsed">
+      {{ rightCollapsed ? '‹' : '›' }}
+    </button>
+
+    <!-- Main Wrapper (expands when right sidebar collapsed) -->
+    <div [ngClass]="{ 'col-10': !rightCollapsed, 'col-12': rightCollapsed }">
       <div class="row">
 
-        <div class="col-2 bg-dark rounded p-1 mb-2 mb-sm-0 fixed-height">
+        <!-- Left Sidebar -->
+        <div *ngIf="!leftCollapsed" class="col-2 bg-dark rounded p-1 mb-2 mb-sm-0 fixed-height text-white">
           <div>
-            <app-side-menu></app-side-menu>
+            <app-side-menu [selected]="selectedId" (select)="onSelect($event)"></app-side-menu>
           </div>
         </div>
 
-        <div class="col-10 fixed-height">
+        <!-- Center Content -->
+        <div [ngClass]="{ 'col-10': !leftCollapsed, 'col-12': leftCollapsed }" class="fixed-height">
           <div>
-            <app-content-section></app-content-section>
+            <app-content-section [selected]="selectedId"></app-content-section>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="col-2 bg-dark text-white rounded fixed-height">
+    <!-- Right Sidebar -->
+    <div *ngIf="!rightCollapsed" class="col-2 bg-dark text-white rounded fixed-height">
       <div>
         <app-notes></app-notes>
       </div>

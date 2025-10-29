@@ -1,84 +1,17 @@
-<div class="nav flex-column nav-pills text-white" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+<div class="nav flex-column nav-pills text-white" role="tablist" aria-orientation="vertical">
+  <ng-container *ngFor="let item of mainItems">
+    <a class="nav-link text-white" [class.active]="selected === item.id" (click)="onSelect(item.id)">
+      {{ item.label }}
+    </a>
+  </ng-container>
 
-  <!-- Main Tabs -->
-  <a class="nav-link text-white active show" id="v-pills-home-tab" data-bs-toggle="pill" href="#v-summary-sheet"
-    role="tab" aria-controls="v-summary-sheet" aria-selected="true">
-    Summary Sheet
-  </a>
-
-  <a class="nav-link text-white" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-patient-document"
-    role="tab" aria-controls="v-patient-document" aria-selected="false">
-    Patient Document
-  </a>
-
-  <a class="nav-link text-white" data-bs-toggle="pill" href="#v-problem-list"
-    role="tab" aria-controls="v-problem-list" aria-selected="false">
-    Problem List
-  </a>
-
-  <a class="nav-link text-white" data-bs-toggle="pill" href="#v-medical-history"
-    role="tab" aria-controls="v-medical-history" aria-selected="false">
-    Medical History
-  </a>
-
-  <a class="nav-link text-white" data-bs-toggle="pill" href="#v-procedures"
-    role="tab" aria-controls="v-procedures" aria-selected="false">
-    Procedures
-  </a>
-
-  <a class="nav-link text-white" data-bs-toggle="pill" href="#v-allergies"
-    role="tab" aria-controls="v-allergies" aria-selected="false">
-    Allergies
-  </a>
-
-  <a class="nav-link text-white" data-bs-toggle="pill" href="#v-medications"
-    role="tab" aria-controls="v-medications" aria-selected="false">
-    Medications
-  </a>
-
-  <a class="nav-link text-white" data-bs-toggle="pill" href="#v-immunizations"
-    role="tab" aria-controls="v-immunizations" aria-selected="false">
-    Immunizations
-  </a>
-
-  <a class="nav-link text-white" data-bs-toggle="pill" href="#v-vital-sign"
-    role="tab" aria-controls="v-vital-sign" aria-selected="false">
-    Vital Sign
-  </a>
-
-  <a class="nav-link text-white" data-bs-toggle="pill" href="#v-charge-capture"
-    role="tab" aria-controls="v-charge-capture" aria-selected="false">
-    Charge Capture
-  </a>
-
-  <!-- Section Divider -->
   <div class="mt-3 mb-1 text-uppercase fw-bold small text-muted ps-2">
     Orders
   </div>
 
-  <!-- Orders Sub-tabs -->
-  <a class="nav-link text-white ps-4" data-bs-toggle="pill" href="#v-prescription"
-    role="tab" aria-controls="v-prescription" aria-selected="false">
-    Prescription
-  </a>
-
-  <a class="nav-link text-white ps-4" data-bs-toggle="pill" href="#v-investigations"
-    role="tab" aria-controls="v-investigations" aria-selected="false">
-    Investigations
-  </a>
-
-  <a class="nav-link text-white ps-4" data-bs-toggle="pill" href="#v-results"
-    role="tab" aria-controls="v-results" aria-selected="false">
-    Results
-  </a>
-
-  <a class="nav-link text-white ps-4" data-bs-toggle="pill" href="#v-referral-order"
-    role="tab" aria-controls="v-referral-order" aria-selected="false">
-    Referral Order
-  </a>
-
-  <a class="nav-link text-white ps-4" data-bs-toggle="pill" href="#v-scheduling-order"
-    role="tab" aria-controls="v-scheduling-order" aria-selected="false">
-    Scheduling Order
-  </a>
+  <ng-container *ngFor="let item of orderItems">
+    <a class="nav-link text-white ps-4" [class.active]="selected === item.id" (click)="onSelect(item.id)">
+      {{ item.label }}
+    </a>
+  </ng-container>
 </div>

@@ -1,4 +1,35 @@
 .fixed-height {
-    height: calc(100vh - 180px);
-    overflow-y: scroll;
+    height: calc(100vh - var(--patient-summary-offset, 120px));
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain; // prevent scroll chaining to body/footer
+    -webkit-overflow-scrolling: touch; // smooth on mobile
+}
+
+.layout-relative {
+  position: relative;
+}
+
+.toggle-btn {
+  position: absolute;
+  top: 4px;
+  z-index: 5;
+  width: 28px;
+  height: 28px;
+  line-height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,.1);
+  background: #fff;
+  color: #333;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  cursor: pointer;
+
+  &.left { left: -6px; }
+  &.right { right: -6px; }
+}
+
+@media (max-width: 992px) {
+  .toggle-btn.left { left: 4px; }
+  .toggle-btn.right { right: 4px; }
 }
