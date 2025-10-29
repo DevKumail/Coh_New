@@ -303,9 +303,7 @@ async loadHCPCSGroup() {
           })),
           { name: 'ALL', code: 0 }  // Adding 'ALL' group at the end
         ];
-      }
-      
-      console.log(this.MYHCPCSGroups, 'Group');
+      }      
     })
     .catch((error) => {
       Swal.fire({
@@ -407,8 +405,8 @@ AllMyCPTCode: any [] = [];
 
   filteCPTGroup(e: any) {
     this.service.MyCptCodebyProvider(this.ProviderId, this.CPTGroupId,this.MyCptCodePaginationInfo.Page,this.MyCptCodePaginationInfo.RowsPerPage).then((response: any) => {
+      
       this.MyCPTCode = response.table1 || [];
-
        this.MyCPTCode.map((e: any) => {
         const isSelected = this.MyServicesData.some((item: any) => item.cptCode  === e.cptCode); 
         if (isSelected) {
@@ -555,8 +553,8 @@ async filterMyDental(e: any){
 
   async provider(event:any) {
     this.loader.show();
-    await this.AllServicesApis();
     await this.AllDignosisApis();
+    await this.AllServicesApis();
     await this.loadICD9Gropu();
     await this.loadCPTGroup();
     await this.loadHCPCSGroup();
@@ -567,7 +565,7 @@ async filterMyDental(e: any){
     this.MyCptCodeTotalItems = 0
       await this.service.MyCptCodebyProvider(this.ProviderId, this.CPTGroupId, this.MyCptCodePaginationInfo.Page,this.MyCptCodePaginationInfo.RowsPerPage ).then((response: any) => {
       console.log('response =>',response);
-      if(response){
+      if(response && Object.keys(response).length > 0){
         this.MyCPTCode = response?.table1 || [];
         this.MyCptCodeTotalItems = response?.table2[0]?.totalRecords || 0;
         console.log(this.MyCPTCode, 'this.MyCPTCode');
@@ -1218,9 +1216,12 @@ MyDiagnosisCodeTotalItems = 0;
 
 async AllDignosisApis() {
   const response: any = await this.service.MyDiagnosisCodebyProvider(this.ProviderId, this.ICT9GroupId, this.ICDVersionId, this.MyDiagnosisCodePaginationInfo.Page, this.MyDiagnosisCodePaginationInfo.RowsPerPage);
-  this.AllMyDiagnosisCode = response?.table1 || [];
-  this.MyDiagnosisCode = [...this.AllMyDiagnosisCode];
-  this.MyDiagnosisCodeTotalItems = response?.table2[0]?.totalRecords || 0;
+
+  if (response && Object.keys(response).length > 0) {
+    this.AllMyDiagnosisCode = response?.table1 || [];
+    this.MyDiagnosisCode = [...this.AllMyDiagnosisCode];
+    this.MyDiagnosisCodeTotalItems = response?.table2[0]?.totalRecords || 0;
+  }
 }
 //#endregion
 
@@ -1463,10 +1464,29 @@ CPTPaginationInfo: any = {
 // API Call
 async GetAllCPT() {
    this.CPTTotalItems = 0;
-   await this.service.GetAllCPTCode(this.AllCPTCode, this.CPTStartCode, this.CPTEndCode, this.Description, this.CPTPaginationInfo.Page, this.CPTPaginationInfo.RowsPerPage ).then((response: any) => {
+  //  const data = {
+  //     AllCPTCode: this.AllCPTCode,
+  //     CPTStartCode: this.CPTStartCode,
+  //     CPTEndCode: this.CPTEndCode,
+  //     Description: this.Description,
+  //     Page: this.CPTPaginationInfo.Page,
+  //     RowsPerPage: this.CPTPaginationInfo.RowsPerPage
+  //  } 
+   
+ const data = { 
+  AllCPTCode: this.AllCPTCode, 
+  CPTStartCode: this.CPTStartCode, 
+  CPTEndCode: this.CPTEndCode, 
+  DescriptionFilter: this.DescriptionFilter, 
+  page: this.CPTPaginationInfo.Page, 
+  rowsPerPage: this.CPTPaginationInfo.RowsPerPage };
+  
+   await this.service.GetAllCPTCode(data).then((response: any) => {
+    if (response && response.table1 && response.table1.length > 0) {
       this.CPTCode = response?.table1 || [];
       this.CPTTotalItems = response?.table2[0]?.totalRecords || 0;      
       console.log(this.CPTCode, 'this.CPTCode');
+    }  
     })
 }
 //#endregion
@@ -1486,7 +1506,13 @@ HCPCSCodePaginationInfo: any = {
 async GetAllHCPCS() {
    this.HCPCSCodeTotalItems = 0;
 
-   const data = { AllHCPCSCode: this.AllHCPCSCode, HCPCStartCode: this.HCPCStartCode, HCPCSEndCode: this.HCPCSEndCode, DescriptionFilter: this.DescriptionFilter, page: this.HCPCSCodePaginationInfo.Page, rowsPerPage: this.HCPCSCodePaginationInfo.RowsPerPage };
+   const data = { 
+    AllHCPCSCode: this.AllHCPCSCode, 
+    HCPCStartCode: this.HCPCStartCode, 
+    HCPCSEndCode: this.HCPCSEndCode, 
+    DescriptionFilter: this.DescriptionFilter, 
+    page: this.HCPCSCodePaginationInfo.Page, 
+    rowsPerPage: this.HCPCSCodePaginationInfo.RowsPerPage };
 
     await this.service.GetAllHCPCSCode(data).then((response: any) => {
     this.HCPCSCodeGrid = response?.table1 || [];

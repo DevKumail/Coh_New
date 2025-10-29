@@ -115,7 +115,7 @@ export class ChargeCaptureService {
     
   GetAllCPTCode(data: any) {
     let params = new HttpParams();
-
+    debugger;
     if (data.AllCPTCode) params = params.set('AllCPTCode', data.AllCPTCode);
     if (data.CPTStartCode) params = params.set('CPTStartCode', data.CPTStartCode);
     if (data.CPTEndCode) params = params.set('CPTEndCode', data.CPTEndCode);
