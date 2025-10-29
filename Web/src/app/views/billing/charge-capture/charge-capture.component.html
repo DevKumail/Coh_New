@@ -1085,7 +1085,7 @@
                       </tr>
                     </thead>
                     <tbody class="table-group-divider">
-                      <tr *ngFor="let item of pagedHCPCS">
+                      <tr *ngFor="let item of HCPCSCodeGrid">
                         <td>
                           <input
                               type="checkbox"
@@ -1105,62 +1105,24 @@
                         </td>
                       </tr>
 
-                      <tr *ngIf="pagedHCPCS.length === 0">
+                      <tr *ngIf="HCPCSCodeTotalItems === 0">
                         <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
-                  <div class="d-flex flex-column align-items-center mt-3 gap-2">
-                    <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
-
-                      <div>
-                        Showing {{ HCPCSStart + 1 }} to {{ HCPCSEnd }} of {{ HCPCSTotalItems }} entries
-                      </div>
-
-                      <nav>
-                        <ul class="pagination pagination-sm mb-0">
-
-                          <!-- Previous -->
-                          <li class="page-item" [class.disabled]="HCPCSCurrentPage === 1">
-                            <button class="page-link" (click)="HCPCSPrevPage()" [disabled]="HCPCSCurrentPage === 1">
-                              Previous
-                            </button>
-                          </li>
-
-                          <!-- Page Numbers -->
-                          <li
-                            class="page-item"
-                            *ngFor="let page of HCPCSPageNumbers"
-                            [class.active]="page === HCPCSCurrentPage"
-                            [class.disabled]="page === '...'">
-                            
-                            <button
-                              class="page-link"
-                              *ngIf="page !== '...'"
-                              (click)="HCPCSGoToPage(+page)">
-                              {{ page }}
-                            </button>
-                            
-                            <span class="page-link" *ngIf="page === '...'">…</span>
-                          </li>
-
-                          <!-- Next -->
-                          <li class="page-item" [class.disabled]="HCPCSCurrentPage === HCPCSTotalPages">
-                            <button class="page-link" (click)="HCPCSNextPage()" [disabled]="HCPCSCurrentPage === HCPCSTotalPages">
-                              Next
-                            </button>
-                          </li>
-
-                        </ul>
-                      </nav>
-
-                    </div>
-                  </div>
+                <app-generic-pagination
+                  [totalItems]="HCPCSCodeTotalItems"
+                  [pageSize]="HCPCSCodePaginationInfo.RowsPerPage"
+                  [currentPage]="HCPCSCodePaginationInfo.Page"
+                  (pageChanged)="onHCPCSCodePageChanged($event)"
+                  >
+                </app-generic-pagination>
             </ng-template>
               </li>
 
+          <!-- Dental Code -->
                <li [ngbNavItem]="6">
                 <a ngbNavLink href="javascript:void(0)">{{ 'DENTAL_CODE' | translate }}</a>
                 <ng-template ngbNavContent>
@@ -1229,7 +1191,7 @@
                       </tr>
                     </thead>
                     <tbody class="table-group-divider">
-                      <tr *ngFor="let item of pagedDental">
+                      <tr *ngFor="let item of AllMyDentalCode">
                         <td>
                           <input
                               type="checkbox"
@@ -1249,7 +1211,7 @@
                         </td>
                       </tr>
 
-                      <tr *ngIf="pagedDental.length === 0">
+                      <tr *ngIf="DentalCodeTotalItems === 0">
                         <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                       </tr>
                     </tbody>
@@ -1257,55 +1219,17 @@
                 </div>
               </div>
 
-                <div class="d-flex flex-column align-items-center mt-3 gap-2">
-                    <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
-
-                      <div>
-                        Showing {{ DentalStart + 1 }} to {{ DentalEnd }} of {{ DentalTotalItems }} entries
-                      </div>
-
-                      <nav>
-                        <ul class="pagination pagination-sm mb-0">
-
-                          <!-- Previous -->
-                          <li class="page-item" [class.disabled]="DentalCurrentPage === 1">
-                            <button class="page-link" (click)="DentalPrevPage()" [disabled]="DentalCurrentPage === 1">
-                              Previous
-                            </button>
-                          </li>
-
-                          <!-- Page Numbers -->
-                          <li
-                            class="page-item"
-                            *ngFor="let page of DentalPageNumbers"
-                            [class.active]="page === DentalCurrentPage"
-                            [class.disabled]="page === '...'">
-                            
-                            <button
-                              class="page-link"
-                              *ngIf="page !== '...'"
-                              (click)="DentalGoToPage(+page)">
-                              {{ page }}
-                            </button>
-                            
-                            <span class="page-link" *ngIf="page === '...'">…</span>
-                          </li>
-
-                          <!-- Next -->
-                          <li class="page-item" [class.disabled]="DentalCurrentPage === DentalTotalPages">
-                            <button class="page-link" (click)="DentalNextPage()" [disabled]="DentalCurrentPage === DentalTotalPages">
-                              Next
-                            </button>
-                          </li>
-
-                        </ul>
-                      </nav>
-
-                    </div>
-                  </div>
+                <app-generic-pagination
+                  [totalItems]="DentalCodeTotalItems"
+                  [pageSize]="DentalCodePaginationInfo.RowsPerPage"
+                  [currentPage]="DentalCodePaginationInfo.Page"
+                  (pageChanged)="onDentalCodePageChanged($event)"
+                  >
+                </app-generic-pagination>
             </ng-template>
               </li>
 
+          <!-- Unclassified Service -->
               <li [ngbNavItem]="7">
                 <a ngbNavLink href="javascript:void(0)">{{ 'UNCLASSIFIED_SERVICE' | translate }}</a>
                 <ng-template ngbNavContent>
@@ -1363,7 +1287,7 @@
                       </tr>
                     </thead>
                     <tbody class="table-group-divider">
-                      <tr *ngFor="let item of pagedUnclassifiedService">
+                      <tr *ngFor="let item of UnclassifiedService">
                         <td>
                           <input
                               type="checkbox"
@@ -1388,7 +1312,7 @@
                         </td>
                       </tr>
 
-                      <tr *ngIf="pagedUnclassifiedService.length === 0">
+                      <tr *ngIf="UnclassifiedServiceTotalItem === 0">
                         <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                       </tr>
                     </tbody>
@@ -1396,56 +1320,17 @@
                 </div>
               </div>
 
-                <div class="d-flex flex-column align-items-center mt-3 gap-2">
-                    <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
-
-                      <div>
-                        Showing {{ UnclassifiedServiceStart + 1 }} to {{ UnclassifiedServiceEnd }} of {{ UnclassifiedServiceTotalItems }} entries
-                      </div>
-
-                      <nav>
-                        <ul class="pagination pagination-sm mb-0">
-
-                          <!-- Previous -->
-                          <li class="page-item" [class.disabled]="UnclassifiedServiceCurrentPage === 1">
-                            <button class="page-link" (click)="UnclassifiedServicePrevPage()" [disabled]="UnclassifiedServiceCurrentPage === 1">
-                              Previous
-                            </button>
-                          </li>
-
-                          <!-- Page Numbers -->
-                          <li
-                            class="page-item"
-                            *ngFor="let page of UnclassifiedServicePageNumbers"
-                            [class.active]="page === UnclassifiedServiceCurrentPage"
-                            [class.disabled]="page === '...'">
-                            
-                            <button
-                              class="page-link"
-                              *ngIf="page !== '...'"
-                              (click)="UnclassifiedServiceGoToPage(+page)">
-                              {{ page }}
-                            </button>
-                            
-                            <span class="page-link" *ngIf="page === '...'">…</span>
-                          </li>
-
-                          <!-- Next -->
-                          <li class="page-item" [class.disabled]="UnclassifiedServiceCurrentPage === UnclassifiedServiceTotalPages">
-                            <button class="page-link" (click)="UnclassifiedServiceNextPage()" [disabled]="UnclassifiedServiceCurrentPage === UnclassifiedServiceTotalPages">
-                              Next
-                            </button>
-                          </li>
-
-                        </ul>
-                      </nav>
-
-                    </div>
-                  </div>
+                <app-generic-pagination
+                  [totalItems]="UnclassifiedServiceTotalItem"
+                  [pageSize]="UnclassifiedServicePaginationInfo.RowsPerPage"
+                  [currentPage]="UnclassifiedServicePaginationInfo.Page"
+                  (pageChanged)="onUnclassifiedServicePageChanged($event)"
+                  >
+                </app-generic-pagination>
             </ng-template>
               </li>
 
-          <!-- Dental Code -->
+          <!-- Comment -->
               <li [ngbNavItem]="8">
                 <a ngbNavLink href="javascript:void(0)">{{'COMMENT' | translate}}</a>
                 <ng-template ngbNavContent>
@@ -1461,12 +1346,13 @@
                 </ng-template>
                 </li>
 
+          <!-- Service Item -->
                  <li [ngbNavItem]="9">
                 <a ngbNavLink href="javascript:void(0)">{{ 'SERVICE_ITEM' | translate }}</a>
                 <ng-template ngbNavContent>
                     <div class="row">
                       <div class="col-md-2 col-sm-4 col-12">
-                      <label for="">{{ 'SEARCH_UNCLASSIFIED' | translate }}:</label>
+                      <label for="">{{ 'SEARCH_SERVICE_ITEM' | translate }}:</label>
                       <select class="form-select" [(ngModel)]="SearchById" name="ICT9GroupId" (onChange)="searchBy($event)">                        <option *ngFor="let item of SearchUnclassifiedby" [value]="item.code">
                           {{ item.name }}
                         </option>
@@ -1516,7 +1402,7 @@
                       </tr>
                     </thead>
                     <tbody class="table-group-divider">
-                      <tr *ngFor="let item of pagedServiceItem">
+                      <tr *ngFor="let item of ServicesGrid">
                         <td>
                           <input
                               type="checkbox"
@@ -1536,60 +1422,21 @@
                         </td>
                       </tr>
 
-                      <tr *ngIf="pagedServiceItem.length === 0">
+                      <tr *ngIf="ServiceItemsTotalItems === 0">
                         <td colspan="4">{{ 'NO_DATA_FOUND' | translate }}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
-
-                 <div class="d-flex flex-column align-items-center mt-3 gap-2">
-                    <div class="d-flex justify-content-between align-items-center bg-light rounded px-3 py-2 w-100 flex-wrap">
-
-                      <div>
-                        Showing {{ ServiceItemStart + 1 }} to {{ ServiceItemEnd }} of {{ ServiceItemTotalItems }} entries
-                      </div>
-
-                      <nav>
-                        <ul class="pagination pagination-sm mb-0">
-
-                          <!-- Previous -->
-                          <li class="page-item" [class.disabled]="ServiceItemCurrentPage === 1">
-                            <button class="page-link" (click)="ServiceItemPrevPage()" [disabled]="ServiceItemCurrentPage === 1">
-                              Previous
-                            </button>
-                          </li>
-
-                          <!-- Page Numbers -->
-                          <li
-                            class="page-item"
-                            *ngFor="let page of ServiceItemPageNumbers"
-                            [class.active]="page === ServiceItemCurrentPage"
-                            [class.disabled]="page === '...'">
-                            
-                            <button
-                              class="page-link"
-                              *ngIf="page !== '...'"
-                              (click)="ServiceItemGoToPage(+page)">
-                              {{ page }}
-                            </button>
-                            
-                            <span class="page-link" *ngIf="page === '...'">…</span>
-                          </li>
-
-                          <!-- Next -->
-                          <li class="page-item" [class.disabled]="ServiceItemCurrentPage === ServiceItemTotalPages">
-                            <button class="page-link" (click)="ServiceItemNextPage()" [disabled]="ServiceItemCurrentPage === ServiceItemTotalPages">
-                              Next
-                            </button>
-                          </li>
-
-                        </ul>
-                      </nav>
-
-                    </div>
-                  </div>
+              
+                <app-generic-pagination
+                  [totalItems]="ServiceItemsTotalItems"
+                  [pageSize]="ServiceItemsPaginationInfo.RowsPerPage"
+                  [currentPage]="ServiceItemsPaginationInfo.Page"
+                  (pageChanged)="onServiceItemsPageChanged($event)"
+              >
+              </app-generic-pagination>
             </ng-template>
               </li>
 
