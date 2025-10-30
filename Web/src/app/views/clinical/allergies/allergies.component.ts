@@ -53,12 +53,36 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
     resetForm(): void {
       if (!this.allergyForm) return;
       try {
-        Object.keys(this.allergyForm.controls).forEach(key => {
-          const control = this.allergyForm.get(key);
-          control?.setValue("");
-          control?.markAsPristine();
-          control?.markAsUntouched();
+        const empId = this.SelectedVisit?.employeeId;
+        const exists = Array.isArray(this.hrEmployees)
+          ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
+          : false;
+        const defaultProvider = exists ? empId : null;
+        this.allergyForm.reset({
+          providerId: defaultProvider,
+          allergyType: '',
+          allergen: '',
+          severity: '',
+          reaction: '',
+          startDate: '',
+          endDate: '',
+          status: 1,
+          isProviderCheck: false,
+          typeId: '',
+          active: true,
+          updatedBy: this.userid,
+          updatedDate: new Date().toISOString().split('T')[0],
+          createdBy: this.userid,
+          createdDate: new Date().toISOString().split('T')[0],
+          appointmentId: this.appId
         });
+
+        // Re-apply provider default safely
+        this.setProviderFromSelectedVisit();
+        // Trigger status rules to disable endDate for Active
+        this.allergyForm.get('status')?.setValue(1, { emitEvent: true });
+
+        // Mark pristine/untouched
         this.allergyForm.markAsPristine();
         this.allergyForm.markAsUntouched();
         this.id = undefined;
@@ -211,7 +235,7 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
     private ClinicalApiService: ClinicalApiService,
     private loader: LoaderService,
     private PatientData: PatientBannerService) { }
-  statusOptions = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }, { id: 2, name: "All" }];
+  statusOptions = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
 
 
 
@@ -247,11 +271,28 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
       });
       this.hrEmployees = provider;
       console.log(this.hrEmployees);
+      try { this.setProviderFromSelectedVisit(); } catch {}
 
     }
   }
   isSubmitting = false;
-
+  SelectedVisit: any;
+  private setProviderFromSelectedVisit(): void {
+    try {
+      if (!this.allergyForm) { return; }
+      const empId = this.SelectedVisit?.employeeId;
+      if (!empId) { return; }
+      const exists = Array.isArray(this.hrEmployees)
+        ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
+        : false;
+      const ctrl = this.allergyForm.get('providerId');
+      if (!ctrl) { return; }
+      ctrl.setValue(exists ? empId : null, { emitEvent: false });
+      ctrl.markAsDirty();
+      ctrl.markAsTouched();
+      ctrl.updateValueAndValidity({ onlySelf: true });
+    } catch {}
+  }
   async ngOnInit(){
     this.patientDataSubscription = this.PatientData.patientData$
   .pipe(
@@ -266,10 +307,22 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
     this.GetPatientAllergyData();
   });
 
+
+     this.PatientData.selectedVisit$.subscribe((data: any) => {
+        this.SelectedVisit = data;
+        console.log('Selected Visit medical-list', this.SelectedVisit);
+        if (this.SelectedVisit) {
+          this.setProviderFromSelectedVisit();
+        }
+      });
+
+
     await this.FillCache();
     await this.GetAlergyType();
     await this.GetSeverityType();
     await this.initForm();
+    // If a visit is already selected, default provider to SelectedVisit.employeeId
+    this.setProviderFromSelectedVisit();
     await this.GetPatientAllergyData();
 
     var app = JSON.parse(sessionStorage.getItem('LoadvisitDetail') || '');
@@ -301,24 +354,20 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
 
   async GetPatientAllergyData() {
     this.loader.show();
-    if(this.SearchPatientData == undefined){
+    this.allergieTotalItems = 0;
+    const mrno = this.SearchPatientData.table2[0].mrNo
+    if(!mrno){
       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       this.loader.hide();
       return;
     }
     this.loader.show();
      
-    console.log( 'mrNo =>',this.SearchPatientData.table2[0].mrNo);
-
-    await this.ClinicalApiService.GetPatientAllergyData
-    (this.SearchPatientData?.table2?.length ? this.SearchPatientData.table2[0].mrNo : 0,).then((res: any) => {
+    await this.ClinicalApiService.GetPatientAllergyData(mrno, this.pagegination.currentPage, this.pagegination.pageSize ).then((res: any) => {
       console.log('res', res);
       this.loader.hide();
       this.MyAllergiesData = res.allergys?.table1 || [];
-      this.allergieTotalItems = this.MyAllergiesData.length;
-      this.onallergiePageChanged(1)
-      this.filteredDiagnosisData = this.MyAllergiesData || [];
-      console.log('this.MyAllergiesData', this.MyAllergiesData);
+      this.allergieTotalItems = res.allergys?.table2[0]?.totalCount || 0;
     })
     this.loader.hide();
 
@@ -358,14 +407,14 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
 
   initForm() {
   this.allergyForm = this.fb.group({
-    providerId: ['', Validators.required],
+    providerId: [null, Validators.required],
     allergyType: ['', Validators.required],
     allergen: ['', Validators.required],
     severity: ['', Validators.required],
     reaction: ['', Validators.required],
     startDate: ['', Validators.required],
-    endDate: ['', Validators.required],
-    status: ['', Validators.required],
+    endDate: [''],
+    status: [1, Validators.required],
     isProviderCheck: [false],
     typeId: [''],
     active: [true],
@@ -375,6 +424,23 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
     createdDate: [new Date().toISOString().split('T')[0]],
     appointmentId: [this.userid]
   });
+  // Apply reactive enable/disable + validators for endDate based on status (Inactive=0)
+  const endCtrl = this.allergyForm.get('endDate');
+  const statusCtrl = this.allergyForm.get('status');
+  const applyStatusRules = (val: any) => {
+    const v = Number(val);
+    if (v === 0) {
+      endCtrl?.enable({ emitEvent: false });
+      endCtrl?.setValidators([Validators.required]);
+    } else {
+      endCtrl?.reset('', { emitEvent: false });
+      endCtrl?.clearValidators();
+      endCtrl?.disable({ emitEvent: false });
+    }
+    endCtrl?.updateValueAndValidity({ onlySelf: true });
+  };
+  applyStatusRules(statusCtrl?.value);
+  statusCtrl?.valueChanges.subscribe(applyStatusRules);
 }
 
   alertForm!: FormGroup;
@@ -428,15 +494,23 @@ submit() {
 
   const sd = parseDMYToDate(formValue.startDate);
   const ed = parseDMYToDate(formValue.endDate);
-  if (!sd || !ed) {
-    Swal.fire('Validation Error', 'Please enter valid dates in dd/MM/yyyy format.', 'warning');
+  if (!sd) {
+    Swal.fire('Validation Error', 'Please enter a valid Start Date (dd/MM/yyyy).', 'warning');
     this.isSubmitting = false;
     return;
   }
-  if (ed < sd) {
-    Swal.fire('Validation Error', 'End Date cannot be earlier than Start Date.', 'warning');
-    this.isSubmitting = false;
-    return;
+  // Only validate end date when status is Inactive (0)
+  if (Number(formValue.status) === 0) {
+    if (!ed) {
+      Swal.fire('Validation Error', 'Please enter a valid End Date (dd/MM/yyyy).', 'warning');
+      this.isSubmitting = false;
+      return;
+    }
+    if (ed < sd) {
+      Swal.fire('Validation Error', 'End Date cannot be earlier than Start Date.', 'warning');
+      this.isSubmitting = false;
+      return;
+    }
   }
 
   const payload: AllergyDto = {
@@ -490,6 +564,18 @@ submit() {
     } catch { return ''; }
   }
 
+  private formatDateYMDForInput(value: any): string {
+    try {
+      if (!value) return '';
+      const d = new Date(value);
+      if (!isFinite(d.getTime())) return '';
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    } catch { return ''; }
+  }
+
 
   onCheckboxChange2() {
      ;
@@ -499,15 +585,22 @@ submit() {
     console.log('providerCheck Checkbox Value:', this.isProviderCheck);
   }
   DropFilled() {
+    const empId = this.SelectedVisit?.employeeId;
+    const exists = Array.isArray(this.hrEmployees)
+      ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
+      : false;
+    const defaultProvider = exists ? empId : null;
     this.allergyForm.reset({
-      typeId: '',
+      providerId: defaultProvider,
+      allergyType: '',
       allergen: '',
       severity: '',
       reaction: '',
       startDate: '',
       endDate: '',
-      status: '',
+      status: 1, // Active by default
       isProviderCheck: false,
+      typeId: '',
       active: true,
       updatedBy: this.userid,
       updatedDate: new Date().toISOString().split('T')[0],
@@ -515,6 +608,15 @@ submit() {
       createdDate: new Date().toISOString().split('T')[0],
       appointmentId: this.appId
     });
+
+    // Ensure provider default is applied if form already exists
+    this.setProviderFromSelectedVisit();
+
+    // Trigger status rules to disable endDate for Active
+    try {
+      const statusCtrl = this.allergyForm.get('status');
+      statusCtrl?.setValue(1, { emitEvent: true });
+    } catch {}
 
   }
 
@@ -572,9 +674,9 @@ editAllergy(allergy: any) {
     allergen: allergy.allergen,
     severity: allergy.severity,
     reaction: allergy.reaction,
-    startDate: this.formatDateDMY(allergy.startDate),
-    endDate: this.formatDateDMY(allergy.endDate),
-    status: allergy.status === 'Active' ? 1 : 2
+    startDate: this.formatDateYMDForInput(allergy.startDate),
+    endDate: this.formatDateYMDForInput(allergy.endDate),
+    status: allergy.status === 'Active' ? 1 : 0
   });
 }
 
@@ -585,23 +687,18 @@ editAllergy(allergy: any) {
   }
 
 
-allergieCurrentPage = 1;
-allergiePageSize = 5;
+pagegination : any = {
+  currentPage: 1,
+  pageSize: 5,
+}
 allergieTotalItems = 0;
 pagedallergie: any[] = [];
 
 async onallergiePageChanged(page: number) {
-  this.allergieCurrentPage = page;
-  this.setPagedallergieData();
-  // await this.GetPatientAllergyData();
+  this.pagegination.currentPage = page;
+  await this.GetPatientAllergyData();
 }
 
-setPagedallergieData() {
-  const startIndex = (this.allergieCurrentPage - 1) * this.allergiePageSize;
-  const endIndex = startIndex + this.allergiePageSize;
-  this.pagedallergie = this.MyAllergiesData.slice(startIndex, endIndex);
-
-}
 
   get isRtl(): boolean {
     try {

@@ -129,7 +129,7 @@ PatientId:any;
 isProviderCheck:any;
 appId:any;
   userId: number | undefined;
-
+SelectedVisit: any;
   private patientDataSubscription!: Subscription;
 
   private focusFirstInvalidControl(): void {
@@ -139,6 +139,24 @@ appId:any;
         firstInvalid?.focus({ preventScroll: true } as any);
         firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
+    } catch {}
+  }
+
+  private setProviderFromSelectedVisit(): void {
+    try {
+      if (!this.medicalForm) { return; }
+      const empId = this.SelectedVisit?.employeeId;
+      if (!empId) { return; }
+      // If provider isn't in hrEmployees, keep placeholder (null)
+      const exists = Array.isArray(this.hrEmployees)
+        ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
+        : false;
+      const ctrl = this.medicalForm.get('providerId');
+      if (!ctrl) { return; }
+      ctrl.setValue(exists ? empId : null, { emitEvent: false });
+      ctrl.markAsDirty();
+      ctrl.markAsTouched();
+      ctrl.updateValueAndValidity({ onlySelf: true });
     } catch {}
   }
 
@@ -190,16 +208,26 @@ appId:any;
         const mrno = this.Mrno;
       });
 
+      debugger
+      this.PatientData.selectedVisit$.subscribe((data: any) => {
+        this.SelectedVisit = data;
+        console.log('Selected Visit medical-list', this.SelectedVisit);
+        if (this.SelectedVisit) {
+          this.setProviderFromSelectedVisit();
+        }
+      });
+
+   
     
     // var app =JSON.parse(localStorage.getItem('LoadvisitDetail') || '');
     // this.appId=app.appointmentId
     this.FillDropDown
 
     this.medicalForm = this.fb.group({
-      providerId: ['', Validators.required],
+      providerId: [null, Validators.required],
       problem: ['', Validators.required],
-      comments: ['', Validators.required],
-      status: ['', Validators.required],  
+      comments: [''],
+      status: ['Active', Validators.required],  
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
       providerName: [''], 
@@ -215,8 +243,11 @@ appId:any;
         .subscribe((isOutside: boolean) => this.updateProviderValidators(isOutside));
     } catch {}
 
+    // Ensure provider is set if SelectedVisit already available
+    this.setProviderFromSelectedVisit();
+
     this.FilterForm = this.fb.group({
-      icdVersionId: [''],
+      icdVersionId: ['2'],
       searchById: ['1'],
       startingCode: [''],
       endingCode: [''],
@@ -225,6 +256,52 @@ appId:any;
     });
     console.log(this.FilterForm)
     this.FillDropDown
+
+    // Apply conditional validators for modal filters
+    const applyFilterValidators = (mode: any) => {
+      const startCtrl = this.FilterForm.get('startingCode');
+      const endCtrl = this.FilterForm.get('endingCode');
+      const descCtrl = this.FilterForm.get('description');
+      if (!startCtrl || !endCtrl || !descCtrl) { return; }
+
+      startCtrl.clearValidators();
+      endCtrl.clearValidators();
+      descCtrl.clearValidators();
+
+      const m = String(mode);
+      if (m === '1') {
+        // Code
+        startCtrl.setValidators([Validators.required]);
+      } else if (m === '2') {
+        // Code Range
+        startCtrl.setValidators([Validators.required]);
+        endCtrl.setValidators([Validators.required]);
+      } else if (m === '3') {
+        // Description
+        descCtrl.setValidators([Validators.required]);
+      }
+
+      startCtrl.updateValueAndValidity({ emitEvent: false });
+      endCtrl.updateValueAndValidity({ emitEvent: false });
+      descCtrl.updateValueAndValidity({ emitEvent: false });
+    };
+
+    // Initialize with default selection and subscribe to changes
+    try { applyFilterValidators(this.FilterForm.get('searchById')?.value); } catch {}
+    this.FilterForm.get('searchById')?.valueChanges.subscribe((val: any) => {
+      applyFilterValidators(val);
+      // Clear inputs so user must re-enter based on new mode
+      this.FilterForm.get('startingCode')?.setValue('', { emitEvent: false });
+      this.FilterForm.get('endingCode')?.setValue('', { emitEvent: false });
+      this.FilterForm.get('description')?.setValue('', { emitEvent: false });
+      // Mark untouched/pristine to avoid showing errors immediately
+      this.FilterForm.get('startingCode')?.markAsPristine();
+      this.FilterForm.get('endingCode')?.markAsPristine();
+      this.FilterForm.get('description')?.markAsPristine();
+      this.FilterForm.get('startingCode')?.markAsUntouched();
+      this.FilterForm.get('endingCode')?.markAsUntouched();
+      this.FilterForm.get('description')?.markAsUntouched();
+    });
 
     // Load user id from session storage
     const currentUser = sessionStorage.getItem('userId');
@@ -372,11 +449,15 @@ minDateValidator(otherControlName: string) {
   // ✅ Clear form
   onClear(): void {
   //this.medicalForm.reset();
+  const empId = this.SelectedVisit?.employeeId;
+  const exists = Array.isArray(this.hrEmployees)
+    ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
+    : false;
   this.medicalForm.patchValue({
-    providerId: '',
+    providerId: exists ? empId : null,
     problem: '',
     comments: '',
-    status: '',
+    status: 'Active',
     startDate: '',
     endDate: '',
     providerName: '', 
@@ -436,7 +517,6 @@ onSubmit() {
 
   const problemPayload: PatientProblemModel = {
     id: this.id,
-    appointmentId:formData.appId,
     providerId: formData.providerId,
     icd9: this.selectedDiagnosis.icD9Code,
     icd9description: this.selectedDiagnosis.descriptionFull,
@@ -448,6 +528,7 @@ onSubmit() {
     status: status || 0,
     createdBy: this.userid || 0,
     updatedBy: this.userid || 0,
+    appointmentId: this.SelectedVisit?.appointmentId,
     // mrno: '1006', 
     
     mrno:  this.SearchPatientData?.table2?.[0]?.mrNo || 0,                           
@@ -498,6 +579,14 @@ onSubmit() {
 
   modalRefInstance: any;
   ClickFilter(modalRef: TemplateRef<any>) {
+    this.FilterForm.patchValue({
+      icdVersionId: 2,
+      searchById: 1,
+      startingCode: null,
+      endingCode: null,
+      description: null
+    });
+
     this.DiagnosisCode = [];
     this.totalrecord = 0;
     this.modalRefInstance = this.modalService.open(modalRef, {
@@ -564,6 +653,8 @@ onSubmit() {
       });
       this.hrEmployees = provider;
       console.log(this.hrEmployees);
+      // Re-apply provider default now that list is loaded
+      try { this.setProviderFromSelectedVisit(); } catch {}
 
     }
     if (universaltoothcode) {
@@ -600,17 +691,113 @@ onSubmit() {
 
     }
   }
-  SearchDiagnosis() {
-     
+
+    SearchDiagnosisOnPageChange() {
+    // Validate required fields based on search type
+    const mode = String(this.FilterForm.value?.searchById || '1');
+    const startRaw = this.FilterForm.value?.startingCode;
+    const endRaw = this.FilterForm.value?.endingCode;
+    const descRaw = this.FilterForm.value?.description;
+    const start = typeof startRaw === 'string' ? startRaw.trim() : startRaw;
+    const end = typeof endRaw === 'string' ? endRaw.trim() : endRaw;
+    const desc = typeof descRaw === 'string' ? descRaw.trim() : descRaw;
+
+    const markAll = () => {
+      this.FilterForm.get('startingCode')?.markAsTouched();
+      this.FilterForm.get('endingCode')?.markAsTouched();
+      this.FilterForm.get('description')?.markAsTouched();
+    };
+
+    if (mode === '1' && !start) {
+      markAll();
+      Swal.fire('Validation Error', 'Please enter Code to search.', 'warning');
+      return;
+    }
+    if (mode === '2' && (!start || !end)) {
+      markAll();
+      Swal.fire('Validation Error', 'Please enter both Starting Code and Ending Code.', 'warning');
+      return;
+    }
+    if (mode === '3' && !desc) {
+      markAll();
+      Swal.fire('Validation Error', 'Please enter Description to search.', 'warning');
+      return;
+    }
+
     this.DiagnosisCode = [];
     this.totalrecord = 0;
     this.loader.show();
     console.log(this.FilterForm.value);
 
     this.ICDVersionId = this.FilterForm.value.icdVersionId || 0;
-    this.DiagnosisStartCode = this.FilterForm.value.startingCode;
-    this.DiagnosisEndCode = this.FilterForm.value.endingCode;
-    this.DescriptionFilter = this.FilterForm.value.description;
+    this.DiagnosisStartCode = start || '';
+    this.DiagnosisEndCode = end || '';
+    this.DescriptionFilter = desc || '';
+    
+    const PageNumber = this.PaginationInfo.Page; 
+    const PageSize = this.PaginationInfo.RowsPerPage;
+    
+
+    this.clinicalApiService.DiagnosisCodebyProvider(
+      this.ICDVersionId, 
+      PageNumber,
+      PageSize,
+      this.DiagnosisStartCode, 
+      this.DiagnosisEndCode, 
+      this.DescriptionFilter,
+    ).then((response: any) => {
+      this.DiagnosisCode = response?.table1;
+      this.totalrecord = response?.table2?.[0]?.totalRecords;
+    this.loader.hide();
+      console.log(this.DiagnosisCode, 'this.DiagnosisCode');
+
+    })
+    this.loader.hide();
+  }
+  SearchDiagnosis() {
+    // Validate required fields based on search type
+    this.PaginationInfo.Page = 1;
+    this.PaginationInfo.RowsPerPage = 5;
+    this.totalrecord = 0;
+    const mode = String(this.FilterForm.value?.searchById || '1');
+    const startRaw = this.FilterForm.value?.startingCode;
+    const endRaw = this.FilterForm.value?.endingCode;
+    const descRaw = this.FilterForm.value?.description;
+    const start = typeof startRaw === 'string' ? startRaw.trim() : startRaw;
+    const end = typeof endRaw === 'string' ? endRaw.trim() : endRaw;
+    const desc = typeof descRaw === 'string' ? descRaw.trim() : descRaw;
+
+    const markAll = () => {
+      this.FilterForm.get('startingCode')?.markAsTouched();
+      this.FilterForm.get('endingCode')?.markAsTouched();
+      this.FilterForm.get('description')?.markAsTouched();
+    };
+
+    if (mode === '1' && !start) {
+      markAll();
+      Swal.fire('Validation Error', 'Please enter Code to search.', 'warning');
+      return;
+    }
+    if (mode === '2' && (!start || !end)) {
+      markAll();
+      Swal.fire('Validation Error', 'Please enter both Starting Code and Ending Code.', 'warning');
+      return;
+    }
+    if (mode === '3' && !desc) {
+      markAll();
+      Swal.fire('Validation Error', 'Please enter Description to search.', 'warning');
+      return;
+    }
+
+    this.DiagnosisCode = [];
+    this.totalrecord = 0;
+    this.loader.show();
+    console.log(this.FilterForm.value);
+
+    this.ICDVersionId = this.FilterForm.value.icdVersionId || 0;
+    this.DiagnosisStartCode = start || '';
+    this.DiagnosisEndCode = end || '';
+    this.DescriptionFilter = desc || '';
     
     const PageNumber = this.PaginationInfo.Page; 
     const PageSize = this.PaginationInfo.RowsPerPage;
@@ -646,7 +833,7 @@ onSubmit() {
 
   async onDiagnosisPageChanged(page: number) {
     this.PaginationInfo.Page = page;
-    this.SearchDiagnosis();
+    this.SearchDiagnosisOnPageChange();
     }
 
 

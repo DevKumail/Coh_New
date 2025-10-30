@@ -25,33 +25,27 @@ import { distinctUntilChanged, filter } from 'rxjs';
   templateUrl: './content-section.component.html',
   styleUrl: './content-section.component.scss'
 })
-export class ContentSectionComponent implements OnInit{
+export class ContentSectionComponent implements OnInit {
   @Input() selected: string = 'summary';
-  
+
   constructor(
-  private Service : SummarySheetApiService,
-  private patientBannerService: PatientBannerService,
+    private Service: SummarySheetApiService,
+    private patientBannerService: PatientBannerService,
+    private router: Router
   ) { }
 
-    ngOnInit(): void {
-     this.patientBannerService.patientData$.pipe(
-                filter((data: any) => !!data?.table2?.[0]?.mrNo),
-                distinctUntilChanged((prev, curr) =>
-                  prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
-                )
-              )
-              .subscribe((data: any) => {
-                this.SearchPatientData = data;
-                if (this.SearchPatientData?.table2?.[0]?.mrNo) {
-                  console.log("summry mrNo",this.SearchPatientData);
-                  this.mrno = this.SearchPatientData?.table2?.[0]?.mrNo;
-                  this.GetAllList();
-
-                }
-      });
-
-      this.GetAllList();
-    }  
+  ngOnInit(): void {
+    this.patientBannerService.patientData$.subscribe((data: any) => {
+      this.SearchPatientData = data;
+      if (this.SearchPatientData?.table2?.[0]?.mrNo) {
+        this.mrno = this.SearchPatientData?.table2?.[0]?.mrNo;
+        this.GetAllList();
+      } 
+    });       
+        this.GetAllList();
+      
+    
+  }
   SearchPatientData: any;
   mrno: any
   Encounters: any[] = [
@@ -118,75 +112,75 @@ export class ContentSectionComponent implements OnInit{
   ];
 
   medicalHistory: any[] = [];
-  MHPaginationInfo: any ={
+  MHPaginationInfo: any = {
     Page: 1,
     RowsPerPage: 3,
   }
   MHtotalRecord: number = 0;
   problemList: any[] = [];
-  PLPaginationInfo: any ={
+  PLPaginationInfo: any = {
     Page: 1,
     RowsPerPage: 3,
   }
   PLtotalRecord: number = 0;
 
-  GetAllList(){
-      this.GetMedHistoryList();
-      this.GetProblemList();
+  GetAllList() {
+    this.GetMedHistoryList();
+    this.GetProblemList();
   }
-  
-  async GetMedHistoryList(){
-    if(this.mrno == 0){
-     Swal.fire({
-      icon: 'warning',
-      title: 'Warning',
-      text: 'MR No is required',
-    })
+
+  async GetMedHistoryList() {
+    if (this.mrno == 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Warning',
+        text: 'MR No is required',
+      })
       return;
     }
-     
-    await this.Service.GetMedHistoryList(this.mrno,this.MHPaginationInfo.Page,this.MHPaginationInfo.RowsPerPage
-     ).then((res:any)=>{
-      if(res?.data?.table1?.length > 0){
+
+    await this.Service.GetMedHistoryList(this.mrno, this.MHPaginationInfo.Page, this.MHPaginationInfo.RowsPerPage
+    ).then((res: any) => {
+      if (res?.data?.table1?.length > 0) {
         this.medicalHistory = res?.data?.table1 || [];
         this.MHtotalRecord = res?.data?.table2[0]?.totalCount || 0;
       } else {
         this.medicalHistory = [];
         this.MHtotalRecord = 0;
       }
-      
+
     })
   }
 
-  async GetProblemList(){
-    if(this.mrno == 0){
-     Swal.fire({
-      icon: 'warning',
-      title: 'Warning',
-      text: 'MR No is required',
-    })  
+  async GetProblemList() {
+    if (this.mrno == 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Warning',
+        text: 'MR No is required',
+      })
       return;
     }
-     
-    await this.Service.GetPatientProblemList(this.mrno,this.PLPaginationInfo.Page,this.PLPaginationInfo.RowsPerPage
-     ).then((res:any)=>{
-      if(res?.data?.table1?.length > 0){
+
+    await this.Service.GetPatientProblemList(this.mrno, this.PLPaginationInfo.Page, this.PLPaginationInfo.RowsPerPage
+    ).then((res: any) => {
+      if (res?.data?.table1?.length > 0) {
         this.problemList = res?.data?.table1 || [];
         this.PLtotalRecord = res?.data?.table2[0]?.totalCount || 0;
       } else {
         this.problemList = [];
         this.PLtotalRecord = 0;
       }
-      
+
     })
   }
 
-  onPLPageChanged(event: any){
+  onPLPageChanged(event: any) {
     this.PLPaginationInfo.Page = event.page;
     this.GetProblemList();
   }
 
-  onMHPageChanged(event: any){
+  onMHPageChanged(event: any) {
     this.MHPaginationInfo.Page = event.page;
     this.GetMedHistoryList();
   }

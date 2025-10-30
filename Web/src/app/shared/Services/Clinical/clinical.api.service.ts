@@ -103,10 +103,9 @@ export class ClinicalApiService {
         return this.api.post(`Alergy/SubmitPatientAlergy`, object).toPromise();
     }
 
-    GetPatientAllergyData(mrno: String) {
-         ;
+    GetPatientAllergyData(mrno: String , page: number, pageSize: number) {
         return this.api
-            .get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}`)
+            .get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}&PageNumber=${page}&PageSize=${pageSize}`)
             .toPromise();
     }
 

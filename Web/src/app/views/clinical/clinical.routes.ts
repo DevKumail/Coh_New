@@ -73,9 +73,10 @@ export const CLINICAL_ROUTES: Routes = [
         data: { module: 'Clinical', component: 'Medications', title: 'Medications' }
       },
       {
-        path:'immunization',
+        path:'immunizations',
         canActivate:[modulePermissionGuard],
-        component:ImmunizationsComponent
+        component:ImmunizationsComponent,
+        data: { module: 'Clinical', component: 'Immunizations', title: 'Immunizations' }
       },
     ]
   }

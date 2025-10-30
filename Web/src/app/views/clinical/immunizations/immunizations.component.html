@@ -4,7 +4,7 @@
   </div>
 
   <div class="card-body">
-    <div class="container-fluid">
+    <!-- <div class="container-fluid"> -->
       <div class="row g-3">
         <div class="col-12 d-flex align-items-center">
           <input type="checkbox" class="form-check-input" id="providerOutside" [(ngModel)]="isProviderCheck" (change)="onCheckboxChange2()" />
@@ -91,15 +91,16 @@
             <option *ngFor="let st of Active" [ngValue]="st.id">{{ st.name }}</option>
           </select>
         </div>
+
+        <div class="d-flex justify-content-end mt-4">
+          <button class="btn btn-success" (click)="submit()">{{ buttonText }}</button>
+          <button class="btn btn-secondary ms-2" (click)="DropFilled()">Clear</button>
+        </div>
       </div>
 
-      <div class="d-flex justify-content-end mt-4">
-        <button class="btn btn-success" (click)="submit()">{{ buttonText }}</button>
-        <button class="btn btn-secondary ms-2" (click)="DropFilled()">Clear</button>
-      </div>
     </div>
 
-    <div class="container-fluid mt-4">
+    <div>
       <div class="row g-3 align-items-end">
         <div class="col-auto">
           <label class="form-label" for="statusFilter">Status</label>
@@ -146,5 +147,5 @@
         </table>
       </div>
     </div>
-  </div>
+  <!-- </div> -->
 </div>

@@ -230,55 +230,55 @@ export const horizontalMenuItems: MenuItemType[] = [
         ],
     },
 
-    {
-        label: 'Clinical',
-        icon: 'tablerStethoscope', // Use appropriate icon
-        isCollapsed: true,
-        children: [
+    // {
+    //     label: 'Clinical',
+    //     icon: 'tablerStethoscope', // Use appropriate icon
+    //     isCollapsed: true,
+    //     children: [
         
-            // {
-            //     label: 'Alerts',
-            //     icon: 'tablerBell',
-            //     url: '/clinical/alerts',
-            // },
-            {
-                label: 'Allergies',
-                icon: 'tablerAlertTriangle',
-                url: '/clinical/allergies',
-            },
-            {
-                label: 'Problem List',
-                icon: 'tablerListDetails',
-                url: '/clinical/problem',
-            },
-            {
-                label: 'Medical History',
-                icon: 'tablerHeartbeat',
-                url: '/clinical/medical-history',
-            },
-            // {
-            //     label: 'Problem',
-            //     icon: 'tablerClipboardText',
-            //     url: '/clinical/Problem-List',
-            // },
-            {
-                label: 'Vital Signs',
-                icon: 'tablerHeartbeat',
-                url: '/clinical/vital-signs',
-            },
-            {
-                label:'Medications',
-                icon: 'tablerSyringe',
-                url:'/clinical/medications'
-            },
-            // {
-            //     label:'immunizations',
-            //     icon: 'tablerSyringe',
-            //     url:'/clinical/immunizations'
+    //         // {
+    //         //     label: 'Alerts',
+    //         //     icon: 'tablerBell',
+    //         //     url: '/clinical/alerts',
+    //         // },
+    //         {
+    //             label: 'Allergies',
+    //             icon: 'tablerAlertTriangle',
+    //             url: '/clinical/allergies',
+    //         },
+    //         {
+    //             label: 'Problem List',
+    //             icon: 'tablerListDetails',
+    //             url: '/clinical/problem',
+    //         },
+    //         {
+    //             label: 'Medical History',
+    //             icon: 'tablerHeartbeat',
+    //             url: '/clinical/medical-history',
+    //         },
+    //         // {
+    //         //     label: 'Problem',
+    //         //     icon: 'tablerClipboardText',
+    //         //     url: '/clinical/Problem-List',
+    //         // },
+    //         {
+    //             label: 'Vital Signs',
+    //             icon: 'tablerHeartbeat',
+    //             url: '/clinical/vital-signs',
+    //         },
+    //         {
+    //             label:'Medications',
+    //             icon: 'tablerSyringe',
+    //             url:'/clinical/medications'
+    //         },
+    //         {
+    //             label:'Immunizations',
+    //             icon: 'tablerSyringe',
+    //             url:'/clinical/immunizations'
 
-            // },
-        ],
-    },
+    //         },
+    //     ],
+    // },
 
     {
         label: 'Billing',
