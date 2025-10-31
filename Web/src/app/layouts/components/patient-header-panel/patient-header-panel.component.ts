@@ -65,7 +65,7 @@ export class PatientHeaderPanelComponent implements OnInit {
     private patientBannerService: PatientBannerService,
     private loader: LoaderService,
     private demographicapi: DemographicApiServices,
-    private secureStorage: SecureStorageService
+    private secureStorage: SecureStorageService,
   ) { }
 
   closeBanner() {
@@ -80,7 +80,7 @@ export class PatientHeaderPanelComponent implements OnInit {
   ngOnInit(): void {
      // 1) Hydrate from secure storage (if available)
      this.GetAllVisit();
-     debugger
+      
      const storedPatient = this.secureStorage.getJson<any>(this.STORAGE_KEYS.patientData);
      if (storedPatient?.table2?.[0]?.mrNo) {
        this.patientData = storedPatient;
@@ -139,7 +139,7 @@ export class PatientHeaderPanelComponent implements OnInit {
 
   async searchAppointment(mrNo: any, modalContent: any){
 
-    debugger
+     
     this.ActiveAppoinment = null;
 
     if(!mrNo){

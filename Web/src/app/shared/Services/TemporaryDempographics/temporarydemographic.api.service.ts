@@ -13,7 +13,7 @@ export class TemporaryPatientDemographicApiServices {
  constructor(private api: ApiService, private http: HttpClient) {}
 
   submitTempDemographic(object: any) {
-    debugger
+     
     return this.api.post('TempDemographic/InsertTempPatientRecord', object).toPromise();
   }
 

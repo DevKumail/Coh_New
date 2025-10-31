@@ -1,26 +1,35 @@
 <div class="tab-content rounded p-1" id="v-pills-tabContent">
-  <div class="tab-pane fade active show" id="v-summary-sheet" role="tabpanel" aria-labelledby="v-pills-home-tab">
+  <div class="tab-pane fade" id="v-summary-sheet" role="tabpanel" aria-labelledby="v-pills-home-tab" [class.active]="selected==='summary'" [class.show]="selected==='summary'">
 
     <div class="row g-3">
+
+      <!-- <div class="col-md-12">
+        <app-vital-signs></app-vital-signs>
+      </div> -->
+
+
+
+
       <div class="col-md-6">
         <div class="card shadow-sm">
-          <div class="card-header">Vitals</div>
+          <div class="card-header">{{'ENCOUNTERS' | translate}}</div>
           <div class="card-body p-0">
-            <table class="table table-sm table-bordered mb-0">
+           <table class="table table-bordered text-center table-striped table-sm">
               <thead>
                 <tr>
-                  <th>Metric</th>
-                  <th>Value</th>
+                  <th>{{ 'DATE' | translate }}</th>
+                  <th>{{ 'VISIT_PURPOSE' | translate }}</th>
+                  <th>{{ 'PROVIDER' | translate }}</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>BP</td>
-                  <td>120/80</td>
+              <tbody class="table-group-divider text-center">
+                <tr *ngFor="let e of Encounters">
+                  <td>{{ e.appDateTime | date : "dd/MM/yyyy h:mm a" }}</td>
+                  <td>{{ e.purposeOfVisit }}</td>
+                  <td>{{ getProviderName(e.providerId) }}</td>
                 </tr>
-                <tr>
-                  <td>Heart Rate</td>
-                  <td>72 bpm</td>
+                <tr *ngIf="Encounters.length === 0">
+                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
                 </tr>
               </tbody>
             </table>
@@ -30,23 +39,24 @@
 
       <div class="col-md-6">
         <div class="card shadow-sm">
-          <div class="card-header">Diagnosis</div>
+          <div class="card-header">{{'ALERTS' | translate}}</div>
           <div class="card-body p-0">
-            <table class="table table-sm table-bordered mb-0">
+           <table class="table table-bordered text-center table-striped table-sm">
               <thead>
                 <tr>
-                  <th>Code</th>
-                  <th>Description</th>
+                  <th>{{ 'REPEAT_DATE' | translate }}</th>
+                  <th>{{ 'ALERT_TYPE' | translate }}</th>
+                  <th>{{ 'ALERT_MESSAGE' | translate }}</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>I10</td>
-                  <td>Hypertension</td>
+              <tbody class="table-group-divider text-center">
+                <tr *ngFor="let e of alerts">
+                  <td>{{ e.repeatDate | date : "dd/MM/yyyy h:mm a" }}</td>
+                  <td>{{ e.alertType }}</td>
+                  <td>{{ e.alertMessage }}</td>
                 </tr>
-                <tr>
-                  <td>E11</td>
-                  <td>Type 2 Diabetes</td>
+                <tr *ngIf="alerts.length === 0">
+                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
                 </tr>
               </tbody>
             </table>
@@ -55,26 +65,29 @@
       </div>
     </div>
 
-    <div class="row g-3 mt-2">
-      <div class="col-md-4">
+    <div class="row g-3">
+      <div class="col-md-6">
         <div class="card shadow-sm">
-          <div class="card-header">Medications</div>
+          <div class="card-header">{{'MEDICATIONS' | translate}}</div>
           <div class="card-body p-0">
-            <table class="table table-sm table-bordered mb-0">
+             <table class="table table-bordered text-center table-striped table-sm">
               <thead>
                 <tr>
-                  <th>Drug</th>
-                  <th>Dosage</th>
+                  <th>{{ 'RX' | translate }}</th>
+                  <th>{{ 'PROVIDER' | translate }}</th>
+                  <th>{{ 'RX_START_DATE' | translate }}</th>
+                  <th>{{ 'STATUS' | translate }}</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>Metformin</td>
-                  <td>500mg</td>
+              <tbody class="table-group-divider text-center">
+                <tr *ngFor="let e of medications">
+                  <td>{{ e.code }}</td>
+                  <td>{{ e.providerId }}</td>
+                  <td>{{ e.rxStartDate | date : "dd/MM/yyyy h:mm a" }}</td>
+                  <td>{{ e.status }}</td>
                 </tr>
-                <tr>
-                  <td>Amlodipine</td>
-                  <td>5mg</td>
+                <tr *ngIf="medications.length === 0">
+                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
                 </tr>
               </tbody>
             </table>
@@ -82,25 +95,30 @@
         </div>
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="card shadow-sm">
-          <div class="card-header">Allergies</div>
+          <div class="card-header">{{'ALLERGIES' | translate}}</div>
           <div class="card-body p-0">
-            <table class="table table-sm table-bordered mb-0">
+             <table class="table table-bordered text-center table-striped table-sm">
               <thead>
                 <tr>
-                  <th>Substance</th>
-                  <th>Reaction</th>
+                  <th>{{ 'TYPE' | translate }}</th>
+                  <th>{{ 'ALLERGEN' | translate }}</th>
+                  <th>{{ 'PROVIDER' | translate }}</th>
+                  <th>{{ 'START_DATE' | translate }}</th>
+                  <th>{{ 'STATUS' | translate }}</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>Penicillin</td>
-                  <td>Rash</td>
+              <tbody class="table-group-divider text-center">
+                <tr *ngFor="let e of allergies">
+                  <td>{{ e.type }}</td>
+                  <td>{{ e.allergen }}</td>
+                  <td>{{ e.providerId }}</td>
+                  <td>{{ e.rxStartDate | date : "dd/MM/yyyy h:mm a" }}</td>
+                  <td>{{ e.status }}</td>
                 </tr>
-                <tr>
-                  <td>Peanuts</td>
-                  <td>Anaphylaxis</td>
+                <tr *ngIf="allergies.length === 0">
+                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
                 </tr>
               </tbody>
             </table>
@@ -108,7 +126,79 @@
         </div>
       </div>
 
-      <div class="col-md-4">
+       <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header">{{'MEDICAL_HISTORY' | translate}}</div>
+          <div class="card-body p-0">
+             <table class="table table-bordered text-center table-striped table-sm">
+              <thead>
+                <tr>
+                  <th>{{ 'PROBLEM' | translate }}</th>
+                  <th>{{ 'PROVIDER' | translate }}</th>
+                  <th>{{ 'START_DATE' | translate }}</th>
+                  <th>{{ 'STATUS' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody class="table-group-divider text-center">
+                <tr *ngFor="let e of medicalHistory">
+                  <td>{{ e.icD9Description }}</td>
+                  <td>{{ e.provider }}</td>
+                  <td>{{ e.startDate | date : "dd/MM/yyyy h:mm a" }}</td>
+                  <td>{{ e.status }}</td>
+                </tr>
+                <tr *ngIf="medicalHistory.length === 0">
+                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <app-generic-pagination
+              [totalItems]="MHtotalRecord"
+              [pageSize]="MHPaginationInfo.RowsPerPage"
+              [currentPage]="MHPaginationInfo.Page"
+              (pageChanged)="onMHPageChanged($event)"
+            >
+            </app-generic-pagination>
+          </div>
+        </div>
+      </div>
+
+       <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header">{{'PROBLEM_LIST' | translate}}</div>
+          <div class="card-body p-0">
+             <table class="table table-bordered text-center table-striped table-sm">
+              <thead>
+                <tr>
+                  <th>{{ 'PROBLEM' | translate }}</th>
+                  <th>{{ 'PROVIDER' | translate }}</th>
+                  <th>{{ 'START_DATE' | translate }}</th>
+                  <th>{{ 'STATUS' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody class="table-group-divider text-center">
+                <tr *ngFor="let e of problemList">
+                  <td>{{ e.problem }}</td>
+                  <td>{{ e.providerId }}</td>
+                  <td>{{ e.startDate | date : "dd/MM/yyyy h:mm a" }}</td>
+                  <td>{{ e.status }}</td>
+                </tr>
+                <tr *ngIf="problemList.length === 0">
+                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
+                </tr>
+              </tbody>
+            </table>
+                   <app-generic-pagination
+              [totalItems]="PLtotalRecord"
+              [pageSize]="PLPaginationInfo.RowsPerPage"
+              [currentPage]="PLPaginationInfo.Page"
+              (pageChanged)="onPLPageChanged($event)"
+            >
+            </app-generic-pagination>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="col-md-4">
         <div class="card shadow-sm">
           <div class="card-header">Lab Results</div>
           <div class="card-body p-0">
@@ -132,64 +222,44 @@
             </table>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
 
   </div>
 
-  <div class="tab-pane fade" id="v-patient-document" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+  <div class="tab-pane fade" id="v-patient-document" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'patient-document'" [class.show]="selected === 'patient-document'">
     <div class="row g-3">
-      <div class="col-md-6">
-        <div class="card shadow-sm">
-          <div class="card-header">Uploaded Documents</div>
-          <div class="card-body p-0">
-            <table class="table table-sm table-bordered mb-0">
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Lab Report</td>
-                  <td>2025-07-30</td>
-                </tr>
-                <tr>
-                  <td>X-Ray</td>
-                  <td>2025-07-29</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+    <app-clinical-note></app-clinical-note>
+    </div>
+  </div>    
 
-      <div class="col-md-6">
-        <div class="card shadow-sm">
-          <div class="card-header">Consent Forms</div>
-          <div class="card-body p-0">
-            <table class="table table-sm table-bordered mb-0">
-              <thead>
-                <tr>
-                  <th>Form</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Consent for Surgery</td>
-                  <td>Signed</td>
-                </tr>
-                <tr>
-                  <td>Privacy Agreement</td>
-                  <td>Pending</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+
+  <!-- Problem List -->
+  <div class="tab-pane fade" id="v-problem-list" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'problem-list'" [class.show]="selected === 'problem-list'">
+    <div class="row g-3">
+      <app-problem></app-problem>
     </div>
   </div>
+
+  <!-- Medical History -->
+  <div class="tab-pane fade" id="v-medical-history" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'medical-history'" [class.show]="selected === 'medical-history'">
+    <div class="row g-3">
+      <app-medical-history></app-medical-history>
+    </div>
+  </div>
+
+  <!-- Allergies -->
+  <div class="tab-pane fade" id="v-allergies" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'allergies'" [class.show]="selected === 'allergies'">
+    <div class="row g-3">
+      <app-allergies></app-allergies>
+    </div>
+  </div>
+
+  <!-- Vital Sign -->
+  <div class="tab-pane fade" id="v-vital-sign" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'vital-sign'" [class.show]="selected === 'vital-sign'">
+    <div class="row g-3">
+      <app-vital-signs></app-vital-signs>
+    </div>
+  </div>
+
 </div>

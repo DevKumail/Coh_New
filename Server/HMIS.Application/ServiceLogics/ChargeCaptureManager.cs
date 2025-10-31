@@ -551,7 +551,7 @@ namespace HMIS.Application.ServiceLogics
         //    }
         //    //return "";m
         //}
-
+       
 
         public async Task<String> SaveChargeCapture(ChargCaptureModel input)
         {
@@ -578,6 +578,8 @@ namespace HMIS.Application.ServiceLogics
 
                         //decimal? price = 0;
                         decimal? price = await GetProcedureUnitPrice(Convert.ToInt16(BillProcedure.TypeOfService), BillProcedure.ProcedureCode, updateComment.ProviderId, Convert.ToInt64(input.PayerId), Convert.ToInt64(BillProcedure.UnclassifiedId));
+                        ;
+
 
                         BlsuperBillProcedure bLSuperBill = new BlsuperBillProcedure
                         {
@@ -745,7 +747,7 @@ namespace HMIS.Application.ServiceLogics
         //    return price;
 
         //}
-        private async Task<decimal> GetProcedureUnitPrice(int procedureType, string? procedureCode, long providerId, long payerId, long UnclassifiedId)
+        private async Task<decimal> GetProcedureUnitPrice(int procedureType, string? procedureCode, long providerId, long? payerId, long UnclassifiedId)
         {
             double price = 0.00;
 

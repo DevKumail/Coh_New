@@ -92,6 +92,7 @@ export class ProblemComponent {
   MyDentalGroups: any[] = [];
   Searchby: any = [{ code: 1, name: 'Diagnosis Code' }, { code: 2, name: 'Diagnosis Code Range' }, { code: 3, name: 'Description' }]
   Active = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }, { id: 0, name: "In Error" }];
+
   DiagnosisForm: any;
 
   paginatedDiagnosisCode: any[] = [];
@@ -106,7 +107,7 @@ export class ProblemComponent {
   end: any;
   totalPagesDiagnoseCode:any;
   isProviderCheck:any;
-
+SelectedVisit: any;
   DescriptionFilter: any = '';
   DiagnosisEndCode: any = '';
   DiagnosisStartCode: any = '';
@@ -147,6 +148,25 @@ MHPaginationInfo: any = {
 
 
 
+  private setProviderFromSelectedVisit(): void {
+    try {
+      if (!this.medicalForm) { return; }
+      const empId = this.SelectedVisit?.employeeId;
+      if (!empId) { return; }
+      // If provider doesn't exist in dropdown list, keep placeholder
+      const exists = Array.isArray(this.hrEmployees)
+        ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
+        : false;
+      const valueToSet = exists ? empId : null;
+      const ctrl = this.medicalForm.get('providerId');
+      if (!ctrl) { return; }
+      ctrl.setValue(valueToSet, { emitEvent: false });
+      ctrl.markAsDirty();
+      ctrl.markAsTouched();
+      ctrl.updateValueAndValidity({ onlySelf: true });
+    } catch {}
+  }
+
   async ngOnInit() {
     this.currentUser = sessionStorage.getItem('userId') || 0;
 
@@ -168,11 +188,19 @@ MHPaginationInfo: any = {
     
           });
 
+        this.PatientData.selectedVisit$.subscribe((data: any) => {
+        this.SelectedVisit = data;
+        console.log('Selected Visit medical-list', this.SelectedVisit);
+        if (this.SelectedVisit) {
+          this.setProviderFromSelectedVisit();
+        }
+      });
+
     this.medicalForm = this.fb.group({
-      providerId: ['', Validators.required],
+      providerId: [null, Validators.required],
       problem: ['', Validators.required],
-      comments: ['', Validators.required],
-      status: ['', Validators.required],  
+      comments: [''],
+      status: ['Active', Validators.required],  
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
       providerName: [''], 
@@ -180,6 +208,9 @@ MHPaginationInfo: any = {
       isConfidentential: [false],
       isProviderCheck: [false] 
     });
+
+    // Ensure provider defaults from SelectedVisit right after form init
+    try { this.setProviderFromSelectedVisit(); } catch {}
 
 
     this.ModalFilterForm = this.fb.group({
@@ -325,7 +356,7 @@ onPROBSubmit() {
       });
       return;
     }
-    debugger
+     
 
     const formData = this.medicalForm.value;
     console.log('medicalForm =>',this.medicalForm.value);
@@ -394,8 +425,14 @@ onPROBSubmit() {
   }
 
 onPROBClear(){
+  // decide provider value based on existence in hrEmployees
+  const empId = this.SelectedVisit?.employeeId;
+  const exists = Array.isArray(this.hrEmployees)
+    ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
+    : false;
+  const providerValue = exists ? empId : null;
   this.medicalForm.patchValue({
-    providerId: '',
+    providerId: providerValue,
     problem: '',
     comments: '',
     status: '',
@@ -405,6 +442,8 @@ onPROBClear(){
     isConfidentential: false,
     isProviderCheck: false 
   })
+  this.medicalForm.markAsPristine();
+  this.medicalForm.markAsUntouched();
     //this.submitted = false;
   }
 
@@ -461,7 +500,7 @@ onPROBClear(){
       })
   }
   FillDropDown(response: any) {
-    debugger
+     
     let jParse = JSON.parse(JSON.stringify(response)).cache;
     let provider = JSON.parse(jParse).Provider;
     let iCDVersion = JSON.parse(jParse).BLICDVersion;
@@ -475,7 +514,8 @@ onPROBClear(){
       });
       this.hrEmployees = provider;
       console.log(this.hrEmployees);
-
+      // Now that providers are available, re-apply provider from SelectedVisit
+      try { this.setProviderFromSelectedVisit(); } catch {}
     }
     if (iCDVersion) {
       iCDVersion = iCDVersion.map(
@@ -485,7 +525,7 @@ onPROBClear(){
             code: item.ICDVersionId,
           };
         });
-      debugger
+       
       const item = {
         name: 'ALL',
         code: 0,

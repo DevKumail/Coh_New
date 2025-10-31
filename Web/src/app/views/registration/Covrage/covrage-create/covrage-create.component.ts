@@ -140,7 +140,7 @@ export class CovrageCreateComponent implements OnInit {
 }
 
 //     ngOnInit(): void {
-//   debugger;
+//    ;
 
 //   // 🟢 Step 1: Get subscriberId from router state (if navigated from EditCoverage)
 //   const subscriberIdFromState = history.state?.subscriberId;
@@ -692,7 +692,7 @@ export class CovrageCreateComponent implements OnInit {
     }
 
     insertsubscriber() {
-        debugger;
+         ;
         this.isSubmitted = true;
         if (this.subscriberForm.invalid) {
             Swal.fire('Error', 'Please fill all required fields', 'error');
@@ -769,7 +769,7 @@ export class CovrageCreateComponent implements OnInit {
             // regInsert
             regDeduct: null,
         };
-        debugger
+         
 
         this.CoveragesApiService
             .InsertSubscriber(dto)
@@ -956,7 +956,7 @@ async GetCoverageById(subscribedId: number) {
         .then(async (response: any) => {
             if (response) {
                 const data = response?.table1?.[0] || {};
-                debugger
+                 
             // Resolve Suffix (Title) code by name or code
             const suffixCode = (() => {
               const raw = data?.suffix || '';

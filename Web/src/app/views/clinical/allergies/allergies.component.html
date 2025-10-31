@@ -1,28 +1,28 @@
 <!-- 🔹 Breadcrumb OUTSIDE card -->
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
-      <li class="breadcrumb-item">
-        <a href="javascript:void(0);">
-          <lucide-angular [img]="homeIcon" class="fs-6"></lucide-angular>
-          {{ 'CLINICAL' | translate }}
-        </a>
-      </li>
-      <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
-         <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
-      </li>
-  <li class="breadcrumb-item active" aria-current="page">{{ 'ALLERGIES' | translate }}</li>
-    </ol>
-  </nav>
+    <li class="breadcrumb-item">
+      <a href="javascript:void(0);">
+        <lucide-angular [img]="homeIcon" class="fs-6"></lucide-angular>
+        {{ 'CLINICAL' | translate }}
+      </a>
+    </li>
+    <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
+      <ng-icon [name]="isRtl ? 'tablerChevronLeft' : 'tablerChevronRight'"></ng-icon>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">{{ 'ALLERGIES' | translate }}</li>
+  </ol>
+</nav>
 
 
 
 <form *ngIf="allergyForm" [formGroup]="allergyForm" class="mt-4">
   <div class="card shadow-lg rounded-3 border-0">
 
-  <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
         <lucide-angular [img]="headingIcon" class="fs-5"></lucide-angular>
-  <span>{{ 'ALLERGIES' | translate }}</span>
+        <span>{{ 'ALLERGIES' | translate }}</span>
       </h5>
       <i class="bi bi-heart-pulse fs-4"></i>
     </div>
@@ -45,12 +45,13 @@
       <div class="row g-2">
         <!-- Provider -->
         <div class="col-md-6 col-lg-3">
-          <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }} <span class="text-danger">*</span></label> 
+          <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }} <span class="text-danger">*</span></label>
           <select class="form-select" formControlName="providerId">
-            <option value="" disabled>{{ 'SELECT_PROVIDER' | translate }}</option>
+            <option [ngValue]="null" disabled>{{ 'SELECT_PROVIDER' | translate }}</option>
             <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}</option>
           </select>
-          <div class="text-danger small" *ngIf="allergyForm.get('providerId')?.touched && allergyForm.get('providerId')?.invalid">
+          <div class="text-danger small"
+            *ngIf="allergyForm.get('providerId')?.touched && allergyForm.get('providerId')?.invalid">
             {{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
         </div>
 
@@ -61,20 +62,24 @@
 
         <!-- Allergy Type -->
         <div class="col-md-6 col-lg-3">
-          <label class="form-label fw-semibold">{{ 'ALLERGY_TYPE' | translate }} <span class="text-danger">*</span></label>
+          <label class="form-label fw-semibold">{{ 'ALLERGY_TYPE' | translate }} <span
+              class="text-danger">*</span></label>
           <select class="form-select" formControlName="allergyType">
             <option Value="" disabled>{{ 'SELECT_ALLERGY_TYPE' | translate }}</option>
             <option *ngFor="let type of GetAlergy" [value]="type.alergyTypeId">{{ type.alergyName }}</option>
           </select>
-          <div class="text-danger small" *ngIf="allergyForm.get('allergyType')?.touched && allergyForm.get('allergyType')?.invalid">
+          <div class="text-danger small"
+            *ngIf="allergyForm.get('allergyType')?.touched && allergyForm.get('allergyType')?.invalid">
             {{ 'ALLERGY_TYPE_IS_REQUIRED' | translate }}</div>
         </div>
 
         <!-- Allergen -->
         <div class="col-md-6 col-lg-3">
           <label class="form-label fw-semibold">{{ 'ALLERGEN' | translate }} <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" formControlName="allergen" placeholder="{{ 'ENTER_ALLERGEN' | translate }}" />
-          <div class="text-danger small" *ngIf="allergyForm.get('allergen')?.touched && allergyForm.get('allergen')?.invalid">
+          <input type="text" class="form-control" formControlName="allergen"
+            placeholder="{{ 'ENTER_ALLERGEN' | translate }}" />
+          <div class="text-danger small"
+            *ngIf="allergyForm.get('allergen')?.touched && allergyForm.get('allergen')?.invalid">
             {{ 'ALLERGEN_IS_REQUIRED' | translate }}</div>
         </div>
 
@@ -85,33 +90,68 @@
             <option Value="" disabled>{{ 'SELECT_SEVERITY' | translate }}</option>
             <option *ngFor="let sev of GetSeverity" [value]="sev.id">{{ sev.severityName }}</option>
           </select>
-          <div class="text-danger small" *ngIf="allergyForm.get('severity')?.touched && allergyForm.get('severity')?.invalid">
+          <div class="text-danger small"
+            *ngIf="allergyForm.get('severity')?.touched && allergyForm.get('severity')?.invalid">
             {{ 'SEVERITY_IS_REQUIRED' | translate }}</div>
         </div>
 
         <!-- Reaction -->
         <div class="col-md-6 col-lg-3">
           <label class="form-label fw-semibold">{{ 'REACTION' | translate }} <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" formControlName="reaction" placeholder="{{ 'ENTER_REACTION' | translate }}" />
-          <div class="text-danger small" *ngIf="allergyForm.get('reaction')?.touched && allergyForm.get('reaction')?.invalid">
+          <input type="text" class="form-control" formControlName="reaction"
+            placeholder="{{ 'ENTER_REACTION' | translate }}" />
+          <div class="text-danger small"
+            *ngIf="allergyForm.get('reaction')?.touched && allergyForm.get('reaction')?.invalid">
             {{ 'REACTION_IS_REQUIRED' | translate }}</div>
         </div>
 
         <!-- Start Date -->
-        <div class="col-md-6 col-lg-3">
-          <label class="form-label fw-semibold">{{ 'START_DATE' | translate }} <span class="text-danger">*</span></label>
-          <input id="allergyStartDate" type="text" class="form-control" formControlName="startDate" placeholder="{{ 'SELECT_DATE' | translate }}" data-provider="flatpickr" />
+        <!-- <div class="col-md-6 col-lg-3">
+          <input id="allergyStartDate" 
+          type="date" 
+          class="form-control" 
+          formControlName="startDate" 
+          placeholder="{{ 'SELECT_DATE' | translate }}" />
           <div class="text-danger small" *ngIf="allergyForm.get('startDate')?.touched && allergyForm.get('startDate')?.invalid">
             {{ 'START_DATE_REQUIRED' | translate }}</div>
+        </div> -->
+
+        <div class="col-md-6 col-lg-3">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">{{ 'START_DATE' | translate }} <span
+                class="text-danger">*</span></label>
+            <input type="date" class="form-control" formControlName="startDate" />
+            <div class="text-danger small"
+              *ngIf="allergyForm.get('startDate')?.touched && allergyForm.get('startDate')?.invalid">{{
+              'START_DATE_REQUIRED' | translate }}</div>
+          </div>
         </div>
 
+
         <!-- End Date -->
+
         <div class="col-md-6 col-lg-3">
+          <div class="mb-3">
+            <label class="form-label">{{ 'END_DATE' | translate }}</label>
+            <input type="date" class="form-control" formControlName="endDate"
+              [attr.min]="allergyForm.get('startDate')?.value || null"
+              [disabled]="allergyForm.get('status')?.value !== 0" />
+            <div class="text-danger small"
+              *ngIf="allergyForm.get('endDate')?.touched && allergyForm.get('endDate')?.invalid">{{ 'END_DATE_REQUIRED'
+              | translate }}</div>
+            <div class="text-danger small"
+              *ngIf="allergyForm.get('endDate')?.touched && allergyForm.get('startDate')?.value && allergyForm.get('endDate')?.value && (allergyForm.get('endDate')?.value < allergyForm.get('startDate')?.value)">
+              {{ 'END_DATE_NOT_LESS_THAN_START' | translate }}
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="col-md-6 col-lg-3">
           <label class="form-label fw-semibold">{{ 'END_DATE' | translate }} <span class="text-danger">*</span></label>
           <input id="allergyEndDate" type="text" class="form-control" formControlName="endDate" placeholder="{{ 'SELECT_DATE' | translate }}" data-provider="flatpickr" />
           <div class="text-danger small" *ngIf="allergyForm.get('endDate')?.touched && allergyForm.get('endDate')?.invalid">
             {{ 'END_DATE_REQUIRED' | translate }}</div>
-        </div>
+        </div> -->
 
         <!-- Status -->
         <div class="col-md-6 col-lg-3">
@@ -120,7 +160,8 @@
             <option Value="" disabled>{{ 'SELECT_STATUS' | translate }}</option>
             <option *ngFor="let status of statusOptions" [value]="status.id">{{ status.name }}</option>
           </select>
-          <div class="text-danger small" *ngIf="allergyForm.get('status')?.touched && allergyForm.get('status')?.invalid">
+          <div class="text-danger small"
+            *ngIf="allergyForm.get('status')?.touched && allergyForm.get('status')?.invalid">
             {{ 'STATUS_REQUIRED' | translate }}</div>
         </div>
 
@@ -144,10 +185,10 @@
   <div class="card mt-3">
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table table-bordered table-striped table-sm">
 
           <thead class="align-middle thead-sm">
-              <tr>
+            <tr>
               <th class="text-center">{{ 'PROVIDER' | translate }}</th>
               <th class="text-center">{{ 'ALLERGY_TYPE' | translate }}</th>
               <th class="text-center">{{ 'ALLERGEN' | translate }}</th>
@@ -160,15 +201,15 @@
             </tr>
           </thead>
           <tbody class="table-group-divider">
-            <tr *ngFor="let allergy of pagedallergie; let i = index">
-              <td class="text-center">{{ allergy.providerName || allergy.providerId }}</td>
-              <td class="text-center">{{ (allergy.alergyName || '').trim() }}</td>
-              <td class="text-center">{{ allergy.allergen }}</td>
-              <td class="text-center">{{ allergy.severityName }}</td>
-              <td class="text-center">{{ allergy.reaction }}</td>
+            <tr *ngFor="let allergy of MyAllergiesData; let i = index">
+              <td class="text-center">{{ allergy.providerName || allergy.providerId || '-' }} </td>
+              <td class="text-center">{{ (allergy.alergyName || '-').trim() }}</td>
+              <td class="text-center">{{ allergy.allergen || '-' }}</td>
+              <td class="text-center">{{ allergy.severityName || '-' }}</td>
+              <td class="text-center">{{ allergy.reaction || '-' }}</td>
               <td class="text-center">{{ allergy.startDate | date:'dd/MM/yyyy' }}</td>
-              <td class="text-center">{{ allergy.endDate | date:'dd/MM/yyyy' }}</td>
-              <td class="text-center">{{ allergy.status }}</td>
+              <td class="text-center">{{ allergy.endDate | date:'dd/MM/yyyy' }} </td>
+              <td class="text-center">{{ allergy.status || '-' }}</td>
               <td class="text-center" style="text-align: center;">
 
                 <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
@@ -180,12 +221,18 @@
                 </div>
               </td>
             </tr>
+            <tr *ngIf="allergieTotalItems === 0">
+              <td colspan="9" class="text-center">{{ 'NO_DATA_FOUND' | translate }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      <app-generic-pagination [totalItems]="allergieTotalItems" [pageSize]="allergiePageSize"
-        [currentPage]="allergieCurrentPage" (pageChanged)="onallergiePageChanged($event)">
+      <app-generic-pagination 
+      [totalItems]="allergieTotalItems" 
+      [pageSize]="pagegination.pageSize"
+      [currentPage]="pagegination.currentPage" 
+      (pageChanged)="onallergiePageChanged($event)">
       </app-generic-pagination>
     </div>
   </div>

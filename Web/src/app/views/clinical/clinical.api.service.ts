@@ -19,58 +19,58 @@ export class ClinicalApiService {
   // }
 
   SubmitPatientProblem(object: any) {
-    debugger
+
     return this.api
       .post(`PatientProblem/SubmitPatientProblem`, object)
       .toPromise();
   }
   MyCptCodebyProvider(ProviderId: number, GroupId: number) {
-    //debugger
+    // 
     return this.api.get(`ChargeCapture/MyCptCode?ProviderId=${ProviderId}&GroupId=${GroupId}`).toPromise();
   }
   UnclassifiedServicebyProvider(AllCode: number, UCStartCode: string, DescriptionFilter: string) {
-    //debugger
+    // 
     return this.api.get(`ChargeCapture/UnclassifiedService?AllCode=${AllCode}&UCStartCode=${UCStartCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
   }
   ServiceItemsbyProvider(AllCode: number, ServiceStartCode: string, DescriptionFilter: string) {
-    //debugger
+    // 
     return this.api.get(`ChargeCapture/ServiceItems?AllCode=${AllCode}&ServiceStartCode=${ServiceStartCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
   }
 
 
   CPTCodebyProvider(AllCPTCode: number, CPTStartCode: string, CPTEndCode: string, Description: string) {
-    //debugger
+    // 
     return this.api.get(`ChargeCapture/CPTCode?AllCPTCode=${AllCPTCode}&CPTStartCode=${CPTStartCode}&CPTEndCode=${CPTEndCode}&Description=${Description}`).toPromise();
   }
   MyHCPCSCodebyProvider(ProviderId: number, GroupId: number, HCPCSCode: string, DescriptionFilter: string, PairId: number) {
-    //debugger
+    // 
     return this.api.get(`ChargeCapture/MyHCPCSCode?ProviderId=${ProviderId}&GroupId=${GroupId}&HCPCSCode=${HCPCSCode}&DescriptionFilter=${DescriptionFilter}&PayerId=${PairId}`).toPromise();
   }
   DiagnosisCodebyProvider(
-    ICDVersionId: number, 
-    PageNumber: any, 
+    ICDVersionId: number,
+    PageNumber: any,
     PageSize: any,
-    DiagnosisStartCode: string, 
-    DiagnosisEndCode: string, 
-    DescriptionFilter: string 
+    DiagnosisStartCode: string,
+    DiagnosisEndCode: string,
+    DescriptionFilter: string
   ) {
     return this.api.get(`ChargeCapture/DiagnosisCode?ICDVersionId=${ICDVersionId}&DiagnosisStartCode=${DiagnosisStartCode}&DiagnosisEndCode=${DiagnosisEndCode}&DescriptionFilter=${DescriptionFilter}&PageNumber=${PageNumber}&PageSize=${PageSize}`).toPromise();
   }
   submitPatientAllergy(data: any): Observable<any> {
-    // debugger
+    //  
     return this.api.post('/Alergy/SubmitPatientAlergy', data);
   }
 
-  GetRowDataOfPatientProblem(IsMedicalHistory:boolean,mrno: string, userId: number, pageNumber: number = 1, pageSize: number = 10) {
+  GetRowDataOfPatientProblem(IsMedicalHistory: boolean, mrno: string, userId: number, pageNumber: number = 1, pageSize: number = 10) {
     return this.api.get(`PatientProblem/GetPatientProblems?IsMedicalHistory=${IsMedicalHistory}&MRNo=${mrno}&UserId=${userId}&pageNumber=${pageNumber}&pageSize=${pageSize}`).toPromise();
   }
- GetPatientProblemData(IsMedicalHistory:boolean, mrno: string, userId: number, pageNumber: number, pageSize: number) {
+  GetPatientProblemData(IsMedicalHistory: boolean, mrno: string, userId: number, pageNumber: number, pageSize: number) {
     // Unified to PatientProblem endpoint (Problem/GetProblemDetailsDB does not exist)
     return this.api.get(`PatientProblem/GetPatientProblems?IsMedicalHistory=${IsMedicalHistory}&MRNo=${mrno}&UserId=${userId}&pageNumber=${pageNumber}&pageSize=${pageSize}`).toPromise();
-}
+  }
 
   MyDiagnosisCodebyProvider(ProviderId: number, GroupId: number | null, ICDVersionId: number | null) {
-    debugger
+
     return this.api.get(`ChargeCapture/MyDiagnosisCode?ProviderId=${ProviderId}&GroupId=${GroupId}&ICDVersionId=${ICDVersionId}`).toPromise();
   }
 
@@ -94,11 +94,11 @@ export class ClinicalApiService {
   //   return this.api.get(`AllDropdowns/GetAlergyType?mrno=${mrno}&userId=${userId}`).toPromise();
   // }
   //  GetAlergyType(){
-  //    // debugger;
+  //    //  ;
   //   return this.api.get(`AllDropdowns/GetAlergyTypes`).toPromise();
   // }
   SubmitPatientAllergies(object: any) {
-    debugger
+
     return this.api.post(`Alergy/SubmitPatientAlergy`, object).toPromise();
   }
   GetAllergyDetails(mrno: string): Promise<any> {
@@ -115,12 +115,12 @@ export class ClinicalApiService {
   // GetAllergyById(id: string): Promise<any> {
   //     const url = `Allergies/GetAllergyById?id=${id}`;
   GetSeverity() {
-    // debugger;
+    //  ;
     return this.api.get(`AllDropdowns/GetSeverityType`).toPromise();
   }
 
   GetPatientAllergyData(mrno: String) {
-    // debugger;
+    //  ;
     return this.api.get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}`).toPromise();
   }
   GetAlergyType(): Observable<any> {
@@ -169,13 +169,13 @@ export class ClinicalApiService {
   UpdatePatientProblem(id: string, data: any): Observable<any> {
     return this.api.put(`/PatientProblem/UpdatePatientProblem/${id}`, data);
   }
- 
-//   DeletePatientProblem(Id: number): Observable<any> {
-//   return this.api.delete(`PatientProblem/DeletePatientProblem/${Id}`);
-// }
-DeletePatientProblem(Id: number){
-  return this.api.delete(`PatientProblem/DeletePatientProblem?Id=${Id}`).toPromise();;
-}
+
+  //   DeletePatientProblem(Id: number): Observable<any> {
+  //   return this.api.delete(`PatientProblem/DeletePatientProblem/${Id}`);
+  // }
+  DeletePatientProblem(Id: number) {
+    return this.api.delete(`PatientProblem/DeletePatientProblem?Id=${Id}`).toPromise();;
+  }
 
 
   GetAlertType() {
@@ -185,6 +185,36 @@ DeletePatientProblem(Id: number){
     return this.api.get('Alert/GetAlertStatus').toPromise();
 
   }
+
+
+  GetEMRRoute() {
+    ;
+    return this.api.get(`AllDropdowns/GetEMRRoute`).toPromise();
+  }
+
+  GetComments() {
+    ;
+    return this.api.get(`AllDropdowns/GetComments`).toPromise();
+  }
+
+  GetFrequency() {
+    ;
+    return this.api.get(`AllDropdowns/GetFrequency`).toPromise();
+  }
+
+  GetAll_Past_CurrentPrescriptions(mrno: string) {
+    return this.api.get(`Prescription/GetAllPrescriptions?mrno=${mrno}`).toPromise();
+  }
+
+  SearchByPrescription(keyword: string, pageNumber: number, pageSize: number) {
+    return this.api.get(`Prescription/SearchByPrescriptions?keyword=${keyword}&pageNumber=${pageNumber}&pageSize=${pageSize}`).toPromise();
+  }
+
+
+  SubmitPrescription(object: any) {
+    return this.api.post(`Prescription/InsertOrUpdatePrescriptions`, object).toPromise();
+  }
+
   // GetSeverity() {
   //   return this.api.get('AllDropdowns/GetSeverityType').toPromise();
   // }

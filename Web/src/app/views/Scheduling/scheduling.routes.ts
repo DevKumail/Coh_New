@@ -7,6 +7,7 @@ import { SchedulingApiService } from './scheduling.api.service';
 import { FilterModalComponent } from './filter.modal/filter.modal.component';
 import { AppointmentDashboardComponent } from './appointment-dashboard/appointment-dashboard.component';
 import { modulePermissionGuard } from '@core/guards/module-permission.guard';
+import { AppointmentHistoryComponent } from './appointment-history/appointment-history.component';
 
 export const Scheduling_ROUTES: Routes = [
     // {
@@ -63,6 +64,12 @@ export const Scheduling_ROUTES: Routes = [
             component: CreateAppointmentComponent,
             canActivate: [modulePermissionGuard],
             data: { module: 'Scheduling', component: 'Appointment Booking', title: 'Appointment Booking' }
+        },
+        {
+            path: 'appointment history',
+            component: AppointmentHistoryComponent,
+            canActivate: [modulePermissionGuard],
+            data: { module: 'Scheduling', component: 'Appointments History', title: 'Appointments History' }
         },
         ]
       }

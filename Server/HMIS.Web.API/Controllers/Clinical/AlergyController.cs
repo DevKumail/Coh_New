@@ -22,9 +22,9 @@ namespace HMIS.Web.Controllers.Clinical
 
 
         [HttpGet("GetAlergyDetailsDB")]
-        public async Task<ActionResult> GetAlergyDetailsDB(string mrno)
+        public async Task<ActionResult> GetAlergyDetailsDB(string mrno, int? PageNumber, int? PageSize)
         {
-            var allergys = await Alergy.GetAlergyDetailsDB(mrno);
+            var allergys = await Alergy.GetAlergyDetailsDB(mrno, PageNumber, PageSize);
             return Ok(new { allergys = allergys });
         }
 

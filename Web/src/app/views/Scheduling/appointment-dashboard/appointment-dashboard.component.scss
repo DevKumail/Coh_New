@@ -6,6 +6,108 @@
   border-radius: 4px;
 }
 
+/* Deep overrides to ensure styles win against global/plugin CSS */
+:host ::ng-deep .calendar-theme-orange {
+  --fc-event-bg-color: #fff6ed;
+  --fc-event-border-color: #f29900;
+  --fc-event-text-color: #f29900;
+  --fc-neutral-bg-color: #fff6ed;
+
+  .fc-daygrid-event,
+  .fc-timegrid-event,
+  .fc-v-event {
+    background-color: #fff6ed !important;
+    border: none !important;
+    /* keep left bar only on inner .fc-event-main to avoid double bars */
+    border-left: none !important;
+    color: #f29900 !important;
+  }
+
+  .fc-daygrid-event .fc-event-main,
+  .fc-timegrid-event .fc-event-main,
+  .fc-v-event .fc-event-main {
+    background-color: #fff6ed !important;
+    border-left: 4px solid #f29900 !important;
+    color: #f29900 !important;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    padding: 2px 8px 2px 8px; /* space after bar */
+  }
+
+  /* Month view anchor gets colored directly; override it */
+  a.fc-daygrid-event.fc-h-event,
+  a.fc-daygrid-event.fc-h-event .fc-event-main {
+    background-color: #fff6ed !important;
+    /* no border on anchor, only on inner */
+    border-left: none !important;
+    color: #f29900 !important;
+  }
+
+  /* Extra-specific month overrides (when theme adds background on .fc-h-event or .fc-event-main) */
+  .fc .fc-daygrid .fc-daygrid-event,
+  .fc .fc-daygrid .fc-h-event,
+  .fc .fc-daygrid .fc-h-event .fc-event-main {
+    background-color: #fff6ed !important;
+    color: #f29900 !important;
+    border-left: none !important; /* outer none */
+    border-color: #f29900 !important;
+  }
+
+  /* General event anchors */
+  a.fc-event,
+  .fc-h-event {
+    background-color: #fff6ed !important;
+    color: #f29900 !important;
+    border: none !important;
+    /* remove outer left bar: use inner only */
+    border-left: none !important;
+  }
+
+  .fc-event-title,
+  .fc-daygrid-event a {
+    color: #f29900 !important;
+  }
+
+  /* Ensure month view title containers adopt orange text */
+  .fc-daygrid-event .fc-event-title,
+  .fc-daygrid-event .fc-event-title-container,
+  .fc-daygrid-event .fc-event-main-frame {
+    color: #f29900 !important;
+    background-color: #fff6ed !important;
+  }
+
+  /* Inline +N badge for Week view (inserted into first visible event) */
+  .fc-slot-more-badge {
+    position: absolute;
+    right: 6px;
+    top: 2px;
+    background: transparent;
+    color: #f29900;
+    border: 1px solid #f29900;
+    border-radius: 10px;
+    padding: 0 6px;
+    height: 16px;
+    line-height: 16px;
+    font-size: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* Hover states for event chips */
+  .fc-daygrid-event .fc-event-main:hover,
+  .fc-timegrid-event .fc-event-main:hover,
+  .fc-v-event .fc-event-main:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    transform: translateY(-1px);
+    transition: box-shadow .15s ease, transform .15s ease;
+  }
+
+  .fc-daygrid-event-dot {
+    border-color: #f29900 !important;
+    background: #f29900 !important;
+  }
+}
+
 /* Calendar header buttons */
 .fc .fc-button {
   background-color: #ff8800; /* orange */
@@ -24,20 +126,380 @@
   background-color: #cc5c00 !important;
 }
 
-/* Today's date background */
-.fc .fc-day-today {
-  background-color: #ffe6cc !important; /* light orange background */
+/* Event appearance */
+.fc .fc-event,
+.fc .fc-daygrid-event {
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-/* Event styling */
-.fc-event {
-  background-color: #ff9900 !important; /* orange */
+.fc .fc-event:hover,
+.fc .fc-daygrid-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* Title emphasis */
+.fc .fc-toolbar-title {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* Ensure inner wrapper allows fixed action button */
+.fc-event-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 8px;
+}
+
+/* Meta content: MRNO | Provider */
+.fc-event-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0; /* allow flex child to shrink */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fc-dot {
+  font-size: 10px;
+  opacity: 0.9;
+}
+.fc-sep {
+  opacity: 0.9;
+}
+
+/* Month view day grid: ensure meta truncates inside event box */
+.fc-daygrid-event .fc-event-inner,
+.fc-daygrid-event .fc-event-main {
+  display: flex;
+  align-items: center;
+}
+.fc-daygrid-event .fc-event-meta {
+  min-width: 0;
+}
+
+/* Week/Day time grid: ensure truncation inside time slot */
+.fc-timegrid-event .fc-event-main,
+.fc-v-event .fc-event-main {
+  display: flex;
+  align-items: center;
+}
+.fc-timegrid-event .fc-event-meta,
+.fc-v-event .fc-event-meta {
+  min-width: 0;
+}
+
+/* List view: truncate title cell */
+.fc .fc-list-event-title,
+.fc .fc-list-event-title a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fc-eye-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
   border: none;
-  color: white;
-  font-weight: bold;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  color: #fff;
+}
+.fc-eye-btn:hover {
+  opacity: 0.85;
+}
+
+/* Day header styling */
+.fc .fc-col-header-cell-cushion {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Weekend background: reset (no orange) */
+.fc .fc-day-sat .fc-daygrid-day-frame,
+.fc .fc-day-sun .fc-daygrid-day-frame {
+  background-color: transparent !important;
+}
+
+/* Today's date background: reset (no orange) */
+.fc .fc-day-today {
+  background-color: inherit !important;
+}
+
+/* Today’s day number: reset to default (no orange pill) */
+.fc .fc-day-today .fc-daygrid-day-number {
+  background: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Subtle today column highlight and now-indicator styled in brand color */
+.fc .fc-timegrid-col.fc-day-today {
+  background: linear-gradient(180deg, rgba(255,246,237,0.45) 0%, rgba(255,255,255,0) 40%);
+}
+.fc .fc-timegrid-now-indicator-line {
+  border-top: 2px solid #f29900;
+}
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: #f29900 transparent transparent #f29900;
+}
+
+/* Eye icon alignment on chips */
+.fc-chip-icon {
+  margin-right: 6px;
+}
+
+/* Modal: appointment details */
+.appt-modal .modal-header {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+.appt-modal .modal-title {
+  font-weight: 700;
+}
+.appt-modal .details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+}
+.appt-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid #f29900;
+  border-radius: 12px;
+  color: #f29900;
+  background: #fff6ed;
+  font-size: 12px;
+}
+
+/* Event styling: soft background with orange left bar and orange text */
+.fc-event {
+  background-color: #fff6ed !important; /* very light orange */
+  color: #f29900 !important;            /* orange text */
+  border: none;
+  border-left: 4px solid #f29900 !important; /* accent bar */
+  font-weight: 600;
+}
+
+/* Stronger, container-scoped overrides to beat theme greens */
+.calendar-theme-orange {
+  /* Force FullCalendar CSS variables to our orange theme */
+  --fc-event-bg-color: #fff6ed;    /* event background */
+  --fc-event-border-color: #f29900;/* left border / border color */
+  --fc-event-text-color: #f29900;  /* text color */
+  --fc-neutral-bg-color: #fff6ed;  /* misc neutral fills */
+  --fc-page-bg-color: inherit;
+
+  /* dayGrid + timeGrid event boxes */
+  .fc-daygrid-event,
+  .fc-timegrid-event,
+  .fc-v-event {
+    background-color: #fff6ed !important;
+    border: none !important;
+    border-left: 4px solid #f29900 !important;
+    color: #f29900 !important;
+  }
+
+  /* In FullCalendar v6 the background is often on .fc-event-main */
+  .fc-daygrid-event .fc-event-main,
+  .fc-timegrid-event .fc-event-main,
+  .fc-v-event .fc-event-main {
+    background-color: #fff6ed !important;
+    border-left: 4px solid #f29900 !important;
+    color: #f29900 !important;
+  }
+
+  /* text/links inside events */
+  .fc-daygrid-event a,
+  .fc-timegrid-event .fc-event-main,
+  .fc-v-event .fc-event-main,
+  .fc-event-title {
+    color: #f29900 !important;
+  }
+
+  /* the small dot that appears in some views */
+  .fc-daygrid-event-dot {
+    border-color: #f29900 !important;
+    background: #f29900 !important;
+  }
+
+  /* Some themes set .bg-success or similar on events; neutralize them here */
+  .bg-success,
+  .text-success {
+    background-color: #fff6ed !important;
+    color: #f29900 !important;
+  }
+
+  /* If any success-like class lands on anchors or event mains */
+  a.bg-success,
+  a.text-bg-success,
+  .fc-event-main.bg-success,
+  .fc-event-main.text-bg-success,
+  .fc-h-event.bg-success,
+  .fc-daygrid-event.bg-success {
+    background-color: #fff6ed !important;
+    color: #f29900 !important;
+    border-left: 4px solid #f29900 !important;
+  }
+
+  /* Generic neutralizer for any bg-* utility on events */
+  .fc-daygrid-event[class*="bg-"],
+  .fc-timegrid-event[class*="bg-"],
+  .fc-v-event[class*="bg-"],
+  a.fc-event[class*="bg-"],
+  .fc-event-main[class*="bg-"],
+  .fc-h-event[class*="bg-"],
+  .fc-daygrid-event a[class*="bg-"],
+  .fc-event-title[class*="bg-"],
+  .fc-daygrid-event .fc-event-main[class*="bg-"] {
+    background-color: #fff6ed !important;
+    color: #f29900 !important;
+    border-left: 4px solid #f29900 !important;
+    border-color: #f29900 !important;
+  }
+}
+
+/* TimeGrid (Week/Day) event polish */
+.fc-timegrid-event,
+.fc-v-event {
+  border-radius: 8px;
+  overflow: hidden;
+  border: none;
+}
+.fc-timegrid-event .fc-event-main,
+.fc-v-event .fc-event-main {
+  padding: 2px 6px;
+}
+
+/* Hover polish for new style */
+.fc .fc-event:hover,
+.fc .fc-daygrid-event:hover {
+  background-color: #ffefdf !important;
+}
+
+/* Density rules when multiple events appear in the same slot (applied by TS via fc-pack-N) */
+.fc-pack-1 .fc-event-meta { font-size: 12px; width: 100px; }
+.fc-pack-2 .fc-event-meta { font-size: 11px; }
+.fc-pack-3 .fc-event-meta { font-size: 10px; }
+
+/* Hide secondary details as the number of concurrent events increases */
+.fc-pack-2 .fc-sep,
+.fc-pack-2 .fc-provider,
+.fc-pack-2 .fc-patient { display: none; }
+.fc-pack-3 .fc-sep,
+.fc-pack-3 .fc-provider,
+.fc-pack-3 .fc-patient { display: none; }
+
+/* Ensure truncation remains effective in dense packs */
+.fc-pack-2 .fc-event-meta,
+.fc-pack-3 .fc-event-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Same height and 3px gap for concurrent events (Week/Day only) */
+.fc-timegrid-event.fc-pack-2,
+.fc-v-event.fc-pack-2,
+.fc-timegrid-event.fc-pack-3,
+.fc-v-event.fc-pack-3 {
+  display: flex;
+  align-items: center;          /* vertical centering */
+  height: 24px !important;      /* uniform chip height when multiple */
+  min-height: 24px !important;
+  box-sizing: border-box;
+}
+.fc-timegrid-event.fc-pack-2,
+.fc-v-event.fc-pack-2 { width: calc((100% - 3px) / 2) !important; }
+.fc-timegrid-event.fc-pack-3,
+.fc-v-event.fc-pack-3 { width: calc((100% - 6px) / 3) !important; }
+
+/* Apply 3px gap only between neighbors */
+.fc-timegrid-event.fc-pack-2:not(:last-child),
+.fc-v-event.fc-pack-2:not(:last-child),
+.fc-timegrid-event.fc-pack-3:not(:last-child),
+.fc-v-event.fc-pack-3:not(:last-child) {
+  margin-right: 3px;
+}
+.fc-timegrid-event.fc-pack-2 .fc-event-main,
+.fc-v-event.fc-pack-2 .fc-event-main,
+.fc-timegrid-event.fc-pack-3 .fc-event-main,
+.fc-v-event.fc-pack-3 .fc-event-main {
+  display: flex;
+  align-items: center;          /* ensure inner content aligns */
+  height: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Inline +N more chip inside slot */
+.fc-slot-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #ffb54d;
+  color: #333;
+  border-radius: 10px;
+  padding: 0 6px;
+  height: 18px;
+  font-size: 11px;
+  margin-left: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* + More link and popover theme */
+.fc .fc-more-link {
+  color: #cc5c00;
+  font-weight: 600;
+}
+.fc .fc-popover .fc-popover-header {
+  background: #ff7f00;
+  color: #fff;
+}
+.fc .fc-popover .fc-popover-body .fc-daygrid-event {
+  background: #ff9900;
+  color: #fff;
 }
 
 /* Selected date range (when dragging/selecting) */
 .fc .fc-highlight {
   background-color: #ffd699 !important;
+}
+
+/* List view polish */
+.fc .fc-list {
+  border-radius: 8px;
+  overflow: hidden;
+}
+.fc .fc-list-table td,
+.fc .fc-list-table th {
+  padding: 10px 12px;
+}
+.fc .fc-list-event:hover td {
+  background: #fff2e6;
+}
+
+
+.fc-chip--week {
+  display: flex;
+  width: 10px;
+  min-height: 24px;            /* adjust vertical size */
+  padding: 2px 8px;            /* inner spacing */
+  font-size: 12px;             /* text size */
+  border-radius: 8px;          /* pill look */
 }

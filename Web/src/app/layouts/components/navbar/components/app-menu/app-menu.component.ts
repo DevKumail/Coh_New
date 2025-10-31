@@ -233,11 +233,19 @@ export class AppMenuComponent implements OnInit, OnDestroy {
   }
 
   onPatientSummaryClick() {
-    if (this.isPatientAvailable) {
-      this.router.navigate(['/patient-summary']);
-    } else {
-      this.openAdvancedSearchModal();
-    }
+
+        this.patientBannerService.patientData$.subscribe((data: any) => {
+        
+          this.isPatientAvailable = data;
+          console.log('isPatientAvailable', this.isPatientAvailable);
+      });
+
+      if (this.isPatientAvailable) {
+        this.router.navigate(['/patient-summary']);
+      } else {
+        this.openAdvancedSearchModal();
+      }
+
   }
 
   onDashboardClick() {

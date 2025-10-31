@@ -1,6 +1,9 @@
-﻿using HMIS.Core.Entities;
+﻿using Dapper;
+using DocumentFormat.OpenXml.Wordprocessing;
 using HMIS.Application.DTOs.Clinical;
 using HMIS.Application.Implementations;
+using HMIS.Core.Entities;
+using HMIS.Infrastructure.ORM;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -8,8 +11,6 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dapper;
-using HMIS.Infrastructure.ORM;
 
 namespace HMIS.Application.ServiceLogics
 {
@@ -24,12 +25,15 @@ namespace HMIS.Application.ServiceLogics
             Configuration = configuration;
         }
 
-        public async Task<DataSet> GetAlergyDetailsDB(string mrno)
+        public async Task<DataSet> GetAlergyDetailsDB(string mrno, int? PageNumber, int? PageSize )
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@MRNo", mrno);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
+
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetAllergies",param);
                 if (ds == null)
                 {

@@ -53,7 +53,7 @@
                   <div class="mb-3" *ngIf="medicalForm.get('isProviderCheck')?.value == false">
                     <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }}</label>
                     <select class="form-select" formControlName="providerId">
-                      <option [ngValue]="" disabled selected>{{ 'SELECT_PROVIDER' | translate }}</option>
+                      <option [ngValue]="null" disabled>{{ 'SELECT_PROVIDER' | translate }}</option>
                       <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}</option>
                     </select>
                     <div class="text-danger small" *ngIf="medicalForm.get('providerId')?.touched && medicalForm.get('providerId')?.invalid">{{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
@@ -269,8 +269,8 @@
                         <ng-icon [name]="record.confidential ? 'tablerCheck' : 'tablerX'"></ng-icon>
                       </td>
                       <td>{{ record.status }}</td>
-                      <td>{{ record.startDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
-                      <td>{{ record.endDate || 'N/A' | date : "dd/MM/yyyy" }}</td>
+                      <td>{{ record.startDate ? (record.startDate | date:'dd/MM/yyyy') : 'N/A' }}</td>
+                      <td>{{ record.endDate ? (record.endDate | date:'dd/MM/yyyy') : 'N/A' }}</td>
                       <td class="text-center">
                             <button
                   class="btn btn-outline-danger p-0 px-1 py-1 me-1"
@@ -376,15 +376,15 @@
       <table class="table table-bordered table-striped table-sm mt-2">
         <thead>
           <tr class="text-center">
-            <th style="font-size: 14px">{{'CODE' | translate}}</th>
             <th style="font-size: 14px">{{'ICD_VERSION' | translate}}</th>
+            <th style="font-size: 14px">{{'CODE' | translate}}</th>
             <th style="font-size: 14px">{{'DESCRIPTION' | translate}}</th>
           </tr>
         </thead>
         <tbody class="table-group-divider text-center">
           <tr *ngFor="let diagnosis of DiagnosisCode" (click)="onRowSelect(diagnosis, modal)">
-            <td style="font-size: 12px">{{ diagnosis?.icD9Code || 'N/A' }}</td>
             <td style="font-size: 12px">{{ diagnosis?.icdVersion || 'N/A' }}</td>
+            <td style="font-size: 12px">{{ diagnosis?.icD9Code || 'N/A' }}</td>
             <td style="font-size: 12px">{{ diagnosis?.descriptionFull || 'N/A' }}</td>
           </tr>
 

@@ -562,7 +562,7 @@ export class AlertComponent implements OnInit, AfterViewInit {
 
   // Load a row into the form for editing
   editAlert(item: any) {
-    debugger;
+     ;
     if (!item) return;
     // Prevent editing of completed alerts
     if (item?.isFinished) {

@@ -35,9 +35,9 @@
 
 
         <div class="mb-3" *ngIf="medicalForm.get('isProviderCheck')?.value == false">
-           <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }}</label>
+           <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }} <span class="text-danger">*</span> </label>
           <select class="form-select" formControlName="providerId">
-            <option [ngValue]="" disabled selected>{{'SELECT_PROVIDER' | translate}}</option>
+            <option [ngValue]="null" disabled>{{'SELECT_PROVIDER' | translate}}</option>
             <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}</option>
           </select>
           <div class="text-danger small" *ngIf="(medicalForm.get('providerId')?.touched || submitted) && medicalForm.get('providerId')?.invalid">{{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
@@ -47,7 +47,7 @@
 
       <div class="col-lg-3">
         <div class="mb-3">
-          <label class="form-label">{{'PROBLEM' | translate}}</label>
+          <label class="form-label">{{'PROBLEM' | translate}} <span class="text-danger">*</span></label>
 
           <div class="input-group">
             <input type="text" class="form-control" formControlName="problem" placeholder="{{ 'ENTER_PROBLEM' | translate }}" />
@@ -66,7 +66,7 @@
         <div class="mb-3">
           <label class="form-label">{{ 'COMMENT' | translate }}</label>
           <input type="text" class="form-control" formControlName="comments" placeholder="{{ 'ENTER_COMMENT' | translate }}"/>
-          <div class="text-danger small" *ngIf="(medicalForm.get('comments')?.touched || submitted) && medicalForm.get('comments')?.invalid">{{ 'COMMENT_IS_REQUIRED' | translate }}</div>
+          <!-- <div class="text-danger small" *ngIf="(medicalForm.get('comments')?.touched || submitted) && medicalForm.get('comments')?.invalid">{{ 'COMMENT_IS_REQUIRED' | translate }}</div> -->
         </div>
       </div>
 
@@ -84,7 +84,7 @@
     <div class="row">
       <div class="col-lg-3">
         <div class="mb-3">
-          <label class="form-label">{{ 'STATUS' | translate }}</label>
+          <label class="form-label">{{ 'STATUS' | translate }} <span class="text-danger">*</span></label>
           <select class="form-select" formControlName="status">
             <option value="" disabled selected>{{ 'SELECT_STATUS' | translate }}</option>
             <option value="Active">{{ 'Active'}}</option>
@@ -96,7 +96,7 @@
 
       <div class="col-lg-3">
         <div class="mb-3">
-          <label class="form-label">{{ 'START_DATE' | translate }}</label>
+          <label class="form-label">{{ 'START_DATE' | translate }} <span class="text-danger">*</span></label>
           <input type="date" class="form-control" formControlName="startDate" />
           <div class="text-danger small" *ngIf="(medicalForm.get('startDate')?.touched || submitted) && medicalForm.get('startDate')?.invalid">{{ 'START_DATE_IS_REQUIRED' | translate }}</div>
         </div>
@@ -119,7 +119,7 @@
         </div>
       </div>
 
-      <div class="col-lg-3 ms-auto">
+      <div class="col-lg-3 ms-auto mt-2">
         <div class="d-flex justify-content-end gap-2 mt-2">
           <button type="button" class="btn btn-secondary" (click)="onClear()">{{ 'CLEAR' | translate }}</button>
           <button type="submit" class="btn btn-success" (click)="onSubmit()">{{ 'SUBMIT' | translate }}</button>
@@ -147,13 +147,13 @@
             <tr *ngFor="let record of medicalHistoryData">
               <td>{{ record.providerName || 'N/A' }}</td>
               <td>{{ record.icD9Description || 'N/A' }}</td>
-              <td>{{ record.comments || 'N/A' }}</td>
+              <td>{{ record.comments || '-' }}</td>
               <td class="text-center">
                 <ng-icon [name]="record.confidential ? 'tablerCheck' : 'tablerX'"></ng-icon>
               </td>
               <td>{{ record.status || 'N/A' }}</td>
-              <td>{{ record.startDate || 'N/A' | date : "dd/MM/yyyy"  }}</td>
-              <td>{{ record.endDate || 'N/A' | date : "dd/MM/yyyy"  }}</td>
+              <td>{{ record.startDate ? (record.startDate | date:'dd/MM/yyyy') : '-' }}</td>
+              <td>{{ record.endDate ? (record.endDate | date:'dd/MM/yyyy') : '-' }}</td>
               <td>
                 <button
                   class="btn btn-outline-danger p-0 px-1 py-1 me-1"
@@ -219,9 +219,9 @@
               </div>
 
               <div class="col-md-3 col-sm-12">
-                <label for="searchById" class="form-label">{{ 'SEARCH_CODE' | translate }}:</label>
+                <label for="searchById" class="form-label">{{ 'SEARCH_TYPE' | translate }}:</label>
                 <select class="form-control" formControlName="searchById" id="searchById" required>
-                  <option value="" disabled selected>{{ 'SELECT_SEARCH_CODE' | translate }}</option>
+                  <option value="" disabled selected>{{ 'SELECT_SEARCH_TYPE' | translate }}</option>
                   <option *ngFor="let item of Searchby" [value]="item.code">
                     {{ item.name }}
                   </option>
@@ -229,9 +229,15 @@
               </div>
 
               <div class="col-md-3 col-sm-12"  *ngIf="FilterForm.value.searchById != 3">
-                <label for="startingCode" class="form-label">{{ 'STARTING_CODE' | translate }}:</label>
-                <input type="text" class="form-control" formControlName="startingCode" id="startingCode"
-                  placeholder="{{ 'ENTER_STARTING_CODE' | translate }}" />
+                @if(FilterForm.value.searchById == 1){
+                  <label for="startingCode" class="form-label">{{ 'CODE' | translate }}:</label>
+                  <input type="text" class="form-control" formControlName="startingCode" id="startingCode"
+                    placeholder="{{ 'ENTER_CODE' | translate }}" />
+                } @else{
+                  <label for="startingCode" class="form-label">{{ 'STARTING_CODE' | translate }}:</label>
+                  <input type="text" class="form-control" formControlName="startingCode" id="startingCode"
+                    placeholder="{{ 'ENTER_STARTING_CODE' | translate }}" />
+                }
               </div>
                 <!-- <div class="row col-12"> -->
                   <!-- Ending Code -->
@@ -251,26 +257,26 @@
                   </div>
 
                   <!-- Search Button -->
-                  <!-- <div class="col-md-2 col-sm-12 col-12 mt-3">
-                    <button class="btn btn-info mt-3 w-100" type="button" (click)="SearchDiagnosis()">Search</button>
-                  </div> -->
                 <!-- </div> -->
 
-
-            </div>
+                
+                <div class="col-md-2 col-sm-12 col-12 ms-auto">
+                  <button class="btn btn-info w-100 mt-4" type="button" (click)="SearchDiagnosis()">Search</button>
+                </div>
+              </div>
           </div>
       <table class="table table-bordered table-striped table-sm mt-2">
         <thead>
           <tr class="text-center">
-            <th style="font-size: 14px">{{'CODE' | translate}}</th>
             <th style="font-size: 14px">{{'ICD_VERSION' | translate}}</th>
+            <th style="font-size: 14px">{{'CODE' | translate}}</th>
             <th style="font-size: 14px">{{'DESCRIPTION' | translate}}</th>
           </tr>
         </thead>
         <tbody class="table-group-divider text-center">
           <tr *ngFor="let diagnosis of DiagnosisCode" (click)="onRowSelect(diagnosis, modal)">
-            <td style="font-size: 12px">{{ diagnosis?.icD9Code || 'N/A' }}</td>
             <td style="font-size: 12px">{{ diagnosis?.icdVersion || 'N/A' }}</td>
+            <td style="font-size: 12px">{{ diagnosis?.icD9Code || 'N/A' }}</td>
             <td style="font-size: 12px">{{ diagnosis?.descriptionFull || 'N/A' }}</td>
           </tr>
 
@@ -292,7 +298,7 @@
 
   <div class="modal-footer">
     <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
-    <button type="submit" class="btn btn-primary" (click)="SearchDiagnosis()">Search</button>
+    <!-- <button type="submit" class="btn btn-primary" (click)="SearchDiagnosis()">Search</button> -->
   </div>
   </div>
   
