@@ -390,10 +390,10 @@ namespace HMIS.Web.Controllers
         }
 
         [HttpGet("SpeechtoText")]
-        public async Task<IActionResult> SpeechtoText(int MRNo)
+        public async Task<IActionResult> SpeechtoText(int? MRNo, int? PageNumber, int? PageSize)
         {
 
-            DataSet result = await _appointmentManager.SpeechtoText(MRNo);
+            DataSet result = await _appointmentManager.SpeechtoText(MRNo,PageNumber, PageSize);
 
             if (result != null)
             {

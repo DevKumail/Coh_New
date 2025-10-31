@@ -11,6 +11,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { Router } from '@angular/router';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { distinctUntilChanged, filter } from 'rxjs';
+import { ClinicalNoteComponent } from '@/app/views/clinical/clinical-note/clinical-note.component';
 @Component({
   selector: 'app-content-section',
   imports: [
@@ -20,7 +21,8 @@ import { distinctUntilChanged, filter } from 'rxjs';
     AllergiesComponent,
     VitalSignsComponent,
     TranslatePipe,
-    GenericPaginationComponent
+    GenericPaginationComponent,
+    ClinicalNoteComponent
   ],
   templateUrl: './content-section.component.html',
   styleUrl: './content-section.component.scss'
