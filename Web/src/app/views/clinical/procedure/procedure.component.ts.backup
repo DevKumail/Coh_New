@@ -1,31 +1,23 @@
  
-import { Patient } from './../../Scheduling/appointment-dashboard/appointment-dashboard.component';
 import { ClinicalApiService } from './../clinical.api.service';
-// import Swal from 'sweetalert2';
-
-import { Component, OnInit, OnChanges, SimpleChanges, TemplateRef, ViewChild, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, TemplateRef, Input, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
-import { FavoritesComponent } from '../favorites/favorites.component';
-//import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import Swal from 'sweetalert2';
-import {PatientProblemModel} from '@/app/shared/Models/Clinical/problemlist.model';
 import { LoaderService } from '@core/services/loader.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
-import { filter,distinctUntilChanged  } from 'rxjs/operators';
+import { filter, distinctUntilChanged } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
-import { S } from 'node_modules/@angular/cdk/scrolling-module.d-ud2XrbF8';
-import { LucideAlertTriangle } from 'lucide-angular';
 
 
 @Component({
-  selector: 'app-problem-list',
+  selector: 'app-procedure',
   standalone: true,
 
   imports: [CommonModule,
@@ -40,26 +32,25 @@ import { LucideAlertTriangle } from 'lucide-angular';
   ],
 
 
-  templateUrl: './problem-list.component.html',
-  styleUrl: './problem-list.component.scss'
+  templateUrl: './procedure.component.html',
+  styleUrl: './procedure.component.scss'
 })
-export class ProblemListComponent implements OnInit, OnChanges, OnDestroy {
+export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
   datePipe = new DatePipe('en-US');
-  medicalForm!: FormGroup;
+  procedureForm!: FormGroup;
   submitted: boolean = false;
   todayStr!: string;
-  isSubmitting: boolean = false;
   currentPage = 1;
   pageSize = 10;
   pageSizes = [5, 10, 25, 50];
   pageNumbers: number[] = [];
     isLoading: boolean = false;
   totalrecord: any;
-  medicalHistoryData: any[] = [];
+  procedureHistoryData: any[] = [];
   totalPages = 0;
   modalService = new NgbModal();
   FilterForm!: FormGroup;
-  @ViewChild('problemModal') problemModal: any;
+  @ViewChild('procedureModal') procedureModal: any;
   @Input() editData: any;
   private pendingEditRecord: any;
   private providerToggleSub?: Subscription;
@@ -75,15 +66,14 @@ export class ProblemListComponent implements OnInit, OnChanges, OnDestroy {
   // diagnosisForm: any
   hrEmployees: any = [];
   form: any;
-  Problems: any = {}
-  ProblemGrid: any = [];
+  Procedures: any = {}
+  ProcedureGrid: any = [];
   Mrno: any;
   userid: any;
   id: any;
   MyDiagnosisData: any = [];
   filteredDiagnosisData = [];
   diagnosisList: any;
-  ICDVersionId: number = 0;
   universaltoothid: any;
   universaltoothcodearray: any[] = [];
   iCDVersion: any;
@@ -97,9 +87,9 @@ export class ProblemListComponent implements OnInit, OnChanges, OnDestroy {
   MyHCPSGroupId: any;
   MyHCPCSCode: any;
   SearchPatientData:any;
-  MyProblemsData:any;
+  MyProceduresData:any;
 
-problemForm:any;
+procedureFormData:any;
   AllCPTCode: any = 0;
   CPTStartCode: any = '2';
   CPTEndCode: any = '0';
@@ -120,15 +110,20 @@ problemForm:any;
   ICT9Group: any;
 PatientId:any;
   ICDVersions: any[] = [];
-  problemTotalItems:any;
-  filteredProblemData:any;
-  problemCurrentPage:any;
-  problemPageSize:any;
-  pagedProblems:any;
+  procedureTotalItems:any;
+  filteredProcedureData:any;
+  procedureCurrentPage:any;
+  procedurePageSize:any;
+  pagedProcedures:any;
+  
+  Active = [{ id: 1, name: 'Active' }, { id: 0, name: 'InActive' }];
+  ActiveStatus = [
+    { id: 1, name: 'Active' },
+    { id: 0, name: 'InActive' },
+  ];
 
   MyDentalGroups: any[] = [];
   Searchby: any = [{ code: 1, name: 'Diagnosis Code' }, { code: 2, name: 'Diagnosis Code Range' }, { code: 3, name: 'Description' }]
-  Active = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }, { id: 0, name: "In Error" }];
   DiagnosisForm: any;
   checked:any;
 isProviderCheck:any;
@@ -149,14 +144,14 @@ SelectedVisit: any;
 
   private setProviderFromSelectedVisit(): void {
     try {
-      if (!this.medicalForm) { return; }
+      if (!this.procedureForm) { return; }
       const empId = this.SelectedVisit?.employeeId;
       if (!empId) { return; }
       // If provider isn't in hrEmployees, keep placeholder (null)
       const exists = Array.isArray(this.hrEmployees)
         ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
         : false;
-      const ctrl = this.medicalForm.get('providerId');
+      const ctrl = this.procedureForm.get('providerId');
       if (!ctrl) { return; }
       ctrl.setValue(exists ? empId : null, { emitEvent: false });
       ctrl.markAsDirty();
@@ -166,8 +161,8 @@ SelectedVisit: any;
   }
 
   private updateProviderValidators(isOutside: boolean): void {
-    const providerIdCtrl = this.medicalForm?.get('providerId');
-    const providerDescCtrl = this.medicalForm?.get('providerDescription');
+    const providerIdCtrl = this.procedureForm?.get('providerId');
+    const providerDescCtrl = this.procedureForm?.get('providerDescription');
     if (!providerIdCtrl || !providerDescCtrl) { return; }
 
     if (isOutside) {
@@ -216,8 +211,8 @@ SelectedVisit: any;
         this.SearchPatientData = data;
         // Set MRNO from banner
         this.Mrno = this.SearchPatientData?.table2?.[0]?.mrNo || '';
-        // After assigning, load problems
-        this.GetPatientProblemData();
+        // After assigning, load Procedures
+        this.GetPatientProcedureData();
         const mrno = this.Mrno;
       });
 
@@ -236,9 +231,9 @@ SelectedVisit: any;
     // this.appId=app.appointmentId
     this.FillDropDown
 
-    this.medicalForm = this.fb.group({
+    this.procedureForm = this.fb.group({
       providerId: [null, Validators.required],
-      problem: ['', Validators.required],
+      procedure: ['', Validators.required],
       comments: [''],
       status: ['Active', Validators.required],  
       startDate: ['', Validators.required],
@@ -246,23 +241,21 @@ SelectedVisit: any;
       providerName: [''], 
       providerDescription:[''],
       isConfidentential: [false],
-      isProviderCheck: [false] 
+      isProviderCheck: [false],
+      ActiveStatus: [1],
     });
 
     // Toggle validators based on provider outside clinic checkbox
     try {
-      this.updateProviderValidators(this.medicalForm.get('isProviderCheck')?.value);
-      this.providerToggleSub = this.medicalForm.get('isProviderCheck')?.valueChanges
+      this.updateProviderValidators(this.procedureForm.get('isProviderCheck')?.value);
+      this.providerToggleSub = this.procedureForm.get('isProviderCheck')?.valueChanges
         .subscribe((isOutside: boolean) => this.updateProviderValidators(isOutside));
     } catch {}
 
     // Ensure provider is set if SelectedVisit already available
     this.setProviderFromSelectedVisit();
-    // Set default Start Date to today
-    try { this.medicalForm.get('startDate')?.setValue(this.todayStr); } catch {}
 
     this.FilterForm = this.fb.group({
-      icdVersionId: ['2'],
       searchById: ['1'],
       startingCode: [''],
       endingCode: [''],
@@ -322,10 +315,10 @@ SelectedVisit: any;
     const currentUser = sessionStorage.getItem('userId');
     const parsedUserId = currentUser ? Number(currentUser) : NaN;
     this.userid = Number.isFinite(parsedUserId) ? parsedUserId : 0;
-    this.Problems.ActiveStatus = 1
+    this.Procedures.ActiveStatus = 1
     // this.loadData();
    
-    await this.GetPatientProblemData();
+    await this.GetPatientProcedureData();
     await this.FillCache();
 
     // Apply any pending edit received before init
@@ -336,9 +329,9 @@ SelectedVisit: any;
 
 
        // Enforce endDate rules based on status and startDate (UI + Reactive validation)
-    const endDateCtrl = this.medicalForm.get('endDate');
-    const startDateCtrl = this.medicalForm.get('startDate');
-    const statusCtrl = this.medicalForm.get('status');
+    const endDateCtrl = this.procedureForm.get('endDate');
+    const startDateCtrl = this.procedureForm.get('startDate');
+    const statusCtrl = this.procedureForm.get('status');
     
     const applyStatusRules = (val: string) => {
       if (val === 'Inactive') {
@@ -385,7 +378,7 @@ minDateValidator(otherControlName: string) {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['editData'] && changes['editData'].currentValue) {
       const record = changes['editData'].currentValue;
-      if (this.medicalForm) {
+      if (this.procedureForm) {
         this.applyEditRecord(record);
       } else {
         this.pendingEditRecord = record;
@@ -402,17 +395,17 @@ minDateValidator(otherControlName: string) {
     // Fallback mapping for favorites payload shape
     try {
       this.id = record?.id ?? this.id;
-      this.medicalForm.patchValue({
-        problem: record?.problem || '',
+      this.procedureForm.patchValue({
+        procedure: record?.procedure || '',
         comments: record?.comments || '',
         startDate: record?.startDate ? this.datePipe.transform(record.startDate, 'yyyy-MM-dd') : '',
         endDate: record?.endDate ? this.datePipe.transform(record.endDate, 'yyyy-MM-dd') : '',
       });
       const statusVal = (record?.status || '').toString().toLowerCase();
       if (statusVal.includes('active')) {
-        this.medicalForm.get('status')?.setValue('Active');
+        this.procedureForm.get('status')?.setValue('Active');
       } else if (statusVal.includes('inactive')) {
-        this.medicalForm.get('status')?.setValue('Inactive');
+        this.procedureForm.get('status')?.setValue('Inactive');
       }
     } catch {}
   }
@@ -422,58 +415,45 @@ minDateValidator(otherControlName: string) {
 
 
 
-  async GetPatientProblemData() {
-  this.loader.show();
-  this.medicalHistoryData = [];
-  this.problemTotalItems = 0;
+  async GetPatientProcedureData() {
+  this.procedureHistoryData = [];
+  this.procedureTotalItems = 0;
 
   const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo;
-  const userIdStr = sessionStorage.getItem('userId');
-  const userId = userIdStr ? Number(userIdStr) : 0;
-  if (!mrNo || !userId) {
+  if (!mrNo ) {
     Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
-    this.loader.hide();
     return;
   }
-
-  this.loader.show();
-   ;
-  console.log('mrNo =>', mrNo);
-
-  await this.clinicalApiService.GetPatientProblemData(
-    true,
+  
+  const status = this.procedureForm.get('ActiveStatus')?.value; 
+  await this.clinicalApiService.GetPatientProceduresList(
+    status,
     mrNo,
-    userId,
     this.MHPaginationInfo.Page,
     this.MHPaginationInfo.RowsPerPage
   ).then((res: any) => {
     console.log('res', res);
-    this.loader.hide();
-
-    this.medicalHistoryData = res.patientProblems?.table1 || [];
-    this.problemTotalItems = res.patientProblems?.table2?.[0]?.totalCount || 0;
-    this.filteredProblemData = this.medicalHistoryData || [];
-
-    console.log('this.medicalHistoryData', this.medicalHistoryData);
+    this.procedureHistoryData = res.data?.table1 || [];
+    this.procedureTotalItems = res.data?.table2?.[0]?.totalCount || 0;
+    this.filteredProcedureData = this.procedureHistoryData || [];
   });
 
-  this.loader.hide();
 }
 
 
   // ✅ Clear form
   onClear(): void {
-  //this.medicalForm.reset();
+  //this.procedureForm.reset();
   const empId = this.SelectedVisit?.employeeId;
   const exists = Array.isArray(this.hrEmployees)
     ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
     : false;
-  this.medicalForm.patchValue({
+  this.procedureForm.patchValue({
     providerId: exists ? empId : null,
-    problem: '',
+    procedure: '',
     comments: '',
     status: 'Active',
-    startDate: this.todayStr,
+    startDate: '',
     endDate: '',
     providerName: '', 
     isConfidentential: false,
@@ -482,14 +462,14 @@ minDateValidator(otherControlName: string) {
   this.submitted = false;
   }
     DropFilled (){
-    this.Problems.ProviderId = ""
-    this.Problems.ICDVersionValue = ""
-    this.Problems.comments = ""
-    this.Problems.startDate = ""
-    this.Problems.endDate = ""
-    this.Problems.status = ""
+    this.Procedures.ProviderId = ""
+    this.Procedures.ICDVersionValue = ""
+    this.Procedures.comments = ""
+    this.Procedures.startDate = ""
+    this.Procedures.endDate = ""
+    this.Procedures.status = ""
     this.checked = ""
-    this.Problems.providerDescription=""
+    this.Procedures.providerDescription=""
     this.isProviderCheck=false;
 
   }
@@ -497,16 +477,16 @@ minDateValidator(otherControlName: string) {
     this.DropFilled();
   }
 
-  onSubmit() {
+onSubmit() {
   
-  if (this.medicalForm.invalid) {
+  if (this.procedureForm.invalid) {
     Swal.fire({
       icon: 'warning',
       title: 'Error',
       text: 'Form is invalid. Please fill in all required fields.',
     });
     this.submitted = true;
-    this.medicalForm.markAllAsTouched();
+    this.procedureForm.markAllAsTouched();
     try { this.focusFirstInvalidControl(); } catch {}
     return;
   }
@@ -521,8 +501,8 @@ minDateValidator(otherControlName: string) {
   }
    
 
-  const formData = this.medicalForm.value;
-  console.log('medicalForm =>',this.medicalForm.value);
+  const formData = this.procedureForm.value;
+  console.log('procedureForm =>',this.procedureForm.value);
   var status;
   if(formData.status == "Active" ){
     status = 1
@@ -530,12 +510,11 @@ minDateValidator(otherControlName: string) {
     status = 2
   }
 
-  const problemPayload: PatientProblemModel = {
+  const problemPayload: any = {
     id: this.id,
     providerId: formData.providerId,
     icd9: this.selectedDiagnosis.icD9Code,
     icd9description: this.selectedDiagnosis.descriptionFull,
-    icdversionId: this.selectedDiagnosis.icdVersionId,
     confidential: formData.isConfidentential || false,
     startDate: formData.startDate,
     endDate: formData.endDate,
@@ -568,28 +547,25 @@ minDateValidator(otherControlName: string) {
     providerDescription: formData.providerDescription  || ''
   };
 
-  console.log('Submitting Patient Problem Payload:', problemPayload);
+  console.log('Submitting Patient procedure Payload:', problemPayload);
 
-  this.isSubmitting = true;
   this.clinicalApiService.SubmitPatientProblem(problemPayload).then((res: any) => {
     console.log("my payload", res);
     Swal.fire({
       icon: 'success',
       title: 'Submitted Successfully',
-      text: 'Patient problem has been submitted.',
+      text: 'Patient procedure has been submitted.',
     });
     this.id = 0;
-    this.GetPatientProblemData();
+    this.GetPatientProcedureData();
     this.onClear();
   }).catch((error: any) => {
     Swal.fire({
       icon: 'error',
       title: 'Submission Error',
-      text: 'An error occurred while submitting the patient problem.',
+      text: 'An error occurred while submitting the Patient procedure.',
     });
     console.error('Submission error:', error);
-  }).finally(() => {
-    this.isSubmitting = false;
   });
 }
 
@@ -598,7 +574,6 @@ minDateValidator(otherControlName: string) {
   modalRefInstance: any;
   ClickFilter(modalRef: TemplateRef<any>) {
     this.FilterForm.patchValue({
-      icdVersionId: 2,
       searchById: 1,
       startingCode: null,
       endingCode: null,
@@ -631,7 +606,7 @@ minDateValidator(otherControlName: string) {
 
   onRowSelect(diagnosis: any, modal: any) {
      
-    this.medicalForm.patchValue({ problem: diagnosis?.descriptionFull });
+    this.procedureForm.patchValue({ procedure: diagnosis?.descriptionFull });
     this.selectedDiagnosis = diagnosis;
     modal.close(diagnosis); 
     console.log("diagnosis waleed",diagnosis)
@@ -657,7 +632,6 @@ minDateValidator(otherControlName: string) {
      
     let jParse = JSON.parse(JSON.stringify(response)).cache;
     let provider = JSON.parse(jParse).Provider;
-    let iCDVersion = JSON.parse(jParse).BLICDVersion;
 
     // 31july
     let universaltoothcode = JSON.parse(jParse).BLUniversalToothCodes;
@@ -687,26 +661,6 @@ minDateValidator(otherControlName: string) {
       this.universaltoothid = universaltoothcode[0].code
       this.universaltoothcodearray = universaltoothcode;
       console.log(this.universaltoothcodearray, 'universal tooth code');
-    }
-    if (iCDVersion) {
-       ;
-      iCDVersion = iCDVersion.map(
-        (item: { ICDVersionId: any; ICDVersion: any }) => {
-          return {
-            name: item.ICDVersion,
-            code: item.ICDVersionId,
-          };
-        });
-       
-      const item = {
-        name: 'ALL',
-        code: 0,
-      };
-      iCDVersion.push(item);
-      this.ICDVersions = iCDVersion;
-      console.log(this.ICDVersions);
-
-
     }
   }
 
@@ -747,31 +701,32 @@ minDateValidator(otherControlName: string) {
     this.loader.show();
     console.log(this.FilterForm.value);
 
-    this.ICDVersionId = this.FilterForm.value.icdVersionId || 0;
-    this.DiagnosisStartCode = start || '';
-    this.DiagnosisEndCode = end || '';
-    this.DescriptionFilter = desc || '';
+    this.DiagnosisStartCode = start || '0';
+    this.DiagnosisEndCode = end || '0';
+    this.DescriptionFilter = desc || '0';
     
-    const PageNumber = this.PaginationInfo.Page; 
-    const PageSize = this.PaginationInfo.RowsPerPage;
-    
+    const PageNumber = this.PaginationInfo?.Page || 1; 
+    const PageSize = this.PaginationInfo?.RowsPerPage || 5;
 
-    this.clinicalApiService.DiagnosisCodebyProvider(
-      this.ICDVersionId, 
-      PageNumber,
-      PageSize,
+    this.clinicalApiService.ProceduresList(
       this.DiagnosisStartCode, 
       this.DiagnosisEndCode, 
       this.DescriptionFilter,
+      PageNumber,
+      PageSize,
     ).then((response: any) => {
       this.DiagnosisCode = response?.table1;
       this.totalrecord = response?.table2?.[0]?.totalRecords;
-    this.loader.hide();
+      this.loader.hide();
       console.log(this.DiagnosisCode, 'this.DiagnosisCode');
-
-    })
-    this.loader.hide();
+    }).catch((error) => {
+      console.error('Error fetching procedures on page change:', error);
+      this.loader.hide();
+    });
   }
+
+
+
   SearchDiagnosis() {
     // Validate required fields based on search type
     this.PaginationInfo.Page = 1;
@@ -812,7 +767,6 @@ minDateValidator(otherControlName: string) {
     this.loader.show();
     console.log(this.FilterForm.value);
 
-    this.ICDVersionId = this.FilterForm.value.icdVersionId || 0;
     this.DiagnosisStartCode = start || '';
     this.DiagnosisEndCode = end || '';
     this.DescriptionFilter = desc || '';
@@ -822,13 +776,12 @@ minDateValidator(otherControlName: string) {
         this.isLoading = true;
 
 
-    this.clinicalApiService.DiagnosisCodebyProvider(
-      this.ICDVersionId, 
-      PageNumber,
-      PageSize,
+    this.clinicalApiService.ProceduresList(
       this.DiagnosisStartCode, 
       this.DiagnosisEndCode, 
       this.DescriptionFilter,
+      PageNumber,
+      PageSize,
     ).then((response: any) => {
       this.DiagnosisCode = response?.table1;
       this.totalrecord = response?.table2?.[0]?.totalRecords;
@@ -838,6 +791,23 @@ minDateValidator(otherControlName: string) {
     this.loader.hide();
     this.isLoading = false;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     PaginationInfo: any = {
@@ -858,9 +828,9 @@ minDateValidator(otherControlName: string) {
 
     
 
-    async onProblemPageChanged(page: number) {
+    async onProcedurePageChanged(page: number) {
       this.MHPaginationInfo.Page = page;
-      this.GetPatientProblemData();
+      this.GetPatientProcedureData();
       }
 
 
@@ -871,14 +841,13 @@ minDateValidator(otherControlName: string) {
       this.selectedDiagnosis = {
         icD9Code :  record?.icD9,
         descriptionFull : record?.icD9Description,
-        icdVersionId : record?.icdVersionID,
       }    
       
       
-        this.medicalForm.patchValue(
+        this.procedureForm.patchValue(
           {
             providerId: record?.providerId,
-            problem: record?.icD9Description,
+            procedure: record?.icD9Description,
             comments: record?.comments,
             isConfidentential: record?.confidential,
             startDate: this.datePipe.transform(record?.startDate, 'yyyy-MM-dd') || '',
@@ -886,9 +855,9 @@ minDateValidator(otherControlName: string) {
           }
         );
         if(record?.status == "Active"){
-          this.medicalForm.get('status')?.setValue('Active');
+          this.procedureForm.get('status')?.setValue('Active');
         }else{
-          this.medicalForm.get('status')?.setValue('Inactive');
+          this.procedureForm.get('status')?.setValue('Inactive');
         }
       }
 
@@ -905,7 +874,7 @@ minDateValidator(otherControlName: string) {
       if (result.isConfirmed) {
         this.loader.show();
       this.clinicalApiService.DeletePatientProblem(id).then((response: any) => {
-        this.GetPatientProblemData();
+        this.GetPatientProcedureData();
     Swal.fire({
       icon: 'success',
       title: 'Deleted Successfully',
@@ -915,7 +884,7 @@ minDateValidator(otherControlName: string) {
 
     })      
   } else if (result.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire(
+        Swal.fire(  
           'Cancelled',
           'Your record is safe :)',
           'error'
@@ -925,5 +894,9 @@ minDateValidator(otherControlName: string) {
 
     this.loader.hide();
     }
-
+  onStatusChange() {
+    this.MHPaginationInfo.Page = 1;
+    this.GetPatientProcedureData();
+  }
 }
+

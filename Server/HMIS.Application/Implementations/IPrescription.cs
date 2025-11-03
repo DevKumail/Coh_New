@@ -11,7 +11,9 @@ namespace HMIS.Application.Implementations
 {
     public interface IPrescription
     {
-        Task<DataSet> GetAllPrescriptions(string mrno);
+        Task<DataSet> GetAllCurrentPrescriptions(string mrno, int? PageNumber, int? PageSize);
+        Task<DataSet> GetAllPastPrescriptions(string mrno, int? PageNumber, int? PageSize);
+
 
         Task<bool> InsertOrUpdatePrescription(PrescriptionModel prescriptionModel);
 

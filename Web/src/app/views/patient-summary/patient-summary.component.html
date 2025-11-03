@@ -1,4 +1,4 @@
-<div class="mx-1 mt-1" [style.--patient-summary-offset.px]="offset">
+<div class="mt-1 p-0" [style.--patient-summary-offset.px]="offset">
   <div class="row layout-relative">
 
     <!-- Toggle Handles -->
@@ -11,17 +11,17 @@
 
     <!-- Main Wrapper (expands when right sidebar collapsed) -->
     <div [ngClass]="{ 'col-10': !rightCollapsed, 'col-12': rightCollapsed }">
-      <div class="row">
+      <div class="row g-0">
 
-        <!-- Left Sidebar -->
-        <div *ngIf="!leftCollapsed" class="col-2 bg-dark rounded p-1 mb-2 mb-sm-0 fixed-height text-white">
-          <div>
-            <app-side-menu [selected]="selectedId" (select)="onSelect($event)"></app-side-menu>
+        <!-- Left Sidebar: keep visible, shrink on collapse -->
+        <div [ngClass]="leftCollapsed ? 'col-auto' : 'col-2'" class="p-0 ms-0 mb-2 mb-sm-0 fixed-height d-flex">
+          <div class="h-100 w-100">
+            <app-side-menu [selected]="selectedId" (select)="onSelect($event)" [collapsed]="leftCollapsed"></app-side-menu>
           </div>
         </div>
 
         <!-- Center Content -->
-        <div [ngClass]="{ 'col-10': !leftCollapsed, 'col-12': leftCollapsed }" class="fixed-height">
+        <div [ngClass]="{ 'col-10': !leftCollapsed, 'col': leftCollapsed }" class="fixed-height">
           <div>
             <app-content-section [selected]="selectedId"></app-content-section>
           </div>

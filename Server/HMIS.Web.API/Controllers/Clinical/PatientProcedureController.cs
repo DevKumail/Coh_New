@@ -1,8 +1,11 @@
-﻿using HMIS.Core.Entities;
-using HMIS.Application.DTOs.Clinical;
+﻿using HMIS.Application.DTOs.Clinical;
 using HMIS.Application.Implementations;
+using HMIS.Application.ServiceLogics;
+using HMIS.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Data;
 
 namespace HMIS.Web.Controllers.Clinical
 {
@@ -12,6 +15,7 @@ namespace HMIS.Web.Controllers.Clinical
     {
 
         private readonly IPatientProcedure patientProcedure;
+        TimerElapsed timerElapsed = new TimerElapsed();
 
 
         public PatientProcedureController(IPatientProcedure patientProcedure)
@@ -62,14 +66,76 @@ namespace HMIS.Web.Controllers.Clinical
         }
 
 
-        [HttpGet("GetProcedureList")]
+        //[HttpGet("GetProcedureList")]
 
-        public async Task<ActionResult> GetProcedureList(long Id, string ProcedureStartCode, string ProcedureEndCode, string DescriptionFilter)
+        //public async Task<ActionResult> GetProcedureList(
+        //    [FromQuery] int? PageNumber,
+        //    [FromQuery] int? PageSize,
+        //    [FromQuery] string? ProcedureStartCode,
+        //    [FromQuery] string? ProcedureEndCode,
+        //    [FromQuery] string? DescriptionFilter)
+        //{
+        //    var patient = await patientProcedure.GetProcedureList(PageNumber, PageSize, ProcedureStartCode, ProcedureEndCode, DescriptionFilter);
+        //    return Ok(new { procedures = patient });
+        //    //  return Ok(new { patient = patient });
+        //}
+
+
+
+        #region GetProcedureList
+        [HttpGet("GetProcedureList")]
+        public async Task<IActionResult> GetProcedureList(string? ProcedureStartCode, string? ProcedureEndCode, string? DescriptionFilter, int? PageNumber, int? PageSize)
         {
-            var patient = await patientProcedure.GetProcedureList(Id, ProcedureStartCode, ProcedureEndCode, DescriptionFilter);
-            return Ok(new { procedures = patient });
-            //  return Ok(new { patient = patient });
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+            var requestMessage = "ProcedureStartCode:" + ProcedureStartCode + "\nProcedureEndCode:" + ProcedureEndCode + "\nDescriptionFilter:" + DescriptionFilter;
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                DataSet result = await patientProcedure.GetProcedureList(ProcedureStartCode, ProcedureEndCode, DescriptionFilter, PageNumber, PageSize);
+
+                elapsed = timerElapsed.StopTimer();
+                if (result != null)
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(result);
+                }
+                else
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+                return BadRequest(ex.Message);
+            }
+
         }
+        #endregion
+
+
+
+
+
+
 
         [HttpGet("GetChargeCaptureProcedureList")]
 

@@ -10,7 +10,7 @@ namespace HMIS.Application.Implementations
 {
     public interface IPatientImmunization
     {
-        Task<DataSet> GetAllPatientImmunization(string mrno);
+        Task<DataSet> GetAllPatientImmunization(string mrno, int? PageNumber, int? PageSize, int? Status);
         Task<bool> InsertOrUpdatePatientImmunization(PatientImmunizationModel patientImmunization);
         Task<bool> DeletePatientImmunization(long Id);
           

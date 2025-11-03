@@ -49,6 +49,7 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
   protected readonly homeIcon = LucideHome;
   protected readonly chevronRightIcon = LucideChevronRight;
   protected readonly headingIcon = LucideAlertTriangle;
+  todayStr!: string;
 
     resetForm(): void {
       if (!this.allergyForm) return;
@@ -64,7 +65,7 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
           allergen: '',
           severity: '',
           reaction: '',
-          startDate: '',
+          startDate: this.todayStr,
           endDate: '',
           status: 1,
           isProviderCheck: false,
@@ -294,6 +295,13 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
     } catch {}
   }
   async ngOnInit(){
+    try {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      this.todayStr = `${y}-${m}-${d}`;
+    } catch {}
     this.patientDataSubscription = this.PatientData.patientData$
   .pipe(
     filter((data: any) => !!data?.table2?.[0]?.mrNo),
@@ -323,6 +331,8 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
     await this.initForm();
     // If a visit is already selected, default provider to SelectedVisit.employeeId
     this.setProviderFromSelectedVisit();
+    // Default Start Date to today
+    try { this.allergyForm.get('startDate')?.setValue(this.todayStr); } catch {}
     await this.GetPatientAllergyData();
 
     var app = JSON.parse(sessionStorage.getItem('LoadvisitDetail') || '');
@@ -596,7 +606,7 @@ submit() {
       allergen: '',
       severity: '',
       reaction: '',
-      startDate: '',
+      startDate: this.todayStr,
       endDate: '',
       status: 1, // Active by default
       isProviderCheck: false,

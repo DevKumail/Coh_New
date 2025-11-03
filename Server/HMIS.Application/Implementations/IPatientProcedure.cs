@@ -16,7 +16,9 @@ namespace HMIS.Application.Implementations
         Task<bool> InsertOrUpdatePatientProcedure(PatientProcedureModel patientProcedure);
 
         Task<bool> DeletePatientProcedure(long Id);
-        Task<DataSet> GetProcedureList(long Id, string ProcedureStartCode, string ProcedureEndCode, string DescriptionFilter);
+        //Task<DataSet> GetProcedureList(int? PageNumber, int? PageSize, string? ProcedureStartCode, string? ProcedureEndCode, string? DescriptionFilter);
+        Task<DataSet> GetProcedureList(string? ProcedureStartCode, string? ProcedureEndCode, string? DescriptionFilter, int? PageNumber, int? PageSize);
+
         Task<DataSet> GetChargeCaptureProcedureList(long Id, string ProcedureStartCode, string ProcedureEndCode, string DescriptionFilter, long ProcedureTypeId);
 
     }
