@@ -859,7 +859,7 @@ namespace HMIS.Application.ServiceLogics
             }
 
         }
-        public async Task<DataSet> SpeechtoText(int? MRNo)
+        public async Task<DataSet> SpeechtoText(int? MRNo, int? PageNumber, int? PageSize)
         {
             try
             {
@@ -867,6 +867,8 @@ namespace HMIS.Application.ServiceLogics
 
 
                 param.Add("@MRNo", MRNo);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetAllSpeechData", param);
                 if (ds.Tables[0].Rows.Count == 0)
                 {

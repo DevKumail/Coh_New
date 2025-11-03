@@ -59,7 +59,7 @@ namespace HMIS.Application.Implementations
         Task<bool> AppointmentStatus(long appId, int appStatusId, int appVisitId);
 
         Task<bool> UpdateRescheduleAppointmentDB(SchRescheduleAppointments schReschedule);
-        Task<DataSet> SpeechtoText( int? MRNo);
+        Task<DataSet> SpeechtoText(int? MRNo, int? PageNumber, int? PageSize);
 
         Task<bool> InsertSpeech(SpeechModel sp);  
         Task<SchAppointmentModel> GetAppoimentForEditById(long appId);

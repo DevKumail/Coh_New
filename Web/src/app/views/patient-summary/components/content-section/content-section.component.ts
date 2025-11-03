@@ -14,6 +14,7 @@ import { distinctUntilChanged, filter } from 'rxjs';
 import { ImmunizationsComponent } from '@/app/views/clinical/immunizations/immunizations.component';
 import { MedicationComponent } from '@/app/views/clinical/medication/medication.component';
 import { ProcedureComponent } from '@/app/views/clinical/procedure/procedure.component';
+import { ClinicalNoteComponent } from '@/app/views/clinical/clinical-note/clinical-note.component';
 @Component({
   selector: 'app-content-section',
   imports: [
@@ -27,6 +28,8 @@ import { ProcedureComponent } from '@/app/views/clinical/procedure/procedure.com
     MedicationComponent,
     ImmunizationsComponent,
     ProcedureComponent
+    GenericPaginationComponent,
+    ClinicalNoteComponent
   ],
   templateUrl: './content-section.component.html',
   styleUrl: './content-section.component.scss'
