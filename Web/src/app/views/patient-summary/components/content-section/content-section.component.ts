@@ -27,8 +27,7 @@ import { ClinicalNoteComponent } from '@/app/views/clinical/clinical-note/clinic
     GenericPaginationComponent,
     MedicationComponent,
     ImmunizationsComponent,
-    ProcedureComponent
-    GenericPaginationComponent,
+    ProcedureComponent,
     ClinicalNoteComponent
   ],
   templateUrl: './content-section.component.html',
