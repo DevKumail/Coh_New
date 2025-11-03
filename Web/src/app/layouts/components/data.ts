@@ -279,6 +279,20 @@ export const horizontalMenuItems: MenuItemType[] = [
     //         },
     //     ],
     // },
+    
+    {
+        label: 'IVF',
+        icon: 'tablerHeartHandshake',
+        module: 'IVF', // this is used by PermissionService
+        isCollapsed: true,
+        children: [
+            {
+                label: 'IVF Dashboard',
+                icon: 'tablerUsers',
+                url: '/ivf/dashboard'
+            }
+        ]
+    },
 
     {
         label: 'Billing',
