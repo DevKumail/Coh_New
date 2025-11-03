@@ -19,10 +19,18 @@ namespace HMIS.Web.Controllers.Clinical
         }
 
 
-        [HttpGet("GetAllPrescriptions")]
-        public async Task<ActionResult> GetPrescriptionsList(string mrno)
+        [HttpGet("GetCurrentPrescriptions")]
+        public async Task<ActionResult> GetCurrentPrescriptionsList(string mrno, int? PageNumber, int? PageSize)
         {
-            var prescriptions = await prescription.GetAllPrescriptions(mrno);
+            var prescriptions = await prescription.GetAllCurrentPrescriptions(mrno, PageNumber, PageSize);
+            return Ok(new { prescription = prescriptions });
+        }
+
+
+        [HttpGet("GetPastPrescriptions")]
+        public async Task<ActionResult> GetPastPrescriptionsList(string mrno, int? PageNumber, int? PageSize)
+        {
+            var prescriptions = await prescription.GetAllPastPrescriptions(mrno,PageNumber, PageSize);
             return Ok(new { prescription = prescriptions });
         }
 

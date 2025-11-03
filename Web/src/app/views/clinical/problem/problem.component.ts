@@ -99,15 +99,18 @@ export class ProblemComponent {
   pageSizeDiagnoseCode: number = 10;
   currentPageDiagnoseCode: number = 1;
   DiagnosisSearched = false; // for empty message display
+  submitted: boolean = false; // used by template to show errors
 
   activeTabId = 1;
   selectedRowIndex: any;
   favoritesTotalItems: number = 0;
+  todayStr!: string;
   start: any;
   end: any;
   totalPagesDiagnoseCode:any;
   isProviderCheck:any;
-SelectedVisit: any;
+  SelectedVisit: any;
+  isSubmitting: boolean = false;
   DescriptionFilter: any = '';
   DiagnosisEndCode: any = '';
   DiagnosisStartCode: any = '';
@@ -168,6 +171,13 @@ MHPaginationInfo: any = {
   }
 
   async ngOnInit() {
+    try {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      this.todayStr = `${y}-${m}-${d}`;
+    } catch {}
     this.currentUser = sessionStorage.getItem('userId') || 0;
 
     this.patientDataSubscription = this.PatientData.patientData$
@@ -211,18 +221,70 @@ MHPaginationInfo: any = {
 
     // Ensure provider defaults from SelectedVisit right after form init
     try { this.setProviderFromSelectedVisit(); } catch {}
+    // Set default Start Date to today
+    try { this.medicalForm.get('startDate')?.setValue(this.todayStr); } catch {}
 
 
     this.ModalFilterForm = this.fb.group({
-      icdVersionId: [''],
+      icdVersionId: ['2'],
       searchById: ['1'],
       startingCode: [''],
       diagnosisEndCode: [''],
       descriptionFilter: ['']
     });
 
+    // Apply conditional validators for modal filters like problem-list
+    const applyModalFilterValidators = (mode: any) => {
+      const startCtrl = this.ModalFilterForm.get('startingCode');
+      const endCtrl = this.ModalFilterForm.get('diagnosisEndCode');
+      const descCtrl = this.ModalFilterForm.get('descriptionFilter');
+      if (!startCtrl || !endCtrl || !descCtrl) { return; }
+
+      startCtrl.clearValidators();
+      endCtrl.clearValidators();
+      descCtrl.clearValidators();
+
+      const m = String(mode);
+      if (m === '1') {
+        // Code
+        startCtrl.setValidators([Validators.required]);
+      } else if (m === '2') {
+        // Code Range
+        startCtrl.setValidators([Validators.required]);
+        endCtrl.setValidators([Validators.required]);
+      } else if (m === '3') {
+        // Description
+        descCtrl.setValidators([Validators.required]);
+      }
+
+      startCtrl.updateValueAndValidity({ emitEvent: false });
+      endCtrl.updateValueAndValidity({ emitEvent: false });
+      descCtrl.updateValueAndValidity({ emitEvent: false });
+    };
+
+    // Initialize and subscribe to search type changes
+    try { applyModalFilterValidators(this.ModalFilterForm.get('searchById')?.value); } catch {}
+    this.ModalFilterForm.get('searchById')?.valueChanges.subscribe((val: any) => {
+      applyModalFilterValidators(val);
+      // Clear inputs so user must re-enter based on new mode
+      this.ModalFilterForm.get('startingCode')?.setValue('', { emitEvent: false });
+      this.ModalFilterForm.get('diagnosisEndCode')?.setValue('', { emitEvent: false });
+      this.ModalFilterForm.get('descriptionFilter')?.setValue('', { emitEvent: false });
+      // Reset modal pagination to first page on mode change
+      this.ModalPaginationInfo.Page = 1;
+      // Reset submitted state so previous errors don't persist across modes
+      this.submitted = false;
+      // Mark untouched/pristine to avoid showing errors immediately
+      this.ModalFilterForm.get('startingCode')?.markAsPristine();
+      this.ModalFilterForm.get('diagnosisEndCode')?.markAsPristine();
+      this.ModalFilterForm.get('descriptionFilter')?.markAsPristine();
+      this.ModalFilterForm.get('startingCode')?.markAsUntouched();
+      this.ModalFilterForm.get('diagnosisEndCode')?.markAsUntouched();
+      this.ModalFilterForm.get('descriptionFilter')?.markAsUntouched();
+    });
+
     this.favoritesForm = this.fb.group({
-      icdVersionId: [''],
+      icdVersionId: ['2'],
       searchById: ['1'],
       startingCode: [''],
       endingCode: [''],
@@ -404,6 +466,7 @@ onPROBSubmit() {
 
     console.log('Submitting Patient Problem Payload:', problemPayload);
 
+    this.isSubmitting = true;
     this.clinicalApiService.SubmitPatientProblem(problemPayload).then((res: any) => {
       console.log("my payload", res);
       Swal.fire({
@@ -421,6 +484,8 @@ onPROBSubmit() {
         text: 'An error occurred while submitting the patient problem.',
       });
       console.error('Submission error:', error);
+    }).finally(() => {
+      this.isSubmitting = false;
     });
   }
 
@@ -436,7 +501,7 @@ onPROBClear(){
     problem: '',
     comments: '',
     status: '',
-    startDate: '',
+    startDate: this.todayStr,
     endDate: '',
     providerName: '', 
     isConfidentential: false,
@@ -547,6 +612,38 @@ ModalPaginationInfo: any = {
   RowsPerPage: 5,
 };
 ModalSearchDiagnosis() {
+  // Validate modal filters before searching
+  if (!this.ModalFilterForm) { return; }
+  // Mark that user attempted to submit search in modal
+  this.submitted = true;
+  const mode = String(this.ModalFilterForm.get('searchById')?.value || '');
+  const start = (this.ModalFilterForm.get('startingCode')?.value || '').toString().trim();
+  const end = (this.ModalFilterForm.get('diagnosisEndCode')?.value || '').toString().trim();
+  const desc = (this.ModalFilterForm.get('descriptionFilter')?.value || '').toString().trim();
+
+      const markAll = () => {
+      this.ModalFilterForm.get('startingCode')?.markAsTouched();
+      this.ModalFilterForm.get('diagnosisEndCode')?.markAsTouched();
+      this.ModalFilterForm.get('descriptionFilter')?.markAsTouched();
+    };
+
+  // Show Swal-style validation like problem-list
+  if (mode === '1' && !start) {
+      markAll();
+      // Swal.fire('Validation Error', 'Please enter Code to search.', 'warning');
+      return;
+    }
+    if (mode === '2' && (!start || !end)) {
+      markAll();
+      // Swal.fire('Validation Error', 'Please enter both Starting Code and Ending Code.', 'warning');
+      return;
+    }
+    if (mode === '3' && !desc) {
+      markAll();
+      // Swal.fire('Validation Error', 'Please enter Description to search.', 'warning');
+      return;
+    }
+
   this.DiagnosisCode = [];
   this.loader.show();
   this.clinicalApiService.DiagnosisCodebyProvider(
@@ -566,6 +663,8 @@ ModalSearchDiagnosis() {
 ClickFilter(modalRef: TemplateRef<any>) {
   this.DiagnosisCode = [];
   this.modaltotalrecord = 0;
+  // Reset submitted flag when opening modal so previous errors don't persist
+  this.submitted = false;
   this.modalRefInstance = this.modalService.open(modalRef, {
     backdrop: 'static',
     size: 'xl',
@@ -583,7 +682,7 @@ onRowSelect(diagnosis: any, modal: any) {
   modal.close(diagnosis); 
 }
 onModalDiagnosisPageChanged(page: number){
-  this.PaginationInfo.Page = page;
+  this.ModalPaginationInfo.Page = page;
   this.ModalSearchDiagnosis();
 }
 // // // // MODAL WORK END // // // //

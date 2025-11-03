@@ -4,7 +4,16 @@
       <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
         <span>{{ 'CLINICAL_NOTES' | translate }}</span>
       </h5>
-      <i class="bi bi-heart-pulse fs-4"></i>
+    <i class="bi bi-heart-pulse fs-4"></i>
+    <div>
+    
+      <i class="pi pi-sync"
+        style="background-color: #3B82F6;color: rgb(228, 228, 230);font-size:1.5rem"></i>
+    <button class="p-button p-button-success" (click)="buttonRoute('/clinical/clinical-note/create')">
+      <i class="pi pi-user-plus"></i>&nbsp;Create
+    </button>
+
+      </div>
     </div>
     
     <div class="card-body">

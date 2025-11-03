@@ -1,4 +1,4 @@
-<nav aria-label="breadcrumb">
+<!-- <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
         <li class="breadcrumb-item">
             <a href="javascript:void(0);">
@@ -14,50 +14,55 @@
         </li>
     <li class="breadcrumb-item active" aria-current="page">{{ 'VITAL_SIGNS' | translate }}</li>
     </ol>
-</nav>
+</nav> -->
 
     <form *ngIf="vitalSignsForm" [formGroup]="vitalSignsForm" (ngSubmit)="onSubmit()">
           <div class="card shadow-lg rounded-3 border-0">
           <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-        <lucide-angular [img]="headingIcon" class="fs-5"></lucide-angular>
+        <!-- <lucide-angular [img]="headingIcon" class="fs-5"></lucide-angular> -->
   <span>{{ 'VITAL_SIGNS' | translate }}</span>
       </h5>
       <i class="bi bi-heart-pulse fs-4"></i>
     </div>
         <div class="card-body">
         <div class="row">
-            <div class="col-sm-3">
+            <div class="col-sm-3 mb-2">
                 <label>{{ 'ENTERED_DATE' | translate }} <span class="text-danger">*</span></label>
+                <div class="mt-2">
                 <input
-                    type="text"
+                    type="date"
                     class="form-control"
                     formControlName="entryDate"
                     id="entryDate"
+                    [attr.min]="todayStr"
                     placeholder="{{ 'SELECT_DATE' | translate }}"
                     data-provider="flatpickr"
                 />
+                </div>
                 <div class="text-danger small" *ngIf="vitalSignsForm.get('entryDate')?.touched && vitalSignsForm.get('entryDate')?.invalid">
                 {{'ENTERED_DATE_IS_REQUIRED' | translate }}
                 </div>
             </div>
 
             <!-- Daily Start Time -->
-            <div class="col-sm-3">
-                <label>{{ 'DAILY_START_TIME' | translate }} <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2">
+                <label>{{ 'START_TIME' | translate }} <span class="text-danger">*</span></label>
+                <div class="mt-2">
                 <input
                     type="time"
                     class="form-control"
                     formControlName="dailyStartTime"
                 />
+                </div>
                 <div class="text-danger small" *ngIf="vitalSignsForm.get('dailyStartTime')?.touched && vitalSignsForm.get('dailyStartTime')?.invalid">
-                    {{'DAILY_START_TIME_IS_REQUIRED' | translate }}
+                    {{'START_TIME_IS_REQUIRED' | translate }}
                 </div>
             </div>
 
             <!-- Systolic -->
-            <div class="col-sm-3">
-                <label>{{ 'SYSTOLIC' | translate }} (mmHg) <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2">
+                <label>{{ 'SYSTOLIC' | translate }} (mmHg)</label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -69,12 +74,16 @@
                     />
                     <div class="text-danger small" *ngIf="vitalSignsForm.get('bpSystolic')?.touched && vitalSignsForm.get('bpSystolic')?.invalid">
                         {{ 'SYSTOLIC_REQUIRED' | translate }}</div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('bpSystolic')?.touched && vitalSignsForm.get('bpSystolic')?.errors?.['outOfRange']">
+                        {{ 'VALUE_MUST_BE_IN_RANGE' | translate }}
+                        ({{ vitalSignsForm.get('bpSystolic')?.errors?.['outOfRange']?.min }} - {{ vitalSignsForm.get('bpSystolic')?.errors?.['outOfRange']?.max }})
+                    </div>
                 </div>
             </div>
 
             <!-- Diastolic -->
-            <div class="col-sm-3">
-                <label>{{ 'DIASTOLIC' | translate }} (mmHg) <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2   ">
+                <label>{{ 'DIASTOLIC' | translate }} (mmHg)</label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -86,12 +95,19 @@
                     />
                     <div class="text-danger small" *ngIf="vitalSignsForm.get('bpDiastolic')?.touched && vitalSignsForm.get('bpDiastolic')?.invalid">
                         {{ 'DIASTOLIC_REQUIRED' | translate }}</div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('bpDiastolic')?.touched && vitalSignsForm.get('bpDiastolic')?.errors?.['requiredWithSystolic']">
+                        {{ 'DIASTOLIC_REQUIRED_WHEN_SYSTOLIC' | translate }}
+                    </div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('bpDiastolic')?.touched && vitalSignsForm.get('bpDiastolic')?.errors?.['outOfRange']">
+                        {{ 'VALUE_MUST_BE_IN_RANGE' | translate }}
+                        ({{ vitalSignsForm.get('bpDiastolic')?.errors?.['outOfRange']?.min }} - {{ vitalSignsForm.get('bpDiastolic')?.errors?.['outOfRange']?.max }})
+                    </div>
                 </div>
             </div>
 
             <!-- Heart Rate -->
-            <div class="col-sm-3">
-                <label>{{ 'HEART_RATE' | translate }} (Beats/minute) <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2">
+                <label>{{ 'HEART_RATE' | translate }} (Beats/minute)</label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -103,12 +119,16 @@
                     />
                     <div class="text-danger small" *ngIf="vitalSignsForm.get('heartRate')?.touched && vitalSignsForm.get('heartRate')?.invalid">
                         {{ 'HEART_RATE_REQUIRED' | translate }}</div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('heartRate')?.touched && vitalSignsForm.get('heartRate')?.errors?.['outOfRange']">
+                        {{ 'VALUE_MUST_BE_IN_RANGE' | translate }}
+                        ({{ vitalSignsForm.get('heartRate')?.errors?.['outOfRange']?.min }} - {{ vitalSignsForm.get('heartRate')?.errors?.['outOfRange']?.max }})
+                    </div>
                 </div>
             </div>
 
             <!-- Respiration Rate -->
-            <div class="col-sm-3">
-                <label>{{ 'RESPIRATION_RATE' | translate }} <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2">
+                <label>{{ 'RESPIRATION_RATE' | translate }}</label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -120,12 +140,16 @@
                     />
                     <div class="text-danger small" *ngIf="vitalSignsForm.get('respirationRate')?.touched && vitalSignsForm.get('respirationRate')?.invalid">
                         {{ 'RESPIRATION_RATE_REQUIRED' | translate }}</div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('respirationRate')?.touched && vitalSignsForm.get('respirationRate')?.errors?.['outOfRange']">
+                        {{ 'VALUE_MUST_BE_IN_RANGE' | translate }}
+                        ({{ vitalSignsForm.get('respirationRate')?.errors?.['outOfRange']?.min }} - {{ vitalSignsForm.get('respirationRate')?.errors?.['outOfRange']?.max }})
+                    </div>
                 </div>
             </div>
 
             <!-- Temperature -->
-            <div class="col-sm-3">
-                <label>{{ 'TEMPERATURE' | translate }} (°F) <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2">
+                <label>{{ 'TEMPERATURE' | translate }} (°F)</label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -137,12 +161,16 @@
                     />
                     <div class="text-danger small" *ngIf="vitalSignsForm.get('temperature')?.touched && vitalSignsForm.get('temperature')?.invalid">
                         {{ 'TEMPERATURE_REQUIRED' | translate }}</div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('temperature')?.touched && vitalSignsForm.get('temperature')?.errors?.['outOfRange']">
+                        {{ 'VALUE_MUST_BE_IN_RANGE' | translate }}
+                        ({{ vitalSignsForm.get('temperature')?.errors?.['outOfRange']?.min }} - {{ vitalSignsForm.get('temperature')?.errors?.['outOfRange']?.max }})
+                    </div>
                 </div>
             </div>
 
             <!-- Weight -->
-            <div class="col-sm-3">
-                <label>{{ 'WEIGHT' | translate }} (kgs) <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2">
+                <label>{{ 'WEIGHT' | translate }} (kgs)</label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -154,12 +182,16 @@
                     />
                     <div class="text-danger small" *ngIf="vitalSignsForm.get('weight')?.touched && vitalSignsForm.get('weight')?.invalid">
                         {{ 'WEIGHT_REQUIRED' | translate }}</div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('weight')?.touched && vitalSignsForm.get('weight')?.errors?.['outOfRange']">
+                        {{ 'VALUE_MUST_BE_IN_RANGE' | translate }}
+                        ({{ vitalSignsForm.get('weight')?.errors?.['outOfRange']?.min }} - {{ vitalSignsForm.get('weight')?.errors?.['outOfRange']?.max }})
+                    </div>
                 </div>
             </div>
 
             <!-- Height -->
-            <div class="col-sm-3">
-                <label>{{ 'HEIGHT' | translate }} (cms) <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2">
+                <label>{{ 'HEIGHT' | translate }} (cms)</label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -171,12 +203,16 @@
                     />
                     <div class="text-danger small" *ngIf="vitalSignsForm.get('height')?.touched && vitalSignsForm.get('height')?.invalid">
                         {{ 'HEIGHT_REQUIRED' | translate }}</div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('height')?.touched && vitalSignsForm.get('height')?.errors?.['outOfRange']">
+                        {{ 'VALUE_MUST_BE_IN_RANGE' | translate }}
+                        ({{ vitalSignsForm.get('height')?.errors?.['outOfRange']?.min }} - {{ vitalSignsForm.get('height')?.errors?.['outOfRange']?.max }})
+                    </div>
                 </div>
             </div>
 
             <!-- BMI -->
-            <div class="col-sm-3">
-                <label>{{ 'BMI' | translate }} <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2">
+                <label>{{ 'BMI' | translate }}</label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -188,12 +224,15 @@
                     />
                     <div class="text-danger small" *ngIf="vitalSignsForm.get('bmi')?.touched && vitalSignsForm.get('bmi')?.invalid">
                         {{ 'BMI_REQUIRED' | translate }}</div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.hasError('bmiOutOfRange') && (vitalSignsForm.touched || vitalSignsForm.dirty)">
+                        {{ 'VALUE_MUST_BE_IN_RANGE' | translate }} (10 - 70)
+                    </div>
                 </div>
             </div>
 
             <!-- SPO2 -->
-            <div class="col-sm-3">
-                <label>{{ 'SPO2' | translate }} (%) <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2">
+                <label>{{ 'SPO2' | translate }} (%)</label>  
                 <div class="mt-2">
                     <input
                         type="number"
@@ -205,12 +244,16 @@
                     />
                     <div class="text-danger small" *ngIf="vitalSignsForm.get('spo2')?.touched && vitalSignsForm.get('spo2')?.invalid">
                         {{ 'SPO2_REQUIRED' | translate }}</div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('spo2')?.touched && vitalSignsForm.get('spo2')?.errors?.['outOfRange']">
+                        {{ 'VALUE_MUST_BE_IN_RANGE' | translate }}
+                        ({{ vitalSignsForm.get('spo2')?.errors?.['outOfRange']?.min }} - {{ vitalSignsForm.get('spo2')?.errors?.['outOfRange']?.max }})
+                    </div>
                 </div>
             </div>
 
             <!-- Glucose -->
-            <div class="col-sm-3">
-                <label>{{ 'GLUCOSE' | translate }} (mg/dl) <span class="text-danger">*</span></label>
+            <div class="col-sm-3 mb-2">
+                <label>{{ 'GLUCOSE' | translate }} (mg/dl)</label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -222,12 +265,16 @@
                     />
                     <div class="text-danger small" *ngIf="vitalSignsForm.get('glucose')?.touched && vitalSignsForm.get('glucose')?.invalid">
                         {{ 'GLUCOSE_REQUIRED' | translate }}</div>
+                    <div class="text-danger small" *ngIf="vitalSignsForm.get('glucose')?.touched && vitalSignsForm.get('glucose')?.errors?.['outOfRange']">
+                        {{ 'VALUE_MUST_BE_IN_RANGE' | translate }}
+                        ({{ vitalSignsForm.get('glucose')?.errors?.['outOfRange']?.min }} - {{ vitalSignsForm.get('glucose')?.errors?.['outOfRange']?.max }})
+                    </div>
                 </div>
             </div>
 
             <!-- Comment -->
-            <div class="col-sm-3 mb-3">
-                <label>{{ 'COMMENT' | translate }} <span class="text-danger">*</span></label>
+            <div class="col-sm-6 mb-2 ">
+                <label>{{ 'COMMENT' | translate }}</label>
                 <input
                     type="text"
                     class="form-control"
@@ -236,10 +283,11 @@
                 />
                 <div class="text-danger small" *ngIf="vitalSignsForm.get('comment')?.touched && vitalSignsForm.get('comment')?.invalid">{{ 'COMMENT_REQUIRED' | translate }}</div>
             </div>
-        </div>
-        <!-- buttons on their own row -->
-        <div class="row">
-            <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+            <div class="col-sm-3 mt-3 ms-auto d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary ms-1 me-1" (click)="clearForm()" [disabled]="isSubmitting">
+                  {{ 'CLEAR' | translate }}
+              </button>
+
               <button
                   class="btn btn-primary"
                   type="submit"
@@ -253,18 +301,25 @@
                       ></span>
                       {{ 'SUBMITTING' | translate }}
                   </span>
-                  <span *ngIf="!isSubmitting">{{ 'SUBMIT' | translate }}</span>
+                  <span *ngIf="!isSubmitting">{{ 'SAVE' | translate }}</span>
               </button>
 
-              <button type="button" class="btn btn-light" (click)="clearForm()" [disabled]="isSubmitting">
-                  {{ 'CLEAR' | translate }}
-              </button>
+              
             </div>
+            <!-- <div class="col-12 mt-2" *ngIf="vitalSignsForm.hasError('noMeasurement') && (vitalSignsForm.touched || vitalSignsForm.dirty)">
+                <div class="text-danger small">
+                    {{ 'AT_LEAST_ONE_MEASUREMENT_REQUIRED' | translate }}
+                </div>
+            </div> -->
         </div>
+        <!-- buttons on their own row -->
         </div>
         </div>
     </form>
 <!-- 👇 Grid/Card Starts -->
+
+
+ 
 <div class="card p-3 mt-4 shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
@@ -273,8 +328,8 @@
                     <tr>
                         <th>{{ 'DATE' | translate }}</th>
                         <!-- <th>Time</th> -->
-                        <th>{{ 'TEMP_F' | translate }}</th>
-                        <th>{{ 'PULSE' | translate }}</th>
+                        <th>{{ 'TEMPERATURE' | translate }} (°F)</th>
+                        <th>{{ 'HEART_RATE' | translate }}</th>
                         <th>{{ 'RESP_RATE' | translate }}</th>
                         <th>{{ 'BP_SYS_DIA' | translate }}</th>
                         <th>{{ 'O2_SAT' | translate }}</th>
@@ -288,23 +343,21 @@
                 </thead>
                 <tbody class="table-group-divider text-center align-middle">
                     <tr *ngFor="let vital of pagedvital; let i = index">
-                        <td>{{ vital.entryDate | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ vital.entryDate | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
                         <!-- <td>{{ vital.dailyStartTime }}</td> -->
-                        <td>{{ vital.temperature || "N/A" }}</td>
-                        <td>{{ vital.pulseRate || "N/A" }}</td>
-                        <td>{{ vital.respirationRate || "N/A" }}</td>
+                        <td>{{ vital.temperature || "-" }}</td>
+                        <td>{{ vital.pulseRate || "-" }}</td>
+                        <td>{{ vital.respirationRate || "-" }}</td>
                         <td>
-                            {{ vital.bpSystolic || "N/A" }}/{{
-                                vital.bpDiastolic || "N/A"
+                            {{ vital.bpSystolic || "-" }}/{{
+                                vital.bpDiastolic || "-"
                             }}
                         </td>
-                        <td>{{ vital.spO2 || "N/A" }}</td>
-                        <td>{{ vital.height || "N/A" }}</td>
-                        <td>{{ vital.weight || "N/A" }}</td>
+                        <td>{{ vital.spO2 || "-" }}</td>
+                        <td>{{ vital.height || "-" }}</td>
+                        <td>{{ vital.weight || "-" }}</td>
                         <td>
-                            <button type="button" class="btn btn-outline-info p-0 px-1 py-1" (click)="editVital(vital)">
-                          <ng-icon name="tablerEdit"></ng-icon>
-                        </button>
+                            <ng-icon name="tablerEdit" class="me-1" (click)="editVital(vital)"></ng-icon>
                         </td>
                     </tr>
                 </tbody>

@@ -1,3 +1,4 @@
+import { ClinicalNoteCreateComponent } from './../clinical-note-create/clinical-note-create.component';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
@@ -29,6 +30,7 @@ export class ClinicalNoteComponent {
       };
     clinicalnoteTotalItems: any= 0;
     private patientDataSubscription: Subscription | undefined;
+    router: any;
       constructor(
         private apiservice: ClinicalApiService,
         private PatientData: PatientBannerService
@@ -63,7 +65,10 @@ export class ClinicalNoteComponent {
         this.clinicalnoteTotalItems = res.table2[0]?.totalCount || 0;
       });
     }
-
+  buttonRoute(url: string) {
+    console.log('Button Route /ClinicalNotes/Create');
+    this.router.navigate(['/clinical/clinical-notes-create']);
+  }
 async onallergiePageChanged(page: number) {
   this.pagegination.currentPage = page;
   await this.speechtoText();

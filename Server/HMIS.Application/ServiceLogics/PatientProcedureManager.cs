@@ -71,36 +71,20 @@ namespace HMIS.Application.ServiceLogics
                     var newPatientProc = new PatientProcedure();
 
                     newPatientProc.AppointmentId = patientProcedure.AppointmentId;
-                   newPatientProc.UpdatedBy = patientProcedure.UpdatedBy;
-                    newPatientProc.UpdatedDate = DateTime.Now;
                     newPatientProc.CreatedBy = patientProcedure.CreatedBy;
                     newPatientProc.CreatedDate = DateTime.Now;
                     newPatientProc.Cptcode = patientProcedure.Cptcode ?? "CPT";
                     newPatientProc.Active = patientProcedure.Active;
-                    newPatientProc.AssociatedDiagnosisCode = patientProcedure.AssociatedDiagnosisCode ?? "test";
-                    newPatientProc.ErrorReason = patientProcedure.ErrorReason ?? "test";
-                    newPatientProc.Comments = patientProcedure.Comments ;
+                    newPatientProc.Comments = patientProcedure.Comments;
                     newPatientProc.IsDeleted = false;
-                    newPatientProc.OldMrno = "test";
-                    newPatientProc.IsHl7msgCreated = patientProcedure.IsHl7msgCreated;
                     newPatientProc.PerformedOnFacility = (bool)patientProcedure.PerformedOnFacility;
-                    newPatientProc.PrimaryAnestheticId = patientProcedure.PrimaryAnestheticId ?? "test";
-                    newPatientProc.ProcedureDateTime = DateTime.Now;
+                    newPatientProc.ProcedureDateTime = patientProcedure.ProcedureDateTime;
                     newPatientProc.ProcedureEndDateTime = patientProcedure.ProcedureEndDateTime;
                     newPatientProc.ProcedureDescription = patientProcedure.ProcedureDescription;
-                    newPatientProc.ProcedurePriority = patientProcedure.ProcedurePriority ?? "test";
                     newPatientProc.ProcedureType = patientProcedure.ProcedureType ?? null;
-                    if (patientProcedure.ProviderId != null)
-                    {
                         newPatientProc.ProviderId = patientProcedure.ProviderId;
-
-                    }
-                    newPatientProc.AnesthesiaStartDateTime = patientProcedure.AnesthesiaStartDateTime;
-                    newPatientProc.AnesthesiaEndDateTime = patientProcedure.AnesthesiaEndDateTime;
-                    newPatientProc.Mrno = patientProcedure.Mrno ?? "test";
-                    newPatientProc.IsLabTest = false;
-                   // newPatientProc.OutsideClinic = patientProcedure.providerDescription;
-
+                    newPatientProc.ProviderName = patientProcedure.ProviderName;
+                    newPatientProc.Mrno = patientProcedure.Mrno;
 
                     _context.PatientProcedure.Add(newPatientProc);
                     await _context.SaveChangesAsync();
@@ -115,31 +99,19 @@ namespace HMIS.Application.ServiceLogics
                     {
                         patient.AppointmentId = patientProcedure.AppointmentId;
                         patient.UpdatedBy = patientProcedure.UpdatedBy;
-                        patient.UpdatedDate = patientProcedure.UpdatedDate;
-                     //   patient.CreatedBy = patientProcedure.CreatedBy;
-                       // patient.CreatedDate = patientProcedure.CreatedDate;
+                        patient.UpdatedDate = DateTime.Now; ;
                         patient.Cptcode = patientProcedure.Cptcode ?? "CPT";
                         patient.Active = patientProcedure.Active;
-                        patient.AssociatedDiagnosisCode = patientProcedure.AssociatedDiagnosisCode ?? "test";
-                        patient.ErrorReason = patientProcedure.ErrorReason ?? "test";
                         patient.Comments = patientProcedure.Comments;
                         patient.IsDeleted = false;
-                        patient.OldMrno = patientProcedure.OldMrno;
-                        patient.IsHl7msgCreated = patientProcedure.IsHl7msgCreated;
                         patient.PerformedOnFacility = (bool)patientProcedure.PerformedOnFacility;
-                        patient.PrimaryAnestheticId = patientProcedure.PrimaryAnestheticId;
                         patient.ProcedureDateTime = patientProcedure.ProcedureDateTime;
+                        patient.ProcedureEndDateTime = patientProcedure.ProcedureEndDateTime;
                         patient.ProcedureDescription = patientProcedure.ProcedureDescription;
-                        patient.ProcedurePriority = patientProcedure.ProcedurePriority;
                         patient.ProcedureType = patientProcedure.ProcedureType;
-                        if(patientProcedure.ProviderId!= null)
-                        {
                             patient.ProviderId = patientProcedure.ProviderId;
-                        }
-                        patient.AnesthesiaStartDateTime = patientProcedure.AnesthesiaStartDateTime;
-                        patient.AnesthesiaEndDateTime = patientProcedure.AnesthesiaEndDateTime;
+                        patient.ProviderName = patientProcedure.ProviderName;
                         patient.Mrno = patientProcedure.Mrno;
-                        //patient.OutsideClinic = patientProcedure.providerDescription;
                         patient.IsLabTest = false;
 
                         await _context.SaveChangesAsync();
@@ -177,34 +149,68 @@ namespace HMIS.Application.ServiceLogics
                 throw ex;
             }
         }
-        public async Task<DataSet> GetProcedureList(long Id , string ProcedureStartCode, string ProcedureEndCode, string DescriptionFilter)
+
+
+        //public async Task<DataSet> GetProcedureList(int? PageNumber, int? PageSize, string? ProcedureStartCode, string? ProcedureEndCode, string? DescriptionFilter)
+        //{
+        //    try
+        //    {
+        //        DynamicParameters param = new DynamicParameters();
+        //        param.Add("@PageNumber", PageNumber);
+        //        param.Add("@PageSize", PageSize);
+        //        param.Add("@CptStartCode", ProcedureStartCode);
+        //        param.Add("@CptEndCode", ProcedureEndCode);
+        //        param.Add("@DescriptionFilter", DescriptionFilter);
+
+        //        DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetProcedureList", param);
+        //        if (ds.Tables[0].Rows.Count == 0)
+        //        {
+
+        //            return new DataSet();
+        //            //throw new Exception("No data found");
+        //        }
+        //        return ds;
+
+
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+
+        //}
+
+
+        public async Task<DataSet> GetProcedureList(string? ProcedureStartCode, string? ProcedureEndCode, string? DescriptionFilter, int? PageNumber, int? PageSize)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
-                //param.Add("@MRNo", MRNo);
+
                 param.Add("@CptStartCode", ProcedureStartCode);
                 param.Add("@CptEndCode", ProcedureEndCode);
                 param.Add("@DescriptionFilter", DescriptionFilter);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetProcedureList", param);
-                if (ds.Tables[0].Rows.Count == 0)
+                if (ds.Tables.Count == 0)
                 {
-
-                    return new DataSet();
-                    //throw new Exception("No data found");
+                    throw new Exception("No data found");
                 }
+
                 return ds;
-
-
-
             }
             catch (Exception ex)
             {
-                throw ex;
+                return new DataSet();
             }
 
         }
+
+
+
 
         public async Task<DataSet> GetChargeCaptureProcedureList(long Id, string ProcedureStartCode, string ProcedureEndCode, string DescriptionFilter, long ProcedureTypeId)
         {

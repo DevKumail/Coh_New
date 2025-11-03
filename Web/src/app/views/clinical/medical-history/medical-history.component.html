@@ -1,5 +1,5 @@
 <!-- 🔹 Breadcrumb OUTSIDE card -->
-<nav aria-label="breadcrumb">
+<!-- <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
       <li class="breadcrumb-item">
         <a href="javascript:void(0);">
@@ -12,23 +12,20 @@
       </li>
   <li class="breadcrumb-item active" aria-current="page">{{ 'MEDICAL_HISTORY' | translate }}</li>
     </ol>
-  </nav>
+  </nav> -->
 
   <!-- 🔹 Tabs INSIDE card -->
-  <div class="card shadow rounded">
-    <div class="card-body">
+  <app-problem-list [editData]="editedFavorite"></app-problem-list>
+  <!-- <div >
+    <div >
 
-      <!-- Tabs -->
-      <ul ngbNav #nav="ngbNav" [(activeId)]="activeTabId" class="nav nav-tabs mb-3">
-        <!-- Problem Tab -->
+      <ul ngbNav #nav="ngbNav" [(activeId)]="activeTabId" [destroyOnHide]="false" class="nav nav-tabs mb-3">
         <li [ngbNavItem]="1">
           <a ngbNavLink href="javascript:void(0)">{{ 'PROBLEM' | translate }}</a>
           <ng-template ngbNavContent>
-            <app-problem-list [editData]="editedFavorite"></app-problem-list>
           </ng-template>
         </li>
 
-        <!-- Favorites Tab -->
         <li [ngbNavItem]="2">
           <a ngbNavLink href="javascript:void(0)">{{ 'FAVORITES' | translate }}</a>
           <ng-template ngbNavContent>
@@ -37,8 +34,7 @@
         </li>
       </ul>
 
-      <!-- Tab Content -->
       <div [ngbNavOutlet]="nav"></div>
 
     </div>
-  </div>
+  </div> -->

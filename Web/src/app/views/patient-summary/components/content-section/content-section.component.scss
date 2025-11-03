@@ -1,0 +1,40 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+/* Make the tab-content scroll within available height */
+#v-pills-tabContent,
+.tab-content {
+  height: 100%;
+  overflow: auto;
+
+  /* Firefox */
+  scrollbar-width: thin;               /* thin scrollbar */
+  scrollbar-color: rgba(100,116,139,0.6) transparent;  /* thumb track */
+}
+
+/* WebKit (Chrome/Edge/Safari) */
+#v-pills-tabContent::-webkit-scrollbar,
+.tab-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+#v-pills-tabContent::-webkit-scrollbar-track,
+.tab-content::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.06);
+  border-radius: 8px;
+}
+
+#v-pills-tabContent::-webkit-scrollbar-thumb,
+.tab-content::-webkit-scrollbar-thumb {
+  background: rgba(100,116,139,0.6);   /* slate-500ish */
+  border-radius: 8px;
+  border: 2px solid transparent;       /* creates padding */
+  background-clip: padding-box;
+}
+
+#v-pills-tabContent::-webkit-scrollbar-thumb:hover,
+.tab-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(71,85,105,0.8);     /* darker on hover */
+}

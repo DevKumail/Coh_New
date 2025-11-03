@@ -2,7 +2,7 @@ export interface vitalsingsDto {
   ID?: number;
   MRNo: string;
   VisitAccountNo?: number;
-  EntryDate: string | Date;
+  EntryDate: any ;
   UpdateDate: string | Date;
   AgeInMonths?: number;
   UpdateBy?: string;
