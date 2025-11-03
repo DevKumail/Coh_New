@@ -249,10 +249,10 @@ export class ClinicalApiService {
             )
             .toPromise();
     }
-    GetPatientImmunizationData(mrno: string) {
+    GetPatientImmunizationData(mrno: string, page: number, pageSize: number, status: any) {
          ;
         return this.api
-            .get(`PatientImmunization/GetPatientImmunizationList?mrno=${mrno}`)
+            .get(`PatientImmunization/GetPatientImmunizationList?mrno=${mrno}&PageNumber=${page}&PageSize=${pageSize}&Status=${status}`)
             .toPromise();
     }
     DeleteImmunization(Id: number) {

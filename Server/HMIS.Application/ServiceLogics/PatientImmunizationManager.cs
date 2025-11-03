@@ -27,12 +27,15 @@ namespace HMIS.Application.ServiceLogics
         }
 
 
-        public async Task<DataSet> GetAllPatientImmunization(string mrno)
+        public async Task<DataSet> GetAllPatientImmunization(string mrno, int? PageNumber, int? PageSize, int? Status)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@MRNo", Convert.ToInt16(mrno));
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
+                param.Add("@Status", Status);
                 //param.Add("@UserId", UserId);
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetPatientImmunizationList",param);
                 if (ds.Tables[0].Rows.Count == 0)
@@ -58,7 +61,7 @@ namespace HMIS.Application.ServiceLogics
             return patient != null;
         }
         public async Task<bool> InsertOrUpdatePatientImmunization(PatientImmunizationModel patientImmunization)
-        {
+            {
             try
             {
                 bool exist = Exist(patientImmunization.Id);
@@ -79,6 +82,7 @@ namespace HMIS.Application.ServiceLogics
                     //newPatient.OutsideClinic = patientImmunization.providerDescription;
                  
                     newPatient.ProviderName= patientImmunization.ProviderName;
+                    newPatient.Description  = patientImmunization.Description;
                     newPatient.Comments= patientImmunization.Comments;
                     newPatient.ManufacturerName = patientImmunization.ManufacturerName;
                     newPatient.ExpiryDate= patientImmunization.ExpiryDate;
@@ -95,9 +99,8 @@ namespace HMIS.Application.ServiceLogics
                     newPatient.ErrorReason= patientImmunization.ErrorReason;
                     newPatient.ImmTypeId = patientImmunization.ImmTypeId;
                     // newPatient.ImmTypeGuid= patientImmunization.ImmTypeGuid;
-                    newPatient.UpdatedDate = DateTime.Now;
+                    newPatient.CreatedDate = DateTime.Now;
                     newPatient.CreatedBy = patientImmunization.CreatedBy;
-                    newPatient.UpdatedBy = null;//patientImmunization.UpdatedBy;
                     newPatient.Visdate= patientImmunization.Visdate;
                   
                     _context.PatientImmunization.Add(newPatient);
@@ -124,6 +127,7 @@ namespace HMIS.Application.ServiceLogics
                         //patient.OutsideClinic = patientImmunization.providerDescription;
 
                         patient.ProviderName = patientImmunization.ProviderName;
+                        patient.Description = patientImmunization.Description;
                         patient.Comments = patientImmunization.Comments;
                         patient.ManufacturerName = patientImmunization.ManufacturerName;
                         patient.ExpiryDate = patientImmunization.ExpiryDate;
@@ -140,8 +144,7 @@ namespace HMIS.Application.ServiceLogics
                         patient.ErrorReason = patientImmunization.ErrorReason;
                         patient.ImmTypeId = patientImmunization.ImmTypeId;
                       //  patient.ImmTypeGuid = patientImmunization.ImmTypeGuid;
-                        //patient.UpdatedDate = DateTime.Now;
-                        patient.CreatedBy = patientImmunization.CreatedBy;
+                        patient.UpdatedDate = DateTime.Now;
                         patient.UpdatedBy = patientImmunization.UpdatedBy;
                         patient.Visdate = patientImmunization.Visdate;
                          

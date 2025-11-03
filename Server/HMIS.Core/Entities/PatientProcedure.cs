@@ -27,7 +27,12 @@ public partial class PatientProcedure
     [Unicode(false)]
     public string? Comments { get; set; }
 
-    public int Active { get; set; }
+
+    [StringLength(200)]
+    [Unicode(false)]
+    public string? ProviderName { get; set; }
+
+    public int? Active { get; set; }
 
     public long? UpdatedBy { get; set; }
 

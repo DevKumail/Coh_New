@@ -80,7 +80,7 @@ export class FavoritesComponent implements OnInit {
       });
 
     this.favoritesForm = this.fb.group({
-      icdVersionId: [''],
+      icdVersionId: ['2'],
       searchById: ['1'],
       startingCode: [''],
       endingCode: [''],
@@ -174,5 +174,37 @@ export class FavoritesComponent implements OnInit {
     await this.getFAVORITELIST(this.Mrno,this.currentUser)
   }
 
+      onDelete(id: any){
+  
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You will not be able to recover this record!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, keep it'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.loader.show();
+        this.clinicalApiService.DeletePatientProblem(id).then((response: any) => {
+          this.getFAVORITELIST();
+      Swal.fire({
+        icon: 'success',
+        title: 'Deleted Successfully',
+      })  
+      this.loader.hide();
+  
+      })      
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+          Swal.fire(
+            'Cancelled',
+            'Your record is safe :)',
+            'error'
+          );
+        }
+      })
+  
+      this.loader.hide();
+      }
   
 }

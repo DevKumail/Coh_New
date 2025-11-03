@@ -1,31 +1,42 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
+import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { distinctUntilChanged, filter, Subscription } from 'rxjs';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { NgIconComponent } from '@ng-icons/core';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-immunizations',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    ReactiveFormsModule,
+    TranslatePipe,
+    GenericPaginationComponent,
+    NgIconComponent,
+    FilledOnValueDirective
   ],
   templateUrl: './immunizations.component.html',
   styleUrls: ['./immunizations.component.scss']
 })
 export class ImmunizationsComponent implements OnInit {
   buttonText = 'Save';
-  Immunization: any = {};
+  ImmunizationForm!: FormGroup;
   providers: any[] = [];
   siteOptions: any[] = [];
   RouteOptions: any[] = [];
   filteredDiagnosisData: any[] = [];
+  private patientDataSubscription!: Subscription;
 
   Active = [{ id: 1, name: 'Active' }, { id: 0, name: 'InActive' }];
   ActiveStatus = [
     { id: 1, name: 'Active' },
     { id: 0, name: 'InActive' },
-    { id: 2, name: 'All' }
   ];
 
   hrEmployees: any[] = [];
@@ -34,38 +45,136 @@ export class ImmunizationsComponent implements OnInit {
   Mrno: any;
   PatientId: any;
   providerCheck: any;
-  isProviderCheck: boolean = false;
-  userid: any;
+  user: any;
   siteId: any;
   immunization: any = {};
-
+  SearchPatientData: any;
+  SelectedVisit : any
+  isSubmitting: boolean = false;
   constructor(
-    private clinical: ClinicalApiService
-  ) {}
+    private clinical: ClinicalApiService,
+    private fb: FormBuilder,
+    private PatientData: PatientBannerService
+  ) { }
 
   ngOnInit(): void {
+    // Get current date in yyyy-MM-dd format
+    const today = new Date();
+    const currentDate = today.getFullYear() + '-' + 
+                        String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(today.getDate()).padStart(2, '0');
+
+    // Build Reactive Form mirroring Medication style
+    this.ImmunizationForm = this.fb.group({
+      isProviderCheck: [false],
+      providerDescription: [''],
+      providerId: [null, Validators.required], // Required by default (inside clinic)
+      immTypeId: [null, Validators.required],
+      comments: [''],
+      dose: [''],
+      manufacturerName: [''],
+      lotNumber: [''],
+      startDate: [currentDate], // Set default current date
+      expiryDate: [''],
+      nextInjectionDate: [''],
+      description: [''],
+      SiteInjection: [null],
+      routeId: [null],
+      status: [1],
+      ActiveStatus: [1]
+    });
+
+
+    this.patientDataSubscription = this.PatientData.patientData$
+      .pipe(
+        filter((data: any) => !!data?.table2?.[0]?.mrNo),
+        distinctUntilChanged((prev, curr) =>
+          prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
+        )
+      )
+      .subscribe((data: any) => {
+        this.SearchPatientData = data;
+        // Set MRNO from banner
+        this.Mrno = this.SearchPatientData?.table2?.[0]?.mrNo || '';
+        this.PatientId = this.SearchPatientData?.table2?.[0]?.patientId || '';
+        // After assigning, 
+        this.GetPatientImmunizationData();
+      });
+
+
+      this.PatientData.selectedVisit$.subscribe((data: any) => {
+        this.SelectedVisit = data;
+        console.log('Selected Visit medical-list', this.SelectedVisit);
+        if (this.SelectedVisit) {
+            this.appId = this.SelectedVisit?.appointmentId || '';
+
+          this.setProviderFromSelectedVisit();
+        }
+      });
+
+    this.setProviderFromSelectedVisit();
+    this.GetPatientImmunizationData();
+
+
+
+    // Toggle provider inputs and validations
+    const isProviderCtrl = this.ImmunizationForm.get('isProviderCheck');
+    const providerIdCtrl = this.ImmunizationForm.get('providerId');
+    const providerDescCtrl = this.ImmunizationForm.get('providerDescription');
+    isProviderCtrl?.valueChanges.subscribe((isOutside: boolean) => {
+      if (isOutside) {
+        // Outside clinic - make providerDescription required, remove providerId validation
+        providerIdCtrl?.clearValidators();
+        providerIdCtrl?.setValue(null);
+        providerIdCtrl?.markAsPristine();
+        providerIdCtrl?.markAsUntouched();
+        providerIdCtrl?.updateValueAndValidity();
+
+        providerDescCtrl?.setValidators([Validators.required]);
+        providerDescCtrl?.updateValueAndValidity();
+      } else {
+        // Inside clinic - make providerId required, remove providerDescription validation
+        providerDescCtrl?.clearValidators();
+        providerDescCtrl?.setValue('');
+        providerDescCtrl?.markAsPristine();
+        providerDescCtrl?.markAsUntouched();
+        providerDescCtrl?.updateValueAndValidity();
+
+        providerIdCtrl?.setValidators([Validators.required]);
+        providerIdCtrl?.updateValueAndValidity();
+      }
+    });
+
     this.GetEMRSite();
     this.GetEMRRoute();
     this.FillCache();
     this.GetImmunizationType();
 
-    const app = JSON.parse(localStorage.getItem('LoadvisitDetail') || '{}');
-    this.appId = app.appointmentId;
 
-    const Demographicsinfo = localStorage.getItem('Demographics');
-    if (Demographicsinfo) {
-      const Demographics = JSON.parse(Demographicsinfo);
-      this.Mrno = Demographics.table2?.[0]?.mrNo;
-      this.PatientId = Demographics.table2?.[0]?.patientId;
-    }
 
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
-      const current_User = JSON.parse(currentUser);
-      this.userid = current_User.userId;
-    }
+
+    this.user = sessionStorage.getItem('userId');
+
     this.GetPatientImmunizationData();
-    this.immunization.ActiveStatus = 1;
+    this.ImmunizationForm.patchValue({ ActiveStatus: 1 });
+  }
+
+
+   private setProviderFromSelectedVisit(): void {
+    try {
+      if (!this.ImmunizationForm) { return; }
+      const empId = this.SelectedVisit?.employeeId;
+      if (!empId) { return; }
+      const exists = Array.isArray(this.hrEmployees)
+        ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
+        : false;
+      const ctrl = this.ImmunizationForm.get('providerId');
+      if (!ctrl) { return; }
+      ctrl.setValue(exists ? empId : null, { emitEvent: false });
+      ctrl.markAsDirty();
+      ctrl.markAsTouched();
+      ctrl.updateValueAndValidity({ onlySelf: true });
+    } catch {}
   }
 
   GetEMRSite() {
@@ -108,7 +217,11 @@ export class ImmunizationsComponent implements OnInit {
       })
       .catch((error: any) => {
         console.error('Error loading cache', error);
-        alert(error?.message || 'Error loading cache');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error?.message || 'Error loading cache'
+        });
       });
   }
 
@@ -123,7 +236,9 @@ export class ImmunizationsComponent implements OnInit {
           providerId: item.EmployeeId,
         };
       });
-      this.hrEmployees = [{ name: '[Outside Clinic]', providerId: 'P1' }, ...provider];
+      this.hrEmployees = provider;
+      try { this.setProviderFromSelectedVisit(); } catch {}
+
     }
   }
 
@@ -131,24 +246,53 @@ export class ImmunizationsComponent implements OnInit {
     const val = event?.target?.value ?? event;
     this.selectedProvider = val;
   }
+id: any
+onEdit(data: any) {
+  this.id = data.id
+  // Helper: Convert any date/time to yyyy-MM-dd for date input
+  const formatToDateInput = (val: any): string | null => {
+    if (!val) return null;
+    const s = String(val);
+    if (s.includes('T')) return s.split('T')[0]; // Handles ISO format
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return null;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  };
 
-  onRowSelect(data: any) {
-    this.buttonText = 'Update';
-    this.immunization.immTypeId = data.immTypeId;
-    this.immunization.providerId = data.providerId;
-    this.immunization.description = data.description;
-    this.immunization.SiteInjection = Number(data.siteInjection);
-    this.immunization.dose = data.dose;
-    this.immunization.manufacturerName = data.manufacturerName;
-    this.immunization.comments = data.comments;
-    this.immunization.routeId = data.routeId;
-    this.immunization.lotNumber = data.lotNumber;
-    this.immunization.status = data.status === 'Active' ? 1 : 0;
-    this.immunization.startDate = data.startDate ? new Date(data.startDate) : null;
-    this.immunization.endDate = data.endDate ? new Date(data.endDate) : null;
-    this.immunization.nextInjectionDate = data.nextInjectionDate ? new Date(data.nextInjectionDate) : null;
-    this.immunization.expiryDate = data.expiryDate ? new Date(data.expiryDate) : null;
-  }
+  // Determine if provider is outside or internal
+  const isOutside = !!data?.providerName || (data?.providerId === 0) || !!data?.providerDescription;
+
+  // Patch form values
+  this.ImmunizationForm.patchValue({
+    isProviderCheck: isOutside,
+    providerDescription: isOutside ? (data?.providerName || data?.providerDescription || '') : '',
+    providerId: isOutside ? null : (data?.providerId ?? null),
+
+    immTypeId: data?.immTypeId ?? null,
+    comments: data?.comments ?? '',
+    dose: data?.dose ?? '',
+    manufacturerName: data?.manufacturerName ?? '',
+    lotNumber: data?.lotNumber ?? '',
+
+    startDate: formatToDateInput(data?.startDate),
+    expiryDate: formatToDateInput(data?.expiryDate),
+    nextInjectionDate: formatToDateInput(data?.nextInjectionDate),
+
+    description: data?.description ?? '',
+    SiteInjection: data?.siteInjection ?? null,
+    routeId: data?.routeId ?? null,
+
+    status: data?.status === 1 || data?.status === 'Active' ? 1 : 0,
+    ActiveStatus: data?.active ? 1 : 0
+  });
+
+  console.log('Form Patched:', this.ImmunizationForm.value);
+}
+
+
 
   onCheckboxChange2() {
     const isChecked = this.providerCheck;
@@ -157,123 +301,151 @@ export class ImmunizationsComponent implements OnInit {
   }
 
   DropFilled() {
-    this.immunization.providerId = '';
-    this.immunization.immTypeId = '';
-    this.immunization.comments = '';
-    this.immunization.status = '';
-    this.immunization.dose = '';
-    this.immunization.manufacturerName = '';
-    this.immunization.lotNumber = '';
-    this.immunization.startDate = '';
-    this.immunization.expiryDate = '';
-    this.immunization.nextInjectionDate = '';
-    this.immunization.SiteInjection = '';
-    this.immunization.routeId = '';
-    this.immunization.providerDescription = '';
-    this.isProviderCheck = false;
-  }
+    // Get current date in yyyy-MM-dd format
+    const today = new Date();
+    const currentDate = today.getFullYear() + '-' + 
+                        String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(today.getDate()).padStart(2, '0');
 
-  submit() {
-    if (this.validation(this.immunization.immTypeId) === true) {
-      alert('Select Type');
-      return;
-    }
-    if (this.validation(this.immunization.comments) === true) {
-      alert('Enter Comments');
-      return;
-    }
-    if (this.validation(this.immunization.dose) === true) {
-      alert('Enter Dose');
-      return;
-    }
-    if (this.validation(this.immunization.manufacturerName) === true) {
-      alert('Enter Manufacturer Name');
-      return;
-    }
-    if (this.validation(this.immunization.lotNumber) === true) {
-      alert('Enter Lot No. of Medication');
-      return;
-    }
-    if (this.validation(this.immunization.startDate) === true) {
-      alert('Select Immunization Start Date');
-      return;
-    }
-    if (this.validation(this.immunization.expiryDate) === true) {
-      alert('Select Expiry Date');
-      return;
-    }
-    if (this.validation(this.immunization.nextInjectionDate) === true) {
-      alert('Select Next Immunizaton Date');
-      return;
-    }
-    if (this.validation(this.immunization.SiteInjection) === true) {
-      alert('Select Site Immunization');
-      return;
-    }
-    if (this.validation(this.immunization.routeId) === true) {
-      alert('Select Route');
-      return;
-    }
-
-    const mrno = this.Mrno;
-    const user = this.userid;
-    const Patientid = this.PatientId;
-    this.immunization.createdBy = user;
-    this.immunization.updatedBy = user;
-    this.immunization.mrno = mrno;
-    this.immunization.patientId = Patientid;
-    this.immunization.AppointmentId = this.appId;
-    this.immunization.providerDescription = this.immunization.providerDescription;
-
-    this.clinical
-      .InsertOrUpdatePatientImmunization(this.immunization)
-      .then(() => {
-        this.DropFilled();
-        alert('Immunization Successfully Created');
-      })
-      .catch((error: any) => alert(error?.message || 'Error creating immunization'));
-  }
-
-  ImmunizationData: any[] = [];
-  GetPatientImmunizationData() {
-    const mrno = this.Mrno;
-    if (!mrno) return;
-    this.clinical.GetPatientImmunizationData(mrno).then((res: any) => {
-      this.ImmunizationData = res.patient?.table1 || [];
-      this.filteredDiagnosisData = this.ImmunizationData;
-      this.onStatusChange();
-      console.log('this.ImmunizationData', this.ImmunizationData);
+    this.ImmunizationForm.reset();
+    this.ImmunizationForm.patchValue({ 
+      status: 1, 
+      ActiveStatus: 1, 
+      isProviderCheck: false,
+      startDate: currentDate // Reset to current date
     });
   }
 
-  delete(id: number) {
+  submit() {
+    if (this.ImmunizationForm.invalid) {
+      this.ImmunizationForm.markAllAsTouched();
+      Swal.fire({
+        icon: 'warning',
+        title: 'Validation',
+        text: 'Please fill all required fields.'
+      });
+      return;
+    }
+
+    const v = this.ImmunizationForm.value;
+    this.isSubmitting = true;
+
+    if(v.isProviderCheck){
+      var payload: any = {
+      id : this.id || 0,
+      providerId: null,
+      providerName: v.isProviderCheck ? v.providerDescription : '',
+      immTypeId: v.immTypeId,
+      comments: v.comments,
+      description: v.description,
+      manufacturerName: v.manufacturerName,
+      updatedBy: this.user,
+      mrno: this.Mrno,
+      patientId: this.PatientId,
+      AppointmentId: this.appId,
+      status: v.status,
+      createdBy: this.user,
+      UpdatedBy: this.user
+    };
+    } else {
+    var payload: any = {
+      id : this.id || 0,
+      providerId: v.isProviderCheck ? 0 : v.providerId,
+      providerName: v.isProviderCheck ? v.providerDescription : '',
+      immTypeId: v.immTypeId,
+      comments: v.comments,
+      dose: v.dose,
+      manufacturerName: v.manufacturerName,
+      lotNumber: v.lotNumber,
+      startDate: v.startDate,
+      expiryDate: v.expiryDate,
+      nextInjectionDate: v.nextInjectionDate,
+      description: v.description,
+      siteInjection: v.SiteInjection,
+      routeId: v.routeId,
+      status: v.status,
+      mrno: this.Mrno,
+      patientId: this.PatientId,
+      AppointmentId: this.appId,
+      createdBy: this.user,
+      UpdatedBy: this.user
+    };
+}
+
+
     this.clinical
-      .DeleteImmunization(id)
+      .InsertOrUpdatePatientImmunization(payload)
       .then(() => {
         this.DropFilled();
-        alert('Immunization Successfully Deleted');
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Immunization successfully created'
+        });
         this.GetPatientImmunizationData();
+        this.id = 0;
       })
-      .catch((error: any) => alert(error?.message || 'Error deleting immunization'));
+      .catch((error: any) => Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error?.message || 'Error creating immunization'
+      }))
+      .finally(() => {
+        this.isSubmitting = false;
+      });
+  }
+
+  ImmunizationData: any[] = [];
+
+  paginationInfo: any = {
+    PageNumber: 1,
+    PageSize: 3,
+  }
+  totalimmunizationCount: any = 0;
+  GetPatientImmunizationData() {
+    const status = this.ImmunizationForm.get('ActiveStatus')?.value;
+    this.clinical.GetPatientImmunizationData(this.Mrno, this.paginationInfo.PageNumber, this.paginationInfo.PageSize, status).then((res: any) => {
+      this.ImmunizationData = res.patient?.table1 || [];
+      this.totalimmunizationCount = res.patient?.table2?.[0]?.totalRecords || 0;
+    });
+  }
+
+  onImmunizationPageChanged(event: any) {
+    this.paginationInfo.PageNumber = event;
+    this.GetPatientImmunizationData();
+  }
+
+
+  delete(id: number) {
+    Swal.fire({
+      icon: 'question',
+      title: 'Are you sure?',
+      text: 'Do you want to delete this immunization?',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.clinical.DeleteImmunization(id).then(() => {
+          this.DropFilled();
+          Swal.fire({
+            icon: 'success',
+            title: 'Deleted',
+            text: 'Immunization successfully deleted'
+          });
+          this.GetPatientImmunizationData();
+        })
+          .catch((error: any) => Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error?.message || 'Error deleting immunization'
+          }));
+      }
+    });
   }
 
   onStatusChange() {
-    const selectedStatus = this.ActiveStatus.find(
-      (status) => status.id === this.immunization.ActiveStatus
-    )?.name;
-    if (selectedStatus === 'All') {
-      this.filteredDiagnosisData = this.ImmunizationData;
-    } else {
-      this.filteredDiagnosisData = this.ImmunizationData.filter(
-        (item: { status: string }) => item.status === selectedStatus
-      );
-    }
-  }
-
-  validation(obj: any) {
-    if (obj == null || obj == undefined || obj == 0 || obj == '') {
-      return true;
-    }
-    return false;
+    this.paginationInfo.PageNumber = 1;
+    this.GetPatientImmunizationData();
   }
 }

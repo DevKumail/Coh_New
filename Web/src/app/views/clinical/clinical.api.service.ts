@@ -202,17 +202,67 @@ export class ClinicalApiService {
     return this.api.get(`AllDropdowns/GetFrequency`).toPromise();
   }
 
-  GetAll_Past_CurrentPrescriptions(mrno: string) {
-    return this.api.get(`Prescription/GetAllPrescriptions?mrno=${mrno}`).toPromise();
+  // GetAll_Past_CurrentPrescriptions(mrno: string) {
+  //   return this.api.get(`Prescription/GetAllPrescriptions?mrno=${mrno}`).toPromise();
+  // }
+
+  GetAllCurrentPrescriptions(mrno: string, pageNumber: number, pageSize: number) {
+    return this.api.get(`Prescription/GetCurrentPrescriptions?mrno=${mrno}&PageNumber=${pageNumber}&PageSize=${pageSize}`).toPromise();
+  }
+
+  GetAllPastPrescriptions(mrno: string, pageNumber: number, pageSize: number) {
+    return this.api.get(`Prescription/GetPastPrescriptions?mrno=${mrno}&PageNumber=${pageNumber}&PageSize=${pageSize}`).toPromise();
   }
 
   SearchByPrescription(keyword: string, pageNumber: number, pageSize: number) {
     return this.api.get(`Prescription/SearchByPrescriptions?keyword=${keyword}&pageNumber=${pageNumber}&pageSize=${pageSize}`).toPromise();
   }
 
+  DeletePrescription(id: number) {
+    return this.api.delete(`Prescription/DeletePrescriptions?Id=${id}`).toPromise();
+  }
 
   SubmitPrescription(object: any) {
     return this.api.post(`Prescription/InsertOrUpdatePrescriptions`, object).toPromise();
+  }
+
+  GetPatientProceduresList(status: string, mrno: string, pageNumber: number, pageSize: number){
+    return this.api.get(`SummarySheet/GetPatientProcedureList?status=${status}&mrno=${mrno}&PageNumber=${pageNumber}&PageSize=${pageSize}`).toPromise();
+  }
+
+// ProceduresList(
+//   pageNumber: number,
+//   pageSize: number,
+//   procStartCode: string,
+//   procEndCode: string,
+//   descriptionFilter: string
+// ) {
+//   const pn = pageNumber || 1;
+//   const ps = pageSize || 5;
+//   const psc = procStartCode || '0';
+//   const pec = procEndCode || '0';
+//   const df = descriptionFilter || '0';
+  
+//   return this.api.get(
+//     `PatientProcedure/GetProcedureList?PageNumber=${pn}&PageSize=${ps}&ProcedureStartCode=${psc}&ProcedureEndCode=${pec}&DescriptionFilter=${df}`
+//   ).toPromise();
+// }
+
+
+  ProceduresList(
+    procStartCode: string,
+    procEndCode: string,
+    descriptionFilter: string,
+    PageNumber: any,
+    PageSize: any,
+  ) {
+    return this.api.get(`PatientProcedure/GetProcedureList?ProcedureStartCode=${procStartCode}&ProcedureEndCode=${procEndCode}&DescriptionFilter=${descriptionFilter}&PageNumber=${PageNumber}&PageSize=${PageSize}`).toPromise();
+  }
+
+    SubmitPatientProcedure(object: any) {
+    return this.api
+      .post(`PatientProcedure/InsertOrUpdatePatientProcedure`, object)
+      .toPromise();
   }
 
   // GetSeverity() {
