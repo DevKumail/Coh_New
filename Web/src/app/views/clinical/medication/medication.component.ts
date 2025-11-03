@@ -29,6 +29,7 @@ export class MedicationComponent {
     MedicationForm!: FormGroup;
     DrugFilterForm!: FormGroup;
     submitted = false;
+    isSubmitting: boolean = false;
     hrEmployees: any[] = [];
     cacheItems: any[] = ['Provider'];
     DrugList: any[] = [];
@@ -37,24 +38,27 @@ export class MedicationComponent {
     Mrno: any;
     PastMedicationPaginationInfo: any = {
         Page: 1,
-        RowsPerPage: 10,
+        RowsPerPage: 3,
     };
     PastMedicationTotalItems: number = 0;
     currentMedicationData: any = [];
     modalService = new NgbModal();
     DrugPaginationInfo: any = {
         Page: 1,
-        RowsPerPage: 10,
+        RowsPerPage: 3,
     };
     DrugTotalItems: number = 0;
     currentMedicationPaginationInfo: any = {
         Page: 1,
-        RowsPerPage: 10,
+        RowsPerPage: 3,
     };
+    Id: any;
+    SelectedVisit: any;
     currentMedicationTotalItems: number = 0;
     private patientDataSubscription!: Subscription;
     private appointmentIdSubscription!: Subscription;
     AppointmentId: any;
+    todayStr: string = '';
     constructor(
         private fb: FormBuilder,
         private clinicalApiService: ClinicalApiService,
@@ -71,12 +75,12 @@ export class MedicationComponent {
             stopDate: ['', Validators.required],
             durationDays: ['', Validators.required],
             frequency: [null, Validators.required],
-            weight: ['', Validators.required],
+            // weight: ['', Validators.required],
             givenBy: [null, Validators.required],
             givenDate: ['', Validators.required],
             checkedBy: [null, Validators.required],
             checkedDate: ['', Validators.required],
-            comments: [null, Validators.required],
+            comments: [null],
         });
         this.DrugFilterForm = this.fb.group({
             search: ['']
@@ -85,10 +89,36 @@ export class MedicationComponent {
 
 
     ngOnInit(): void {
+        // Build today's date string in local timezone: YYYY-MM-DD
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        this.todayStr = `${y}-${m}-${d}`;
+
+        // Set default start date to today
+        this.MedicationForm.get('startDate')?.setValue(this.todayStr);
+
         this.FillCache();
         this.GetEMRRoute();
         this.GetComments();
         this.GetFrequency();
+
+        // Toggle provider inputs: clear dropdown when outside clinic is checked, clear text when unchecked
+        const isProviderCtrl = this.MedicationForm.get('isProviderCheck');
+        const providerIdCtrl = this.MedicationForm.get('providerId');
+        const providerDescCtrl = this.MedicationForm.get('providerDescription');
+        isProviderCtrl?.valueChanges.subscribe((isOutside: boolean) => {
+            if (isOutside) {
+                providerIdCtrl?.setValue(null);
+                providerIdCtrl?.markAsPristine();
+                providerIdCtrl?.markAsUntouched();
+            } else {
+                providerDescCtrl?.setValue('');
+                providerDescCtrl?.markAsPristine();
+                providerDescCtrl?.markAsUntouched();
+            }
+        });
 
         // Wait for patient banner to provide MRNO before loading data
         this.patientDataSubscription = this.PatientData.patientData$
@@ -103,16 +133,41 @@ export class MedicationComponent {
                 // Set MRNO from banner
                 this.Mrno = this.SearchPatientData?.table2?.[0]?.mrNo || '';
                 // After assigning, load problems
-                this.GetAll_Past_CurrentPrescriptions();
+                this.GetAllCurrentPrescriptions();
+                this.GetAllPastPrescriptions();
             });
 
-        this.appointmentIdSubscription = this.PatientData.visitAppointments$.subscribe((data: any) => {
-            debugger
-            this.AppointmentId = data?.table2?.[0]?.appointmentId || '';
-        });
-
-        this.GetAll_Past_CurrentPrescriptions();
+    this.PatientData.selectedVisit$.subscribe((data: any) => {
+        this.SelectedVisit = data;
+        console.log('Selected Visit medical-list', this.SelectedVisit);
+        if (this.SelectedVisit) {
+            this.AppointmentId = this.SelectedVisit?.appointmentId || '';
+          this.setProviderFromSelectedVisit();
+        }
+      });
+        this.setProviderFromSelectedVisit();
+        this.GetAllCurrentPrescriptions();
+        this.GetAllPastPrescriptions();
     }
+
+
+      private setProviderFromSelectedVisit(): void {
+    try {
+      if (!this.MedicationForm) { return; }
+      const empId = this.SelectedVisit?.employeeId;
+      if (!empId) { return; }
+      const exists = Array.isArray(this.hrEmployees)
+        ? this.hrEmployees.some((p: any) => String(p?.providerId) === String(empId))
+        : false;
+      const ctrl = this.MedicationForm.get('providerId');
+      if (!ctrl) { return; }
+      ctrl.setValue(exists ? empId : null, { emitEvent: false });
+      ctrl.markAsDirty();
+      ctrl.markAsTouched();
+      ctrl.updateValueAndValidity({ onlySelf: true });
+    } catch {}
+  }
+
 
     async FillCache() {
         await this.clinicalApiService.getCacheItems({ entities: this.cacheItems }).then((response: any) => {
@@ -141,6 +196,8 @@ export class MedicationComponent {
                 };
             });
             this.hrEmployees = provider;
+                  try { this.setProviderFromSelectedVisit(); } catch {}
+
         }
     };
 
@@ -164,13 +221,12 @@ export class MedicationComponent {
     }
 
     onCurrentMedicationPageChanged(event: any) {
-        this.currentMedicationPaginationInfo.Page = event.page;
-        this.currentMedicationPaginationInfo.RowsPerPage = event.rowsPerPage;
-        // this.SearchMedication();
+        this.currentMedicationPaginationInfo.Page = event;
+        this.GetAllCurrentPrescriptions();
     }
     onPastMedicationPageChanged(event: any) {
-        this.PastMedicationPaginationInfo.Page = event.page;
-        this.PastMedicationPaginationInfo.RowsPerPage = event.rowsPerPage;
+        this.PastMedicationPaginationInfo.Page = event;
+        this.GetAllPastPrescriptions();
     }
     
     onSubmit() {
@@ -191,6 +247,7 @@ export class MedicationComponent {
         }
 
         const payload: any = {
+            medicationId: this.Id,
             rx: v.rx,
             dose: v.dose,
             route: v.route,
@@ -201,24 +258,50 @@ export class MedicationComponent {
             givenBy: v.givenBy,
             givenDate: v.givenDate,
             checkedBy: v.checkedBy,
+            medicationCheckedById: v.checkedBy,
+            medicationGivenById: v.givenBy,
             checkedDate: v.checkedDate,
             comments: v.comments,
             providerId: v.isProviderCheck ? 0 : v.providerId,
-            providerDescription: v.isProviderCheck ? v.providerDescription : '',
+            outSideClinicProviderName: v.isProviderCheck ? v.providerDescription : '',
+            appointmentId: this.AppointmentId,
             mrno: this.Mrno || '',
-            createdBy: sessionStorage.getItem('userId'),
-            // AppointmentId: ,
+            // audit fields will be set below based on create/update
         };
 
+        // Set audit fields conditionally (create vs update)
+        const nowIso = new Date().toISOString();
+        const currentUser = sessionStorage.getItem('userId');
+        if (this.Id) {
+            // Update flow
+            payload.updatedBy = currentUser;
+            payload.updatedDate = nowIso;
+            // Ensure create fields are not sent on update
+            delete payload.createdBy;
+            delete payload.createdDate;
+        } else {
+            // Create flow
+            payload.createdBy = currentUser;
+            payload.createDate = nowIso;
+            // Ensure update fields are not sent on create
+            delete payload.updatedBy;
+            delete payload.updatedDate;
+        }
+
+        this.isSubmitting = true;
         this.clinicalApiService.SubmitPrescription(payload)
             .then(() => {
                 Swal.fire('Success', 'Medication successfully created', 'success');
-                this.GetAll_Past_CurrentPrescriptions();
+                this.GetAllCurrentPrescriptions();
+                this.GetAllPastPrescriptions();
                 this.onClear();
                 this.submitted = false;
             })
             .catch((error: any) => {
                 Swal.fire('Error', error?.message || 'Failed to submit medication', 'error');
+            })
+            .finally(() => {
+                this.isSubmitting = false;
             });
     }
 
@@ -226,6 +309,8 @@ export class MedicationComponent {
     onClear() {
         this.MedicationForm.reset();
         this.submitted = false;
+        // Re-apply default start date after clearing
+        this.MedicationForm.get('startDate')?.setValue(this.todayStr);
     }
 
     SearchDrug() {
@@ -236,10 +321,72 @@ export class MedicationComponent {
         })
     }
     onDelete(id: any) {
-
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't Delete this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.clinicalApiService.DeletePrescription(id).then(() => {
+                    Swal.fire('Deleted!', 'Medication has been deleted.', 'success');
+                    this.GetAllCurrentPrescriptions();
+                    this.GetAllPastPrescriptions();
+                })
+            }
+        })
     }
     onEdit(record: any) {
+        this.Id = record?.medicationId || record?.id || null;
 
+        const formatToDateInput = (value: any): string | null => {
+            if (!value) return null;
+            try {
+                const s = String(value);
+                if (s.includes('T')) {
+                    return s.split('T')[0];
+                }
+                const d = new Date(s);
+                if (isNaN(d.getTime())) return null;
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${dd}`;
+            } catch { return null; }
+        };
+
+        const isOutside = (record?.providerId === 0) || !!record?.outSideClinicProviderName;
+
+        this.MedicationForm.patchValue({
+            // Provider fields
+            isProviderCheck: isOutside,
+            providerDescription: isOutside ? (record?.outSideClinicProviderName || record?.providerDescription || '') : '',
+            providerId: isOutside ? null : (record?.providerId ?? null),
+
+            // Rx details
+            rx: record?.rx ?? '',
+            dose: record?.dose ?? '',
+            route: record?.routeId ?? record?.route ?? null,
+
+            // Dates and duration
+            startDate: formatToDateInput(record?.startDate),
+            stopDate: formatToDateInput(record?.stopDate),
+            durationDays: record?.duration ?? '',
+            frequency: record?.frequencyId ?? record?.frequency ?? null,
+
+            // Given/Checked
+            weight: record?.weight ?? this.MedicationForm.get('weight')?.value ?? '',
+            givenBy: record?.medicationGivenByID ?? null,
+            givenDate: formatToDateInput(record?.givenDate),
+            checkedBy: record?.medicationCheckedByID ?? null,
+            checkedDate: formatToDateInput(record?.checkedDate),
+
+            // Comments
+            comments: record?.commentId ?? null,
+        });
     }
     onDrugPageChanged(event: any) {
         this.DrugPaginationInfo.Page = event.page;
@@ -262,16 +409,55 @@ export class MedicationComponent {
         });
         this.modalRefInstance.result.then((result: any) => {
             if (result) {
-                console.log('Modal returned:', result);
             }
         }).catch(() => {
-            // Modal dismissed without selecting
-            console.log('Modal dismissed');
         });
     }
 
-    GetAll_Past_CurrentPrescriptions() {
+    // GetAll_Past_CurrentPrescriptions() {
 
+    //     if (!this.Mrno) {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Error',
+    //             text: 'Please load a patient',
+    //             confirmButtonColor: '#d33'
+    //         })
+    //         return;
+    //     }
+    //     this.clinicalApiService.GetAll_Past_CurrentPrescriptions(this.Mrno)
+    //         .then((res: any) => {
+    //             const MyMedicationData = res?.prescription?.table1 || [];
+
+    //             const currentDate = new Date();
+    //             this.currentMedicationData = [];
+    //             this.PastMedicationData = [];
+
+    //             MyMedicationData.forEach((medication: any) => {
+    //                 const stopDate = new Date(medication.stopDate);
+
+    //                 const isInvalidStopDate =
+    //                     !medication.stopDate ||
+    //                     isNaN(stopDate.getTime()) ||
+    //                     stopDate.getFullYear() === 1970; // handles '1970-01-01T00:00:00'
+
+    //                 if (isInvalidStopDate || stopDate > currentDate) {
+    //                     this.currentMedicationData.push(medication);
+    //                 } else {
+    //                     this.PastMedicationData.push(medication);
+    //                 }
+    //             });
+
+    //             console.log('✅ Current Medications:', this.currentMedicationData);
+    //             console.log('📜 Past Medications:', this.PastMedicationData);
+    //         })
+    //         .catch(error => {
+    //         });
+
+    // }
+
+
+    GetAllPastPrescriptions() {
         if (!this.Mrno) {
             Swal.fire({
                 icon: 'error',
@@ -281,36 +467,38 @@ export class MedicationComponent {
             })
             return;
         }
-        this.clinicalApiService.GetAll_Past_CurrentPrescriptions(this.Mrno)
+        this.PastMedicationTotalItems = 0;
+        this.clinicalApiService.GetAllPastPrescriptions(this.Mrno,this.PastMedicationPaginationInfo.Page,this.PastMedicationPaginationInfo.RowsPerPage)
             .then((res: any) => {
-                const MyMedicationData = res?.prescription?.table1 || [];
-                console.log('this.MyMedicationData', MyMedicationData);
-
-                const currentDate = new Date();
-                this.currentMedicationData = [];
-                this.PastMedicationData = [];
-
-                MyMedicationData.forEach((medication: any) => {
-                    const stopDate = new Date(medication.stopDate);
-
-                    const isInvalidStopDate =
-                        !medication.stopDate ||
-                        isNaN(stopDate.getTime()) ||
-                        stopDate.getFullYear() === 1970; // handles '1970-01-01T00:00:00'
-
-                    if (isInvalidStopDate || stopDate > currentDate) {
-                        this.currentMedicationData.push(medication);
-                    } else {
-                        this.PastMedicationData.push(medication);
-                    }
-                });
-
-                console.log('✅ Current Medications:', this.currentMedicationData);
-                console.log('📜 Past Medications:', this.PastMedicationData);
+                this.PastMedicationData = res?.prescription?.table1 || [];;
+                this.PastMedicationTotalItems = res?.prescription?.table2?.[0]?.totalRecords || 0;
             })
-            .catch(error => {
-                console.error('❌ Error fetching prescriptions:', error);
+            .catch((error: any) => {
             });
 
     }
+
+        GetAllCurrentPrescriptions() {
+        if (!this.Mrno) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please load a patient',
+                confirmButtonColor: '#d33'
+            })
+            return;
+        }
+        this.currentMedicationTotalItems = 0;
+        this.clinicalApiService.GetAllCurrentPrescriptions(this.Mrno,this.currentMedicationPaginationInfo.Page,this.currentMedicationPaginationInfo.RowsPerPage)
+            .then((res: any) => {
+                this.currentMedicationData = res?.prescription?.table1 || [];;
+                this.currentMedicationTotalItems = res?.prescription?.table2?.[0]?.totalRecords || 0;
+            })
+            .catch((error: any) => {
+            });
+
+    }
+
+
+
 }

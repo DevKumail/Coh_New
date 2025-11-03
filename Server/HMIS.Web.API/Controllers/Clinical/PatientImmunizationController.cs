@@ -20,9 +20,9 @@ namespace HMIS.Web.Controllers.Clinical
         }
 
         [HttpGet("GetPatientImmunizationList")]
-        public async Task<ActionResult> GetPatientImmunizationList(string mrno)
+        public async Task<ActionResult> GetPatientImmunizationList(string mrno, int? PageNumber, int? PageSize, int? Status)
         {
-            var patient  = await patientImmunization.GetAllPatientImmunization(mrno);
+            var patient  = await patientImmunization.GetAllPatientImmunization(mrno, PageNumber, PageSize, Status);
             return Ok(new { patient = patient });
         }
 

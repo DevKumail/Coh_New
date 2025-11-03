@@ -262,4 +262,22 @@
     </div>
   </div>
 
+  <div class="tab-pane fade" id="v-medications" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'medications'" [class.show]="selected === 'medications'">
+    <div class="row g-3">
+      <app-medication></app-medication>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="v-immunizations" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'immunizations'" [class.show]="selected === 'immunizations'">
+    <div class="row g-3">
+      <app-immunizations></app-immunizations>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="v-procedures" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'procedures'" [class.show]="selected === 'procedures'">
+    <div class="row g-3">
+      <app-procedure></app-procedure>
+    </div>
+  </div>
+
 </div>

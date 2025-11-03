@@ -1,8 +1,9 @@
 ﻿using Dapper;
-using HMIS.Infrastructure.ORM;
-using HMIS.Core.Entities;
+using DocumentFormat.OpenXml.Wordprocessing;
 using HMIS.Application.DTOs.Clinical;
 using HMIS.Application.Implementations;
+using HMIS.Core.Entities;
+using HMIS.Infrastructure.ORM;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SqlServer.Management.Sdk.Differencing.SPI;
@@ -31,14 +32,17 @@ namespace HMIS.Application.ServiceLogics
         }
 
 
-        public async Task<DataSet> GetAllPrescriptions(string mrno)
+        public async Task<DataSet> GetAllCurrentPrescriptions(string mrno, int? PageNumber, int? PageSize)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
 
                 param.Add("@MRNo", Convert.ToInt16(mrno));
-                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetPrescriptionsList", param);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
+
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetCurrentPrescriptionsList", param);
                 if (ds.Tables[0].Rows.Count == 0)
                 {
 
@@ -54,6 +58,34 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
+        public async Task<DataSet> GetAllPastPrescriptions(string mrno, int? PageNumber, int? PageSize)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+
+                param.Add("@MRNo", Convert.ToInt16(mrno));
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
+
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetPastPrescriptionsList", param);
+                if (ds.Tables[0].Rows.Count == 0)
+                {
+
+                    return new DataSet();
+                    //throw new Exception("No data found");
+                }
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                return new DataSet();
+            }
+
+        }
+
+
+
         private bool Exist(long id)
         {
 
@@ -66,138 +98,141 @@ namespace HMIS.Application.ServiceLogics
         }
         public async Task<bool> InsertOrUpdatePrescription(PrescriptionModel prescriptionModel)
         {
-
-            bool exist = Exist(prescriptionModel.MedicationId);
-
-            if (!exist)
+            try
             {
-                var newPrescription = new Prescription
+                bool exist = Exist(prescriptionModel.MedicationId);
+
+                if (!exist)
                 {
-                    MedicationId = prescriptionModel.MedicationId,
-                    ProviderId = prescriptionModel.ProviderId ?? null,
-                    Mrno = prescriptionModel.Mrno,
-                    AppointmentId = prescriptionModel.AppointmentId,
-                    DrugId = prescriptionModel.DrugId,
-                    Rx = prescriptionModel.Rx,
-                    Dose = prescriptionModel.Dose,
-                    Route = prescriptionModel.Route,
-                    Frequency = prescriptionModel.Frequency,
-                    Duration = prescriptionModel.Duration,
-                    Dispense = prescriptionModel.Dispense,
-                    Quantity = prescriptionModel.Quantity,
-                    IsRefill = prescriptionModel.IsRefill,
-                    AdditionalRefills = prescriptionModel.AdditionalRefills,
-                    PrescriptionDate = prescriptionModel.PrescriptionDate,
-                    StartDate = prescriptionModel.StartDate,
-                    StopDate = prescriptionModel.StopDate,
-                    Samples = prescriptionModel.Samples,
-                    Instructions = prescriptionModel.Instructions,
-                    Indications = prescriptionModel.Indications,
-                    Comments = prescriptionModel.Comments,
-                    UpdateBy = prescriptionModel.UpdateBy,
-                    UpdateDate = prescriptionModel.UpdateDate,
-                    GcnSeqno = prescriptionModel.GcnSeqno,
-                    IsActive = prescriptionModel.IsActive,
-                    Status = prescriptionModel.Status,
-                    StatusReason = prescriptionModel.StatusReason,
-                    SendToLabId = prescriptionModel.SendToLabId,
-                    Ndc = prescriptionModel.Ndc,
-                    ReviewedDate = prescriptionModel.ReviewedDate,
-                    ReviewedBy = prescriptionModel.ReviewedBy,
-                    ParentMedicationId = prescriptionModel.ParentMedicationId,
-                    OriginalRefillCount = prescriptionModel.OriginalRefillCount,
-                    AlertOverrideReason = prescriptionModel.AlertOverrideReason,
-                    OutSideClinicProviderName = prescriptionModel.OutSideClinicProviderName,
-                    IsSigned = prescriptionModel.IsSigned,
-                    OldMrno = prescriptionModel.OldMrno,
-                    MedicationGivenById = prescriptionModel.MedicationGivenById,
-                    GivenDate = prescriptionModel.GivenDate,
-                    MedicationCheckedById = prescriptionModel.MedicationCheckedById,
-                    CheckedDate = prescriptionModel.CheckedDate,
-                    IsSubmitted = prescriptionModel.IsSubmitted,
-                    SubmissionBatchId = prescriptionModel.SubmissionBatchId,
-                    ErxId = prescriptionModel.ErxId,
-                    DhpoRouteId = prescriptionModel.DhpoRouteId,
-                    EncounterType = prescriptionModel.EncounterType,
-                    IsInternal = prescriptionModel.IsInternal,
-                    PharmacyEmailId = prescriptionModel.PharmacyEmailId,
-                    PickupTypeId = prescriptionModel.PickupTypeId,
-                    IsDeleted = false,
-                   // OutsideClinic=prescriptionModel.providerDescription
-                };
+                    var newPrescription = new Prescription
+                    {
+                        MedicationId = prescriptionModel.MedicationId,
+                        ProviderId = prescriptionModel.ProviderId == 0 ? null : prescriptionModel.ProviderId,
+                        Mrno = prescriptionModel.Mrno,
+                        AppointmentId = prescriptionModel.AppointmentId,
+                        DrugId = prescriptionModel.DrugId,
+                        Rx = prescriptionModel.Rx,
+                        Dose = prescriptionModel.Dose,
+                        Route = prescriptionModel.Route,
+                        Frequency = prescriptionModel.Frequency,
+                        Duration = prescriptionModel.Duration,
+                        Dispense = prescriptionModel.Dispense,
+                        Quantity = prescriptionModel.Quantity,
+                        IsRefill = prescriptionModel.IsRefill,
+                        AdditionalRefills = prescriptionModel.AdditionalRefills,
+                        PrescriptionDate = prescriptionModel.PrescriptionDate,
+                        StartDate = prescriptionModel.StartDate,
+                        StopDate = prescriptionModel.StopDate,
+                        Samples = prescriptionModel.Samples,
+                        Instructions = prescriptionModel.Instructions,
+                        Indications = prescriptionModel.Indications,
+                        Comments = prescriptionModel.Comments,
+                        CreatedBy = prescriptionModel.CreatedBy,
+                        CreateDate = prescriptionModel.CreateDate,
+                        GcnSeqno = prescriptionModel.GcnSeqno,
+                        IsActive = prescriptionModel.IsActive,
+                        Status = prescriptionModel.Status,
+                        StatusReason = prescriptionModel.StatusReason,
+                        SendToLabId = prescriptionModel.SendToLabId,
+                        Ndc = prescriptionModel.Ndc,
+                        ReviewedDate = prescriptionModel.ReviewedDate,
+                        ReviewedBy = prescriptionModel.ReviewedBy,
+                        ParentMedicationId = prescriptionModel.ParentMedicationId,
+                        OriginalRefillCount = prescriptionModel.OriginalRefillCount,
+                        AlertOverrideReason = prescriptionModel.AlertOverrideReason,
+                        OutSideClinicProviderName = prescriptionModel.OutSideClinicProviderName,
+                        IsSigned = prescriptionModel.IsSigned,
+                        OldMrno = prescriptionModel.OldMrno,
+                        MedicationGivenById = prescriptionModel.MedicationGivenById,
+                        GivenDate = prescriptionModel.GivenDate,
+                        MedicationCheckedById = prescriptionModel.MedicationCheckedById,
+                        CheckedDate = prescriptionModel.CheckedDate,
+                        IsSubmitted = prescriptionModel.IsSubmitted,
+                        SubmissionBatchId = prescriptionModel.SubmissionBatchId,
+                        ErxId = prescriptionModel.ErxId,
+                        DhpoRouteId = prescriptionModel.DhpoRouteId,
+                        EncounterType = prescriptionModel.EncounterType,
+                        IsInternal = prescriptionModel.IsInternal,
+                        PharmacyEmailId = prescriptionModel.PharmacyEmailId,
+                        PickupTypeId = prescriptionModel.PickupTypeId,
+                        IsDeleted = false
+                    };
 
-                 _context.Prescription.Add(newPrescription);
-                await _context.SaveChangesAsync();
-                return true;
-
-        }
-            else if(exist)
-            {
-                var prescription = _context.Prescription.Find(prescriptionModel.MedicationId);
-
-                prescription.MedicationId = prescriptionModel.MedicationId;
-                if (prescriptionModel.ProviderId != null)
-                {
-                    prescription.ProviderId = prescriptionModel.ProviderId;
-
+                    _context.Prescription.Add(newPrescription);
+                    await _context.SaveChangesAsync();
+                    return true;
                 }
-                prescription.Mrno = prescriptionModel.Mrno;
-                //prescription.OutsideClinic = prescriptionModel.providerDescription;
-                prescription.AppointmentId = prescriptionModel.AppointmentId;
-                prescription.DrugId = prescriptionModel.DrugId;
-                prescription.Rx = prescriptionModel.Rx;
-                prescription.Dose = prescriptionModel.Dose;
-                prescription.Route = prescriptionModel.Route;
-                prescription.Frequency = prescriptionModel.Frequency;
-                prescription.Duration = prescriptionModel.Duration;
-                prescription.Dispense = prescriptionModel.Dispense;
-                prescription.Quantity = prescriptionModel.Quantity;
-                prescription.IsRefill = prescriptionModel.IsRefill;
-                prescription.AdditionalRefills = prescriptionModel.AdditionalRefills;
-                prescription.PrescriptionDate = prescriptionModel.PrescriptionDate;
-                prescription.StartDate = prescriptionModel.StartDate;
-                prescription.StopDate = prescriptionModel.StopDate;
-                prescription.Samples = prescriptionModel.Samples;
-                prescription.Instructions = prescriptionModel.Instructions;
-                prescription.Indications = prescriptionModel.Indications;
-                prescription.Comments = prescriptionModel.Comments;
-                prescription.UpdateBy = prescriptionModel.UpdateBy;
-                prescription.UpdateDate = prescriptionModel.UpdateDate;
-                prescription.GcnSeqno = prescriptionModel.GcnSeqno;
-                prescription.IsActive = prescriptionModel.IsActive;
-                prescription.Status = prescriptionModel.Status;
-                prescription.StatusReason = prescriptionModel.StatusReason;
-                prescription.SendToLabId = prescriptionModel.SendToLabId;
-                prescription.Ndc = prescriptionModel.Ndc;
-                prescription.ReviewedDate = prescriptionModel.ReviewedDate;
-                prescription.ReviewedBy = prescriptionModel.ReviewedBy;
-                prescription.ParentMedicationId = prescriptionModel.ParentMedicationId;
-                prescription.OriginalRefillCount = prescriptionModel.OriginalRefillCount;
-                prescription.AlertOverrideReason = prescriptionModel.AlertOverrideReason;
-                prescription.OutSideClinicProviderName = prescriptionModel.OutSideClinicProviderName;
-                prescription.IsSigned = prescriptionModel.IsSigned;
-                prescription.OldMrno = prescriptionModel.OldMrno;
-                prescription.MedicationGivenById = prescriptionModel.MedicationGivenById;
-                prescription.GivenDate = prescriptionModel.GivenDate;
-                prescription.CheckedDate = prescriptionModel.CheckedDate;
-                prescription.IsSubmitted = prescriptionModel.IsSubmitted;
-                prescription.ErxId = prescriptionModel.ErxId;
-                prescription.DhpoRouteId = prescriptionModel.DhpoRouteId;
-                prescription.EncounterType = prescriptionModel.EncounterType;
-                prescription.IsInternal = prescriptionModel.IsInternal;
-                prescription.PharmacyEmailId = prescriptionModel.PharmacyEmailId;
-                prescription.PickupTypeId = prescriptionModel.PickupTypeId;
-                prescription.IsDeleted = false;
-        
-                await _context.SaveChangesAsync();
-                return true;
+                else
+                {
+                    var prescription = _context.Prescription.Find(prescriptionModel.MedicationId);
 
+                    if (prescription == null)
+                        throw new Exception("Prescription not found for update.");
+
+                    prescription.MedicationId = prescriptionModel.MedicationId;
+                    prescription.ProviderId = prescriptionModel.ProviderId == 0 ? null : prescriptionModel.ProviderId;
+                    prescription.Mrno = prescriptionModel.Mrno;
+                    prescription.AppointmentId = prescriptionModel.AppointmentId;
+                    prescription.DrugId = prescriptionModel.DrugId;
+                    prescription.Rx = prescriptionModel.Rx;
+                    prescription.Dose = prescriptionModel.Dose;
+                    prescription.Route = prescriptionModel.Route;
+                    prescription.Frequency = prescriptionModel.Frequency;
+                    prescription.Duration = prescriptionModel.Duration;
+                    prescription.Dispense = prescriptionModel.Dispense;
+                    prescription.Quantity = prescriptionModel.Quantity;
+                    prescription.IsRefill = prescriptionModel.IsRefill;
+                    prescription.AdditionalRefills = prescriptionModel.AdditionalRefills;
+                    prescription.PrescriptionDate = prescriptionModel.PrescriptionDate;
+                    prescription.StartDate = prescriptionModel.StartDate;
+                    prescription.StopDate = prescriptionModel.StopDate;
+                    prescription.Samples = prescriptionModel.Samples;
+                    prescription.Instructions = prescriptionModel.Instructions;
+                    prescription.Indications = prescriptionModel.Indications;
+                    prescription.Comments = prescriptionModel.Comments;
+                    prescription.UpdateBy = prescriptionModel.UpdateBy;
+                    prescription.UpdateDate = prescriptionModel.UpdateDate;
+                    prescription.GcnSeqno = prescriptionModel.GcnSeqno;
+                    prescription.IsActive = prescriptionModel.IsActive;
+                    prescription.Status = prescriptionModel.Status;
+                    prescription.StatusReason = prescriptionModel.StatusReason;
+                    prescription.SendToLabId = prescriptionModel.SendToLabId;
+                    prescription.Ndc = prescriptionModel.Ndc;
+                    prescription.ReviewedDate = prescriptionModel.ReviewedDate;
+                    prescription.ReviewedBy = prescriptionModel.ReviewedBy;
+                    prescription.ParentMedicationId = prescriptionModel.ParentMedicationId;
+                    prescription.OriginalRefillCount = prescriptionModel.OriginalRefillCount;
+                    prescription.AlertOverrideReason = prescriptionModel.AlertOverrideReason;
+                    prescription.OutSideClinicProviderName = prescriptionModel.OutSideClinicProviderName;
+                    prescription.IsSigned = prescriptionModel.IsSigned;
+                    prescription.OldMrno = prescriptionModel.OldMrno;
+                    prescription.MedicationGivenById = prescriptionModel.MedicationGivenById;
+                    prescription.GivenDate = prescriptionModel.GivenDate;
+                    prescription.CheckedDate = prescriptionModel.CheckedDate;
+                    prescription.IsSubmitted = prescriptionModel.IsSubmitted;
+                    prescription.ErxId = prescriptionModel.ErxId;
+                    prescription.DhpoRouteId = prescriptionModel.DhpoRouteId;
+                    prescription.EncounterType = prescriptionModel.EncounterType;
+                    prescription.IsInternal = prescriptionModel.IsInternal;
+                    prescription.PharmacyEmailId = prescriptionModel.PharmacyEmailId;
+                    prescription.PickupTypeId = prescriptionModel.PickupTypeId;
+                    prescription.IsDeleted = false;
+
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
             }
+            catch (Exception ex)
+            {
+                // Log the exception (you can replace this with your logging framework)
+                Console.WriteLine($"Error in InsertOrUpdatePrescription: {ex.Message}");
+                // Optionally, log stack trace for debugging
+                Console.WriteLine(ex.StackTrace);
 
-            return false;
-
-
+                return false;
+            }
         }
+
 
         public async Task<bool> DeletePrescription(long Id)
         {

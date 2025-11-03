@@ -1,5 +1,5 @@
 <!-- 🔹 Breadcrumb OUTSIDE card -->
-<nav aria-label="breadcrumb">
+<!-- <nav aria-label="breadcrumb">
   <ol class="breadcrumb bg-light bg-opacity-50 p-2 mb-3">
     <li class="breadcrumb-item">
       <a href="javascript:void(0);">
@@ -12,16 +12,15 @@
     </li>
     <li class="breadcrumb-item active" aria-current="page">{{ 'ALLERGIES' | translate }}</li>
   </ol>
-</nav>
+</nav> -->
 
 
 
-<form *ngIf="allergyForm" [formGroup]="allergyForm" class="mt-4">
+<form *ngIf="allergyForm" [formGroup]="allergyForm">
   <div class="card shadow-lg rounded-3 border-0">
-
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-        <lucide-angular [img]="headingIcon" class="fs-5"></lucide-angular>
+        <!-- <lucide-angular [img]="headingIcon" class="fs-5"></lucide-angular> -->
         <span>{{ 'ALLERGIES' | translate }}</span>
       </h5>
       <i class="bi bi-heart-pulse fs-4"></i>
@@ -116,17 +115,28 @@
             {{ 'START_DATE_REQUIRED' | translate }}</div>
         </div> -->
 
+         <div class="col-md-6 col-lg-3">
+          <label class="form-label fw-semibold">{{ 'STATUS' | translate }} <span class="text-danger">*</span></label>
+          <select class="form-select" formControlName="status">
+            <option Value="" disabled>{{ 'SELECT_STATUS' | translate }}</option>
+            <option *ngFor="let status of statusOptions" [value]="status.id">{{ status.name }}</option>
+          </select>
+          <div class="text-danger small"
+            *ngIf="allergyForm.get('status')?.touched && allergyForm.get('status')?.invalid">
+            {{ 'STATUS_REQUIRED' | translate }}</div>
+        </div>
+
+
         <div class="col-md-6 col-lg-3">
           <div class="mb-3">
             <label class="form-label fw-semibold">{{ 'START_DATE' | translate }} <span
                 class="text-danger">*</span></label>
-            <input type="date" class="form-control" formControlName="startDate" />
+            <input type="date" class="form-control" formControlName="startDate" [attr.min]="todayStr" />
             <div class="text-danger small"
               *ngIf="allergyForm.get('startDate')?.touched && allergyForm.get('startDate')?.invalid">{{
               'START_DATE_REQUIRED' | translate }}</div>
           </div>
         </div>
-
 
         <!-- End Date -->
 
@@ -154,29 +164,20 @@
         </div> -->
 
         <!-- Status -->
-        <div class="col-md-6 col-lg-3">
-          <label class="form-label fw-semibold">{{ 'STATUS' | translate }} <span class="text-danger">*</span></label>
-          <select class="form-select" formControlName="status">
-            <option Value="" disabled>{{ 'SELECT_STATUS' | translate }}</option>
-            <option *ngFor="let status of statusOptions" [value]="status.id">{{ status.name }}</option>
-          </select>
-          <div class="text-danger small"
-            *ngIf="allergyForm.get('status')?.touched && allergyForm.get('status')?.invalid">
-            {{ 'STATUS_REQUIRED' | translate }}</div>
-        </div>
+       
 
       </div>
     </div>
 
     <!-- Buttons -->
-    <div class="card-footer d-flex justify-content-end gap-2 bg-light">
-      <button type="button" class="btn btn-outline-secondary" (click)="resetForm()">
+    <div class="d-flex justify-content-end gap-2 p-2">
+      <button type="button" class="btn btn-secondary" (click)="resetForm()">
         <i class="bi bi-arrow-counterclockwise"></i> {{ 'CLEAR' | translate }}
       </button>
 
       <button type="button" class="btn btn-success" [disabled]="isSubmitting" (click)="submit()">
         <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        {{ isSubmitting ? ('SUBMITTING' | translate) : ('SUBMIT' | translate) }}
+        {{ isSubmitting ? ('SUBMITTING' | translate) : ('SAVE' | translate) }}
       </button>
 
     </div>
@@ -215,8 +216,7 @@
                 <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
                   <ng-icon name="tablerEdit" class="me-1" (click)="editAllergy(allergy)">
                   </ng-icon>
-                  <ng-icon name="tablerTrash" class="text-danger me-1" (click)="
-                                           deleteAllergy(allergy.allergyId) ">
+                  <ng-icon name="tablerTrash" class="text-danger me-1" (click)="deleteAllergy(allergy.allergyId) ">
                   </ng-icon>
                 </div>
               </td>
