@@ -103,10 +103,9 @@ export class ClinicalApiService {
         return this.api.post(`Alergy/SubmitPatientAlergy`, object).toPromise();
     }
 
-    GetPatientAllergyData(mrno: String) {
-         ;
+    GetPatientAllergyData(mrno: String , page: number, pageSize: number) {
         return this.api
-            .get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}`)
+            .get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}&PageNumber=${page}&PageSize=${pageSize}`)
             .toPromise();
     }
 
@@ -250,10 +249,10 @@ export class ClinicalApiService {
             )
             .toPromise();
     }
-    GetPatientImmunizationData(mrno: string) {
+    GetPatientImmunizationData(mrno: string, page: number, pageSize: number, status: any) {
          ;
         return this.api
-            .get(`PatientImmunization/GetPatientImmunizationList?mrno=${mrno}`)
+            .get(`PatientImmunization/GetPatientImmunizationList?mrno=${mrno}&PageNumber=${page}&PageSize=${pageSize}&Status=${status}`)
             .toPromise();
     }
     DeleteImmunization(Id: number) {
@@ -338,4 +337,9 @@ export class ClinicalApiService {
             )
             .toPromise();
     }
+
+
+      SpeechtoText(MRNo:string, currentPage?: number, pageSize?: number) {
+    return this.api.get(`Appointment/SpeechtoText?mrNo=${MRNo}&PageNumber=${currentPage}&PageSize=${pageSize}`).toPromise();
+  }
 }

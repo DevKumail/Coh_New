@@ -23,6 +23,12 @@ export const routes: Routes = [
         loadChildren: () => import('./views/clinical/clinical.module').then((m) => m.ClinicalModule)
       },
       {
+        path: 'ivf',
+        canActivate: [modulePermissionGuard],
+        data: { module: 'IVF' },
+        loadChildren: () => import('./views/ivf/ivf.module').then((m) => m.IVFModule)
+      },
+      {
         path: 'registration',
         canActivate: [modulePermissionGuard],
         data: { module: 'Registration' },

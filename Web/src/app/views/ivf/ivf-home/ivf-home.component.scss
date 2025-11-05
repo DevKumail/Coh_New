@@ -1,0 +1,22 @@
+/* Styles for IVFHomeComponent */
+:host { display: block; }
+
+.compact-card {
+  .card-body { padding: .75rem; }
+  .btn { text-align: left; }
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  background: #e9ecef;
+}
+
+.nav-tabs .nav-link {
+  padding: .25rem .5rem;
+}
+
+table.table-sm th, table.table-sm td {
+  white-space: nowrap;
+}

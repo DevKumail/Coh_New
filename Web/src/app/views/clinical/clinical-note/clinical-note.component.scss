@@ -1,0 +1,31 @@
+.custom-panel {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .create-button button {
+    margin-top: 4px;
+  }
+  
+  /* Style for the table */
+  .p-datatable-sm {
+    width: 100%;
+    overflow: auto!important;
+  }
+  
+  /* Adjust styles for table headers and rows as needed */
+  .p-datatable-sm th,
+  .p-datatable-sm td {
+    font-size: 14px;
+  }
+  
+  /* You can add more specific styles for the table headers and rows as per your design */
+  

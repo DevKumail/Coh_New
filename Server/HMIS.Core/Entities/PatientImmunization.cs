@@ -55,7 +55,10 @@ public partial class PatientImmunization
     public long? UpdatedBy { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime UpdatedDate { get; set; }
+    public DateTime? UpdatedDate { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? CreatedDate { get; set; }
 
     [Column("MRNo")]
     [StringLength(10)]
@@ -75,6 +78,12 @@ public partial class PatientImmunization
     [Unicode(false)]
     public string? ProviderName { get; set; }
 
+
+    [StringLength(500)]
+    [Unicode(false)]
+    public string? Description { get; set; }
+
+
     [StringLength(100)]
     [Unicode(false)]
     public string? ErrorReason { get; set; }
@@ -90,7 +99,7 @@ public partial class PatientImmunization
 
     public bool? IsDeleted { get; set; }
 
-    public long CreatedBy { get; set; }
+    public long? CreatedBy { get; set; }
 
     public long? ImmTypeId { get; set; }
 
@@ -100,7 +109,7 @@ public partial class PatientImmunization
 
     [ForeignKey("CreatedBy")]
     [InverseProperty("PatientImmunizationCreatedByNavigation")]
-    public virtual Hremployee CreatedByNavigation { get; set; } = null!;
+    public virtual Hremployee? CreatedByNavigation { get; set; } = null!;
 
     [ForeignKey("DrugTypeId")]
     [InverseProperty("PatientImmunizationDrugType")]

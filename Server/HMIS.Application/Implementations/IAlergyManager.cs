@@ -10,7 +10,7 @@ namespace HMIS.Application.Implementations
 {
     public interface IAlergyManager
     {
-        Task<DataSet> GetAlergyDetailsDB(string mrno);
+        Task<DataSet> GetAlergyDetailsDB(string mrno, int? PageNumber, int? PageSize);
 
         Task<bool> InsertOrUpdateAlergy(AlergyModel alergyModel);
 

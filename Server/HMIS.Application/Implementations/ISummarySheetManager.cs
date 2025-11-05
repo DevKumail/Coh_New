@@ -29,7 +29,7 @@ namespace HMIS.Application.Implementations
 
         Task<DataSet> SS_GetPatientProblem(long MRNo, int? PageNumber, int? PageSize);
 
-        Task<DataSet> SS_GetPatientProcedure(long MRNo);
+        Task<DataSet> SS_GetPatientProcedure(int? status, long MRNo, int? PageNumber, int? PageSize);
 
         Task<DataSet> SS_GetPatientImmunization(long MRNo);
 

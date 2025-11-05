@@ -306,13 +306,16 @@ namespace HMIS.Application.ServiceLogics
         }
 
 
-        public async Task<DataSet> SS_GetPatientProcedure(long MRNo)
+        public async Task<DataSet> SS_GetPatientProcedure(int? status, long MRNo, int? PageNumber, int? PageSize)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
 
+                param.Add("@status", status);
                 param.Add("@MRNo", MRNo);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("SS_GetPatientProcedures", param);
                 if (ds.Tables[0].Rows.Count == 0)
                 {

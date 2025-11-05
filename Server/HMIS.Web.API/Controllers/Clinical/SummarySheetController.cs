@@ -279,11 +279,11 @@ namespace HMIS.Web.Controllers.Clinical
 
         }
         [HttpGet("GetPatientProcedureList")]
-        public async Task<IActionResult> GetPatientProcedureList(long MRNo)
+        public async Task<IActionResult> GetPatientProcedureList(int? status, long MRNo, int? PageNumber, int? PageSize)
         {
             try
             {
-                var Procedure = await _summarySheetManager.SS_GetPatientProcedure(MRNo);
+                var Procedure = await _summarySheetManager.SS_GetPatientProcedure(status,MRNo, PageNumber, PageSize);
                 return Ok(new { data = Procedure });
 
             }

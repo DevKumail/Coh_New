@@ -230,54 +230,68 @@ export const horizontalMenuItems: MenuItemType[] = [
         ],
     },
 
+    // {
+    //     label: 'Clinical',
+    //     icon: 'tablerStethoscope', // Use appropriate icon
+    //     isCollapsed: true,
+    //     children: [
+        
+    //         // {
+    //         //     label: 'Alerts',
+    //         //     icon: 'tablerBell',
+    //         //     url: '/clinical/alerts',
+    //         // },
+    //         {
+    //             label: 'Allergies',
+    //             icon: 'tablerAlertTriangle',
+    //             url: '/clinical/allergies',
+    //         },
+    //         {
+    //             label: 'Problem List',
+    //             icon: 'tablerListDetails',
+    //             url: '/clinical/problem',
+    //         },
+    //         {
+    //             label: 'Medical History',
+    //             icon: 'tablerHeartbeat',
+    //             url: '/clinical/medical-history',
+    //         },
+    //         // {
+    //         //     label: 'Problem',
+    //         //     icon: 'tablerClipboardText',
+    //         //     url: '/clinical/Problem-List',
+    //         // },
+    //         {
+    //             label: 'Vital Signs',
+    //             icon: 'tablerHeartbeat',
+    //             url: '/clinical/vital-signs',
+    //         },
+    //         {
+    //             label:'Medications',
+    //             icon: 'tablerSyringe',
+    //             url:'/clinical/medications'
+    //         },
+    //         {
+    //             label:'Immunizations',
+    //             icon: 'tablerSyringe',
+    //             url:'/clinical/immunizations'
+
+    //         },
+    //     ],
+    // },
+    
     {
-        label: 'Clinical',
-        icon: 'tablerStethoscope', // Use appropriate icon
+        label: 'IVF',
+        icon: 'tablerHeartHandshake',
+        module: 'IVF', // this is used by PermissionService
         isCollapsed: true,
         children: [
-        
-            // {
-            //     label: 'Alerts',
-            //     icon: 'tablerBell',
-            //     url: '/clinical/alerts',
-            // },
             {
-                label: 'Allergies',
-                icon: 'tablerAlertTriangle',
-                url: '/clinical/allergies',
-            },
-            {
-                label: 'Problem List',
-                icon: 'tablerListDetails',
-                url: '/clinical/problem',
-            },
-            {
-                label: 'Medical History',
-                icon: 'tablerHeartbeat',
-                url: '/clinical/medical-history',
-            },
-            // {
-            //     label: 'Problem',
-            //     icon: 'tablerClipboardText',
-            //     url: '/clinical/Problem-List',
-            // },
-            {
-                label: 'Vital Signs',
-                icon: 'tablerHeartbeat',
-                url: '/clinical/vital-signs',
-            },
-            {
-                label:'Medications',
-                icon: 'tablerSyringe',
-                url:'/clinical/medications'
-            },
-            // {
-            //     label:'immunizations',
-            //     icon: 'tablerSyringe',
-            //     url:'/clinical/immunizations'
-
-            // },
-        ],
+                label: 'IVF Dashboard',
+                icon: 'tablerUsers',
+                url: '/ivf/dashboard'
+            }
+        ]
     },
 
     {

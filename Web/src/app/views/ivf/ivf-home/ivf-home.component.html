@@ -1,0 +1,127 @@
+<form [formGroup]="form" class="container-fluid">
+  <div class="row g-3 align-items-stretch">
+    <div class="col-12 col-xl-3">
+      <div class="card h-100 compact-card">
+        <div class="card-body">
+          <div class="d-flex gap-3 align-items-center mb-3">
+            <div class="avatar"></div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">Female</div>
+              <div class="text-muted small">ID</div>
+            </div>
+          </div>
+          <div class="mb-2">
+            <label for="femaleId" class="form-label small mb-1">Female ID</label>
+            <input id="femaleId" type="text" class="form-control form-control-sm" formControlName="femaleId" />
+          </div>
+          <div class="d-grid gap-2 mb-3">
+            <button type="button" class="btn btn-outline-secondary btn-sm">Demographics</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm">Medical history</button>
+          </div>
+          <div class="mb-2 fw-semibold small">Diagnostics</div>
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm">Lab diagnostics</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm">Female exam.</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-6">
+      <div class="card h-100">
+        <div class="card-header py-2">
+          <ul class="nav nav-tabs card-header-tabs small">
+            <li class="nav-item"><button class="nav-link" [class.active]="selectedTab==='messages'" (click)="selectedTab='messages'">Messages</button></li>
+            <li class="nav-item"><button class="nav-link" [class.active]="selectedTab==='lab'" (click)="selectedTab='lab'">Lab tests</button></li>
+            <li class="nav-item"><button class="nav-link" [class.active]="selectedTab==='consents'" (click)="selectedTab='consents'">Consents</button></li>
+            <li class="nav-item"><button class="nav-link" [class.active]="selectedTab==='application'" (click)="selectedTab='application'">Application</button></li>
+          </ul>
+        </div>
+        <div class="card-body text-center text-muted small py-5">
+          <ng-container [ngSwitch]="selectedTab">
+            <div *ngSwitchDefault>&lt;No data to display&gt;</div>
+            <div *ngSwitchCase="'lab'">&lt;No data to display&gt;</div>
+            <div *ngSwitchCase="'consents'">&lt;No data to display&gt;</div>
+            <div *ngSwitchCase="'application'">&lt;No data to display&gt;</div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-3">
+      <div class="card h-100 compact-card">
+        <div class="card-body">
+          <div class="d-flex gap-3 align-items-center mb-3">
+            <div class="avatar"></div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">Male</div>
+              <div class="text-muted small">ID</div>
+            </div>
+          </div>
+          <div class="mb-2">
+            <label for="maleId" class="form-label small mb-1">Male ID</label>
+            <input id="maleId" type="text" class="form-control form-control-sm" formControlName="maleId" />
+          </div>
+          <div class="d-grid gap-2 mb-3">
+            <button type="button" class="btn btn-outline-secondary btn-sm">Demographics</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm">Medical history</button>
+          </div>
+          <div class="mb-2 fw-semibold small">Diagnostics</div>
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm">Lab diagnostics</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm">Male exam.</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header py-2"><div class="fw-semibold small">Overview</div></div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm mb-0 align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Woman</th>
+                  <th>No.</th>
+                  <th>Start</th>
+                  <th>Egg-treatment prt.</th>
+                  <th>Partner</th>
+                  <th>Sperm</th>
+                  <th>Stimulation</th>
+                  <th>Stim. prot.</th>
+                  <th>Stim. med.</th>
+                  <th>Triggering</th>
+                  <th>Trig. med.</th>
+                  <th>Cycle</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="overview.length===0">
+                  <td colspan="12" class="text-center text-muted">No data to display</td>
+                </tr>
+                <tr *ngFor="let row of overview">
+                  <td>{{row.woman}}</td>
+                  <td>{{row.no}}</td>
+                  <td>{{row.start}}</td>
+                  <td>{{row.eggTreatment}}</td>
+                  <td>{{row.partner}}</td>
+                  <td>{{row.sperm}}</td>
+                  <td>{{row.stimulation}}</td>
+                  <td>{{row.stimProt}}</td>
+                  <td>{{row.stimMed}}</td>
+                  <td>{{row.triggering}}</td>
+                  <td>{{row.trigMed}}</td>
+                  <td>{{row.cycle}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

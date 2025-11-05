@@ -80,7 +80,34 @@ export class SignInComponent implements OnInit {
   }
 
   // Ensure default UI is English/LTR unless user has chosen otherwise
+  private readonly sessionWhitelist = new Set([
+    'allowscreens',
+    'empId',
+    'facilities',
+    'uiDict_en',
+    'uiDir',
+    'uiLang',
+    'userId',
+    'userName'
+  ]);
+
+  private cleanSessionStorage(): void {
+    try {
+      const keys = Object.keys(sessionStorage);
+      for (const key of keys) {
+        const keep = this.sessionWhitelist.has(key);
+        const isBannedPrefix = key.startsWith('coh_secure_') || key.startsWith('pb.') || key.startsWith('pb_');
+        if (!keep || isBannedPrefix) {
+          sessionStorage.removeItem(key);
+        }
+      }
+    } catch {}
+  }
+
   async ngOnInit() {
+    // Cleanup session storage aggressively when reaching sign-in
+    this.cleanSessionStorage();
+    setTimeout(() => this.cleanSessionStorage(), 300);
     const lang = (sessionStorage.getItem('uiLang') as 'en' | 'ar') || 'en';
     const dir = (sessionStorage.getItem('uiDir') as 'ltr' | 'rtl') || 'ltr';
     // Persist defaults if not present
@@ -103,6 +130,9 @@ export class SignInComponent implements OnInit {
 
   this.authService.login(username, password).subscribe({
     next: () => {
+      // Cleanup again on successful login before navigation
+      this.cleanSessionStorage();
+      setTimeout(() => this.cleanSessionStorage(), 100);
       this.isLoading = false;
       Swal.fire({
         icon: 'success',
