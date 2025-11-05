@@ -1,7 +1,8 @@
 ﻿using Dapper;
-using HMIS.Infrastructure.ORM;
-using HMIS.Core.Entities;
+using DocumentFormat.OpenXml.Wordprocessing;
 using HMIS.Application.Implementations;
+using HMIS.Core.Entities;
+using HMIS.Infrastructure.ORM;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -112,24 +113,32 @@ namespace HMIS.Application.ServiceLogics
         }
 
 
-        public async Task<DataSet> GetAppointmentDetailsByMRNo(string MRNo)
+        public async Task<DataSet> GetAppointmentDetailsByMRNo(int? PageNumber, int? PageSize, string MRNo)
         {
             try
             {
-                DynamicParameters param = new DynamicParameters();
-                 param.Add("@MRNo", MRNo, DbType.String);
+                // Default safe values if frontend passes null
+                int page = PageNumber ?? 1;
+                int size = PageSize ?? 10;
 
-                //DataSet ds = await DapperHelper.GetDataSetBySPWithParams("Common_CoverageAndRegPatientGet", param);
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@MRNo", MRNo, DbType.String);
+                param.Add("@PageNumber", page, DbType.Int32);
+                param.Add("@PageSize", size, DbType.Int32);
+
+                // Call stored procedure (returns Table1 + Table2)
                 DataSet ds = await DapperHelper.GetAppointmentDetails("GetAppointmentDetailByMRNo", param);
+
                 if (ds.Tables[0].Rows.Count == 0)
                 {
-                    return new DataSet();
+                    throw new Exception("No data found");
                 }
 
                 return ds;
             }
             catch (Exception ex)
             {
+                // You can log ex.Message here for debugging
                 return new DataSet();
             }
         }

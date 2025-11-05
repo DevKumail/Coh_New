@@ -25,9 +25,9 @@ namespace HMIS.Application.Implementations
 
         Task<DataSet> SS_GetPatientAllergies(long MRNo);
 
-        Task<DataSet> SS_GetMedicalHistory(long MRNo);
+        Task<DataSet> SS_GetMedicalHistory(long MRNo, int? PageNumber, int? PageSize);
 
-        Task<DataSet> SS_GetPatientProblem(long MRNo);
+        Task<DataSet> SS_GetPatientProblem(long MRNo, int? PageNumber, int? PageSize);
 
         Task<DataSet> SS_GetPatientProcedure(long MRNo);
 

@@ -252,7 +252,7 @@ export class DemographicListComponent {
 
 
 async DemographicsFetchData(req: any) {
-    debugger
+     
   this.Loader.show();
 
  // Set filter flag based on FilterData

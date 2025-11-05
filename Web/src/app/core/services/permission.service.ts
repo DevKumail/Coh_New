@@ -27,10 +27,12 @@ export class PermissionService {
   }
 
   hasModuleAccess(module: string): boolean {
+    console.log('permissionService', module);
     return [...this.allowedScreens].some(screen => screen.startsWith(`${module}:`));
   }
 
   hasComponentAccess(module: string, component: string): boolean {
+    console.log('permissionService', module, component);
     return [...this.allowedScreens].some(screen =>
       screen.startsWith(`${module}:${component}`)
     );

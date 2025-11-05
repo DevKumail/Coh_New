@@ -84,19 +84,19 @@ namespace HMIS.Web.Controllers.Common
         }
 
         [HttpGet("GetAppointmentInfoByMRNo")]
-
-        public async Task<IActionResult> GetAppointmentInfoByMRNo(string MRNo = "")
+        public async Task<IActionResult> GetAppointmentInfoByMRNo(int? PageNumber = 1, int? PageSize = 10, string MRNo = "")
         {
-            DataSet result = await _commonManager.GetAppointmentDetailsByMRNo(MRNo);
+            if (string.IsNullOrWhiteSpace(MRNo))
+                return BadRequest("MRNo is required.");
 
+            DataSet result = await _commonManager.GetAppointmentDetailsByMRNo(PageNumber, PageSize, MRNo);
 
-            if (result != null)
-            {
-                return Ok(result);
-            }
+            if (result == null || result.Tables.Count == 0)
+                return NotFound("No appointment details found.");
 
-            return BadRequest(result);
+            return Ok(result);
         }
+
 
         [HttpGet("GetInsurrancePayerInfo")]
         public async Task<IActionResult> GetInsurrancePayerInfo(long MRNo)

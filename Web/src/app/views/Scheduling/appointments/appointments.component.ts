@@ -566,7 +566,7 @@ get isRtl(): boolean {
 
     async SearchAppointmentWithpagination() {
         this.loader.show();
-        debugger
+         
         const {
           fromDate,
           toDate,

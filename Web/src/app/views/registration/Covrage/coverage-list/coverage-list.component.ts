@@ -139,7 +139,7 @@ paginationInfo = {
 coverageTotalItems = 0;
 
 GetCoverageData() {
-  debugger
+   
   if (!this.SearchPatientData?.table2[0]?.mrNo) {
     Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
     return;

@@ -243,11 +243,11 @@ namespace HMIS.Web.Controllers.Clinical
 
 
         [HttpGet("GetMedicalHistoryList")]
-        public async Task<IActionResult> GetMedicalHistoryList(long MRNo)
+        public async Task<IActionResult> GetMedicalHistoryList(long MRNo, int? PageNumber, int? PageSize)
         {
             try
             {
-                var HistoryList = await _summarySheetManager.SS_GetMedicalHistory(MRNo);
+                var HistoryList = await _summarySheetManager.SS_GetMedicalHistory(MRNo,PageNumber,PageSize);
                 return Ok(new { data = HistoryList });
 
             }
@@ -261,11 +261,11 @@ namespace HMIS.Web.Controllers.Clinical
 
         }
         [HttpGet("GetPatientProblemList")]
-        public async Task<IActionResult> GetPatientProblemList(long MRNo)
+        public async Task<IActionResult> GetPatientProblemList(long MRNo, int? PageNumber, int? PageSize)
         {
             try
             {
-                var Problem = await _summarySheetManager.SS_GetPatientProblem(MRNo);
+                var Problem = await _summarySheetManager.SS_GetPatientProblem(MRNo, PageNumber, PageSize);
                 return Ok(new { data = Problem });
 
             }

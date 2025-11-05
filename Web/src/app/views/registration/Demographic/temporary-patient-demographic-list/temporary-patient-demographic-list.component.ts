@@ -219,7 +219,7 @@ getTempDemographics(data: any) {
 
 
   editTemp(tempOrId: any) {
-    debugger;
+     ;
     const isObj = typeof tempOrId === 'object' && tempOrId !== null;
     const tempObj = isObj ? tempOrId : this.pagedTemps.find(t => t.tempId === tempOrId);
     const tempId = isObj ? tempOrId.tempId : tempOrId;

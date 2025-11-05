@@ -1,6 +1,7 @@
-﻿using HMIS.Core.Entities;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
 using HMIS.Application.DTOs.ChargeCaptureDTOs;
 using HMIS.Application.Implementations;
+using HMIS.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -34,7 +35,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_UserCPT_Code
         [HttpGet("MyCptCode")]
-        public async Task<IActionResult> CC_MyCptCodeGet(long ProviderId, long? GroupId, long? PayerId)
+        public async Task<IActionResult> CC_MyCptCodeGetDB(long ProviderId, long? GroupId, long? PayerId, int? PageNumber, int? PageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -54,7 +55,7 @@ namespace HMIS.Web.Controllers.Billing
                 {
                     PayerId = 0;
                 }
-                DataSet result = await _chargeCaptureManager.CC_MyCptCodeGetDB(ProviderId, GroupId, PayerId);
+                DataSet result = await _chargeCaptureManager.CC_MyCptCodeGetDB(ProviderId, GroupId, PayerId, PageNumber,PageSize);
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)
                 {
@@ -90,7 +91,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_UserDiagnosisCode
         [HttpGet("MyDiagnosisCode")]
-        public async Task<IActionResult> CC_MyDiagnosisCode(long ProviderId, long? GroupId, long? ICDVersionId)
+        public async Task<IActionResult> CC_MyDiagnosisCode(long ProviderId, long? GroupId, long? ICDVersionId, int? PageNumber, int? PageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -111,7 +112,7 @@ namespace HMIS.Web.Controllers.Billing
                     ICDVersionId = null;
                 }
 
-                DataSet result = await _chargeCaptureManager.CC_MyDiagnosisCodeDB(ProviderId, GroupId, ICDVersionId);
+                DataSet result = await _chargeCaptureManager.CC_MyDiagnosisCodeDB(ProviderId, GroupId, ICDVersionId, PageNumber, PageSize);
 
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)
@@ -197,7 +198,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_AllCPTCode
         [HttpGet("CPTCode")]
-        public async Task<IActionResult> CC_CPTCode(int? AllCPTCode, string? CPTStartCode, string? CPTEndCode, string? Description)
+        public async Task<IActionResult> CC_CPTCode(int? AllCPTCode, string? CPTStartCode, string? CPTEndCode, string? Description, int? pageNumber, int? pageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -209,7 +210,7 @@ namespace HMIS.Web.Controllers.Billing
             timerElapsed.StartTimer();
             try
             {
-                DataSet result = await _chargeCaptureManager.CC_CPTCodeDB(AllCPTCode, CPTStartCode, CPTEndCode, Description);
+                DataSet result = await _chargeCaptureManager.CC_CPTCodeDB(AllCPTCode, CPTStartCode, CPTEndCode, Description, pageNumber, pageSize);
 
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)
@@ -300,7 +301,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_AllDentalCode
         [HttpGet("DentalCode")]
-        public async Task<IActionResult> CC_DentalCode(int? AllDentalCode, string? DentalStartCode, string? DentalEndCode, string? DescriptionFilter)
+        public async Task<IActionResult> CC_DentalCode(int? AllDentalCode, string? DentalStartCode, string? DentalEndCode, string? DescriptionFilter, int? pageNumber, int? pageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -312,7 +313,7 @@ namespace HMIS.Web.Controllers.Billing
             timerElapsed.StartTimer();
             try
             {
-                DataSet result = await _chargeCaptureManager.CC_DentalCodeDB(AllDentalCode, DentalStartCode, DentalEndCode, DescriptionFilter);
+                DataSet result = await _chargeCaptureManager.CC_DentalCodeDB(AllDentalCode, DentalStartCode, DentalEndCode, DescriptionFilter, pageNumber, pageSize);
 
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)
@@ -403,7 +404,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_AllHCPSCode
         [HttpGet("HCPCSCode")]
-        public async Task<IActionResult> CC_HCPCSCode(int? AllHCPCSCode, string? HCPCStartCode, string? HCPCSEndCode, string? DescriptionFilter)
+        public async Task<IActionResult> CC_HCPCSCode(int? AllHCPCSCode, string? HCPCStartCode, string? HCPCSEndCode, string? DescriptionFilter, int? pageNumber, int? pageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -415,7 +416,7 @@ namespace HMIS.Web.Controllers.Billing
             timerElapsed.StartTimer();
             try
             {
-                DataSet result = await _chargeCaptureManager.CC_HCPCSCodeDB(AllHCPCSCode, HCPCStartCode, HCPCSEndCode, DescriptionFilter);
+                DataSet result = await _chargeCaptureManager.CC_HCPCSCodeDB(AllHCPCSCode, HCPCStartCode, HCPCSEndCode, DescriptionFilter, pageNumber, pageSize);
 
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)
@@ -452,7 +453,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_UnclassifiedService
         [HttpGet("UnclassifiedService")]
-        public async Task<IActionResult> CC_UnclassifiedService(int? AllCode, string? UCStartCode, string? DescriptionFilter)
+        public async Task<IActionResult> CC_UnclassifiedService(int? AllCode, string? UCStartCode, string? DescriptionFilter, int? pageNumber, int? pageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -464,7 +465,7 @@ namespace HMIS.Web.Controllers.Billing
             timerElapsed.StartTimer();
             try
             {
-                DataSet result = await _chargeCaptureManager.CC_UnclassifiedServiceDB(AllCode, UCStartCode, DescriptionFilter);
+                DataSet result = await _chargeCaptureManager.CC_UnclassifiedServiceDB(AllCode, UCStartCode, DescriptionFilter, pageNumber, pageSize);
 
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)
@@ -501,7 +502,7 @@ namespace HMIS.Web.Controllers.Billing
 
         #region Get_ServiceItems
         [HttpGet("ServiceItems")]
-        public async Task<IActionResult> CC_ServiceItems(int? AllCode, string? ServiceStartCode, string? DescriptionFilter)
+        public async Task<IActionResult> CC_ServiceItems(int? AllCode, string? ServiceStartCode, string? DescriptionFilter, int? pageNumber, int? pageSize)
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -513,7 +514,7 @@ namespace HMIS.Web.Controllers.Billing
             timerElapsed.StartTimer();
             try
             {
-                DataSet result = await _chargeCaptureManager.CC_ServiceItemsDB(AllCode, ServiceStartCode, DescriptionFilter);
+                DataSet result = await _chargeCaptureManager.CC_ServiceItemsDB(AllCode, ServiceStartCode, DescriptionFilter, pageNumber, pageSize);
 
                 elapsed = timerElapsed.StopTimer();
                 if (result != null)

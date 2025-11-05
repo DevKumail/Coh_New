@@ -21,6 +21,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { SecureStorageService } from '@core/services/secure-storage.service';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import Swal from 'sweetalert2';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 
 
 @Component({
@@ -35,6 +36,7 @@ import Swal from 'sweetalert2';
     FormsModule,
     NgIconComponent,
     TranslatePipe,
+    GenericPaginationComponent
   ],
   animations: [
     trigger('slideToggle', [
@@ -59,56 +61,12 @@ export class PatientHeaderPanelComponent implements OnInit {
     visitAppointments: 'patient_banner_visit_appts',
     selectedVisit: 'patient_banner_selected_visit'
   } as const;
-  
-  // Pagination state for Visits list
-  pageSize: number = 10;
-  currentPage: number = 1;
-  totalPages: number = 1;
-  pageNumbers: number[] = [];
-  
-  // Current page slice of appointments
-  get paginatedAppointments(): any[] {
-    if (!Array.isArray(this.AppoinmentData) || this.AppoinmentData.length === 0) {
-      return [];
-    }
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    return this.AppoinmentData.slice(start, end);
-  }
-  
-  private updatePagination(): void {
-    const totalItems = Array.isArray(this.AppoinmentData) ? this.AppoinmentData.length : 0;
-    this.totalPages = Math.max(1, Math.ceil(totalItems / this.pageSize));
-    // Clamp current page into range
-    this.currentPage = Math.min(Math.max(this.currentPage, 1), this.totalPages);
-    // Build page numbers [1..totalPages]
-    this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-  
-  prevPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-    }
-  }
-  
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-    }
-  }
-  
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
-  }
     constructor(
     private patientBannerService: PatientBannerService,
     private loader: LoaderService,
     private demographicapi: DemographicApiServices,
-    private secureStorage: SecureStorageService
+    private secureStorage: SecureStorageService,
   ) { }
-  // patientBannerService = inject(PatientBannerService)
 
   closeBanner() {
     this.visible = false;
@@ -119,83 +77,72 @@ export class PatientHeaderPanelComponent implements OnInit {
     this.secureStorage.removeItem(this.STORAGE_KEYS.selectedVisit);
   }
 
-  // get patientInfo() {
-  //   return this.patientData?.table2?.[0] || null;
-  // }
-
-  // get insuranceInfo() {
-  //   console.log('insuranceInfo');
-  //   return this.patientData?.table1 || [];
-  // }
-
   ngOnInit(): void {
      // 1) Hydrate from secure storage (if available)
+     this.GetAllVisit();
+      
      const storedPatient = this.secureStorage.getJson<any>(this.STORAGE_KEYS.patientData);
      if (storedPatient?.table2?.[0]?.mrNo) {
        this.patientData = storedPatient;
        this.patientInfo = this.patientData?.table2?.[0] || null;
-       this.insuranceInfo = this.patientData?.table1 || [];
+       this.insuranceInfo = this.patientData?.table1?.[0] || [];
        this.visible = true;
      }
-     const storedVisitAppts = this.secureStorage.getJson<any>(this.STORAGE_KEYS.visitAppointments);
-     if (storedVisitAppts?.table?.[0]) {
-       this.visitAppointments = storedVisitAppts?.table?.[0];
-     }
+    //  const storedLoadVisitAppts = this.secureStorage.getJson<any>(this.STORAGE_KEYS.selectedVisit);
+    //  if (storedLoadVisitAppts) {
+    //   this.visitAppointments = storedLoadVisitAppts;
+    //  }
 
      // 2) Subscribe to live stream and persist
-     this.patientBannerService.patientData$
-      .pipe(
-        filter((data: any) => !!data?.table2?.[0]?.mrNo),
-        distinctUntilChanged((prev, curr) => 
-          prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
-        )
-      )
-      .subscribe((data: any) => {
-        console.log('✅ Subscription triggered with MRNO in Header Component:', data?.table2?.[0]?.mrNo);
+      this.patientBannerService.patientData$.subscribe((data: any) => {
         this.patientData = data;
         if (this.patientData) {
-        this.patientInfo = this.patientData?.table2?.[0] || null;
-        this.insuranceInfo = this.patientData?.table1 || [];
-        console.log('✅ Subscription triggered with MRNO in Header Component:', this.patientData);
-        // Persist patient data
-        this.secureStorage.setJson(this.STORAGE_KEYS.patientData, this.patientData);
-          
-        this.visible = true;
-        }
+          this.visitAppointments = this.patientBannerService.getSelectedVisit()
+          if (this.visitAppointments) {
+              this.ActiveAppoinment = this.visitAppointments?.appointmentId; 
+              this.secureStorage.setJson(this.STORAGE_KEYS.selectedVisit, this.visitAppointments);
+          }
+          this.patientInfo = this.patientData?.table2?.[0] || null;
+          this.insuranceInfo = this.patientData?.table1?.[0] || [];
+          console.log('Patient Data:', this.patientInfo);
+          console.log('Insurance Info:', this.insuranceInfo);
+          // Persist patient data
+          this.secureStorage.setJson(this.STORAGE_KEYS.patientData, this.patientData);
+            
+          this.visible = true;
+          }
       });
-      this.patientBannerService.visitAppointments$.subscribe((data: any) => {
-        console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
-        this.visitAppointments = data?.table?.[0];
+
+
+      this.patientBannerService.selectedVisit$.subscribe((data: any) => {
+        this.visitAppointments = data;
         if (this.visitAppointments) {
-          console.log('Visit Appointments',this.visitAppointments);          
-          // Persist visit appointments payload
-          this.secureStorage.setJson(this.STORAGE_KEYS.visitAppointments, data);
-        }
-      });
-      // Persist selected visit whenever it changes
-      this.patientBannerService.selectedVisit$.subscribe((sel: any) => {
-        if (sel) {
-          this.secureStorage.setJson(this.STORAGE_KEYS.selectedVisit, sel);
+          console.log('banner Selected Visit Appointments ',this.visitAppointments);
+          this.ActiveAppoinment = this.visitAppointments?.appointmentId; 
+          this.secureStorage.setJson(this.STORAGE_KEYS.selectedVisit, this.visitAppointments);
         }
       });
 
 
-    // this.patientBannerService.patientData$.subscribe(data => {
-    //   this.patientData = data;
-    //   if (this.patientData) {
-    //     this.visible = true;
+
+
+    // .subscribe((data: any) => {
+    //   this.visitAppointments = data;
+    //   if (this.visitAppointments) {
+    //     console.log('banner Selected Visit Appointments ',this.visitAppointments);
     //   }
     // });
+
   }
 
 
 
   async searchAppointment(mrNo: any, modalContent: any){
 
+     
     this.ActiveAppoinment = null;
 
     if(!mrNo){
-        this.loader.hide();
         if (this.modalRef) {
           this.modalRef.close();
         }
@@ -206,61 +153,25 @@ export class PatientHeaderPanelComponent implements OnInit {
               });
               return;
     }
+    this.GetAllVisit();
 
     this.patientBannerService.selectedVisit$.subscribe((data: any) => {
-      console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
       this.visitAppointments = data;
       if (this.visitAppointments) {
-        console.log('Visit Appointments',this.visitAppointments);
+        console.log('Selected Visit Appointments ',this.visitAppointments);
         this.ActiveAppoinment = this.visitAppointments?.appointmentId; 
-        // Persist currently selected visit
         this.secureStorage.setJson(this.STORAGE_KEYS.selectedVisit, this.visitAppointments);
       }
     });
 
 
-    this.patientBannerService.visitAppointments$.subscribe((data: any) => {
-      console.log('✅ Subscription triggered with Visit Appointments in Alert Component:', data?.length);
-      if (data) {
-        this.AppoinmentData = data?.table;
-        this.updatePagination()
-        // this.ActiveAppoinment = this.visitAppointments?.appointmentId; 
-        // Persist currently selected visit
-        // this.secureStorage.setJson(this.STORAGE_KEYS.selectedVisit, this.visitAppointments);
-      }
-    });
-    
-    
-    // this.AppoinmentData = this.AppoinmentData = this.secureStorage.getItem(this.STORAGE_KEYS.visitAppointments);
-    
-    
-    // const storedAllVisitAppts = this.secureStorage.getJson<any>(this.STORAGE_KEYS.visitAppointments);
-    // if (storedAllVisitAppts?.table?.[0]) {
-    //   this.AppoinmentData = storedAllVisitAppts?.table;
-    //   console.log('Visit All Appointments',this.AppoinmentData);
-    //  }
-
-    this.modalRef = this.modalService.open(modalContent, { size: 'xl', backdrop: 'static' });
-    // this.loader.show();
-    // await this.demographicapi.GetAppointmentByMRNO(mrNo).subscribe((Response: any)=>{
-    //   console.log("Load Visit new work =>", Response);
-    //   if (Object.keys(Response).length > 0){
-    //     this.AppoinmentData = Response?.table;
-    //     // reset and build pagination
-    //     this.currentPage = 1;
-    //     this.updatePagination();
-    //     // this.patientBannerService.setVisitAppointments(Response);
-    //     // this.patientBannerService.setSelectedVisit(Response?.table[0]);
-    //     this.loader.hide();
-    //   } else{
-    //     // this.patientBannerService.setVisitAppointments(null);
-    //     // this.patientBannerService.setSelectedVisit(null);
-    //     this.AppoinmentData = [];
-    //     this.currentPage = 1;
-    //     this.updatePagination();
-    //     this.loader.hide();
+    // this.patientBannerService.visitAppointments$.subscribe((data: any) => {
+    //   if (data) {
+    //     this.AppoinmentData = data?.table;
+    //     console.log('All Visit Appointments ', this.AppoinmentData);
     //   }
-    // })
+    // });
+    this.modalRef = this.modalService.open(modalContent, { size: 'xl', backdrop: 'static' });
   }
 
   appointmentLoad(data: any){
@@ -268,7 +179,6 @@ export class PatientHeaderPanelComponent implements OnInit {
     if (this.modalRef) {
     this.modalRef.close();
     }
-    // Persist selected visit explicitly on selection
     if (data) {
       this.secureStorage.setJson(this.STORAGE_KEYS.selectedVisit, data);
     }
@@ -281,4 +191,36 @@ export class PatientHeaderPanelComponent implements OnInit {
       return false;
     }
   }
+
+
+  AllVisitPaginationInfo: any = {
+    Page: 1,
+    RowsPerPage: 10
+  };
+  AllVisitTotalItems = 0;
+  
+      async onAllVisitPageChanged(page: number) {
+      this.AllVisitPaginationInfo.Page = page;
+      await this.GetAllVisit();
+      }
+
+     async GetAllVisit(){
+       if(this.patientInfo?.mrNo){
+         this.loader.show();
+       await this.demographicapi.GetAppointmentByMRNO(this.patientInfo?.mrNo,this.AllVisitPaginationInfo.Page,this.AllVisitPaginationInfo.RowsPerPage).subscribe((Response: any)=>{
+      console.log("All Visit =>", Response);
+      if (Response?.table1?.length > 0){
+        this.AppoinmentData = Response?.table1;
+        this.AllVisitTotalItems = Response?.table2?.[0]?.totalRecords;
+        this.loader.hide();
+        this.secureStorage.removeItem(this.STORAGE_KEYS.visitAppointments);
+        this.secureStorage.setJson(this.STORAGE_KEYS.visitAppointments, this.AppoinmentData);
+      } else{
+        this.AppoinmentData = [];
+        this.loader.hide();
+      } 
+    })
+    }
+  }
+      
 }

@@ -63,9 +63,9 @@ namespace HMIS.Web.Controllers.Clinical
 
 
         [HttpGet("SearchByPrescriptions")]
-        public async Task<ActionResult> SearchByPrescriptions(string keyword)
+        public async Task<ActionResult> SearchByPrescriptions(string? keyword, int? PageNumber, int? PageSize)
         {
-            var prescriptions = await prescription.FilterPrescriptions(keyword);
+            var prescriptions = await prescription.FilterPrescriptions(keyword, PageNumber, PageSize);
             return Ok(new { prescription = prescriptions });
 
              

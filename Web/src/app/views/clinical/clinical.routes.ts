@@ -9,6 +9,7 @@ import { AppointmentsComponent } from '../Scheduling/appointments/appointments.c
 import { modulePermissionGuard } from '@core/guards/module-permission.guard';
 import { VitalSignsComponent } from './vital-signs/vital-signs.component';
 import { ImmunizationsComponent } from './immunizations/immunizations.component';
+import { MedicationComponent } from './medication/medication.component';
 
 export const CLINICAL_ROUTES: Routes = [
   {
@@ -59,14 +60,6 @@ export const CLINICAL_ROUTES: Routes = [
         component: AllergiesComponent,
         data: { module: 'Clinical', component: 'Allergies', title: 'Allergies' }
       },
-
-      {
-        path: 'vital signs',
-        canActivate: [modulePermissionGuard],
-        component: VitalSignsComponent,
-        data: { module: 'Clinical', component: 'Vital Signs', title: 'Vital Signs' }
-      },
-      // Alias for hyphenated vital-signs
       {
         path: 'vital-signs',
         canActivate: [modulePermissionGuard],
@@ -74,17 +67,16 @@ export const CLINICAL_ROUTES: Routes = [
         data: { module: 'Clinical', component: 'Vital Signs', title: 'Vital Signs' }
       },
       {
+        path: 'medications',
+        canActivate: [modulePermissionGuard],
+        component: MedicationComponent,
+        data: { module: 'Clinical', component: 'Medications', title: 'Medications' }
+      },
+      {
         path:'immunization',
         canActivate:[modulePermissionGuard],
         component:ImmunizationsComponent
-      }
-      ,
-      // Alias plural for immunizations
-      {
-        path:'immunizations',
-        canActivate:[modulePermissionGuard],
-        component:ImmunizationsComponent
-      }
+      },
     ]
   }
 ];

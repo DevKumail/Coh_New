@@ -1,5 +1,5 @@
 import { credits, currentYear } from '@/app/constants';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgIcon } from '@ng-icons/core';
@@ -23,7 +23,7 @@ import { UiPrefsStoreService } from '@core/services/ui-prefs-store.service';
     styles: ``,
 
 })
-export class SignInComponent {
+export class SignInComponent implements OnInit {
     currentYear = currentYear
     credits = credits
       username = '';
@@ -77,6 +77,22 @@ export class SignInComponent {
     this.uiPrefs.get().then(p => {
       if (p?.uiDir) this.selectedDir = p.uiDir as any;
     });
+  }
+
+  // Ensure default UI is English/LTR unless user has chosen otherwise
+  async ngOnInit() {
+    const lang = (sessionStorage.getItem('uiLang') as 'en' | 'ar') || 'en';
+    const dir = (sessionStorage.getItem('uiDir') as 'ltr' | 'rtl') || 'ltr';
+    // Persist defaults if not present
+    if (!sessionStorage.getItem('uiLang')) sessionStorage.setItem('uiLang', lang);
+    if (!sessionStorage.getItem('uiDir')) sessionStorage.setItem('uiDir', dir);
+    this.selectedDir = dir;
+    try {
+      document.documentElement.setAttribute('dir', dir);
+      document.documentElement.setAttribute('lang', lang);
+      document.body.classList.toggle('rtl', dir === 'rtl');
+      await this.i18n.load(lang);
+    } catch {}
   }
 
 

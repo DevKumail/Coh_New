@@ -18,7 +18,7 @@ namespace HMIS.Application.Implementations
         Task<bool> DeletePrescription(long Id);
 
 
-        Task<DataSet> FilterPrescriptions(string keyword);
+        Task<DataSet> FilterPrescriptions(string? keyword, int? PageNumber, int? PageSize);
 
 
      }
