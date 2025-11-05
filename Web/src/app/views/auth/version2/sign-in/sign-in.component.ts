@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { TranslationService } from '@/app/shared/i18n/translation.service';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { UiPrefsStoreService } from '@core/services/ui-prefs-store.service';
 
 
 
@@ -31,16 +32,19 @@ export class SignInComponent {
   isLoading = false;
 
   // Direction selection (applies on login screen)
-  selectedDir: 'ltr' | 'rtl' = (sessionStorage.getItem('uiDir') as 'ltr' | 'rtl') || 'ltr';
+  selectedDir: 'ltr' | 'rtl' = 'ltr';
 
   setDir(dir: 'ltr' | 'rtl') {
     try {
       this.selectedDir = dir;
-      sessionStorage.setItem('uiDir', dir);
+      // Persist in RxDB
+      void this.uiPrefs.setDir(dir);
       // Apply immediately so user sees effect on login screen too
       document.documentElement.setAttribute('dir', dir);
       document.documentElement.setAttribute('lang', dir === 'rtl' ? 'ar' : 'en');
       document.body.classList.toggle('rtl', dir === 'rtl');
+      // Legacy sessionStorage (commented)
+      // sessionStorage.setItem('uiDir', dir);
     } catch {}
   }
 
@@ -48,12 +52,16 @@ export class SignInComponent {
   async setUi(lang: 'en' | 'ar', dir: 'ltr' | 'rtl') {
     try {
       this.selectedDir = dir;
-      sessionStorage.setItem('uiDir', dir);
-      sessionStorage.setItem('uiLang', lang);
+      // Persist in RxDB
+      await this.uiPrefs.set({ uiDir: dir, uiLang: lang } as any);
+      // Apply immediately
       document.documentElement.setAttribute('dir', dir);
       document.documentElement.setAttribute('lang', lang);
       document.body.classList.toggle('rtl', dir === 'rtl');
       await this.i18n.load(lang);
+      // Legacy sessionStorage (commented)
+      // sessionStorage.setItem('uiDir', dir);
+      // sessionStorage.setItem('uiLang', lang);
     } catch {}
   }
 
@@ -62,8 +70,14 @@ export class SignInComponent {
     private authService: AuthService,
     private patientBanner: PatientBannerService,
     private router: Router,
-    private i18n: TranslationService
-  ) {}
+    private i18n: TranslationService,
+    private uiPrefs: UiPrefsStoreService
+  ) {
+    // Seed selectedDir from RxDB (fire-and-forget)
+    this.uiPrefs.get().then(p => {
+      if (p?.uiDir) this.selectedDir = p.uiDir as any;
+    });
+  }
 
 
   onLogin(username: string, password: string): void {

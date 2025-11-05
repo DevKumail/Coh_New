@@ -107,6 +107,7 @@ getStateByCountry(countryId:any) {
 }
 
  getCacheItem(object: any) {
+  debugger
         return this.api.post('Cache/GetCache', object).toPromise();
     }
 

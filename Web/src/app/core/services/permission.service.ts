@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { AuthStoreService } from './auth-store.service';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionService {
   private allowedScreens: Set<string> = new Set();
   private permissionsRefreshed = new BehaviorSubject<void>(undefined);
-  
-  constructor() {
-    this.loadPermissions();
+
+  constructor(private authStore: AuthStoreService) {
+    void this.reloadFromDb();
   }
 
-  private loadPermissions(): void {
-    const screens = JSON.parse(sessionStorage.getItem('allowscreens') || '[]');
-    this.allowedScreens = new Set(screens);
+  private async reloadFromDb(): Promise<void> {
+    const session = await this.authStore.getSessionOnce();
+    this.allowedScreens = new Set(session?.allowscreens ?? []);
   }
 
   // Add public method to refresh permissions after login
   refreshPermissions(): void {
-    this.loadPermissions();
-    this.permissionsRefreshed.next();
+    void this.reloadFromDb().then(() => this.permissionsRefreshed.next());
   }
 
   // Observable to notify when permissions are refreshed
