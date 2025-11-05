@@ -19,6 +19,12 @@
          canActivate: [modulePermissionGuard],
          component: IVFHomeComponent,
          data: { module: 'IVF', component: 'IVF Dashboard', title: 'IVF Dashboard' }
+       },
+       {
+         path: 'dashboard',
+         canActivate: [modulePermissionGuard],
+         component: IVFHomeComponent,
+         data: { module: 'IVF', component: 'Patient Summary', title: 'Patient Summary' }
        }
      ]
    }
