@@ -290,6 +290,11 @@ export const horizontalMenuItems: MenuItemType[] = [
                 label: 'IVF Dashboard',
                 icon: 'tablerUsers',
                 url: '/ivf/dashboard'
+            },
+            {
+                label: 'Patient Summary',
+                icon: 'tablerFiles',
+                url: '/ivf/patient-summary'
             }
         ]
     },
