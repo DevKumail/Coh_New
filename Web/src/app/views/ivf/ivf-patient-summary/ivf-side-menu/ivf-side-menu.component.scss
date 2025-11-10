@@ -1,0 +1,91 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.side-menu {
+  width: 240px;
+  height: 100%;
+  max-height: 100%;
+  background: rgb(49, 58, 70); /* match patient-summary */
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  padding: 10px 8px;
+  transition: width 0.2s ease-in-out, padding 0.2s ease-in-out, background 0.2s;
+  overflow-y: auto;
+}
+
+.side-menu.collapsed {
+  width: 64px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.side-menu .nav-link {
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.side-menu .nav-link ng-icon,
+.side-menu .nav-link i {
+  font-size: 1.05rem;
+  color: inherit;
+}
+
+.side-menu .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.side-menu.collapsed .nav-link {
+  justify-content: center;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  position: relative;
+}
+
+.side-menu.collapsed .section-title {
+  display: none;
+}
+
+.side-menu.collapsed .ps-4 {
+  padding-left: 0 !important;
+}
+
+.side-menu .section-title {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.side-menu .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Tooltip when collapsed */
+/* Tooltip via Bootstrap JS; custom ::after tooltip removed */
+/* Flyout styling to mimic Inspinia */
+.tooltip.menu-flyout {
+  --flyout-bg: rgb(49, 58, 70);
+  --flyout-text: #fff;
+  --flyout-shadow: 0 12px 30px rgba(0,0,0,.35);
+}
+
+.tooltip.menu-flyout .tooltip-inner {
+  background: var(--flyout-bg);
+  color: var(--flyout-text);
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: 10px;
+  min-width: 200px;
+  box-shadow: var(--flyout-shadow);
+  font-weight: 600;
+}
+
+.tooltip.menu-flyout .tooltip-arrow::before {
+  border-right-color: var(--flyout-bg) !important;
+}
+
+.flyout-title {
+  font-size: 14px;
+}

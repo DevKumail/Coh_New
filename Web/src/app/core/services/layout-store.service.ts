@@ -4,6 +4,7 @@ import {LayoutState} from '@/app/types/layout';
 import {NgbOffcanvas} from '@ng-bootstrap/ng-bootstrap';
 import {CustomizerComponent} from '@layouts/components/customizer/customizer.component';
 import {BehaviorSubject} from 'rxjs';
+import { LayoutConfigStoreService } from '@core/services/layout-config-store.service';
 
 const STORAGE_KEY = '__INSPINIA_ANGULAR_CONFIG__';
 
@@ -25,8 +26,10 @@ const defaultState: LayoutState = {
 @Injectable({providedIn: 'root'})
 export class LayoutStoreService {
 
-    constructor(private offcanvasService: NgbOffcanvas) {
+    constructor(private offcanvasService: NgbOffcanvas, private layoutConfigStore: LayoutConfigStoreService) {
         this.applyAllAttributes();
+        // Hydrate from RxDB (async) and apply to DOM/state if present
+        void this.hydrateFromRxdb();
     }
 
     state = signal<LayoutState>(this.loadInitialState());
@@ -38,15 +41,29 @@ export class LayoutStoreService {
 
     private loadInitialState(): LayoutState {
         try {
-            const stored = localStorage.getItem(STORAGE_KEY);
+            const stored = localStorage.getItem(STORAGE_KEY); // legacy storage (kept for fallback)
             return stored ? JSON.parse(stored) : defaultState;
         } catch {
             return defaultState;
         }
     }
 
+    private async hydrateFromRxdb(): Promise<void> {
+        try {
+            const doc = await this.layoutConfigStore.get();
+            if (doc?.state) {
+                this.state.set(doc.state);
+                this.applyAllAttributes();
+                this.layoutStateSubject.next(this.state());
+            }
+        } catch {}
+    }
+
     private persistToStorage() {
+        // Legacy write-through for compatibility
         localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state()));
+        // Persist to RxDB
+        void this.layoutConfigStore.set(this.state());
     }
 
     get skin() {

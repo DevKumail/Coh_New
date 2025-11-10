@@ -1,0 +1,66 @@
+/* Styles for IVFHomeComponent */
+:host { display: block; }
+
+.ivf-split {
+  position: relative;
+
+  /* center divider */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--bs-border-color, #dee2e6);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .left-pane .card {
+    border-right: 0 !important; /* join at center */
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  .right-pane .card {
+    border-left: 0 !important; /* join at center */
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+  }
+
+  .card {
+    min-height: 40vh;
+  }
+}
+
+/* Compact cards above (optional) */
+.compact-card .card-body {
+  padding: 1rem;
+}
+
+.compact-card {
+  .card-body { padding: .75rem; }
+  .btn { text-align: left; }
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  background: #e9ecef;
+}
+
+.nav-tabs .nav-link {
+  padding: .25rem .5rem;
+}
+
+table.table-sm th, table.table-sm td {
+  white-space: nowrap;
+}
+
+.icon-sm {
+  width: 16px;
+  height: 16px;
+}
+
