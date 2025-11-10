@@ -53,13 +53,16 @@ namespace HMIS.Application.ServiceLogics
             }
         }
 
-        public async Task<DataSet> GetAllVitalSigns(long MRNo, long VisitAccountNo)
+        public async Task<DataSet> GetAllVitalSigns(int? PageNumber, int? PageSize, long MRNo = 0, long VisitAccountNo = 0)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@MRNo", MRNo);
                 param.Add("@VisitAccountNo", VisitAccountNo);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
+
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("GetAllVitalSign", param);
                 if (ds.Tables[0].Rows.Count == 0)
                 {
@@ -288,8 +291,8 @@ namespace HMIS.Application.ServiceLogics
                 DynamicParameters param = new DynamicParameters();
 
                 param.Add("@MRNo", MRNo);
-                param.Add("@PageNumber", MRNo);
-                param.Add("@PageSize", MRNo);
+                param.Add("@PageNumber", PageNumber);
+                param.Add("@PageSize", PageSize);
 
                 DataSet ds = await DapperHelper.GetDataSetBySPWithParams("SS_GetPatientProblems", param);
                 if (ds.Tables[0].Rows.Count == 0)

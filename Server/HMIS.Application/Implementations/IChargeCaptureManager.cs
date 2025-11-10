@@ -33,5 +33,11 @@ namespace HMIS.Application.Implementations
         Task<string> UpdateMyProcedureDB(List<BLSuperBillProcedure> sb);
         Task<List<Blcptgroup>> GetCPTByProvider(long? Id);
         Task<DataSet> CC_LoadAllGroupsAndCodes(long? GroupId, long? ProviderId, long? PayerId);
+
+        Task<DataSet> GetAllChargeCaptureService(long? AppointmentId, int? pageNumber, int? pageSize);
+
+        Task<DataSet> GetAllChargeCaptureDiagnosis(long? AppointmentId, int? pageNumber, int? pageSize);
+
+
     }
 }

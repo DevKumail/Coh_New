@@ -161,7 +161,6 @@ export class AlertComponent implements OnInit, AfterViewInit {
     }
     this.alertForm.updateValueAndValidity({ emitEvent: false });
 
-    this.calculatePagination();
 
     // Defer picker initialization until the form is in the DOM
     setTimeout(() => this.initDatePickers(), 0);
@@ -289,6 +288,11 @@ export class AlertComponent implements OnInit, AfterViewInit {
   }
 
   alertsTable: any
+
+  paginationInfo: any = {
+    pageNumber: 1,
+    pageSize: 1,
+  };
   GetPatientAlertsData() {
     if (this.SearchPatientData == undefined) {
       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
@@ -296,9 +300,10 @@ export class AlertComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.registrationApiService.GetAlertDetailsDb(this.SearchPatientData.table2[0].mrNo).then((res: any) => {
+    this.registrationApiService.GetAlertDetailsDb(this.SearchPatientData.table2[0].mrNo,this.paginationInfo.pageNumber,this.paginationInfo.pageSize).then((res: any) => {
       this.MyAlertsData = [];
       this.alertsTable = res?.alert?.table1 || [];
+      this.totalItems  = res?.alert?.table2?.[0]?.totalRecords || 0;
       if (Array.isArray(this.alertsTable) && this.alertsTable.length > 0) {
         // Normalize to match AlertDTO types and ensure alertId exists as number
         this.MyAlertsData = this.alertsTable.map((it: any) => {
@@ -313,16 +318,18 @@ export class AlertComponent implements OnInit, AfterViewInit {
           return normalized as AlertDTO;
         });
         this.filteredAlertsData = this.MyAlertsData;
-        this.totalItems = this.MyAlertsData.length;
-        this.currentPage = 1; // reset to first page when data reloads
-        this.calculatePagination();
-        this.updatePagedData();
-        console.log(this.MyAlertsData, "alerts");
       }
     }).catch((error: any) => {
       console.error("Failed to fetch alert data", error);
     });
 
+  }
+
+
+  onAlertPageChanged(event: any) {
+    console.log(event);
+    this.paginationInfo.pageNumber = event;
+    this.GetPatientAlertsData();
   }
   GetAlertType() {
 
@@ -376,19 +383,11 @@ export class AlertComponent implements OnInit, AfterViewInit {
     }
 
     const formValue = this.alertForm.value;
-    const ssUserName = (typeof window !== 'undefined' && window?.sessionStorage)
-      ? (sessionStorage.getItem('userName') || '')
-      : '';
-    const effectiveUpdatedBy = formValue.updatedBy || ssUserName;
-    const effectiveEnteredBy = formValue.enteredBy || ssUserName;
     const today = new Date();
     const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
       .toISOString()
       .slice(0, 10);
     const effectiveEnteredDateStr = formValue.enteredDate || todayStr;
-    // updatedDate: prefer form value (set in edit mode), fallback to today
-    const effectiveUpdatedDateStr = formValue.updatedDate || todayStr;
-
     // Additional validation: Start Date is always required; Repeat Date only required in update mode
     let sd = this.parseDMYToDate(formValue.startDate);
     if (!sd) {
@@ -428,8 +427,6 @@ export class AlertComponent implements OnInit, AfterViewInit {
 
     // Determine the id to send for update
     const selectedId = Number(this.editingAlertId || this.alertForm?.get('alertId')?.value || 0) || 0;
-    console.log('Submitting Alert. editingAlertId=', this.editingAlertId, 'form.alertId=', this.alertForm?.get('alertId')?.value, 'selectedId=', selectedId);
-
     const alert = {
       // Ensure backend receives the correct identifier for update
       alertId: selectedId,
@@ -441,12 +438,9 @@ export class AlertComponent implements OnInit, AfterViewInit {
       repeatDate: rd,
       startDate: sd,
       isFinished: String(formValue.status) === '2',
-      enteredBy: effectiveEnteredBy,
+      enteredBy: this.SearchPatientData?.table2?.[0]?.mrNo || null,
       enteredDate: new Date(effectiveEnteredDateStr),
-      // Send updatedDate only in update mode (id > 0); otherwise null
-      updatedDate: selectedId > 0 ? new Date(effectiveUpdatedDateStr) : null,
-      // For new insert (no id), send empty string for UpdatedBy per requirement; for updates, use updatedBy/current user
-      updatedBy: selectedId > 0 ? effectiveUpdatedBy : '',
+      updatedBy: sessionStorage.getItem('userId') || '',
       appointmentId: Number(this.appID) || 0,
       alertTypeId: parseInt(formValue.alertType),
       comments: formValue.message,
@@ -459,19 +453,12 @@ export class AlertComponent implements OnInit, AfterViewInit {
     if (alert.alertId && alert.alertId > 0) {
       (alert as any).AlertId = alert.alertId;
     }
-    // Also mirror UpdatedBy in PascalCase to satisfy strict backends
-    (alert as any).UpdatedBy = alert.updatedBy;
-    // Mirror UpdatedDate in PascalCase to satisfy backends expecting 'UpdateDate'
-    ;(alert as any).UpdatedDate = (alert as any).updatedDate;
-    ;(alert as any).UpdateDate = (alert as any).updatedDate;
 
     // Guard: If user is updating but alertId is 0, stop and inform
     if (this.buttontext === 'update' && (!alert.alertId || alert.alertId === 0)) {
       Swal.fire('Validation Error', 'Cannot update: missing Alert ID. Please reselect the alert to edit.', 'warning');
       return;
     }
-
-    console.log('this.SearchPatientData?.table2[0]?.mrNo =>', this.SearchPatientData?.table2[0]?.mrNo);
 
     // Final payload strictly aligned with working POST sample
     const alert2: AlertDTO = alert;
@@ -670,70 +657,6 @@ export class AlertComponent implements OnInit, AfterViewInit {
 }
 
 
-  get start(): number {
-    return (this.currentPage - 1) * this.pageSize;
-  }
-
-  get end(): number {
-    return Math.min(this.start + this.pageSize, this.totalItems);
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagedData();
-      this.calculatePagination();
-    }
-  }
-
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagedData();
-      this.calculatePagination();
-    }
-  }
-
-  goToPage(page: number) {
-    if (typeof page !== 'number') return;
-    if (page < 1 || page > this.totalPages) return;
-    this.currentPage = page;
-    this.updatePagedData();
-    this.calculatePagination();
-  }
-
-  onPageSizeChange(event: any) {
-    this.pageSize = +event.target.value;
-    this.currentPage = 1;
-    this.calculatePagination();
-    this.updatePagedData();
-  }
-
-  calculatePagination() {
-    this.totalItems = this.MyAlertsData.length;
-    this.totalPages = Math.ceil(this.totalItems / this.pageSize) || 1;
-
-    // Generate page numbers with ellipses like in Demographics
-    const total = this.totalPages;
-    const current = this.currentPage;
-    const delta = 2;
-    const range: (number | string)[] = [];
-    const left = Math.max(2, current - delta);
-    const right = Math.min(total - 1, current + delta);
-
-    range.push(1);
-    if (left > 2) range.push('...');
-    for (let i = left; i <= right; i++) range.push(i);
-    if (right < total - 1) range.push('...');
-    if (total > 1) range.push(total);
-
-    this.pageNumbers = range;
-  }
-
-  private updatePagedData() {
-    this.pagedAlerts = this.MyAlertsData.slice(this.start, this.end);
-  }
-  
   // Compute column class so fields stretch when Repeat Date is hidden
   getFormColClass(): string {
     return this.buttontext === 'update' ? 'col-lg-3' : 'col-lg-4';

@@ -57,6 +57,14 @@
       </div>
 
       <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
+        <label class="form-label">Route</label>
+        <select class="form-select" formControlName="routeId">
+          <option [ngValue]="null">Route</option>
+          <option *ngFor="let r of RouteOptions" [ngValue]="r.routeId">{{ r.name }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
         <label class="form-label">Immunization Start Date</label>
         <input type="date" class="form-control" formControlName="startDate" />
       </div>
@@ -99,13 +107,7 @@
         </select>
       </div>
 
-      <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
-        <label class="form-label">Route</label>
-        <select class="form-select" formControlName="routeId">
-          <option [ngValue]="null">Route</option>
-          <option *ngFor="let r of RouteOptions" [ngValue]="r.routeId">{{ r.name }}</option>
-        </select>
-      </div>
+ 
 
       <div class="col-md-3 col-sm-4 col-12">
         <label class="form-label">Comments</label>
@@ -140,6 +142,7 @@
       <div class="col-lg-4 col-md-4 col-sm-6">
         <!-- <label class="form-label" for="statusFilter">Status</label> -->
         <select id="statusFilter" class="form-select" formControlName="ActiveStatus" (change)="onStatusChange()">
+          <option value="-1" selected>ALL</option>
           <option *ngFor="let st of ActiveStatus" [ngValue]="st.id">{{ st.name }}</option>
         </select>
       </div>
@@ -150,9 +153,9 @@
         <thead>
           <tr class="text-center">
             <th>Provider Name</th>
-            <th>Manufacturer Name</th>
-            <th>Lot Number</th>
-            <th>Expiry Date</th>
+            <th>Type</th>
+            <th>Dose</th>
+            <th>Route</th>
             <th>Immunization Date</th>
             <th>Next Immunization</th>
             <th>Site Immunization</th>
@@ -168,9 +171,9 @@
             @else{
               <td>{{ data.providerName || '-' }} <br> (Out Side Clinic)</td>
             }
-            <td>{{ data.manufacturerName || '-' }}</td>
-            <td>{{ data.lotNumber || '-' }}</td>
-            <td>{{ data.expiryDate ? (data.expiryDate | date:'dd/MM/yyyy') : '-' }}</td>
+            <td>{{ data.immTypeName || '-' }}</td>
+            <td>{{ data.dose || '-' }}</td>
+            <td>{{ data.routeName || '-' }}</td>
             <td>{{ data.startDate ? (data.startDate | date:'dd/MM/yyyy') : '-' }}</td>
             <td>{{ (data.nextInjectionDate ? (data.nextInjectionDate | date:'dd/MM/yyyy') : '-') }}</td>
             <td>{{ data.siteName || '-' }}</td>

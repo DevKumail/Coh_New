@@ -26,6 +26,7 @@ import { Subscription } from 'rxjs';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { ClinicalActivityService } from '@/app/shared/Services/clinical-activity.service';
 
 @Component({
     selector: 'app-procedure',
@@ -87,8 +88,8 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
     ]
 
     Searchby: any = [
-        { code: 1, name: 'Diagnosis Code' },
-        { code: 2, name: 'Diagnosis Code Range' },
+        { code: 1, name: 'CPT Code' },
+        { code: 2, name: 'CPT Code Range' },
         { code: 3, name: 'Description' },
     ];
     checked: any;
@@ -172,6 +173,7 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
         private clinicalApiService: ClinicalApiService,
         private loader: LoaderService,
         private PatientData: PatientBannerService,
+        private clinicalActivityService: ClinicalActivityService,
     ) {}
 
     async ngOnInit() {
@@ -515,7 +517,7 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
             procedure: formData.procedure,
             performedOnFacility: formData.isPerformedOnFacility,
             ProcedureDateTime: formData.startDate,
-            ProcedureEndDateTime: formData.endDate,
+            ProcedureEndDateTime: formData.endDate ?? null,
         };
 
         console.log('Submitting Patient procedure Payload:', problemPayload);
@@ -525,6 +527,23 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
             .SubmitPatientProcedure(problemPayload)
             .then((res: any) => {
                 console.log('my payload', res);
+                
+                // Emit clinical activity
+                const providerName = isOutside 
+                    ? formData.providerName 
+                    : (this.hrEmployees.find((p: any) => p.providerId === formData.providerId)?.name || 'Unknown Provider');
+                const procedureTypeName = this.type.find(t => t.id === formData.procedureType)?.name || 'Unknown Type';
+                this.clinicalActivityService.addActivity({
+                    timestamp: new Date(),
+                    activityType: this.id ? 'update' : 'create',
+                    module: 'Procedure',
+                    providerName: providerName,
+                    mrNo: this.SearchPatientData?.table2?.[0]?.mrNo || '',
+                    patientName: this.SearchPatientData?.table2?.[0]?.patientName || '',
+                    details: problemPayload,
+                    summary: `${procedureTypeName} - ${formData.procedure} (Start: ${formData.startDate}${formData.endDate ? ', End: ' + formData.endDate : ''})`
+                });
+                
                 Swal.fire({
                     icon: 'success',
                     title: 'Submitted Successfully',
@@ -844,7 +863,7 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
             if (result.isConfirmed) {
                 this.loader.show();
                 this.clinicalApiService
-                    .DeletePatientProblem(id)
+                    .DeletePatientProcedure(id)
                     .then((response: any) => {
                         this.GetPatientProcedureData();
                         Swal.fire({

@@ -6,6 +6,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import Swal from 'sweetalert2';
 import { ClinicalApiService } from '../clinical.api.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgIconComponent } from '@ng-icons/core';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
@@ -20,7 +21,8 @@ import { distinctUntilChanged, filter, Subscription } from 'rxjs';
         GenericPaginationComponent,
         TranslatePipe,
         NgIconComponent,
-        FilledOnValueDirective
+        FilledOnValueDirective,
+        NgbNavModule
     ],
     templateUrl: './medication.component.html',
     styleUrl: './medication.component.scss'
@@ -59,6 +61,7 @@ export class MedicationComponent {
     private appointmentIdSubscription!: Subscription;
     AppointmentId: any;
     todayStr: string = '';
+    activeTabId: number = 1;
     constructor(
         private fb: FormBuilder,
         private clinicalApiService: ClinicalApiService,
@@ -309,6 +312,7 @@ export class MedicationComponent {
     onClear() {
         this.MedicationForm.reset();
         this.submitted = false;
+        this.MedicationForm.get('isProviderCheck')?.setValue(false);
         // Re-apply default start date after clearing
         this.MedicationForm.get('startDate')?.setValue(this.todayStr);
     }

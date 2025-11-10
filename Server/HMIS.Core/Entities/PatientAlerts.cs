@@ -62,6 +62,6 @@ public partial class PatientAlerts
     [Column(TypeName = "datetime")]
     public DateTime? StartDate { get; set; }
 
-    [Column(TypeName = "UpdateDate")]
-    public DateTime? UpdateDate { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime? UpdatedDate { get; set; }
 }

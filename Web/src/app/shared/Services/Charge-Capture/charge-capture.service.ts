@@ -125,6 +125,15 @@ export class ChargeCaptureService {
 
     return this.api.get('ChargeCapture/CPTCode', params).toPromise();
   }
+
+
+    GetAllChargeCaptureDiagnosis(AppointmentId:number, PageNumber: any, PageSize: any) {
+	return this.api.get(`ChargeCapture/GetAllChargeCaptureDiagnosis?AppointmentId=${AppointmentId}&pageNumber=${PageNumber}&pageSize=${PageSize}`).toPromise();
+  }
+
+    GetAllChargeCaptureService(AppointmentId:number, PageNumber: any, PageSize: any) {
+	return this.api.get(`ChargeCapture/GetAllChargeCaptureService?AppointmentId=${AppointmentId}&pageNumber=${PageNumber}&pageSize=${PageSize}`).toPromise();
+  }
     
   
 }

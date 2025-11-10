@@ -79,7 +79,7 @@ namespace HMIS.Application.ServiceLogics
                     newPatientProc.IsDeleted = false;
                     newPatientProc.PerformedOnFacility = (bool)patientProcedure.PerformedOnFacility;
                     newPatientProc.ProcedureDateTime = patientProcedure.ProcedureDateTime;
-                    newPatientProc.ProcedureEndDateTime = patientProcedure.ProcedureEndDateTime;
+                    newPatientProc.ProcedureEndDateTime = patientProcedure.ProcedureEndDateTime ?? null;
                     newPatientProc.ProcedureDescription = patientProcedure.ProcedureDescription;
                     newPatientProc.ProcedureType = patientProcedure.ProcedureType ?? null;
                         newPatientProc.ProviderId = patientProcedure.ProviderId;
@@ -106,7 +106,7 @@ namespace HMIS.Application.ServiceLogics
                         patient.IsDeleted = false;
                         patient.PerformedOnFacility = (bool)patientProcedure.PerformedOnFacility;
                         patient.ProcedureDateTime = patientProcedure.ProcedureDateTime;
-                        patient.ProcedureEndDateTime = patientProcedure.ProcedureEndDateTime;
+                        patient.ProcedureEndDateTime = patientProcedure.ProcedureEndDateTime ?? null;
                         patient.ProcedureDescription = patientProcedure.ProcedureDescription;
                         patient.ProcedureType = patientProcedure.ProcedureType;
                             patient.ProviderId = patientProcedure.ProviderId;

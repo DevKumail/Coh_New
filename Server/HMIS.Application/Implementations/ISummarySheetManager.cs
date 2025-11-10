@@ -15,7 +15,7 @@ namespace HMIS.Application.Implementations
 
         //Vital Signs
 
-        Task<DataSet> GetAllVitalSigns(long MRNo, long VisitAccountNo);
+        Task<DataSet> GetAllVitalSigns(int? PageNumber, int? PageSize, long MRNo = 0, long VisitAccountNo = 0);
         Task<DataSet> GetVitalSigns(long id, long VisitAccountNo);
         Task<bool> VSInsert(VitalSign vitalSigns);
         Task<bool> VSUpdate(VitalSign vitalSigns);

@@ -13,13 +13,13 @@ namespace HMIS.Application.Implementations
     {
         //Task<List<PatientChartSocialHistory>> GetAllSocialHistory();
 
-        Task<DataSet> GetAllSocialHistory();
+        Task<DataSet> GetAllSocialHistory(string? MRNo, int? PageNumber, int? PageSize);
         Task<string> CreateSocialHistory(PatientChartFamilyHistoryModel model);
         Task<bool> DeleteSocialHistoryByShId(long shid);
 
    //     Task<List<PatientChartFamilyHistory>> GetAllFamilyHistory();
         Task<string> CreateFamilyHistory(PatientChartFamilyHistoryModel model);
-        Task<DataSet> GetAllFamilyHistory();
+        Task<DataSet> GetAllFamilyHistory(string? MRNo, int? PageNumber, int? PageSize);
         Task<bool> DeleteFamilyHistoryByFHID(long fhid);
     }
 }

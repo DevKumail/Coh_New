@@ -13,7 +13,7 @@
   </ol>
 </nav>
 
-<form  *ngIf="alertForm" [formGroup]="alertForm" (ngSubmit)="onSubmit()">
+<form  *ngIf="alertForm" [formGroup]="alertForm">
   <div class="card p-2 shadow rounded">
     <h5 class="card-title mb-3 fw-bold gap-2">
         <lucide-angular [img]="bellIcon" class="me-2 fs-4"></lucide-angular>
@@ -85,7 +85,7 @@
 
       <div class="d-flex justify-content-end">
       <button type="button" class="btn btn-light" (click)="clearForm()">{{'CLEAR' | translate}}</button>
-      <button type="submit" class="btn btn-primary ms-2"
+      <button type="submit" class="btn btn-primary ms-2" (click)="onSubmit()"
         [title]="!SearchPatientData?.table2?.[0]?.mrNo ? ('PLEASE_LOAD_SELECT_PATIENT' | translate) : (alertForm.invalid ? ('PLEASE_FILL_REQUIRED' | translate) : '')">
         {{ buttontext === 'update' ? ('UPDATE' | translate) : ('SUBMIT' | translate) }}
       </button>
@@ -112,11 +112,12 @@
               </tr>
             </thead>
             <tbody  class="table-group-divider text-center">
-              <tr *ngFor="let item of pagedAlerts">
-                <td class="text-center">{{ getAlertTypeName(item.alertTypeId) }}</td>
+              <tr *ngFor="let item of MyAlertsData">
+                <td class="text-center">{{ getAlertTypeName(item.alertTypeId) || '-' }}</td>
 
-                <td class="text-center">{{ item.startDate|date:'dd/MM/yyyy' }}</td>
-                <td class="text-center">{{ item.repeatDate|date:'dd/MM/yyyy' }}</td>
+                <td class="text-center">{{ item.startDate ? (item.startDate | date: 'dd/MM/yyyy h:mm a') : '-' }}</td>
+                <td>{{ item.repeatDate ? (item.repeatDate | date: 'dd/MM/yyyy h:mm a') : '-' }}</td>
+
                 <td
                   class="text-center message-cell"
                   [ngbTooltip]="item.alertMessage"
@@ -125,13 +126,13 @@
                   triggers="hover focus"
                   style="max-width: 340px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                 >
-                  {{ item.alertMessage }}
+                  {{ item.alertMessage || '-' }}
                 </td>
-                <td class="text-center">{{ item.enteredBy }}</td>
-                <td class="text-center">{{ item.enteredDate|date:'dd/MM/yyyy' }}</td>
+                <td class="text-center">{{ item.enteredBy || '-' }}</td>
+                <td class="text-center">{{ item.enteredDate ? (item.enteredDate | date: 'dd/MM/yyyy h:mm a') : '-' }}</td>
                 <td class="text-center">{{ item.isFinished ? 'Completed' : (item.active ? 'Active' : 'Inactive') }}</td>
-                <td class="text-center">{{ item.updatedBy }}</td>
-                <td class="text-center">{{ item.updateDate | date:'dd/M/yyyy' }}</td>
+                <td class="text-center">{{ item.updatedBy || '-' }}</td>
+                <td class="text-center">{{ item.updateDate ? (item.updateDate | date: 'dd/MM/yyyy h:mm a') : '-' }}</td>
                 <td class="text-center align-middle actions-cell">
                   <div class="d-inline-flex justify-content-center align-items-center gap-2 text-nowrap actions-wrap">
                     <lucide-angular
@@ -147,16 +148,25 @@
                   </div>
                 </td>
               </tr>
-                <tr *ngIf="pagedAlerts?.length === 0">
+                <tr *ngIf="totalItems === 0">
                 <td colspan="10" class="text-center">{{'NO_DATA_FOUND' | translate}}</td>
               </tr>
             </tbody>
           </table>
+              <app-generic-pagination
+              [totalItems]="totalItems"
+              [pageSize]="paginationInfo.RowsPerPage"
+              [currentPage]="paginationInfo.Page"
+              (pageChanged)="onAlertPageChanged($event)"
+            >
+            </app-generic-pagination>    
         </div>
 
                   <!-- Pagination -->
 
-        <div class="d-flex flex-column align-items-center mt-3 gap-2">
+   
+
+        <!-- <div class="d-flex flex-column align-items-center mt-3 gap-2">
           <div class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap">
             <div class="d-flex align-items-center gap-2 flex-wrap">
               <div class="me-2">
@@ -190,7 +200,7 @@
             </nav>
 
           </div>
-        </div>
+        </div> -->
 
       </div>
     </div>

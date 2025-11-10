@@ -237,128 +237,137 @@
     </div>
 
     <div class="card mt-3">
-        <h4 class="p-2">{{ 'CURRENT_MEDICATION' | translate }}</h4>
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped table-sm">
-                    <thead>
-                        <tr class="text-center">
-                            <th>{{ 'PROVIDER' | translate }}</th>
-                            <th style="width: 250px; min-width: 250px; max-width: 250px;">{{ 'RX' | translate }}</th>
-                            <th>{{ 'DOSE' | translate }}</th>
-                            <th>{{ 'DURATION_DAYS' | translate }}</th>
-                            <th>{{ 'START_DATE' | translate }}</th>
-                            <th>{{ 'STOP_DATE' | translate }}</th>
-                            <th>{{ 'ROUTE' | translate }}</th>
-                            <th>{{ 'FREQUENCY' | translate }}</th>
-                            <th>{{ 'GIVEN_DATE' | translate }}</th>
-                            <th>{{ 'CHECKED_DATE' | translate }}</th>
-                            <th>{{ 'COMMENT' | translate }}</th>
-                            <th>{{ 'ACTION' | translate }}</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-group-divider text-center">
-                        <tr *ngFor="let record of currentMedicationData">
-                            <td>{{ record.providerName || '-' }}</td>
-                            <td style="width: 250px; min-width: 250px; max-width: 250px;">{{ record.rx || '-' }}</td>
-                            <td>{{ record.dose || '-' }}</td>
-                            <td>{{ record.duration || '-' }} Day</td>
-                            <td>{{ record.startDate || '-' | date : "dd/MM/yyyy" }}</td>
-                            <td>{{ record.stopDate || '-' | date : "dd/MM/yyyy" }}</td>
-                            <td>{{ record.route || '-' }}</td>
-                            <td>{{ record.frequency || '-' }}</td>
-                            <td>{{ record.givenDate || '-' | date : "dd/MM/yyyy" }}</td>
-                            <td>{{ record.checkedDate || '-' | date : "dd/MM/yyyy" }}</td>
-                            <td>{{ record.comments || '-' }}</td>
-                            <td>
-                                <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
-                                    <ng-icon name="tablerEdit" style="cursor: pointer;" class="me-1" (click)="onEdit(record)">
-                                    </ng-icon>
-                                    <ng-icon name="tablerTrash" style="cursor: pointer;" class="text-danger me-1" (click)="onDelete(record?.medicationId)">
-                                    </ng-icon>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr *ngIf="currentMedicationData.length === 0">
-                            <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <ul ngbNav #nav="ngbNav" [(activeId)]="activeTabId" [destroyOnHide]="false" class="nav nav-tabs mb-3">
+                <li [ngbNavItem]="1">
+                    <a ngbNavLink href="javascript:void(0)">{{ 'CURRENT_MEDICATION' | translate }}</a>
+                    <ng-template ngbNavContent>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>{{ 'PROVIDER' | translate }}</th>
+                                        <th style="width: 250px; min-width: 250px; max-width: 250px;">{{ 'RX' | translate }}</th>
+                                        <th>{{ 'DOSE' | translate }}</th>
+                                        <th>{{ 'DURATION_DAYS' | translate }}</th>
+                                        <th>{{ 'START_DATE' | translate }}</th>
+                                        <th>{{ 'STOP_DATE' | translate }}</th>
+                                        <th>{{ 'ROUTE' | translate }}</th>
+                                        <th>{{ 'FREQUENCY' | translate }}</th>
+                                        <th>{{ 'GIVEN_DATE' | translate }}</th>
+                                        <th>{{ 'CHECKED_DATE' | translate }}</th>
+                                        <th>{{ 'COMMENT' | translate }}</th>
+                                        <th>{{ 'ACTION' | translate }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider text-center">
+                                    <tr *ngFor="let record of currentMedicationData">
+                                        @if(record.providerName){ 
+                                        <td>{{ record.providerName || '-' }}</td>
+                                        }
+                                        @else{
+                                        <td>{{ record.outSideClinicProviderName || '-' }} <br> (Out Side Clinic)</td>
+                                        }                                        <td style="width: 250px; min-width: 250px; max-width: 250px;">{{ record.rx || '-' }}</td>
+                                        <td>{{ record.dose || '-' }}</td>
+                                        <td>{{ record.duration || '-' }} Day</td>
+                                        <td>{{ record.startDate || '-' | date : "dd/MM/yyyy" }}</td>
+                                        <td>{{ record.stopDate || '-' | date : "dd/MM/yyyy" }}</td>
+                                        <td>{{ record.route || '-' }}</td>
+                                        <td>{{ record.frequency || '-' }}</td>
+                                        <td>{{ record.givenDate || '-' | date : "dd/MM/yyyy" }}</td>
+                                        <td>{{ record.checkedDate || '-' | date : "dd/MM/yyyy" }}</td>
+                                        <td>{{ record.comments || '-' }}</td>
+                                        <td>
+                                            <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
+                                                <ng-icon name="tablerEdit" style="cursor: pointer;" class="me-1" (click)="onEdit(record)">
+                                                </ng-icon>
+                                                <ng-icon name="tablerTrash" style="cursor: pointer;" class="text-danger me-1" (click)="onDelete(record?.medicationId)">
+                                                </ng-icon>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="currentMedicationData.length === 0">
+                                        <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <app-generic-pagination [totalItems]="currentMedicationTotalItems"
+                            [pageSize]="currentMedicationPaginationInfo?.RowsPerPage"
+                            [currentPage]="currentMedicationPaginationInfo?.Page"
+                            (pageChanged)="onCurrentMedicationPageChanged($event)">
+                        </app-generic-pagination>
+                    </ng-template>
+                </li>
+                <li [ngbNavItem]="2">
+                    <a ngbNavLink href="javascript:void(0)">{{ 'PAST_MEDICATION' | translate }}</a>
+                    <ng-template ngbNavContent>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm">
+                                <thead>
+                                    <tr class="text-center">
+                                        
+                                        <th>{{ 'PROVIDER' | translate }}</th>
+                                        <th style="width: 250px; min-width: 250px; max-width: 250px;">{{ 'RX' | translate }}</th>
+                                        <th>{{ 'DOSE' | translate }}</th>
+                                        <th>{{ 'DURATION_DAYS' | translate }}</th>
+                                        <th>{{ 'START_DATE' | translate }}</th>
+                                        <th>{{ 'STOP_DATE' | translate }}</th>
+                                        <th>{{ 'ROUTE' | translate }}</th>
+                                        <th>{{ 'FREQUENCY' | translate }}</th>
+                                        <th>{{ 'GIVEN_DATE' | translate }}</th>
+                                        <th>{{ 'CHECKED_DATE' | translate }}</th>
+                                        <th>{{ 'COMMENT' | translate }}</th>
+                                        <th>{{ 'ACTION' | translate }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider text-center">
+                                    <tr *ngFor="let record of PastMedicationData">
+                                        @if(record.providerName){ 
+                                        <td>{{ record.providerName || '-' }}</td>
+                                        }
+                                        @else{
+                                        <td>{{ record.outSideClinicProviderName || '-' }} <br> (Out Side Clinic)</td>
+                                        }
+                                        <td style="width: 250px; min-width: 250px; max-width: 250px;">{{ record.rx || '-' }}</td>
+                                        <td>{{ record.dose || '-' }}</td>
+                                        <td>{{ record.duration || '-' }} Day</td>
+                                        <td>{{ record.startDate || '-' | date : "dd/MM/yyyy" }}</td>
+                                        <td>{{ record.stopDate || '-' | date : "dd/MM/yyyy" }}</td>
+                                        <td>{{ record.route || '-' }}</td>
+                                        <td>{{ record.frequency || '-' }}</td>
+                                        <td>{{ record.givenDate || '-' | date : "dd/MM/yyyy" }}</td>
+                                        <td>{{ record.checkedDate || '-' | date : "dd/MM/yyyy" }}</td>
+                                        <td>{{ record.comments || '-' }}</td>
+                                        <td>
+                                            <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
+                                                <ng-icon name="tablerEdit" style="cursor: pointer;" class="me-1" (click)="onEdit(record)">
+                                                </ng-icon>
+                                                <ng-icon name="tablerTrash" style="cursor: pointer;" class="text-danger me-1" (click)="onDelete(record?.medicationId)">
+                                                </ng-icon>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="PastMedicationData.length === 0">
+                                        <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <app-generic-pagination 
+                            [totalItems]="PastMedicationTotalItems"
+                            [pageSize]="PastMedicationPaginationInfo?.RowsPerPage" 
+                            [currentPage]="PastMedicationPaginationInfo?.Page"
+                            (pageChanged)="onPastMedicationPageChanged($event)">
+                        </app-generic-pagination>
+                    </ng-template>
+                </li>
+            </ul>
+            <div [ngbNavOutlet]="nav"></div>
         </div>
-
-        <app-generic-pagination [totalItems]="currentMedicationTotalItems"
-            [pageSize]="currentMedicationPaginationInfo?.RowsPerPage"
-            [currentPage]="currentMedicationPaginationInfo?.Page"
-            (pageChanged)="onCurrentMedicationPageChanged($event)">
-        </app-generic-pagination>
-    </div>
-
-
-
-    <div class="card mt-3">
-        <h4 class="p-2">{{ 'PAST_MEDICATION' | translate }}</h4>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped table-sm">
-                    <thead>
-                        <tr class="text-center">
-                            <th>{{ 'PROVIDER' | translate }}</th>
-                            <th style="width: 250px; min-width: 250px; max-width: 250px;">{{ 'RX' | translate }}</th>
-                            <th>{{ 'DOSE' | translate }}</th>
-                            <th>{{ 'DURATION_DAYS' | translate }}</th>
-                            <th>{{ 'START_DATE' | translate }}</th>
-                            <th>{{ 'STOP_DATE' | translate }}</th>
-                            <th>{{ 'ROUTE' | translate }}</th>
-                            <th>{{ 'FREQUENCY' | translate }}</th>
-                            <th>{{ 'GIVEN_DATE' | translate }}</th>
-                            <th>{{ 'CHECKED_DATE' | translate }}</th>
-                            <th>{{ 'COMMENT' | translate }}</th>
-                            <th>{{ 'ACTION' | translate }}</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-group-divider text-center">
-                        <tr *ngFor="let record of PastMedicationData">
-                            <td>{{ record.providerName || '-' }}</td>
-                            <td style="width: 250px; min-width: 250px; max-width: 250px;">{{ record.rx || '-' }}</td>
-                            <td>{{ record.dose || '-' }}</td>
-                            <td>{{ record.duration || '-' }} Day</td>
-                            <td>{{ record.startDate || '-' | date : "dd/MM/yyyy" }}</td>
-                            <td>{{ record.stopDate || '-' | date : "dd/MM/yyyy" }}</td>
-                            <td>{{ record.route || '-' }}</td>
-                            <td>{{ record.frequency || '-' }}</td>
-                            <td>{{ record.givenDate || '-' | date : "dd/MM/yyyy" }}</td>
-                            <td>{{ record.checkedDate || '-' | date : "dd/MM/yyyy" }}</td>
-                            <td>{{ record.comments || '-' }}</td>
-                            <td>
-                                <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
-                                    <ng-icon name="tablerEdit" style="cursor: pointer;" class="me-1" (click)="onEdit(record)">
-                                    </ng-icon>
-                                    <ng-icon name="tablerTrash" style="cursor: pointer;" class="text-danger me-1" (click)="onDelete(record?.medicationId)">
-                                    </ng-icon>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr *ngIf="PastMedicationData.length === 0">
-                            <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <app-generic-pagination 
-        [totalItems]="PastMedicationTotalItems"
-        [pageSize]="PastMedicationPaginationInfo?.RowsPerPage" 
-        [currentPage]="PastMedicationPaginationInfo?.Page"
-        (pageChanged)="onPastMedicationPageChanged($event)">
-        </app-generic-pagination>
     </div>
 
 </form>
-
-
-
 
 
 <ng-template #standardModal let-modal>

@@ -16,6 +16,7 @@ import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { AllergyDto} from '@/app/shared/Models/Clinical/allergy.model'
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { ClinicalActivityService } from '@/app/shared/Services/clinical-activity.service';
 
 declare var flatpickr: any;
 
@@ -235,7 +236,8 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
     private router: Router,
     private ClinicalApiService: ClinicalApiService,
     private loader: LoaderService,
-    private PatientData: PatientBannerService) { }
+    private PatientData: PatientBannerService,
+    private clinicalActivityService: ClinicalActivityService) { }
   statusOptions = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
 
 
@@ -363,28 +365,28 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
 
 
   async GetPatientAllergyData() {
-    this.loader.show();
+    // this.loader.show();
     this.allergieTotalItems = 0;
     const mrno = this.SearchPatientData.table2[0].mrNo
     if(!mrno){
       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
-      this.loader.hide();
+      // this.loader.hide();
       return;
     }
-    this.loader.show();
+    // this.loader.show();
      
     await this.ClinicalApiService.GetPatientAllergyData(mrno, this.pagegination.currentPage, this.pagegination.pageSize ).then((res: any) => {
       console.log('res', res);
-      this.loader.hide();
+      // this.loader.hide();
       this.MyAllergiesData = res.allergys?.table1 || [];
       this.allergieTotalItems = res.allergys?.table2[0]?.totalCount || 0;
     })
-    this.loader.hide();
+    // this.loader.hide();
 
   }
 
   async GetAlergyType() {
-    this.loader.show();
+    // this.loader.show();
     console.log('init');
     await this.ClinicalApiService.GetAlergyType().then((res: any) => {
       console.log(res);
@@ -395,15 +397,15 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
     this.loader.hide();
   }
   async GetProviderType() {
-    this.loader.show();
+    // this.loader.show();
     await this.ClinicalApiService.GetAlergyByProviderId().subscribe((res: any) => {
       this.hrEmployees = res.result;
       this.loader.hide();
     })
-    this.loader.show();
+    // this.loader.show();
   }
   async GetSeverityType() {
-    this.loader.show();
+    // this.loader.show();
     await this.ClinicalApiService.GetSeverity().then((res: any) => {
       this.GetSeverity = res.result;
       console.log('GetSeverity', this.GetSeverity);
@@ -547,6 +549,22 @@ submit() {
     this.DropFilled();
     this.GetPatientAllergyData();
     this.isSubmitting = false;
+    
+    // Emit clinical activity
+    const providerName = this.hrEmployees.find(p => p.providerId === formValue.providerId)?.name || 'Unknown Provider';
+    const allergyTypeName = this.GetAlergy?.find((a: any) => a.alergyTypeId === formValue.allergyType)?.alergyName || formValue.allergyType;
+    const severityName = this.GetSeverity?.find((s: any) => s.id === formValue.severity)?.severityName || formValue.severity;
+    this.clinicalActivityService.addActivity({
+      timestamp: new Date(),
+      activityType: this.id ? 'update' : 'create',
+      module: 'Allergy',
+      providerName: providerName,
+      mrNo: this.SearchPatientData?.table2?.[0]?.mrNo || '',
+      patientName: this.SearchPatientData?.table2?.[0]?.patientName || '',
+      details: payload,
+      summary: `${allergyTypeName} - ${formValue.allergen} (${formValue.reaction || 'No reaction noted'}) - Severity: ${severityName || 'Not specified'}`
+    });
+    
     Swal.fire('Success', 'Allergies Successfully Created', 'success');
   }).catch((error: any) => {
     this.isSubmitting = false;

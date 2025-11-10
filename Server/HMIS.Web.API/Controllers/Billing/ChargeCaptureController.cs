@@ -981,6 +981,102 @@ namespace HMIS.Web.Controllers.Billing
         }
         #endregion
 
+        #region Get_AllService
+        [HttpGet("GetAllChargeCaptureService")]
+        public async Task<IActionResult> GetAllChargeCaptureService(long? AppointmentId, int? pageNumber, int? pageSize)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+            var requestMessage = "AppointmentId:" + (AppointmentId == null ? 0 : AppointmentId);
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                DataSet result = await _chargeCaptureManager.GetAllChargeCaptureService(AppointmentId, pageNumber, pageSize);
+
+                elapsed = timerElapsed.StopTimer();
+                if (result != null)
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(result);
+                }
+                else
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        #region Get_AllDiagnosis
+        [HttpGet("GetAllChargeCaptureDiagnosis")]
+        public async Task<IActionResult> GetAllChargeCaptureDiagnosis(long? AppointmentId, int? pageNumber, int? pageSize)
+        {
+            var method = HttpContext.Request.Method;
+            var path = HttpContext.Request.Path;
+            var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+            var requestMessage = "AppointmentId:" + (AppointmentId == null ? 0 : AppointmentId);
+            double elapsed = 0;
+            timerElapsed.StartTimer();
+            try
+            {
+                DataSet result = await _chargeCaptureManager.GetAllChargeCaptureDiagnosis(AppointmentId, pageNumber, pageSize);
+
+                elapsed = timerElapsed.StopTimer();
+                if (result != null)
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return Ok(result);
+                }
+                else
+                {
+                    var statusCode = HttpContext.Response.StatusCode;
+                    var responseMessage = JsonConvert.SerializeObject(result);
+                    var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                    logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+        method, path, statusCode, elapsed, requestMessage, responseMessage);
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var statusCode = HttpContext.Response.StatusCode;
+                var responseMessage = JsonConvert.SerializeObject(ex.Message);
+                var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
+                logger.Information("HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms - Request: {RequestMessage}, Response: {ResponseMessage}",
+    method, path, statusCode, elapsed, requestMessage, responseMessage);
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
         #endregion
     }
 

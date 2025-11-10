@@ -1,7 +1,7 @@
 <div class="tab-content rounded p-1" id="v-pills-tabContent">
   <div class="tab-pane fade" id="v-summary-sheet" role="tabpanel" aria-labelledby="v-pills-home-tab" [class.active]="selected==='summary'" [class.show]="selected==='summary'">
 
-    <div class="row g-3">
+    <div class="row g-1">
 
       <!-- <div class="col-md-12">
         <app-vital-signs></app-vital-signs>
@@ -23,20 +23,39 @@
                 </tr>
               </thead>
               <tbody class="table-group-divider text-center">
-                <tr *ngFor="let e of Encounters">
+                <!-- Skeleton Loader -->
+                <ng-container *ngIf="isLoadingEncounters">
+                  <tr *ngFor="let i of [1,2,3]">
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                  </tr>
+                </ng-container>
+                <!-- Actual Data -->
+                <ng-container *ngIf="!isLoadingEncounters">
+                <tr *ngFor="let e of EncounterData">
                   <td>{{ e.appDateTime | date : "dd/MM/yyyy h:mm a" }}</td>
-                  <td>{{ e.purposeOfVisit }}</td>
-                  <td>{{ getProviderName(e.providerId) }}</td>
+                  <td>{{ e.purposeOfVisit || '-'}}</td>
+                  <td>{{ e.fullName || '-'}}</td>
                 </tr>
-                <tr *ngIf="Encounters.length === 0">
+                <tr *ngIf="EncounterData.length === 0">
                   <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
                 </tr>
+                </ng-container>
               </tbody>
             </table>
+                        <app-generic-pagination
+              [totalItems]="EncounterTotalRecord"
+              [pageSize]="EncounterpaginationInfo.pageSize"
+              [currentPage]="EncounterpaginationInfo.currentPage"
+              (pageChanged)="onEncounterPageChanged($event)"
+            >
+            </app-generic-pagination>
           </div>
         </div>
       </div>
 
+      <!-- Alerts -->
       <div class="col-md-6">
         <div class="card shadow-sm">
           <div class="card-header">{{'ALERTS' | translate}}</div>
@@ -50,22 +69,42 @@
                 </tr>
               </thead>
               <tbody class="table-group-divider text-center">
-                <tr *ngFor="let e of alerts">
-                  <td>{{ e.repeatDate | date : "dd/MM/yyyy h:mm a" }}</td>
-                  <td>{{ e.alertType }}</td>
-                  <td>{{ e.alertMessage }}</td>
-                </tr>
-                <tr *ngIf="alerts.length === 0">
-                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
-                </tr>
+                <!-- Skeleton Loader -->
+                <ng-container *ngIf="isLoadingAlerts">
+                  <tr *ngFor="let i of [1,2,3]">
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                  </tr>
+                </ng-container>
+                <!-- Actual Data -->
+                <ng-container *ngIf="!isLoadingAlerts">
+                  <tr *ngFor="let e of MyAlertsData">
+                    <td>{{ e.repeatDate ? (e.repeatDate | date: 'dd/MM/yyyy h:mm a') : '-' }}</td>
+                    <td>{{ e.name }}</td>
+                    <td>{{ e.alertMessage }}</td>
+                  </tr>
+                  <tr *ngIf="alertTotalItems === 0">
+                    <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
+            <app-generic-pagination
+              [totalItems]="alertTotalItems"
+              [pageSize]="alertPaginationInfo.RowsPerPage"
+              [currentPage]="alertPaginationInfo.Page"
+              (pageChanged)="onAlertPageChanged($event)"
+            >
+            </app-generic-pagination>
           </div>
         </div>
       </div>
-    </div>
+    <!-- </div>
 
-    <div class="row g-3">
+    <div class="row g-3"> -->
+
+      <!-- Medications -->
       <div class="col-md-6">
         <div class="card shadow-sm">
           <div class="card-header">{{'MEDICATIONS' | translate}}</div>
@@ -75,26 +114,50 @@
                 <tr>
                   <th>{{ 'RX' | translate }}</th>
                   <th>{{ 'PROVIDER' | translate }}</th>
-                  <th>{{ 'RX_START_DATE' | translate }}</th>
-                  <th>{{ 'STATUS' | translate }}</th>
+                  <th>{{ 'START_DATE' | translate }}</th>
+                  <th>{{ 'STOP_DATE' | translate }}</th>
                 </tr>
               </thead>
               <tbody class="table-group-divider text-center">
-                <tr *ngFor="let e of medications">
-                  <td>{{ e.code }}</td>
-                  <td>{{ e.providerId }}</td>
-                  <td>{{ e.rxStartDate | date : "dd/MM/yyyy h:mm a" }}</td>
-                  <td>{{ e.status }}</td>
-                </tr>
-                <tr *ngIf="medications.length === 0">
-                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
-                </tr>
+                <!-- Skeleton Loader -->
+                <ng-container *ngIf="isLoadingMedications">
+                  <tr *ngFor="let i of [1,2,3]">
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                  </tr>
+                </ng-container>
+                <!-- Actual Data -->
+                <ng-container *ngIf="!isLoadingMedications">
+                  <tr *ngFor="let e of currentMedicationData">
+                    <td>{{ e.rx }}</td>
+                    @if(e.providerName){
+                      <td>{{ e.providerName }}</td>
+                    } @else {
+                      <td>{{ e.outSideClinicProviderName }} (OSC)</td>
+                    }
+                    <td>{{ e.startDate | date : "dd/MM/yyyy h:mm a" }}</td>
+                    <td>{{ e.stopDate | date : "dd/MM/yyyy h:mm a" }}</td>
+                  </tr>
+                  <tr *ngIf="currentMedicationData.length === 0">
+                    <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
+            <app-generic-pagination
+              [totalItems]="currentMedicationTotalItems"
+              [pageSize]="currentMedicationPaginationInfo.RowsPerPage"
+              [currentPage]="currentMedicationPaginationInfo.Page"
+              (pageChanged)="onCurrentMedicationPageChanged($event)"
+            >
+            </app-generic-pagination>
           </div>
         </div>
       </div>
 
+      <!-- Allergies -->
       <div class="col-md-6">
         <div class="card shadow-sm">
           <div class="card-header">{{'ALLERGIES' | translate}}</div>
@@ -110,22 +173,43 @@
                 </tr>
               </thead>
               <tbody class="table-group-divider text-center">
-                <tr *ngFor="let e of allergies">
-                  <td>{{ e.type }}</td>
-                  <td>{{ e.allergen }}</td>
-                  <td>{{ e.providerId }}</td>
-                  <td>{{ e.rxStartDate | date : "dd/MM/yyyy h:mm a" }}</td>
-                  <td>{{ e.status }}</td>
-                </tr>
-                <tr *ngIf="allergies.length === 0">
-                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
-                </tr>
+                <!-- Skeleton Loader -->
+                <ng-container *ngIf="isLoadingAllergies">
+                  <tr *ngFor="let i of [1,2,3]">
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                  </tr>
+                </ng-container>
+                <!-- Actual Data -->
+                <ng-container *ngIf="!isLoadingAllergies">
+                  <tr *ngFor="let e of MyAllergiesData">
+                    <td>{{ e.alergyName || '-' }}</td>
+                    <td>{{ e.allergen || '-' }}</td>
+                    <td>{{ e.providerName || '-' }}</td>
+                    <td>{{ e.startDate | date : "dd/MM/yyyy h:mm a" }}</td>
+                    <td>{{ e.status || '-' }}</td>
+                  </tr>
+                  <tr *ngIf="allergieTotalItems === 0">
+                    <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
+            <app-generic-pagination
+              [totalItems]="allergieTotalItems"
+              [pageSize]="Allergiepagegination.pageSize"
+              [currentPage]="Allergiepagegination.currentPage"
+              (pageChanged)="onallergiePageChanged($event)"
+            >
+            </app-generic-pagination>
           </div>
         </div>
       </div>
 
+      <!-- MEDICAL HISTORY -->
        <div class="col-md-6">
         <div class="card shadow-sm">
           <div class="card-header">{{'MEDICAL_HISTORY' | translate}}</div>
@@ -140,15 +224,27 @@
                 </tr>
               </thead>
               <tbody class="table-group-divider text-center">
-                <tr *ngFor="let e of medicalHistory">
-                  <td>{{ e.icD9Description }}</td>
-                  <td>{{ e.provider }}</td>
-                  <td>{{ e.startDate | date : "dd/MM/yyyy h:mm a" }}</td>
-                  <td>{{ e.status }}</td>
-                </tr>
-                <tr *ngIf="medicalHistory.length === 0">
-                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
-                </tr>
+                <!-- Skeleton Loader -->
+                <ng-container *ngIf="isLoadingMedicalHistory">
+                  <tr *ngFor="let i of [1,2,3]">
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                  </tr>
+                </ng-container>
+                <!-- Actual Data -->
+                <ng-container *ngIf="!isLoadingMedicalHistory">
+                  <tr *ngFor="let e of medicalHistory">
+                    <td>{{ e.icD9Description }}</td>
+                    <td>{{ e.providerName }}</td>
+                    <td>{{ e.startDate | date : "dd/MM/yyyy h:mm a" }}</td>
+                    <td>{{ e.status }}</td>
+                  </tr>
+                  <tr *ngIf="medicalHistory.length === 0">
+                    <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
             <app-generic-pagination
@@ -162,6 +258,7 @@
         </div>
       </div>
 
+      <!-- PROBLEM LIST -->
        <div class="col-md-6">
         <div class="card shadow-sm">
           <div class="card-header">{{'PROBLEM_LIST' | translate}}</div>
@@ -176,15 +273,27 @@
                 </tr>
               </thead>
               <tbody class="table-group-divider text-center">
-                <tr *ngFor="let e of problemList">
-                  <td>{{ e.problem }}</td>
-                  <td>{{ e.providerId }}</td>
-                  <td>{{ e.startDate | date : "dd/MM/yyyy h:mm a" }}</td>
-                  <td>{{ e.status }}</td>
-                </tr>
-                <tr *ngIf="problemList.length === 0">
-                  <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
-                </tr>
+                <!-- Skeleton Loader -->
+                <ng-container *ngIf="isLoadingProblemList">
+                  <tr *ngFor="let i of [1,2,3]">
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                  </tr>
+                </ng-container>
+                <!-- Actual Data -->
+                <ng-container *ngIf="!isLoadingProblemList">
+                  <tr *ngFor="let e of problemList">
+                    <td>{{ e.icD9Description }}</td>
+                    <td>{{ e.providerName }}</td>
+                    <td>{{ e.startDate | date : "dd/MM/yyyy h:mm a" }}</td>
+                    <td>{{ e.status }}</td>
+                  </tr>
+                  <tr *ngIf="problemList.length === 0">
+                    <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
                    <app-generic-pagination
@@ -198,31 +307,111 @@
         </div>
       </div>
 
-      <!-- <div class="col-md-4">
+      <!-- Immunization -->
+     <div class="col-md-6">
         <div class="card shadow-sm">
-          <div class="card-header">Lab Results</div>
+          <div class="card-header">{{'IMMUNIZATION' | translate}}</div>
           <div class="card-body p-0">
-            <table class="table table-sm table-bordered mb-0">
+             <table class="table table-bordered text-center table-striped table-sm">
               <thead>
                 <tr>
-                  <th>Test</th>
-                  <th>Result</th>
+                  <th>{{ 'TYPE' | translate }}</th>
+                  <th>{{ 'PROVIDER' | translate }}</th>
+                  <th>{{ 'START_DATE' | translate }}</th>
+                  <th>{{ 'STATUS' | translate }}</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>HbA1c</td>
-                  <td>6.5%</td>
-                </tr>
-                <tr>
-                  <td>Cholesterol</td>
-                  <td>180 mg/dL</td>
-                </tr>
+              <tbody class="table-group-divider text-center">
+                <!-- Skeleton Loader -->
+                <ng-container *ngIf="isLoadingImmunization">
+                  <tr *ngFor="let i of [1,2,3]">
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                  </tr>
+                </ng-container>
+                <!-- Actual Data -->
+                <ng-container *ngIf="!isLoadingImmunization">
+                  <tr *ngFor="let e of immunizationList">
+                    <td>{{ e.immTypeName  || '-'}}</td>
+                    @if(e.fullName){
+                      <td>{{ e.fullName || '-'}}</td>
+                    } @else{
+                      <td>{{e.providerName || '-'}}(OSC)</td>
+                    }
+                    <td>{{ e.startDate ? (e.startDate | date: 'dd/MM/yyyy h:mm a') : '-' }}</td>
+                    <td>{{ e.status == 1 ? 'Active' : 'Inactive' }}</td>
+                  </tr>
+                  <tr *ngIf="immunizationList.length === 0">
+                    <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
+                   <app-generic-pagination
+              [totalItems]="totalimmunizationCount"
+              [pageSize]="immunizationPaginationInfo.PageSize"
+              [currentPage]="immunizationPaginationInfo.PageNumber"
+              (pageChanged)="onImmunizationPageChanged($event)"
+            >
+            </app-generic-pagination>
           </div>
         </div>
-      </div> -->
+      </div>
+
+     <!-- Procedure -->
+     <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header">{{'PROCEDURE' | translate}}</div>
+          <div class="card-body p-0">
+             <table class="table table-bordered text-center table-striped table-sm">
+              <thead>
+                <tr>
+                  <th>{{ 'PROCEDURE' | translate }}</th>
+                  <th>{{ 'PROVIDER' | translate }}</th>
+                  <th>{{ 'START_DATE' | translate }}</th>
+                  <th>{{ 'STATUS' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody class="table-group-divider text-center">
+                <!-- Skeleton Loader -->
+                <ng-container *ngIf="isLoadingProcedure">
+                  <tr *ngFor="let i of [1,2,3]">
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                  </tr>
+                </ng-container>
+                <!-- Actual Data -->
+                <ng-container *ngIf="!isLoadingProcedure">
+                  <tr *ngFor="let e of procedureHistoryData">
+                    <td>{{ e.procedureDescription  || '-'}}</td>
+                    @if(e.provider){
+                      <td>{{ e.provider || '-'}}</td>
+                    } @else{
+                      <td>{{e.providerName || '-'}}(OSC)</td>
+                    }
+                    <td>{{ e.startDate ? (e.startDate | date: 'dd/MM/yyyy h:mm a') : '-' }}</td>
+                    <td>{{ e.status || 'Inactive' }}</td>
+                  </tr>
+                  <tr *ngIf="procedureTotalItems === 0">
+                    <td colspan="8">{{ 'NO_DATA_FOUND' | translate }}</td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+                   <app-generic-pagination
+              [totalItems]="procedureTotalItems"
+              [pageSize]="procedurePaginationInfo.RowsPerPage"
+              [currentPage]="procedurePaginationInfo.Page"
+              (pageChanged)="onProcedurePageChanged($event)"
+            >
+            </app-generic-pagination>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -245,6 +434,18 @@
   <div class="tab-pane fade" id="v-medical-history" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'medical-history'" [class.show]="selected === 'medical-history'">
     <div class="row g-3">
       <app-medical-history></app-medical-history>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="v-social-history" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'social-history'" [class.show]="selected === 'social-history'">
+    <div class="row g-3">
+      <app-social-history></app-social-history>
+    </div>
+  </div>
+
+ <div class="tab-pane fade" id="v-family-history" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'family-history'" [class.show]="selected === 'family-history'">
+    <div class="row g-3">
+      <app-family-history></app-family-history>
     </div>
   </div>
 
@@ -277,6 +478,12 @@
   <div class="tab-pane fade" id="v-procedures" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'procedures'" [class.show]="selected === 'procedures'">
     <div class="row g-3">
       <app-procedure></app-procedure>
+    </div>
+  </div>
+
+   <div class="tab-pane fade" id="v-chargecapture" role="tabpanel" aria-labelledby="v-pills-profile-tab" [class.active]="selected === 'chargecapture'" [class.show]="selected === 'chargecapture'">
+    <div class="row g-3">
+      <app-charge-capture></app-charge-capture>
     </div>
   </div>
 

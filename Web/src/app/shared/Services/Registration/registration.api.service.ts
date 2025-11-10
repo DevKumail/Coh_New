@@ -46,8 +46,8 @@ export class RegistrationApiService {
         return this.api.get('AllDropdowns/GetAlertType').toPromise();
     }
 
-    GetAlertDetailsDb(mrno: string): Promise<any> {
-        const url = `Alert/GetAlertDeatilsDB?mrno=${mrno}`;
+    GetAlertDetailsDb(mrno: string, pageNumber: number, pageSize: number ): Promise<any> {
+        const url = `Alert/GetAlertDeatilsDB?mrno=${mrno}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
         return this.api.get(url).toPromise();
     }
 

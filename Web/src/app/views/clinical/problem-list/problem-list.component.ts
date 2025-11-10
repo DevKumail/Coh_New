@@ -423,7 +423,7 @@ minDateValidator(otherControlName: string) {
 
 
   async GetPatientProblemData() {
-  this.loader.show();
+  // this.loader.show();
   this.medicalHistoryData = [];
   this.problemTotalItems = 0;
 
@@ -432,11 +432,11 @@ minDateValidator(otherControlName: string) {
   const userId = userIdStr ? Number(userIdStr) : 0;
   if (!mrNo || !userId) {
     Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
-    this.loader.hide();
+    // this.loader.hide();
     return;
   }
 
-  this.loader.show();
+  // this.loader.show();
    ;
   console.log('mrNo =>', mrNo);
 
@@ -448,7 +448,7 @@ minDateValidator(otherControlName: string) {
     this.MHPaginationInfo.RowsPerPage
   ).then((res: any) => {
     console.log('res', res);
-    this.loader.hide();
+    // this.loader.hide();
 
     this.medicalHistoryData = res.patientProblems?.table1 || [];
     this.problemTotalItems = res.patientProblems?.table2?.[0]?.totalCount || 0;

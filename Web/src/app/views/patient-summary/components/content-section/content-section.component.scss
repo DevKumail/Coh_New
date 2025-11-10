@@ -38,3 +38,22 @@
 .tab-content::-webkit-scrollbar-thumb:hover {
   background: rgba(71,85,105,0.8);     /* darker on hover */
 }
+
+/* Skeleton Loader Styles */
+.skeleton-loader {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+
