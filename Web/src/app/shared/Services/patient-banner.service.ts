@@ -16,6 +16,9 @@ export class PatientBannerService {
 
   private patientDataSource = new BehaviorSubject<any>(null);
   patientData$ = this.patientDataSource.asObservable();
+  
+  private patientIVFDataSource = new BehaviorSubject<any>(null);
+  patientIVFData$ = this.patientIVFDataSource.asObservable();
 
   private visitAppointmentsSource = new BehaviorSubject<any[]>([]);
   visitAppointments$ = this.visitAppointmentsSource.asObservable();
@@ -26,6 +29,10 @@ export class PatientBannerService {
   private selectedVisit = new BehaviorSubject<any>(null);
   selectedVisit$ = this.selectedVisit.asObservable();
 
+  
+  private Isbanneropen = new BehaviorSubject<any>(null);
+  Isbanneropen$ = this.Isbanneropen.asObservable();
+
   data = new Subject<boolean>() 
 
   constructor(private store: PatientBannerStoreService) {
@@ -35,6 +42,7 @@ export class PatientBannerService {
       if (doc.patientData !== undefined) this.patientDataSource.next(doc.patientData);
       if (doc.visitAppointments !== undefined) this.visitAppointmentsSource.next(doc.visitAppointments);
       if (doc.selectedVisit !== undefined) this.selectedVisit.next(doc.selectedVisit);
+
     });
     // Legacy sessionStorage rehydration (commented)
     // try {
@@ -54,6 +62,26 @@ export class PatientBannerService {
   setPatientData(data: any) {
     this.patientDataSource.next(data);
     void this.store.set({ patientData: data });
+    // Legacy sessionStorage (commented)
+    // try {
+    //   if (data === null || data === undefined) sessionStorage.removeItem(this.STORAGE_KEYS.patientData);
+    //   else sessionStorage.setItem(this.STORAGE_KEYS.patientData, JSON.stringify(data));
+    // } catch {}
+  }
+
+  getIVFPatientData(): any | null {
+    try {
+      const raw = {};
+      //  sessionStorage.getItem(this.STORAGE_KEYS.patientIVFData);     
+       return raw;
+    } catch {
+      return null;
+    }
+  }
+
+  setIVFPatientData(data: any) {
+    this.patientIVFDataSource.next(data);
+    void this.store.set({ patientIVFData: data });
     // Legacy sessionStorage (commented)
     // try {
     //   if (data === null || data === undefined) sessionStorage.removeItem(this.STORAGE_KEYS.patientData);
@@ -116,6 +144,10 @@ export class PatientBannerService {
     } catch {
       return null;
     }
+  }
+
+    setIsbanneropen(isOpen: boolean = true) {
+      this.Isbanneropen.next(isOpen);
   }
 }
 

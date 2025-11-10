@@ -10,6 +10,7 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { NgIcon } from '@ng-icons/core';
 import { Router } from '@angular/router';
+import { take } from 'rxjs/operators';
  
 
 @Component({
@@ -23,6 +24,7 @@ import { Router } from '@angular/router';
 })
 export class IVFHomeComponent {
   form: FormGroup;
+  couple: { female?: any; male?: any } | null = null;
   selectedTab: 'messages' | 'lab' | 'consents' | 'application' = 'messages';
   overview: Array<{
     woman: string;
@@ -45,21 +47,48 @@ export class IVFHomeComponent {
   constructor(
     private fb: FormBuilder, 
     private router: Router,
-    private secureStorage: SecureStorageService
+    private secureStorage: SecureStorageService,
+    private patientBannerService : PatientBannerService,
   ) {
     this.form = this.fb.group({
       femaleId: ['5'],
-      maleId: ['2']
     });
   }
   ngOnInit() {
-    this.secureStorage.getItem('testKey');
+    console.log('IVF Home initialized', this.patientBannerService.getPatientData());
+    // Ensure patient banner stays closed on IVF Home
+    // try {
+    //   this.patientBannerService.setPatientData(null);
+    //   this.patientBannerService.setVisitAppointments([] as any);
+    //   this.patientBannerService.setSelectedVisit(null);
+    // } catch {}
+
+    this.patientBannerService.setIsbanneropen(false);
+
+    // If an MRNo already exists in patient banner data, call GetCouple once
+    this.patientBannerService.patientData$.pipe(take(1)).subscribe((pd: any) => {
+      const mrNo = pd?.MRNo ?? pd?.mrno ?? pd?.mrNo ?? pd?.MrNo;
+      if (!mrNo) return;
+      this.ivfApi.getCoupleData(String(mrNo)).subscribe({
+        next: (res: any) => {
+          this.handleCoupleResponse(res);
+          // keep banner closed even after fetching
+          try { 
+            // this.patientBannerService.setPatientData(null);
+
+           } catch {}
+          // TODO: handle couple data if needed
+        },
+        error: (err: any) => {
+          console.error('Failed to fetch IVF couple data (init)', err);
+        }
+      });
+    });
   }
 
   // subscribe to IVF search events published by topbar
   private ivfSearch = inject(IvfSearchService);
   private ivfApi = inject(IVFApiService);
-  private patientBannerService = inject(PatientBannerService);
   private ivfSearchSub: any;
 
   ngAfterViewInit() {
@@ -70,9 +99,10 @@ export class IVFHomeComponent {
       this.ivfApi.getCoupleData(mrNo).subscribe({
         next: (res: any) => {
           console.log('IVF couple data (from ivf-home):', res);
+          this.handleCoupleResponse(res);
           // Keep patient banner closed for IVF searches
           try {
-            this.patientBannerService.setPatientData(null);
+            // this.patientBannerService.setPatientData(null);
           } catch (e) {
             // service may not be available in some contexts
           }
@@ -86,6 +116,7 @@ export class IVFHomeComponent {
   }
 
   ngOnDestroy(): void {
+    this.patientBannerService.setIsbanneropen(true);
     if (this.ivfSearchSub) {
       this.ivfSearchSub.unsubscribe();
     }
@@ -96,4 +127,12 @@ export class IVFHomeComponent {
     this.router.navigate([`/ivf/patient-summary`], { queryParams: { id: side === 'female' ? this.form.value.femaleId : this.form.value.maleId } });
     console.log('View summary clicked for', side, 'ID:', side === 'female' ? this.form.value.femaleId : this.form.value.maleId);
   }
+
+  private handleCoupleResponse(res: any) {
+    // API returns { couple: { female, male } }
+    this.couple = res?.couple ?? res ?? null;
+  }
+
+
+
 }

@@ -167,7 +167,9 @@ export class TopbarComponent implements OnInit {
         if (res?.table2?.length > 0) {
           this.patientBannerService.setPatientData(res);
           console.log('topbar Patient Data:', res);
-          this.showPatientBanner = true;
+              if(this.router.url != '/ivf/dashboard' ){
+              this.showPatientBanner = true;
+              }
     this.demographicapi
         } else {
           this.patientBannerService.setPatientData(null);

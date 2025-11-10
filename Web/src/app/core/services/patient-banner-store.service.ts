@@ -5,6 +5,7 @@ import { DbService } from './db.service';
 export interface PatientBannerDocType {
   id: string; // 'current'
   patientData: any | null;
+  patientIVFData: any | null;
   visitAppointments: any[];
   selectedVisit: any | null;
   updatedAt: number;
@@ -20,6 +21,7 @@ const schema: RxJsonSchema<PatientBannerDocType> = {
   properties: {
     id: { type: 'string', maxLength: 50 },
     patientData: { type: 'object' },
+    patientIVFData: { type: 'object' },
     visitAppointments: { type: 'array', items: { type: 'object' } },
     selectedVisit: { type: 'object' },
     updatedAt: { type: 'number' }
