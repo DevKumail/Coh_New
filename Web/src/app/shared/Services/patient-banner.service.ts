@@ -35,7 +35,8 @@ export class PatientBannerService {
       if (doc.patientData !== undefined) this.patientDataSource.next(doc.patientData);
       if (doc.visitAppointments !== undefined) this.visitAppointmentsSource.next(doc.visitAppointments);
       if (doc.selectedVisit !== undefined) this.selectedVisit.next(doc.selectedVisit);
-      if (doc.payerInfo !== undefined) this.payerInfo.next(doc.payerInfo);
+      const payerInfo = (doc as any)?.payerInfo;
+      if (payerInfo !== undefined) this.payerInfo.next(payerInfo);
     });
     // Legacy sessionStorage rehydration (commented)
     // try {
@@ -53,8 +54,27 @@ export class PatientBannerService {
   }
 
   setPatientData(data: any) {
+    const prev = this.patientDataSource.value;
+    const prevMrNo = this.extractMrNo(prev);
+    const nextMrNo = this.extractMrNo(data);
+
+    // If clearing, wipe all dependent state and RxDB doc
+    if (data === null || data === undefined) {
+      void this.clearAll();
+      return;
+    }
+
+    // If switching to a different patient, reset dependent state
+    const isSwitch = prevMrNo && nextMrNo && prevMrNo !== nextMrNo;
     this.patientDataSource.next(data);
-    void this.store.set({ patientData: data });
+    if (isSwitch) {
+      this.visitAppointmentsSource.next([]);
+      this.selectedVisit.next(null);
+      this.payerInfo.next([]);
+      void this.store.set({ patientData: data, visitAppointments: [], selectedVisit: null, payerInfo: [] } as any);
+    } else {
+      void this.store.set({ patientData: data });
+    }
     // Legacy sessionStorage (commented)
     // try {
     //   if (data === null || data === undefined) sessionStorage.removeItem(this.STORAGE_KEYS.patientData);
@@ -84,7 +104,7 @@ export class PatientBannerService {
 
   setPayerInfo(payerInfo: any[]) {
     this.payerInfo.next(payerInfo ?? []);
-    void this.store.set({ payerInfo: payerInfo ?? [] });
+    void this.store.set({ payerInfo: payerInfo ?? [] } as any);
     // Legacy sessionStorage (commented)
     // try {
     //   if (!payerInfo || payerInfo.length === 0) sessionStorage.removeItem(this.STORAGE_KEYS.payerInfo);
@@ -107,6 +127,23 @@ export class PatientBannerService {
 
   getPayerInfo(): any[] | any | null {
     return this.payerInfo.value ?? null;
+  }
+
+  // Clear all banner-related state (in-memory and RxDB)
+  async clearAll(): Promise<void> {
+    this.patientDataSource.next(null);
+    this.visitAppointmentsSource.next([]);
+    this.selectedVisit.next(null);
+    this.payerInfo.next([]);
+    await this.store.clear();
+  }
+
+  private extractMrNo(src: any): string | null {
+    try {
+      return src?.table2?.[0]?.mrNo || null;
+    } catch {
+      return null;
+    }
   }
 }
 
