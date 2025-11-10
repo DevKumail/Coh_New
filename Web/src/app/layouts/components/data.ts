@@ -279,6 +279,14 @@ export const horizontalMenuItems: MenuItemType[] = [
     //         },
     //     ],
     // },
+
+
+    {
+        label: 'cryo management',
+        icon: 'tablerRocket',
+        module: 'Cryo Manager',
+        url: '/cryo/cryo-management',
+    },
     
     {
         label: 'IVF',
