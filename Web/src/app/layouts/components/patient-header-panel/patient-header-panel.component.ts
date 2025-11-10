@@ -68,6 +68,7 @@ export class PatientHeaderPanelComponent implements OnInit {
     private secureStorage: SecureStorageService,
   ) { }
 
+  
   closeBanner() {
     this.visible = false;
     this.patientBannerService.setPatientData(null);

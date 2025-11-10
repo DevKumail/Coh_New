@@ -20,6 +20,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
+import { IvfSearchService } from '@/app/shared/Services/IVF/ivf-search.service';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { AdvanceSearchModalComponent } from "./components/advance-search-modal/advance-search-modal.component";
 import Swal from 'sweetalert2';
@@ -77,6 +78,7 @@ export class TopbarComponent implements OnInit {
   @Output() patientBannerToggle = new EventEmitter<boolean>();
   showPatientBanner = true;
   private demographicapi = inject(DemographicApiServices);
+  private ivfSearch = inject(IvfSearchService);
 
   toggleSidebar() {
     const html = document.documentElement;
@@ -128,8 +130,16 @@ export class TopbarComponent implements OnInit {
 
   onSearchClick() {
     if (this.mrNo && this.mrNo.length >= 3) {
-      this.searchPatient(this.mrNo);
-      this.searchAppointment(this.mrNo);
+      // If we are on an IVF route, treat the search as coming from the IVF dashboard
+      const isIvfRoute = !!(this.router && this.router.url && this.router.url.indexOf('/ivf') !== -1);
+      if (isIvfRoute) {
+        // Publish IVF search event and do not open the patient banner here.
+        this.ivfSearch.publishSearch(this.mrNo);
+        this.searchAppointment(this.mrNo);
+      } else {
+        this.searchPatient(this.mrNo);
+        this.searchAppointment(this.mrNo);
+      }
     } else {
       this.patientBannerService.setPatientData(null);
       this.patientBannerService.setVisitAppointments(null);

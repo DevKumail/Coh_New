@@ -1,86 +1,200 @@
-<form [formGroup]="form" class="container-fluid">
+<form [formGroup]="form" class="container-fluid mw-100 w-100">
   <div class="row g-3 align-items-stretch">
-    <div class="col-12 col-xl-3">
-      <div class="card h-100 compact-card">
-        <div class="card-body">
-          <div class="d-flex gap-3 align-items-center mb-3">
-            <div class="avatar"></div>
-            <div class="flex-grow-1">
-              <div class="fw-semibold">Female</div>
-              <div class="text-muted small">ID</div>
-            </div>
-            <button type="button" class="btn btn-sm btn-outline-secondary btn-icon rounded-circle ms-auto" title="View summary" (click)="viewSummary('female')" aria-label="View female summary">
-              <ng-icon name="tablerUser" class="fs-lg"></ng-icon>
-            </button>
-          </div>
-          <div class="mb-2">
-            <label for="femaleId" class="form-label small mb-1">Female ID</label>
-            <input id="femaleId" type="text" class="form-control form-control-sm" formControlName="femaleId" />
-          </div>
-          <div class="d-grid gap-2 mb-3">
-            <button type="button" class="btn btn-outline-secondary btn-sm">Demographics</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm">Medical history</button>
-          </div>
-          <div class="mb-2 fw-semibold small">Diagnostics</div>
-          <div class="d-grid gap-2">
-            <button type="button" class="btn btn-outline-secondary btn-sm">Lab diagnostics</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm">Female exam.</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="col-12 col-xl-6">
-      <div class="card h-100">
-        <div class="card-header py-2">
-          <ul class="nav nav-tabs card-header-tabs small">
-            <li class="nav-item"><button class="nav-link" [class.active]="selectedTab==='messages'" (click)="selectedTab='messages'">Messages</button></li>
-            <li class="nav-item"><button class="nav-link" [class.active]="selectedTab==='lab'" (click)="selectedTab='lab'">Lab tests</button></li>
-            <li class="nav-item"><button class="nav-link" [class.active]="selectedTab==='consents'" (click)="selectedTab='consents'">Consents</button></li>
-            <li class="nav-item"><button class="nav-link" [class.active]="selectedTab==='application'" (click)="selectedTab='application'">Application</button></li>
-          </ul>
-        </div>
-        <div class="card-body text-center text-muted small py-5">
-          <ng-container [ngSwitch]="selectedTab">
-            <div *ngSwitchDefault>&lt;No data to display&gt;</div>
-            <div *ngSwitchCase="'lab'">&lt;No data to display&gt;</div>
-            <div *ngSwitchCase="'consents'">&lt;No data to display&gt;</div>
-            <div *ngSwitchCase="'application'">&lt;No data to display&gt;</div>
-          </ng-container>
+      <div class="card h-100 compact-card">
+        <div class="card-body position-relative">
+          <a type="button" (click)="viewSummary('female')" title="View Female Summary"  class=" position-absolute top-0 end-0 mt-2 me-2">Move to Patient Summary</a>
+          <div class="d-flex gap-3 align-items-center mb-3">
+            <div >
+              <img
+                src="data:image/png;base64,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"
+                alt="Patient"
+                class="rounded-circle"
+                style="object-fit: cover; height: 100px; width: 100px"
+              />
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">Asma Othman Al Hammadi</div>
+              <div class="fw-semibold">
+                10/11/1981 
+                <span class="text-primary ms-1">(44 y)</span>
+              </div>
+              <div class="text-muted">MR No: 1006</div>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">
+                <svg class="icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--ng-icon__stroke-width, 2)"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"></path></svg> 
+                03334567345
+              </div>
+              <div class="fw-semibold ">
+                <svg class="icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--ng-icon__stroke-width, 2)"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"></path><path d="M3 7l9 6l9 -6"></path></svg> 
+                Asma&#64;gmail.com
+              </div>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">EID: 784-1234-1234567-1</div>
+              <div class="fw-semibold">Nationality: Emirati</div>
+            </div>
+            <!-- <button type="button" class="btn btn-sm btn-outline-secondary btn-icon rounded-circle ms-auto" title="View summary" (click)="viewSummary('female')" aria-label="View female summary">
+              <ng-icon name="tablerUser" class="fs-lg"></ng-icon>
+            </button> -->
+          </div>
+          <div class="row g-3">
+            <div class="col-4 col-md-3">
+              <ul class="nav nav-pills flex-column" id="femaleTabs" role="tablist">
+                <!-- <li class="nav-item mb-2" role="presentation">
+                  <button class="nav-link active" id="female-demographics-tab" data-bs-toggle="pill" data-bs-target="#female-demographics" type="button" role="tab">Demographics</button>
+                </li> -->
+                <li class="nav-item mb-2" role="presentation">
+                  <button class="nav-link" id="female-medical-tab" data-bs-toggle="pill" data-bs-target="#female-medical" type="button" role="tab">Medical history</button>
+                </li>
+                <li class="nav-item mb-2" role="presentation">
+                  <button class="nav-link" id="female-lab-tab" data-bs-toggle="pill" data-bs-target="#female-lab" type="button" role="tab">Lab tests</button>
+                </li>
+                <li class="nav-item mb-2" role="presentation">
+                  <button class="nav-link" id="female-consent-tab" data-bs-toggle="pill" data-bs-target="#female-consent" type="button" role="tab">Consent</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="female-exam-tab" data-bs-toggle="pill" data-bs-target="#female-exam" type="button" role="tab">Female exam.</button>
+                </li>
+              </ul>
+            </div>
+            <div class="col-8 col-md-9 order-md-1">
+              <div class="tab-content">
+                <!-- <div class="tab-pane fade show active" id="female-demographics" role="tabpanel" aria-labelledby="female-demographics-tab">
+                  <div class="table-responsive">
+                    <table class="table table-sm mb-0 align-middle">
+                      <tbody>
+                        <tr>
+                          <td class="text-muted">No data to display</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div> -->
+                <div class="tab-pane fade" id="female-medical" role="tabpanel" aria-labelledby="female-medical-tab">
+                  <div class="table-responsive">
+                    <table class="table table-sm table-striped table-hover table-bordered mb-0 align-middle">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Visit account number</th>
+                          <th>Date</th>
+                          <th>Provider name</th>
+                          <th>Purpose</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td colspan="5" class="text-center text-muted py-4">No data to display</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="female-lab" role="tabpanel" aria-labelledby="female-lab-tab">
+                  <div class="table-responsive">
+                    <table class="table table-sm table-striped table-hover table-bordered mb-0 align-middle">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Test Name</th>
+                          <th>Order ID</th>
+                          <th>Comments</th>
+                          <th>Sample Due Date</th>
+                          <th>Material</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td colspan="5" class="text-center text-muted py-4">No data to display</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="female-consent" role="tabpanel" aria-labelledby="female-consent-tab">
+                  <div class="table-responsive"><table class="table table-sm mb-0"><tbody><tr><td class="text-muted">No data to display</td></tr></tbody></table></div>
+                </div>
+                <div class="tab-pane fade" id="female-exam" role="tabpanel" aria-labelledby="female-exam-tab">
+                  <div class="table-responsive"><table class="table table-sm mb-0"><tbody><tr><td class="text-muted">No data to display</td></tr></tbody></table></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="col-12 col-xl-3">
+    <div class="col-12 col-xl-6">
       <div class="card h-100 compact-card">
         <div class="card-body">
-          <div class="d-flex gap-3 align-items-center mb-3">
-            <div class="avatar"></div>
+          <div class="d-flex  gap-3 align-items-center mb-3">
+            <div>
+              <img
+                src="data:image/webp;base64,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" alt="Male Patient"
+                class="rounded-circle"
+                style="object-fit: cover; height: 100px; width: 100px"
+              />
+            </div>
             <div class="flex-grow-1">
-              <div class="fw-semibold">Male</div>
-              <div class="text-muted small">ID</div>
+              <div class="fw-semibold">Male Name</div>
             </div>
             <button type="button" class="btn btn-sm btn-outline-secondary btn-icon rounded-circle ms-auto" title="View summary" (click)="viewSummary('male')" aria-label="View male summary">
               <ng-icon name="tablerUser" class="fs-lg"></ng-icon>
             </button>
           </div>
-          <div class="mb-2">
-            <label for="maleId" class="form-label small mb-1">Male ID</label>
-            <input id="maleId" type="text" class="form-control form-control-sm" formControlName="maleId" />
-          </div>
-          <div class="d-grid gap-2 mb-3">
-            <button type="button" class="btn btn-outline-secondary btn-sm">Demographics</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm">Medical history</button>
-          </div>
-          <div class="mb-2 fw-semibold small">Diagnostics</div>
-          <div class="d-grid gap-2">
-            <button type="button" class="btn btn-outline-secondary btn-sm">Lab diagnostics</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm">Male exam.</button>
+          <div class="row g-3">
+            <div class="col-4 col-md-3 order-md-2">
+              <ul class="nav nav-pills flex-column" id="maleTabs" role="tablist">
+                <!-- <li class="nav-item mb-2" role="presentation">
+                  <button class="nav-link active" id="male-demographics-tab" data-bs-toggle="pill" data-bs-target="#male-demographics" type="button" role="tab">Demographics</button>
+                </li> -->
+                <li class="nav-item mb-2" role="presentation">
+                  <button class="nav-link" id="male-medical-tab" data-bs-toggle="pill" data-bs-target="#male-medical" type="button" role="tab">Medical history</button>
+                </li>
+                <li class="nav-item mb-2" role="presentation">
+                  <button class="nav-link" id="male-lab-tab" data-bs-toggle="pill" data-bs-target="#male-lab" type="button" role="tab">Lab tests</button>
+                </li>
+                <li class="nav-item mb-2" role="presentation">
+                  <button class="nav-link" id="male-consent-tab" data-bs-toggle="pill" data-bs-target="#male-consent" type="button" role="tab">Consent</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="male-exam-tab" data-bs-toggle="pill" data-bs-target="#male-exam" type="button" role="tab">Male exam.</button>
+                </li>
+              </ul>
+            </div>
+            <div class="col-8 col-md-9">
+              <div class="tab-content">
+                <div class="tab-pane fade show active" id="male-demographics" role="tabpanel" aria-labelledby="male-demographics-tab">
+                  <div class="table-responsive">
+                    <table class="table table-sm mb-0 align-middle">
+                      <tbody>
+                        <tr>
+                          <td class="text-muted">No data to display</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="male-medical" role="tabpanel" aria-labelledby="male-medical-tab">
+                  <div class="table-responsive"><table class="table table-sm mb-0"><tbody><tr><td class="text-muted">No data to display</td></tr></tbody></table></div>
+                </div>
+                <div class="tab-pane fade" id="male-lab" role="tabpanel" aria-labelledby="male-lab-tab">
+                  <div class="table-responsive"><table class="table table-sm mb-0"><tbody><tr><td class="text-muted">No data to display</td></tr></tbody></table></div>
+                </div>
+                <div class="tab-pane fade" id="male-consent" role="tabpanel" aria-labelledby="male-consent-tab">
+                  <div class="table-responsive"><table class="table table-sm mb-0"><tbody><tr><td class="text-muted">No data to display</td></tr></tbody></table></div>
+                </div>
+                <div class="tab-pane fade" id="male-exam" role="tabpanel" aria-labelledby="male-exam-tab">
+                  <div class="table-responsive"><table class="table table-sm mb-0"><tbody><tr><td class="text-muted">No data to display</td></tr></tbody></table></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
 
   <div class="row g-3 mt-2">
     <div class="col-12">

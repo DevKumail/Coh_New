@@ -1,8 +1,9 @@
-﻿using HMIS.Application.ServiceLogics;
+﻿using HMIS.Application.Implementations;
+using HMIS.Application.ServiceLogics;
+using HMIS.Application.ServiceLogics.IVF;
+using HMIS.ApplicationImplementations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using HMIS.Application.Implementations;
-using HMIS.ApplicationImplementations;
 
 namespace HMIS.Application
 {
@@ -38,6 +39,8 @@ namespace HMIS.Application
             services.AddScoped<ILocalizationSpService, LocalizationSpService>();
             services.AddScoped<IPrescription, PrescriptionManager>();
             services.AddScoped<IAlertManager, AlertManager >();
+            services.AddScoped<IDashboardService, DashboardService>();
+
 
 
         }
