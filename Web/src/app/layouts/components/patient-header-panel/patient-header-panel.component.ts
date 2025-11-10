@@ -22,6 +22,7 @@ import { DemographicApiServices } from '@/app/shared/Services/Demographic/demogr
 import Swal from 'sweetalert2';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { Router } from '@angular/router';
+import { SecureStorageService } from '@core/services/secure-storage.service';
 
 
 @Component({
@@ -60,7 +61,6 @@ export class PatientHeaderPanelComponent implements OnInit {
     private patientBannerService: PatientBannerService,
     private loader: LoaderService,
     private demographicapi: DemographicApiServices,
-        private secureStorage: SecureStorageService,
         private router: Router
   ) { }
 

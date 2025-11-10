@@ -15,17 +15,17 @@ export interface PatientBannerDocType {
 export type PatientBannerCollection = RxCollection<PatientBannerDocType>;
 
 const schema: RxJsonSchema<PatientBannerDocType> = {
-  title: 'patient_banner',
-  version: 1,
+  title: 'patientbanner',
+  version: 2,
   primaryKey: 'id',
   type: 'object',
   properties: {
     id: { type: 'string', maxLength: 50 },
-    patientData: { type: 'object' },
+    patientData: { type: 'object', properties: {}, additionalProperties: true },
     patientIVFData: { type: 'object' },
-    visitAppointments: { type: 'array', items: { type: 'object' } },
-    selectedVisit: { type: 'object' },
-    payerInfo: { type: 'array', items: { type: 'object' } },
+    visitAppointments: { type: 'array', items: { type: 'object', properties: {}, additionalProperties: true } },
+    selectedVisit: { type: 'object', properties: {}, additionalProperties: true },
+    payerInfo: { type: 'array', items: { type: 'object', properties: {}, additionalProperties: true } },
     updatedAt: { type: 'number' }
   },
   required: ['id', 'visitAppointments', 'updatedAt']
@@ -47,12 +47,43 @@ export class PatientBannerStoreService {
 
   private async col(): Promise<PatientBannerCollection> {
     const db = await this.db();
+    // If already exists, return it (new name)
+    const existing = (db as any)?.collections?.patientbanner as PatientBannerCollection | undefined;
+    if (existing) return existing;
+    // Backward-compat: if old underscore name exists, use it
+    const legacy = (db as any)?.collections?.patient_banner as PatientBannerCollection | undefined;
+    if (legacy) return legacy;
+
+    // Try to create and return the created instance
     try {
-      await db.addCollections({ patient_banner: { schema, migrationStrategies: migrationStrategies as any } });
+      const created = await db.addCollections({ patientbanner: { schema, migrationStrategies: migrationStrategies as any } });
+      const direct = (created as any)?.patientbanner as PatientBannerCollection | undefined;
+      if (direct) return direct;
+      const afterCreate = (db as any)?.collections?.patientbanner as PatientBannerCollection | undefined;
+      if (afterCreate) return afterCreate;
+      const afterCreateLegacy = (db as any)?.collections?.patient_banner as PatientBannerCollection | undefined;
+      if (afterCreateLegacy) return afterCreateLegacy;
     } catch (e) {
-      // If collection already exists, ignore and proceed; RxDB will have the collection ready
+      // ignore and fall back to db.collections
     }
-    return (db as any).collections.patient_banner as PatientBannerCollection;
+
+    // Retry once more in case of race
+    try {
+      const created2 = await db.addCollections({ patientbanner: { schema, migrationStrategies: migrationStrategies as any } });
+      const direct2 = (created2 as any)?.patientbanner as PatientBannerCollection | undefined;
+      if (direct2) return direct2;
+    } catch {}
+    // Try to create legacy-named collection as last resort
+    try {
+      const createdLegacy = await db.addCollections({ patient_banner: { schema, migrationStrategies: migrationStrategies as any } });
+      const directLegacy = (createdLegacy as any)?.patient_banner as PatientBannerCollection | undefined;
+      if (directLegacy) return directLegacy;
+    } catch {}
+    const col = (db as any)?.collections?.patientbanner as PatientBannerCollection | undefined;
+    if (col) return col;
+    const colLegacy = (db as any)?.collections?.patient_banner as PatientBannerCollection | undefined;
+    if (colLegacy) return colLegacy;
+    throw new Error('RxDB collection patientbanner is unavailable');
   }
 
   private db(): Promise<RxDatabase> {
