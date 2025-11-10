@@ -42,7 +42,7 @@ export class PatientBannerService {
       if (doc.patientData !== undefined) this.patientDataSource.next(doc.patientData);
       if (doc.visitAppointments !== undefined) this.visitAppointmentsSource.next(doc.visitAppointments);
       if (doc.selectedVisit !== undefined) this.selectedVisit.next(doc.selectedVisit);
-
+      if (doc.payerInfo !== undefined) this.payerInfo.next(doc.payerInfo);
     });
     // Legacy sessionStorage rehydration (commented)
     // try {
@@ -109,45 +109,37 @@ export class PatientBannerService {
     // } catch {}
   }
 
+  setPayerInfo(payerInfo: any[]) {
+    this.payerInfo.next(payerInfo ?? []);
+    void this.store.set({ payerInfo: payerInfo ?? [] });
+    // Legacy sessionStorage (commented)
+    // try {
+    //   if (!payerInfo || payerInfo.length === 0) sessionStorage.removeItem(this.STORAGE_KEYS.payerInfo);
+    //   else sessionStorage.setItem(this.STORAGE_KEYS.payerInfo, JSON.stringify(payerInfo));
+    // } catch {}
+  }
+
   // Getters: read directly from sessionStorage (safe JSON parsing)
   getPatientData(): any | null {
-    try {
-      const raw = sessionStorage.getItem(this.STORAGE_KEYS.patientData);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
+    return this.patientDataSource.value ?? null;
   }
 
   getVisitAppointments(): any[] | any | null {
-    try {
-      const raw = sessionStorage.getItem(this.STORAGE_KEYS.visitAppointments);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
+    return this.visitAppointmentsSource.value ?? null;
   }
 
   getSelectedVisit(): any | null {
-    try {
-      const raw = sessionStorage.getItem(this.STORAGE_KEYS.selectedVisit);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
+    return this.selectedVisit.value ?? null;
   }
 
   getPayerInfo(): any[] | any | null {
-    try {
-      const raw = sessionStorage.getItem(this.STORAGE_KEYS.payerInfo);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
+    return this.payerInfo.value ?? null;
   }
 
-    setIsbanneropen(isOpen: boolean = true) {
-      this.Isbanneropen.next(isOpen);
+  setIsbanneropen(isOpen: boolean = true) {
+    this.Isbanneropen.next(isOpen);
   }
+
+
 }
 
