@@ -7,7 +7,9 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { IvfSideMenuComponent } from './ivf-side-menu/ivf-side-menu.component';
 import { IvfPsDemographicComponent } from './sections/demographic/ivf-ps-demographic.component';
 import { IvfPsMedicalHistoryComponent } from './sections/medical-history/ivf-ps-medical-history.component';
-import { IvfPsLabDiagnosticsComponent } from './sections/lab-diagnostics/ivf-ps-lab-diagnostics.component';
+import { IvfPsPathologyResultsComponent } from './sections/lab-diagnostics/ivf-ps-pathology-results.component';
+import { IvfPsLabOrdersComponent } from './sections/lab-diagnostics/ivf-ps-lab-orders.component';
+import { IvfPsSemenAnalysisComponent } from './sections/lab-diagnostics/ivf-ps-semen-analysis.component';
 import { IvfPsBillingComponent } from './sections/billing/ivf-ps-billing.component';
 import { IvfPsMessageComponent } from './sections/message/ivf-ps-message.component';
 import { IvfPsCycleComponent } from './sections/cycle/ivf-ps-cycle.component';
@@ -22,7 +24,7 @@ import { LoaderService } from '@core/services/loader.service';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, NgIcon, IvfSideMenuComponent,
-    IvfPsDemographicComponent, IvfPsMedicalHistoryComponent, IvfPsLabDiagnosticsComponent,
+    IvfPsDemographicComponent, IvfPsMedicalHistoryComponent, IvfPsPathologyResultsComponent, IvfPsLabOrdersComponent, IvfPsSemenAnalysisComponent,
     IvfPsBillingComponent, IvfPsMessageComponent, IvfPsCycleComponent, IvfPsSwitchPartnerComponent,
     AdvanceSearchModalComponent
   ],
