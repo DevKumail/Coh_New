@@ -45,7 +45,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             var dto = new DashboardReadDTO
             {
                 Female = gender == "Female" ? new FemaleDemographicDTO
-                {
+                {   
                     MrNo = patient.MrNo,
                     Name = patient.Name,
                     DateOfBirth = patient.DateOfBirth,
@@ -87,12 +87,43 @@ namespace HMIS.Application.ServiceLogics.IVF
                     };
                 }
 
-                DynamicParameters param = new DynamicParameters();
-                param.Add("@MRNo", MRNo, DbType.String);
+                var query = @"
+                        SELECT 
+                            RP.MRNo,
+                            CONCAT(
+                                RP.PersonFirstName, 
+                                CASE 
+                                    WHEN RP.PersonMiddleName IS NOT NULL AND RP.PersonMiddleName <> '' 
+                                    THEN ' ' + RP.PersonMiddleName 
+                                    ELSE '' 
+                                END, 
+                                CASE 
+                                    WHEN RP.PersonLastName IS NOT NULL AND RP.PersonLastName <> '' 
+                                    THEN ' ' + RP.PersonLastName 
+                                    ELSE '' 
+                                END
+                            ) AS FullName,
+                            RP.PatientBirthDate,
+                            RP.PatientPicture,
+                            RP.PersonSocialSecurityNo,
+                            G.Gender,
+                            N.NationalityCode,
+                            PD.CellPhone,
+                            PD.Email
+                        FROM RegPatient AS RP
+                        LEFT JOIN RegGender AS G 
+                            ON RP.PersonSex = G.GenderId
+                        LEFT JOIN Nationality AS N 
+                            ON RP.Nationality = N.NationalityId
+                        LEFT JOIN RegPatientDetails AS PD
+                            ON RP.PatientId = PD.PatientId
+							Where RP.MRNo = "+ MRNo
+                        ;
 
-                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("Common_CoverageAndRegPatientGet", param);
+                var ds = await DapperHelper.GetDataSetByQuery(query, new { MRNo });
 
-                if (ds == null || ds.Tables.Count < 2 || ds.Tables[1].Rows.Count == 0)
+
+                if (ds == null || ds.Tables.Count < 1 || ds.Tables[0].Rows.Count == 0)
                 {
                     return new Result<(string, BaseDemographicDTO)>
                     {
@@ -102,7 +133,8 @@ namespace HMIS.Application.ServiceLogics.IVF
                     };
                 }
 
-                var data = ds.Tables[1].Rows[0];
+                var data = ds.Tables[0].Rows[0];
+                var patientAge = GetPatientAge(Convert.ToDateTime(data["PatientBirthDate"]));
 
                 string gender = data.Table.Columns.Contains("Gender") && data["Gender"] != DBNull.Value
                     ? (data["Gender"].ToString() == "Female" ? "Female" : "Male")
@@ -110,16 +142,14 @@ namespace HMIS.Application.ServiceLogics.IVF
 
                 var patient = new BaseDemographicDTO
                 {
-                    Name = data["PersonFirstName"].ToString(),
+                    Name = data["FullName"].ToString(),
                     DateOfBirth = Convert.ToDateTime(data["PatientBirthDate"]),
-                    AgeYears = data["Age"].ToString(),
+                    AgeYears = patientAge,
                     MrNo = Convert.ToInt32(data["MRNo"]),
-                    Phone = data["personCellPhone"].ToString(),
-                    Email = data["personEmail"].ToString(),
-                    //EID = data[""].ToString(),
-                    //Nationality = data[""].ToString(),
-                    EID = "",
-                    Nationality = "",
+                    Phone = data["CellPhone"].ToString(),
+                    Email = data["Email"].ToString(),
+                    EID = data["PersonSocialSecurityNo"].ToString(),
+                    Nationality = data["NationalityCode"].ToString(),
                     Picture = (byte[])data["PatientPicture"]
                 };
 
@@ -140,6 +170,43 @@ namespace HMIS.Application.ServiceLogics.IVF
                 };
             }
         }
-        
+        public static string GetPatientAge(DateTime birthDate)
+        {
+            var today = DateTime.Today;
+
+            int years = today.Year - birthDate.Year;
+            int months = today.Month - birthDate.Month;
+            int days = today.Day - birthDate.Day;
+
+            // Adjust if current month/day is before birth month/day
+            if (days < 0)
+            {
+                months--;
+                var prevMonth = today.AddMonths(-1);
+                days += DateTime.DaysInMonth(prevMonth.Year, prevMonth.Month);
+            }
+
+            if (months < 0)
+            {
+                years--;
+                months += 12;
+            }
+
+            var parts = new List<string>();
+
+            if (years > 0)
+                parts.Add($"{years}y");
+            if (months > 0)
+                parts.Add($"{months}m");
+            if (days > 0)
+                parts.Add($"{days}d");
+
+            // In case all are zero (same day)
+            if (parts.Count == 0)
+                return "0d";
+
+            return string.Join(" ", parts);
+        }
+
     }
 }

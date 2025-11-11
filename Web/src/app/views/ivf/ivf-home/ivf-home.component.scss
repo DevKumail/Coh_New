@@ -64,3 +64,10 @@ table.table-sm th, table.table-sm td {
   height: 16px;
 }
 
+/* Blur/disable only the card content when patient data is missing */
+.blur-on-missing.is-blurred {
+  filter: blur(1px) grayscale(.3);
+  opacity: .6;
+  pointer-events: none; /* disable interactions behind the button */
+}
+

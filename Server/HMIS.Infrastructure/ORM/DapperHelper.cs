@@ -16,7 +16,25 @@ namespace HMIS.Infrastructure.ORM
 {
     public static class DapperHelper
     {
+        public static async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? parameters = null)
+        {
+            // Load connection string from appsettings.json
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
 
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+            IEnumerable<T> data;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                data = await connection.QueryAsync<T>(sql, parameters);
+            }
+
+            return data;
+        }
         public static bool ExcecuteSP(string sql)
         {
             try
@@ -40,6 +58,19 @@ namespace HMIS.Infrastructure.ORM
 
                 return false;
 
+            }
+        }
+        public static async Task<DataSet> GetDataSetByQuery(string query, object? parameters = null)
+        {
+            var connectionString = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build()
+                .GetConnectionString("DefaultConnection");
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var reader = await connection.ExecuteReaderAsync(query, parameters, commandType: CommandType.Text);
+                return ConvertDataReaderToDataSet(reader);
             }
         }
 

@@ -91,10 +91,36 @@ export class PatientBannerStoreService {
     return this.initPromise;
   }
 
+  private async colLegacy(): Promise<PatientBannerCollection | null> {
+    const db = await this.db();
+    const legacy = (db as any)?.collections?.patient_banner as PatientBannerCollection | undefined;
+    if (legacy) return legacy;
+    try {
+      const created = await db.addCollections({ patient_banner: { schema, migrationStrategies: migrationStrategies as any } });
+      const direct = (created as any)?.patient_banner as PatientBannerCollection | undefined;
+      return direct || ((db as any)?.collections?.patient_banner as PatientBannerCollection | undefined) || null;
+    } catch {
+      return (db as any)?.collections?.patient_banner || null;
+    }
+  }
+
   async get(): Promise<PatientBannerDocType | null> {
     const col = await this.col();
     const doc = await col.findOne('current').exec();
-    return doc ? (doc.toJSON() as PatientBannerDocType) : null;
+    if (doc) return doc.toJSON() as PatientBannerDocType;
+
+    // Try legacy collection and migrate if found
+    const legacyCol = await this.colLegacy();
+    if (legacyCol) {
+      const legacyDoc = await legacyCol.findOne('current').exec();
+      if (legacyDoc) {
+        const legacyData = legacyDoc.toJSON() as PatientBannerDocType;
+        await col.upsert(legacyData);
+        try { await legacyDoc.remove(); } catch {}
+        return legacyData;
+      }
+    }
+    return null;
   }
 
   async set(partial: Partial<Omit<PatientBannerDocType, 'id' | 'updatedAt'>>): Promise<void> {
