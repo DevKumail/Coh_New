@@ -34,6 +34,11 @@ public partial class PatientChartFamilyHistory
 
     public bool? Active { get; set; }
 
+    public long? UpdatedBy { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? UpdatedDate { get; set; }
+
     [ForeignKey("RelationShipId")]
     [InverseProperty("PatientChartFamilyHistory")]
     public virtual RegRelationShip? RelationShip { get; set; }

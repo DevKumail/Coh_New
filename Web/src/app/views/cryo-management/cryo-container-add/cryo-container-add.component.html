@@ -1,1 +1,209 @@
-<p>cryo-container-add works!</p>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2">
+        <li class="breadcrumb-item">
+            <a href="javascript:void(0);">
+                <lucide-angular [img]="homeIcon" class="fs-6"></lucide-angular>
+                {{'Cryo Management' | translate }}
+            </a>
+        </li>
+        <li
+            class="d-flex align-items-center text-muted mx-1"
+            aria-current="page"
+        >
+            <lucide-angular [img]="chevronRightIcon" class="fs-6"></lucide-angular>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            {{'Cryo_CREATE' | translate }}
+        </li>
+    </ol>
+</nav>
+<div class="row mt-3">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+
+        <h5 class="card-title mb-3">
+          <i class="fa fa-snowflake me-2"></i>
+          {{ 'CRYO_CONTAINER' | translate }}
+        </h5>
+
+        <form [formGroup]="cryoForm" class="row g-3">
+
+          <!-- Description -->
+          <div class="col-md-4 col-sm-6 col-12">
+            <label>{{ 'DESCRIPTION' | translate }} <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" appFilledOnValue
+                   formControlName="description"
+                   placeholder="{{ 'ENTER_DESCRIPTION' | translate }}">
+          </div>
+
+          <!-- Location -->
+          <div class="col-md-4 col-sm-6 col-12">
+            <label>{{ 'LOCATION' | translate }}</label>
+            <input type="text" class="form-control" appFilledOnValue
+                   formControlName="location"
+                   placeholder="{{ 'ENTER_LOCATION' | translate }}">
+          </div>
+
+          <!-- Type -->
+          <div class="col-md-4 col-sm-6 col-12">
+            <label>{{ 'TYPE' | translate }} <span class="text-danger">*</span></label>
+            <div class="d-flex mt-2">
+              <div class="form-check me-3">
+                <input class="form-check-input" type="checkbox"
+                       [checked]="isTypeSelected('Sperm')"
+                       (change)="onTypeToggle($event, 'Sperm')" />
+                <label class="form-check-label">{{ 'Sperm' }}</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       [checked]="isTypeSelected('Ooc/Emb')"
+                       (change)="onTypeToggle($event, 'Ooc/Emb')" />
+                <label class="form-check-label">{{ 'Ooc / Emb' }}</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Last Audit -->
+          <div class="col-md-4 col-sm-6 col-12">
+            <label>{{ 'LAST_AUDIT' | translate }}</label>
+            <textarea rows="3" class="form-control" appFilledOnValue
+                      formControlName="lastAudit"
+                      placeholder="{{ 'ENTER_LAST_AUDIT' | translate }}"></textarea>
+          </div>
+
+          <!-- Max Straws -->
+          <div class="col-md-4 col-sm-6 col-12">
+            <label>{{ 'MAX_STRAWS_LAST_LEVEL' | translate }}</label>
+            <input type="number" class="form-control" appFilledOnValue
+                   formControlName="maxStraws"
+                   placeholder="{{ 'ENTER_MAX_STRAWS' | translate }}">
+          </div>
+<!-- LEVEL A, B, C SIDE BY SIDE -->
+<div class="row mt-4">
+
+    <!-- LEVEL A -->
+<!-- LEVEL A -->
+<div class="col-md-4">
+  <h6 class="fw-bold">Level A Canisters</h6>
+  <div class="border p-3 rounded bg-light">
+
+    <div class="d-flex mb-3">
+      <input class="form-control me-2"
+             placeholder="C1, C2..."
+             [(ngModel)]="newLevelA"
+             name="newLevelA"
+             [ngModelOptions]="{standalone: true}" />
+      <button class="btn btn-primary" type="button" (click)="addLevelA()">Add</button>
+    </div>
+
+    <ul class="list-group">
+      <li class="list-group-item d-flex justify-content-between align-items-center"
+          *ngFor="let a of levelAs"
+          (click)="selectA(a)"
+          [class.active]="a === selectedA">
+        <span>{{ a.code }}</span>
+        <span class="btn-group btn-group-sm">
+          <button type="button" class="btn btn-outline-secondary btn-sm"
+                  (click)="editLevelA(a, $event)" title="Edit">
+            <lucide-angular [img]="editIcon" class="fs-5"></lucide-angular>
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm"
+                  (click)="deleteLevelA(a, $event)" title="Delete">
+            <lucide-angular [img]="trashIcon" class="fs-5"></lucide-angular>
+          </button>
+        </span>
+      </li>
+    </ul>
+
+  </div>
+</div>
+
+
+<!-- LEVEL B -->
+<div class="col-md-4">
+  <h6 class="fw-bold">Level B Goblets</h6>
+  <div class="border p-3 rounded bg-light">
+
+    <div *ngIf="selectedA">
+      <div class="d-flex mb-3">
+        <input class="form-control me-2" placeholder="N1, N2..."
+               [(ngModel)]="newLevelB"
+               [ngModelOptions]="{standalone: true}" />
+        <button class="btn btn-primary" type="button" (click)="addLevelB()">Add</button>
+      </div>
+
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center"
+            *ngFor="let b of selectedA.levelBs"
+            (click)="selectB(b)"
+            [class.active]="b === selectedB">
+          <span>{{ b.code }}</span>
+          <span class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-secondary btn-sm"
+                    (click)="editLevelB(b, $event)" title="Edit">
+              <lucide-angular [img]="editIcon" class="fs-5"></lucide-angular>
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                    (click)="deleteLevelB(b, $event)" title="Delete">
+              <lucide-angular [img]="trashIcon" class="fs-5"></lucide-angular>
+            </button>
+          </span>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+<!-- LEVEL C -->
+<div class="col-md-4">
+  <h6 class="fw-bold">Level C Straw Positions</h6>
+  <div class="border p-3 rounded bg-light">
+
+    <div *ngIf="selectedB">
+      <label>Number of Straws</label>
+      <input type="number"
+             [(ngModel)]="newStrawsCount"
+             class="form-control w-100 mb-2"
+             (change)="generateStraws()"
+             [ngModelOptions]="{standalone: true}" />
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center"
+            *ngFor="let c of selectedB.levelCs">
+          <span>Position {{ c.position }}</span>
+          <span class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-secondary btn-sm"
+                    (click)="editLevelC(c, $event)" title="Edit">
+              <lucide-angular [img]="editIcon" class="fs-5"></lucide-angular>
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                    (click)="deleteLevelC(c, $event)" title="Delete">
+              <lucide-angular [img]="trashIcon" class="fs-5"></lucide-angular>
+            </button>
+          </span>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+ 
+  </div>
+
+
+
+
+          <!-- Submit -->
+          <div class="col-12 mt-4">
+            <button class="btn btn-success" (click)="saveContainer()">
+              {{ 'SAVE_CONTAINER' | translate }}
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>

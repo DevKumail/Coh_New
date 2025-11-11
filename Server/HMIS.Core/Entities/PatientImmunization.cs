@@ -57,9 +57,6 @@ public partial class PatientImmunization
     [Column(TypeName = "datetime")]
     public DateTime? UpdatedDate { get; set; }
 
-    [Column(TypeName = "datetime")]
-    public DateTime? CreatedDate { get; set; }
-
     [Column("MRNo")]
     [StringLength(10)]
     [Unicode(false)]
@@ -77,12 +74,6 @@ public partial class PatientImmunization
     [StringLength(50)]
     [Unicode(false)]
     public string? ProviderName { get; set; }
-
-
-    [StringLength(500)]
-    [Unicode(false)]
-    public string? Description { get; set; }
-
 
     [StringLength(100)]
     [Unicode(false)]
@@ -103,13 +94,19 @@ public partial class PatientImmunization
 
     public long? ImmTypeId { get; set; }
 
+    [StringLength(500)]
+    public string? Description { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? CreatedDate { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("PatientImmunization")]
     public virtual SchAppointment? Appointment { get; set; }
 
     [ForeignKey("CreatedBy")]
     [InverseProperty("PatientImmunizationCreatedByNavigation")]
-    public virtual Hremployee? CreatedByNavigation { get; set; } = null!;
+    public virtual Hremployee? CreatedByNavigation { get; set; }
 
     [ForeignKey("DrugTypeId")]
     [InverseProperty("PatientImmunizationDrugType")]

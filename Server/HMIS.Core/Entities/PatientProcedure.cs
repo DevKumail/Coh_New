@@ -27,12 +27,7 @@ public partial class PatientProcedure
     [Unicode(false)]
     public string? Comments { get; set; }
 
-
-    [StringLength(200)]
-    [Unicode(false)]
-    public string? ProviderName { get; set; }
-
-    public int? Active { get; set; }
+    public int Active { get; set; }
 
     public long? UpdatedBy { get; set; }
 
@@ -96,6 +91,10 @@ public partial class PatientProcedure
     public bool? IsDeleted { get; set; }
 
     public long? AppointmentId { get; set; }
+
+    [StringLength(200)]
+    [Unicode(false)]
+    public string? ProviderName { get; set; }
 
     [ForeignKey("AppointmentId")]
     [InverseProperty("PatientProcedure")]

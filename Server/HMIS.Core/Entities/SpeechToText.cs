@@ -53,6 +53,17 @@ public partial class SpeechToText
 
     public string? NotePath { get; set; }
 
+    public long? AppointmentId { get; set; }
+
+    public int? NotePathId { get; set; }
+
+    [Column(TypeName = "text")]
+    public string? ApiResponse { get; set; }
+
+    [ForeignKey("AppointmentId")]
+    [InverseProperty("SpeechToText")]
+    public virtual SchAppointment? Appointment { get; set; }
+
     [ForeignKey("PatientId")]
     [InverseProperty("SpeechToText")]
     public virtual RegPatient Patient { get; set; } = null!;

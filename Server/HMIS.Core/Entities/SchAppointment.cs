@@ -296,8 +296,6 @@ public partial class SchAppointment
 
     public long? PlanId { get; set; }
 
-
-
     [StringLength(50)]
     [Unicode(false)]
     public string? PatientBalance { get; set; }
@@ -399,6 +397,9 @@ public partial class SchAppointment
     [ForeignKey("SiteId")]
     [InverseProperty("SchAppointment")]
     public virtual RegLocationTypes Site { get; set; } = null!;
+
+    [InverseProperty("Appointment")]
+    public virtual ICollection<SpeechToText> SpeechToText { get; set; } = new List<SpeechToText>();
 
     [ForeignKey("SubscriberId")]
     [InverseProperty("SchAppointment")]

@@ -31,4 +31,17 @@ public partial class PatientChartSocialHistory
     public DateTime? CreatedDate { get; set; }
 
     public bool? Active { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? UpdatedDate { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? StartDate { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? EndDate { get; set; }
+
+    public long? AppId { get; set; }
 }

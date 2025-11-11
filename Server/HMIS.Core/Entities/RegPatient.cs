@@ -56,7 +56,6 @@ public partial class RegPatient
 
     public int? PatientBloodGroupId { get; set; }
 
-    [Column(TypeName = "image")]
     public byte[]? PatientPicture { get; set; }
 
     public bool Inactive { get; set; }

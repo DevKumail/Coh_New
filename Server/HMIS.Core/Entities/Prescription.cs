@@ -87,13 +87,6 @@ public partial class Prescription
     [Column(TypeName = "datetime")]
     public DateTime? UpdateDate { get; set; }
 
-    [StringLength(100)]
-    [Unicode(false)]
-    public string? CreatedBy { get; set; }
-
-    [Column(TypeName = "datetime")]
-    public DateTime? CreateDate { get; set; }
-
     [Column("GCN_SEQNO")]
     [StringLength(20)]
     [Unicode(false)]
@@ -175,6 +168,12 @@ public partial class Prescription
 
     public bool? IsDeleted { get; set; }
 
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? CreateDate { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("Prescription")]
     public virtual SchAppointment? Appointment { get; set; }
@@ -186,7 +185,4 @@ public partial class Prescription
     [ForeignKey("ProviderId")]
     [InverseProperty("Prescription")]
     public virtual Hremployee? Provider { get; set; }
-
-
-
 }
