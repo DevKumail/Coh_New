@@ -30,6 +30,12 @@ export const routes: Routes = [
         data: { module: 'IVF' },
         loadChildren: () => import('./views/ivf/ivf.module').then((m) => m.IVFModule)
       },
+       {
+        path: 'cryo',
+        canActivate: [modulePermissionGuard],
+        data: { module: 'Cryo Mangement' },
+        loadChildren: () => import('./views/cryo-management/cryo.module').then((m) => m.CRYOModule)
+      },
       {
         path: 'registration',
         canActivate: [modulePermissionGuard],
