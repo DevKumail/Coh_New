@@ -71,9 +71,6 @@ export class PatientHeaderPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-     // Initial fetch attempt (will only run if patientInfo is already present)
-     this.GetAllVisit();
-
      // Subscribe to live stream from RxDB-backed service
      this.patientBannerService.patientData$.subscribe((data: any) => {
        this.patientData = data;
@@ -84,6 +81,9 @@ export class PatientHeaderPanelComponent implements OnInit {
          }
          this.patientInfo = this.patientData?.table2?.[0] || null;
          this.insuranceInfo = this.patientData?.table1?.[0] || [];
+         if (this.patientInfo?.mrNo) {
+           this.GetAllVisit();
+         }
          this.visible = true;
        } else {
          this.visible = false;
@@ -192,14 +192,20 @@ AllVisitTotalItems = 0;
      async GetAllVisit(){
   if (this.patientInfo?.mrNo) {
     this.loader.show();
-    await this.demographicapi.GetAppointmentByMRNO(this.patientInfo?.mrNo, this.AllVisitPaginationInfo.Page, this.AllVisitPaginationInfo.RowsPerPage).subscribe((Response: any) => {
-      console.log("All Visit =>", Response);
-      if (Response?.table1?.length > 0) {
-        this.AppoinmentData = Response?.table1;
-        this.AllVisitTotalItems = Response?.table2?.[0]?.totalRecords;
+    await this.demographicapi.GetAppointmentByMRNO(this.patientInfo?.mrNo, this.AllVisitPaginationInfo.Page, this.AllVisitPaginationInfo.RowsPerPage).subscribe({
+      next: (Response: any) => {
+        console.log("All Visit =>", Response);
+        if (Response?.table1?.length > 0) {
+          this.AppoinmentData = Response?.table1;
+          this.AllVisitTotalItems = Response?.table2?.[0]?.totalRecords;
+          this.patientBannerService.setVisitAppointments(this.AppoinmentData);
+        } else {
+          this.AppoinmentData = [];
+        }
         this.loader.hide();
-        this.patientBannerService.setVisitAppointments(this.AppoinmentData);
-      } else{
+      },
+      error: (err) => {
+        console.error('GetAppointmentByMRNO failed', err);
         this.AppoinmentData = [];
         this.loader.hide();
       }

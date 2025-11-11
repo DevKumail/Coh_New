@@ -63,7 +63,7 @@ export class TopbarComponent implements OnInit {
   constructor(
     public layout: LayoutStoreService,
     private modalService: NgbModal,
-    private patientBannerService: PatientBannerService,
+    public patientBannerService: PatientBannerService,
     private loader: LoaderService,
     private router: Router,
   ) { }
@@ -101,14 +101,12 @@ export class TopbarComponent implements OnInit {
   }
 
   togglePatientBanner(content: TemplateRef<HTMLElement>) {
-    const loadedPatient = sessionStorage.getItem('loadedPatientName');
-
-    if (loadedPatient) {
-      // Just toggle patient banner
+    // Derive banner visibility from RxDB-backed patient data
+    if (this.patientData) {
       this.showPatientBanner = !this.showPatientBanner;
       this.patientBannerToggle.emit(this.showPatientBanner);
     } else {
-      // No patient loaded, open modal
+      // No patient loaded, open modal to search/select patient
       this.modalService.open(content, { size: 'lg' });
     }
   }
@@ -122,8 +120,9 @@ export class TopbarComponent implements OnInit {
   ngOnInit() {
     this.patientBannerService.patientData$.subscribe(data => {
       this.patientData = data;
+      this.showPatientBanner = !!data;
+      this.mrNo = this.patientData?.table2?.[0]?.mrNo;
     });
-    this.mrNo = this.patientData?.table2?.[0]?.mrNo;
   }
 
   mrNo: any;
