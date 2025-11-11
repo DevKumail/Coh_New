@@ -45,7 +45,8 @@ namespace HMIS.Application.ServiceLogics.Cryo
                     {
                         FacilityId = containerDto.FacilityID,
                         Description = containerDto.Description,
-                        Type = containerDto.Type,
+                        IsSperm = containerDto.IsSperm,
+                        IsOocyteOrEmbryo = containerDto.IsOocyteOrEmb,
                         LastAudit = containerDto.LastAudit,
                         MaxStrawsInLastLevel = containerDto.MaxStrawsInLastLevel,
                         CreatedBy = containerDto.CreatedBy,
@@ -117,7 +118,8 @@ namespace HMIS.Application.ServiceLogics.Cryo
                     if (container == null) return false;
 
                     container.Description = containerDto.Description;
-                    container.Type = containerDto.Type;
+                    container.IsSperm = containerDto.IsSperm;
+                    container.IsOocyteOrEmbryo = containerDto.IsOocyteOrEmb;
                     container.LastAudit = containerDto.LastAudit;
                     container.MaxStrawsInLastLevel = containerDto.MaxStrawsInLastLevel;
                     container.UpdatedBy = containerDto.UpdatedBy;
@@ -153,7 +155,8 @@ namespace HMIS.Application.ServiceLogics.Cryo
                         ID = c.Id,
                         FacilityID = c.FacilityId,
                         Description = c.Description,
-                        Type = c.Type,
+                        IsSperm = c.IsSperm ?? false,
+                        IsOocyteOrEmb = c.IsOocyteOrEmbryo ?? false,
                         LastAudit = c.LastAudit,
                         MaxStrawsInLastLevel = c.MaxStrawsInLastLevel,
                         CreatedAt = c.CreatedAt,

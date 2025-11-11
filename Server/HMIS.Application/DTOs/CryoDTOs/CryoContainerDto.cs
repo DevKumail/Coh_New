@@ -4,7 +4,7 @@ namespace HMIS.Application.DTOs.CryoDTOs
 {
     public class CryoContainerDto
     {
-        public long? ID { get; set; } // For update scenarios
+        public long? ID { get; set; }
 
         [Required(ErrorMessage = "Facility ID is required.")]
         public long FacilityID { get; set; }
@@ -12,20 +12,24 @@ namespace HMIS.Application.DTOs.CryoDTOs
         [Required(ErrorMessage = "Description is required.")]
         public string Description { get; set; }
 
-        [Required(ErrorMessage = "Type is required.")]
-        public string Type { get; set; } // Sperm / Ooc/Emb
+        [Required(ErrorMessage = "Please select container type.")]
+        public bool IsSperm { get; set; }
+
+        public bool IsOocyteOrEmb { get; set; }
 
         public string LastAudit { get; set; }
         public int? MaxStrawsInLastLevel { get; set; }
 
         public long? CreatedBy { get; set; }
         public long? UpdatedBy { get; set; }
+
         public DateTime? CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; } = DateTime.Now;
 
         // Nested Levels
         public List<CryoLevelADto> LevelA { get; set; } = new List<CryoLevelADto>();
     }
+
 
     public class CryoLevelADto
     {

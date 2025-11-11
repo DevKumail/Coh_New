@@ -56,7 +56,8 @@ export interface CryoContainerResultDto {
   id?: number;
   facilityId: number;
   description: string;
-  type: string; 
+  isSperm: boolean;
+  isOocyteOrEmb?: boolean;
   lastAudit?: string;
   maxStrawsInLastLevel?: number;
   createdBy?: number;

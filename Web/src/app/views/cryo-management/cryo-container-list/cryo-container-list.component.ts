@@ -95,4 +95,11 @@ deleteContainer(id: number) {
   });
 }
 
+// Return display text for type based on boolean flags
+getTypeText(item: CryoContainerResultDto): string {
+  if (item.isSperm && item.isOocyteOrEmb) return 'BothGenders';
+  if (item.isSperm) return 'Sperm';
+  if (item.isOocyteOrEmb) return 'Ooc/Emb';
+  return 'N/A';
+}
 }

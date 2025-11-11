@@ -19,9 +19,6 @@ public partial class CryoContainers
     [StringLength(50)]
     public string Description { get; set; } = null!;
 
-    [StringLength(50)]
-    public string Type { get; set; } = null!;
-
     [StringLength(100)]
     public string? LastAudit { get; set; }
 
@@ -38,6 +35,10 @@ public partial class CryoContainers
     public DateTime UpdatedAt { get; set; }
 
     public bool IsDeleted { get; set; }
+
+    public bool? IsSperm { get; set; }
+
+    public bool? IsOocyteOrEmbryo { get; set; }
 
     [InverseProperty("Container")]
     public virtual ICollection<CryoLevelA> CryoLevelA { get; set; } = new List<CryoLevelA>();

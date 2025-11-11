@@ -73,7 +73,6 @@ export class CryoContainerAddComponent {
     this.cryoForm = this.fb.group({
       description: ['', Validators.required],
       location: [''],
-      // replaced "type" array with two boolean flags
       isSperm: [false],
       isOocyteOrEmb: [false],
       lastAudit: [''],

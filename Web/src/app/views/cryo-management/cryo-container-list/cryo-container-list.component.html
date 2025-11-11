@@ -58,7 +58,7 @@
       <tbody class="table-group-divider text-center">
       <tr *ngFor="let item of CryoPagedData">
         <td>{{ item.description || 'N/A' }}</td>
-        <td>{{ item.type || 'N/A' }}</td>
+        <td>{{ getTypeText(item) }}</td>
         <td>{{ item.maxStrawsInLastLevel || 'N/A' }}</td>
         <td>{{ item.lastAudit || 'N/A' }}</td>
 
