@@ -21,7 +21,9 @@ export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges
   // Match patient-summary structure: main menu + optional orders section
   mainItems = [
     { id: 'demographic', label: 'Demographic', icon: 'tablerUsers' },
-    { id: 'medical-history', label: 'Medical History', icon: 'tablerNotes' },
+    { id: 'medical-history', label: 'Fertility History', icon: 'tablerNotes' },
+    { id: 'social-history', label: 'Social History', icon: 'tablerNotes' },
+    { id: 'family-history', label: 'Family History', icon: 'tablerNotes' },
     { id: 'lab-diagnostics', label: 'Lab Diagnostics', icon: 'tablerSearch' },
     { id: 'billing', label: 'Billing', icon: 'tablerReceipt' },
     { id: 'message', label: 'Message', icon: 'tablerMessage2' },

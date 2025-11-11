@@ -1,0 +1,33 @@
+<div class="genetics-form">
+  <!-- Genetics row -->
+  <div class="card px-3 py-2 mb-1">
+    <h5 class="fw-bold mb-1">Genetics</h5>
+    <div class="row g-2 align-items-end">
+      <div class="col-md-8">
+        <label class="form-group">Genes</label>
+        <input type="text" class="form-control" placeholder="">
+      </div>
+      <div class="col-md-4">
+        <label class="form-group">Inheritance</label>
+        <select class="form-select">
+          <option value="" selected>Select</option>
+          <option value="Autosomal dominant">Autosomal dominant</option>
+          <option value="Autosomal recessive">Autosomal recessive</option>
+          <option value="X-linked">X-linked</option>
+          <option value="Mitochondrial">Mitochondrial</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medical opinion area -->
+  <div class="card px-3 py-2">
+    <label class="fw-bold mb-2">Medical opinion</label>
+    <quill-editor
+      [(ngModel)]="editorContent"
+      [modules]="quillModules"
+      format="html"
+      [styles]="{height: '300px'}">
+    </quill-editor>
+  </div>
+</div>
