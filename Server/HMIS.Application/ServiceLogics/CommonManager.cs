@@ -113,7 +113,7 @@ namespace HMIS.Application.ServiceLogics
         }
 
 
-        public async Task<DataSet> GetAppointmentDetailsByMRNo(int? PageNumber, int? PageSize, string MRNo)
+        public async Task<(bool isSuccess, string message,DataSet ds)> GetAppointmentDetailsByMRNo(int? PageNumber, int? PageSize, string MRNo)
         {
             try
             {
@@ -134,12 +134,12 @@ namespace HMIS.Application.ServiceLogics
                     throw new Exception("No data found");
                 }
 
-                return ds;
+                return (true , "" , ds);
             }
             catch (Exception ex)
             {
                 // You can log ex.Message here for debugging
-                return new DataSet();
+                return (false, ex.Message, new DataSet());
             }
         }
 

@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, AfterViewInit, inject, TemplateRef } from '@angular/core';
+import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -11,6 +12,8 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { NgIcon } from '@ng-icons/core';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
  
 
 @Component({
@@ -18,13 +21,23 @@ import { take } from 'rxjs/operators';
   templateUrl: './ivf-home.component.html',
   styleUrls: ['./ivf-home.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,
-      GenericPaginationComponent,
-      TranslatePipe, NgIcon]
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule,
+    GenericPaginationComponent,
+    TranslatePipe, 
+    NgIcon,
+  FilledOnValueDirective]
 })
 export class IVFHomeComponent {
   form: FormGroup;
+  SearchPatientForm: FormGroup;
   couple: { female?: any; male?: any } | null = null;
+  private noCoupleAlertShown = false;
+  PatientList: any = [];
+  isLoading = false;
+  modalRefInstance: any;
+  modalService = new NgbModal();
   selectedTab: 'messages' | 'lab' | 'consents' | 'application' = 'messages';
   overview: Array<{
     woman: string;
@@ -44,12 +57,22 @@ export class IVFHomeComponent {
         pageSize: 10,
         currentPage: 1,
       };
+   PatientListPaginationInfo: any = {
+        pageSize: 5,
+        currentPage: 1,
+      };
+      PatientListTotalrecord: any = 0;
   constructor(
     private fb: FormBuilder, 
     private router: Router,
     private secureStorage: SecureStorageService,
     private patientBannerService : PatientBannerService,
   ) {
+    this.SearchPatientForm = this.fb.group({
+      mrNo: [''],
+      phone: [''],
+      emiratesId: [''],
+    });
     this.form = this.fb.group({
       femaleId: ['5'],
     });
@@ -131,8 +154,51 @@ export class IVFHomeComponent {
   private handleCoupleResponse(res: any) {
     // API returns { couple: { female, male } }
     this.couple = res?.couple ?? res ?? null;
+    try {
+      const hasFemale = !!this.couple?.female;
+      const hasMale = !!this.couple?.male;
+      if (!hasFemale && !hasMale && !this.noCoupleAlertShown) {
+        this.noCoupleAlertShown = true;
+        Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+      }
+      if (hasFemale || hasMale) {
+        this.noCoupleAlertShown = false;
+      }
+    } catch {}
   }
 
 
+  async openLinkaPatient(modalRef: TemplateRef<any>) {
+      this.modalRefInstance = this.modalService.open(modalRef, {
+      backdrop: 'static',
+      size: 'xl',
+      centered: true
+    });
+    this.modalRefInstance.result.then((result: any) => {
+      if (result) {
+        console.log('Modal returned:', result);
+      }
+    }).catch(() => {
+      // Modal dismissed without selecting
+      console.log('Modal dismissed');
+    });
+  }
+
+   onRowSelect(SelactData: any, modal: any) {
+     
+    console.log("SELECTED DATA",SelactData)
+    this.form.patchValue({ femaleId: SelactData?.name });
+    modal.close(SelactData); 
+  }
+
+  SearchPatient(){
+    this.isLoading = true;
+    this.PatientList = [];
+  }
+
+  onPatientPageChanged(event: any) {
+    this.PatientListPaginationInfo = event;
+    this.SearchPatient();
+  }
 
 }
