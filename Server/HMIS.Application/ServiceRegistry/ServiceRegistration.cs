@@ -1,8 +1,10 @@
-﻿using HMIS.Application.ServiceLogics;
+﻿using HMIS.Application.Implementations;
+using HMIS.Application.ServiceLogics;
+using HMIS.ApplicationImplementations;
+using HMIS.Service.Implementations;
+using HMIS.Service.ServiceLogics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using HMIS.Application.Implementations;
-using HMIS.ApplicationImplementations;
 
 namespace HMIS.Application
 {
@@ -34,6 +36,7 @@ namespace HMIS.Application
             services.AddScoped<IPatientImmunization, PatientImmunizationManager>();
             services.AddScoped<IPatientProcedure, PatientProcedureManager>();
             services.AddScoped<IAlergyManager, AlergyManager >();
+            services.AddScoped<IEMRNotesManager, EMRNotesManager>();
             services.AddScoped<IPatientChartFamilyHistoryManager, PatientChartFamilyHistoryManager>();
             services.AddScoped<ILocalizationSpService, LocalizationSpService>();
             services.AddScoped<IPrescription, PrescriptionManager>();

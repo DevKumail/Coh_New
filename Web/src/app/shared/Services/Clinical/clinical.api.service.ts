@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '@/app/core/services/api.service';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class ClinicalApiService {
+    private question = 'assets/question.json';
+
 
     // getCacheItem(arg0: { entities: string[]; }) {
     //     throw new Error('Method not implemented.');
@@ -16,7 +19,7 @@ export class ClinicalApiService {
     add(arg0: { severity: string; summary: string; detail: string; }) {
         throw new Error('Method not implemented.');
     }
-    constructor(private api: ApiService) {}
+    constructor(private api: ApiService,private http: HttpClient) {}
 
     submitPatientAllergy(data: any): Observable<any> {
         return this.api.post('/Alergy/SubmitPatientAlergy', data);
@@ -337,8 +340,19 @@ export class ClinicalApiService {
             )
             .toPromise();
     }
-
-
+     EMRNotesGetByEmpId(EmpId: any) {
+    return this.api.get(`EMRNotes/EMRNotesGetByEmpId?EmpId=${EmpId}`).toPromise();
+  }
+     GetNotesTemplate(PathId: any) {
+    return this.api.get(`EMRNotes/GetNoteQuestionBYPathId?pathId=${PathId}`).toPromise();
+  }
+  getDataquestion(): Observable<any[]> {
+    return this.http.get<any[]>(this.question);
+  }
+  InsertSpeech(note: any) {
+    debugger
+    return this.api.post(`Appointment/InsertSpeech`, note).toPromise();
+  }
       SpeechtoText(MRNo:string, currentPage?: number, pageSize?: number) {
     return this.api.get(`Appointment/SpeechtoText?mrNo=${MRNo}&PageNumber=${currentPage}&PageSize=${pageSize}`).toPromise();
   }

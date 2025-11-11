@@ -1,0 +1,132 @@
+<div class="d-flex row col-12 h-100">
+
+    <div [ngClass]="{
+      'col-8': dataquestion?.node?.noteTitle,
+      'col-12': !dataquestion?.node?.noteTitle
+    }" class="card  mt-2 d-flex flex-column">
+    <form [formGroup]="clinicalForm" (ngSubmit)="submitVoice()">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
+      <span>{{ 'CLINICAL_CREATE' | translate }}</span>
+    </h5>
+
+         <div class="row">
+          <div class="col-12 d-flex justify-content-end gap-2">
+              <button class="btn btn-danger"
+               type="button">{{ 'CANCEL' | translate }}</button>
+            <button class="btn btn-info" [disabled]="clinicalForm.invalid" type="submit">{{ 'SAVE' | translate }}</button>
+          </div>
+        </div>
+
+  </div>
+
+  <div class="card-body flex-grow-1 overflow-auto">
+      <div >
+        <div class="row g-3 mb-2">
+          <div class="col-sm-3">
+            <label class="form-label">Provider <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="provider"
+              (change)="onProviderchange()">
+              <option value="null" disabled>Select Provider</option>
+              <option *ngFor="let p of providers" [value]="p.code">{{ p.name }}</option>
+            </select>
+          </div>
+
+          <div class="col-sm-3">
+            <label class="form-label">Notes <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="note">
+              <option value="null" disabled>Select Note</option>
+              <option *ngFor="let n of clinicalNotes" [value]="n.pathId">{{ n.pathName }}</option>
+            </select>
+          </div>
+
+          <div class="col-sm-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" style="height: 37px;" placeholder="Description" formControlName="description"></textarea>
+          </div>
+
+          <div class="col-sm-3 d-flex align-items-center">
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary mt-2" (click)="startVoiceRecording()" *ngIf="!recording" type="button">
+                <i class="bi bi-mic-fill me-1"></i> Start Speech
+              </button>
+              <button class="btn btn-danger mt-2" [disabled]="isListening === true || isListening === null" (click)="stopVoiceRecording()" *ngIf="recording" type="button">
+                <i class="bi bi-stop-circle me-1"></i> Stop Speech
+              </button>
+            </div>
+          </div>
+
+
+        <div class="row mb-3">
+
+          <div class="col-12 mt-2">
+            <audio *ngIf="audioUrl" controls class="w-100" [src]="audioUrl"></audio>
+            <p *ngIf="!audioUrl && voiceBlob" class="text-muted">Processing audio...</p>
+          </div>
+        </div>
+        </div>
+
+        <div class="row mb-2">
+          <div *ngIf="recording" class="mic-container d-flex align-items-center gap-3">
+            <div class="mic-icon">
+              <i class="bi bi-mic-fill fs-4 text-primary"></i>
+            </div>
+            <div class="wave-container d-flex align-items-center">
+              <span class="d-inline-block bg-secondary rounded-pill" style="width:6px;height:6px;margin:0 3px;"></span>
+              <span class="d-inline-block bg-secondary rounded-pill" style="width:6px;height:6px;margin:0 3px;"></span>
+              <span class="d-inline-block bg-secondary rounded-pill" style="width:6px;height:6px;margin:0 3px;"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="row">
+          <div class="col-12 d-flex justify-content-end gap-2">
+              <button class="btn btn-danger"
+               type="button">{{ 'CANCEL' | translate }}</button>
+            <button class="btn btn-info" [disabled]="clinicalForm.invalid" type="submit">{{ 'SAVE' | translate }}</button>
+          </div>
+        </div> -->
+      </div>
+
+    <!-- Bootstrap tabs -->
+    <div class="mt-2" *ngIf="dataquestion?.node?.noteTitle">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="structured-tab" data-bs-toggle="tab" data-bs-target="#structured" type="button" role="tab">
+            Structured Note Template
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content border border-top-0 p-3">
+        <div class="tab-pane fade show active" id="structured" role="tabpanel" aria-labelledby="structured-tab">
+          <div *ngIf="viewquestion" class="card p-3">
+            <h2 class="fw-bold text-decoration-underline">{{ dataquestion?.node?.noteTitle }}</h2>
+            <div *ngFor="let q of dataquestion?.node?.questions" class="mt-2">
+              <app-question-view [question]="q"></app-question-view>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="note" role="tabpanel" aria-labelledby="note-tab">
+          <div *ngIf="viewNoteResponse" class="card p-3">
+            <h2 class="fw-bold text-decoration-underline">{{ nodeData?.noteTitle }}</h2>
+            <div class="mt-2">
+              <app-question-item *ngFor="let question of nodeData?.questions" [question]="question"></app-question-item>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-2" *ngIf="!dataquestion?.node?.noteTitle">
+        <h3 style="text-align: center;">No Template Found!</h3>
+    </div>
+
+  </div> <!-- card-body -->
+</form>
+
+</div> <!-- card -->
+<div class="col-4 bg-dark text-white rounded fixed-height mt-2" *ngIf="dataquestion?.node?.noteTitle">
+    <app-notes></app-notes>
+</div>
+</div>

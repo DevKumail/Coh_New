@@ -10,6 +10,8 @@ import { modulePermissionGuard } from '@core/guards/module-permission.guard';
 import { VitalSignsComponent } from './vital-signs/vital-signs.component';
 import { ImmunizationsComponent } from './immunizations/immunizations.component';
 import { MedicationComponent } from './medication/medication.component';
+import { ClinicalNoteComponent } from './clinical-note/clinical-note.component';
+import { ClinicalNoteCreateComponent } from './clinical-note-create/clinical-note-create.component';
 
 export const CLINICAL_ROUTES: Routes = [
   {
@@ -76,6 +78,12 @@ export const CLINICAL_ROUTES: Routes = [
         path:'immunizations',
         canActivate:[modulePermissionGuard],
         component:ImmunizationsComponent,
+        data: { module: 'Clinical', component: 'Immunizations', title: 'Immunizations' }
+      },
+      {
+        path:'create-notes',
+        canActivate:[modulePermissionGuard],
+        component:ClinicalNoteCreateComponent,
         data: { module: 'Clinical', component: 'Immunizations', title: 'Immunizations' }
       },
     ]
