@@ -9,7 +9,7 @@ namespace HMIS.Application.Implementations
 {
     public interface IAlertManager
     {
-        Task<DataSet> GetAlertDeatilsDB(string mrno);
+        Task<DataSet> GetAlertDeatilsDB(string mrno, int? PageNumber, int? PageSize);
 
         Task<bool> InsertOrUpdateAlert(Alerts_Model Alert);
         

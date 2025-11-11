@@ -220,7 +220,10 @@ MyDentalGroups:any[]=[];
       .subscribe((visitdata: any) => {
           if (visitdata) {
             this.visitDetail = visitdata;
-            this.VisitAccountNO = visitdata.appointmentId
+            this.GetALLServices();
+            this.GetALLDidnosis();
+            this.VisitAccountNO = visitdata.appointmentId;
+            
             console.log('✅ Subscription triggered with visit:', this.visitDetail);
           }
       }); 
@@ -233,8 +236,87 @@ MyDentalGroups:any[]=[];
           }
       });
 
+      if(this.VisitAccountNO){
+        this.GetALLServices();
+        this.GetALLDidnosis();
+      }
+
     await this.FillCache();
     await this.populateYearDropdown();
+  }
+
+  getDignosisPageInfo:any = {
+    PageSize: 5,
+    PageNumber: 1
+  }
+  AllDiagnosis: any = [];
+  TotalDiagnosisCount: any;
+  getServicePageInfo:any = {
+    PageSize: 5,
+    PageNumber: 1
+  }
+  TotalServiceCount: any;
+  AllService: any = [];
+
+  async GetALLServices(){
+    const AppId: any = this.VisitAccountNO;
+    this.MyServicesData = [];
+        this.service.GetAllChargeCaptureService(AppId, this.getServicePageInfo.PageNumber, this.getServicePageInfo.PageSize).then((response: any) => {
+          console.log('ALL_SERVICES' ,response);
+          this.AllService = response?.table1 || [];
+          this.TotalServiceCount = response?.table2 || 0;
+          
+          // Bind existing services to Always Service section
+          if(this.AllService && this.AllService.length > 0) {
+            console.log('Raw AllService Data:', this.AllService);
+            this.MyServicesData = this.AllService.map((service: any) => {
+              const mappedService = {
+                procedureId: service?.procedureId || 0,
+                type: service?.procedureType || 'Service',
+                cptCode: service?.procedureCode || service?.cptCode,
+                description: service?.description || service?.providerDescription,
+                Unit: service?.units || service?.Unit || '1',
+                M1: service?.modifier1 || service?.M1 || null,
+                M2: service?.modifier2 || service?.M2 || null,
+                M3: service?.modifier3 || service?.M3 || null,
+                M4: service?.modifier4 || service?.M4 || null,
+                universaltoothcode: service?.toothCode || service?.universaltoothcode,
+                UnclassifiedId: service?.unclassifiedId || service?.UnclassifiedId
+              };
+              console.log('Mapped Service:', mappedService);
+              return mappedService;
+            });
+            this.AllServiceSetPagedData();
+            this.AllServiceTotalItems = this.MyServicesData.length;
+            console.log('Final MyServicesData:', this.MyServicesData);
+            console.log('ServiceM flag:', this.ServiceM);
+          }
+        })
+  }
+
+
+  GetALLDidnosis(){
+    const AppId: any = this.VisitAccountNO;
+    this.MyDiagnosisData = [];
+    this.service.GetAllChargeCaptureDiagnosis(AppId, this.getDignosisPageInfo.PageNumber, this.getDignosisPageInfo.PageSize).then((response: any) => {
+      this.AllDiagnosis = response?.table1 || [];
+      this.TotalDiagnosisCount = response?.table2 || 0;
+      console.log('ALL_DIAGNOSIS' ,response);
+      
+      // Bind existing diagnosis to Always Diagnosis section
+      if(this.AllDiagnosis && this.AllDiagnosis.length > 0) {
+        this.MyDiagnosisData = this.AllDiagnosis.map((diagnosis: any) => ({
+          diagnosisId: diagnosis?.diagnosisId || 0,
+          ICDCode: diagnosis?.icD9Code || diagnosis?.icD9Code,
+          version: diagnosis?.icdVersion || '-',
+          versionId: diagnosis?.icdVersionId || diagnosis?.versionId,
+          description: diagnosis?.descriptionshort || diagnosis?.descriptionshort,
+          typeofDiagnosis: diagnosis?.diagnosisPriority || diagnosis?.typeofDiagnosis || '',
+          yearofOnset: diagnosis?.yearofOnset || ''
+        }));
+        this.allDiagnosisUpdatePagination();
+      }
+        })
   }
 
   async loadICD9Gropu(){
@@ -567,6 +649,9 @@ async filterMyDental(e: any){
       console.log('response =>',response);
       if(response && Object.keys(response).length > 0){
         this.MyCPTCode = response?.table1 || [];
+        // Apply auto-check filter
+        this.MyCPTCode = this.checkExistingServices(this.MyCPTCode);
+        this.AllMyCPTCode = [...this.MyCPTCode];
         this.MyCptCodeTotalItems = response?.table2[0]?.totalRecords || 0;
         console.log(this.MyCPTCode, 'this.MyCPTCode');
       }
@@ -602,7 +687,7 @@ async filterMyDental(e: any){
       return;
     }
 
-    if (this.MyDiagnosisData.length <= 0 || this.pagedAllService.length <= 0) {
+    if (this.MyDiagnosisData.length <= 0 || this.MyServicesData.length <= 0) {
       this.loader.hide();
       Swal.fire({
         icon: 'error',
@@ -638,7 +723,7 @@ async filterMyDental(e: any){
         return;
         }
       let Array={
-        DiagnosisId : 0,
+        DiagnosisId : this.MyDiagnosisData[i].diagnosisId || 0,
         VisitAccountNo : parseInt(this.VisitAccountNO),
         Icd9code: this.MyDiagnosisData[i].ICDCode,
         LastUpdatedBy:this.currentUser,
@@ -660,22 +745,23 @@ async filterMyDental(e: any){
     ChargCaptureModel.BLSupperBillDiagnosisModel=data;
    
     let procedureData: any = [];
-    for (let i = 0; i < this.pagedAllService.length; i++) {
+    for (let i = 0; i < this.MyServicesData.length; i++) {
       let procedure = {
-        ProcedureId: 0,
+        ProcedureId: this.MyServicesData[i].procedureId || 0,
         VisitAccountNo: parseInt(this.VisitAccountNO),
         DateOfServiceFrom: currentDate,
         DateOfServiceTo: currentDate,
         CreatedBy: this.currentUser,
-        ProcedureCode: this.pagedAllService[i].cptCode,
-        Description: this.pagedAllService[i].description,
-        UnclassifiedId: this.pagedAllService[i].UnclassifiedId || null,
-        ProcedureType: this.pagedAllService[i].type,
-        Units: this.pagedAllService[i].Unit || '1',
-        Modifier1: this.pagedAllService[i].M1,
-        Modifier2: this.pagedAllService[i].M2,
-        Modifier3: this.pagedAllService[i].M3,
-        Modifier4: this.pagedAllService[i].M4,
+        ProcedureCode: this.MyServicesData[i].cptCode,
+        Description: this.MyServicesData[i].description,
+        UnclassifiedId: this.MyServicesData[i].UnclassifiedId || null,
+        ProcedureType: this.MyServicesData[i].type,
+        Units: this.MyServicesData[i].Unit || '1',
+        Modifier1: this.MyServicesData[i].M1,
+        Modifier2: this.MyServicesData[i].M2,
+        Modifier3: this.MyServicesData[i].M3,
+        Modifier4: this.MyServicesData[i].M4,
+        ToothCode: this.MyServicesData[i].universaltoothcode || null,
         CreatedDate: currentDate
       };
       procedureData.push(procedure);
@@ -951,96 +1037,108 @@ onMyhcpcsCheckboxChange(event: any, item: any): void {
 
 
   CPTRows() {
-     
-    let data: any[] = [];
-
+    // Keep existing MyServicesData and only update based on selectedServices
+    let existingData = [...this.MyServicesData];
+    
     for (let i = 0; i < this.selectedServices.length; i++) {
-      let oldData = {
-        type: "",
-        cptCode: undefined,
-        description: undefined,
-        UnclassifiedId: undefined
-      };
-
       let svc = this.selectedServices[i];
+      let cptCode = '';
+      let type = '';
+      let description = '';
+      let unclassifiedId = undefined;
 
       if (svc.procedureType === "Dental") {
-        oldData.type = svc.procedureType;
-        oldData.cptCode = svc.dentalCode;
-        oldData.description = svc.providerDescription;
+        type = svc.procedureType;
+        cptCode = svc.dentalCode;
+        description = svc.providerDescription;
         this.Dental = true;
         this.cpt = false;
         this.HCPCS = false;
-        data.push(oldData);
       } 
       else if (svc.procedureType === "ALLDental") {
-        oldData.type = "Dental";
-        oldData.cptCode = svc.code;
-        oldData.description = svc.descriptionFull;
+        type = "Dental";
+        cptCode = svc.code;
+        description = svc.descriptionFull;
         this.Dental = true;
         this.cpt = false;
         this.HCPCS = false;
-        data.push(oldData);
       } 
       else if (svc.procedureType === "CPT") {
-        oldData.type = svc.procedureType;
-        oldData.cptCode = svc.cptCode;
-        oldData.description = svc.providerDescription;
+        type = svc.procedureType;
+        cptCode = svc.cptCode;
+        description = svc.providerDescription;
         this.cpt = true;
         this.Dental = false;
         this.HCPCS = false;
-        data.push(oldData);
       } 
       else if (svc.procedureType === "ALLCPT") {
-        oldData.type = "CPT";
-        oldData.cptCode = svc.code;
-        oldData.description = svc.descriptionFull;
+        type = "CPT";
+        cptCode = svc.code;
+        description = svc.descriptionFull;
         this.cpt = true;
         this.Dental = false;
         this.HCPCS = false;
-        data.push(oldData);
       } 
       else if (svc.procedureType === "HCPCS") {
-        oldData.type = svc.procedureType;
-        oldData.cptCode = svc.hcpcsCode;
-        oldData.description = svc.providerDescription;
+        type = svc.procedureType;
+        cptCode = svc.hcpcsCode;
+        description = svc.providerDescription;
         this.HCPCS = true;
         this.cpt = false;
         this.Dental = false;
-        data.push(oldData);
       } 
       else if (svc.procedureType === "ALLHCPCS") {
-        oldData.type = "HCPCS";
-        oldData.cptCode = svc.code;
-        oldData.description = svc.descriptionFull;
+        type = "HCPCS";
+        cptCode = svc.code;
+        description = svc.descriptionFull;
         this.HCPCS = true;
         this.cpt = false;
         this.Dental = false;
-        data.push(oldData);
       }
       else if (svc.procedureType === "Service") {
-        oldData.type = "Service";
-        oldData.cptCode = svc.code;
-        oldData.description = svc.description;
-        oldData.UnclassifiedId = svc.unclassifiedID
+        type = "Service";
+        cptCode = svc.code;
+        description = svc.description;
+        unclassifiedId = svc.unclassifiedID;
         this.HCPCS = true;
         this.cpt = false;
         this.Dental = false;
-        data.push(oldData);
       }
       else if(svc.procedureType === "UnclassifiedService"){
-        oldData.type = "Service";
-        oldData.cptCode = svc.code;
-        oldData.description = svc.description;
-        oldData.UnclassifiedId = svc.unclassifiedID
+        type = "Service";
+        cptCode = svc.code;
+        description = svc.description;
+        unclassifiedId = svc.unclassifiedID;
         this.HCPCS = true;
         this.cpt = false;
         this.Dental = false;
-        data.push(oldData);
+      }
+
+      // Check if item already exists in MyServicesData
+      const existsIndex = existingData.findIndex((item: any) => 
+        item.cptCode === cptCode && 
+        (unclassifiedId ? item.UnclassifiedId === unclassifiedId : true)
+      );
+
+      if (existsIndex === -1) {
+        // Add new item if not exists
+        existingData.push({
+          procedureId: 0,
+          type: type,
+          cptCode: cptCode,
+          description: description,
+          Unit: '1',
+          M1: null,
+          M2: null,
+          M3: null,
+          M4: null,
+          universaltoothcode: null,
+          UnclassifiedId: unclassifiedId
+        });
       }
     }
 
-    this.MyServicesData = data;
+    this.MyServicesData = existingData;
     this.GetAllService(this.MyServicesData);
     console.log(this.MyServicesData, "Processed Selected Services");
   }
@@ -1219,6 +1317,8 @@ async AllDignosisApis() {
 
   if (response && Object.keys(response).length > 0) {
     this.AllMyDiagnosisCode = response?.table1 || [];
+    // Apply auto-check filter
+    this.AllMyDiagnosisCode = this.checkExistingDiagnosis(this.AllMyDiagnosisCode);
     this.MyDiagnosisCode = [...this.AllMyDiagnosisCode];
     this.MyDiagnosisCodeTotalItems = response?.table2[0]?.totalRecords || 0;
   }
@@ -1361,7 +1461,9 @@ async MyHCPCSCodebyProvider() {
   await this.service.MyHCPCSCodebyProvider(this.ProviderId || 0, this.MyHCPSGroupId || 0, this.HCPCSCode || 0 , this.DescriptionFilter || '', this.PairId || 0).then((response: any) => {
     if (response) {
       this.MyHCPCSCode = response?.table1 || [];
-      this.AllMyHCPCSCode = response?.table1 || [];
+      // Apply auto-check filter
+      this.MyHCPCSCode = this.checkExistingServices(this.MyHCPCSCode);
+      this.AllMyHCPCSCode = [...this.MyHCPCSCode];
       this.MyHCPCSCodeTotalItems = this.MyHCPCSCode.length;
       this.MyHCPCSCodeCurrentPage = 1;
       this.MyHCPCSCodeSetPagedData();
@@ -1440,7 +1542,9 @@ async MyDentalCodebyProvider() {
   await this.service.MyDentalCodebyProvider(this.ProviderId, this.GroupId, this.ProviderDescription, this.DentalCode).then((response: any) => {
     if (response) {
       this.MyDentalCode = response?.table1 || [];
-      this.AllMyDentalCode = response?.table1 || [];
+      // Apply auto-check filter
+      this.MyDentalCode = this.checkExistingServices(this.MyDentalCode);
+      this.AllMyDentalCode = [...this.MyDentalCode];
       this.MyDentalCodeTotalItems = this.MyDentalCode.length;
       this.MyDentalCodeCurrentPage = 1;
       this.MyDentalCodeSetPagedData();
@@ -1484,6 +1588,8 @@ async GetAllCPT() {
    await this.service.GetAllCPTCode(data).then((response: any) => {
     if (response && response.table1 && response.table1.length > 0) {
       this.CPTCode = response?.table1 || [];
+      // Apply auto-check filter
+      this.CPTCode = this.checkExistingServices(this.CPTCode);
       this.CPTTotalItems = response?.table2[0]?.totalRecords || 0;      
       console.log(this.CPTCode, 'this.CPTCode');
     }  
@@ -1516,6 +1622,8 @@ async GetAllHCPCS() {
 
     await this.service.GetAllHCPCSCode(data).then((response: any) => {
     this.HCPCSCodeGrid = response?.table1 || [];
+    // Apply auto-check filter
+    this.HCPCSCodeGrid = this.checkExistingServices(this.HCPCSCodeGrid);
     this.HCPCSCodeTotalItems = response?.table2?.[0]?.totalRecords || 0;
     console.log(this.HCPCSCodeGrid, 'this.HCPCSCodeGrid');
     });
@@ -1541,6 +1649,8 @@ async GetAllDental() {
 
     await this.service.GetAllDentalCode(data).then((response: any) => {
     this.AllMyDentalCode = response?.table1 || [];
+    // Apply auto-check filter
+    this.AllMyDentalCode = this.checkExistingServices(this.AllMyDentalCode);
     this.DentalCodeTotalItems = response?.table2?.[0]?.totalRecords || 0;
     console.log(this.AllMyDentalCode, 'this.AllMyDentalCode');
 });
@@ -1566,6 +1676,8 @@ async GetAllUnclassifiedService() {
 
    await this.service.GetAllUnclassifiedService(data).then((response: any) => {
       this.UnclassifiedService = response?.table1 || [];
+      // Apply auto-check filter
+      this.UnclassifiedService = this.checkExistingServices(this.UnclassifiedService);
       this.UnclassifiedServiceTotalItem = response?.table2[0]?.totalRecords || 0;      
       console.log(this.UnclassifiedService, 'this.UnclassifiedService');
     })
@@ -1591,13 +1703,59 @@ async GetAllServiceItem() {
 
    await this.service.GetAllServiceItems(data).then((response: any) => {
       this.ServicesGrid = response?.table1 || [];
+      // Apply auto-check filter
+      this.ServicesGrid = this.checkExistingServices(this.ServicesGrid);
       this.ServiceItemsTotalItems = response?.table2[0]?.totalRecords || 0;      
       console.log(this.ServicesGrid, 'this.ServicesGrid');
     })
 }
 //#endregion
 
-//#region All Service
+//#region Helper Functions for Auto-Checking Existing Items
+
+// Function to check and mark existing services in grid data
+checkExistingServices(gridData: any[]) {
+  if (!gridData || !this.MyServicesData) return gridData;
+  
+  return gridData.map((item: any) => {
+    const exists = this.MyServicesData.some((service: any) => {
+      // Check by CPT code for different service types
+      if (item.procedureType === 'CPT' || item.procedureType === 'ALLCPT') {
+        return service.cptCode === (item.cptCode || item.code);
+      } else if (item.procedureType === 'HCPCS' || item.procedureType === 'ALLHCPCS') {
+        return service.cptCode === (item.hcpcsCode || item.code);
+      } else if (item.procedureType === 'Dental' || item.procedureType === 'ALLDental') {
+        return service.cptCode === (item.dentalCode || item.code);
+      } else if (item.procedureType === 'Service' || item.procedureType === 'UnclassifiedService') {
+        return service.cptCode === item.code && service.UnclassifiedId === item.unclassifiedID;
+      }
+      return false;
+    });
+    
+    return {
+      ...item,
+      selected: exists
+    };
+  });
+}
+
+// Function to check and mark existing diagnosis in grid data
+checkExistingDiagnosis(gridData: any[]) {
+  if (!gridData || !this.MyDiagnosisData) return gridData;
+  
+  return gridData.map((item: any) => {
+    const exists = this.MyDiagnosisData.some((diagnosis: any) => {
+      return diagnosis.ICDCode === (item.icD9Code || item.code);
+    });
+    
+    return {
+      ...item,
+      selected: exists
+    };
+  });
+}
+
+//#endregion
 pagedAllService: any[] = [];
 AllServiceCurrentPage = 1;
 AllServicePageSize = 5;

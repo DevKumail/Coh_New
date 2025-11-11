@@ -119,10 +119,12 @@ export class ClinicalApiService {
     return this.api.get(`AllDropdowns/GetSeverityType`).toPromise();
   }
 
-  GetPatientAllergyData(mrno: String) {
-    //  ;
-    return this.api.get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}`).toPromise();
-  }
+
+    GetPatientAllergyData(mrno: String , page: number, pageSize: number) {
+        return this.api
+            .get(`Alergy/GetAlergyDetailsDB?mrno=${mrno}&PageNumber=${page}&PageSize=${pageSize}`)
+            .toPromise();
+    }
   GetAlergyType(): Observable<any> {
     return this.api.get('AllDropdowns/GetAlergyTypes');
   }
@@ -265,9 +267,59 @@ export class ClinicalApiService {
       .toPromise();
   }
 
+  GetSocialHistory(){
+    return this.api.get(`AllDropdowns/GetSocialHistory`).toPromise();
+  }
+
+    DeletePatientProcedure(id: number){
+    return this.api.delete(`PatientProcedure/DeletePatientProcedure?Id=${id}`).toPromise();
+  }
+
+  GetAllSocialHistory(MRNo: string, pageNumber: number, pageSize: number){
+    return this.api.get(`PatientChartFamilyHistory/GetAllSocialHistory?MRNo=${MRNo}&PageNumber=${pageNumber}&PageSize=${pageSize}`).toPromise();
+  }
+
+  SubmitSocialHistory(object:any){
+    return this.api.post(`PatientChartFamilyHistory/CreateSocialHistory`,object).toPromise();
+  }
+
+
+  DeleteSocialHistory(id: number){
+    return this.api.delete(`PatientChartFamilyHistory/DeleteSocialHistoryByShId?shid=${id}`).toPromise();
+  }
   // GetSeverity() {
   //   return this.api.get('AllDropdowns/GetSeverityType').toPromise();
   // }
+  CreateFamilyHistory(object:any){
+    return this.api.post(`PatientChartFamilyHistory/CreateFamilyHistory`,object).toPromise();
+  }
 
+  GetFamilyProblemHistory(){
+  return this.api.get(`AllDropdowns/GetFamilyProblemHistory`).toPromise();
+ }
+
+   GetAllFamilyHistory(MRNo: string, pageNumber: number, pageSize: number){
+    return this.api.get(`PatientChartFamilyHistory/GetAllFamilyHistory?MRNo=${MRNo}&PageNumber=${pageNumber}&PageSize=${pageSize}`).toPromise();
+  }
+
+  DeleteFamilyHistoryByFHID(id: number){
+    return this.api.delete(`PatientChartFamilyHistory/DeleteFamilyHistoryByFHID?fhid=${id}`).toPromise();
+  }
+
+      GetAlertDetailsDb(mrno: string, pageNumber: number, pageSize: number ): Promise<any> {
+        const url = `Alert/GetAlertDeatilsDB?mrno=${mrno}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
+        return this.api.get(url).toPromise();
+    }
+
+      GetPatientImmunizationData(mrno: string, page: number, pageSize: number, status: any) {
+        return this.api
+            .get(`PatientImmunization/GetPatientImmunizationList?mrno=${mrno}&PageNumber=${page}&PageSize=${pageSize}&Status=${status}`)
+            .toPromise();
+    }
+
+        GetAppointmentByMRNO(MRNo:any,currentPage:any,pageSize:any) {
+	return this.api.get(`Common/GetAppointmentInfoByMRNo?PageNumber=${currentPage}&PageSize=${pageSize}&MRNo=${MRNo}`);
+
+  }
 
 }

@@ -111,5 +111,6 @@ export class DemographicApiServices {
 	return this.api.get(`Common/GetAppointmentInfoByMRNo?PageNumber=${currentPage}&PageSize=${pageSize}&MRNo=${MRNo}`);
 
   }
+  
 
 }

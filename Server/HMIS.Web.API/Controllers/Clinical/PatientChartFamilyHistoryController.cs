@@ -23,9 +23,9 @@ namespace HMIS.Web.Controllers.Clinical
 
         
         [HttpGet("GetAllSocialHistory")]
-        public async Task<ActionResult> GetAllSocialHistory()
+        public async Task<ActionResult> GetAllSocialHistory(string? MRNo, int? PageNumber, int? PageSize)
         {
-            var List = await FamilyHistory.GetAllSocialHistory();
+            var List = await FamilyHistory.GetAllSocialHistory(MRNo, PageNumber, PageSize);
             return Ok(List);
         }
         
@@ -45,7 +45,8 @@ namespace HMIS.Web.Controllers.Clinical
             return Ok(new {Error="Error"});
         }
 
-        [HttpDelete("DeleteSocialHistoryByShId/{shid}")]
+        //[HttpDelete("DeleteSocialHistoryByShId/{shid}")]
+        [HttpDelete("DeleteSocialHistoryByShId")]
         public async Task<ActionResult> DeleteSocialHistoryByShId(long shid)
         {
             var List = await FamilyHistory.DeleteSocialHistoryByShId(shid);
@@ -54,9 +55,9 @@ namespace HMIS.Web.Controllers.Clinical
 
 
         [HttpGet("GetAllFamilyHistory")]
-        public async Task<ActionResult> GetAllFamilyHistory()
+        public async Task<ActionResult> GetAllFamilyHistory(string? MRNo, int? PageNumber, int? PageSize)
         {
-            var List = await FamilyHistory.GetAllFamilyHistory();
+            var List = await FamilyHistory.GetAllFamilyHistory(MRNo, PageNumber, PageSize);
             return Ok(List);
         }
 
@@ -76,7 +77,9 @@ namespace HMIS.Web.Controllers.Clinical
             return Ok(new { Error = "Error" });
         }
 
-        [HttpDelete("DeleteFamilyHistoryByFHID/{fhid}")]
+        //[HttpDelete("DeleteFamilyHistoryByFHID/{fhid}")]
+        [HttpDelete("DeleteFamilyHistoryByFHID")]
+
         public async Task<ActionResult> DeleteFamilyHistoryByFHID(long fhid)
         {
             var List = await FamilyHistory.DeleteFamilyHistoryByFHID(fhid);

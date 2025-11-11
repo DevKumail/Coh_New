@@ -16,6 +16,8 @@ import { AdvanceSearchModalComponent } from '@/app/layouts/components/topbar/com
 import { ModalTriggerService } from '@core/services/modal-trigger.service';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import { LoaderService } from '@core/services/loader.service';
+import { SocialHistoryComponent } from '../../clinical/social-history/social-history.component';
+import { FamilyHistoryComponent } from '../../clinical/family-history/family-history.component';
 
 @Component({
   selector: 'app-ivf-patient-summary',
@@ -24,7 +26,7 @@ import { LoaderService } from '@core/services/loader.service';
     CommonModule, ReactiveFormsModule, NgIcon, IvfSideMenuComponent,
     IvfPsDemographicComponent, IvfPsMedicalHistoryComponent, IvfPsLabDiagnosticsComponent,
     IvfPsBillingComponent, IvfPsMessageComponent, IvfPsCycleComponent, IvfPsSwitchPartnerComponent,
-    AdvanceSearchModalComponent
+    AdvanceSearchModalComponent, SocialHistoryComponent, FamilyHistoryComponent
   ],
   templateUrl: './ivf-patient-summary.component.html',
   styleUrls: ['./ivf-patient-summary.component.scss']

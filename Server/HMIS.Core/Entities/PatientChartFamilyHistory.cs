@@ -32,6 +32,11 @@ public partial class PatientChartFamilyHistory
     [Column(TypeName = "datetime")]
     public DateTime? CreatedDate { get; set; }
 
+    public long? UpdatedBy { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? UpdatedDate { get; set; }
+
     public bool? Active { get; set; }
 
     public long? UpdatedBy { get; set; }

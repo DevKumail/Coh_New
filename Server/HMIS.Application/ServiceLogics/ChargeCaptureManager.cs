@@ -551,163 +551,341 @@ namespace HMIS.Application.ServiceLogics
         //    }
         //    //return "";m
         //}
-       
 
-        public async Task<String> SaveChargeCapture(ChargCaptureModel input)
+
+        //public async Task<String> SaveChargeCapture(ChargCaptureModel input)
+        //{
+        //    try
+        //    {
+        //        List<BlSuperBillProcedureModel> blSuperBillProcedures = _mapper.Map<List<BlSuperBillProcedureModel>>(input.blSuperBillProcedureModel);
+
+        //        List<BLSupperBillDiagnosisModel> bLSupperBillDiagnosis = _mapper.Map<List<BLSupperBillDiagnosisModel>>(input.BLSupperBillDiagnosisModel);
+
+        //        var updateComment = _dbContext.SchAppointment.SingleOrDefault(e => e.AppId == input.AppointmentId);
+
+        //        if (blSuperBillProcedures.Count > 0)
+        //        {
+        //            List<BlsuperBillProcedure> ls = new List<BlsuperBillProcedure>();
+        //            foreach (var BillProcedure in blSuperBillProcedures)
+        //            {
+        //                BillProcedure.TypeOfService = Convert.ToString(
+        //                    await _dbContext.TypeOfServiceMaster
+        //                    .Where(x => x.Name == BillProcedure.ProcedureType)
+        //                    .Select(x => x.ServiceTypeId)
+        //                    .FirstOrDefaultAsync()
+        //                    );
+
+
+        //                //decimal? price = 0;
+        //                decimal? price = await GetProcedureUnitPrice(Convert.ToInt16(BillProcedure.TypeOfService), BillProcedure.ProcedureCode, updateComment.ProviderId, Convert.ToInt64(input.PayerId), Convert.ToInt64(BillProcedure.UnclassifiedId));
+        //                ;
+
+
+        //                BlsuperBillProcedure bLSuperBill = new BlsuperBillProcedure
+        //                {
+        //                    ProcedureType = BillProcedure.ProcedureType,
+        //                    ProcedureCode = BillProcedure.ProcedureCode,
+        //                    Description = BillProcedure.Description,
+        //                    ToothCode = BillProcedure.ToothCode,
+        //                    DateOfServiceFrom = DateTime.Now,
+        //                    DateOfServiceTo = DateTime.Now,
+        //                    CreatedDate = DateTime.Now,
+        //                    PlaceOfService = "11",
+        //                    TypeOfService = BillProcedure.TypeOfService,
+        //                    CreatedBy = BillProcedure.CreatedBy,
+        //                    AppointmentId = input.AppointmentId,
+        //                    Units = BillProcedure.Units,
+        //                    UnitPrice = price,
+        //                    Modifier1 = BillProcedure.Modifier1,
+        //                    Modifier2 = BillProcedure.Modifier2,
+        //                    Modifier3 = BillProcedure.Modifier3,
+        //                    Modifier4 = BillProcedure.Modifier4
+        //                };
+        //                ls.Add(bLSuperBill);
+        //                _dbContext.BlsuperBillProcedure.Add(bLSuperBill);
+
+        //                if (BillProcedure.ProcedureType == "CPT")
+        //                {
+        //                    var getCptId = await _dbContext.ProcedureType.Where(x => x.Type == BillProcedure.ProcedureType).Select(x => x.Id).FirstOrDefaultAsync();
+        //                    PatientProcedure patientProcedure = new PatientProcedure()
+        //                    {
+        //                        ProviderId = Convert.ToInt64(BillProcedure.CreatedBy),
+        //                        Cptcode = BillProcedure.ProcedureType,
+        //                        ProcedureDescription = BillProcedure.Description,
+        //                        ProcedureDateTime = System.DateTime.UtcNow,
+        //                        ProcedureType = getCptId,
+        //                        Active = 1,
+        //                        ProcedurePriority = BillProcedure.ProcedurePriority,
+        //                        AssociatedDiagnosisCode = BillProcedure.AssociatedDiagnosisCode,
+        //                        PrimaryAnestheticId = BillProcedure.PrimaryAnestheticId.ToString(),
+        //                        TypeOfAnesthesia = BillProcedure.TypeOfAnesthesia,
+        //                        AnesthesiaStartDateTime = BillProcedure.AnesthesiaStartDateTime,
+        //                        AnesthesiaEndDateTime = BillProcedure.AnesthesiaEndDateTime,
+        //                        PerformedOnFacility = true,
+        //                        IsHl7msgCreated = BillProcedure.IsHl7msgCreated,
+        //                        IsLabTest = BillProcedure.IsLabTest
+
+        //                    };
+        //                    _dbContext.PatientProcedure.Add(patientProcedure);
+        //                }
+        //            }
+        //            if (updateComment != null)
+        //            {
+        //                updateComment.ChargeCaptureComments = input.Comment;
+        //            }
+        //            await _dbContext.SaveChangesAsync();
+        //            //return "OK";
+        //        }
+        //        if (bLSupperBillDiagnosis.Count > 0)
+        //        {
+        //            foreach (var Diagnosis in bLSupperBillDiagnosis)
+        //            {
+        //                // Call ValidateChargeCapture with a list containing the current diagnosis
+        //                //var message = await ValidateChargeCapture(new List<BlsuperBillDiagnosis> { Diagnosis }, input.VisitAccountNo, input.EmployeeId);
+
+        //                //_dbContext.BlsuperBillDiagnoses.Add(Diagnosis);
+        //                var EmpName = await _dbContext.Hremployee.Where(x => x.EmployeeId == Convert.ToInt64(Diagnosis.CreatedBy)).FirstOrDefaultAsync();
+
+        //                BlsuperBillDiagnosis blsuperBillDiagnosis = new BlsuperBillDiagnosis()
+        //                {
+        //                    CreatedBy = EmpName.FullName,
+        //                    CreatedDate = DateTime.Now,
+        //                    Descriptionshort = Diagnosis.Descriptionshort,
+        //                    DiagnosisPriority = Diagnosis.DiagnosisPriority,
+        //                    DiagnosisType = Diagnosis.DiagnosisType,
+        //                    Icd9code = Diagnosis.Icd9code,
+        //                    Icdorder = Diagnosis.Icdorder,
+        //                    IcdversionId = Diagnosis.IcdversionId,
+        //                    IsHl7msgCreated = Diagnosis.IsHl7msgCreated,
+        //                    Type = Diagnosis.Type,
+        //                    YearofOnset = Diagnosis.YearofOnset,
+        //                    LastUpdatedBy = EmpName.FullName,
+        //                    LastUpdatedDate = DateTime.Now,
+        //                    AppointmentId = Diagnosis.VisitAccountNo
+        //                };
+        //                _dbContext.BlsuperBillDiagnosis.Add(blsuperBillDiagnosis);
+        //            }
+        //            await _dbContext.SaveChangesAsync();
+        //            //return "OK";
+        //        }
+        //        return "OK";
+
+        //        //return null;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //return ex.ToString();
+        //        return "Something went wrong while saving";
+        //    }
+
+        //    //    List<BlsuperBillDiagnosis> bLSupperBillDiagnosis = _mapper.Map<List<BlsuperBillDiagnosis>>(input.BLSupperBillDiagnosisModel);
+
+
+        //    //    BlsuperBillProcedure? blsuperBillProcedure = await Task.Run(() => _dbContext.BlsuperBillProcedures.Where(x => x.AppointmentId == input.VisitAccountNo).FirstOrDefaultAsync());
+        //    //    //BlpatientVisit? blpatientVisitTab = await Task.Run(() => _dbContext.SchAppointments.Where(x => x.VisitAccountNo == input.VisitAccountNo).FirstOrDefaultAsync());
+        //    //    SchAppointment? SchAppointmentTab = await Task.Run(() => _dbContext.SchAppointments.Where(x => x.VisitAccountNo == input.VisitAccountNo)
+        //    //    .FirstOrDefaultAsync());
+
+        //    //    BlsuperBillDiagnosis? blsuperBillDiagnosisTab = _dbContext.BlsuperBillDiagnoses.Where(x => x.AppointmentId == input.BLSupperBillDiagnosisModel[0].VisitAccountNo).FirstOrDefault();
+
+        //    //    foreach (var Diagnosis in bLSupperBillDiagnosis)
+        //    //    {
+        //    //        // Call ValidateChargeCapture with a list containing the current diagnosis
+        //    //        var message = await ValidateChargeCapture(new List<BlsuperBillDiagnosis> { Diagnosis }, input.VisitAccountNo, input.EmployeeId);
+
+        //    //        _dbContext.BlsuperBillDiagnoses.Add(Diagnosis);
+        //    //    }
+
+        //    //    _dbContext.BlsuperBillProcedures.Add(blsuperBillProcedure);
+
+        //    //    return "";
+
+
+
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    return ex.ToString();
+        //    //}
+        //}
+
+
+
+        public async Task<string> SaveChargeCapture(ChargCaptureModel input)
         {
             try
             {
                 List<BlSuperBillProcedureModel> blSuperBillProcedures = _mapper.Map<List<BlSuperBillProcedureModel>>(input.blSuperBillProcedureModel);
-
                 List<BLSupperBillDiagnosisModel> bLSupperBillDiagnosis = _mapper.Map<List<BLSupperBillDiagnosisModel>>(input.BLSupperBillDiagnosisModel);
 
-                var updateComment = _dbContext.SchAppointment.SingleOrDefault(e => e.AppId == input.AppointmentId);
+                var updateComment = await _dbContext.SchAppointment.SingleOrDefaultAsync(e => e.AppId == input.AppointmentId);
 
-                if (blSuperBillProcedures.Count > 0)
+                // ✅ Handle Procedures (Insert or Update)
+                if (blSuperBillProcedures != null && blSuperBillProcedures.Count > 0)
                 {
-                    List<BlsuperBillProcedure> ls = new List<BlsuperBillProcedure>();
-                    foreach (var BillProcedure in blSuperBillProcedures)
+                    foreach (var billProcedure in blSuperBillProcedures)
                     {
-                        BillProcedure.TypeOfService = Convert.ToString(
-                            await _dbContext.TypeOfServiceMaster
-                            .Where(x => x.Name == BillProcedure.ProcedureType)
+                        // Get TypeOfServiceId
+                        billProcedure.TypeOfService = Convert.ToString(await _dbContext.TypeOfServiceMaster
+                            .Where(x => x.Name == billProcedure.ProcedureType)
                             .Select(x => x.ServiceTypeId)
-                            .FirstOrDefaultAsync()
-                            );
+                            .FirstOrDefaultAsync());
 
+                        // Get Unit Price
+                        decimal? price = await GetProcedureUnitPrice(
+                            Convert.ToInt16(billProcedure.TypeOfService),
+                            billProcedure.ProcedureCode,
+                            updateComment.ProviderId,
+                            Convert.ToInt64(input.PayerId),
+                            Convert.ToInt64(billProcedure.UnclassifiedId));
 
-                        //decimal? price = 0;
-                        decimal? price = await GetProcedureUnitPrice(Convert.ToInt16(BillProcedure.TypeOfService), BillProcedure.ProcedureCode, updateComment.ProviderId, Convert.ToInt64(input.PayerId), Convert.ToInt64(BillProcedure.UnclassifiedId));
-                        ;
+                        // ✅ Check if Procedure exists (Update case)
+                        var existingProcedure = await _dbContext.BlsuperBillProcedure
+                            .FirstOrDefaultAsync(x => x.ProcedureId == billProcedure.ProcedureId);
 
-
-                        BlsuperBillProcedure bLSuperBill = new BlsuperBillProcedure
+                        if (existingProcedure != null)
                         {
-                            ProcedureType = BillProcedure.ProcedureType,
-                            ProcedureCode = BillProcedure.ProcedureCode,
-                            Description = BillProcedure.Description,
-                            ToothCode = BillProcedure.ToothCode,
-                            DateOfServiceFrom = DateTime.Now,
-                            DateOfServiceTo = DateTime.Now,
-                            CreatedDate = DateTime.Now,
-                            PlaceOfService = "11",
-                            TypeOfService = BillProcedure.TypeOfService,
-                            CreatedBy = BillProcedure.CreatedBy,
-                            AppointmentId = input.AppointmentId,
-                            Units = BillProcedure.Units,
-                            UnitPrice = price,
-                            Modifier1 = BillProcedure.Modifier1,
-                            Modifier2 = BillProcedure.Modifier2,
-                            Modifier3 = BillProcedure.Modifier3,
-                            Modifier4 = BillProcedure.Modifier4
-                        };
-                        ls.Add(bLSuperBill);
-                        _dbContext.BlsuperBillProcedure.Add(bLSuperBill);
-
-                        if (BillProcedure.ProcedureType == "CPT")
+                            // Update existing record
+                            existingProcedure.ProcedureType = billProcedure.ProcedureType;
+                            existingProcedure.ProcedureCode = billProcedure.ProcedureCode;
+                            existingProcedure.Description = billProcedure.Description;
+                            existingProcedure.ToothCode = billProcedure.ToothCode;
+                            existingProcedure.LastUpdatedDate = DateTime.Now;
+                            existingProcedure.PlaceOfService = "11";
+                            existingProcedure.TypeOfService = billProcedure.TypeOfService;
+                            existingProcedure.Units = billProcedure.Units;
+                            existingProcedure.UnitPrice = price;
+                            existingProcedure.Modifier1 = billProcedure.Modifier1;
+                            existingProcedure.Modifier2 = billProcedure.Modifier2;
+                            existingProcedure.Modifier3 = billProcedure.Modifier3;
+                            existingProcedure.Modifier4 = billProcedure.Modifier4;
+                            existingProcedure.LastUpdatedBy = billProcedure.CreatedBy;
+                        }
+                        else
                         {
-                            var getCptId = await _dbContext.ProcedureType.Where(x => x.Type == BillProcedure.ProcedureType).Select(x => x.Id).FirstOrDefaultAsync();
-                            PatientProcedure patientProcedure = new PatientProcedure()
+                            // Insert new record
+                            BlsuperBillProcedure newProc = new BlsuperBillProcedure
                             {
-                                ProviderId = Convert.ToInt64(BillProcedure.CreatedBy),
-                                Cptcode = BillProcedure.ProcedureType,
-                                ProcedureDescription = BillProcedure.Description,
-                                ProcedureDateTime = System.DateTime.UtcNow,
+                                ProcedureType = billProcedure.ProcedureType,
+                                ProcedureCode = billProcedure.ProcedureCode,
+                                Description = billProcedure.Description,
+                                ToothCode = billProcedure.ToothCode,
+                                DateOfServiceFrom = DateTime.Now,
+                                DateOfServiceTo = DateTime.Now,
+                                CreatedDate = DateTime.Now,
+                                PlaceOfService = "11",
+                                TypeOfService = billProcedure.TypeOfService,
+                                CreatedBy = billProcedure.CreatedBy,
+                                AppointmentId = input.AppointmentId,
+                                Units = billProcedure.Units,
+                                UnitPrice = price,
+                                Modifier1 = billProcedure.Modifier1,
+                                Modifier2 = billProcedure.Modifier2,
+                                Modifier3 = billProcedure.Modifier3,
+                                Modifier4 = billProcedure.Modifier4
+                            };
+                            _dbContext.BlsuperBillProcedure.Add(newProc);
+                        }
+
+                        // ✅ Also handle CPT insertion into PatientProcedure table
+                        if (billProcedure.ProcedureType == "CPT")
+                        {
+                            var getCptId = await _dbContext.ProcedureType
+                                .Where(x => x.Type == billProcedure.ProcedureType)
+                                .Select(x => x.Id)
+                                .FirstOrDefaultAsync();
+
+                            PatientProcedure patientProcedure = new PatientProcedure
+                            {
+                                ProviderId = Convert.ToInt64(billProcedure.CreatedBy),
+                                Cptcode = billProcedure.ProcedureType,
+                                ProcedureDescription = billProcedure.Description,
+                                ProcedureDateTime = DateTime.UtcNow,
                                 ProcedureType = getCptId,
                                 Active = 1,
-                                ProcedurePriority = BillProcedure.ProcedurePriority,
-                                AssociatedDiagnosisCode = BillProcedure.AssociatedDiagnosisCode,
-                                PrimaryAnestheticId = BillProcedure.PrimaryAnestheticId.ToString(),
-                                TypeOfAnesthesia = BillProcedure.TypeOfAnesthesia,
-                                AnesthesiaStartDateTime = BillProcedure.AnesthesiaStartDateTime,
-                                AnesthesiaEndDateTime = BillProcedure.AnesthesiaEndDateTime,
+                                ProcedurePriority = billProcedure.ProcedurePriority,
+                                AssociatedDiagnosisCode = billProcedure.AssociatedDiagnosisCode,
+                                PrimaryAnestheticId = billProcedure.PrimaryAnestheticId?.ToString(),
+                                TypeOfAnesthesia = billProcedure.TypeOfAnesthesia,
+                                AnesthesiaStartDateTime = billProcedure.AnesthesiaStartDateTime,
+                                AnesthesiaEndDateTime = billProcedure.AnesthesiaEndDateTime,
                                 PerformedOnFacility = true,
-                                IsHl7msgCreated = BillProcedure.IsHl7msgCreated,
-                                IsLabTest = BillProcedure.IsLabTest
-
+                                IsHl7msgCreated = billProcedure.IsHl7msgCreated,
+                                IsLabTest = billProcedure.IsLabTest
                             };
                             _dbContext.PatientProcedure.Add(patientProcedure);
                         }
                     }
+
                     if (updateComment != null)
-                    {
                         updateComment.ChargeCaptureComments = input.Comment;
-                    }
+
                     await _dbContext.SaveChangesAsync();
-                    //return "OK";
                 }
-                if (bLSupperBillDiagnosis.Count > 0)
+
+                // ✅ Handle Diagnoses (Insert or Update)
+                if (bLSupperBillDiagnosis != null && bLSupperBillDiagnosis.Count > 0)
                 {
-                    foreach (var Diagnosis in bLSupperBillDiagnosis)
+                    foreach (var diagnosis in bLSupperBillDiagnosis)
                     {
-                        // Call ValidateChargeCapture with a list containing the current diagnosis
-                        //var message = await ValidateChargeCapture(new List<BlsuperBillDiagnosis> { Diagnosis }, input.VisitAccountNo, input.EmployeeId);
+                        var emp = await _dbContext.Hremployee.FirstOrDefaultAsync(x => x.EmployeeId == Convert.ToInt64(diagnosis.CreatedBy));
 
-                        //_dbContext.BlsuperBillDiagnoses.Add(Diagnosis);
-                        var EmpName = await _dbContext.Hremployee.Where(x => x.EmployeeId == Convert.ToInt64(Diagnosis.CreatedBy)).FirstOrDefaultAsync();
+                        // Check if diagnosis exists
+                        var existingDiagnosis = await _dbContext.BlsuperBillDiagnosis
+                            .FirstOrDefaultAsync(x => x.DiagnosisId == diagnosis.DiagnosisId);
 
-                        BlsuperBillDiagnosis blsuperBillDiagnosis = new BlsuperBillDiagnosis()
+                        if (existingDiagnosis != null)
                         {
-                            CreatedBy = EmpName.FullName,
-                            CreatedDate = Diagnosis.CreatedDate,
-                            Descriptionshort = Diagnosis.Descriptionshort,
-                            DiagnosisPriority = Diagnosis.DiagnosisPriority,
-                            DiagnosisType = Diagnosis.DiagnosisType,
-                            Icd9code = Diagnosis.Icd9code,
-                            Icdorder = Diagnosis.Icdorder,
-                            IcdversionId = Diagnosis.IcdversionId,
-                            IsHl7msgCreated = Diagnosis.IsHl7msgCreated,
-                            Type = Diagnosis.Type,
-                            YearofOnset = Diagnosis.YearofOnset,
-                            LastUpdatedBy = EmpName.FullName,
-                            LastUpdatedDate = DateTime.Now,
-                            AppointmentId = Diagnosis.VisitAccountNo
-                        };
-                        _dbContext.BlsuperBillDiagnosis.Add(blsuperBillDiagnosis);
+                            // Update existing
+                            existingDiagnosis.Descriptionshort = diagnosis.Descriptionshort;
+                            existingDiagnosis.DiagnosisPriority = diagnosis.DiagnosisPriority;
+                            existingDiagnosis.DiagnosisType = diagnosis.DiagnosisType;
+                            existingDiagnosis.Icd9code = diagnosis.Icd9code;
+                            existingDiagnosis.Icdorder = diagnosis.Icdorder;
+                            existingDiagnosis.IcdversionId = diagnosis.IcdversionId;
+                            existingDiagnosis.IsHl7msgCreated = diagnosis.IsHl7msgCreated;
+                            existingDiagnosis.Type = diagnosis.Type;
+                            existingDiagnosis.YearofOnset = diagnosis.YearofOnset;
+                            existingDiagnosis.LastUpdatedBy = emp?.FullName;
+                            existingDiagnosis.LastUpdatedDate = DateTime.Now;
+                        }
+                        else
+                        {
+                            // Insert new
+                            BlsuperBillDiagnosis newDiag = new BlsuperBillDiagnosis
+                            {
+                                CreatedBy = emp?.FullName,
+                                CreatedDate = DateTime.Now,
+                                Descriptionshort = diagnosis.Descriptionshort,
+                                DiagnosisPriority = diagnosis.DiagnosisPriority,
+                                DiagnosisType = diagnosis.DiagnosisType,
+                                Icd9code = diagnosis.Icd9code,
+                                Icdorder = diagnosis.Icdorder,
+                                IcdversionId = diagnosis.IcdversionId,
+                                IsHl7msgCreated = diagnosis.IsHl7msgCreated,
+                                Type = diagnosis.Type,
+                                YearofOnset = diagnosis.YearofOnset,
+                                LastUpdatedBy = emp?.FullName,
+                                LastUpdatedDate = DateTime.Now,
+                                AppointmentId = diagnosis.VisitAccountNo
+                            };
+                            _dbContext.BlsuperBillDiagnosis.Add(newDiag);
+                        }
                     }
                     await _dbContext.SaveChangesAsync();
-                    //return "OK";
                 }
-                return "OK";
 
-                //return null;
+                return "OK";
             }
             catch (Exception ex)
             {
-                //return ex.ToString();
-                return "Something went wrong while saving";
+                return $"Something went wrong while saving: {ex.Message}";
             }
-
-            //    List<BlsuperBillDiagnosis> bLSupperBillDiagnosis = _mapper.Map<List<BlsuperBillDiagnosis>>(input.BLSupperBillDiagnosisModel);
-
-
-            //    BlsuperBillProcedure? blsuperBillProcedure = await Task.Run(() => _dbContext.BlsuperBillProcedures.Where(x => x.AppointmentId == input.VisitAccountNo).FirstOrDefaultAsync());
-            //    //BlpatientVisit? blpatientVisitTab = await Task.Run(() => _dbContext.SchAppointments.Where(x => x.VisitAccountNo == input.VisitAccountNo).FirstOrDefaultAsync());
-            //    SchAppointment? SchAppointmentTab = await Task.Run(() => _dbContext.SchAppointments.Where(x => x.VisitAccountNo == input.VisitAccountNo)
-            //    .FirstOrDefaultAsync());
-
-            //    BlsuperBillDiagnosis? blsuperBillDiagnosisTab = _dbContext.BlsuperBillDiagnoses.Where(x => x.AppointmentId == input.BLSupperBillDiagnosisModel[0].VisitAccountNo).FirstOrDefault();
-
-            //    foreach (var Diagnosis in bLSupperBillDiagnosis)
-            //    {
-            //        // Call ValidateChargeCapture with a list containing the current diagnosis
-            //        var message = await ValidateChargeCapture(new List<BlsuperBillDiagnosis> { Diagnosis }, input.VisitAccountNo, input.EmployeeId);
-
-            //        _dbContext.BlsuperBillDiagnoses.Add(Diagnosis);
-            //    }
-
-            //    _dbContext.BlsuperBillProcedures.Add(blsuperBillProcedure);
-
-            //    return "";
-
-
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    return ex.ToString();
-            //}
         }
+
+
+
+
 
         //private double GetProcedureUnitPrice(int procedureType, string procedureCode, long providerId, long payerId)
         //{
@@ -998,6 +1176,56 @@ namespace HMIS.Application.ServiceLogics
             }
         }
 
+
+        public async Task<DataSet> GetAllChargeCaptureDiagnosis(long? AppointmentId, int? pageNumber, int? pageSize)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+
+                    param.Add("@AppointmentId", AppointmentId); 
+                    param.Add("@PageNumber", pageNumber);
+                    param.Add("@PageSize", pageSize);
+
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("ChargeCaptureDiagnosis", param);
+
+                if (ds.Tables.Count == 0)
+                {
+                    throw new Exception("No data found");
+                }
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                return new DataSet();
+            }
+        }
+
+        public async Task<DataSet> GetAllChargeCaptureService(long? AppointmentId, int? pageNumber, int? pageSize)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+
+                param.Add("@AppointmentId", AppointmentId);
+                param.Add("@PageNumber", pageNumber);
+                param.Add("@PageSize", pageSize);
+
+                DataSet ds = await DapperHelper.GetDataSetBySPWithParams("ChargeCaptureService", param);
+
+                if (ds.Tables.Count == 0)
+                {
+                    throw new Exception("No data found");
+                }
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                return new DataSet();
+            }
+        }
 
     }
 

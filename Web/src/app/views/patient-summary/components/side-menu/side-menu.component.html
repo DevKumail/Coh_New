@@ -1,25 +1,37 @@
 <div class="nav flex-column nav-pills text-white side-menu" [class.collapsed]="collapsed" role="tablist" aria-orientation="vertical">
-  <ng-container *ngFor="let item of mainItems">
-    <a class="nav-link text-white d-flex align-items-center gap-2"
-       [class.active]="selected === item.id"
-       (click)="onSelect(item.id)"
-       [attr.title]="collapsed ? item.label : null">
-      <ng-icon [name]="item.icon" class="me-1"></ng-icon>
-      <span class="label" *ngIf="!collapsed">{{ item.label }}</span>
-    </a>
-  </ng-container>
-
-  <div class="mt-3 mb-1 text-uppercase fw-bold small text-muted ps-2 section-title" *ngIf="!collapsed">
-    Orders
+  <!-- Clinical Section Header -->
+  <button type="button" class="section-header d-flex align-items-center justify-content-between" (click)="!collapsed && toggleSection('clinical')" [attr.aria-expanded]="isOpen('clinical') || collapsed">
+    <span class="text-uppercase fw-bold small text-muted" *ngIf="!collapsed">{{ 'CLINICAL' | translate }}</span>
+    <ng-icon *ngIf="!collapsed" [name]="(isOpen('clinical') ? 'tablerChevronDown' : 'tablerChevronRight')"></ng-icon>
+  </button>
+  <!-- Clinical Items -->
+  <div class="collapse-body" [class.open]="isOpen('clinical') || collapsed" [class.mt-2]="collapsed">
+    <ng-container *ngFor="let item of mainItems">
+      <a class="nav-link text-white d-flex align-items-center gap-2"
+         [class.active]="selected === item.id"
+         (click)="onSelect(item.id)"
+         [attr.title]="collapsed ? item.label : null">
+        <ng-icon [name]="item.icon" class="me-1"></ng-icon>
+        <span class="label" *ngIf="!collapsed">{{ item.label }}</span>
+      </a>
+    </ng-container>
   </div>
 
-  <ng-container *ngFor="let item of orderItems">
-    <a class="nav-link text-white d-flex align-items-center gap-2 ps-4"
-       [class.active]="selected === item.id"
-       (click)="onSelect(item.id)"
-       [attr.title]="collapsed ? item.label : null">
-      <ng-icon [name]="item.icon" class="me-1"></ng-icon>
-      <span class="label" *ngIf="!collapsed">{{ item.label }}</span>
-    </a>
-  </ng-container>
+  <!-- Orders Section Header -->
+  <button type="button" class="section-header d-flex align-items-center justify-content-between mt-2" (click)="!collapsed && toggleSection('orders')" [attr.aria-expanded]="isOpen('orders') || collapsed">
+    <span class="text-uppercase fw-bold small text-muted" *ngIf="!collapsed">{{ 'ORDERS' | translate }}</span>
+    <ng-icon *ngIf="!collapsed" [name]="(isOpen('orders') ? 'tablerChevronDown' : 'tablerChevronRight')"></ng-icon>
+  </button>
+  <!-- Orders Items -->
+  <div class="collapse-body" [class.open]="isOpen('orders') || collapsed" [class.mt-2]="collapsed">
+    <ng-container *ngFor="let item of orderItems">
+      <a class="nav-link text-white d-flex align-items-center gap-2 ps-4"
+         [class.active]="selected === item.id"
+         (click)="onSelect(item.id)"
+         [attr.title]="collapsed ? item.label : null">
+        <ng-icon [name]="item.icon" class="me-1"></ng-icon>
+        <span class="label" *ngIf="!collapsed">{{ item.label }}</span>
+      </a>
+    </ng-container>
+  </div>
 </div>

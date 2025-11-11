@@ -342,7 +342,7 @@ minDateValidator(otherControlName: string) {
 
 // // // // PROBLEM WORK START // // // // 
   async GetPatientProblemData() {
-  this.loader.show();
+  // this.loader.show();
   this.medicalHistoryData = [];
   this.problemTotalItems = 0;
   const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo;
@@ -350,10 +350,10 @@ minDateValidator(otherControlName: string) {
   const userId = userIdStr ? Number(userIdStr) : 0;
     if (!mrNo || !userId) {
       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
-      this.loader.hide();
+      // this.loader.hide();
       return;
     }
-  this.loader.show();
+  // this.loader.show();
   await this.clinicalApiService.GetPatientProblemData(
     false,
     mrNo,
@@ -361,11 +361,11 @@ minDateValidator(otherControlName: string) {
     this.MHPaginationInfo.Page,
     this.MHPaginationInfo.RowsPerPage
   ).then((res: any) => {
-    this.loader.hide();
+    // this.loader.hide();
     this.medicalHistoryData = res.patientProblems?.table1 || [];
     this.problemTotalItems = res.patientProblems?.table2?.[0]?.totalCount || 0;
   });
-  this.loader.hide();
+  // this.loader.hide();
 }
 
 onMedicalPageChanged(page: number){

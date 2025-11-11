@@ -1,0 +1,45 @@
+<div class="medical-history-container">
+  <div class="card">
+    <div class="card-header">
+      <h5>Fertility History</h5>
+    </div>
+    <div class="card-body">
+      <ul ngbNav #nav="ngbNav" [(activeId)]="activeTabId" [destroyOnHide]="false" class="nav nav-tabs mb-3">
+        <li [ngbNavItem]="1">
+          <a ngbNavLink href="javascript:void(0)">Basic</a>
+          <ng-template ngbNavContent>
+            <app-medical-history-basic></app-medical-history-basic>
+          </ng-template>
+        </li>
+        <li [ngbNavItem]="2">
+          <a ngbNavLink href="javascript:void(0)">General</a>
+          <ng-template ngbNavContent>
+            <app-medical-history-general></app-medical-history-general>
+          </ng-template>
+        </li>
+        <li [ngbNavItem]="3">
+          <a ngbNavLink href="javascript:void(0)">Testicles and sem. tract</a>
+          <ng-template ngbNavContent>
+            <app-medical-history-testicles></app-medical-history-testicles>
+          </ng-template>
+        </li>
+        <li [ngbNavItem]="4">
+          <a ngbNavLink href="javascript:void(0)">Genetics / Opinion</a>
+          <ng-template ngbNavContent>
+            <app-medical-history-genetics></app-medical-history-genetics>
+          </ng-template>
+        </li>
+      </ul>
+      <div [ngbNavOutlet]="nav"></div>
+
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">
+          <i class="bi bi-x-circle me-1"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-success" (click)="onSave()">
+          <i class="bi bi-check-circle me-1"></i> OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

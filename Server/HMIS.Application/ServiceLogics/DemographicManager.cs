@@ -504,6 +504,7 @@ namespace HMIS.Application.ServiceLogics
                 }
                 ;
                 _context.RegPatient.Update(findResult);
+
                     await _context.SaveChangesAsync();
                     return true;
                 

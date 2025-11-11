@@ -47,15 +47,13 @@ export class ClinicalApiService {
             )
             .toPromise();
     }
-    SummarySheet(MRNo: string) {
-         ;
+    SummarySheet(MRNo: string,PageNumber: number,PageSize: number) {
         return this.api
-            .get(`SummarySheet/GetSummarySheet?mrNo=${MRNo}`)
+            .get(`SummarySheet/GetAllVitalSigns?PageNumber=${PageNumber}&PageSize=${PageSize}&mrNo=${MRNo}`)
             .toPromise();
     }
 
     VitalSignGet(Id: string, appointmentId: number) {
-         ;
         return this.api
             .get(
                 `SummarySheet/VitalSignGet?id=${Id}&visitaccountNo=${appointmentId}`

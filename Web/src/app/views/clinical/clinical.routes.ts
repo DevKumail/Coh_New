@@ -10,6 +10,8 @@ import { modulePermissionGuard } from '@core/guards/module-permission.guard';
 import { VitalSignsComponent } from './vital-signs/vital-signs.component';
 import { ImmunizationsComponent } from './immunizations/immunizations.component';
 import { MedicationComponent } from './medication/medication.component';
+import { SocialHistoryComponent } from './social-history/social-history.component';
+import { FamilyHistoryComponent } from './family-history/family-history.component';
 
 export const CLINICAL_ROUTES: Routes = [
   {
@@ -77,6 +79,18 @@ export const CLINICAL_ROUTES: Routes = [
         canActivate:[modulePermissionGuard],
         component:ImmunizationsComponent,
         data: { module: 'Clinical', component: 'Immunizations', title: 'Immunizations' }
+      },
+      {
+        path: 'social-history',
+        canActivate: [modulePermissionGuard],
+        component: SocialHistoryComponent,
+        data: { module: 'Clinical', component: 'Social History', title: 'Social History' }
+      },
+      {
+        path: 'family-history',
+        canActivate: [modulePermissionGuard],
+        component: FamilyHistoryComponent,
+        data: { module: 'Clinical', component: 'Family History', title: 'Family History' }
       },
     ]
   }

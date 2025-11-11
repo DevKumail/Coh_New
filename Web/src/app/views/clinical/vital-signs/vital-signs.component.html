@@ -321,7 +321,7 @@
 
  
 <div class="card p-3 mt-4 shadow-sm">
-    <div class="card-body">
+    <!-- <div class="card-body"> -->
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-sm text-center">
                 <thead>
@@ -342,7 +342,7 @@
                     </tr>
                 </thead>
                 <tbody class="table-group-divider text-center align-middle">
-                    <tr *ngFor="let vital of pagedvital; let i = index">
+                    <tr *ngFor="let vital of vitalSignsPagedData; let i = index">
                         <td>{{ vital.entryDate | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
                         <!-- <td>{{ vital.dailyStartTime }}</td> -->
                         <td>{{ vital.temperature || "-" }}</td>
@@ -362,24 +362,25 @@
                     </tr>
                 </tbody>
             </table>
+                            <app-generic-pagination
+                    [totalItems]="vitalTotalItems"
+                    [pageSize]="PageInfo.PageSize"
+                    [currentPage]="PageInfo.CurrentPage"
+                    (pageChanged)="onvitalPageChanged($event)"
+                >
+                </app-generic-pagination>
         </div>
-        <div
+        <!-- <div
             *ngIf="vitalSignsPagedData.length > 0"
             class="d-flex flex-column align-items-center mt-3 gap-2"
         >
             <div
                 class="d-flex justify-content-end align-items-center bg-light rounded px-3 py-2 gap-3 w-100 flex-wrap"
             >
-                <app-generic-pagination
-                    [totalItems]="vitalTotalItems"
-                    [pageSize]="vitalPageSize"
-                    [currentPage]="vitalCurrentPage"
-                    (pageChanged)="onvitalPageChanged($event)"
-                >
-                </app-generic-pagination>
+
             </div>
-        </div>
-    </div>
+        </div> -->
+    <!-- </div> -->
 </div>
 
 <!-- 👆 Grid/Card Ends -->

@@ -21,9 +21,9 @@ namespace HMIS.Web.Controllers.Clinical
 
         [HttpGet("GetAlertDeatilsDB")]
 
-        public async Task<ActionResult> GetAlertDeatilsDB(string mrno)
+        public async Task<ActionResult> GetAlertDeatilsDB(string mrno, int? PageNumber, int? PageSize)
 
-        { var alert = await _Alert.GetAlertDeatilsDB(mrno);
+        { var alert = await _Alert.GetAlertDeatilsDB(mrno, PageNumber, PageSize);
             return Ok(new { alert = alert });
         }
 

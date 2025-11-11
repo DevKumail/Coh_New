@@ -210,7 +210,7 @@
               <td class="text-center">{{ allergy.reaction || '-' }}</td>
               <td class="text-center">{{ allergy.startDate | date:'dd/MM/yyyy' }}</td>
               <td class="text-center">{{ allergy.endDate | date:'dd/MM/yyyy' }} </td>
-              <td class="text-center">{{ allergy.status || '-' }}</td>
+              <td class="text-center">{{ allergy.status == 'Active'  ? 'Active' : 'Inactive' }}</td>
               <td class="text-center" style="text-align: center;">
 
                 <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">

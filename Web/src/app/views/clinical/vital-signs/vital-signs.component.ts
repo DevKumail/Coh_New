@@ -126,10 +126,10 @@ bpSystolic = 0;
       .subscribe((data: any) => {
         this.SearchPatientData = data;
         const mrNo = this.SearchPatientData?.table2[0]?.mrNo;
-        this.vitalSign(mrNo);
+        this.vitalSign();
       });
 
-    this.vitalSign(this.SearchPatientData?.table2[0]?.mrNo || '' );
+    this.vitalSign();
 
     // Build form with only entryDate, dailyStartTime (and bpArm) required. Others optional.
     this.vitalSignsForm = this.fb.group(
@@ -288,7 +288,7 @@ onSubmit() {
         confirmButtonText: 'OK'
       }).then(() => {
         this.clearForm();
-        this.vitalSign(this.SearchPatientData?.table2?.[0]?.mrNo || '');
+        this.vitalSign();
       });
     })
     .catch((err: any) => {
@@ -301,22 +301,24 @@ onSubmit() {
     });
 }
 
-  vitalSign(mrNo:string){
-     
-    this.vitalSignsPagedData = [];
-    this.vitalTotalItems = this.vitalSignsPagedData.length;
-    this.onvitalPageChanged(1);
+PageInfo: any = {
+  CurrentPage: 1,
+  PageSize: 5,
+}
 
+  vitalSign(){
+     this.vitalSignsPagedData = [];
+    this.vitalTotalItems = 0
     if (!this.SearchPatientData?.table2?.[0]?.mrNo) {
       Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       return;
     }
 
-    this.ClinicalApiService.SummarySheet(mrNo).then((res:any)=>{
+    const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo || '';
+    this.ClinicalApiService.SummarySheet(mrNo,this.PageInfo.CurrentPage,this.PageInfo.PageSize).then((res:any)=>{
     console.log('vital Sign RESULT: ',res);
-    this.vitalSignsPagedData = res?.vitalSigns || []
-    this.vitalTotalItems = this.vitalSignsPagedData.length;
-    this.onvitalPageChanged(1)
+    this.vitalSignsPagedData = res?.vitalSigns.table1 || []
+    this.vitalTotalItems = res?.vitalSigns.table2?.[0]?.totalRecords || 0;
     })
   }
 
@@ -326,16 +328,10 @@ onSubmit() {
     pagedvital: any[] = [];
 
     async onvitalPageChanged(page: number) {
-    this.vitalCurrentPage = page;
-    this.setPagedvitalData();
+    this.PageInfo.CurrentPage = page;
+    this.vitalSign();
     }
 
-    setPagedvitalData() {
-    const startIndex = (this.vitalCurrentPage - 1) * this.vitalPageSize;
-    const endIndex = startIndex + this.vitalPageSize;
-    this.pagedvital = this.vitalSignsPagedData.slice(startIndex, endIndex);
-
-    }
 
     get isRtl(): boolean {
     try {

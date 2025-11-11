@@ -31,8 +31,8 @@ namespace HMIS.Web.Controllers.Clinical
         #endregion
 
         #region Methods
-        [HttpGet("GetSummarySheet")]
-        public async Task<IActionResult> GetSummarySheet(long MRNo = 0, long VisitAccountNo = 0)
+        [HttpGet("GetAllVitalSigns")]
+        public async Task<IActionResult> GetAllVitalSigns(int? PageNumber, int? PageSize,long MRNo = 0, long VisitAccountNo = 0 )
         {
             var method = HttpContext.Request.Method;
             var path = HttpContext.Request.Path;
@@ -43,24 +43,24 @@ namespace HMIS.Web.Controllers.Clinical
             try
             {
                 //VitalSigns
-                DataSet result = await _summarySheetManager.GetAllVitalSigns(MRNo, VisitAccountNo);
+                DataSet result = await _summarySheetManager.GetAllVitalSigns(PageNumber, PageSize, MRNo, VisitAccountNo);
 
                 if (result != null)
                 {
                     var statusCode = HttpContext.Response.StatusCode;
-                    var responseMessage = JsonConvert.SerializeObject(new { VitalSigns = result.Tables[0] });
+                    var responseMessage = JsonConvert.SerializeObject(new { VitalSigns = result });
                     var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
                     logger.Information($"HTTP {method} {path} responded {statusCode} in {elapsed} ms - Request : {requestMessage}, Response : {responseMessage}");
 
-                    return Ok(new { VitalSigns = result.Tables[0] });
-                }
+                    return Ok(new { VitalSigns = result });
+                }   
                 else
                 {
                     var statusCode = HttpContext.Response.StatusCode;
                     var responseMessage = JsonConvert.SerializeObject(result);
                     var logger = LoggerConfig.CreateLogger(requestMessage, responseMessage, configuration);
                     logger.Information($"HTTP {method} {path} responded {statusCode} in {elapsed} ms - Request : {requestMessage}, Response : {responseMessage}");
-                    return BadRequest(new { VitalSigns = result.Tables[0] });
+                    return BadRequest(new { VitalSigns = result });
                 }
             }
             catch (Exception ex)

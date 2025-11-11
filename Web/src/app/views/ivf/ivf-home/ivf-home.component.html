@@ -1,8 +1,11 @@
-<form [formGroup]="form" class="container-fluid mw-100 w-100">
-  <div class="row g-3 align-items-stretch">
+<form [formGroup]="form" class="container-fluid mw-100 w-100 mt-2">
+  <div class="row g-3 align-items-stretch" *ngIf="couple?.female || couple?.male; else noCouple">
+    <!-- Female start -->
     <div class="col-12 col-xl-6">
       <div class="card h-100 compact-card">
         <div class="card-body position-relative">
+          <button *ngIf="!couple?.female" type="button" class="btn btn-success btn-lg position-absolute top-50 start-50 translate-middle shadow" (click)="openLinkaPatient(standardModal)">Link a Patient</button>
+          <div class="blur-on-missing" [class.is-blurred]="!couple?.female">
           <a type="button" (click)="viewSummary('female')" title="View Female Summary"  class=" position-absolute top-0 end-0 mt-2 me-2">Move to Patient Summary</a>
           <div class="d-flex gap-3 align-items-center mb-3">
             <div >
@@ -14,26 +17,26 @@
               />
             </div>
             <div class="flex-grow-1">
-              <div class="fw-semibold">{{ couple?.female?.name }}</div>
+              <div class="fw-semibold">{{ couple?.female?.name ?? 'Female Data Not Available' }}</div>
               <div class="fw-semibold">
-                {{ couple?.female?.dateOfBirth | date:'dd/MM/yyyy' }}
-                <span class="text-primary ms-1">({{ couple?.female?.ageYears }})</span>
+                {{ (couple?.female?.dateOfBirth | date:'dd/MM/yyyy') ?? 'N/A' }}
+                <span class="text-primary ms-1">{{ couple?.female?.ageYears ? (couple?.female?.ageYears) : '' }}</span>
               </div>
-              <div class="text-muted">MR No: {{ couple?.female?.mrNo }}</div>
+              <div class="text-muted">MR No: {{ couple?.female?.mrNo ?? 'N/A' }}</div>
             </div>
             <div class="flex-grow-1">
               <div class="fw-semibold">
                 <svg class="icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--ng-icon__stroke-width, 2)"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"></path></svg> 
-                {{ couple?.female?.phone }}
+                {{ couple?.female?.phone ?? 'N/A' }}
               </div>
               <div class="fw-semibold ">
                 <svg class="icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--ng-icon__stroke-width, 2)"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"></path><path d="M3 7l9 6l9 -6"></path></svg> 
-                {{ couple?.female?.email }}
+                {{ couple?.female?.email ?? 'N/A' }}
               </div>
             </div>
             <div class="flex-grow-1">
-              <div class="fw-semibold">EID: {{ couple?.female?.eid || '-' }}</div>
-              <div class="fw-semibold">Nationality: {{ couple?.female?.nationality || '-' }}</div>
+              <div class="fw-semibold">EID: {{ couple?.female?.eid || 'N/A' }}</div>
+              <div class="fw-semibold">Nationality: {{ couple?.female?.nationality || 'N/A' }}</div>
             </div>
             <!-- <button type="button" class="btn btn-sm btn-outline-secondary btn-icon rounded-circle ms-auto" title="View summary" (click)="viewSummary('female')" aria-label="View female summary">
               <ng-icon name="tablerUser" class="fs-lg"></ng-icon>
@@ -121,33 +124,58 @@
               </div>
             </div>
           </div>
+          </div>
         </div>
       </div>
     </div>
+    <!-- Female end -->
+
+    <!-- Male start -->
     <div class="col-12 col-xl-6">
       <div class="card h-100 compact-card">
-        <div class="card-body">
+        <div class="card-body position-relative">
+          <button *ngIf="!couple?.male" type="button" class="btn btn-success btn-lg position-absolute top-50 start-50 translate-middle shadow" (click)="openLinkaPatient(standardModal)">Link a Patient</button>
+          <div class="blur-on-missing" [class.is-blurred]="!couple?.male">
+          <a type="button" (click)="viewSummary('male')" title="View Male Summary"  class=" position-absolute top-0 end-0 mt-2 me-2">Move to Patient Summary</a>
+          
           <div class="d-flex  gap-3 align-items-center mb-3">
             <div>
               <img
-                src="data:image/webp;base64,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" alt="Male Patient"
+                [src]="couple?.male?.picture ? ('data:image/jpeg;base64,' + couple?.male?.picture) : 'data:image/webp;base64,UklGRpgUAABXRUJQVlA4TIsUAAAv/8F/EIfBOpJkJfsMd0iH/P88CXf3NFxHsm1a69pW/sncb/smYOP5uY4kW6kO7u5REwckxL+7O08O00i22yxWFyos9aZWhN2Aac7Q0FGW8w/AC8ABwAHABsAGwIk/PD/wAnA62LJvnei9MRCCjdv53OeN26sVijnVzL3XSTiWwLCQ4EgKHFw9aKxKUAxyGZRPIJ0ikd8ZGkO397gx6duv7bpt92l/XMI75NrCp4jMqKvsIBiqygKdAk9u+RUrA1WXOublZR0HkeSGzd1L5Q9akhsIETEBTJE/K1UFTqBOAep5wEiyqFaS7lGLUV2cSdKduZjHA3jr7k5UgX7mi987wNuXvl3bqiTbti25x0Xt4q/9rf9AH/fx/5/X7lCLg78GVbRi7Qa1SQgkp0NE/ydAkrNtea5oFfyaVLfh/hdpfPHnTo9T3pC3o/dgQmBAIKL/E0Bb2va4bXOebtnsJKoKL+zeern/27MlAmD1RTkTOcDgxzIYmBhhDKrQRPR/Atw2khRIKZABJ2F//kE+M7izHgbWIiF2DRTR/wmQ4wBs3TqHCPo9QCaj0f2v109skQ60lhyIshJlMJCGRw0R/Z8AOo4kSZKk78z/v3jPHu5WtAHutkcQBjgRgBMR0f8J+H9If/t6vr7E8Hz+NOfR2kf/8MNSWmtzppRq7Ut3tpvytVd/8mxuv3RpMx197XHTybpqmm6/eZlHXZpvLUP70SjsPNYeN5GsNRWK3VLXfMMYWicRlll13B6G1kmos+q4HYx1NEKeVUf8G3o0Qm9VY15Z2RAea0S5/T4N5Ow7rg193HC2qtFMH6Najh3B9rsb2lZz1Cq9GeDZc6QaaxrmtEZ80sdgHzsqjdUM+FzRaL8b9VJzDNJs6JNGntGL4W99xJtcGYaljjiTDwZkzfFlHwzMI8eVnRigx44nmhioaceRnRiwacePfDBwjxw3cmUA1xEvRmcYlx4rVmEwtxUjtDGop8aGnBjcR44JozPIezzQxkBvGgfywYA/cgToDPwVersx+OcOuXEwCtZw08ZI2HaYjcqI2ENsN0bFuYOrMjr2sNqNEXLugOqMlCuU8mS0TCOItDBilh1AlZGzh06ejJ5pBI0WRtCyA6YzkvZQyYnRNI0g2YURte0AWYysGhyd0bWHxTgYYY+QyJNRduZg2IWRtu1AWIy4GgSd1+R3b9/fXd3+WrucQ7g+n1/LWLhhD4CDV+L8rryG3zi/Y5sXVnyJV2Eu54Pwd5wUPuwuk/jn5aoeJH3JieULXG5E7+cdpG6nMGJzYMuN4HfVH74kxFqBtguhuy39aRgf5huZEvo+oT9emw7zDUyJPJ/+/TobZopLCTyXOhhGhyksJe791Mm32TBFpYTtVx09ToYpKCVqP+prK2SYYlKitlB3kwxTSErQ2dRjI8MUkRKzP3X6kmEKSInZQt1+zoUpHiVkf+r5KlzYhrMJ2UJ9j82FbzS5IPKn/hsV5gVMbgRsIYRGhbULy5jE608gkwqbg0oi3gzB3FRYhnIQ7xHQ2FTYg6QSrj9BbU6FdSCvCLc0gV1OhS0aQwnXhPfjwhTGJtwqxJcL2yhyQeNPmA8XrZCYBJsh1EaFTRAHwZqA32OZhQV7MLwi2Cv88Z10BuwFQYnVr1j8zsZniiAXLP7EZDuOzguASyNUX2KzFmzWLnyJUHcToSuhWYbXCTVDnFZHZh2cEqqJ1jBk3NAuBYqJ2VWAlYEsEWkVuddhMQHrRHpFbyQsvoK1ifSK4QOLG9SlIani+MBqF0wHgVaxfFHxgLQI9Irnz0HxFaBNoJ+YXg6KG08DcsV1K6AmnEqcT2zHxsQOZhPnFd/LMXFjaTieGH+gGpRKmE+cH0ysQDZhXrGemLhhXBqMKtpjY2oXFJUoj4hvDokVxCZKE/UPEzeE0VCkyD+Y2kBQCTJFv0NiB7AJsgR/FROzfAnEDg1gYkriKTF60wguTFThLgWDL42hYSpDtkqI/jSI4ZBYRdvEWDWMFxO3ZBPD0UAWTFOwV4RoGskPE1+JdSkQUmO5MZUhVSXCHYNRMbEKlYnQmwYzHBOzTAeET8NpoA6RNhFejWcGxS1RQmAa0QSVBFICTA3pBUWVZwIoMSbaoKY4ryi/Nw3qAcUlzKUBsBiVQFWE6UTo9o2JCih2UUaBMOfcdUgOKl4kqcRpMSAPVhdkEKk/VuqA5Kg45OhQ5jROuk8fz8NJWF2MUcBMYyRPn639kIdSYZWLFJ1wjY9waZ9OZSAbFrsUBc80NsLJbrw4D0IFVhkyvCLiw8XNyW4buyEYLC4ZzpDmYkLbnqfrATxcRYRXxFyI0Lb/lXyBi0uCBmoaDczyfJFOjqsJsAi7cVCN5RurbAUXl38TV1KgT5b3RSeZAZveKYFvfNVYgSct1wFG9e0JWcLTx89ig1QfsuRZJvSNrTIr+pRl2siY/arYDJo+WvG/VInkyKpfBZsD09FKaWQqyMrFp1cE/6HS0crKJEpkfOXTRGeYtLMSM3kOtLNHm+gdUNUXVm4NEdWfJ3izogns+Fn2UwdR8iYTv0EJ7GiHaGS52Jh9qVdAwRHY0Q5VQ1R9OV8BMxBUzcyFHbCDqHiiRvB2rmpm4vu3f8Bf5PjAUf0ICKxfVTNzKs+CO1WEnry4DGF2qQZmjqWkshGcfZFioePw4cXAO9NpZqItveHZjNDyYTKY+78ia2aOqZRUeCJgZNjwpgfFIH7Dq4GZYypCEbBagoDH7F6n8BtYYDGtxGNgJNj4nt07KNiAKotfipwY2Cru4SvOqVHMwWiTirQoMHEVH9W1gKEMo2NTkRmFiNCTa04uxCI5CrYT9iOAjqlhdPmqWUmPAxNmDKhbgZueStpJF8KSgSe3nMOULMQyRBxsAKg4pQYyS8XKMJF4EVUYoLoUSQSZTNllJ1FOwbNLB4mzRKbsNKsFTQqLQ9tIvkpTTdlxTEzjgNudSKzGsuucmEvCszsNxZ0kNa52nhVjJDRntgGLKwCCkEICtyudxSgHKwhoIZPF7spksUjRJQiYiEfDdOQyXhcFgijiRwOHGwrjrQxshYEVkTyoGwFXSCgEAc7DkxsHjFmCi4KC5heTx7MTxWixAsMLv0oEswsvGiSsJhwiv2RiuRBwdKJYweHELSaTyQXHEURNQNjM61JRHNiG81qQLkgEXoUK7i/XebwKiig0pza57OkyrFAA/ciY6QyWwYJxKmRYsg2rJoDeZHOnegG5E8JWABkdK1WANYFh+DgdIVVjFVYAvU46W6LLWDE0Io8682EjjRIZRUQ0HI87IlTTdFgJjROHbkYkpsmsdEHDchgJ0ZzGiSwCGB61VyZMkxRjdYFH7rWAslMsVrXgEfpcE6ivFJGVxuctKjFFRpL5GUC6HleEak7hrI7o5BkWT3AZqq4AUreqbwnXIaesNDojAatyi8nMjSFy2PaKkF1ygZXB5pqgDXKT1RGQ0xZ1xmbKORPiNkGzELYudhnUfOZTCyDHTXeEbpFSKkT5zCMgc0XwqlTnQrSEfhoR99wd4dulAhmiJfRhiMRnRgI4SGU2RGO3nYFlIYSz1EGHaMzbXCBiDoe6EMSHlAGex7ppwqS+JZCFLjDrn1tp6g0R0XxXn6krSLq3hPKQ2VhUeTaVUlrzNN/Vw+EQIIkzwbxlTirr0rf5+e5w0JAowvmU6VDWhWNS+YrtebpMZOLLDkTEb+OV8h6ZKJOZNMRUsxsbLllmMilQERH5ZrdXqEwZR6KgSkS+2d4KFJcxpA2qRsry9JiYSLmBkuWaQCkS+/7h7jHZEieT8jWwxuSUeL2trTutwdRvq4RJl4i3VcMkSoS3tSCRbyuFSZaYt5XHZEq0t7Um4bcVYeoSdlc1UAxT+wrw3/zoW1/D6YKi8POwjJ8rUDx+BGu5y9Teh+DzQO17KhGuG1MDT+2BPHgeqZMKYZcIWL3H1nuhNXS0FyLkGlabSwNuDc0G5YGjPRHh1sAqYDxsHptCihpqtD8i0BRaA43HzIMzfq6iIY9YI3ArLKIGkFc9/L6JFEBEaovkae9E5FVrpTXlCRcir9pTT/hKOJ9tkcHZJRqptgdqEvNtbUpkUgoThVWWCLePxypIxNtHYRUlOimPiceqSyxStAda/yKctw9hrRIbVUMkgbUlCqo1Ig2sIlFReUQUWFXUSdHex2UmqgaIx2rKZFRq35NlIiqPRyKso0xHRXgosLrMyarBQWCrzGbl0UhobZnBitBYozVkKiwFBqFdhRsrwqKh1aQyrAaFRytLBViERCO0g1Sn1YDwcHWpkxbh0AhulSq41jAQ3kWqOi1CQeHlVXzi8hgkwnvKBVykEEgesCC3eBECngBfcicw2n2eEFe5QcyjWxPkQ646MPqOrRHkXhNmYvyOrBHmOUVExu+4EoEeUyxmVFgetZViQ6OC8oT6TlGpUSF5gr0mzdSogBTBntNEbPwbjiLcY5qTG/8GsybgzzQDHP+Eogj5kaY2cFQgipBvNXEgxxcYnqAPqRa53/d7xZAJ+5Vqk/t1v98rghjB26kquT/u9/u9yhedW7CrySe33/f3vkgXnXMRupmuc/v1vvuLbNE9XZDr6Ta38ZsIxKbono3I7S9Xndo7/hSv6DYuuBVzMFOzPwqkpui2zLAlFxY0jycvjCa3tYFtuVCgfTwThM/kei6oZRfqwezTU0HYTK73jNnZnAzIPmJPXKLrbzB7cuNEFvteeEzR8RwhUzcGsY+dIrCYHOcFseFGnbz8025xYZCi457xmuZo5GVxIMGbohOY4Xp2ZePyOPYbrMuc0JjR2q7Ug9angyIuQGQqOGaszuZshPURxxMUMj0+Zqie3dmsPLIkCGSaZ0Zqu1Md1ac8IujK7DLNNS44FXM4kLLI+MqITHM2M0pPLimoj8ibriyITDOPGSR1qTqmd+T/7zqIyBTiAlExpwOld8Ckr9deZKZQ4wzQk1sK6R2Qia7rd0REZqY6FG7M+KhbldE7kByK5DijY44HQu9AEwvnxhmawzUFRIHmwMO5cQZGXauOxwJRTJxbZlSKOR/h/B+B6MDFuQWU6l5h8w5csXFunBHJ7tUJxkfgOvC5e/z9Xzimebi4UKCLzYf7x6d//4TF8mFQeY9AdyBTHjc/TDMQw4f6IOn3hVCg8uH/x+1/nwKEw7xUHk6sqjoHNgOT8sgxf/f/ANQPO10ZlfS3fEMm8JCV9mbaTu5kntZrwre7/jEbKgMLm+lYoe7nVX3JV0Ml0efXQCSQmJwy5Eb1nLIv9ngNeG8P3XkONAYKN0753qnXs3k0bxVd7SR66BpIBAK3lbK/U68nov7YGZbX3kRzXIbCJ3C2ElRpvZ7C2TxegLx2ag/NeBkCAcxmgs2tO3rLp3EC4nWjJgqRDdwnULeVMGTqjtlp+GQVQ93orqD574AVgG4r4XknR6ua11k6r9REUVwGaYCZnJBtHanslz0K5r09FFOeA0zAsMkJYSZH6NE8V6kqiSK8DMiAMFdCWzo66pudJar0ULSnQYjsbivhzuSoPJj3S5zeFPsf8im3kZdMTvgzOSLLPzuL4sR6iks+ZRUZyeR0kkxonE3AJUhteqJr2qdsRiY2F6cz5Y7EkmCchPCN9XTXtJFF5DAXp/PljsHJROwiVNKz5mnjsHGQzbnSWd83eEsGO/lXRU9+zZuNA2I/mWulk28OrAwhum/e9EVcU2yMPcYOInMuTi8hb7C6CTlOXjnpq8lrTjEbP/+BmYjInHMt5vRaNgdUhhTWfdpYX1/WF5c7nG5iDn/6XYtwcyhDDqueVNFSzB1GNUGHH6QlmUAMSax74KJlWTy/bqKOk3Mba2nmmttpyGLLtaYFmrfMlkl7dqqylumeVTNx1SXSYt1yUnnswRkXLdji2TyawNsVf2jRlprLlsgONypr4WbP4zCRsxOVtXizZ5FlsupA1RLOnkE1ocfpi21axtkPOw2pbH2pTUu5+FHL5J5fhrScix8zTfD9RUhLuvghWzKrX4C0rMsR1UQfp89WtbTLfmXIZutzVS5uSrupSf/4eVy0wNedkom/P0/TEv/wfbZ8Vj8HaZmXXaoBHO3TNi31tEMbCEw/qWq578+pYayf4FzwuD5TDeRoHyda8uWJNlDY/qiuZb/92Tac9WO48Gn9mGpI24detPTLRzSDuj/w41v5Lx/aWKy+7+sN4Nvv91VD294p326BP9/TDO5+J90Evv14Z+OxRb58uw1+JbkM8eOPb7fCwsMgj583g2+/Byb75+2AhvqvW8HdcP+8Dfw04PnrLeBrRmb8b/lLNOyLv7uh/4K+Mfi3sdcXnx+Rx+drUMiTY7i4W0dxUDeO48FcO5DViOuKxH3EG59jKaKNcjQXbet4LtbWER2kjWN6cHYc1Nso6xsVV2Osy3F9jTA+R1bEF+XYiuiiHF0RW5TjKyKLcoRFXFGOsYgqylEWqCiH+QpSlAN9RUDJob4imihHW8QS5XiLSKIc8dc46ueYv0ZRP0e9GkNdjvs9CDrXkb8HP+PoD3rG8V/srBN4RdxQzqEaNS1nsRozXc7jHcSMc7l4WWdTxArlfKqR0s8ZrYOTU07qEiTrvKoRQjmzdfBxysldYoPr/KqR0XKG6+BiykleYoLrPL9GRD+negmHcbbVWGg533eJA65zrkZBy2kfIoB7nXh1/s5z8pe54zr/NZk7ZQiqs9YyDJcZ4xqJNfmaMhSv1bk6MiCXeWoZk3eZI64vKOwaJmjK0KxhcuYZnm8Sw/MMUZ2szDNM30kI5/nixNZJBucZrjXMA6cM2drOAacM27sdv95r7OqEjkcG8BtGrbcM4rsdsbP2RZHtNx0rjgznq8Mwnb1G9HVtR6i3jGwNY9P7jG9NR6VHRrmm48GRsf62A8FeGfG1hxHg2TLwNc2/tR4Z/6Vp/i31bPljeDX9t8IelT+OV3P676DP6vpzWdrT/MviGZU/oVc7zb+WPrO6/rCWdqb7z8Y+syp/cu/TzunmH4rdZ2al8if4+rv1pN2Zc7q7+fW//Pdfkt3d55wzM7tSOdMA'" 
+                alt="Male Patient"
                 class="rounded-circle"
                 style="object-fit: cover; height: 100px; width: 100px"
               />
             </div>
             <div class="flex-grow-1">
-              <div class="fw-semibold">{{ couple?.male?.name || 'Male' }}</div>
+              <div class="fw-semibold">{{ couple?.male?.name??"Male Data Not Available" }}</div>
+              <div class="fw-semibold">
+                {{ (couple?.male?.dateOfBirth | date:'dd/MM/yyyy') ?? "N/A" }}
+                <span class="text-primary ms-1"> {{couple?.male?.ageYears? ( couple?.male?.ageYears ):""}} </span>
+              </div>
+              <div class="text-muted">MR No: {{ couple?.male?.mrNo??"N/A" }}</div>
             </div>
-            <button type="button" class="btn btn-sm btn-outline-secondary btn-icon rounded-circle ms-auto" title="View summary" (click)="viewSummary('male')" aria-label="View male summary">
+            <div class="flex-grow-1">
+              <div class="fw-semibold">
+                <svg class="icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--ng-icon__stroke-width, 2)"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"></path></svg> 
+                {{ couple?.male?.phone??"N/A" }}
+              </div>
+              <div class="fw-semibold ">
+                <svg class="icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--ng-icon__stroke-width, 2)"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"></path><path d="M3 7l9 6l9 -6"></path></svg> 
+                {{ couple?.male?.email??"N/A" }}
+              </div>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">EID: {{ couple?.male?.eid || 'N/A' }}</div>
+              <div class="fw-semibold">Nationality: {{ couple?.male?.nationality || 'N/A' }}</div>
+            </div>
+            <!-- <button type="button" class="btn btn-sm btn-outline-secondary btn-icon rounded-circle ms-auto" title="View summary" (click)="viewSummary('male')" aria-label="View male summary">
               <ng-icon name="tablerUser" class="fs-lg"></ng-icon>
-            </button>
+            </button> -->
           </div>
           <div class="row g-3">
             <div class="col-4 col-md-3 order-md-2">
               <ul class="nav nav-pills flex-column" id="maleTabs" role="tablist">
-                <!-- <li class="nav-item mb-2" role="presentation">
-                  <button class="nav-link active" id="male-demographics-tab" data-bs-toggle="pill" data-bs-target="#male-demographics" type="button" role="tab">Demographics</button>
-                </li> -->
                 <li class="nav-item mb-2" role="presentation">
                   <button class="nav-link" id="male-medical-tab" data-bs-toggle="pill" data-bs-target="#male-medical" type="button" role="tab">Medical history</button>
                 </li>
@@ -164,17 +192,6 @@
             </div>
             <div class="col-8 col-md-9">
               <div class="tab-content">
-                <div class="tab-pane fade show active" id="male-demographics" role="tabpanel" aria-labelledby="male-demographics-tab">
-                  <div class="table-responsive">
-                    <table class="table table-sm mb-0 align-middle">
-                      <tbody>
-                        <tr>
-                          <td class="text-muted">No data to display</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
                 <div class="tab-pane fade" id="male-medical" role="tabpanel" aria-labelledby="male-medical-tab">
                   <div class="table-responsive"><table class="table table-sm mb-0"><tbody><tr><td class="text-muted">No data to display</td></tr></tbody></table></div>
                 </div>
@@ -193,10 +210,13 @@
         </div>
       </div>
     </div>
+    <!-- Male end -->
   </div>
 
 
-  <div class="row g-3 mt-2">
+
+
+  <div class="row g-3 mt-2" *ngIf="couple?.female || couple?.male">
     <div class="col-12">
       <div class="card">
         <div class="card-header py-2"><div class="fw-semibold small">Overview</div></div>
@@ -244,4 +264,110 @@
       </div>
     </div>
   </div>
+  </div>
 </form>
+
+
+  <ng-template #noCouple>
+    <div class="row g-3 align-items-center justify-content-center my-4">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="card h-100 compact-card">
+          <div class="card-body d-flex justify-content-center align-items-center text-center" style="min-height: 280px">
+            <div>
+              <div class="display-6 text-warning">!</div>
+              <!-- <div class="fw-semibold mb-1">Validation Error</div> -->
+              <div class="fw-semibold mb-1">MrNo is a required field. Please load a patient.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+
+  <ng-template #standardModal let-modal>
+  <style>
+    .modal {
+      max-height: 100vh;
+    }
+  </style>
+  <form *ngIf="SearchPatientForm" [formGroup]="SearchPatientForm">
+    <div class="modal-header">
+      <h5 class="modal-title">{{'SEARCH_PATIENT' | translate}}</h5>
+      <button type="button" class="btn-close" (click)="modalRefInstance.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <div class="card shadow-sm rounded-3">
+        <div class="card-body">
+          <div class="">
+            <div class="row g-3">
+              <div class="col-md-3 col-sm-12">
+                <label for="mrNo" class="form-label">{{ 'MRNO' | translate }}:</label>
+                <input type="text" class="form-control" formControlName="mrNo" id="mrNo" placeholder="Enter MRNO">
+              </div>
+
+              <div class="col-md-3 col-sm-12">
+                <label for="phone" class="form-label">{{ 'PHONE' | translate }}:</label>
+                <input type="text" class="form-control" formControlName="phone" id="phone" placeholder="Enter Phone">
+              </div>
+
+              <div class="col-md-3 col-sm-12">
+                <label for="phone" class="form-label">{{ 'EMIRATES_ID' | translate }}:</label>
+                <input type="text" class="form-control" formControlName="emiratesId" id="emiratesId" placeholder="Enter Emirates ID">
+              </div>
+
+          
+
+
+              <div class="col-md-2 col-sm-12 col-12 ms-auto">
+                <button class="btn btn-info w-100 mt-4" type="button" (click)="SearchPatient()"
+                  [disabled]="isLoading">
+
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"
+                    aria-hidden="true"></span>
+                  <span>{{ isLoading ? ('SEARCHING' | translate) : ('SEARCH' | translate) }}</span>
+
+                </button>
+              </div>
+            </div>
+          </div>
+          <table class="table table-bordered table-striped table-sm mt-2">
+            <thead>
+              <tr class="text-center">
+                <th style="font-size: 14px">{{'MRNO' | translate}}</th>
+                <th style="font-size: 14px">{{'NAME' | translate}}</th>
+                <th style="font-size: 14px">{{'GENDER' | translate}}</th>
+                <th style="font-size: 14px">{{'DOB' | translate}}</th>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider text-center">
+              <tr *ngFor="let data of PatientList" (click)="onRowSelect(data, modal)">
+                <td style="font-size: 12px">{{ data?.mrNo || 'N/A' }}</td>
+                <td style="font-size: 12px">{{ data?.name || 'N/A' }}</td>
+                <td style="font-size: 12px">{{ data?.gender || 'N/A' }}</td>
+                <td style="font-size: 12px">{{ data?.dob || 'N/A' }}</td>
+              </tr>
+
+              <tr *ngIf="PatientList.length === 0">
+                <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <app-generic-pagination 
+      [totalItems]="PatientListTotalrecord" 
+      [pageSize]="PatientListPaginationInfo?.RowsPerPage"
+      [currentPage]="PatientListPaginationInfo?.Page" 
+      (pageChanged)="onPatientPageChanged($event)">
+      </app-generic-pagination>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
+        <!-- <button type="submit" class="btn btn-primary" (click)="SearchDiagnosis()">Search</button> -->
+      </div>
+    </div>
+
+  </form>
+</ng-template>

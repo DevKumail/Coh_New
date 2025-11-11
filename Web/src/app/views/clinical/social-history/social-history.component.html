@@ -1,0 +1,121 @@
+<form *ngIf="SocialForm" [formGroup]="SocialForm">
+  <div class="card shadow-lg rounded-3 border-0">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
+        <span>{{ 'SOCIAL_HISTORY' | translate }}</span>
+      </h5>
+      <i class="bi bi-heart-pulse fs-4"></i>
+    </div>
+    <div class="card-body">
+      <div class="row g-2">
+
+        <div class="col-md-6 col-lg-3">
+          <label class="form-label fw-semibold">{{ 'SOCIAL_HISTORY' | translate }} <span class="text-danger">*</span></label>
+          <select class="form-select" formControlName="socialHistory">
+            <option [ngValue]="null" disabled>{{ 'SELECT_SOCIAL_HISTORY' | translate }}</option>
+            <option *ngFor="let sh of SocialHistoryData" [value]="sh.shid">{{ sh.shname }}</option>
+          </select>
+          <div class="text-danger small"
+            *ngIf="SocialForm.get('socialHistory')?.touched && SocialForm.get('socialHistory')?.invalid">
+            {{ 'SOCIAL_HISTORY_IS_REQUIRED' | translate }}</div>
+        </div>
+
+
+
+        <div class="col-md-6 col-lg-3">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">{{ 'START_DATE' | translate }} <span
+                class="text-danger">*</span></label>
+            <input type="date" class="form-control" formControlName="startDate" 
+             />
+             <!-- [attr.min]="todayStr" -->
+            <div class="text-danger small"
+              *ngIf="SocialForm.get('startDate')?.touched && SocialForm.get('startDate')?.invalid">{{
+                  'START_DATE_REQUIRED' | translate }}</div>
+          </div>
+        </div>
+        
+        <!-- End Date -->
+        
+        <div class="col-md-6 col-lg-3">
+          <div class="mb-3">
+            <label class="form-label">{{ 'END_DATE' | translate }}<span
+                class="text-danger">*</span></label>
+            <input type="date" class="form-control" formControlName="endDate"
+            [attr.min]="SocialForm.get('startDate')?.value || null"
+            />
+            <div class="text-danger small"
+              *ngIf="SocialForm.get('endDate')?.touched && SocialForm.get('endDate')?.invalid">{{ 'END_DATE_REQUIRED'| translate }}</div>
+            <div class="text-danger small"
+              *ngIf="SocialForm.get('endDate')?.touched && SocialForm.get('startDate')?.value && SocialForm.get('endDate')?.value && (SocialForm.get('endDate')?.value < SocialForm.get('startDate')?.value)">
+              {{ 'END_DATE_NOT_LESS_THAN_START' | translate }}
+            </div>
+          </div>
+        </div>
+       <div class="col-md-6 col-lg-3 mt-3">
+        
+        <div class="d-flex justify-content-end mt-3 ">
+      <button type="button" class="btn btn-secondary" (click)="resetForm()">
+        <i class="bi bi-arrow-counterclockwise"></i> {{ 'CLEAR' | translate }}
+      </button>
+
+      <button type="button" class="btn btn-success ms-2" [disabled]="isSubmitting" (click)="submit()">
+        <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        {{ isSubmitting ? ('SUBMITTING' | translate) : ('SAVE' | translate) }}
+      </button>
+       </div>
+
+    </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+
+  </div>
+
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped table-sm">
+
+          <thead class="align-middle thead-sm text-center">
+            <tr>
+              <th>{{ 'SOCIAL_HISTORY' | translate }}</th>
+              <th>{{ 'START_DATE' | translate }}</th>
+              <th>{{ 'END_DATE' | translate }}</th>
+              <th>{{'STATUS' | translate}}</th>
+              <th class="text-center">{{ 'ACTION' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody class="table-group-divider text-center">
+            <tr *ngFor="let data of SocialHistoryList; let i = index">
+              <td>{{ data.shName || '-' }} </td>
+            <td>{{ data.startDate ? (data.startDate | date:'dd/MM/yyyy') : '-' }}</td>
+            <td>{{ data.endDate ? (data.endDate | date:'dd/MM/yyyy') : '-' }}</td>  
+            <td>{{ data.active  ? 'Active' : 'Inactive' }}</td>
+              <td class="text-center" style="text-align: center;">
+
+                <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
+                  <ng-icon name="tablerEdit" class="me-1" (click)="editSocialHistory(data)">
+                  </ng-icon>
+                  <ng-icon name="tablerTrash" class="text-danger me-1" (click)="deleteSocialHistory(data.shid) ">
+                  </ng-icon>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="SocialHistoryTotalItems === 0">
+              <td colspan="9" class="text-center">{{ 'NO_DATA_FOUND' | translate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <app-generic-pagination 
+      [totalItems]="SocialHistoryTotalItems" 
+      [pageSize]="pagegination.pageSize"
+      [currentPage]="pagegination.currentPage" 
+      (pageChanged)="onSocialHistoryPageChanged($event)">
+      </app-generic-pagination>
+    </div>
+  </div>
+</form>

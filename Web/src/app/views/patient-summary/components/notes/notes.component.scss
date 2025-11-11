@@ -1,10 +1,62 @@
 .notes-panel {
-  height: 100%;
-  max-height: 100%;
-  background: rgb(49, 58, 70);
-  color: #fff;
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  // height: 100%;
+  // max-height: 100%;
+  // background: rgb(49, 58, 70);
+  // color: #fff;
+  // border-radius: 14px;
+  // box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  // padding: 8px;
+  // overflow-y: auto;
+}
+
+.activity-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-right: 3px solid #4a90e2;
+  border-radius: 8px;
   padding: 12px;
-  overflow-y: auto;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(2px);
+  }
+}
+
+.activity-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+
+.activity-type {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.activity-module {
+  color: #a0aec0;
+  // font-size: 0.9rem;
+}
+
+
+
+.activity-summary {
+  color: #e2e8f0;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+
+.activity-meta {
+  color: #a0aec0;
+  font-size: 0.8rem;
 }

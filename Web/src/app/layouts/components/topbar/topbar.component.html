@@ -60,9 +60,9 @@
       </div>
     </div>
 
-    <div *ngIf="showPatientBanner">
+    <ng-container *ngIf="(patientBannerService.patientData$ | async)">
       <app-patient-header-panel />
-    </div>
+    </ng-container>
 
     <div>
       <app-navbar />

@@ -21,7 +21,7 @@ import { LucideAngularModule, Search, Sliders, Home, User, Users, ChevronDown, C
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, take } from 'rxjs/operators';
 import { ModalTriggerService } from '@core/services/modal-trigger.service';
 import { PermissionService } from '@core/services/permission.service';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
@@ -233,19 +233,18 @@ export class AppMenuComponent implements OnInit, OnDestroy {
   }
 
   onPatientSummaryClick() {
-
-        this.patientBannerService.patientData$.subscribe((data: any) => {
-        
-          this.isPatientAvailable = data;
-          console.log('isPatientAvailable', this.isPatientAvailable);
-      });
-
+    this.patientBannerService.patientData$.pipe(
+      take(1)
+    ).subscribe((data: any) => {
+      this.isPatientAvailable = data;
+      console.log('isPatientAvailable', this.isPatientAvailable);
+      
       if (this.isPatientAvailable) {
         this.router.navigate(['/patient-summary']);
       } else {
         this.openAdvancedSearchModal();
       }
-
+    });
   }
 
   onDashboardClick() {

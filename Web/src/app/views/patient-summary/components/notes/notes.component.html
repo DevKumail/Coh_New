@@ -1,3 +1,29 @@
-<div class="notes-panel mt-2">
-    <p>Notes will be implemented here</p>
+<div class="notes-panel p-1 mt-1">
+    <div class="activity-timeline" *ngIf="activities.length > 0">
+        <div class="activity-item" *ngFor="let activity of activities">
+            <div class="activity-header">
+                <span class="activity-type" [class.text-success]="activity.activityType === 'create'" 
+                      [class.text-warning]="activity.activityType === 'update'">
+                    {{ activity.activityType === 'create' ? 'Created' : 'Updated' }}
+                </span>
+                <span class="activity-module">{{ activity.module }}</span>
+            </div>
+            <div class="activity-body">
+                <div class="activity-summary">{{ activity.summary }}</div>
+                <div class="activity-meta">
+                    <small class="text-muted">
+                        <strong>Provider:</strong> {{ activity.providerName }} | 
+                        <strong>MR#:</strong> {{ activity.mrNo }} | 
+                        <strong>Patient Name:</strong> {{ SelectedVisit.patientFullName }} | 
+                        <strong>Time:</strong> {{ activity.timestamp | date: 'short' }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center text-muted py-4" *ngIf="activities.length === 0">
+        <p>No clinical activities recorded yet.</p>
+        <small>Activities will appear here when you create or update records.</small>
+    </div>
 </div>

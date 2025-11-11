@@ -1,5 +1,5 @@
 <!-- 🔹 Breadcrumb OUTSIDE card -->
-<nav aria-label="breadcrumb">
+<!-- <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-light bg-opacity-50 p-2 ">
       <li class="breadcrumb-item">
         <a href="javascript:void(0);">
@@ -12,7 +12,7 @@
       </li>
   <li class="breadcrumb-item active" aria-current="page">{{ 'CHARGE_CAPTURE' | translate }}</li>
     </ol>
-  </nav>
+  </nav> -->
 
   <!-- hide Diagnosis gride -->
   <div class="card shadow rounded">
@@ -1467,14 +1467,14 @@
                 <thead class="align-middle thead-sm">
                   <tr>
                     <th style="width: 10%">{{ 'TYPE' | translate }}</th>
-                    <th style="width: 10%">{{ 'CODE' | translate }}</th>
-                    <th style="width: 10%">{{ 'UNIT' | translate }}</th>
-                    <th style="width: 40%">{{ 'DESCRIPTION' | translate }}</th>
+                    <th style="width: 9%">{{ 'CODE' | translate }}</th>
+                    <th style="width: 7%">{{ 'UNIT' | translate }}</th>
+                    <th style="width: 100px; max-width: 100px;">{{ 'DESCRIPTION' | translate }}</th>
                     <th style="width: 10%" *ngIf="serviceToothCode">{{ 'TOOTH_CODE' | translate }}</th>
-                    <th style="width: 5%" *ngIf="ServiceM" >{{ 'M1' | translate }}</th>
-                    <th style="width: 5%" *ngIf="ServiceM">{{ 'M2' | translate }}</th>
-                    <th style="width: 5%" *ngIf="ServiceM">{{ 'M3' | translate }}</th>
-                    <th style="width: 5%" *ngIf="ServiceM">{{ 'M4' | translate }}</th>
+                    <th style="width: 7%" *ngIf="ServiceM" >{{ 'M1' | translate }}</th>
+                    <th style="width: 7%" *ngIf="ServiceM">{{ 'M2' | translate }}</th>
+                    <th style="width: 7%" *ngIf="ServiceM">{{ 'M3' | translate }}</th>
+                    <th style="width: 7%" *ngIf="ServiceM">{{ 'M4' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody class="table-group-divider">
@@ -1497,8 +1497,10 @@
                      </div>
                     </td>
 
-                    <td style="font-size: 12px">
-                    <span>{{MyServicesData.description}}</span>
+                    <td style="font-size: 12px;">
+                    <div style="max-height: 70px; overflow-y: auto; overflow-x: hidden; word-wrap: break-word;">
+                      <span>{{MyServicesData.description}}</span>
+                    </div>
                     </td>
                     <td style="font-size: 12px" *ngIf="serviceToothCode">
                       <div >
@@ -1509,16 +1511,15 @@
                       </select>
                     </div>
                     </td>
-                    <td style="font-size: 12px">
+                    <td style="font-size: 12px" *ngIf="ServiceM">
                     <div>
                       <input
                           pInputText
                           class="form-control"
-                          type="text"
+                          type="number"
                           [(ngModel)]="MyServicesData.M1"
                           placeholder="{{ 'M1' | translate }}"
                           [disabled]="MyServicesData?.type != 'HCPCS'"
-                          type="number"
                           />
                      </div>
                     </td>
@@ -1527,11 +1528,10 @@
                       <input
                           pInputText
                           class="form-control"
-                          type="text"
+                          type="number"
                           [(ngModel)]="MyServicesData.M2"
                           placeholder="{{ 'M2' | translate }}"
                           [disabled]="MyServicesData?.type != 'HCPCS'"
-                          type="number"
                           />
                      </div>
                     </td>
@@ -1540,11 +1540,10 @@
                       <input
                           pInputText
                           class="form-control"
-                          type="text"
+                          type="number"
                           [(ngModel)]="MyServicesData.M3"
                           placeholder="{{ 'M3' | translate }}"
                           [disabled]="MyServicesData?.type != 'HCPCS'"
-                          type="number"
                           />
                      </div>
                     </td>
@@ -1554,11 +1553,10 @@
                       <input
                           pInputText
                           class="form-control"
-                          type="text"
+                          type="number"
                           [(ngModel)]="MyServicesData.M4"
                           placeholder="{{ 'M4' | translate }}"
                           [disabled]="MyServicesData?.type != 'HCPCS'"
-                          type="number"
                           />
                      </div>
                     </td>

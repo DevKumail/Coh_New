@@ -357,6 +357,7 @@
                 formControlName="ActiveStatus"
                 (change)="onStatusChange()"
             >
+            <option value="-1" selected>ALL</option>
                 <option *ngFor="let st of ActiveStatus" [ngValue]="st.id">
                     {{ st.name }}
                 </option>
