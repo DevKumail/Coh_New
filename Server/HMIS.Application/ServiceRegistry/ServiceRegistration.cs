@@ -1,5 +1,6 @@
 ﻿using HMIS.Application.Implementations;
 using HMIS.Application.ServiceLogics;
+using HMIS.Application.ServiceLogics.Cryo;
 using HMIS.Application.ServiceLogics.IVF;
 using HMIS.ApplicationImplementations;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +41,7 @@ namespace HMIS.Application
             services.AddScoped<IPrescription, PrescriptionManager>();
             services.AddScoped<IAlertManager, AlertManager >();
             services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<ICryoManagementService, CryoManagementService>();
 
 
 

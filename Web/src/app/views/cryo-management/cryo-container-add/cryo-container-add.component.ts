@@ -73,8 +73,9 @@ export class CryoContainerAddComponent {
     this.cryoForm = this.fb.group({
       description: ['', Validators.required],
       location: [''],
-      // keep selected types as an array for checkboxes
-      type: [[]],
+      // replaced "type" array with two boolean flags
+      isSperm: [false],
+      isOocyteOrEmb: [false],
       lastAudit: [''],
       maxStraws: ['']
     });
@@ -156,12 +157,13 @@ export class CryoContainerAddComponent {
     });
     return;
   }
-
+ 
   const containerDto: CryoContainerDto = {
     ID: 0, // new container
     FacilityID: 1, // TODO: replace with actual facility id
     Description: this.cryoForm.value.description,
-    Type: this.cryoForm.value.type.join(','), // convert array to string
+    IsSperm: !!this.cryoForm.value.isSperm,
+    IsOocyteOrEmb: !!this.cryoForm.value.isOocyteOrEmb,
     LastAudit: this.cryoForm.value.lastAudit,
     MaxStrawsInLastLevel: this.cryoForm.value.maxStraws,
     CreatedBy: 1, // TODO: replace with actual user

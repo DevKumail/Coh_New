@@ -50,15 +50,11 @@
             <label>{{ 'TYPE' | translate }} <span class="text-danger">*</span></label>
             <div class="d-flex mt-2">
               <div class="form-check me-3">
-                <input class="form-check-input" type="checkbox"
-                       [checked]="isTypeSelected('Sperm')"
-                       (change)="onTypeToggle($event, 'Sperm')" />
+                <input class="form-check-input" type="checkbox" formControlName="isSperm" />
                 <label class="form-check-label">{{ 'Sperm' }}</label>
               </div>
               <div class="form-check">
-                <input class="form-check-input" type="checkbox"
-                       [checked]="isTypeSelected('Ooc/Emb')"
-                       (change)="onTypeToggle($event, 'Ooc/Emb')" />
+                <input class="form-check-input" type="checkbox" formControlName="isOocyteOrEmb" />
                 <label class="form-check-label">{{ 'Ooc / Emb' }}</label>
               </div>
             </div>

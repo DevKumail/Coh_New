@@ -2,8 +2,6 @@
 using HMIS.Application.ServiceLogics.Cryo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace HMIS.Web.Controllers.Cryo
 {
@@ -35,5 +33,25 @@ namespace HMIS.Web.Controllers.Cryo
                 return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
             }
         }
+
+        [HttpGet("GetAll")]
+        public async Task<ActionResult> GetAll(int page = 1, int pageSize = 10)
+        {
+            try
+            {
+                var result = await _cryoService.GetAllCryoContainers(page, pageSize);
+
+                return Ok(new
+                {
+                    data = result.Data,
+                    totalCount = result.TotalCount
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+            }
+        }
+
     }
 }

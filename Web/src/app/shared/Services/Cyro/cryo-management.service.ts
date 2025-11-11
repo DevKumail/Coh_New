@@ -20,7 +20,7 @@ export class CryoManagementService {
     if (pageNumber != null && pageSize != null) {
       query = `?PageNumber=${pageNumber}&PageSize=${pageSize}`;
     }
-    return this.api.get(`CryoManagement/GetAllContainers${query}`);
+    return this.api.get(`CryoManagement/GetAll${query}`);
   }
 
   // Get single container by ID

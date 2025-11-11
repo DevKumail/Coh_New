@@ -13,6 +13,9 @@ namespace HMIS.Application.ServiceLogics.Cryo
     {
         Task<bool> InsertOrUpdateCryoContainer(CryoContainerDto containerDto);
 
+        Task<(IEnumerable<CryoContainerDto> Data, int TotalCount)>
+      GetAllCryoContainers(int page, int pageSize);
+
     }
     public class CryoManagementService : ICryoManagementService
     {
@@ -131,5 +134,41 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 throw ex;
             }
         }
+
+        public async Task<(IEnumerable<CryoContainerDto> Data, int TotalCount)>
+        GetAllCryoContainers(int page, int pageSize)
+        {
+            try
+            {
+                var query = _context.CryoContainers.AsQueryable();
+
+                int totalCount = await query.CountAsync();
+
+                var containers = await query
+                    .OrderByDescending(c => c.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(c => new CryoContainerDto
+                    {
+                        ID = c.Id,
+                        FacilityID = c.FacilityId,
+                        Description = c.Description,
+                        Type = c.Type,
+                        LastAudit = c.LastAudit,
+                        MaxStrawsInLastLevel = c.MaxStrawsInLastLevel,
+                        CreatedAt = c.CreatedAt,
+                        UpdatedAt = c.UpdatedAt
+                    })
+                    .ToListAsync();
+
+                return (containers, totalCount);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
     }
 }

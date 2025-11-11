@@ -40,12 +40,28 @@ export interface CryoContainerDto {
   ID?: number;
   FacilityID: number;
   Description: string;
-  Type: string; // Sperm / Ooc/Emb
   LastAudit?: string;
   MaxStrawsInLastLevel?: number;
+  IsSperm: boolean;
+  IsOocyteOrEmb?: boolean; 
   CreatedBy?: number;
   UpdatedBy?: number;
   CreatedAt?: string | Date;
   UpdatedAt?: string | Date;
   LevelA?: CryoLevelADto[];
+}
+
+
+export interface CryoContainerResultDto {
+  id?: number;
+  facilityId: number;
+  description: string;
+  type: string; 
+  lastAudit?: string;
+  maxStrawsInLastLevel?: number;
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  levelA?: CryoLevelADto[];
 }
