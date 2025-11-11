@@ -4,7 +4,7 @@ import { CryoContainerDto } from '@/app/shared/Models/Cyro/cyro-container.model'
 import { CryoManagementService } from '@/app/shared/Services/Cyro/cryo-management.service';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgIconComponent } from '@ng-icons/core';
@@ -33,18 +33,18 @@ interface LevelA {
 
 @Component({
   selector: 'app-cryo-container-add',
-      imports: [
-          CommonModule,
-          ReactiveFormsModule,
-          FormsModule,
-          RouterModule,
-          NgIconComponent,
-          TranslatePipe,
-          FilePondModule,
-          NgbNavModule,
-          LucideAngularModule,
-          FilledOnValueDirective
-      ],
+  standalone: true,
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        FormsModule,
+        RouterModule,
+        TranslatePipe,
+        FilePondModule,
+        NgbNavModule,
+        LucideAngularModule,
+        FilledOnValueDirective
+    ],
   providers: [
     provideNgxMask(),
     { provide: 'ngModelOptions', useValue: { standalone: true } }
@@ -68,8 +68,8 @@ export class CryoContainerAddComponent {
   newLevelB = '';
   newStrawsCount = 0;
 
-  constructor(private fb: FormBuilder,private cryoService: CryoManagementService,
-  private router: Router) {
+  constructor(private fb: FormBuilder, private cryoService: CryoManagementService,
+    private router: Router) {
     this.cryoForm = this.fb.group({
       description: ['', Validators.required],
       location: [''],
@@ -77,7 +77,14 @@ export class CryoContainerAddComponent {
       isOocyteOrEmb: [false],
       lastAudit: [''],
       maxStraws: ['']
-    });
+    }, { validators: this.typeRequiredValidator });
+  }
+
+  // form-level validator: require at least one of the two type checkboxes
+  private typeRequiredValidator(control: AbstractControl): ValidationErrors | null {
+    const isSperm = !!control.get('isSperm')?.value;
+    const isOocyte = !!control.get('isOocyteOrEmb')?.value;
+    return (isSperm || isOocyte) ? null : { typeRequired: true };
   }
  
   // Checkbox helpers for "type" (store as string[] in form control)
@@ -101,7 +108,6 @@ export class CryoContainerAddComponent {
   }
 
     addLevelA() {
-      debugger;
     if (!this.newLevelA.trim()) return;
 
     this.levelAs.push({
@@ -193,7 +199,8 @@ export class CryoContainerAddComponent {
         showConfirmButton: false,
         timer: 2000,
       });
-      this.router.navigate(['/cryo/containers']); // replace with actual route
+      // route to list component after save
+      this.router.navigate(['/cryo/cryo-management']);
     },
     error: (error: any) => {
       let errorMessage = 'Something went wrong';
@@ -228,20 +235,27 @@ export class CryoContainerAddComponent {
     a.code = String(next).trim() || a.code;
   }
 
-  // Delete Level A only if it has no child LevelBs
-  deleteLevelA(a: LevelA, event?: Event) {
+  // Delete Level A (allow deleting even if it has children) using Swal instead of browser confirm/alert
+  async deleteLevelA(a: LevelA, event?: Event) {
     if (event) event.stopPropagation();
-    if (a.levelBs && a.levelBs.length > 0) {
-      // check deeper: if any LevelB still has LevelC, instruct to remove them first
-      const hasCs = a.levelBs.some(b => b.levelCs && b.levelCs.length > 0);
-      if (hasCs) {
-        alert('Please remove Level C entries first, then Level B, then Level A.');
-        return;
-      }
-      alert('Please remove Level B entries first, then delete this Level A.');
-      return;
-    }
-    if (!confirm(`Delete Level A "${a.code}"?`)) return;
+
+    const childCountB = a.levelBs?.length || 0;
+    const childCountC = a.levelBs?.reduce((acc, b) => acc + (b.levelCs?.length || 0), 0) || 0;
+    const message = childCountB || childCountC
+      ? `Deleting "${a.code}" will also remove ${childCountB} Level B item(s) and ${childCountC} Level C item(s). Are you sure?`
+      : `Delete Level A "${a.code}"?`;
+
+    const result = await Swal.fire({
+      title: 'Confirm delete',
+      text: message,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel',
+    });
+
+    if (!result.isConfirmed) return;
+
     const idx = this.levelAs.indexOf(a);
     if (idx > -1) {
       this.levelAs.splice(idx, 1);
@@ -249,11 +263,12 @@ export class CryoContainerAddComponent {
         this.selectedA = null;
         this.selectedB = null;
       }
+      await Swal.fire({ icon: 'success', title: 'Deleted', text: 'Level A and its children removed.', timer: 1200, showConfirmButton: false, position: 'center' });
     }
   }
 
-  // Edit Level B code (no restriction)
-  editLevelB(b: LevelB, event?: Event) {
+   // Edit Level B code (no restriction)
+   editLevelB(b: LevelB, event?: Event) {
     if (event) event.stopPropagation();
     const next = window.prompt('Edit Level B code', b.code);
     if (next === null) return;
@@ -261,25 +276,37 @@ export class CryoContainerAddComponent {
   }
 
   // Delete Level B only if it has no LevelC entries
-  deleteLevelB(b: LevelB, event?: Event) {
+  async deleteLevelB(b: LevelB, event?: Event) {
     if (event) event.stopPropagation();
-    if (b.levelCs && b.levelCs.length > 0) {
-      alert('Please remove Level C entries first before deleting this Level B.');
-      return;
-    }
     if (!this.selectedA) return;
-    if (!confirm(`Delete Level B "${b.code}"?`)) return;
+
+    const childCountC = b.levelCs?.length || 0;
+    const message = childCountC
+      ? `Deleting "${b.code}" will also remove ${childCountC} Level C item(s). Are you sure?`
+      : `Delete Level B "${b.code}"?`;
+
+    const result = await Swal.fire({
+      title: 'Confirm delete',
+      text: message,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel',
+    });
+    if (!result.isConfirmed) return;
+
     const idx = this.selectedA.levelBs.indexOf(b);
     if (idx > -1) {
       this.selectedA.levelBs.splice(idx, 1);
       if (this.selectedB === b) {
         this.selectedB = null;
       }
+      await Swal.fire({ icon: 'success', title: 'Deleted', text: 'Level B and its children removed.', timer: 1200, showConfirmButton: false, position: 'center' });
     }
   }
 
-  // Edit Level C position (no restriction)
-  editLevelC(c: LevelC, event?: Event) {
+   // Edit Level C position (no restriction)
+   editLevelC(c: LevelC, event?: Event) {
     if (event) event.stopPropagation();
     const next = window.prompt('Edit Level C position (number)', String(c.position));
     if (next === null) return;
@@ -292,13 +319,24 @@ export class CryoContainerAddComponent {
   }
 
   // Delete Level C
-  deleteLevelC(c: LevelC, event?: Event) {
+  async deleteLevelC(c: LevelC, event?: Event) {
     if (event) event.stopPropagation();
     if (!this.selectedB) return;
-    if (!confirm(`Delete Level C position "${c.position}"?`)) return;
+
+    const result = await Swal.fire({
+      title: 'Confirm delete',
+      text: `Delete Level C position "${c.position}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel',
+    });
+    if (!result.isConfirmed) return;
+
     const idx = this.selectedB.levelCs.indexOf(c);
     if (idx > -1) {
       this.selectedB.levelCs.splice(idx, 1);
+      await Swal.fire({ icon: 'success', title: 'Deleted', text: 'Level C removed.', timer: 1000, showConfirmButton: false, position: 'center' });
     }
   }
 }

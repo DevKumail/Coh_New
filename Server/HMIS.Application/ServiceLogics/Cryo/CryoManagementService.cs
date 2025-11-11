@@ -16,6 +16,12 @@ namespace HMIS.Application.ServiceLogics.Cryo
         Task<(IEnumerable<CryoContainerDto> Data, int TotalCount)>
       GetAllCryoContainers(int page, int pageSize);
 
+        Task<bool> DeleteCryoContainer(long containerId, long? updatedBy);
+
+        Task<CryoContainerDto?> GetCryoContainerById(long id);
+
+
+
     }
     public class CryoManagementService : ICryoManagementService
     {
@@ -142,7 +148,8 @@ namespace HMIS.Application.ServiceLogics.Cryo
         {
             try
             {
-                var query = _context.CryoContainers.AsQueryable();
+                var query = _context.CryoContainers
+                    .Where(c => !c.IsDeleted);
 
                 int totalCount = await query.CountAsync();
 
@@ -155,8 +162,8 @@ namespace HMIS.Application.ServiceLogics.Cryo
                         ID = c.Id,
                         FacilityID = c.FacilityId,
                         Description = c.Description,
-                        IsSperm = c.IsSperm ?? false,
-                        IsOocyteOrEmb = c.IsOocyteOrEmbryo ?? false,
+                        IsSperm = c.IsSperm,
+                        IsOocyteOrEmb = c.IsOocyteOrEmbryo,
                         LastAudit = c.LastAudit,
                         MaxStrawsInLastLevel = c.MaxStrawsInLastLevel,
                         CreatedAt = c.CreatedAt,
@@ -166,10 +173,131 @@ namespace HMIS.Application.ServiceLogics.Cryo
 
                 return (containers, totalCount);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
+        }
+
+
+        public async Task<bool> DeleteCryoContainer(long containerId, long? updatedBy)
+        {
+            var container = await _context.CryoContainers
+                .Include(c => c.CryoLevelA)
+                    .ThenInclude(a => a.CryoLevelB)
+                        .ThenInclude(b => b.CryoLevelC)
+                .FirstOrDefaultAsync(c => c.Id == containerId);
+
+            if (container == null || (container.GetType().GetProperty("IsDeleted") != null && (bool?)container.GetType().GetProperty("IsDeleted")?.GetValue(container) == true))
+                return false;
+
+            if (container.GetType().GetProperty("IsDeleted") != null)
+                container.GetType().GetProperty("IsDeleted")?.SetValue(container, true);
+            container.UpdatedBy = updatedBy;
+            container.UpdatedAt = DateTime.Now;
+
+            // Soft delete LevelA
+            if (container.CryoLevelA != null)
+            {
+                foreach (var levelA in container.CryoLevelA)
+                {
+                    if (levelA.GetType().GetProperty("IsDeleted") != null)
+                        levelA.GetType().GetProperty("IsDeleted")?.SetValue(levelA, true);
+                    levelA.UpdatedBy = updatedBy;
+                    levelA.UpdatedAt = DateTime.Now;
+
+                    // Soft delete LevelB
+                    if (levelA.CryoLevelB != null)
+                    {
+                        foreach (var levelB in levelA.CryoLevelB)
+                        {
+                            if (levelB.GetType().GetProperty("IsDeleted") != null)
+                                levelB.GetType().GetProperty("IsDeleted")?.SetValue(levelB, true);
+                            levelB.UpdatedBy = updatedBy;
+                            levelB.UpdatedAt = DateTime.Now;
+
+                            // Soft delete LevelC
+                            if (levelB.CryoLevelC != null)
+                            {
+                                foreach (var levelC in levelB.CryoLevelC)
+                                {
+                                    if (levelC.GetType().GetProperty("IsDeleted") != null)
+                                        levelC.GetType().GetProperty("IsDeleted")?.SetValue(levelC, true);
+                                    levelC.UpdatedBy = updatedBy;
+                                    levelC.UpdatedAt = DateTime.Now;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<CryoContainerDto?> GetCryoContainerById(long id)
+        {
+            var container = await _context.CryoContainers
+                .Include(c => c.CryoLevelA)
+                    .ThenInclude(a => a.CryoLevelB)
+                        .ThenInclude(b => b.CryoLevelC)
+                .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
+
+            if (container == null)
+                return null;
+
+            return new CryoContainerDto
+            {
+                ID = container.Id,
+                FacilityID = container.FacilityId,
+                Description = container.Description,
+                LastAudit = container.LastAudit,
+                MaxStrawsInLastLevel = container.MaxStrawsInLastLevel,
+                IsSperm = container.IsSperm ?? false,
+                IsOocyteOrEmb = container.IsOocyteOrEmbryo,
+                CreatedBy = container.CreatedBy,
+                UpdatedBy = container.UpdatedBy,
+                CreatedAt = container.CreatedAt,
+                UpdatedAt = container.UpdatedAt,
+                LevelA = container.CryoLevelA?
+                    .Where(a => !a.IsDeleted)
+                    .Select(a => new CryoLevelADto
+                    {
+                        ID = a.Id,
+                        ContainerID = a.ContainerId,
+                        CanisterCode = a.CanisterCode,
+                        CreatedBy = a.CreatedBy,
+                        UpdatedBy = a.UpdatedBy,
+                        CreatedAt = a.CreatedAt,
+                        UpdatedAt = a.UpdatedAt,
+                        LevelB = a.CryoLevelB?
+                            .Where(b => !b.IsDeleted)
+                            .Select(b => new CryoLevelBDto
+                            {
+                                ID = b.Id,
+                                LevelAID = b.LevelAid,
+                                CaneCode = b.CaneCode,
+                                CreatedBy = b.CreatedBy,
+                                UpdatedBy = b.UpdatedBy,
+                                CreatedAt = b.CreatedAt,
+                                UpdatedAt = b.UpdatedAt,
+                                LevelC = b.CryoLevelC?
+                                    .Where(c => !c.IsDeleted)
+                                    .Select(c => new CryoLevelCDto
+                                    {
+                                        ID = c.Id,
+                                        LevelBID = c.LevelBid,
+                                        StrawPosition = c.StrawPosition,
+                                        SampleID = c.SampleId,
+                                        Status = c.Status,
+                                        CreatedBy = c.CreatedBy,
+                                        UpdatedBy = c.UpdatedBy,
+                                        CreatedAt = c.CreatedAt,
+                                        UpdatedAt = c.UpdatedAt
+                                    }).ToList()
+                            }).ToList()
+                    }).ToList()
+            };
         }
 
 

@@ -3,6 +3,7 @@ import { authGuard } from '@/app/core/guards/auth.guard';
 import { modulePermissionGuard } from '@/app/core/guards/module-permission.guard';
 import { CryoContainerListComponent } from './cryo-container-list/cryo-container-list.component';
 import { CryoContainerAddComponent } from './cryo-container-add/cryo-container-add.component';
+import { CryoContainerEditComponent } from './cryo-container-edit/cryo-container-edit.component';
 
 export const CRYO_ROUTES: Routes = [
 {
@@ -18,6 +19,14 @@ component: CryoContainerAddComponent,
 canActivate: [authGuard, modulePermissionGuard],
 data: { module: 'Cryo Mangement', component: 'Cryo Manager', title: 'Cryo Manager'
 }
+},
+{
+path: 'cryo-management/edit/:id',
+component: CryoContainerEditComponent,
+canActivate: [authGuard, modulePermissionGuard],
+data: { module: 'Cryo Mangement', component: 'Cryo Manager', title: 'Cryo Manager'
 }
+}
+
 
 ];

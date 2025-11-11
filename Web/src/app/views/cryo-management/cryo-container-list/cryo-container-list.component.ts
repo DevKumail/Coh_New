@@ -11,6 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgIcon, NgIconComponent } from '@ng-icons/core';
 import { LucideAngularModule, LucideDelete, LucideEdit, LucideHome, LucideUsers } from 'lucide-angular';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cryo-container-list',
@@ -89,9 +90,25 @@ editContainer(item: any) {
 }
 
 deleteContainer(id: number) {
-  // open confirmation
-  this.cryoService.deleteContainer(id).subscribe(() => {
-    this.loadCryoContainers();
+  this.cryoService.deleteContainer(id).subscribe({
+    next: (res: any) => {
+      // show success alert then reload list
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: res?.message || 'Record deleted',
+        showConfirmButton: false,
+        timer: 1800,
+      });
+      this.loadCryoContainers();
+    },
+    error: (err: any) => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Delete failed',
+        text: err?.error?.message || err?.message || 'Unable to delete record.',
+      });
+    }
   });
 }
 

@@ -16,7 +16,7 @@ public partial class HMISDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Action> Action { get; set; }
+    public virtual DbSet<Entities.Action> Action { get; set; }
 
     public virtual DbSet<AlergyTypes> AlergyTypes { get; set; }
 
@@ -352,7 +352,7 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<TabDrugsNameBackup> TabDrugsNameBackup { get; set; }
 
-    public virtual DbSet<Task> Task { get; set; }
+    public virtual DbSet<Entities.Task> Task { get; set; }
 
     public virtual DbSet<TaskForwarding> TaskForwarding { get; set; }
 
@@ -398,7 +398,7 @@ public partial class HMISDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Action>(entity =>
+        modelBuilder.Entity<Entities.Action>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -1725,7 +1725,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.NewDrugId).ValueGeneratedOnAdd();
         });
 
-        modelBuilder.Entity<Task>(entity =>
+        modelBuilder.Entity<Entities.Task>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });

@@ -27,10 +27,13 @@ export class CryoManagementService {
   getContainerById(containerId: number): Observable<CryoContainerDto> {
     return this.api.get(`CryoManagement/GetContainerById?ID=${containerId}`);
   }
+   updateContainer(containerId: number, dto: any): Observable<any> {
+    return this.api.put<any>(`CryoManagement/UpdateContainer/${containerId}`, dto);
+  }
 
   // Delete container by ID
-  deleteContainer(containerId: number): Observable<any> {
-    return this.api.delete(`CryoManagement/DeleteContainer?ID=${containerId}`);
+   deleteContainer(containerId: number): Observable<any> {
+    return this.api.delete<any>(`CryoManagement/DeleteContainer/${containerId}`);
   }
 
   // Additional helper endpoints for levels if needed

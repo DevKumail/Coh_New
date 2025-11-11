@@ -58,6 +58,11 @@
                 <label class="form-check-label">{{ 'Ooc / Emb' }}</label>
               </div>
             </div>
+            <!-- validation message for type (shows after user interacts) -->
+            <div class="text-danger small mt-1"
+                 *ngIf="cryoForm.hasError('typeRequired') && (cryoForm.dirty || cryoForm.touched)">
+              {{ 'Please select at least one type.' }}
+            </div>
           </div>
 
           <!-- Last Audit -->
@@ -192,9 +197,11 @@
 
           <!-- Submit -->
           <div class="col-12 mt-4">
-            <button class="btn btn-success" (click)="saveContainer()">
-              {{ 'SAVE_CONTAINER' | translate }}
-            </button>
+            <button type="button" class="btn btn-success"
+                    (click)="saveContainer()"
+                    [disabled]="cryoForm.invalid">
+               {{ 'SAVE_CONTAINER' | translate }}
+             </button>
           </div>
 
         </form>

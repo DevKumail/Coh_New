@@ -13,9 +13,9 @@ namespace HMIS.Application.DTOs.CryoDTOs
         public string Description { get; set; }
 
         [Required(ErrorMessage = "Please select container type.")]
-        public bool IsSperm { get; set; } = false;
+        public bool? IsSperm { get; set; } = false;
 
-        public bool IsOocyteOrEmb { get; set; } = false;
+        public bool? IsOocyteOrEmb { get; set; } = false;
 
         public string LastAudit { get; set; }
         public int? MaxStrawsInLastLevel { get; set; }

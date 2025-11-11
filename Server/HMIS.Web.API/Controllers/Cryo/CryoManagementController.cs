@@ -52,6 +52,40 @@ namespace HMIS.Web.Controllers.Cryo
                 return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
             }
         }
+        [HttpDelete("DeleteContainer/{containerId}")]
+        public async Task<ActionResult> DeleteContainer(long containerId, [FromQuery] long? updatedBy = null)
+        {
+            try
+            {
+                bool deleted = await _cryoService.DeleteCryoContainer(containerId, updatedBy);
+                if (deleted)
+                    return Ok(new { message = "Cryo container and its levels deleted (soft) successfully." });
+                else
+                    return NotFound(new { message = "Cryo container not found or already deleted." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+            }
+        }
+
+        [HttpGet("GetContainerById")]
+        public async Task<ActionResult<CryoContainerDto>> GetContainerById([FromQuery] long ID)
+        {
+            try
+            {
+                var container = await _cryoService.GetCryoContainerById(ID);
+                if (container == null)
+                    return NotFound(new { message = "Cryo container not found." });
+
+                return Ok(container);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+            }
+        }
+
 
     }
 }
