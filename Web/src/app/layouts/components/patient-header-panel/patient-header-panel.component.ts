@@ -84,7 +84,11 @@ export class PatientHeaderPanelComponent implements OnInit {
          }
          this.patientInfo = this.patientData?.table2?.[0] || null;
          this.insuranceInfo = this.patientData?.table1?.[0] || [];
-         this.visible = true;
+           if(this.router.url == '/ivf/dashboard' ){
+            this.visible = false;
+          } else {
+            this.visible = true;
+          }
        } else {
          this.visible = false;
          this.patientInfo = null;
@@ -105,8 +109,10 @@ export class PatientHeaderPanelComponent implements OnInit {
 
   this.patientBannerService.Isbanneropen$.subscribe((data: any) => {
    
-    this.visible = data;
     if(this.router.url == '/ivf/dashboard' ){
+      this.visible = false;
+    } else{
+      this.visible = data;
     }
   })
 
