@@ -90,7 +90,7 @@ export class IVFHomeComponent {
 
     // If an MRNo already exists in patient banner data, call GetCouple once
     this.patientBannerService.patientData$.pipe(take(1)).subscribe((pd: any) => {
-      const mrNo = pd?.MRNo ?? pd?.mrno ?? pd?.mrNo ?? pd?.MrNo;
+      const mrNo = pd?.table2?.[0]?.mrNo
       if (!mrNo) return;
       this.ivfApi.getCoupleData(String(mrNo)).subscribe({
         next: (res: any) => {

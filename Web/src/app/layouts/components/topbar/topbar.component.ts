@@ -134,8 +134,11 @@ export class TopbarComponent implements OnInit {
       if (isIvfRoute) {
         // Publish IVF search event and do not open the patient banner here.
         this.ivfSearch.publishSearch(this.mrNo);
+        this.searchPatient(this.mrNo);
         this.searchAppointment(this.mrNo);
+        this.patientBannerService.setIsbanneropen(false);
       } else {
+        this.ivfSearch.publishSearch(this.mrNo);
         this.searchPatient(this.mrNo);
         this.searchAppointment(this.mrNo);
       }
