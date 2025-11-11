@@ -86,15 +86,23 @@ namespace HMIS.Web.Controllers.Common
         [HttpGet("GetAppointmentInfoByMRNo")]
         public async Task<IActionResult> GetAppointmentInfoByMRNo(int? PageNumber = 1, int? PageSize = 10, string MRNo = "")
         {
-            if (string.IsNullOrWhiteSpace(MRNo))
-                return BadRequest("MRNo is required.");
-
-            DataSet result = await _commonManager.GetAppointmentDetailsByMRNo(PageNumber, PageSize, MRNo);
-
-            if (result == null || result.Tables.Count == 0)
+            //if (string.IsNullOrWhiteSpace(MRNo))
+            //return BadRequest("MRNo is required.");
+            try
+            {
+                var result = await _commonManager.GetAppointmentDetailsByMRNo(PageNumber, PageSize, MRNo);
+                if (!result.isSuccess) 
+                {
+                    return NoContent();
+                }
+                return Ok(result.ds);
+            }
+            catch (Exception ex)
+            {
+                // You can log ex.Message here for debugging
                 return NotFound("No appointment details found.");
+            }
 
-            return Ok(result);
         }
 
 
