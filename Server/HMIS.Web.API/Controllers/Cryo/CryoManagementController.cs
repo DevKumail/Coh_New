@@ -86,6 +86,56 @@ namespace HMIS.Web.Controllers.Cryo
             }
         }
 
+        [HttpDelete("DeleteLevelA/{levelAId}")]
+        public async Task<ActionResult> DeleteLevelA(long levelAId, [FromQuery] long? updatedBy = null)
+        {
+            try
+            {
+                bool deleted = await _cryoService.DeleteLevelA(levelAId, updatedBy);
+                if (deleted)
+                    return Ok(new { message = "Level A and its children deleted (soft) successfully." });
+                else
+                    return NotFound(new { message = "Level A not found or already deleted." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteLevelB/{levelBId}")]
+        public async Task<ActionResult> DeleteLevelB(long levelBId, [FromQuery] long? updatedBy = null)
+        {
+            try
+            {
+                bool deleted = await _cryoService.DeleteLevelB(levelBId, updatedBy);
+                if (deleted)
+                    return Ok(new { message = "Level B and its children deleted (soft) successfully." });
+                else
+                    return NotFound(new { message = "Level B not found or already deleted." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteLevelC/{levelCId}")]
+        public async Task<ActionResult> DeleteLevelC(long levelCId, [FromQuery] long? updatedBy = null)
+        {
+            try
+            {
+                bool deleted = await _cryoService.DeleteLevelC(levelCId, updatedBy);
+                if (deleted)
+                    return Ok(new { message = "Level C deleted (soft) successfully." });
+                else
+                    return NotFound(new { message = "Level C not found or already deleted." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+            }
+        }
 
     }
 }

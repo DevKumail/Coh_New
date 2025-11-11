@@ -28,7 +28,7 @@ export class CryoManagementService {
     return this.api.get(`CryoManagement/GetContainerById?ID=${containerId}`);
   }
    updateContainer(containerId: number, dto: any): Observable<any> {
-    return this.api.put<any>(`CryoManagement/UpdateContainer/${containerId}`, dto);
+    return this.api.post<any>(`CryoManagement/InsertOrUpdate`, dto);
   }
 
   // Delete container by ID
@@ -49,5 +49,17 @@ export class CryoManagementService {
   getLevelCDetails(levelBId: number): Observable<any> {
     return this.api.get(`CryoManagement/GetLevelCByLevelBId?LevelBID=${levelBId}`);
   }
+  deleteLevelA(levelAId: number): Observable<any> {
+    return this.api.delete<any>(`CryoManagement/DeleteLevelA/${levelAId}`);
+  }
 
+  // Delete existing Level B (backend should cascade/remove Level C children)
+  deleteLevelB(levelBId: number): Observable<any> {
+    return this.api.delete<any>(`CryoManagement/DeleteLevelB/${levelBId}`);
+  }
+
+  // Delete existing Level C
+  deleteLevelC(levelCId: number): Observable<any> {
+    return this.api.delete<any>(`CryoManagement/DeleteLevelC/${levelCId}`);
+  }
 }

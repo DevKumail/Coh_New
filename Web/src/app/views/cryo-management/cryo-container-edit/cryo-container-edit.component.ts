@@ -163,26 +163,155 @@ export class CryoContainerEditComponent {
   }
 
   // edit/delete functions same as create component (you can reuse implementations)
-  editLevelA(a: LevelA, event?: Event) { if (event) event.stopPropagation(); const next = window.prompt('Edit Level A code', a.code); if (next === null) return; a.code = String(next).trim() || a.code; }
-  async deleteLevelA(a: LevelA, event?: Event) { if (event) event.stopPropagation();
+  editLevelA(a: LevelA, event?: Event) {
+    if (event) event.stopPropagation();
+    const next = window.prompt('Edit Level A code', a.code);
+    if (next === null) return;
+    a.code = String(next).trim() || a.code;
+  }
+
+  async deleteLevelA(a: LevelA, event?: Event) {
+    if (event) event.stopPropagation();
+
     const childCountB = a.levelBs?.length || 0;
     const childCountC = a.levelBs?.reduce((acc, b) => acc + (b.levelCs?.length || 0), 0) || 0;
-    const message = childCountB || childCountC ? `Deleting "${a.code}" will also remove ${childCountB} Level B and ${childCountC} Level C item(s). Continue?` : `Delete Level A "${a.code}"?`;
-    const result = await Swal.fire({ title: 'Confirm delete', text: message, icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete' });
+    const message = childCountB || childCountC
+      ? `Deleting "${a.code}" will also remove ${childCountB} Level B item(s) and ${childCountC} Level C item(s). Are you sure?`
+      : `Delete Level A "${a.code}"?`;
+
+    const result = await Swal.fire({
+      title: 'Confirm delete',
+      text: message,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel',
+    });
     if (!result.isConfirmed) return;
-    const idx = this.levelAs.indexOf(a); if (idx > -1) { this.levelAs.splice(idx, 1); if (this.selectedA === a) { this.selectedA = null; this.selectedB = null; } await Swal.fire({ icon: 'success', title: 'Deleted', timer: 1000, showConfirmButton: false }); } }
+
+    // existing record on backend -> call API
+    if (a.id && a.id > 0) {
+      this.cryoService.deleteLevelA(a.id).subscribe({
+        next: (res: any) => {
+          this.removeLocalLevelA(a);
+          Swal.fire({ position: 'center', icon: 'success', title: res?.message || 'Level A deleted', showConfirmButton: false, timer: 1400 });
+        },
+        error: (err: any) => {
+          Swal.fire({ icon: 'error', title: 'Delete failed', text: err?.error?.message || err?.message || 'Unable to delete Level A.' });
+        }
+      });
+      return;
+    }
+
+    // local-only record -> remove locally
+    this.removeLocalLevelA(a);
+    await Swal.fire({ icon: 'success', title: 'Deleted', text: 'Level A and its children removed.', timer: 1200, showConfirmButton: false, position: 'center' });
+  }
+
+  private removeLocalLevelA(a: LevelA) {
+    const idx = this.levelAs.indexOf(a);
+    if (idx > -1) {
+      this.levelAs.splice(idx, 1);
+      if (this.selectedA === a) {
+        this.selectedA = null;
+        this.selectedB = null;
+      }
+    }
+  }
 
   editLevelB(b: LevelB, event?: Event) { if (event) event.stopPropagation(); const next = window.prompt('Edit Level B code', b.code); if (next === null) return; b.code = String(next).trim() || b.code; }
-  async deleteLevelB(b: LevelB, event?: Event) { if (event) event.stopPropagation(); if (!this.selectedA) return;
+
+  async deleteLevelB(b: LevelB, event?: Event) {
+    if (event) event.stopPropagation();
+    if (!this.selectedA) return;
+
     const childCountC = b.levelCs?.length || 0;
-    const message = childCountC ? `Deleting "${b.code}" will also remove ${childCountC} Level C item(s). Continue?` : `Delete Level B "${b.code}"?`;
-    const result = await Swal.fire({ title: 'Confirm delete', text: message, icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete' });
+    const message = childCountC
+      ? `Deleting "${b.code}" will also remove ${childCountC} Level C item(s). Are you sure?`
+      : `Delete Level B "${b.code}"?`;
+
+    const result = await Swal.fire({
+      title: 'Confirm delete',
+      text: message,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel',
+    });
     if (!result.isConfirmed) return;
+
+    // existing backend record -> call API
+    if (b.id && b.id > 0) {
+      this.cryoService.deleteLevelB(b.id).subscribe({
+        next: (res: any) => {
+          this.removeLocalLevelB(b);
+          Swal.fire({ position: 'center', icon: 'success', title: res?.message || 'Level B deleted', showConfirmButton: false, timer: 1400 });
+        },
+        error: (err: any) => {
+          Swal.fire({ icon: 'error', title: 'Delete failed', text: err?.error?.message || err?.message || 'Unable to delete Level B.' });
+        }
+      });
+      return;
+    }
+
+    // local-only: remove locally
+    this.removeLocalLevelB(b);
+    await Swal.fire({ icon: 'success', title: 'Deleted', text: 'Level B and its children removed.', timer: 1000, showConfirmButton: false, position: 'center' });
+  }
+
+  private removeLocalLevelB(b: LevelB) {
+    if (!this.selectedA) return;
     const idx = this.selectedA.levelBs.indexOf(b);
-    if (idx > -1) { this.selectedA.levelBs.splice(idx, 1); if (this.selectedB === b) this.selectedB = null; await Swal.fire({ icon: 'success', title: 'Deleted', timer: 1000, showConfirmButton: false }); } }
+    if (idx > -1) {
+      this.selectedA.levelBs.splice(idx, 1);
+      if (this.selectedB === b) {
+        this.selectedB = null;
+      }
+    }
+  }
 
   editLevelC(c: LevelC, event?: Event) { if (event) event.stopPropagation(); const next = window.prompt('Edit Level C position (number)', String(c.position)); if (next === null) return; const num = Number(next); if (!Number.isFinite(num) || num <= 0) { Swal.fire({ icon: 'error', title: 'Invalid position' }); return; } c.position = Math.floor(num); }
-  async deleteLevelC(c: LevelC, event?: Event) { if (event) event.stopPropagation(); if (!this.selectedB) return; const result = await Swal.fire({ title: 'Confirm delete', text: `Delete Level C position "${c.position}"?`, icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete' }); if (!result.isConfirmed) return; const idx = this.selectedB.levelCs.indexOf(c); if (idx > -1) { this.selectedB.levelCs.splice(idx, 1); await Swal.fire({ icon: 'success', title: 'Deleted', timer: 800, showConfirmButton: false }); } }
+
+  async deleteLevelC(c: LevelC, event?: Event) {
+    if (event) event.stopPropagation();
+    if (!this.selectedB) return;
+
+    const result = await Swal.fire({
+      title: 'Confirm delete',
+      text: `Delete Level C position "${c.position}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel',
+    });
+    if (!result.isConfirmed) return;
+
+    // existing backend record -> call API
+    if (c.id && c.id > 0) {
+      this.cryoService.deleteLevelC(c.id).subscribe({
+        next: (res: any) => {
+          this.removeLocalLevelC(c);
+          Swal.fire({ position: 'center', icon: 'success', title: res?.message || 'Level C deleted', showConfirmButton: false, timer: 1200 });
+        },
+        error: (err: any) => {
+          Swal.fire({ icon: 'error', title: 'Delete failed', text: err?.error?.message || err?.message || 'Unable to delete Level C.' });
+        }
+      });
+      return;
+    }
+
+    // local-only -> remove locally
+    this.removeLocalLevelC(c);
+    await Swal.fire({ icon: 'success', title: 'Deleted', text: 'Level C removed.', timer: 800, showConfirmButton: false, position: 'center' });
+  }
+
+  private removeLocalLevelC(c: LevelC) {
+    if (!this.selectedB) return;
+    const idx = this.selectedB.levelCs.indexOf(c);
+    if (idx > -1) {
+      this.selectedB.levelCs.splice(idx, 1);
+    }
+  }
 
   // ----------------- update -----------------
   saveContainer() {

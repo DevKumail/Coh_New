@@ -20,7 +20,9 @@ namespace HMIS.Application.ServiceLogics.Cryo
 
         Task<CryoContainerDto?> GetCryoContainerById(long id);
 
-
+        Task<bool> DeleteLevelA(long levelAId, long? updatedBy);
+        Task<bool> DeleteLevelB(long levelBId, long? updatedBy);
+        Task<bool> DeleteLevelC(long levelCId, long? updatedBy);
 
     }
     public class CryoManagementService : ICryoManagementService
@@ -117,11 +119,30 @@ namespace HMIS.Application.ServiceLogics.Cryo
                     // Update existing container
                     var container = await _context.CryoContainers
                         .Include(c => c.CryoLevelA)
-                        .ThenInclude(a => a.CryoLevelB)
-                        .ThenInclude(b => b.CryoLevelC)
-                        .FirstOrDefaultAsync(c => c.Id == containerDto.ID);
+                            .ThenInclude(a => a.CryoLevelB)
+                                .ThenInclude(b => b.CryoLevelC)
+                        .FirstOrDefaultAsync(c => c.Id == containerDto.ID && !c.IsDeleted);
 
                     if (container == null) return false;
+
+                    container.CryoLevelA = container.CryoLevelA
+                        .Where(a => !a.IsDeleted)
+                        .Select(a =>
+                        {
+                            a.CryoLevelB = a.CryoLevelB
+                                .Where(b => !b.IsDeleted)
+                                .Select(b =>
+                                {
+                                    b.CryoLevelC = b.CryoLevelC
+                                        .Where(c => !c.IsDeleted)
+                                        .ToList();
+                                    return b;
+                                })
+                                .ToList();
+                            return a;
+                        })
+                        .ToList();
+
 
                     container.Description = containerDto.Description;
                     container.IsSperm = containerDto.IsSperm;
@@ -131,10 +152,113 @@ namespace HMIS.Application.ServiceLogics.Cryo
                     container.UpdatedBy = containerDto.UpdatedBy;
                     container.UpdatedAt = DateTime.Now;
 
-                    // TODO: Handle updating nested levels (LevelA/B/C) if needed
+                    // Handle LevelA
+                    if (containerDto.LevelA != null)
+                    {
+                        foreach (var levelADto in containerDto.LevelA)
+                        {
+                            CryoLevelA? levelAEntity = null;
+                            if (levelADto.ID.HasValue && levelADto.ID.Value > 0)
+                            {
+                                // Update existing LevelA
+                                levelAEntity = container.CryoLevelA.FirstOrDefault(a => a.Id == levelADto.ID && !a.IsDeleted);
+                                if (levelAEntity != null)
+                                {
+                                    levelAEntity.CanisterCode = levelADto.CanisterCode;
+                                    levelAEntity.UpdatedBy = levelADto.UpdatedBy;
+                                    levelAEntity.UpdatedAt = DateTime.Now;
+                                }
+                            }
+                            else
+                            {
+                                // Add new LevelA
+                                levelAEntity = new CryoLevelA
+                                {
+                                    ContainerId = container.Id,
+                                    CanisterCode = levelADto.CanisterCode,
+                                    CreatedBy = levelADto.CreatedBy,
+                                    CreatedAt = DateTime.Now
+                                };
+                                _context.CryoLevelA.Add(levelAEntity);
+                                await _context.SaveChangesAsync(); // Save to get the new ID for LevelA
+                                container.CryoLevelA.Add(levelAEntity);
+                            }
+
+                            // Handle LevelB for this LevelA
+                            if (levelADto.LevelB != null && levelAEntity != null)
+                            {
+                                foreach (var levelBDto in levelADto.LevelB)
+                                {
+                                    CryoLevelB? levelBEntity = null;
+                                    if (levelBDto.ID.HasValue && levelBDto.ID.Value > 0)
+                                    {
+                                        // Update existing LevelB
+                                        levelBEntity = levelAEntity.CryoLevelB.FirstOrDefault(b => b.Id == levelBDto.ID && !b.IsDeleted);
+                                        if (levelBEntity != null)
+                                        {
+                                            levelBEntity.CaneCode = levelBDto.CaneCode;
+                                            levelBEntity.UpdatedBy = levelBDto.UpdatedBy;
+                                            levelBEntity.UpdatedAt = DateTime.Now;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Add new LevelB
+                                        levelBEntity = new CryoLevelB
+                                        {
+                                            LevelAid = levelAEntity.Id,
+                                            CaneCode = levelBDto.CaneCode,
+                                            CreatedBy = levelBDto.CreatedBy,
+                                            CreatedAt = DateTime.Now
+                                        };
+                                        _context.CryoLevelB.Add(levelBEntity);
+                                        await _context.SaveChangesAsync(); 
+                                        levelAEntity.CryoLevelB.Add(levelBEntity);
+                                    }
+
+                                    // Handle LevelC for this LevelB
+                                    if (levelBDto.LevelC != null && levelBEntity != null)
+                                    {
+                                        foreach (var levelCDto in levelBDto.LevelC)
+                                        {
+                                            CryoLevelC? levelCEntity = null;
+                                            if (levelCDto.ID.HasValue && levelCDto.ID.Value > 0)
+                                            {
+                                                // Update existing LevelC
+                                                levelCEntity = levelBEntity.CryoLevelC.FirstOrDefault(c => c.Id == levelCDto.ID && !c.IsDeleted);
+                                                if (levelCEntity != null)
+                                                {
+                                                    levelCEntity.StrawPosition = levelCDto.StrawPosition;
+                                                    levelCEntity.SampleId = levelCDto.SampleID;
+                                                    levelCEntity.Status = levelCDto.Status;
+                                                    levelCEntity.UpdatedBy = levelCDto.UpdatedBy;
+                                                    levelCEntity.UpdatedAt = DateTime.Now;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // Add new LevelC
+                                                levelCEntity = new CryoLevelC
+                                                {
+                                                    LevelBid = levelBEntity.Id,
+                                                    StrawPosition = levelCDto.StrawPosition,
+                                                    SampleId = levelCDto.SampleID,
+                                                    Status = levelCDto.Status,
+                                                    CreatedBy = levelCDto.CreatedBy,
+                                                    CreatedAt = DateTime.Now
+                                                };
+                                                _context.CryoLevelC.Add(levelCEntity);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     await _context.SaveChangesAsync();
                     return true;
+
                 }
             }
             catch (Exception ex)
@@ -300,6 +424,86 @@ namespace HMIS.Application.ServiceLogics.Cryo
             };
         }
 
+        public async Task<bool> DeleteLevelA(long levelAId, long? updatedBy)
+        {
+            var levelA = await _context.CryoLevelA
+                .Include(a => a.CryoLevelB)
+                    .ThenInclude(b => b.CryoLevelC)
+                .FirstOrDefaultAsync(a => a.Id == levelAId && !a.IsDeleted);
+
+            if (levelA == null)
+                return false;
+
+            levelA.IsDeleted = true;
+            levelA.UpdatedBy = updatedBy;
+            levelA.UpdatedAt = DateTime.Now;
+
+            if (levelA.CryoLevelB != null)
+            {
+                foreach (var levelB in levelA.CryoLevelB)
+                {
+                    levelB.IsDeleted = true;
+                    levelB.UpdatedBy = updatedBy;
+                    levelB.UpdatedAt = DateTime.Now;
+
+                    if (levelB.CryoLevelC != null)
+                    {
+                        foreach (var levelC in levelB.CryoLevelC)
+                        {
+                            levelC.IsDeleted = true;
+                            levelC.UpdatedBy = updatedBy;
+                            levelC.UpdatedAt = DateTime.Now;
+                        }
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteLevelB(long levelBId, long? updatedBy)
+        {
+            var levelB = await _context.CryoLevelB
+                .Include(b => b.CryoLevelC)
+                .FirstOrDefaultAsync(b => b.Id == levelBId && !b.IsDeleted);
+
+            if (levelB == null)
+                return false;
+
+            levelB.IsDeleted = true;
+            levelB.UpdatedBy = updatedBy;
+            levelB.UpdatedAt = DateTime.Now;
+
+            if (levelB.CryoLevelC != null)
+            {
+                foreach (var levelC in levelB.CryoLevelC)
+                {
+                    levelC.IsDeleted = true;
+                    levelC.UpdatedBy = updatedBy;
+                    levelC.UpdatedAt = DateTime.Now;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteLevelC(long levelCId, long? updatedBy)
+        {
+            var levelC = await _context.CryoLevelC
+                .FirstOrDefaultAsync(c => c.Id == levelCId && !c.IsDeleted);
+
+            if (levelC == null)
+                return false;
+
+            levelC.IsDeleted = true;
+            levelC.UpdatedBy = updatedBy;
+            levelC.UpdatedAt = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
     }
 }
