@@ -15,6 +15,7 @@ using HMIS.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using HMIS.Application.DTOs.Registration;
 using HMIS.Application.DTOs.SpLocalModel;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

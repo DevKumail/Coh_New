@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Emgu.CV.Ocl;
 using HMIS.Application.DTOs.Clinical;
 using HMIS.Application.Implementations;
+using HMIS.Core.Context;
 using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
 using Microsoft.AspNetCore.Mvc;

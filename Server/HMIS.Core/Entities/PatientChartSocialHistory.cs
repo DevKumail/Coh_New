@@ -24,24 +24,11 @@ public partial class PatientChartSocialHistory
     public string? Mrno { get; set; }
 
     public long? VisitAccountNo { get; set; }
-    public long? AppId { get; set; }
-    
 
     public long? CreatedBy { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedDate { get; set; }
-
-    public int? UpdatedBy { get; set; }
-
-    [Column(TypeName = "datetime")]
-    public DateTime? UpdatedDate { get; set; }
-
-    [Column(TypeName = "datetime")]
-    public DateTime? StartDate { get; set; }
-
-    [Column(TypeName = "datetime")]
-    public DateTime? EndDate { get; set; }
 
     public bool? Active { get; set; }
 

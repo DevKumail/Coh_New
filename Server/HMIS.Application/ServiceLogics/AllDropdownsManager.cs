@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using HMIS.ApplicationImplementations;
 using HMIS.Core.Entities;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

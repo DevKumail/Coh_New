@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Module = HMIS.Application.DTOs.Module;
 using GdPicture.Internal.Text.Encoding.Detect.Core.Analyzers.Japanese;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

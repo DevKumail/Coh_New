@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static HMIS.Application.DTOs.SpLocalModel.UserListModel;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

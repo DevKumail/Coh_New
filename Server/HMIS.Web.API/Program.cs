@@ -11,6 +11,7 @@ using HMIS.Infrastructure.Helpers;
 using HMIS.Application.ModelMapping;
 using HMIS.Application;
 using HMIS.Core.Entities;
+using HMIS.Core.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 

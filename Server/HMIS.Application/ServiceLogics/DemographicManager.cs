@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using HMIS.Application.DTOs.Registration;
 using HMIS.Application.DTOs.Demographics;
 using static HMIS.Application.DTOs.SpLocalModel.DemographicListModel;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

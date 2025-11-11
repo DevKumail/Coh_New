@@ -5,6 +5,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Emgu.CV.Ocl;
 using HMIS.Application.DTOs.ChargeCaptureDTOs;
 using HMIS.Application.Implementations;
+using HMIS.Core.Context;
 using HMIS.Core.Entities;
 using HMIS.Infrastructure.Helpers;
 using HMIS.Infrastructure.ORM;

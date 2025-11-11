@@ -10,6 +10,7 @@ using HMIS.Application.DTOs.DashBoardDTOs.CommonDTOs;
 using Microsoft.AspNetCore.Authorization;
 using HMIS.Application.ServiceLogics;
 using Microsoft.EntityFrameworkCore;
+using HMIS.Core.Context;
 
 namespace HMIS.Web.Controllers.Dashboard
 {

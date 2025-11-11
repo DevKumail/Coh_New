@@ -1,6 +1,7 @@
 ﻿//using COI.Application.Interfaces;
 
 using HMIS.Application;
+using HMIS.Core.Context;
 using HMIS.Core.Entities;
 using Microsoft.EntityFrameworkCore.Storage;
 

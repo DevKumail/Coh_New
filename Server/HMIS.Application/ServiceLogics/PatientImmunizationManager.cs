@@ -11,6 +11,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

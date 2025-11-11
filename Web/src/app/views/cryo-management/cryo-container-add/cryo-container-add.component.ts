@@ -1,14 +1,17 @@
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { CryoContainerDto } from '@/app/shared/Models/Cyro/cyro-container.model';
+import { CryoManagementService } from '@/app/shared/Services/Cyro/cryo-management.service';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgIconComponent } from '@ng-icons/core';
 import { LucideAngularModule, LucideChevronRight, LucideHome, LucideUsers, LucideEdit2, LucideTrash2 } from 'lucide-angular';
 import { FilePondModule } from 'ngx-filepond';
 import { provideNgxMask } from 'ngx-mask';
+import Swal from 'sweetalert2';
 
 interface LevelC {
   id: number;
@@ -65,7 +68,8 @@ export class CryoContainerAddComponent {
   newLevelB = '';
   newStrawsCount = 0;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,private cryoService: CryoManagementService,
+  private router: Router) {
     this.cryoForm = this.fb.group({
       description: ['', Validators.required],
       location: [''],
@@ -143,14 +147,75 @@ export class CryoContainerAddComponent {
     );
   }
 
-  saveContainer() {
-    const payload = {
-      ...this.cryoForm.value,
-      levels: this.levelAs
-    };
-
-    console.log('Saving Cryo Container:', payload);
+ saveContainer() {
+  if (this.cryoForm.invalid) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation Error',
+      text: 'Please fill all required fields.',
+    });
+    return;
   }
+
+  const containerDto: CryoContainerDto = {
+    ID: 0, // new container
+    FacilityID: 1, // TODO: replace with actual facility id
+    Description: this.cryoForm.value.description,
+    Type: this.cryoForm.value.type.join(','), // convert array to string
+    LastAudit: this.cryoForm.value.lastAudit,
+    MaxStrawsInLastLevel: this.cryoForm.value.maxStraws,
+    CreatedBy: 1, // TODO: replace with actual user
+    LevelA: this.levelAs.map(a => ({
+      ID: a.id,
+      CanisterCode: a.code,
+      CreatedBy: 1,
+      LevelB: a.levelBs.map(b => ({
+        ID: b.id,
+        CaneCode: b.code,
+        CreatedBy: 1,
+        LevelC: b.levelCs.map(c => ({
+          ID: c.id,
+          StrawPosition: c.position,
+          Status: 'Available',
+          CreatedBy: 1
+        }))
+      }))
+    }))
+  };
+
+  this.cryoService.saveContainer(containerDto).subscribe({
+    next: (res: any) => {
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: res?.message || 'Cryo container saved successfully!',
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      this.router.navigate(['/cryo/containers']); // replace with actual route
+    },
+    error: (error: any) => {
+      let errorMessage = 'Something went wrong';
+      if (error?.error) {
+        if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        } else if (error.error.message) {
+          errorMessage = error.error.message;
+        } else {
+          errorMessage = JSON.stringify(error.error);
+        }
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Error',
+        text: errorMessage,
+      });
+    }
+  });
+}
 
   // --------- New edit/delete helpers ----------
 

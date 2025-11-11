@@ -15,6 +15,7 @@ using HMIS.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.AccessControl;
 using static HMIS.Application.DTOs.SpLocalModel.ProviderScheduleModel;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

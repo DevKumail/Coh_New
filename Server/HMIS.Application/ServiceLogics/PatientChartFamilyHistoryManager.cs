@@ -3,6 +3,7 @@ using Dapper;
 using HMIS.Application.DTOs.Clinical;
 using HMIS.Application.DTOs.Demographics;
 using HMIS.Application.Implementations;
+using HMIS.Core.Context;
 using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
 using System.Data;
@@ -91,7 +92,7 @@ namespace HMIS.Application.ServiceLogics
                     Fpatient.Mrno = model.mrno;
                     Fpatient.ChartId = model.chartId;
                     Fpatient.Shitem = model.shitem?.ToString();
-                    Fpatient.UpdatedBy = model.updatedBy;
+                    Fpatient.UpdatedBy= model.updatedBy;
                     Fpatient.UpdatedDate = DateTime.Now;
                     Fpatient.EndDate = model.endDate;
                     Fpatient.StartDate = model.startDate;

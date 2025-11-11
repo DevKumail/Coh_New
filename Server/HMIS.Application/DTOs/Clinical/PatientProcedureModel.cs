@@ -22,7 +22,7 @@ namespace HMIS.Application.DTOs.Clinical
         
         public string? ProviderName { get; set; }
 
-        public int? Active { get; set; }
+        public int Active { get; set; }
 
         public long? UpdatedBy { get; set; }
 

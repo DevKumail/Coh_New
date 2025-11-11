@@ -33,6 +33,7 @@ using Emgu.CV.Structure;
 using Emgu.CV;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

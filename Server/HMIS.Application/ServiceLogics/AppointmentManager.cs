@@ -24,6 +24,7 @@ using System.Linq;
 using System.Numerics;
 using static HMIS.Application.DTOs.AppointmentDTOs.SpLocalModel.SchAppointmentIWithFilter;
 using Microsoft.SqlServer.Management.Smo;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

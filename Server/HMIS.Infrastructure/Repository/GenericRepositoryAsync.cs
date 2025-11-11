@@ -1,4 +1,5 @@
-﻿using HMIS.Core.Entities;
+﻿using HMIS.Core.Context;
+using HMIS.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

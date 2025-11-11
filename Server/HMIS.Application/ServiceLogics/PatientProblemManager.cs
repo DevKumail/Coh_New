@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using HMIS.Application.DTOs.Clinical;
 using HMIS.Application.DTOs.ControlPanel;
 using HMIS.Application.Implementations;
+using HMIS.Core.Context;
 using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
 using Microsoft.EntityFrameworkCore;

@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using HMIS.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using Action = HMIS.Core.Entities.Action;
 
-namespace HMIS.Core.Entities;
+namespace HMIS.Core.Context;
 
 public partial class HMISDbContext : DbContext
 {
+    public HMISDbContext()
+    {
+    }
+
     public HMISDbContext(DbContextOptions<HMISDbContext> options)
         : base(options)
     {
@@ -101,6 +107,14 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<CptsInCptbyAppType> CptsInCptbyAppType { get; set; }
 
+    public virtual DbSet<CryoContainers> CryoContainers { get; set; }
+
+    public virtual DbSet<CryoLevelA> CryoLevelA { get; set; }
+
+    public virtual DbSet<CryoLevelB> CryoLevelB { get; set; }
+
+    public virtual DbSet<CryoLevelC> CryoLevelC { get; set; }
+
     public virtual DbSet<DeductiblePercent> DeductiblePercent { get; set; }
 
     public virtual DbSet<EligibilityLog> EligibilityLog { get; set; }
@@ -108,6 +122,18 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<EmirateType> EmirateType { get; set; }
 
     public virtual DbSet<Emrfrequency> Emrfrequency { get; set; }
+
+    public virtual DbSet<EmrnoteQuestionRemoved> EmrnoteQuestionRemoved { get; set; }
+
+    public virtual DbSet<EmrnoteVoiceinText> EmrnoteVoiceinText { get; set; }
+
+    public virtual DbSet<EmrnotesEncounterPath> EmrnotesEncounterPath { get; set; }
+
+    public virtual DbSet<EmrnotesPathQuestion> EmrnotesPathQuestion { get; set; }
+
+    public virtual DbSet<EmrnotesQuestion> EmrnotesQuestion { get; set; }
+
+    public virtual DbSet<EmrproviderEncounterPath> EmrproviderEncounterPath { get; set; }
 
     public virtual DbSet<Emrroute> Emrroute { get; set; }
 
@@ -120,6 +146,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<FeeSchedule> FeeSchedule { get; set; }
 
     public virtual DbSet<FinancialClass> FinancialClass { get; set; }
+
+    public virtual DbSet<HiePatientDemographicsOutboundQueue> HiePatientDemographicsOutboundQueue { get; set; }
 
     public virtual DbSet<HolidaySchedule> HolidaySchedule { get; set; }
 
@@ -325,7 +353,7 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<TabDrugsNameBackup> TabDrugsNameBackup { get; set; }
 
-    public virtual DbSet<Task> Task { get; set; }
+    public virtual DbSet<Entities.Task> Task { get; set; }
 
     public virtual DbSet<TaskForwarding> TaskForwarding { get; set; }
 
@@ -364,6 +392,10 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<VwSpecialitybyFacilityid> VwSpecialitybyFacilityid { get; set; }
 
     public virtual DbSet<Vwprovider> Vwprovider { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=175.107.195.221;Database=HMISCOH;User Id=Tekno;Password=123qwe@;Encrypt=False;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -722,6 +754,51 @@ public partial class HMISDbContext : DbContext
                 .HasConstraintName("FK_CPTsInCPTByAppType_CPTByAppType");
         });
 
+        modelBuilder.Entity<CryoContainers>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Cryo_Con__3214EC27B2AC8892");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+        });
+
+        modelBuilder.Entity<CryoLevelA>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Cryo_Lev__3214EC27FFA90B71");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.Container).WithMany(p => p.CryoLevelA)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cryo_Leve__Conta__43E1002F");
+        });
+
+        modelBuilder.Entity<CryoLevelB>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Cryo_Lev__3214EC27172594AE");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.LevelA).WithMany(p => p.CryoLevelB)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cryo_Leve__Level__48A5B54C");
+        });
+
+        modelBuilder.Entity<CryoLevelC>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Cryo_Lev__3214EC270D952296");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.Status).HasDefaultValue("Available");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.LevelB).WithMany(p => p.CryoLevelC)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cryo_Leve__Level__541767F8");
+        });
+
         modelBuilder.Entity<DeductiblePercent>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
@@ -752,6 +829,26 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
+        modelBuilder.Entity<EmrnoteVoiceinText>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Table_1");
+        });
+
+        modelBuilder.Entity<EmrnotesEncounterPath>(entity =>
+        {
+            entity.Property(e => e.PathId).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<EmrnotesPathQuestion>(entity =>
+        {
+            entity.Property(e => e.PathQuestionId).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<EmrnotesQuestion>(entity =>
+        {
+            entity.Property(e => e.QuestId).ValueGeneratedNever();
+        });
+
         modelBuilder.Entity<Emrsite>(entity =>
         {
             entity.HasKey(e => e.SiteId).HasName("PK_SiteId");
@@ -778,6 +875,13 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<FinancialClass>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+        });
+
+        modelBuilder.Entity<HiePatientDemographicsOutboundQueue>(entity =>
+        {
+            entity.HasKey(e => e.QueueId).HasName("PK__HIE_Pati__8324E7158AF56F0C");
+
+            entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<HolidaySchedule>(entity =>
@@ -1017,9 +1121,7 @@ public partial class HMISDbContext : DbContext
 
             entity.HasOne(d => d.Appointment).WithMany(p => p.PatientImmunization).HasConstraintName("FK_PatientImmunization_AppointmentId");
 
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PatientImmunizationCreatedByNavigation)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_PatientImmunization_CreatedBy");
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PatientImmunizationCreatedByNavigation).HasConstraintName("FK_PatientImmunization_CreatedBy");
 
             entity.HasOne(d => d.DrugType).WithMany(p => p.PatientImmunizationDrugType).HasConstraintName("FK_PatientImmunization_DrugTypeId");
 
@@ -1052,7 +1154,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
             entity.Property(e => e.IsHl7msgCreated).HasDefaultValue(false);
             entity.Property(e => e.PerformedOnFacility).HasDefaultValue(true);
-            entity.Property(e => e.ProcedureEndDateTime).HasDefaultValueSql("('')");
+            entity.Property(e => e.ProcedureEndDateTime).HasDefaultValueSql("(NULL)");
             entity.Property(e => e.ProcedurePriority).HasDefaultValue("");
             entity.Property(e => e.ProcedureType).HasDefaultValueSql("('')");
 
@@ -1607,9 +1709,11 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<SpeechToText>(entity =>
         {
-            entity.HasOne(d => d.Patient).WithMany(p => p.SpeechToText)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_SpeechToText_RegPatient");
+            entity.HasOne(d => d.Appointment).WithMany(p => p.SpeechToText)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_SpeechToText_SchAppointment");
+
+            entity.HasOne(d => d.Patient).WithMany(p => p.SpeechToText).HasConstraintName("FK_SpeechToText_RegPatient");
         });
 
         modelBuilder.Entity<TabDrugsName>(entity =>
@@ -1622,7 +1726,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.NewDrugId).ValueGeneratedOnAdd();
         });
 
-        modelBuilder.Entity<Task>(entity =>
+        modelBuilder.Entity<Entities.Task>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });

@@ -22,6 +22,7 @@ using System.Linq.Dynamic.Core;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Configuration;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

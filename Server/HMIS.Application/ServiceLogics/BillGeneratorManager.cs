@@ -19,6 +19,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Security.Principal;
 using System.Text;
 using Task = System.Threading.Tasks.Task;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {

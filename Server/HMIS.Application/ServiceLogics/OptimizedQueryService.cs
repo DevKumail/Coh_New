@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
+using HMIS.Core.Context;
 
 namespace HMIS.Application.ServiceLogics
 {
