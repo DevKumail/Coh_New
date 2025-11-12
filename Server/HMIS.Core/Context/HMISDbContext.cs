@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using HMIS.Core.Entities;
+﻿using HMIS.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Context;
@@ -16,7 +14,7 @@ public partial class HMISDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Entities.Action> Action { get; set; }
+    public virtual DbSet<Action> Action { get; set; }
 
     public virtual DbSet<AlergyTypes> AlergyTypes { get; set; }
 
@@ -352,7 +350,7 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<TabDrugsNameBackup> TabDrugsNameBackup { get; set; }
 
-    public virtual DbSet<Entities.Task> Task { get; set; }
+    public virtual DbSet<Task> Task { get; set; }
 
     public virtual DbSet<TaskForwarding> TaskForwarding { get; set; }
 
@@ -398,7 +396,7 @@ public partial class HMISDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Entities.Action>(entity =>
+        modelBuilder.Entity<Action>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
@@ -1725,7 +1723,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.NewDrugId).ValueGeneratedOnAdd();
         });
 
-        modelBuilder.Entity<Entities.Task>(entity =>
+        modelBuilder.Entity<Task>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
