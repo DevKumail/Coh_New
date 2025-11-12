@@ -8,18 +8,13 @@ using HMIS.Infrastructure.ORM;
 using HMIS.Service.DTOs;
 using HMIS.Service.Implementations;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
-using System.Text.Json;
 using Newtonsoft.Json;
 using System.Data;
 using System.Data.SqlClient;
 using Microsoft.Data.SqlClient;
+using HMIS.Core.Context;
 
 
 namespace HMIS.Service.ServiceLogics

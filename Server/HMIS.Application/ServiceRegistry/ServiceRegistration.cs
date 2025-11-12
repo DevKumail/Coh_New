@@ -2,6 +2,7 @@
 using HMIS.Application.ServiceLogics;
 using HMIS.Application.ServiceLogics.Cryo;
 using HMIS.Application.ServiceLogics.IVF;
+using HMIS.ApplicationImplementations;
 using HMIS.Service.Implementations;
 using HMIS.Service.ServiceLogics;
 using Microsoft.Extensions.Configuration;
