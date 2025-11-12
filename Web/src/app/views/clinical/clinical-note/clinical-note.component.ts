@@ -1,4 +1,3 @@
-import { ClinicalNoteCreateComponent } from './../clinical-note-create/clinical-note-create.component';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
@@ -8,6 +7,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { distinctUntilChanged, filter, Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
+import { NgIconComponent } from '@ng-icons/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-clinical-note',
@@ -17,6 +18,7 @@ import Swal from 'sweetalert2';
     GenericPaginationComponent,
     TranslatePipe,
     FormsModule,
+    NgIconComponent,
   ],
   templateUrl: './clinical-note.component.html',
   styleUrl: './clinical-note.component.scss'
@@ -30,12 +32,12 @@ export class ClinicalNoteComponent {
       };
     clinicalnoteTotalItems: any= 0;
     private patientDataSubscription: Subscription | undefined;
-    router: any;
       constructor(
         private apiservice: ClinicalApiService,
-        private PatientData: PatientBannerService
+        private PatientData: PatientBannerService,
+        private router: Router
     ) { }
-  
+
 
         async ngOnInit(){
         this.patientDataSubscription = this.PatientData.patientData$
@@ -65,10 +67,12 @@ export class ClinicalNoteComponent {
         this.clinicalnoteTotalItems = res.table2[0]?.totalCount || 0;
       });
     }
-  buttonRoute(url: string) {
-    console.log('Button Route /ClinicalNotes/Create');
-    this.router.navigate(['/clinical/clinical-notes-create']);
-  }
+
+            buttonRoute(path: string) {
+                console.log('Button Route', path);
+                this.router.navigate(['/clinical/create-notes']);
+        }
+
 async onallergiePageChanged(page: number) {
   this.pagegination.currentPage = page;
   await this.speechtoText();

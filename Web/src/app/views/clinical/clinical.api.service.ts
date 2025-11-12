@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '@/app/core/services/api.service';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 
 @Injectable({ providedIn: 'root' })
 export class ClinicalApiService {
 
-  constructor(private api: ApiService) { }
-
+  constructor(private api: ApiService,private http: HttpClient) { }
+private question = 'assets/question.json';
 
   // //   submitPatientAllergy(data: any): Observable<any> {
   // //     return this.api.post('SubmitPatientAlergy', data);
@@ -25,25 +26,25 @@ export class ClinicalApiService {
       .toPromise();
   }
   MyCptCodebyProvider(ProviderId: number, GroupId: number) {
-    // 
+    //
     return this.api.get(`ChargeCapture/MyCptCode?ProviderId=${ProviderId}&GroupId=${GroupId}`).toPromise();
   }
   UnclassifiedServicebyProvider(AllCode: number, UCStartCode: string, DescriptionFilter: string) {
-    // 
+    //
     return this.api.get(`ChargeCapture/UnclassifiedService?AllCode=${AllCode}&UCStartCode=${UCStartCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
   }
   ServiceItemsbyProvider(AllCode: number, ServiceStartCode: string, DescriptionFilter: string) {
-    // 
+    //
     return this.api.get(`ChargeCapture/ServiceItems?AllCode=${AllCode}&ServiceStartCode=${ServiceStartCode}&DescriptionFilter=${DescriptionFilter}`).toPromise();
   }
 
 
   CPTCodebyProvider(AllCPTCode: number, CPTStartCode: string, CPTEndCode: string, Description: string) {
-    // 
+    //
     return this.api.get(`ChargeCapture/CPTCode?AllCPTCode=${AllCPTCode}&CPTStartCode=${CPTStartCode}&CPTEndCode=${CPTEndCode}&Description=${Description}`).toPromise();
   }
   MyHCPCSCodebyProvider(ProviderId: number, GroupId: number, HCPCSCode: string, DescriptionFilter: string, PairId: number) {
-    // 
+    //
     return this.api.get(`ChargeCapture/MyHCPCSCode?ProviderId=${ProviderId}&GroupId=${GroupId}&HCPCSCode=${HCPCSCode}&DescriptionFilter=${DescriptionFilter}&PayerId=${PairId}`).toPromise();
   }
   DiagnosisCodebyProvider(
@@ -57,7 +58,7 @@ export class ClinicalApiService {
     return this.api.get(`ChargeCapture/DiagnosisCode?ICDVersionId=${ICDVersionId}&DiagnosisStartCode=${DiagnosisStartCode}&DiagnosisEndCode=${DiagnosisEndCode}&DescriptionFilter=${DescriptionFilter}&PageNumber=${PageNumber}&PageSize=${PageSize}`).toPromise();
   }
   submitPatientAllergy(data: any): Observable<any> {
-    //  
+    //
     return this.api.post('/Alergy/SubmitPatientAlergy', data);
   }
 
@@ -244,7 +245,7 @@ export class ClinicalApiService {
 //   const psc = procStartCode || '0';
 //   const pec = procEndCode || '0';
 //   const df = descriptionFilter || '0';
-  
+
 //   return this.api.get(
 //     `PatientProcedure/GetProcedureList?PageNumber=${pn}&PageSize=${ps}&ProcedureStartCode=${psc}&ProcedureEndCode=${pec}&DescriptionFilter=${df}`
 //   ).toPromise();
@@ -266,7 +267,19 @@ export class ClinicalApiService {
       .post(`PatientProcedure/InsertOrUpdatePatientProcedure`, object)
       .toPromise();
   }
-
+    EMRNotesGetByEmpId(EmpId: any) {
+    return this.api.get(`EMRNotes/EMRNotesGetByEmpId?EmpId=${EmpId}`).toPromise();
+  }
+  GetNotesTemplate(PathId: any) {
+    return this.api.get(`EMRNotes/GetNoteQuestionBYPathId?pathId=${PathId}`).toPromise();
+  }
+  getDataquestion(): Observable<any[]> {
+    return this.http.get<any[]>(this.question);
+  }
+    InsertSpeech(note: any) {
+    debugger
+    return this.api.post(`Appointment/InsertSpeech`, note).toPromise();
+  }
   GetSocialHistory(){
     return this.api.get(`AllDropdowns/GetSocialHistory`).toPromise();
   }

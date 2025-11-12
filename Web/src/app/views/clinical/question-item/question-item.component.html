@@ -1,0 +1,57 @@
+<div class="card mb-2">
+  <div class="card-body p-2">
+    <h5 *ngIf="question.type === 'Question Section'" class="card-title mb-2 fw-bold">
+      {{ question.quest_Title }}
+    </h5>
+
+    <div *ngIf="form; else staticView" [formGroup]="form" class="row align-items-start g-2">
+      <div *ngIf="question.type === 'TextBox'" class="col-12">
+        <label [for]="'q' + question.quest_Id" class="form-label fw-semibold ms-1">{{ question.quest_Title }}</label>
+        <textarea class="form-control" [id]="'q' + question.quest_Id" [formControlName]="question.quest_Id.toString()" rows="2"></textarea>
+      </div>
+
+      <div *ngIf="question.type === 'CheckBox'" class="col-12">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" [id]="'q' + question.quest_Id" [formControlName]="question.quest_Id.toString()">
+          <label class="form-check-label" [for]="'q' + question.quest_Id">
+            {{ question.quest_Title }}
+          </label>
+        </div>
+      </div>
+
+      <div *ngIf="question.type !== 'TextBox' && question.type !== 'CheckBox' && question.type !== 'Question Section'" class="col-12">
+        <label class="form-label fw-semibold ms-1">{{ question.quest_Title }}</label>
+        <div class="form-control-plaintext ms-1">{{ question.answer }}</div>
+      </div>
+    </div>
+
+    <ng-template #staticView>
+      <div class="row g-2">
+        <div class="col-12">
+          <div *ngIf="question.type === 'TextBox'">
+            <label class="form-label fw-semibold ms-1">{{ question.quest_Title }}</label>
+            <div class="border rounded p-2 ms-1">{{ question.answer }}</div>
+          </div>
+
+          <div *ngIf="question.type === 'CheckBox'">
+            <label class="form-label fw-semibold ms-1"><strong>{{ question.quest_Title }}:</strong></label>
+            <div class="ms-3">{{ question.answer }}</div>
+          </div>
+
+          <div *ngIf="question.type !== 'TextBox' && question.type !== 'CheckBox' && question.type !== 'Question Section'">
+            <label class="form-label fw-semibold ms-1">{{ question.quest_Title }}</label>
+            <div class="ms-1">{{ question.answer }}</div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<div *ngIf="question.children?.length" class="ms-3">
+  <app-question-item
+    *ngFor="let child of question.children"
+    [question]="child"
+    [form]="form"
+  ></app-question-item>
+</div>

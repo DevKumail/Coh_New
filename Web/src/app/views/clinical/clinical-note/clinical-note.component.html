@@ -1,4 +1,3 @@
-
 <div class="card mt-3">
       <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
@@ -6,16 +5,20 @@
       </h5>
     <i class="bi bi-heart-pulse fs-4"></i>
     <div>
-    
+
       <i class="pi pi-sync"
         style="background-color: #3B82F6;color: rgb(228, 228, 230);font-size:1.5rem"></i>
-    <button class="p-button p-button-success" (click)="buttonRoute('/clinical/clinical-note/create')">
-      <i class="pi pi-user-plus"></i>&nbsp;Create
-    </button>
+   <button
+  type="button"
+  class="btn btn-success"
+  (click)="buttonRoute('/clinical/create-notes')">
+  <ng-icon style="margin-bottom: 1px;" class="me-2 ms-1" name="tablerPlus"></ng-icon>
+  {{ 'ADD' | translate }}
+</button>
 
       </div>
     </div>
-    
+
     <div class="card-body">
       <div class="table-responsive">
         <table class="table table-bordered table-striped table-sm">
@@ -38,16 +41,13 @@
               <td class="text-center">{{ data.visitAccDisplay || '-' }}</td>
               <td class="text-center">{{ data.visitDate || '-' }}</td>
               <td class="text-center">{{ data.createdBy || '-' }}</td>
-            <td style="font-size: 12px">
-                <audio *ngIf="data.notePath" controls style="width: 200px;">
-                  <source [src]="data.notePath" type="audio/webm" />
-                  Your browser does not support the audio element.
+              <td style="font-size: 12px">
+                <audio
+                  *ngIf="data.voiceSafeUrl || data.notePath"
+                  controls
+                  style="width: 200px;"
+                  [src]="data.voiceSafeUrl || data.notePath">
                 </audio>
-                <!-- <audio controls>
-                  <source
-                    src="https://localhost:44307/uploads/voice-notes/104082_9590b8f7-3b0e-4a3a-976f-31c365477656.webm"
-                    type="audio/webm" />
-                </audio> -->
               </td>
             </tr>
             <tr *ngIf="clinicalnoteTotalItems === 0">
@@ -57,10 +57,10 @@
         </table>
       </div>
 
-      <app-generic-pagination 
-      [totalItems]="clinicalnoteTotalItems" 
+      <app-generic-pagination
+      [totalItems]="clinicalnoteTotalItems"
       [pageSize]="pagegination.pageSize"
-      [currentPage]="pagegination.currentPage" 
+      [currentPage]="pagegination.currentPage"
       (pageChanged)="onallergiePageChanged($event)">
       </app-generic-pagination>
     </div>
