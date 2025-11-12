@@ -2,15 +2,15 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { CryoManagementService } from '@/app/shared/Services/Cyro/cryo-management.service';
-import { CryoContainerDto } from '@/app/shared/Models/Cyro/cyro-container.model';
+import { CryoManagementService } from '../../../shared/Services/Cyro/cryo-management.service';
+import { CryoContainerDto } from '../../../../app/shared/Models/Cyro/cyro-container.model';
 import { NgIconComponent } from '@ng-icons/core';
 import { LucideAngularModule, LucideChevronRight, LucideHome, LucideUsers, LucideEdit2, LucideTrash2 } from 'lucide-angular';
 import { FilePondModule } from 'ngx-filepond';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { provideNgxMask } from 'ngx-mask';
-import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
-import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { FilledOnValueDirective } from '../../../shared/directives/filled-on-value.directive';
+import { TranslatePipe } from '../../../../app/shared/i18n/translate.pipe';
 import Swal from 'sweetalert2';
 
 interface LevelC { id: number; position: number; }
@@ -138,7 +138,6 @@ export class CryoContainerEditComponent {
         });
       },
       error: () => {
-        Swal.fire({ icon: 'error', title: 'Load failed', text: 'Unable to load container.' });
         this.router.navigate(['/cryo/cryo-management']);
       }
     });
@@ -147,28 +146,31 @@ export class CryoContainerEditComponent {
   // reuse create behaviour for levels (add/select/generate/delete/edit)
   addLevelA() {
     if (!this.newLevelA.trim()) return;
-    this.levelAs.push({ id: this.levelAs.length + 1, code: this.newLevelA.trim(), levelBs: [] });
+    this.levelAs.push({ id: 0, code: this.newLevelA.trim(), levelBs: [] });
     this.newLevelA = '';
   }
   selectA(a: LevelA) { this.selectedA = a; this.selectedB = null; }
   addLevelB() {
     if (!this.selectedA || !this.newLevelB.trim()) return;
-    this.selectedA.levelBs.push({ id: this.selectedA.levelBs.length + 1, code: this.newLevelB.trim(), levelCs: [] });
+    this.selectedA.levelBs.push({ id: 0, code: this.newLevelB.trim(), levelCs: [] });
     this.newLevelB = '';
   }
-  selectB(b: LevelB) { this.selectedB = b; }
-  generateStraws() {
-    if (!this.selectedB) return;
-    this.selectedB.levelCs = Array.from({ length: this.newStrawsCount }, (_, i) => ({ id: i + 1, position: i + 1 }));
-  }
 
-  // edit/delete functions same as create component (you can reuse implementations)
   editLevelA(a: LevelA, event?: Event) {
     if (event) event.stopPropagation();
     const next = window.prompt('Edit Level A code', a.code);
     if (next === null) return;
     a.code = String(next).trim() || a.code;
   }
+
+  selectB(b: LevelB) { this.selectedB = b; }
+
+  generateStraws() {
+    if (!this.selectedB) return;
+    // Create new Level C items as new records (id = 0) with sequential positions
+    this.selectedB.levelCs = Array.from({ length: this.newStrawsCount }, (_, i) => ({ id: 0, position: i + 1 }));
+  }
+
 
   async deleteLevelA(a: LevelA, event?: Event) {
     if (event) event.stopPropagation();
@@ -178,7 +180,6 @@ export class CryoContainerEditComponent {
     const message = childCountB || childCountC
       ? `Deleting "${a.code}" will also remove ${childCountB} Level B item(s) and ${childCountC} Level C item(s). Are you sure?`
       : `Delete Level A "${a.code}"?`;
-
     const result = await Swal.fire({
       title: 'Confirm delete',
       text: message,
