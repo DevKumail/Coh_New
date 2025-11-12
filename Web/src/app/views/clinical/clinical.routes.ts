@@ -12,6 +12,8 @@ import { ImmunizationsComponent } from './immunizations/immunizations.component'
 import { MedicationComponent } from './medication/medication.component';
 import { SocialHistoryComponent } from './social-history/social-history.component';
 import { FamilyHistoryComponent } from './family-history/family-history.component';
+import { ClinicalNoteComponent } from './clinical-note/clinical-note.component';
+import { ClinicalNoteCreateComponent } from './clinical-note-create/clinical-note-create.component';
 
 export const CLINICAL_ROUTES: Routes = [
   {
@@ -91,6 +93,12 @@ export const CLINICAL_ROUTES: Routes = [
         canActivate: [modulePermissionGuard],
         component: FamilyHistoryComponent,
         data: { module: 'Clinical', component: 'Family History', title: 'Family History' }
+      },
+      {
+        path:'create-notes',
+        canActivate:[modulePermissionGuard],
+        component:ClinicalNoteCreateComponent,
+        data: { module: 'Clinical', component: 'Immunizations', title: 'Immunizations' }
       },
     ]
   }

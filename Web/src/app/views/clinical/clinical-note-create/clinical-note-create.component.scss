@@ -26,9 +26,9 @@ textarea {
     box-sizing: border-box;
 }
 
-button {
-    margin-right: 10px;
-}
+// button {
+//     margin-right: 10px;
+// }
 
 
 /* Add styles to make the component visually appealing */
@@ -36,8 +36,8 @@ button {
   max-width: 600px;
   margin: auto;
   padding: 20px;
-  background-color: #f8f9fa; 
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
 } */
 
@@ -45,19 +45,19 @@ h2 {
   color: #343a40; /* Dark text color */
 }
 
-button {
-  background-color: #007bff; /* Bootstrap primary color */
-  color: #fff; /* White text color */
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-right: 10px;
-}
+// button {
+//   background-color: #007bff; /* Bootstrap primary color */
+//   color: #fff; /* White text color */
+//   padding: 10px 20px;
+//   border: none;
+//   border-radius: 4px;
+//   cursor: pointer;
+//   margin-right: 10px;
+// }
 
-button:hover {
-  background-color: #0056b3; /* Darker shade on hover */
-}
+// button:hover {
+//   background-color: #0056b3; /* Darker shade on hover */
+// }
 
 label {
   margin-right: 10px;
@@ -209,4 +209,12 @@ h4 {
   color: #444;
 }
 
+.fixed-height {
+    // height: calc(100vh - var(--patient-summary-offset, 120px));
+    height: fixed;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain; // prevent scroll chaining to body/footer
+    -webkit-overflow-scrolling: touch; // smooth on mobile
+}
 

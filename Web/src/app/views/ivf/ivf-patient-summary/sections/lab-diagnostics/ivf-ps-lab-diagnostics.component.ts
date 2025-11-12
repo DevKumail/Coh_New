@@ -26,7 +26,7 @@ import { CommonModule } from '@angular/common';
                   <th>Type</th>
                   <th>Group</th>
                   <th>Sample</th>
-                  <th>Parameter</th>
+                  <th>Material</th>
                   <th>Param. abbreviation</th>
                   <th>Value</th>
                   <th>Unit</th>
