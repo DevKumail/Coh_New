@@ -6,8 +6,8 @@ import { CryoContainerDto, CryoContainerResultDto } from '@/app/shared/Models/Cy
 import { CryoManagementService } from '@/app/shared/Services/Cyro/cryo-management.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgIcon, NgIconComponent } from '@ng-icons/core';
 import { LucideAngularModule, LucideDelete, LucideEdit, LucideHome, LucideUsers } from 'lucide-angular';
@@ -47,15 +47,24 @@ export class CryoContainerListComponent {
   *
   */
  CryoPagedData: CryoContainerResultDto[] = [];
+FilterForm!: FormGroup;
+@ViewChild('CryoToggler') CryoToggler?: ElementRef<HTMLButtonElement>;
 CryoTotalItems = 0;
-
+  isCryoFiltered = false;
+  Type: any = []
 PaginationInfo = {
   Page: 1,
   RowsPerPage: 10
 };
 
- constructor(    public router: Router,private cryoService: CryoManagementService,
-) { }
+ constructor(    
+  public router: Router,
+  private cryoService: CryoManagementService,
+  private fb: FormBuilder
+) { 
+
+  
+}
     protected readonly homeIcon = LucideHome;
     protected readonly headingIcon = LucideUsers;
       protected readonly editIcon = LucideEdit;
@@ -71,6 +80,10 @@ PaginationInfo = {
 
   }
   ngOnInit() {
+    this.FilterForm = this.fb.group({
+      description: [''],
+      type: ['']
+  })
   this.loadCryoContainers();
 }
 loadCryoContainers() {
@@ -119,4 +132,23 @@ getTypeText(item: CryoContainerResultDto): string {
   if (item.isOocyteOrEmb) return 'Ooc/Emb';
   return 'N/A';
 }
+
+ClearFilter() { 
+  this.isCryoFiltered = false;
+  this.collapseIfOpen(this.CryoToggler);
+}
+
+FilterCryo(){ 
+  this.isCryoFiltered = !!( this.FilterForm?.value?.fromDate || this.FilterForm?.value?.toDate );
+  this.collapseIfOpen(this.CryoToggler);
+}
+
+  private collapseIfOpen(toggler?: ElementRef<HTMLButtonElement>) {
+    if (!toggler) return;
+    const btn = toggler.nativeElement;
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    if (expanded) {
+      btn.click();
+    }
+  }
 }

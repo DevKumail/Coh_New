@@ -16,7 +16,7 @@
 </nav>
 
 <div class="card" *hasPermission="'Cryo Mangement:Cryo Manager:View'">
-  <div class="accordion" id="CryoAccordion">
+  <!-- <div class="accordion" id="CryoAccordion">
     <div class="accordion-item">
       <h2 class="accordion-header">
         <div class="d-flex w-100 align-items-center">
@@ -30,7 +30,6 @@
             {{ 'CryoStorage' | translate }}
           </button>
 
-          <!-- ADD button -->
           <button style="width: 100px;"
                   class="btn btn-success ms-1 me-1"
                   (click)="router.navigate(['/cryo/cryo-management/add'])">
@@ -40,7 +39,78 @@
         </div>
       </h2>
     </div>
-  </div>
+  </div> -->
+
+
+   <div class="accordion" id="Cryoaccordion">
+            <div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <div class="d-flex w-100 align-items-center">
+                        <button #CryoToggler class="accordion-button collapsed d-flex no-accordion-caret flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#CryoManagement" aria-expanded="false" aria-controls="CryoManagement">
+                          {{'CRYO_STORAGE' | translate}}
+                        </button>
+                        <button type="button" class="btn btn-link p-0 mb-1" title="Filter"
+                                (click)="CryoToggler?.click()"
+                                [style.marginInlineStart]="'auto'">
+                                <ng-icon style="color: orange;" [name]="isCryoFiltered ? 'tablerFilterFill' : 'tablerFilter'" [ngClass]="{ 'blink': isCryoFiltered }"></ng-icon>
+                            </button>
+                            <button style="width: 100px;" class="btn btn-success ms-2 me-2" (click)="router.navigate(['/cryo/cryo-management/add'])"> 
+                                <ng-icon style="margin-bottom: 1px;" class="me-2 ms-1" name='tablerPlus'></ng-icon>
+                                <span class="me-1">
+                                    {{'ADD' | translate}} 
+                                </span>
+                            </button>
+                      </div> 
+                    </h2>
+                    <div id="CryoManagement" class="accordion-collapse collapse" data-bs-parent="#Cryoaccordion">
+                      <div class="accordion-body">
+                        <div class="card shadow-sm rounded-3">
+                            <form *ngIf="FilterForm" [formGroup]="FilterForm">
+                            <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3 mb-2">
+                                            <label>{{ 'DESCRIPTION' | translate }}</label>
+                                            <input
+                                                type="text"
+                                                appFilledOnValue
+                                                class="form-control"
+                                                formControlName="description"
+                                            />
+                                        </div>
+                                         <div class="col-md-3 mb-2">
+                                            <label>{{ 'TYPE' | translate }}</label>
+                                            <select
+                                                appFilledOnValue
+                                                class="form-control form-select"
+                                                formControlName="type"
+                                            >
+                                                <option value="" disabled selected>-- {{ 'SELECT_TYPE' | translate }} --</option>
+                                                <option
+                                                    *ngFor="let item of Type"
+                                                    [value]="item.code"
+                                                >
+                                                    {{ item.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                      
+                                        <div class="col-md-3 px-2" style="margin-top: 20px; text-align: right;">
+                                            <button type="button" class="btn btn-light me-2" (click)="ClearFilter()">{{ 'CLEAR' | translate }}</button>
+                                            <button type="submit" (click)="FilterCryo()" class="btn btn-primary">{{ 'SEARCH' | translate }}</button>
+                                        </div>
+                                    </div>
+                            </div>
+                            </form>
+
+                           
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            </div>
+
 
   <!-- ✅ TABLE -->
   <div class="card-body">

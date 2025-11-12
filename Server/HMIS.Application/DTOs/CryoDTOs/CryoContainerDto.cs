@@ -4,7 +4,7 @@ namespace HMIS.Application.DTOs.CryoDTOs
 {
     public class CryoContainerDto
     {
-        public long? ID { get; set; }
+        public long ID { get; set; }
 
         [Required(ErrorMessage = "Facility ID is required.")]
         public long FacilityID { get; set; }

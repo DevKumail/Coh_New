@@ -174,13 +174,13 @@ namespace HMIS.Application.ServiceLogics.Cryo
                                 // Add new LevelA
                                 levelAEntity = new CryoLevelA
                                 {
-                                    ContainerId = container.Id,
+                                    ContainerId = containerDto.ID,
                                     CanisterCode = levelADto.CanisterCode,
                                     CreatedBy = levelADto.CreatedBy,
                                     CreatedAt = DateTime.Now
                                 };
                                 _context.CryoLevelA.Add(levelAEntity);
-                                await _context.SaveChangesAsync(); // Save to get the new ID for LevelA
+                                await _context.SaveChangesAsync(); 
                                 container.CryoLevelA.Add(levelAEntity);
                             }
 
