@@ -1,0 +1,148 @@
+<form [formGroup]="form" class="row ">
+  <!-- Top panel: single row, col-3 each -->
+  <div class="col-12">
+    <div class="card p-2">
+      <div class="row g-1">
+        <div class="col-lg-2 col-md-4 col-sm-6">
+          <label class="form-label">Volume </label>
+          <input type="number" class="form-control" formControlName="volume" placeholder="[ml]" />
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+          <label class="form-label">Conc.
+            (
+              <span class="text-muted"> Conc < 0.1</span>
+              <input type="checkbox" class="form-check-input me-1 ms-1" formControlName="concLtPointOne" />
+            )
+          </label>
+          <input type="number" class="form-control" formControlName="concentration" placeholder="[10^6/ml]" />
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+          <label class="form-label">Vitality </label>
+          <input type="number" class="form-control" formControlName="vitality" placeholder="[%]" />
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+          <label class="form-label">Leukocytes </label>
+          <input type="number" class="form-control" formControlName="leukocytes" placeholder="[10^6/ml]" />
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+          <label class="form-label">Round cells </label>
+          <input type="number" class="form-control" formControlName="roundCells" placeholder="[10^6/ml]" />
+        </div>
+
+        <!-- Added fields per request -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+          <label class="form-label">Quantification possible?</label>
+          <select class="form-select" formControlName="quantPossible">
+            <option value="">Select</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+          <label class="form-label">Total sperm count</label>
+          <input type="number" class="form-control" formControlName="totalSpermCountM" placeholder="[10^6]" />
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+          <label class="form-label">Peroxidase-positive cells</label>
+          <input type="number" class="form-control" formControlName="peroxidasePositive" placeholder="[10^6/ml]" />
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+          <label class="form-label">Immunobead test</label>
+          <input type="number" class="form-control" formControlName="immunobeadPercentAdherent" placeholder="[% adherent]" />
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6">
+          <div class="d-flex align-items-center gap-2 flex-nowrap">
+            <label class="form-label mb-0 me-2 text-nowrap">MAR test</label>
+            <div class="card p-1 flex-grow-1">
+              <div class="row g-2 align-items-end">
+                <div class="col-4">
+                  <small class="text-muted d-block">Adherent</small>
+                  <input type="number" class="form-control" formControlName="marAdherentPercent" placeholder="[%]" />
+                </div>
+                <div class="col-4">
+                  <small class="text-muted d-block">IgG</small>
+                  <input type="number" class="form-control" formControlName="marIgGPercent" placeholder="[%]" />
+                </div>
+                <div class="col-4">
+                  <small class="text-muted d-block">IgA</small>
+                  <input type="number" class="form-control" formControlName="marIgAPercent" placeholder="[%]" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: two separate boxes side-by-side -->
+   <!-- Motility -->
+  <div class="col-lg-6 col-md-12">
+    <div class="card p-2 h-100">
+      <div class="fw-semibold mb-2">Motility</div>
+      <div class="row g-2">
+        <!-- <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">WHO A [%]</label>
+          <input type="number" class="form-control" formControlName="whoA" placeholder="%" />
+        </div> -->
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">WHO AB </label>
+          <input type="number" class="form-control" formControlName="whoB" placeholder="[%]" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">WHO C </label>
+          <input type="number" class="form-control" formControlName="whoC" placeholder="[%]" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">WHO D </label>
+          <input type="number" class="form-control" formControlName="whoD" placeholder="[%]" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label"># Prog. motile </label>
+          <input type="number" class="form-control" formControlName="numberOfProgMotile" placeholder="[10^6]" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">Overall motility </label>
+          <input type="number" class="form-control" formControlName="overallMotility" placeholder="[10^6]" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Morphology -->
+  <div class="col-lg-6 col-md-12">
+    <div class="card p-2 h-100">
+      <div class="fw-semibold mb-2">Morphology</div>
+      <div class="row g-2">
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">Normal forms </label>
+          <input type="number" class="form-control" formControlName="normalForms" placeholder="[%]" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">Head defects</label>
+          <input type="number" class="form-control" formControlName="headDefects" placeholder="[%]" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">Neck and midpiece defects</label>
+          <input type="number" class="form-control" formControlName="neckDefects" placeholder="[%]" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">Tail defects</label>
+          <input type="number" class="form-control" formControlName="tailDefects" placeholder="[%]" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">Excess residual cytoplasm (ERC)</label>
+          <input type="number" class="form-control" formControlName="excessResidualCytoplasm" placeholder="[%]" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">Multiple defects</label>
+          <input type="number" class="form-control" formControlName="multipleDefects" placeholder="%" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <label class="form-label">Teratozoospermia Index</label>
+          <input type="number" class="form-control" formControlName="tzi" placeholder="TZI" />
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

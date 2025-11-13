@@ -36,6 +36,12 @@ export const routes: Routes = [
         data: { module: 'Cryo Mangement' },
         loadChildren: () => import('./views/cryo-management/cryo.module').then((m) => m.CRYOModule)
       },
+        {
+        path: 'setup',
+        canActivate: [modulePermissionGuard],
+        data: { module: 'Cryo Mangement' },
+        loadChildren: () => import('./views/cryo-management/cryo.module').then((m) => m.CRYOModule)
+      },
       {
         path: 'registration',
         canActivate: [modulePermissionGuard],
