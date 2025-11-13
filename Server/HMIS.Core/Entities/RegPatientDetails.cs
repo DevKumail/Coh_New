@@ -11,11 +11,10 @@ public partial class RegPatientDetails
     [Key]
     public int Id { get; set; }
 
-    [StringLength(30)]
     [Unicode(false)]
     public string? StreetName { get; set; }
 
-    [StringLength(15)]
+    [Unicode(false)]
     public string? DwellingNumber { get; set; }
 
     public int? CountryId { get; set; }
