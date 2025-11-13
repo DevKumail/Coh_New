@@ -21,11 +21,11 @@ namespace HMIS.Web.Controllers.Configuration
         // Category APIs
 
         [HttpGet("GetAllCategories")]
-        public async Task<ActionResult> GetAllCategories()
+        public async Task<ActionResult> GetAllCategories(int page = 1, int pageSize = 10)
         {
             try
             {
-                var categories = await _dropDownService.GetAllCategoriesAsync();
+                var categories = await _dropDownService.GetAllCategoriesAsync(page, pageSize);
                 return Ok(new { data = categories });
             }
             catch (Exception ex)

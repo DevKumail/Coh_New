@@ -7,8 +7,7 @@ namespace HMIS.Application.ServiceLogics
 {
     public interface IDropDownLookUpService
     {
-        Task<List<DropDownCategoryDto>> GetAllCategoriesAsync();
-        Task<DropDownCategoryDto?> GetCategoryByIdAsync(long categoryId);
+        Task<(IEnumerable<DropDownCategoryDto> Data, int TotalCount)> GetAllCategoriesAsync(int page, int pageSize); Task<DropDownCategoryDto?> GetCategoryByIdAsync(long categoryId);
         Task<bool> CreateOrUpdateCategoryAsync(DropDownCategoryDto categoryDto);
         Task<bool> DeleteCategoryAsync(long categoryId, long? updatedBy);
 
@@ -29,12 +28,18 @@ namespace HMIS.Application.ServiceLogics
             _context = context;
         }
 
-        public async Task<List<DropDownCategoryDto>> GetAllCategoriesAsync()
+        public async Task<(IEnumerable<DropDownCategoryDto> Data, int TotalCount)> GetAllCategoriesAsync(int page, int pageSize)
         {
             try
             {
-                var categories = await _context.DropdownCategory
+                var query = _context.DropdownCategory;
+
+                int totalCount = await query.CountAsync();
+
+                var categories = await query
                     .OrderBy(c => c.CategoryName)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(c => new DropDownCategoryDto
                     {
                         CategoryId = c.CategoryId,
@@ -43,7 +48,7 @@ namespace HMIS.Application.ServiceLogics
                     })
                     .ToListAsync();
 
-                return categories;
+                return (categories, totalCount);
             }
             catch (Exception)
             {
