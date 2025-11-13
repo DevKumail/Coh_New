@@ -1,0 +1,72 @@
+<div class="card shadow-sm">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <div class="fw-bold">Semen analyses</div>
+    <div>
+      <button class="btn btn-sm btn-primary" (click)="openAdd()" *ngIf="!showAdd">Add</button>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <ng-container *ngIf="showAdd; else listView">
+      <div class="p-2">
+        <app-semen-add-edit (click)="$event.stopPropagation()"></app-semen-add-edit>
+        <div class="mt-2 d-flex justify-content-end">
+          <button class="btn btn-sm btn-outline-secondary" (click)="onCancel()">Back to list</button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #listView>
+    <div class="table-responsive">
+      <table class="table table-bordered text-center table-striped table-sm mb-0">
+        <thead>
+          <tr>
+            <th>Collection date</th>
+            <th>Thawing date</th>
+            <th>Time</th>
+            <th>Sample ID</th>
+            <th>Purpose</th>
+            <th>Collection method</th>
+            <th>Vol. [ml]</th>
+            <th>Conc. [10^6/ml]</th>
+            <th>Total sperm count [M]</th>
+            <th>WHO A [%]</th>
+            <th>WHO C [%]</th>
+            <th>WHO D [%]</th>
+            <th>Norm. [%]</th>
+            <th>Cryo status</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          <ng-container *ngIf="isLoading">
+            <tr *ngFor="let i of [1,2,3]">
+              <td colspan="15" class="text-start"><div class="placeholder-wave"><span class="placeholder col-12"></span></div></td>
+            </tr>
+          </ng-container>
+          <ng-container *ngIf="!isLoading">
+            <tr *ngFor="let r of rows">
+              <td>{{ r.collectionDate }}</td>
+              <td>{{ r.thawingDate }}</td>
+              <td>{{ r.time }}</td>
+              <td>{{ r.sampleId }}</td>
+              <td>{{ r.purpose }}</td>
+              <td>{{ r.method }}</td>
+              <td>{{ r.vol }}</td>
+              <td>{{ r.conc }}</td>
+              <td>{{ r.totalCountM }}</td>
+              <td>{{ r.whoA }}</td>
+              <td>{{ r.whoC }}</td>
+              <td>{{ r.whoD }}</td>
+              <td>{{ r.norm }}</td>
+              <td>{{ r.cryoStatus }}</td>
+              <td>{{ r.status }}</td>
+            </tr>
+            <tr *ngIf="rows.length===0">
+              <td colspan="15">No data found</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    </ng-template>
+  </div>
+</div>

@@ -10,6 +10,7 @@ import { IvfPsMedicalHistoryComponent } from './sections/medical-history/ivf-ps-
 import { IvfPsPathologyResultsComponent } from './sections/lab-diagnostics/ivf-ps-pathology-results.component';
 import { IvfPsLabOrdersComponent } from './sections/lab-diagnostics/ivf-ps-lab-orders.component';
 import { IvfPsSemenAnalysisComponent } from './sections/lab-diagnostics/ivf-ps-semen-analysis.component';
+import { SemenListComponent } from './sections/semen/semen-list/semen-list.component';
 import { IvfPsBillingComponent } from './sections/billing/ivf-ps-billing.component';
 import { IvfPsMessageComponent } from './sections/message/ivf-ps-message.component';
 import { IvfPsCycleComponent } from './sections/cycle/ivf-ps-cycle.component';
@@ -25,10 +26,22 @@ import { FamilyHistoryComponent } from '../../clinical/family-history/family-his
   selector: 'app-ivf-patient-summary',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, NgIcon, IvfSideMenuComponent,
-    IvfPsDemographicComponent, IvfPsMedicalHistoryComponent, IvfPsPathologyResultsComponent, IvfPsLabOrdersComponent, IvfPsSemenAnalysisComponent,
-    IvfPsBillingComponent, IvfPsMessageComponent, IvfPsCycleComponent, IvfPsSwitchPartnerComponent,
-    AdvanceSearchModalComponent, SocialHistoryComponent, FamilyHistoryComponent
+    CommonModule, 
+    ReactiveFormsModule, 
+    NgIcon, 
+    IvfSideMenuComponent,
+    IvfPsDemographicComponent, 
+    IvfPsMedicalHistoryComponent, 
+    IvfPsPathologyResultsComponent, 
+    IvfPsLabOrdersComponent, 
+    SemenListComponent,
+    IvfPsBillingComponent, 
+    IvfPsMessageComponent, 
+    IvfPsCycleComponent, 
+    IvfPsSwitchPartnerComponent,
+    AdvanceSearchModalComponent, 
+    SocialHistoryComponent, 
+    FamilyHistoryComponent
   ],
   templateUrl: './ivf-patient-summary.component.html',
   styleUrls: ['./ivf-patient-summary.component.scss']

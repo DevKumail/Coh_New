@@ -281,12 +281,31 @@ export const horizontalMenuItems: MenuItemType[] = [
     // },
 
 
-    {
-        label: 'cryo management',
-        icon: 'tablerRocket',
-        module: 'Cryo Manager',
-        url: '/cryo/cryo-management',
+    // {
+    //     label: 'cryo management',
+    //     icon: 'tablerRocket',
+    //     module: 'Cryo Manager',
+    //     url: '/cryo/cryo-management',
         
+    // },
+
+        {
+        label: 'Setup',
+        icon: 'tablerHeartHandshake',
+        module: 'IVF', // this is used by PermissionService
+        isCollapsed: true,
+        children: [
+            {
+                label: 'Dropdown Configration',
+                icon: 'tablerUsers',
+                url: '/setup/dropdown-configration'
+            },
+            {
+                label: 'Cryo Management',
+                icon: 'tablerFiles',
+                url: '/cryo/cryo-management'
+            }
+        ]
     },
     {
         label: 'IVF',

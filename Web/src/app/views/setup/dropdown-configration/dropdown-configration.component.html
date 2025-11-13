@@ -1,0 +1,173 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light bg-opacity-50 p-2">
+        <li class="breadcrumb-item">
+            <a href="javascript:void(0);">
+                <lucide-angular [img]="homeIcon" class="fs-6"></lucide-angular>
+                {{'SETUP' | translate }}
+            </a>
+        </li>
+        <li class="d-flex align-items-center text-muted mx-1" aria-current="page">
+            <lucide-angular [img]="chevronRightIcon" class="fs-6"></lucide-angular>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            {{'DROPDOWN_CONFIGURATION' | translate }}
+        </li>
+    </ol>
+</nav>
+
+<div class="card shadow-lg rounded-3 border-0">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
+            <span>{{ 'DROPDOWN_CONFIGURATION' | translate }}</span>
+        </h5>
+
+        <button type="button" class="btn btn-primary" (click)="onAddUpdateDropdownConfiguration(standardModal)">
+            {{ 'ADD_DROPDOWN_CONFIGURATION' | translate }}
+        </button>
+    </div>
+
+    <!-- TABLE SECTION -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <div class="">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>{{ 'CATEGORY_NAME' | translate }}</th>
+                                    <th>{{ 'DESCRIPTION' | translate }}</th>
+                                    <th>{{ 'ACTION' | translate }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider text-center">
+                                <tr *ngFor="let record of dropdownListData">
+                                    <td>{{ record.providerName || 'N/A' }}</td>
+                                    <td>{{ record.icD9Description || 'N/A' }}</td>
+                                    <td>
+                                        <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
+                                            <ng-icon name="tablerEdit" class="me-1" (click)="onEdit(record)">
+                                            </ng-icon>
+                                            <!-- <ng-icon name="tablerTrash" class="text-danger me-1" (click)="onDelete(record?.id)">
+                    </ng-icon> -->
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="dropdownListData.length === 0">
+                                    <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <app-generic-pagination [totalItems]="dropdownListData.length"
+                    [pageSize]="dropdownlistPaginationInfo?.RowsPerPage"
+                    [currentPage]="dropdownlistPaginationInfo?.Page" (pageChanged)="onDropdownListPageChanged($event)">
+                </app-generic-pagination>
+            </div>
+        </div>
+    </div>
+
+
+    <ng-template #standardModal let-modal>
+        <style>
+            .modal {
+                max-height: 100vh;
+            }
+        </style>
+        <form *ngIf="AddForm" [formGroup]="AddForm">
+            <div class="modal-header">
+                <h5 class="modal-title">{{'ADD_UPDATE_DROPDOWN_CONFIGURATION' | translate}}</h5>
+                <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-sm rounded-3">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-5">
+                                <div class="mb-0">
+                                    <label for="categoryName" class="form-label">{{ 'CATEGORY_NAME' | translate }} 
+                                        <span *ngIf="lockedCategoryName"> (Locked: {{ lockedCategoryName }})</span>
+                                    </label>
+                                    <select id="categoryName" class="form-select" formControlName="categoryName">
+                                        <option value="" disabled selected>{{ 'SELECT' | translate }}</option>
+                                        <option *ngFor="let c of availableCategories" [value]="c">{{ c }}</option>
+                                    </select>
+                                    <!-- <div *ngIf="AddForm?.controls?.['categoryName']?.errors?.['required']" class="text-danger">
+                                        {{ 'CATEGORY_NAME' | translate }} is required.
+                                    </div> -->
+                                    
+                                    <div *ngIf="categoryMismatch" class="text-danger small">
+                                        You can only add items for: {{ lockedCategoryName }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="mb-0">
+                                    <label for="description" class="form-label">{{ 'DESCRIPTION' | translate }}</label>
+                                    <input type="text" formControlName="description" class="form-control" id="description" placeholder="Enter description">
+                                    <!-- <div *ngIf="AddForm?.controls?.['description']?.errors?.['required']" class="text-danger">
+                                        {{ 'DESCRIPTION' | translate }} is required.
+                                    </div> -->
+                                </div>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end mb-0">
+                                <div class="btn-group ms-md-2" role="group">
+                                    <button type="button" class="btn btn-outline-primary" (click)="addItem()" title="Add">
+                                        <lucide-angular [img]="plusIcon"></lucide-angular>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" (click)="removeLastItem()" title="Remove">
+                                        <lucide-angular [img]="minusIcon"></lucide-angular>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="">
+                            <div class="table-responsive">
+                                <div class="">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped table-sm">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <th>{{ 'CATEGORY_NAME' | translate }}</th>
+                                                    <th>{{ 'DESCRIPTION' | translate }}</th>
+                                                    <th>{{ 'ACTION' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider text-center">
+                                                <tr *ngFor="let record of modalItems; let i = index">
+                                                    <td>{{ record.categoryName || 'N/A' }}</td>
+                                                    <td>{{ record.description || 'N/A' }}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeItemAt(i)" title="Remove">
+                                                            <lucide-angular [img]="crossIcon"></lucide-angular>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr *ngIf="modalItems.length === 0">
+                                                    <td colspan="9">{{ 'NO_DATA_FOUND' | translate }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <app-generic-pagination [totalItems]="modalItems.length"
+                                    [pageSize]="dropdownlistPaginationInfo?.RowsPerPage"
+                                    [currentPage]="dropdownlistPaginationInfo?.Page"
+                                    (pageChanged)="onDropdownListPageChanged($event)">
+                                </app-generic-pagination>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" (click)="modal.dismiss()">Close</button>
+                    <button type="submit" class="btn btn-primary" (click)="Save()">Save</button>
+                </div>
+            </div>
+
+        </form>
+    </ng-template>
