@@ -61,10 +61,10 @@
                     </div>
                 </div>
 
-                <app-generic-pagination [totalItems]="dropdownListData.length"
+                <!-- <app-generic-pagination [totalItems]="dropdownListData.length"
                     [pageSize]="dropdownlistPaginationInfo?.RowsPerPage"
                     [currentPage]="dropdownlistPaginationInfo?.Page" (pageChanged)="onDropdownListPageChanged($event)">
-                </app-generic-pagination>
+                </app-generic-pagination> -->
             </div>
         </div>
     </div>
@@ -153,12 +153,6 @@
                                         </table>
                                     </div>
                                 </div>
-
-                                <app-generic-pagination [totalItems]="modalItems.length"
-                                    [pageSize]="dropdownlistPaginationInfo?.RowsPerPage"
-                                    [currentPage]="dropdownlistPaginationInfo?.Page"
-                                    (pageChanged)="onDropdownListPageChanged($event)">
-                                </app-generic-pagination>
                             </div>
                         </div>
                     </div>

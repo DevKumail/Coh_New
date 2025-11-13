@@ -65,6 +65,8 @@ export class DropdownConfigrationComponent {
       categoryName: ['', Validators.required],
       description: ['', Validators.required],
     });
+
+    this.GetDropdownListData();
   }
 
 
@@ -72,13 +74,12 @@ export class DropdownConfigrationComponent {
   onEdit(record: any) {
     console.log(record);
   }
-  onDropdownListPageChanged(page:any){
-    this.dropdownlistPaginationInfo.Page = page;
-    this.GetDropdownListData();
-  }
+
 
   GetDropdownListData(){
-    
+    this.clinicalApiService.GetAllCategories().then((res:any)=>{
+      this.dropdownListData = res;
+    })
   }
 
     modalRefInstance: any;

@@ -335,4 +335,9 @@ private question = 'assets/question.json';
 
   }
 
+  GetAllCategories() {
+	return this.api.get(`DropDownLookUp/GetAllCategories`).toPromise();;
+
+  }
+
 }
