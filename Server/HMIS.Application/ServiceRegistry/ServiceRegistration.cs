@@ -45,6 +45,7 @@ namespace HMIS.Application
             services.AddScoped<IAlertManager, AlertManager >();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<ICryoManagementService, CryoManagementService>();
+            services.AddScoped<IDropDownLookUpService, DropDownLookUpService>();
 
 
 
