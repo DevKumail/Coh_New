@@ -29,12 +29,10 @@ import { IvfConfirmDialogComponent } from './ivf-confirm-dialog.component';
                   <th>Time</th>
                   <th>Clinician</th>
                   <th>Name</th>
-                  <th>Note</th>
-                  <th>Parameter</th>
+                 
                   <th>Material</th>
                   <th>Laboratory</th>
                   <th>States</th>
-                  <th>Pat. status</th>
                   <th>Comment</th>
                   <th style="width:60px">Actions</th>
                 </tr>
@@ -52,12 +50,10 @@ import { IvfConfirmDialogComponent } from './ivf-confirm-dialog.component';
                     <td>{{ o.time }}</td>
                     <td>{{ o.clinician }}</td>
                     <td>{{ o.name }}</td>
-                    <td>{{ o.note }}</td>
-                    <td>{{ o.parameter }}</td>
+              
                     <td>{{ o.material }}</td>
                     <td>{{ o.laboratory }}</td>
                     <td>{{ o.states }}</td>
-                    <td>{{ o.patientStatus }}</td>
                     <td>{{ o.comment }}</td>
                     <td>
                       <button class="btn btn-sm btn-outline-primary" (click)="openEdit(o)">Open</button>
