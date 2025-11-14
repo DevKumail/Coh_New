@@ -119,11 +119,11 @@ namespace HMIS.Web.Controllers.Configuration
         }
 
         [HttpPost("CreateOrUpdateConfiguration")]
-        public async Task<ActionResult> CreateOrUpdateConfiguration([FromBody] DropDownConfigurationDto configurationDto)
+        public async Task<ActionResult> CreateOrUpdateConfiguration([FromBody] List<DropDownConfigurationDto> configurationDto)
         {
             try
             {
-                bool success = await _dropDownService.CreateOrUpdateConfigurationAsync(configurationDto);
+                bool success = await _dropDownService.CreateOrUpdateConfigurationsAsync(configurationDto);
                 if (success)
                     return Ok(new { message = "Configuration created or updated successfully." });
                 else
