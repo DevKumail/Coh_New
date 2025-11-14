@@ -6,10 +6,10 @@ import { LucideAngularModule, LucideCalculator } from 'lucide-angular';
 import { NgbModal, NgbModalModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'app-semen-parameter-after-prep',
+  selector: 'app-preparation-parameter',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, LucideAngularModule, NgbModalModule, NgbNavModule],
-  templateUrl: './semen-parameter-after-prep.component.html',
+  templateUrl: './preparation-parameter.component.html',
   styles: [
     `
     .form-label { font-weight: 400; margin-bottom: 0.25rem; }
@@ -30,8 +30,8 @@ import { NgbModal, NgbModalModule, NgbNavModule } from '@ng-bootstrap/ng-bootstr
     `
   ]
 })
-export class SemenParameterAfterPrepComponent {
- form: FormGroup;
+export class PreparationParameterComponent {
+  form: FormGroup;
    protected readonly calculatorIcon = LucideCalculator;
    // Calculator modal state
    concCount = 0; // Count result
