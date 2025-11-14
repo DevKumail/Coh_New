@@ -3,38 +3,43 @@
   <div class="col-12">
     <div class="card p-2">
       <div class="row g-1">
-        <div class="col-lg-2 col-md-4 col-sm-6">
+        <div class="col-lg-3 col-md-4 col-sm-6">
           <label class="form-label">Volume </label>
           <input type="number" class="form-control" formControlName="volume" placeholder="[ml]" />
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6">
+        <div class="col-lg-3 col-md-4 col-sm-6">
           <label class="form-label">pH</label>
           <input type="number" class="form-control" formControlName="ph" placeholder="pH" />
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6">
+        <div class="col-lg-3 col-md-4 col-sm-6">
         <label class="form-label">Conc.
             (
               <span class="text-muted"> Conc < 0.1</span>
               <input type="checkbox" class="form-check-input me-1 ms-1" formControlName="concLtPointOne" />
             )
           </label>          
-          <input type="number" class="form-control" formControlName="concentration" placeholder="[10^6/ml]" />
+          <div class="input-group">
+            <input type="number" class="form-control" formControlName="concentration" placeholder="[10^6/ml]" />
+            <button type="button" class="btn btn-outline-success btn-sm p-1" (click)="openConcCalc(concCalcTpl)">
+              <lucide-angular [img]="calculatorIcon" size="24"></lucide-angular>
+            </button>
+          </div>
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6">
+        <div class="col-lg-3 col-md-4 col-sm-6">
           <label class="form-label">Vitality </label>
           <input type="number" class="form-control" formControlName="vitality" placeholder="[%]" />
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6">
+        <div class="col-lg-3 col-md-4 col-sm-6">
           <label class="form-label">Leukocytes </label>
           <input type="number" class="form-control" formControlName="leukocytes" placeholder="[10^6/ml]" />
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6">
+        <div class="col-lg-3 col-md-4 col-sm-6">
           <label class="form-label">Round cells </label>
           <input type="number" class="form-control" formControlName="roundCells" placeholder="[10^6/ml]" />
         </div>
 
         <!-- Added fields per request -->
-        <div class="col-lg-2 col-md-4 col-sm-6">
+        <div class="col-lg-3 col-md-4 col-sm-6">
           <label class="form-label">Quantification possible?</label>
           <select class="form-select" formControlName="quantPossible">
             <option value="">Select</option>
@@ -42,21 +47,21 @@
             <option>No</option>
           </select>
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6">
+        <div class="col-lg-3 col-md-4 col-sm-6">
           <label class="form-label">Total sperm count</label>
           <input type="number" class="form-control" formControlName="totalSpermCountM" placeholder="[10^6]" />
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6">
+        <div class="col-lg-3 col-md-4 col-sm-6">
           <label class="form-label">Peroxidase-positive cells</label>
           <input type="number" class="form-control" formControlName="peroxidasePositive" placeholder="[10^6/ml]" />
         </div>
-        <div class="col-lg-2 col-md-4 col-sm-6">
+        <div class="col-lg-3 col-md-4 col-sm-6">
           <label class="form-label">Immunobead test</label>
           <input type="number" class="form-control" formControlName="immunobeadPercentAdherent" placeholder="[% adherent]" />
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-6">
+        <div class="col-lg-6 col-md-4 col-sm-6">
           <div class="d-flex align-items-center gap-2 flex-nowrap">
-            <label class="form-label mb-0 me-2 text-nowrap">MAR test</label>
+            <label class="form-label mb-3 ms-1 text-nowrap">MAR test:</label>
             <div class="card p-1 flex-grow-1">
               <div class="row g-2 align-items-end">
                 <div class="col-4">
@@ -79,33 +84,183 @@
     </div>
   </div>
 
+  <!-- Concentration Calculator Modal Template -->
+  <ng-template #concCalcTpl let-modal>
+    <div class="modal-header py-2">
+      <h4  class="modal-title mb-0">Concentration counter</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body p-2">
+      <ul ngbNav #calcNav="ngbNav" class="nav-tabs mb-2">
+        <li [ngbNavItem]="1">
+          <button ngbNavLink>Sperm counter</button>
+          <ng-template ngbNavContent>
+            <div class="d-flex align-items-center justify-content-center border rounded p-3 mb-2" style="min-height:80px;">
+              <div class="display-5 fw-bold">{{ concCount || 0 }}</div>
+              <div class="ms-2 text-muted">Number of sperms</div>
+            </div>
+
+            <div class="card p-2">
+              <div class="fw-semibold mb-2">Concentration calculator</div>
+              <div class="d-flex align-items-end calc-inline">
+                <div class="d-flex align-items-end gap-1">
+                  <span class="my-1">(</span>
+                  <div class="d-flex flex-column">
+                    <small class="text-muted">Count result</small>
+                    <input type="number" class="form-control" [(ngModel)]="concCount" [ngModelOptions]="{standalone: true}" />
+                  </div>
+                  <span class="my-1">*</span>
+                  <div class="d-flex flex-column">
+                    <small class="text-muted">Dilution (factor)</small>
+                    <input type="number" class="form-control" [(ngModel)]="concDilution" [ngModelOptions]="{standalone: true}" />
+                  </div>
+                  <span class="my-1">)</span>
+                  <span class="my-1">/</span>
+                  <div class="d-flex flex-column">
+                    <small class="text-muted">Portion (factor)</small>
+                    <input type="number" class="form-control" [(ngModel)]="concPortion" [ngModelOptions]="{standalone: true}" />
+                  </div>
+                  <span class="my-1">=</span>
+                  <div class="d-flex flex-column">
+                    <small class="text-muted">Conc. [10^6/ml]</small>
+                    <input type="number" class="form-control result" [value]="concComputed" readonly />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </li>
+        <li [ngbNavItem]="2">
+          <button ngbNavLink>Configuration</button>
+          <ng-template ngbNavContent>
+            <div class="text-muted small">Configuration options can go here (e.g., default factors).</div>
+          </ng-template>
+        </li>
+      </ul>
+      <div [ngbNavOutlet]="calcNav"></div>
+    </div>
+    <div class="modal-footer py-2">
+      <button type="button" class="btn btn-light" (click)="modal.dismiss()">Cancel</button>
+      <button type="button" class="btn btn-success" (click)="takeOverConc(modal)">Take over</button>
+    </div>
+  </ng-template>
+
+  <!-- Morphology Calculator Modal Template -->
+  <ng-template #morphCalcTpl let-modal>
+    <div class="modal-header py-2">
+      <h4 class="modal-title mb-0">WHO sperm morphology counter</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body p-1">
+      <div class="card p-2 mb-1">
+        <div class="fw-semibold mb-1">Native</div>
+        <div class="row g-2">
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Normal forms</label>
+            <input type="number" class="form-control" [(ngModel)]="morphologyCalculater.normal" [ngModelOptions]="{standalone: true}" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Abnormal forms</label>
+            <input type="number" class="form-control" [(ngModel)]="morphologyCalculater.abnormal" [ngModelOptions]="{standalone: true}" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Head defect</label>
+            <input type="number" class="form-control" [(ngModel)]="morphologyCalculater.head" [ngModelOptions]="{standalone: true}" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Neck & midpiece defect</label>
+            <input type="number" class="form-control" [(ngModel)]="morphologyCalculater.neck" [ngModelOptions]="{standalone: true}" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Tail defect</label>
+            <input type="number" class="form-control" [(ngModel)]="morphologyCalculater.tail" [ngModelOptions]="{standalone: true}" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Cytoplasmic excess</label>
+            <input type="number" class="form-control" [(ngModel)]="morphologyCalculater.excess" [ngModelOptions]="{standalone: true}" />
+          </div>
+        </div>
+        <div class="mt-2 d-flex justify-content-center">
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="computeMorphology()">Keyboard - morphology counter</button>
+        </div>
+      </div>
+      <div class="card p-2">
+        <div class="fw-semibold mb-1">Morphology</div>
+        <div class="row g-2">
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Normal forms</label>
+            <input type="number" class="form-control" [value]="morphologyPerc.normal" readonly placeholder="[%]" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Abnormal forms</label>
+            <input type="number" class="form-control" [value]="morphologyPerc.abnormal" readonly placeholder="[%]" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Head defect</label>
+            <input type="number" class="form-control" [value]="morphologyPerc.head" readonly placeholder="[%]" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Neck & midpiece defect</label>
+            <input type="number" class="form-control" [value]="morphologyPerc.neck" readonly placeholder="[%]" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Tail defect</label>
+            <input type="number" class="form-control" [value]="morphologyPerc.tail" readonly placeholder="[%]" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Cytoplasmic excess</label>
+            <input type="number" class="form-control" [value]="morphologyPerc.excess" readonly placeholder="[%]" />
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label">Teratozoospermia index (TZI)</label>
+            <input type="number" class="form-control" [value]="morphologyPerc.tzi" readonly />
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="roundValuesChk" [(ngModel)]="morphologyCalculater.round" [ngModelOptions]="{standalone: true}" />
+              <label for="roundValuesChk" class="form-check-label">Round values</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer py-2">
+      <button type="button" class="btn btn-light" (click)="modal.dismiss()">Cancel</button>
+      <button type="button" class="btn btn-success" (click)="takeOverMorph(modal)">Apply</button>
+    </div>
+  </ng-template>
   <!-- Bottom: two separate boxes side-by-side -->
    <!-- Motility -->
-  <div class="col-lg-6 col-md-12">
+  <div class="col-lg-12 col-md-12">
     <div class="card p-2 h-100">
-      <div class="fw-semibold mb-2">Motility</div>
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="fw-semibold">Motility</div>
+        <button type="button" class="btn btn-outline-success btn-sm p-1">
+          <lucide-angular [img]="calculatorIcon" size="24"></lucide-angular>
+        </button>
+      </div>
       <div class="row g-2">
         <!-- <div class="col-lg-6 col-md-6 col-sm-6">
           <label class="form-label">WHO A [%]</label>
           <input type="number" class="form-control" formControlName="whoA" placeholder="%" />
         </div> -->
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-2 col-md-6 col-sm-6">
           <label class="form-label">WHO AB </label>
           <input type="number" class="form-control" formControlName="whoB" placeholder="[%]" />
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-2 col-md-6 col-sm-6">
           <label class="form-label">WHO C </label>
           <input type="number" class="form-control" formControlName="whoC" placeholder="[%]" />
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-2 col-md-6 col-sm-6">  
           <label class="form-label">WHO D </label>
           <input type="number" class="form-control" formControlName="whoD" placeholder="[%]" />
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-2 col-md-6 col-sm-6">
           <label class="form-label"># Prog. motile </label>
           <input type="number" class="form-control" formControlName="numberOfProgMotile" placeholder="[10^6]" />
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-2 col-md-6 col-sm-6">
           <label class="form-label">Overall motility </label>
           <input type="number" class="form-control" formControlName="overallMotility" placeholder="[10^6]" />
         </div>
@@ -114,37 +269,43 @@
   </div>
 
   <!-- Morphology -->
-  <div class="col-lg-6 col-md-12">
+  <div class="col-lg-12 col-md-12 mt-2">
     <div class="card p-2 h-100">
       <div class="fw-semibold mb-2">Morphology</div>
       <div class="row g-2">
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-3 col-md-6 col-sm-6">
           <label class="form-label">Normal forms </label>
-          <input type="number" class="form-control" formControlName="normalForms" placeholder="[%]" />
+          <div class="input-group">
+            <input type="number" class="form-control" formControlName="normalForms" placeholder="[%]" />
+            <button type="button" class="btn btn-outline-success btn-sm p-1" (click)="openMorphCalc(morphCalcTpl)">
+              <lucide-angular [img]="calculatorIcon" size="24"></lucide-angular>
+            </button>
+          </div>
+          
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-3 col-md-6 col-sm-6">
           <label class="form-label">Head defects</label>
           <input type="number" class="form-control" formControlName="headDefects" placeholder="[%]" />
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
-          <label class="form-label">Neck and midpiece defects</label>
+        <div class="col-lg-3 col-md-6 col-sm-6">
+          <label class="form-label">Neck & midpiece defect</label>
           <input type="number" class="form-control" formControlName="neckDefects" placeholder="[%]" />
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-3 col-md-6 col-sm-6">
           <label class="form-label">Tail defects</label>
           <input type="number" class="form-control" formControlName="tailDefects" placeholder="[%]" />
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
-          <label class="form-label">Excess residual cytoplasm (ERC)</label>
+        <div class="col-lg-3 col-md-6 col-sm-6">
+          <label class="form-label">Cytoplasmic excess</label>
           <input type="number" class="form-control" formControlName="excessResidualCytoplasm" placeholder="[%]" />
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-3 col-md-6 col-sm-6">
           <label class="form-label">Multiple defects</label>
-          <input type="number" class="form-control" formControlName="multipleDefects" placeholder="%" />
+          <input type="number" class="form-control" formControlName="multipleDefects" placeholder="[%]" />
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-3 col-md-6 col-sm-6">
           <label class="form-label">Teratozoospermia Index</label>
-          <input type="number" class="form-control" formControlName="tzi" placeholder="TZI" />
+          <input type="number" class="form-control" formControlName="tzi" placeholder="[%]" />
         </div>
       </div>
     </div>

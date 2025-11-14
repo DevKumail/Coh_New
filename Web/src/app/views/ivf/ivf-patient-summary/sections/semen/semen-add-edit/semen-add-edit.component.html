@@ -19,7 +19,7 @@
   <div class="card-body">
     <form [formGroup]="form" class="row g-1">
       <div class="row w-100" >
-      <div class=" top-cards col-lg-4 col-md-4 col-sm-6">
+      <div class=" top-cards col-lg-6 col-md-6 col-sm-6">
       <div class="card d-flex p-1">
         <div class="col-12">
           <label class="form-label">Collection date & time</label>
@@ -33,7 +33,7 @@
       
       <!-- Thawing date -->
       <!-- date when frozen sample was thawed (if applicable) -->
-       <div class="top-cards col-lg-4 col-md-4 col-sm-6">
+       <div class="top-cards col-lg-6 col-md-6 col-sm-6">
        <div class="card d-flex p-1">
         <div class="col-12">
           <label class="form-label">Thawing date & time</label>
@@ -46,7 +46,7 @@
        </div>
       
             <!-- Abstinence period [d] -->
-      <div class="top-cards col-lg-4 col-md-4 col-sm-6">
+      <!-- <div class="top-cards col-lg-4 col-md-4 col-sm-6">
       <div class="card d-flex p-1">
         <div class="d-flex gap-2">
           <div>
@@ -59,7 +59,21 @@
           </div>
         </div>
       </div>
+      </div> -->
       </div>
+
+      <!-- Abstinence period [d] -->
+      <!-- internal identifier of the sample -->
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label">Abstinence period [d]</label>
+        <input type="number" class="form-control" formControlName="abstinenceDays" placeholder="Abstinence (days)" />
+      </div>
+
+      <!-- Sample ID -->
+      <!-- internal identifier of the sample -->
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label">Start Of Analysis</label>
+        <input type="time" class="form-control" formControlName="startOfAnalysis" placeholder="Start of analysis time" />
       </div>
 
       <!-- Sample ID -->
@@ -158,31 +172,36 @@
       </div>
 
       <!-- Liquefaction time [min] -->
-      <div class="col-lg-2 col-md-4 col-sm-4">
+      <div class="col-lg-3 col-md-4 col-sm-4">
         <label class="form-label">Liquefaction time [min]</label>
         <input type="number" class="form-control" formControlName="liquefactionTime" placeholder="Minutes" />
       </div>
+
+       <!-- DNA fragmented   -->
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label">DNA fragmented [%]</label>
+        <input type="number" class="form-control" formControlName="dnaFragmented" placeholder="Enter % value" />
+      </div>
       
       <!-- Agglutination (checkbox, reactive) -->
-      <div class="col-lg-2 col-md-4 col-sm-4 d-flex align-items-end">
+      <div class="col-lg-3 col-md-4 col-sm-4 d-flex align-items-center">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" formControlName="agglutination" id="agglutinationChk">
           <label class="form-check-label" for="agglutinationChk">Agglutination</label>
         </div>
       </div>
 
-      <!-- DNA fragmented   -->
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <label class="form-label">DNA fragmented [%]</label>
-        <input type="number" class="form-control" formControlName="dnaFragmented" placeholder="Enter % value" />
-      </div>
+     
 
       <!-- Divider -->
       <div class="col-12"><hr/></div>
 
       <!-- Parameter / Files Tabs Card -->
-      <div class="col-12">
+      <div class="col-8">
         <app-semen-parameter-tabs></app-semen-parameter-tabs>
+      </div>
+      <div class="col-4">
+        <app-semen-diagnosis-approval></app-semen-diagnosis-approval>
       </div>
 
       <!-- Footer actions -->

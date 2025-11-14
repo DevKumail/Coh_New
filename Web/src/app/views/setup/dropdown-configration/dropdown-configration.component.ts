@@ -39,6 +39,7 @@ export class DropdownConfigrationComponent {
     Page: 1,
     RowsPerPage: 10,
   };
+  dropdownlistlotalCount: number = 0;
   modalService = new NgbModal();
   CatogaryListData: any = [];
   // Available categories for the dropdown (populate as needed)
@@ -48,7 +49,7 @@ export class DropdownConfigrationComponent {
     'Category 3',
   ];
   // Items added within the modal session
-  modalItems: { categoryName: string; description: string }[] = [];
+  modalItems: any[] = [];
   // Tracks locked category once first item is added
   lockedCategoryName: string | null = null;
   // Validation flag for attempting to add mismatched category
@@ -62,8 +63,8 @@ export class DropdownConfigrationComponent {
 
   ngOnInit(): void {
     this.AddForm = this.fb.group({
-      categoryName: ['', Validators.required],
-      description: ['', Validators.required],
+      categoryName: [{ value: '', disabled: true }],
+      description: [''],
     });
 
     this.GetDropdownListData();
@@ -75,24 +76,34 @@ export class DropdownConfigrationComponent {
     console.log(record);
   }
 
-
+onDropdownListPageChanged(page:any){
+  this.dropdownlistPaginationInfo.Page = page;
+  this.GetDropdownListData();
+}
   GetDropdownListData(){
-    this.clinicalApiService.GetAllCategories().then((res:any)=>{
-      this.dropdownListData = res;
+    this.clinicalApiService.GetAllCategories(this.dropdownlistPaginationInfo.Page,this.dropdownlistPaginationInfo.RowsPerPage).then((res:any)=>{
+      this.dropdownListData = res?.data?.item1 || [];
+      this.dropdownlistlotalCount = res?.data?.item2 || 0;
     })
   }
 
     modalRefInstance: any;
 
-  onAddUpdateDropdownConfiguration(modalRef: TemplateRef<any>){
-     this.AddForm.patchValue({
-      categoryName: '',
-      description: '',
+  onAddUpdateDropdownConfiguration(modalRef: TemplateRef<any>,categoryId:any){
+ 
+    // prepare state and then load
+    this.modalItems = [];
+    this.clinicalApiService.GetCategoryWithValues(categoryId).then((res:any)=>{
+      this.modalItems = res?.data?.values || [];
+      this.AddForm.patchValue({
+      categoryName: res?.data?.categoryName,
+      // description: res?.data?.description,
     });
+    })
+
     this.lockedCategoryName = null;
     this.categoryMismatch = false;
-    this.AddForm.get('categoryName')?.enable({ emitEvent: false });
-    this.modalItems = [];
+    this.AddForm.get('categoryName')?.disable({ emitEvent: false });
 
     this.modalRefInstance = this.modalService.open(modalRef, {
       backdrop: 'static',
@@ -110,11 +121,16 @@ export class DropdownConfigrationComponent {
   }
 
   Save(){
+    this.clinicalApiService.AddUpdateCategory(this.modalItems).then((res:any)=>{
+      this.GetDropdownListData();
+    })
     
   }
 
   onDelete(id:any){
-    
+    this.clinicalApiService.DeleteCategory(id).then((res:any)=>{
+      this.GetDropdownListData();
+    })
   }
 
   addItem(){
@@ -122,24 +138,13 @@ export class DropdownConfigrationComponent {
       this.AddForm.markAllAsTouched();
       return;
     }
-    const categoryName = this.AddForm.get('categoryName')?.value?.toString().trim();
+    // const categoryName = this.AddForm.get('categoryName')?.value?.toString().trim();
     const description = this.AddForm.get('description')?.value?.toString().trim();
-    if (!categoryName || !description) return;
+    if (!description) return;
 
-    // If already locked, ensure same category
-    if (this.lockedCategoryName && categoryName !== this.lockedCategoryName) {
-      this.categoryMismatch = true;
-      return;
-    }
 
-    // First add: lock category and disable control
-    if (!this.lockedCategoryName) {
-      this.lockedCategoryName = categoryName;
-      this.AddForm.get('categoryName')?.disable({ emitEvent: false });
-    }
 
-    this.categoryMismatch = false;
-    this.modalItems.push({ categoryName, description });
+    this.modalItems.push({ valueName: this.AddForm.get('description')?.value });
     this.AddForm.get('description')?.reset('');
   }
 
@@ -151,7 +156,7 @@ export class DropdownConfigrationComponent {
     if (this.modalItems.length === 0) {
       this.lockedCategoryName = null;
       this.categoryMismatch = false;
-      this.AddForm.get('categoryName')?.enable({ emitEvent: false });
+      this.AddForm.get('categoryName')?.disable({ emitEvent: false });
     }
   }
 
@@ -162,7 +167,7 @@ export class DropdownConfigrationComponent {
     if (this.modalItems.length === 0) {
       this.lockedCategoryName = null;
       this.categoryMismatch = false;
-      this.AddForm.get('categoryName')?.enable({ emitEvent: false });
+      this.AddForm.get('categoryName')?.disable({ emitEvent: false });
     }
   }
 

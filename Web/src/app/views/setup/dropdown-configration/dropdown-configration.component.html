@@ -21,9 +21,9 @@
             <span>{{ 'DROPDOWN_CONFIGURATION' | translate }}</span>
         </h5>
 
-        <button type="button" class="btn btn-primary" (click)="onAddUpdateDropdownConfiguration(standardModal)">
+        <!-- <button type="button" class="btn btn-primary" >
             {{ 'ADD_DROPDOWN_CONFIGURATION' | translate }}
-        </button>
+        </button> -->
     </div>
 
     <!-- TABLE SECTION -->
@@ -42,11 +42,11 @@
                             </thead>
                             <tbody class="table-group-divider text-center">
                                 <tr *ngFor="let record of dropdownListData">
-                                    <td>{{ record.providerName || 'N/A' }}</td>
-                                    <td>{{ record.icD9Description || 'N/A' }}</td>
+                                    <td>{{ record.categoryName || '-' }}</td>
+                                    <td>{{ record.description || '-' }}</td>
                                     <td>
                                         <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
-                                            <ng-icon name="tablerEdit" class="me-1" (click)="onEdit(record)">
+                                            <ng-icon name="tablerEdit" class="me-1" (click)="onAddUpdateDropdownConfiguration(standardModal,record.categoryId)">
                                             </ng-icon>
                                             <!-- <ng-icon name="tablerTrash" class="text-danger me-1" (click)="onDelete(record?.id)">
                     </ng-icon> -->
@@ -61,10 +61,11 @@
                     </div>
                 </div>
 
-                <!-- <app-generic-pagination [totalItems]="dropdownListData.length"
+                <app-generic-pagination 
+                [totalItems]="dropdownlistlotalCount"
                     [pageSize]="dropdownlistPaginationInfo?.RowsPerPage"
                     [currentPage]="dropdownlistPaginationInfo?.Page" (pageChanged)="onDropdownListPageChanged($event)">
-                </app-generic-pagination> -->
+                </app-generic-pagination>
             </div>
         </div>
     </div>
@@ -88,16 +89,8 @@
                             <div class="col-md-5">
                                 <div class="mb-0">
                                     <label for="categoryName" class="form-label">{{ 'CATEGORY_NAME' | translate }} 
-                                        <span *ngIf="lockedCategoryName"> (Locked: {{ lockedCategoryName }})</span>
                                     </label>
-                                    <select id="categoryName" class="form-select" formControlName="categoryName">
-                                        <option value="" disabled selected>{{ 'SELECT' | translate }}</option>
-                                        <option *ngFor="let c of availableCategories" [value]="c">{{ c }}</option>
-                                    </select>
-                                    <!-- <div *ngIf="AddForm?.controls?.['categoryName']?.errors?.['required']" class="text-danger">
-                                        {{ 'CATEGORY_NAME' | translate }} is required.
-                                    </div> -->
-                                    
+                                    <input type="text" formControlName="categoryName" class="form-control" id="categoryName">
                                     <div *ngIf="categoryMismatch" class="text-danger small">
                                         You can only add items for: {{ lockedCategoryName }}
                                     </div>
@@ -105,11 +98,8 @@
                             </div>
                             <div class="col-md-5">
                                 <div class="mb-0">
-                                    <label for="description" class="form-label">{{ 'DESCRIPTION' | translate }}</label>
-                                    <input type="text" formControlName="description" class="form-control" id="description" placeholder="Enter description">
-                                    <!-- <div *ngIf="AddForm?.controls?.['description']?.errors?.['required']" class="text-danger">
-                                        {{ 'DESCRIPTION' | translate }} is required.
-                                    </div> -->
+                                    <label for="description" class="form-label">{{ 'VALUE' | translate }}</label>
+                                    <input type="text" formControlName="description" class="form-control" id="description" placeholder="Enter value">
                                 </div>
                             </div>
                             <div class="col-md-2 d-flex align-items-end mb-0">
@@ -124,7 +114,7 @@
                             </div>
                         </div>
 
-                        <div class="">
+                        <div class="mt-2">
                             <div class="table-responsive">
                                 <div class="">
                                     <div class="table-responsive">
@@ -132,18 +122,19 @@
                                             <thead>
                                                 <tr class="text-center">
                                                     <th>{{ 'CATEGORY_NAME' | translate }}</th>
-                                                    <th>{{ 'DESCRIPTION' | translate }}</th>
+                                                    <th>{{ 'VALUE' | translate }}</th>
                                                     <th>{{ 'ACTION' | translate }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="table-group-divider text-center">
                                                 <tr *ngFor="let record of modalItems; let i = index">
-                                                    <td>{{ record.categoryName || 'N/A' }}</td>
-                                                    <td>{{ record.description || 'N/A' }}</td>
+                                                    <td>{{ AddForm?.controls?.['categoryName']?.value || 'N/A' }}</td>
+                                                    <td>{{ record.valueName || 'N/A' }}</td>
                                                     <td>
-                                                        <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeItemAt(i)" title="Remove">
+                                                        <button *ngIf="!record.valueId" type="button" class="btn btn-outline-danger btn-sm" (click)="removeItemAt(i)" title="Remove">
                                                             <lucide-angular [img]="crossIcon"></lucide-angular>
                                                         </button>
+                                                         <ng-icon *ngIf="record.valueId" name="tablerTrash" class="text-danger me-1" (click)="onDelete(record?.valueId)"></ng-icon>
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="modalItems.length === 0">

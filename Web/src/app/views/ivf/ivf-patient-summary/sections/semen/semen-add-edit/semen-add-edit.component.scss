@@ -14,3 +14,18 @@
 :host .top-cards > .card .form-label {
   margin-bottom: 0.25rem;
 }
+
+/* Global label and spacing styles for all nested semen components */
+:host ::ng-deep .form-label {
+  font-weight: 400;
+  margin-bottom: 0.25rem;
+}
+
+:host ::ng-deep .card .fw-semibold {
+  font-weight: 600;
+}
+
+:host ::ng-deep .card .row.g-1 > [class*='col-'],
+:host ::ng-deep .card .row.g-2 > [class*='col-'] {
+  margin-bottom: 0.5rem;
+}

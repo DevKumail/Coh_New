@@ -1,0 +1,14 @@
+.form-label {
+  font-weight: 400;
+  margin-bottom: 0.25rem;
+}
+
+.card .fw-semibold {
+  font-weight: 600;
+}
+
+/* Space between fields similar to .form-group.mb-2 */
+.card .row.g-1 > [class*='col-'],
+.card .row.g-2 > [class*='col-'] {
+  margin-bottom: 0.5rem;
+}

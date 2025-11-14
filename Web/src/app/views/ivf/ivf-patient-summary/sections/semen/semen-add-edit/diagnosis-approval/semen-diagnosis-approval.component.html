@@ -1,0 +1,85 @@
+<div class="card h-100">
+  <div class="card-body p-2" [formGroup]="form">
+    <ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
+      <li [ngbNavItem]="1">
+        <button ngbNavLink>Diagnosis</button>
+        <ng-template ngbNavContent>
+          <div class="mt-2">
+            <div class="mb-2">
+              <label class="form-label">Diagnosis</label>
+              <select class="form-select" formControlName="diagnosis">
+                <option>Not specified</option>
+                <option>Azoospermia</option>
+                <option>Asthenozoospermia</option>
+                <option>Oligozoospermia</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <div class="form-label">Finding</div>
+              <div class="d-flex gap-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" [value]="'Normal'" name="finding" formControlName="finding" id="findingNormal">
+                  <label class="form-check-label" for="findingNormal">Normal</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" [value]="'Abnormal'" name="finding" formControlName="finding" id="findingAbnormal">
+                  <label class="form-check-label" for="findingAbnormal">Abnormal</label>
+                </div>
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Note</label>
+              <textarea rows="10" class="form-control" formControlName="note" placeholder="Enter note"></textarea>
+            </div>
+          </div>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="2">
+        <button ngbNavLink>Approval status</button>
+        <ng-template ngbNavContent>
+          <div class="mt-2">
+            <div class="mb-2">
+              <label class="form-label">Approval status</label>
+              <select class="form-select" formControlName="approvalStatus">
+                <option>Pending</option>
+                <option>Approved</option>
+                <option>Rejected</option>
+              </select>
+            </div>
+          </div>
+        </ng-template>
+      </li>
+    </ul>
+    <div [ngbNavOutlet]="nav"></div>
+
+    <div class="row g-2 mt-2">
+      <div class="col-7 d-flex align-items-center">
+        <label class="form-label mb-0">Time between collection and usage</label>
+      </div>
+      <div class="col-5">
+        <input type="time" class="form-control" formControlName="timeBetweenCollectionAndUsage" />
+      </div>
+
+      <div class="col-7 d-flex align-items-center">
+        <label class="form-label mb-0">Number of insem. motile sperms [x10^6]</label>
+      </div>
+      <div class="col-5">
+        <input type="number" class="form-control" formControlName="numberOfInsemMotile" />
+      </div>
+
+      <div class="col-7 d-flex align-items-center">
+        <label class="form-label mb-0">Inseminated amount [ml]</label>
+      </div>
+      <div class="col-5">
+        <input type="number" class="form-control" formControlName="inseminatedAmountMl" />
+      </div>
+
+      <div class="col-7 d-flex align-items-center">
+        <label class="form-label mb-0">24h Motility rate [%]</label>
+      </div>
+      <div class="col-5">
+        <input type="number" class="form-control" formControlName="rate24hMotility" />
+      </div>
+    </div>
+  </div>
+</div>

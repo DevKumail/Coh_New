@@ -335,9 +335,22 @@ private question = 'assets/question.json';
 
   }
 
-  GetAllCategories() {
-	return this.api.get(`DropDownLookUp/GetAllCategories`).toPromise();;
+  GetAllCategories(pageNumber: number, pageSize: number) {
+	return this.api.get(`DropDownLookUp/GetAllCategories?page=${pageNumber}&pageSize=${pageSize}`).toPromise();
 
   }
+
+  
+  GetCategoryWithValues(id: any) {
+	return this.api.get(`DropDownLookUp/GetCategoryWithValues/${id}`).toPromise();
+  }
+
+   AddUpdateCategory(data:any){
+    return this.api.post(`DropDownLookUp/AddUpdateCategory`,data).toPromise();
+   } 
+
+   DeleteCategory(id:any){
+    return this.api.delete(`DropDownLookUp/DeleteConfiguration/${id}`).toPromise();
+   }
 
 }
