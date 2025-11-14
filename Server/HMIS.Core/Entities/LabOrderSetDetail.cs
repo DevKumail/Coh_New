@@ -73,4 +73,13 @@ public partial class LabOrderSetDetail
     public int? BillOnOrder { get; set; }
 
     public bool? IsDeleted { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? CollectDate { get; set; }
+
+    [StringLength(50)]
+    public string? Status { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? PerformDate { get; set; }
 }

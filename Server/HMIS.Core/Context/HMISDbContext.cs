@@ -1,4 +1,6 @@
-﻿using HMIS.Core.Entities;
+using System;
+using System.Collections.Generic;
+using HMIS.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Context;
@@ -114,6 +116,10 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<DeductiblePercent> DeductiblePercent { get; set; }
 
+    public virtual DbSet<DropdownCategory> DropdownCategory { get; set; }
+
+    public virtual DbSet<DropdownConfiguration> DropdownConfiguration { get; set; }
+
     public virtual DbSet<EligibilityLog> EligibilityLog { get; set; }
 
     public virtual DbSet<EmirateType> EmirateType { get; set; }
@@ -173,6 +179,12 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<InsuredPolicy> InsuredPolicy { get; set; }
 
     public virtual DbSet<InsuredSubscriber> InsuredSubscriber { get; set; }
+
+    public virtual DbSet<InvestigationType> InvestigationType { get; set; }
+
+    public virtual DbSet<IvfmaleSemenSample> IvfmaleSemenSample { get; set; }
+
+    public virtual DbSet<LabOrderSet> LabOrderSet { get; set; }
 
     public virtual DbSet<LabOrderSetDetail> LabOrderSetDetail { get; set; }
 
@@ -805,6 +817,22 @@ public partial class HMISDbContext : DbContext
                 .HasConstraintName("FK_DeductiblePercent_InsuredSubscriber");
         });
 
+        modelBuilder.Entity<DropdownCategory>(entity =>
+        {
+            entity.HasKey(e => e.CategoryId).HasName("PK__Dropdown__19093A0B926B72D2");
+        });
+
+        modelBuilder.Entity<DropdownConfiguration>(entity =>
+        {
+            entity.HasKey(e => e.ValueId).HasName("PK__Dropdown__93364E482CC3C347");
+
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+
+            entity.HasOne(d => d.Category).WithMany(p => p.DropdownConfiguration)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__DropdownC__Categ__7C255952");
+        });
+
         modelBuilder.Entity<EligibilityLog>(entity =>
         {
             entity.HasOne(d => d.Facility).WithMany(p => p.EligibilityLog).HasConstraintName("FK_EligibilityLog_RegFacility");
@@ -1015,6 +1043,25 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.State).WithMany(p => p.InsuredSubscriber)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_InsuredSubscriber_RegStates");
+        });
+
+        modelBuilder.Entity<InvestigationType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Investig__3214EC07992AE891");
+        });
+
+        modelBuilder.Entity<IvfmaleSemenSample>(entity =>
+        {
+            entity.HasKey(e => e.SampleId).HasName("PK__IVFSemen__8B99EC6A783EBA77");
+
+            entity.Property(e => e.Agglutination).HasDefaultValue(false);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+        });
+
+        modelBuilder.Entity<LabOrderSet>(entity =>
+        {
+            entity.HasKey(e => e.LabOrderSetId).HasName("PK__LabOrder__322AE07AA8CA4595");
         });
 
         modelBuilder.Entity<LabOrderSetDetail>(entity =>

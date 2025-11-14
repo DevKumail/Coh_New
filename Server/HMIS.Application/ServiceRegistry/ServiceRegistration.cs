@@ -1,4 +1,4 @@
-﻿using HMIS.Application.Implementations;
+using HMIS.Application.Implementations;
 using HMIS.Application.ServiceLogics;
 using HMIS.Application.ServiceLogics.Cryo;
 using HMIS.Application.ServiceLogics.IVF;
@@ -45,6 +45,8 @@ namespace HMIS.Application
             services.AddScoped<IAlertManager, AlertManager >();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<ICryoManagementService, CryoManagementService>();
+            services.AddScoped<IIVFLabService, IVFLabService>();
+            services.AddScoped<IIVFLabOrderService, IVFLabOrderService>();
 
 
 
