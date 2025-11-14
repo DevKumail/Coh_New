@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { SemenParameterTabsComponent } from './parameter-tabs/semen-parameter-tabs.component';
+import { SemenTabsComponent } from './semen-tabs/semen-tabs.component';
 import { SemenDiagnosisApprovalComponent } from './diagnosis-approval/semen-diagnosis-approval.component';
 
 @Component({
   selector: 'app-semen-add-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SemenParameterTabsComponent, SemenDiagnosisApprovalComponent],
+  imports: [CommonModule, ReactiveFormsModule, SemenTabsComponent, SemenDiagnosisApprovalComponent],
   templateUrl: './semen-add-edit.component.html',
   styleUrls: ['./semen-add-edit.component.scss']
 })

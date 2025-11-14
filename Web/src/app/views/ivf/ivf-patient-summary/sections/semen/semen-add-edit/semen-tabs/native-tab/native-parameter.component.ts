@@ -6,10 +6,10 @@ import { LucideAngularModule, LucideCalculator } from 'lucide-angular';
 import { NgbModal, NgbModalModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'app-semen-parameter-native',
+  selector: 'app-native-parameter',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, LucideAngularModule, NgbModalModule, NgbNavModule],
-  templateUrl: './semen-parameter-native.component.html',
+  templateUrl: './native-parameter.component.html',
   styles: [
     `
     .form-label { font-weight: 400; margin-bottom: 0.25rem; }
@@ -30,8 +30,8 @@ import { NgbModal, NgbModalModule, NgbNavModule } from '@ng-bootstrap/ng-bootstr
     `
   ]
 })
-export class SemenParameterNativeComponent {
-  form: FormGroup;
+export class NativeParameterComponent {
+   form: FormGroup;
   protected readonly calculatorIcon = LucideCalculator;
   // Calculator modal state
   concCount = 0; // Count result
