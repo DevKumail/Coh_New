@@ -13,7 +13,8 @@ namespace HMIS.Application.ServiceLogics
 
         Task<List<DropDownConfigurationDto>> GetConfigurationsByCategoryIdAsync(long categoryId);
         Task<DropDownConfigurationDto?> GetConfigurationByIdAsync(long valueId);
-        Task<bool> CreateOrUpdateConfigurationAsync(DropDownConfigurationDto configurationDto);
+        Task<bool> CreateOrUpdateConfigurationsAsync(List<DropDownConfigurationDto> configurationDtos);
+
         Task<bool> DeleteConfigurationAsync(long valueId, long? updatedBy);
 
         Task<DropDownCategoryWithValuesDto?> GetCategoryWithValuesAsync(long categoryId);
@@ -190,39 +191,56 @@ namespace HMIS.Application.ServiceLogics
                 throw;
             }
         }
-
-        public async Task<bool> CreateOrUpdateConfigurationAsync(DropDownConfigurationDto configurationDto)
+        public async Task<bool> CreateOrUpdateConfigurationsAsync(List<DropDownConfigurationDto> configurationDtos)
         {
             try
             {
-                if (configurationDto.ValueId.HasValue && configurationDto.ValueId > 0)
-                {
-                    // Update existing configuration
-                    var existingConfig = await _context.DropdownConfiguration
-                        .FirstOrDefaultAsync(c => c.ValueId == configurationDto.ValueId && !c.IsActive);
+                var existingIds = configurationDtos
+                    .Where(dto => dto.ValueId.HasValue && dto.ValueId > 0)
+                    .Select(dto => dto.ValueId.Value)
+                    .ToList();
 
-                    if (existingConfig == null) return false;
+                // Bulk fetch existing configurations
+                var existingConfigs = await _context.DropdownConfiguration
+                    .Where(c => existingIds.Contains(c.ValueId) && !c.IsActive)
+                    .ToDictionaryAsync(c => c.ValueId);
 
-                    existingConfig.ValueName = configurationDto.ValueName;
-                    existingConfig.SortOrder = configurationDto.SortOrder;
-                    existingConfig.IsActive = configurationDto.IsActive;
-                }
-                else
+                var configsToAdd = new List<DropdownConfiguration>();
+
+                foreach (var configurationDto in configurationDtos)
                 {
-                    // Create new configuration
-                    var newConfig = new DropdownConfiguration
+                    if (configurationDto.ValueId.HasValue && configurationDto.ValueId > 0)
                     {
-                        CategoryId = configurationDto.CategoryId,
-                        ValueName = configurationDto.ValueName,
-                        SortOrder = configurationDto.SortOrder,
-                        IsActive = configurationDto.IsActive,
-                    };
-
-                    _context.DropdownConfiguration.Add(newConfig);
+                        // Update existing configuration
+                        if (existingConfigs.TryGetValue(configurationDto.ValueId.Value, out var existingConfig))
+                        {
+                            existingConfig.ValueName = configurationDto.ValueName;
+                            existingConfig.SortOrder = configurationDto.SortOrder;
+                            existingConfig.IsActive = configurationDto.IsActive;
+                        }
+                    }
+                    else
+                    {
+                        // Create new configuration
+                        var newConfig = new DropdownConfiguration
+                        {
+                            CategoryId = configurationDto.CategoryId,
+                            ValueName = configurationDto.ValueName,
+                            SortOrder = configurationDto.SortOrder,
+                            IsActive = configurationDto.IsActive,
+                        };
+                        configsToAdd.Add(newConfig);
+                    }
                 }
 
-                await _context.SaveChangesAsync();
-                return true;
+                // Bulk add new configurations
+                if (configsToAdd.Any())
+                {
+                    _context.DropdownConfiguration.AddRange(configsToAdd);
+                }
+
+                var savedCount = await _context.SaveChangesAsync();
+                return savedCount > 0;
             }
             catch (Exception)
             {
