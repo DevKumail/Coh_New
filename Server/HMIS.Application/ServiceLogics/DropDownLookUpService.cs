@@ -1,7 +1,12 @@
-﻿using HMIS.Application.DTOs.Configurations;
+﻿using GdPicture.Internal.MSOfficeBinary.translator.Spreadsheet.XlsFileFormat.Records;
+using HMIS.Application.DTOs;
+using HMIS.Application.DTOs.Configurations;
 using HMIS.Core.Context;
 using HMIS.Core.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using System.Data;
 
 namespace HMIS.Application.ServiceLogics
 {
@@ -19,14 +24,19 @@ namespace HMIS.Application.ServiceLogics
 
         Task<DropDownCategoryWithValuesDto?> GetCategoryWithValuesAsync(long categoryId);
         Task<List<DropDownCategoryWithValuesDto>> GetAllCategoriesWithValuesAsync();
+        Task<Dictionary<string, List<DropDownItemDto>>> GetDropdownsForPage(string page);
     }
     public class DropDownLookUpService : IDropDownLookUpService
     {
         private readonly HMISDbContext _context;
+        private readonly IMemoryCache _cache;
 
-        public DropDownLookUpService(HMISDbContext context)
+
+        public DropDownLookUpService(HMISDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
+
         }
 
         public async Task<(IEnumerable<DropDownCategoryDto> Data, int TotalCount)> GetAllCategoriesAsync(int page, int pageSize)
@@ -240,6 +250,8 @@ namespace HMIS.Application.ServiceLogics
                 }
 
                 var savedCount = await _context.SaveChangesAsync();
+
+                InvalidateDropdownCache();
                 return savedCount > 0;
             }
             catch (Exception)
@@ -260,6 +272,8 @@ namespace HMIS.Application.ServiceLogics
                 configuration.IsActive = false;
 
                 await _context.SaveChangesAsync();
+                InvalidateDropdownCache();
+
                 return true;
             }
             catch (Exception)
@@ -337,5 +351,65 @@ namespace HMIS.Application.ServiceLogics
                 throw;
             }
         }
+
+        public async Task<Dictionary<string, List<DropDownItemDto>>> GetDropdownsForPage(string page)
+        {
+            string cacheKey = "dropdowns_master";
+
+            if (_cache.TryGetValue(cacheKey, out Dictionary<string, List<DropDownItemDto>> cached))
+                return cached;
+
+            var data = await LoadDropdownsFromDB(page);
+
+            _cache.Set(cacheKey, data, TimeSpan.FromHours(6));
+
+            return data;
+        }
+
+        private async Task<Dictionary<string, List<DropDownItemDto>>> LoadDropdownsFromDB(string page)
+        {
+            string pagePrefix = page + ":";  
+
+            var result = new Dictionary<string, List<DropDownItemDto>>();
+
+            var data = await _context.DropdownCategory
+                .Where(c => c.CategoryName.StartsWith(pagePrefix))
+                .Join(
+                    _context.DropdownConfiguration.Where(v => v.IsActive),
+                    c => c.CategoryId,
+                    v => v.CategoryId,
+                    (c, v) => new
+                    {
+                        c.CategoryName,
+                        v.ValueId,
+                        v.ValueName,
+                        v.SortOrder
+                    }
+                )
+                .OrderBy(x => x.CategoryName)
+                .ThenBy(x => x.SortOrder)
+                .ToListAsync();
+
+            foreach (var item in data)
+            {
+                if (!result.ContainsKey(item.CategoryName))
+                    result[item.CategoryName] = new List<DropDownItemDto>();
+
+                result[item.CategoryName].Add(new DropDownItemDto
+                {
+                    ValueId = item.ValueId,
+                    Name = item.ValueName
+                });
+            }
+
+            return result;
+        }
+
+        private void InvalidateDropdownCache()
+        {
+            _cache.Remove("dropdowns_master");
+        }
+
+
     }
 }
