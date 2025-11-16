@@ -1,15 +1,9 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Data;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
-using System.Xml.Linq;
-using Microsoft.AspNetCore.Mvc.Routing;
 using HMIS.Infrastructure.Logger;
 
 namespace HMIS.Infrastructure.ORM

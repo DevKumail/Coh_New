@@ -1,212 +1,235 @@
 using HMIS.Application.DTOs.IVFDTOs;
 using HMIS.Infrastructure.ORM;
 using System.Data;
-using System.Threading.Tasks;
-using System;
 using Dapper;
+using HMIS.Application.DTOs.SpLocalModel;
+using HMIS.Core.Context;
+using HMIS.Core.Entities;
+using Microsoft.EntityFrameworkCore;
+using System;
+using Microsoft.Data.SqlClient;
 
 namespace HMIS.Application.ServiceLogics.IVF
 {
-    public class Result<T>
-    {
-        public bool IsSuccess { get; set; }     // true if operation succeeded
-        public T Data { get; set; }             // the actual result data
-        public string ErrorMessage { get; set; } // error message if any
-    }
-    // Service interface
     public interface IDashboardService
     {
-        Task<(bool IsSuccess, DashboardReadDTO Data)> GetCoupleData(string mrno);
-        Task<Result<(string gender, BaseDemographicDTO)>> GetCoverageAndRegPatientDBByMrNo(string MRNo);
+        Task<(bool IsSuccess, DashboardReadDTO Data)> GetCoupleData(string MrNo);
+        Task<(bool IsSuccess, IEnumerable<AllExceptSelfPatientsReadDTO> Data, int TotalRecords)> GetOppositeGenderPatients(string gender, PaginationInfo pagination, string? mrno = null, string? phone = null, string? emiratesId = null, string? name = null);
+        Task<(bool IsSuccess, int IvfMainId, string Error)> GenerateIVFMain(InsertIvfRelationDTO dto);
+        Task<(bool IsSuccess, int RelationId, string Error)> InsertPatientRelation(InsertPatientRelationDTO dto);
     }
 
-    // Service implementation
-    public class DashboardService : IDashboardService
+    internal class DashboardService : IDashboardService
     {
         private readonly DapperContext _dapper;
-
-        public DashboardService(DapperContext dapper)
+        private readonly HMISDbContext _db;
+        public DashboardService(DapperContext dapper, HMISDbContext db)
         {
             _dapper = dapper;
+            _db = db;
         }
 
-        public async Task<(bool IsSuccess, DashboardReadDTO Data)> GetCoupleData(string mrno)
+        public async Task<(bool IsSuccess, DashboardReadDTO Data)> GetCoupleData(string MrNo)
         {
-            var result = await GetCoverageAndRegPatientDBByMrNo(mrno);
+            if (string.IsNullOrWhiteSpace(MrNo)) return (false, null);
 
-            if (!result.IsSuccess || result.Data.gender is null)
+            using var conn = _dapper.CreateConnection();
+
+            var rows = (await conn.QueryAsync<BaseDemographicDTO>(
+                "IVF_GetCoupleDetails",
+                new { MrNo },
+                commandType: CommandType.StoredProcedure
+            )).ToList();
+
+            if (!rows.Any()) return (false, null);
+
+            var dto = new DashboardReadDTO();
+
+            foreach (var r in rows)
             {
-                return (false, null);
-            }
-
-
-            var (gender, patient) = result.Data;
-
-            var dto = new DashboardReadDTO
-            {
-                Female = gender == "Female" ? new FemaleDemographicDTO
-                {   
-                    MrNo = patient.MrNo,
-                    Name = patient.Name,
-                    DateOfBirth = patient.DateOfBirth,
-                    AgeYears = patient.AgeYears,
-                    Phone = patient.Phone,
-                    Email = patient.Email,
-                    EID = patient.EID,
-                    Nationality = patient.Nationality,
-                    Picture = patient.Picture
-                } : null,
-                Male = gender == "Male" ? new MaleDemographicDTO
+                BaseDemographicDTO target = r.Gender switch
                 {
-                    MrNo = patient.MrNo,
-                    Name = patient.Name,
-                    DateOfBirth = patient.DateOfBirth,
-                    AgeYears = patient.AgeYears,
-                    Phone = patient.Phone,
-                    Email = patient.Email,
-                    EID = patient.EID,
-                    Nationality = patient.Nationality,
-                    Picture = patient.Picture
-                } : null
-            };
+                    "Male" => dto.Male = new MaleDemographicDTO(),
+                    "Female" => dto.Female = new FemaleDemographicDTO(),
+                    _ => null
+                };
+
+                if (target == null) continue;
+
+                target.MrNo = r.MrNo;
+                target.Name = r.Name;
+                target.DateOfBirth = r.DateOfBirth;
+                target.AgeYears = r.AgeYears;
+                target.Phone = r.Phone;
+                target.Email = r.Email;
+                target.EID = r.EID;
+                target.Nationality = r.Nationality;
+                target.Picture = r.Picture;
+                target.Gender = r.Gender;
+            }
 
             return (true, dto);
         }
 
-        public async Task<Result<(string gender, BaseDemographicDTO)>> GetCoverageAndRegPatientDBByMrNo(string MRNo)
+        public async Task<(bool IsSuccess, IEnumerable<AllExceptSelfPatientsReadDTO> Data, int TotalRecords)> GetOppositeGenderPatients(string gender, PaginationInfo pagination, string? mrno = null, string? phone = null, string? emiratesId = null, string? name = null)
         {
+            if (string.IsNullOrWhiteSpace(gender)) return (false, Enumerable.Empty<AllExceptSelfPatientsReadDTO>(), 0);
+
+            var normalized = gender.Trim();
+            string opposite = normalized.Equals("Male", StringComparison.OrdinalIgnoreCase)
+                ? "Female"
+                : normalized.Equals("Female", StringComparison.OrdinalIgnoreCase)
+                    ? "Male"
+                    : string.Empty;
+
+            if (string.IsNullOrEmpty(opposite)) return (false, Enumerable.Empty<AllExceptSelfPatientsReadDTO>(), 0);
+
+            using var conn = _dapper.CreateConnection();
+
+            using var grid = await conn.QueryMultipleAsync(
+                "IVF_GetOppositeGenderPatients",
+                new
+                {
+                    Gender = opposite,
+                    Page = pagination?.Page,
+                    RowsPerPage = pagination?.RowsPerPage,
+                    MrNo = string.IsNullOrWhiteSpace(mrno) ? null : mrno?.Trim(),
+                    Phone = string.IsNullOrWhiteSpace(phone) ? null : phone?.Trim(),
+                    EmiratesId = string.IsNullOrWhiteSpace(emiratesId) ? null : emiratesId?.Trim(),
+                    Name = string.IsNullOrWhiteSpace(name) ? null : name?.Trim()
+                },
+                commandType: CommandType.StoredProcedure
+            );
+
+            var list = (await grid.ReadAsync<AllExceptSelfPatientsReadDTO>()).ToList();
+            var total = (await grid.ReadAsync<int>()).FirstOrDefault();
+
+            return (true, list, total);
+        }
+
+        public async Task<(bool IsSuccess, int IvfMainId, string Error)> GenerateIVFMain(InsertIvfRelationDTO dto)
+        {
+            if (dto == null) return (false, 0, "Invalid payload");
+            if (string.IsNullOrWhiteSpace(dto.PrimaryMrNo) || string.IsNullOrWhiteSpace(dto.SecondaryMrNo))
+                return (false, 0, "Primary and Secondary MRNo are required");
+
+            var primaryMr = dto.PrimaryMrNo.Trim();
+            var secondaryMr = dto.SecondaryMrNo.Trim();
+
+            var primary = await _db.RegPatient.FirstOrDefaultAsync(p => p.Mrno == primaryMr);
+            if (primary == null) return (false, 0, $"Primary MRNo not found: {primaryMr}");
+
+            var secondary = await _db.RegPatient.FirstOrDefaultAsync(p => p.Mrno == secondaryMr);
+            if (secondary == null) return (false, 0, $"Secondary MRNo not found: {secondaryMr}");
+
+            long maleId;
+            long femaleId;
+
+            if (dto.PrimaryIsMale.HasValue)
+            {
+                if (dto.PrimaryIsMale.Value)
+                {
+                    maleId = primary.PatientId;
+                    femaleId = secondary.PatientId;
+                }
+                else
+                {
+                    maleId = secondary.PatientId;
+                    femaleId = primary.PatientId;
+                }
+            }
+            else
+            {
+                // Infer from RegPatientDetails -> RegGender by matching GenderId and taking RegGender.Gender
+                var primaryDetails = await _db.RegPatientDetails
+                    .Include(d => d.Gender)
+                    .FirstOrDefaultAsync(d => d.PatientId == primary.PatientId);
+
+                var secondaryDetails = await _db.RegPatientDetails
+                    .Include(d => d.Gender)
+                    .FirstOrDefaultAsync(d => d.PatientId == secondary.PatientId);
+
+                string pGender = primaryDetails?.Gender?.Gender?.Trim();
+                string sGender = secondaryDetails?.Gender?.Gender?.Trim();
+
+                bool pIsMale = !string.IsNullOrEmpty(pGender) && pGender.Equals("Male", StringComparison.OrdinalIgnoreCase);
+                bool pIsFemale = !string.IsNullOrEmpty(pGender) && pGender.Equals("Female", StringComparison.OrdinalIgnoreCase);
+                bool sIsMale = !string.IsNullOrEmpty(sGender) && sGender.Equals("Male", StringComparison.OrdinalIgnoreCase);
+                bool sIsFemale = !string.IsNullOrEmpty(sGender) && sGender.Equals("Female", StringComparison.OrdinalIgnoreCase);
+
+                if (pIsMale && sIsFemale)
+                {
+                    maleId = primary.PatientId;
+                    femaleId = secondary.PatientId;
+                }
+                else if (pIsFemale && sIsMale)
+                {
+                    maleId = secondary.PatientId;
+                    femaleId = primary.PatientId;
+                }
+                else
+                {
+                    return (false, 0, "Unable to infer genders from RegPatientDetails/RegGender. Provide PrimaryIsMale explicitly.");
+                }
+            }
+
+            if (dto.VisitAccountNo <= 0)
+                return (false, 0, "VisitAccountNo is required");
+
+            var visitExists = await _db.BlpatientVisit.AnyAsync(v => v.VisitAccountNo == dto.VisitAccountNo);
+            if (!visitExists) return (false, 0, "VisitAccountNo not found");
+
+            var entity = new Ivfmain
+            {
+                MalePatientId = maleId,
+                FemalePatientId = femaleId,
+                VisitAccountNo = dto.VisitAccountNo
+            };
+
+            _db.Ivfmain.Add(entity);
+            await _db.SaveChangesAsync();
+
+            return (true, entity.IvfmainId, string.Empty);
+        }
+
+        public async Task<(bool IsSuccess, int RelationId, string Error)> InsertPatientRelation(InsertPatientRelationDTO dto)
+        {
+            if (dto == null) return (false, 0, "Invalid payload");
+            if (string.IsNullOrWhiteSpace(dto.PrimaryMrNo) || string.IsNullOrWhiteSpace(dto.SecondaryMrNo))
+                return (false, 0, "Primary and Secondary MRNo are required");
+
+            var pMr = dto.PrimaryMrNo.Trim();
+            var sMr = dto.SecondaryMrNo.Trim();
+
+            var primary = await _db.RegPatient.FirstOrDefaultAsync(p => p.Mrno == pMr);
+            if (primary == null) return (false, 0, $"Primary MRNo not found: {pMr}");
+
+            var secondary = await _db.RegPatient.FirstOrDefaultAsync(p => p.Mrno == sMr);
+            if (secondary == null) return (false, 0, $"Secondary MRNo not found: {sMr}");
+
+            var relationId = dto.RelationshipId <= 0 ? 4 : dto.RelationshipId; // default spouse=4
+
+            var entity = new RegPatientRelation
+            {
+                PatientId = primary.PatientId,
+                RelatedPatientId = secondary.PatientId,
+                RelationshipId = relationId,
+            };
+
+            _db.RegPatientRelation.Add(entity);
             try
             {
-                if (string.IsNullOrWhiteSpace(MRNo))
-                {
-                    return new Result<(string, BaseDemographicDTO)>
-                    {
-                        IsSuccess = false,
-                        ErrorMessage = "MRNo cannot be empty",
-                        Data = (null, null)
-                    };
-                }
-
-                var query = @"
-                        SELECT 
-                            RP.MRNo,
-                            CONCAT(
-                                RP.PersonFirstName, 
-                                CASE 
-                                    WHEN RP.PersonMiddleName IS NOT NULL AND RP.PersonMiddleName <> '' 
-                                    THEN ' ' + RP.PersonMiddleName 
-                                    ELSE '' 
-                                END, 
-                                CASE 
-                                    WHEN RP.PersonLastName IS NOT NULL AND RP.PersonLastName <> '' 
-                                    THEN ' ' + RP.PersonLastName 
-                                    ELSE '' 
-                                END
-                            ) AS FullName,
-                            RP.PatientBirthDate,
-                            RP.PatientPicture,
-                            RP.PersonSocialSecurityNo,
-                            G.Gender,
-                            N.NationalityCode,
-                            PD.CellPhone,
-                            PD.Email
-                        FROM RegPatient AS RP
-                        LEFT JOIN RegGender AS G 
-                            ON RP.PersonSex = G.GenderId
-                        LEFT JOIN Nationality AS N 
-                            ON RP.Nationality = N.NationalityId
-                        LEFT JOIN RegPatientDetails AS PD
-                            ON RP.PatientId = PD.PatientId
-							Where RP.MRNo = "+ MRNo
-                        ;
-
-                var ds = await DapperHelper.GetDataSetByQuery(query, new { MRNo });
-
-
-                if (ds == null || ds.Tables.Count < 1 || ds.Tables[0].Rows.Count == 0)
-                {
-                    return new Result<(string, BaseDemographicDTO)>
-                    {
-                        IsSuccess = false,
-                        ErrorMessage = "No patient data found",
-                        Data = (null, null)
-                    };
-                }
-
-                var data = ds.Tables[0].Rows[0];
-                var patientAge = GetPatientAge(Convert.ToDateTime(data["PatientBirthDate"]));
-
-                string gender = data.Table.Columns.Contains("Gender") && data["Gender"] != DBNull.Value
-                    ? (data["Gender"].ToString() == "Female" ? "Female" : "Male")
-                    : "Unknown";
-
-                var patient = new BaseDemographicDTO
-                {
-                    Name = data["FullName"].ToString(),
-                    DateOfBirth = Convert.ToDateTime(data["PatientBirthDate"]),
-                    AgeYears = patientAge,
-                    MrNo = Convert.ToInt32(data["MRNo"]),
-                    Phone = data["CellPhone"].ToString(),
-                    Email = data["Email"].ToString(),
-                    EID = data["PersonSocialSecurityNo"].ToString(),
-                    Nationality = data["NationalityCode"].ToString(),
-                    Picture = (byte[])data["PatientPicture"]
-                };
-
-                return new Result<(string, BaseDemographicDTO)>
-                {
-                    IsSuccess = true,
-                    Data = (gender, patient)
-                };
+                await _db.SaveChangesAsync();
+                return (true, entity.PatientRelationId, string.Empty);
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2627 || sqlEx.Number == 2601))
+            {
+                return (false, 0, "Relation already exists.");
             }
             catch (Exception ex)
             {
-                // Log the exception if necessary
-                return new Result<(string, BaseDemographicDTO)>
-                {
-                    IsSuccess = false,
-                    ErrorMessage = ex.Message,
-                    Data = (null, null)
-                };
+                return (false, 0, ex.Message);
             }
         }
-        public static string GetPatientAge(DateTime birthDate)
-        {
-            var today = DateTime.Today;
-
-            int years = today.Year - birthDate.Year;
-            int months = today.Month - birthDate.Month;
-            int days = today.Day - birthDate.Day;
-
-            // Adjust if current month/day is before birth month/day
-            if (days < 0)
-            {
-                months--;
-                var prevMonth = today.AddMonths(-1);
-                days += DateTime.DaysInMonth(prevMonth.Year, prevMonth.Month);
-            }
-
-            if (months < 0)
-            {
-                years--;
-                months += 12;
-            }
-
-            var parts = new List<string>();
-
-            if (years > 0)
-                parts.Add($"{years}y");
-            if (months > 0)
-                parts.Add($"{months}m");
-            if (days > 0)
-                parts.Add($"{days}d");
-
-            // In case all are zero (same day)
-            if (parts.Count == 0)
-                return "0d";
-
-            return string.Join(" ", parts);
-        }
-
     }
 }

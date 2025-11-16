@@ -11,10 +11,10 @@ namespace HMIS.Core.Entities;
 public partial class IvfmaleSemenSample
 {
     [Key]
-    public long SampleId { get; set; }
+    public int SampleId { get; set; }
 
     [Column("IVFMainId")]
-    public long IvfmainId { get; set; }
+    public int IvfmainId { get; set; }
 
     [StringLength(64)]
     public string SampleCode { get; set; } = null!;
@@ -67,15 +67,19 @@ public partial class IvfmaleSemenSample
     [Column(TypeName = "decimal(5, 2)")]
     public decimal? Motility24hPercent { get; set; }
 
-    public long? CryoStatusId { get; set; }
+    public int? CryoStatusId { get; set; }
 
-    public long? StatusId { get; set; }
+    public int? StatusId { get; set; }
 
-    public long? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
 
-    public long? UpdatedBy { get; set; }
+    public int? UpdatedBy { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    [ForeignKey("IvfmainId")]
+    [InverseProperty("IvfmaleSemenSample")]
+    public virtual Ivfmain Ivfmain { get; set; } = null!;
 }

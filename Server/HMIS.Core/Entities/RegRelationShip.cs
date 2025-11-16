@@ -24,4 +24,7 @@ public partial class RegRelationShip
 
     [InverseProperty("Relationship")]
     public virtual ICollection<RegPatientDetails> RegPatientDetails { get; set; } = new List<RegPatientDetails>();
+
+    [InverseProperty("Relationship")]
+    public virtual ICollection<RegPatientRelation> RegPatientRelation { get; set; } = new List<RegPatientRelation>();
 }

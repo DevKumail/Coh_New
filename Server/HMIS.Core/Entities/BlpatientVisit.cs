@@ -156,6 +156,9 @@ public partial class BlpatientVisit
     [InverseProperty("BlpatientVisit")]
     public virtual SchAppointment? Appointment { get; set; }
 
+    [InverseProperty("VisitAccountNoNavigation")]
+    public virtual ICollection<Ivfmain> Ivfmain { get; set; } = new List<Ivfmain>();
+
     [ForeignKey("PayerId")]
     [InverseProperty("BlpatientVisit")]
     public virtual Blpayer? Payer { get; set; }
