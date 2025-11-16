@@ -331,6 +331,9 @@ public partial class Hremployee
     [InverseProperty("Employee")]
     public virtual ICollection<HrlicenseInfo> HrlicenseInfo { get; set; } = new List<HrlicenseInfo>();
 
+    [InverseProperty("Provider")]
+    public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistory { get; set; } = new List<IvfmaleFertilityHistory>();
+
     [InverseProperty("CreatedByNavigation")]
     public virtual ICollection<PatientAllergy> PatientAllergyCreatedByNavigation { get; set; } = new List<PatientAllergy>();
 

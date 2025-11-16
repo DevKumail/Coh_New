@@ -19,4 +19,7 @@ public partial class DropdownCategory
 
     [InverseProperty("Category")]
     public virtual ICollection<DropdownConfiguration> DropdownConfiguration { get; set; } = new List<DropdownConfiguration>();
+
+    [InverseProperty("Category")]
+    public virtual ICollection<IvfmaleFhgeneral> IvfmaleFhgeneral { get; set; } = new List<IvfmaleFhgeneral>();
 }
