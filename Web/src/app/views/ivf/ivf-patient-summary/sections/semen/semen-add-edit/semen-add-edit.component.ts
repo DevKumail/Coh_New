@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, SimpleChanges, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SemenTabsComponent } from './semen-tabs/semen-tabs.component';
@@ -16,10 +16,11 @@ import Swal from 'sweetalert2';
   templateUrl: './semen-add-edit.component.html',
   styleUrls: ['./semen-add-edit.component.scss']
 })
-export class SemenAddEditComponent {
+export class SemenAddEditComponent implements OnChanges {
   form: FormGroup;
   AllDropdownValues:any = [];
   hrEmployees: any = [];
+  @Input() model: any = null;
   @Output() back = new EventEmitter<void>();
   @Output() saved = new EventEmitter<any>();
   // Holds dropdown data keyed by payload keys like 'IVFSemanAnalysis:Appearance'
@@ -108,6 +109,71 @@ export class SemenAddEditComponent {
     this.getAlldropdown();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['model'] && changes['model'].currentValue) {
+      // Apply immediately if children are ready; otherwise defer slightly
+      setTimeout(() => this.applyModel(changes['model'].currentValue), 0);
+    }
+  }
+
+  private applyModel(m: any) {
+    if (!m) return;
+    const splitDT = (dt: string | null | undefined) => {
+      if (!dt) return { d: null as any, t: null as any };
+      const s = String(dt);
+      const d = s.substring(0, 10);
+      const t = s.length >= 16 ? s.substring(11, 16) : null;
+      return { d, t };
+    };
+    const toHHmm = (t: string | null | undefined) => {
+      if (!t) return null;
+      const s = String(t);
+      if (/^\d{2}:\d{2}$/.test(s)) return s;
+      if (/^\d{2}:\d{2}:\d{2}$/.test(s)) return s.substring(0,5);
+      return null;
+    };
+
+    const col = splitDT(m.collectionDateTime);
+    const thaw = splitDT(m.thawingDateTime);
+
+    this.form.patchValue({
+      collectionDate: col.d,
+      collectionTime: col.t,
+      thawingDate: thaw.d,
+      thawingTime: thaw.t,
+      sampleId: m.sampleCode ?? '',
+      purpose: m.purposeId ?? '',
+      abstinenceDays: m.abstinencePeriod ? Number(m.abstinencePeriod) : null,
+      analysedBy: m.analyzedById ?? '',
+      appearance: m.appearanceId ?? '',
+      smell: m.smellId ?? '',
+      viscosity: m.viscosityId ?? '',
+      liquefactionTime: m.liquefactionMinutes ?? null,
+      treatment: m.treatmentNotes ?? '',
+      score: m.score ?? '',
+      startOfAnalysis: toHHmm(m.analysisStartTime),
+      agglutination: !!m.agglutination,
+      dnaFragmented: m.dnaFragmentedPercent ?? null,
+      collectionMethod: m.collectionMethodId ?? '',
+      collectionPlace: m.collectionPlaceId ?? '',
+      collectionDifficulties: m.collectionDifficulties ?? '',
+      timeBetweenCollectionAndUsage: toHHmm(m.timeBetweenCollectionUsage),
+      numberOfInsemMotile: m.inseminationMotileSperms ?? null,
+      inseminatedAmountMl: m.inseminatedAmountML ?? null,
+      rate24hMotility: m.motility24hPercent ?? null,
+    });
+
+    // Patch diagnosis/approval
+    const diag = (m.diagnoses && m.diagnoses[0]) || null;
+    const appr = m.approvalStatus || null;
+    const approvalStatus = appr?.isApproved ? 'Approved' : (appr?.isAttention ? 'Rejected' : 'Pending');
+    try { this.diag?.form.patchValue({ finding: diag?.finding ?? 'Normal', note: diag?.notes ?? '', approvalStatus }); } catch {}
+
+    // Patch tabs (native, after-prep, preparation)
+    const nativeObs = (m.observations || []).find((o: any) => o.observationType === 'Native');
+    const afterObs = (m.observations || []).find((o: any) => o.observationType === 'AfterPreparation');
+    try { this.tabs?.patchFromModel(nativeObs, afterObs); } catch {}
+  }
 
   getAlldropdown(){
     this.sharedservice.getDropDownValuesByName(Page.IVFMaleSemanAnalysis).subscribe((res:any)=>{
@@ -169,8 +235,8 @@ export class SemenAddEditComponent {
     const approval = String(d.approvalStatus || 'Pending');
 
     const payload = {
-      sampleId: 0,
-      ivfMainId: 0,
+      sampleId: this.model?.sampleId ?? 0,
+      ivfMainId: this.model?.ivfMainId ?? 0,
       sampleCode: h.sampleId || '',
       collectionDateTime,
       thawingDateTime,
@@ -226,6 +292,60 @@ export class SemenAddEditComponent {
         updatedAt: nowIso,
       },
     };
+
+    // If editing, merge existing IDs into payload
+    if (this.model?.sampleId) {
+      try {
+        const existing = this.model;
+        // Observations
+        for (const obs of payload.observations || []) {
+          const match = (existing.observations || []).find((o: any) => o.observationType === obs.observationType);
+          if (match) {
+            obs.observationId = match.observationId || 0;
+            obs.sampleId = existing.sampleId;
+            if (obs.motility && match.motility) {
+              obs.motility.motilityId = match.motility.motilityId || 0;
+              obs.motility.observationId = match.observationId || 0;
+            }
+            if (obs.morphology && match.morphology) {
+              obs.morphology.morphologyId = match.morphology.morphologyId || 0;
+              obs.morphology.observationId = match.observationId || 0;
+            }
+            if (obs.observationType === 'AfterPreparation' && Array.isArray(obs.preparations) && obs.preparations.length) {
+              const newPrep = obs.preparations[0];
+              const oldPrep = (match.preparations || [])[0];
+              if (newPrep) {
+                newPrep.preparationId = oldPrep?.preparationId || 0;
+                newPrep.observationId = match.observationId || 0;
+                // Map preparationMethods ids where possible
+                if (Array.isArray(newPrep.preparationMethods)) {
+                  for (const pm of newPrep.preparationMethods) {
+                    const pmOld = (oldPrep?.preparationMethods || []).find((x: any) => x.preparationMethodId === pm.preparationMethodId);
+                    pm.id = pmOld?.id || 0;
+                    pm.preparationId = newPrep.preparationId || 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Diagnosis
+        if (payload.diagnoses && payload.diagnoses[0]) {
+          const dOld = (existing.diagnoses || [])[0];
+          if (dOld) {
+            payload.diagnoses[0].diagnosisId = dOld.diagnosisId || 0;
+            payload.diagnoses[0].sampleId = existing.sampleId || 0;
+          }
+        }
+
+        // Approval status
+        if (payload.approvalStatus && existing.approvalStatus) {
+          payload.approvalStatus.approvalStatusId = existing.approvalStatus.approvalStatusId || 0;
+          payload.approvalStatus.sampleId = existing.sampleId || 0;
+        }
+      } catch {}
+    }
 
     this.ivfservice.InsertOrUpdateMaleSemenAnalysis(payload).subscribe({
       next: (res) => {

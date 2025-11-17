@@ -285,4 +285,41 @@ export class NativeParameterComponent {
       preparations: [] as any[],
     };
   }
+
+  // Patch from observation model
+  patchFromObservation(obs: any) {
+    if (!obs) return;
+    const m = obs || {};
+    const mot = m.motility || {};
+    const mor = m.morphology || {};
+    this.form.patchValue({
+      volume: m.volumeML ?? null,
+      ph: m.phValue ?? null,
+      concentration: m.concentrationPerML ?? null,
+      vitality: m.vitalityPercent ?? null,
+      leukocytes: m.leukocytesml ?? null,
+      roundCells: m.roundCellsml ?? null,
+      concLtPointOne: !!m.concLessThanPointOne,
+      quantPossible: m.quantificationPossibleId ?? '',
+      totalSpermCountM: m.totalSpermCount ?? null,
+      peroxidasePositive: m.peroxidasePositive ?? null,
+      immunobeadPercentAdherent: m.immunobeadAdherentPercent ?? null,
+      marAdherentPercent: m.marTesPercent ?? null,
+      marIgGPercent: m.maR_IgG_Percent ?? null,
+      marIgAPercent: m.maR_IgA_Percent ?? null,
+      whoA: mot.whO_AB_Percent ?? null,
+      whoB: null,
+      whoC: mot.whO_C_Percent ?? null,
+      whoD: mot.whO_D_Percent ?? null,
+      numberOfProgMotile: mot.progressiveMotile ?? null,
+      overallMotility: mot.overallMotilityPercent ?? null,
+      normalForms: mor.morphologyNormalPercent ?? null,
+      headDefects: mor.headDefectsPercent ?? null,
+      neckDefects: mor.neckMidpieceDefectsPercent ?? null,
+      tailDefects: mor.tailDefectsPercent ?? null,
+      excessResidualCytoplasm: mor.ercPercent ?? null,
+      multipleDefects: mor.multipleDefectsPercent ?? null,
+      tzi: mor.teratozoospermiaIndex ?? null,
+    });
+  }
 }

@@ -58,4 +58,8 @@ export class IVFApiService {
   GetAllMaleSemenAnalysis(page: number = 1, pageSize: number = 10): Observable<any> {
     return this.api.get('IVFMaleSemanAnalysis/GetAll', { page, pageSize });
   }
+
+  GetMaleSemenSampleById(sampleId: number): Observable<any> {
+    return this.api.get(`IVFMaleSemanAnalysis/GetSampleById/${sampleId}`);
+  }
 }

@@ -58,4 +58,11 @@ export class SemenTabsComponent implements AfterViewInit {
   getPreparation() {
     return this.prepTab?.buildPreparation();
   }
+
+  patchFromModel(nativeObs: any, afterObs: any) {
+    try { this.nativeTab?.patchFromObservation?.(nativeObs); } catch {}
+    try { this.afterParamTab?.patchFromObservation?.(afterObs); } catch {}
+    const prep = afterObs?.preparations?.[0] || null;
+    try { this.prepTab?.patchFromPreparation?.(prep); } catch {}
+  }
 }

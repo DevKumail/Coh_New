@@ -94,4 +94,29 @@ export class PreparationPreparationComponent implements OnChanges {
       return null;
     }
   }
+
+  // Patch from preparation model (first preparation in AfterPreparation observation)
+  patchFromPreparation(prep: any) {
+    if (!prep) return;
+    const p = prep || {};
+    const toHHmm = (t: string | null | undefined) => {
+      if (!t) return null;
+      const s = String(t);
+      if (/^\d{2}:\d{2}$/.test(s)) return s;
+      if (/^\d{2}:\d{2}:\d{2}$/.test(s)) return s.substring(0,5);
+      return null;
+    };
+    this.form.patchValue({
+      prepDate: p.preparationDate || null,
+      prepTime: toHHmm(p.preparationTime),
+      prepBy: p.preparedById || '',
+    });
+    const selectedMethodIds: number[] = (p.preparationMethods || []).map((m: any) => m.preparationMethodId);
+    // Ensure methods controls match current options length
+    this.rebuildMethods();
+    this.methodsFA.controls.forEach((ctl, idx) => {
+      const method = this.methodsOptions[idx];
+      ctl.setValue(!!(method && selectedMethodIds.includes(method.id)), { emitEvent: false });
+    });
+  }
 }

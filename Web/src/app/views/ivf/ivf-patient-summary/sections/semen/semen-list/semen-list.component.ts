@@ -14,6 +14,7 @@ export class SemenListComponent {
   showAdd = false;
   isLoading = false;
   rows: any[] = [];
+  editModel: any = null;
 
   constructor(private ivf: IVFApiService) {
     this.load();
@@ -24,6 +25,7 @@ export class SemenListComponent {
 
   onSaved(_payload: any) {
     this.showAdd = false;
+    this.editModel = null;
     this.load();
   }
 
@@ -34,6 +36,7 @@ export class SemenListComponent {
         // Expecting res to have data array; adjust mapping if API differs
         const data = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
         this.rows = (data || []).map((x: any) => ({
+          id: x.sampleId || x.id || 0,
           collectionDate: x.collectionDateTime ? new Date(x.collectionDateTime).toLocaleDateString() : '',
           thawingDate: x.thawingDateTime ? new Date(x.thawingDateTime).toLocaleDateString() : '',
           time: x.analysisStartTime || '',
@@ -54,5 +57,23 @@ export class SemenListComponent {
       },
       error: _ => { this.isLoading = false; this.rows = []; }
     });
+  }
+
+  edit(row: any) {
+    const id = row?.id;
+    if (!id) { return; }
+    this.isLoading = true;
+    this.ivf.GetMaleSemenSampleById(id).subscribe({
+      next: (sample: any) => {
+        this.isLoading = false;
+        this.editModel = sample;
+        this.showAdd = true;
+      },
+      error: _ => { this.isLoading = false; }
+    });
+  }
+
+  delete(row: any) {
+    // TODO: Wire delete endpoint when available
   }
 }
