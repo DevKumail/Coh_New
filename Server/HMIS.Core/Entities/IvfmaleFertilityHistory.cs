@@ -53,6 +53,9 @@ public partial class IvfmaleFertilityHistory
     [InverseProperty("IvfmaleFh")]
     public virtual ICollection<IvfmaleFhsemenAnalysis> IvfmaleFhsemenAnalysis { get; set; } = new List<IvfmaleFhsemenAnalysis>();
 
+    [InverseProperty("IvfmaleFh")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSem { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
     [ForeignKey("ProviderId")]
     [InverseProperty("IvfmaleFertilityHistory")]
     public virtual Hremployee Provider { get; set; } = null!;

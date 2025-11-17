@@ -1,4 +1,4 @@
-<div class="mt-1 p-0" [style.--patient-summary-offset.px]="offset" *ngIf="isCoupleLink">
+<div class="mt-1 p-0" [style.--patient-summary-offset.px]="offset" *ngIf="isCoupleLink && isivfstart">
   <div class="row layout-relative">
 
     <button type="button" class="toggle-btn left" (click)="toggleLeft()" [attr.aria-expanded]="!leftCollapsed">
@@ -49,7 +49,7 @@
               <!-- <div class="fw-semibold mb-1">Validation Error</div> -->
               <div class="fw-semibold mb-1">this patient has no partner go to IVF dashboard and link a partner...</div>
               <button type="button" 
-              class="btn btn-success btn-lg position-absolute top-50 start-50 translate-middle shadow" 
+              class="btn btn-success " 
               (click)="GotoDashboard()">Go to IVF Dashboard</button>
             </div>
 
@@ -57,7 +57,7 @@
               <div class="display-6 text-warning">!</div>
               <div class="fw-semibold mb-1">Start IVF Process.......</div>
               <button type="button" 
-              class="btn btn-success btn-lg position-absolute top-50 start-50 translate-middle shadow" 
+              class="btn btn-success" 
               (click)="StartIvf()">Start</button>
             </div>
           </div>
