@@ -18,4 +18,8 @@ public partial class IvfmaleSemenObservationPreparationMethod
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }
+
+    [ForeignKey("PreparationMethodId")]
+    [InverseProperty("IvfmaleSemenObservationPreparationMethod")]
+    public virtual DropdownConfiguration PreparationMethod { get; set; } = null!;
 }

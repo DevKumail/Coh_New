@@ -79,7 +79,44 @@ public partial class IvfmaleSemenSample
 
     public DateTime? UpdatedAt { get; set; }
 
+    public bool IsDeleted { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    [ForeignKey("AppearanceId")]
+    [InverseProperty("IvfmaleSemenSampleAppearance")]
+    public virtual DropdownConfiguration? Appearance { get; set; }
+
+    [ForeignKey("CollectionMethodId")]
+    [InverseProperty("IvfmaleSemenSampleCollectionMethod")]
+    public virtual DropdownConfiguration? CollectionMethod { get; set; }
+
+    [ForeignKey("CollectionPlaceId")]
+    [InverseProperty("IvfmaleSemenSampleCollectionPlace")]
+    public virtual DropdownConfiguration? CollectionPlace { get; set; }
+
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfmaleSemenSample")]
     public virtual Ivfmain Ivfmain { get; set; } = null!;
+
+    [InverseProperty("Sample")]
+    public virtual ICollection<IvfmaleSemenObservation> IvfmaleSemenObservation { get; set; } = new List<IvfmaleSemenObservation>();
+
+    [InverseProperty("Sample")]
+    public virtual ICollection<IvfmaleSemenSampleApprovalStatus> IvfmaleSemenSampleApprovalStatus { get; set; } = new List<IvfmaleSemenSampleApprovalStatus>();
+
+    [InverseProperty("Sample")]
+    public virtual ICollection<IvfmaleSemenSampleDiagnosis> IvfmaleSemenSampleDiagnosis { get; set; } = new List<IvfmaleSemenSampleDiagnosis>();
+
+    [ForeignKey("PurposeId")]
+    [InverseProperty("IvfmaleSemenSamplePurpose")]
+    public virtual DropdownConfiguration? Purpose { get; set; }
+
+    [ForeignKey("SmellId")]
+    [InverseProperty("IvfmaleSemenSampleSmell")]
+    public virtual DropdownConfiguration? Smell { get; set; }
+
+    [ForeignKey("ViscosityId")]
+    [InverseProperty("IvfmaleSemenSampleViscosity")]
+    public virtual DropdownConfiguration? Viscosity { get; set; }
 }

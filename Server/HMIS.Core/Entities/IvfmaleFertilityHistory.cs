@@ -31,11 +31,15 @@ public partial class IvfmaleFertilityHistory
 
     public int? NoOfPregnanciesAchieved { get; set; }
 
-    public int? CategoryId { get; set; }
+    public long? ChromosomeAnalysisCategoryId { get; set; }
 
     [Column("CFTRCarrier")]
     [StringLength(50)]
     public string? Cftrcarrier { get; set; }
+
+    [ForeignKey("ChromosomeAnalysisCategoryId")]
+    [InverseProperty("IvfmaleFertilityHistory")]
+    public virtual DropdownConfiguration? ChromosomeAnalysisCategory { get; set; }
 
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfmaleFertilityHistory")]
