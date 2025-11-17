@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-semen-diagnosis-approval',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgbNavModule],
+  imports: [CommonModule,FilledOnValueDirective, ReactiveFormsModule, NgbNavModule],
   templateUrl: './semen-diagnosis-approval.component.html',
   styleUrls: ['./semen-diagnosis-approval.component.scss']
 })

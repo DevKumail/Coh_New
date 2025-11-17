@@ -9,6 +9,7 @@ import { NgbModal, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgIconComponent } from '@ng-icons/core';
 import { ClinicalApiService } from '../../clinical/clinical.api.service';
 import { LucideAngularModule, LucideChevronRight, LucideHome, LucideUsers, LucideEdit2, LucideTrash2, LucidePlus, LucideMinus, LucideX } from 'lucide-angular';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dropdown-configration',
@@ -54,6 +55,7 @@ export class DropdownConfigrationComponent {
   lockedCategoryName: string | null = null;
   // Validation flag for attempting to add mismatched category
   categoryMismatch: boolean = false;
+  currentCategoryId: any = null;
 
   constructor(
     private fb: FormBuilder,
@@ -81,26 +83,32 @@ onDropdownListPageChanged(page:any){
   this.GetDropdownListData();
 }
   GetDropdownListData(){
+this.loader.show();
     this.clinicalApiService.GetAllCategories(this.dropdownlistPaginationInfo.Page,this.dropdownlistPaginationInfo.RowsPerPage).then((res:any)=>{
       this.dropdownListData = res?.data?.item1 || [];
       this.dropdownlistlotalCount = res?.data?.item2 || 0;
+      this.loader.hide();
     })
+          this.loader.hide();
+
   }
 
     modalRefInstance: any;
 
   onAddUpdateDropdownConfiguration(modalRef: TemplateRef<any>,categoryId:any){
- 
+    this.loader.show();
     // prepare state and then load
     this.modalItems = [];
+    this.currentCategoryId = categoryId;
     this.clinicalApiService.GetCategoryWithValues(categoryId).then((res:any)=>{
       this.modalItems = res?.data?.values || [];
       this.AddForm.patchValue({
       categoryName: res?.data?.categoryName,
       // description: res?.data?.description,
     });
+    this.loader.hide();
     })
-
+    this.loader.hide();
     this.lockedCategoryName = null;
     this.categoryMismatch = false;
     this.AddForm.get('categoryName')?.disable({ emitEvent: false });
@@ -121,16 +129,42 @@ onDropdownListPageChanged(page:any){
   }
 
   Save(){
-    this.clinicalApiService.AddUpdateCategory(this.modalItems).then((res:any)=>{
+    this.loader.show();
+    const payload = (this.modalItems || []).map((item: any, index: number) => ({
+      valueId: item?.valueId ?? 0,
+      categoryId: this.currentCategoryId ?? 0,
+      valueName: item?.valueName ?? '',
+      sortOrder: item?.sortOrder ?? index + 1,
+      isActive: item?.isActive ?? true,
+      // createdBy: item?.createdBy ?? 0,
+      // updatedBy: item?.updatedBy ?? 0,
+      // createdAt: item?.createdAt ?? nowIso,
+      // updatedAt: nowIso,
+    }));
+    this.clinicalApiService.AddUpdateCategory(payload).then((res:any)=>{
+      Swal.fire('Success','Dropdown Configuration saved successfully','success');
+      if (this.modalRefInstance) {
+        this.modalRefInstance.close(true);
+        this.modalRefInstance = null;
+      }
       this.GetDropdownListData();
+      this.loader.hide();
     })
-    
+    this.loader.hide();    
   }
 
   onDelete(id:any){
+    this.loader.show();
     this.clinicalApiService.DeleteCategory(id).then((res:any)=>{
+      Swal.fire('Success','Dropdown Configuration deleted successfully','success');
+      if (this.modalRefInstance) {
+        this.modalRefInstance.close(true);
+        this.modalRefInstance = null;
+      }
       this.GetDropdownListData();
+      this.loader.hide();
     })
+    this.loader.hide();
   }
 
   addItem(){

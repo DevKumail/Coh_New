@@ -50,7 +50,7 @@ export class IvfPatientSummaryComponent implements OnInit {
   leftCollapsed = false;
   selectedId: string = 'demographic';
   offset = 120; // px: used in CSS var --patient-summary-offset
-
+  isCoupleLink = false;
   patientBannerService = inject(PatientBannerService);
   router = inject(Router);
   modalTrigger = inject(ModalTriggerService);
@@ -64,6 +64,16 @@ export class IvfPatientSummaryComponent implements OnInit {
         this.modalTrigger.openModal('advance-filter-modal', 'ivf-patient-summary');
       }
     });
+
+    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+      if (data) {
+        if(data?.couple?.female && data?.couple?.male){
+          this.isCoupleLink = true;
+        }
+      }
+    });
+
+
   }
 
   toggleLeft(): void {
@@ -73,6 +83,15 @@ export class IvfPatientSummaryComponent implements OnInit {
 
   onSelect(id: string): void {
     this.selectedId = id;
+  }
+
+  GotoDashboard(){
+    this.router.navigate(['/ivf/ivf-home']);
+  }
+
+  isivfstart: boolean = false;
+  StartIvf(){
+    this.isivfstart = true;
   }
 
   async onPatientPicked(ev: { mrno: string, context?: string }) {

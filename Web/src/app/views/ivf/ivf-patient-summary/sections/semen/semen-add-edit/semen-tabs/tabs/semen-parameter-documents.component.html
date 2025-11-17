@@ -1,6 +1,0 @@
-<form [formGroup]="form" class="row g-2">
-  <div class="col-lg-3 col-md-4 col-sm-6"><label class="form-label">Diagnosis</label><select class="form-select" formControlName="diagnosis"><option>Not specified</option><option>Specified</option></select></div>
-  <div class="col-lg-3 col-md-4 col-sm-6"><label class="form-label">Finding</label><div class="d-flex gap-3 align-items-center"><label class="form-check-label"><input class="form-check-input me-1" type="radio" formControlName="finding" value="Normal"> Normal</label><label class="form-check-label"><input class="form-check-input me-1" type="radio" formControlName="finding" value="Abnormal"> Abnormal</label></div></div>
-  <div class="col-12"><label class="form-label">Note</label><textarea class="form-control" rows="3" formControlName="note" placeholder="Enter note"></textarea></div>
-  <div class="col-lg-3 col-md-4 col-sm-6"><label class="form-label">Approval status</label><select class="form-select" formControlName="approvalStatus"><option value="">Select status</option><option>Approved</option><option>Pending</option><option>Rejected</option></select></div>
-</form>

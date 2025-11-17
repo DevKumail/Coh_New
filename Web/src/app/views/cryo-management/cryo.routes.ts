@@ -32,7 +32,7 @@ export const CRYO_ROUTES: Routes = [
         }
     },
     {
-        path: 'dropdown-configration',
+        path: 'dropdown-configuration',
         component: DropdownConfigrationComponent,
         canActivate: [authGuard, modulePermissionGuard],
         data: {

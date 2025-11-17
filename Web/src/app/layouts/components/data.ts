@@ -296,9 +296,9 @@ export const horizontalMenuItems: MenuItemType[] = [
         isCollapsed: true,
         children: [
             {
-                label: 'Dropdown Configration',
+                label: 'Dropdown Configuration',
                 icon: 'tablerUsers',
-                url: '/setup/dropdown-configration'
+                url: '/setup/dropdown-configuration'
             },
             {
                 label: 'Cryo Management',

@@ -3,15 +3,13 @@
     <div class="fw-bold">Semen analyses</div>
     <div>
       <button class="btn btn-sm btn-primary" (click)="openAdd()" *ngIf="!showAdd">Add</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="onCancel()" *ngIf="showAdd">Back to list</button>
     </div>
   </div>
   <div class="card-body p-0">
     <ng-container *ngIf="showAdd; else listView">
       <div class="p-2">
         <app-semen-add-edit (click)="$event.stopPropagation()"></app-semen-add-edit>
-        <div class="mt-2 d-flex justify-content-end">
-          <button class="btn btn-sm btn-outline-secondary" (click)="onCancel()">Back to list</button>
-        </div>
       </div>
     </ng-container>
     <ng-template #listView>

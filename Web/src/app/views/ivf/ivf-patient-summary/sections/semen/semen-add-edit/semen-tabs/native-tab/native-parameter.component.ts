@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LucideAngularModule, LucideCalculator } from 'lucide-angular';
 import { NgbModal, NgbModalModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-native-parameter',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, LucideAngularModule, NgbModalModule, NgbNavModule],
+  imports: [CommonModule,FilledOnValueDirective, ReactiveFormsModule, FormsModule, LucideAngularModule, NgbModalModule, NgbNavModule],
   templateUrl: './native-parameter.component.html',
   styles: [
     `

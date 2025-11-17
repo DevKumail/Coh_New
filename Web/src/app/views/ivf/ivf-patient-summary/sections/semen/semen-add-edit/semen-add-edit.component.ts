@@ -1,18 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SemenTabsComponent } from './semen-tabs/semen-tabs.component';
 import { SemenDiagnosisApprovalComponent } from './diagnosis-approval/semen-diagnosis-approval.component';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-semen-add-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SemenTabsComponent, SemenDiagnosisApprovalComponent],
+  imports: [CommonModule,FilledOnValueDirective, ReactiveFormsModule, SemenTabsComponent, SemenDiagnosisApprovalComponent],
   templateUrl: './semen-add-edit.component.html',
   styleUrls: ['./semen-add-edit.component.scss']
 })
 export class SemenAddEditComponent {
   form: FormGroup;
+  @Output() back = new EventEmitter<void>();
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({

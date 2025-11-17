@@ -163,6 +163,8 @@ export class IVFHomeComponent {
       }
       if (hasFemale || hasMale) {
         this.noCoupleAlertShown = false;
+      } else if(hasFemale && hasMale){
+        this.patientBannerService.setIVFPatientData(res);
       }
     } catch {}
   }

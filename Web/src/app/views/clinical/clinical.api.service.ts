@@ -346,7 +346,7 @@ private question = 'assets/question.json';
   }
 
    AddUpdateCategory(data:any){
-    return this.api.post(`DropDownLookUp/AddUpdateCategory`,data).toPromise();
+    return this.api.post(`DropDownLookUp/CreateOrUpdateConfiguration`,data).toPromise();
    } 
 
    DeleteCategory(id:any){
