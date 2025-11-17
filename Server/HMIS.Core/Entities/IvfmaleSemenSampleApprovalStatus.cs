@@ -31,4 +31,8 @@ public partial class IvfmaleSemenSampleApprovalStatus
 
     [Column(TypeName = "datetime")]
     public DateTime? UpdatedAt { get; set; }
+
+    [ForeignKey("SampleId")]
+    [InverseProperty("IvfmaleSemenSampleApprovalStatus")]
+    public virtual IvfmaleSemenSample Sample { get; set; } = null!;
 }

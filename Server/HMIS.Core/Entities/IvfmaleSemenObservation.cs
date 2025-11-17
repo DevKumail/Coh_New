@@ -65,4 +65,12 @@ public partial class IvfmaleSemenObservation
 
     [Column(TypeName = "datetime")]
     public DateTime? UpdatedAt { get; set; }
+
+    [ForeignKey("QuantificationPossibleId")]
+    [InverseProperty("IvfmaleSemenObservation")]
+    public virtual DropdownConfiguration? QuantificationPossible { get; set; }
+
+    [ForeignKey("SampleId")]
+    [InverseProperty("IvfmaleSemenObservation")]
+    public virtual IvfmaleSemenSample Sample { get; set; } = null!;
 }

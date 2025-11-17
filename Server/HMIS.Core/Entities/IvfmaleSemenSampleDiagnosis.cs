@@ -29,4 +29,8 @@ public partial class IvfmaleSemenSampleDiagnosis
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    [ForeignKey("SampleId")]
+    [InverseProperty("IvfmaleSemenSampleDiagnosis")]
+    public virtual IvfmaleSemenSample Sample { get; set; } = null!;
 }
