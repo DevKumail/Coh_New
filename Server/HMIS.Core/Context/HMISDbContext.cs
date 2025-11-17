@@ -1361,6 +1361,8 @@ public partial class HMISDbContext : DbContext
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
             entity.Property(e => e.IsRadiologyTest).HasComment("2 = Pathalogy\r\n1 = Lab\r\n0 = Radiology");
+
+            entity.HasOne(d => d.SampleType).WithMany(p => p.LabOrderSetDetail).HasConstraintName("FK_LabOrderSetDetail_SampleTypes");
         });
 
         modelBuilder.Entity<LabSampleTypes>(entity =>
