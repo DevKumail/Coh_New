@@ -1161,6 +1161,8 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<IvfmaleFhgenetics>(entity =>
         {
             entity.HasOne(d => d.CategoryIdInheritanceNavigation).WithMany(p => p.IvfmaleFhgenetics).HasConstraintName("FK_IVFMaleFHGenetics_DropdownConfiguration");
+
+            entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhgenetics).HasConstraintName("FK_IVFMaleFHGenetics_IVFMaleFertilityHistory");
         });
 
         modelBuilder.Entity<IvfmaleFhillness>(entity =>
