@@ -48,6 +48,7 @@ namespace HMIS.Application
             services.AddScoped<IDropDownLookUpService, DropDownLookUpService>();
             services.AddScoped<IIVFLabService, IVFLabService>();
             services.AddScoped<IIVFLabOrderService, IVFLabOrderService>();
+            services.AddScoped<IIVFMaleSemenService, IVFMaleSemenService>();
 
 
 
