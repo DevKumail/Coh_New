@@ -23,4 +23,37 @@ public partial class DropdownConfiguration
     [ForeignKey("CategoryId")]
     [InverseProperty("DropdownConfiguration")]
     public virtual DropdownCategory Category { get; set; } = null!;
+
+    [InverseProperty("CategoryIdInheritanceNavigation")]
+    public virtual ICollection<IvfmaleFhgenetics> IvfmaleFhgenetics { get; set; } = new List<IvfmaleFhgenetics>();
+
+    [InverseProperty("CategoryIdDiagnosisOfInfectionNavigation")]
+    public virtual ICollection<IvfmaleFhinfections> IvfmaleFhinfectionsCategoryIdDiagnosisOfInfectionNavigation { get; set; } = new List<IvfmaleFhinfections>();
+
+    [InverseProperty("CategoryIdPrevInfectionsNavigation")]
+    public virtual ICollection<IvfmaleFhinfections> IvfmaleFhinfectionsCategoryIdPrevInfectionsNavigation { get; set; } = new List<IvfmaleFhinfections>();
+
+    [InverseProperty("CategoryIdClinicalVaricoceleNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdClinicalVaricoceleNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdDistalSeminalTractNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdDistalSeminalTractNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdEtiologicalDiagnosisNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdEtiologicalDiagnosisNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdInstrumentalVaricoceleNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdInstrumentalVaricoceleNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdKryptorchidismNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdKryptorchidismNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdOrchitisNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdOrchitisNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdProximalSeminalTractNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdProximalSeminalTractNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdTesticleNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdTesticleNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
 }
