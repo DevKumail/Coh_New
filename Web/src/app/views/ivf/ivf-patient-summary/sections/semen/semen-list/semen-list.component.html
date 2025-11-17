@@ -9,7 +9,7 @@
   <div class="card-body p-0">
     <ng-container *ngIf="showAdd; else listView">
       <div class="p-2">
-        <app-semen-add-edit (click)="$event.stopPropagation()"></app-semen-add-edit>
+        <app-semen-add-edit (saved)="onSaved($event)" (back)="onCancel()" (click)="$event.stopPropagation()"></app-semen-add-edit>
       </div>
     </ng-container>
     <ng-template #listView>

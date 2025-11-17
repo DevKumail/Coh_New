@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
@@ -9,47 +9,89 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
   imports: [CommonModule, ReactiveFormsModule, FilledOnValueDirective],
   templateUrl: './preparation-preparation.component.html',
 })
-export class PreparationPreparationComponent {
+export class PreparationPreparationComponent implements OnChanges {
+  @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
+  @Input() labelFor: (key: string) => string = (k) => k;
+  @Input() hrEmployees: Array<{ name: string; providerId: number }> = [];
   form: FormGroup;
-  methodsOptions: string[] = [
-    'None',
-    'Density gradient',
-    'Swim-up',
-    'Wash / centrifugation',
-    'Incubation',
-    'Glass wool filtration',
-    'Migration / sedimentation',
-    'Concentration',
-    'Unknown',
-    'Other',
-    'Mechanical',
-    'Enzymatical',
-    'Density gradient plus swim-up',
-    'Pellet resuspended',
-    'MACS',
-    'Fertile Chip',
-    'Cryo sperm without further preparation',
-  ];
+  methodsOptions: Array<{ id: number; name: string }> = [];
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       prepDate: [null],
       prepTime: [null],
       prepBy: [''],
-      methods: this.fb.array(this.methodsOptions.map(() => new FormControl(false)))
+      methods: this.fb.array([])
     });
+    this.rebuildMethods();
   }
 
   get methodsFA(): FormArray<FormControl<boolean>> {
     return this.form.get('methods') as FormArray<FormControl<boolean>>;
   }
 
-  onMethodToggle(idx: number) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['dropdowns']) {
+      const items = this.dropdowns?.['IVFSemanAnalysis:Preperation'] || [];
+      this.methodsOptions = items.map(x => ({ id: x.valueId, name: x.name }));
+      this.rebuildMethods();
+    }
+  }
+
+  private rebuildMethods() {
+    const fa = this.fb.array(this.methodsOptions.map(() => new FormControl(false)));
+    this.form.setControl('methods', fa);
+  }
+
+  onMethodToggle(idx: any) {
     const selected = this.methodsFA.controls.filter(c => !!c.value).length;
     if (selected > 4) {
       // revert the last toggle if over limit
       const ctl = this.methodsFA.at(idx) as FormControl<boolean>;
       ctl.setValue(false, { emitEvent: false });
+    }
+  }
+
+  // Build preparation payload from form
+  buildPreparation(): any {
+    const v = this.form.value as any;
+    const time = this.formatTime(v.prepTime);
+    const selectedIdx: number[] = (this.methodsFA.controls || [])
+      .map((ctl, i) => (!!ctl.value ? i : -1))
+      .filter(i => i >= 0);
+    const selectedMethods = selectedIdx
+      .map(i => this.methodsOptions[i])
+      .filter(x => !!x)
+      .map(x => ({ id: 0, preparationId: 0, preparationMethodId: x.id, createdAt: new Date().toISOString() }));
+
+    return {
+      preparationId: 0,
+      observationId: 0,
+      preparationDate: v.prepDate || null,
+      preparationTime: time,
+      preparedById: v.prepBy || 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      preparationMethods: selectedMethods,
+    };
+  }
+
+  private formatTime(timeVal: any): string | null {
+    if (!timeVal) return null;
+    try {
+      const s = String(timeVal);
+      if (/^\d{2}:\d{2}:\d{2}$/.test(s)) return s;
+      if (/^\d{2}:\d{2}$/.test(s)) return `${s}:00`;
+      const d = new Date(s);
+      if (!isNaN(d.getTime())) {
+        const hh = `${d.getHours()}`.padStart(2, '0');
+        const mm = `${d.getMinutes()}`.padStart(2, '0');
+        const ss = `${d.getSeconds()}`.padStart(2, '0');
+        return `${hh}:${mm}:${ss}`;
+      }
+      return null;
+    } catch {
+      return null;
     }
   }
 }

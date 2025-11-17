@@ -111,6 +111,7 @@ export class IvfPatientSummaryComponent implements OnInit {
   }
 
   StartIvf() {
+    this.isivfstart = true;
 
     const primaryMrNo = Number(this?.PrimaryPatientData?.mrNo);
 

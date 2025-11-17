@@ -40,11 +40,10 @@
 
         <!-- Added fields per request -->
         <div class="col-lg-3 col-md-4 col-sm-6">
-          <label class="form-label">Quantification possible?</label>
+          <label class="form-label">{{ labelFor('IVFSemanAnalysis:Quantification') }}</label>
           <select class="form-select" formControlName="quantPossible">
             <option value="">Select</option>
-            <option>Yes</option>
-            <option>No</option>
+            <option *ngFor="let o of dropdowns?.['IVFSemanAnalysis:Quantification']" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
         <div class="col-lg-3 col-md-4 col-sm-6">
