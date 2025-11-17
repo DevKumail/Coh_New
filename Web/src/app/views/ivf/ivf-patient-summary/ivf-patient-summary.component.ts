@@ -22,6 +22,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { SocialHistoryComponent } from '../../clinical/social-history/social-history.component';
 import { FamilyHistoryComponent } from '../../clinical/family-history/family-history.component';
 import { log } from 'node:console';
+import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 
 @Component({
   selector: 'app-ivf-patient-summary',
@@ -53,11 +54,15 @@ export class IvfPatientSummaryComponent implements OnInit {
   offset = 120; // px: used in CSS var --patient-summary-offset
   isCoupleLink : boolean = false;
   isivfstart: boolean = false;
+  PrimaryPatientData: any = [];
+  PrimaryPatientDataVisitAccountNo: any;
+  SecondaryPatientData: any;
   patientBannerService = inject(PatientBannerService);
   router = inject(Router);
   modalTrigger = inject(ModalTriggerService);
   demographicapi = inject(DemographicApiServices);
   loader = inject(LoaderService);
+  ivfapi = inject(IVFApiService);
 
   ngOnInit(): void {
     // Auto-open Advanced Filter modal when no patient is loaded
@@ -65,17 +70,29 @@ export class IvfPatientSummaryComponent implements OnInit {
     this.patientBannerService.patientData$.subscribe(data => {
       if (!data) {
         this.modalTrigger.openModal('advance-filter-modal', 'ivf-patient-summary');
-      }
-    });
-    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+      } else {
+        this.PrimaryPatientData = data.table2[0] || [];
+        this.patientBannerService.selectedVisit$.subscribe((visit: any) => {
+          if (visit) {
+            this.PrimaryPatientDataVisitAccountNo = visit.visitAccDisplay;
+          }
+        });
+
+      this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
       console.log("IVF Patient Data",data)
       if (data) {
+        this.SecondaryPatientData = data?.couple || [];
         if(data?.couple?.female && data?.couple?.male){
           this.isCoupleLink = true;
           this.isivfstart = data?.IsIVFmain || false;
         } 
       }
     });
+      }
+    });
+
+
+
 
 
   }
@@ -94,7 +111,26 @@ export class IvfPatientSummaryComponent implements OnInit {
   }
 
   StartIvf(){
-    this.isivfstart = true;
+
+      const secondaryMrs = [
+        this.SecondaryPatientData.female.mrNo,
+        this.SecondaryPatientData.male.mrNo
+    ];
+    const body: any = {
+        primaryMrNo: this?.PrimaryPatientData?.mrNo || '',
+        secondaryMrNo: secondaryMrs.filter(mr => mr !== this?.PrimaryPatientData?.mrNo) || '',
+        visitAccountNo: this.PrimaryPatientDataVisitAccountNo || '',
+        primaryIsMale: this?.PrimaryPatientData?.gender === 'Male' || false,
+    }
+    this.ivfapi.GenerateIVFMain(body).subscribe({
+      next: (res: any) => {
+      this.isivfstart = true;
+      console.log("IVF Patient Data",res)
+      },
+      error: (err: any) => {
+      console.error('Failed to update IVF patient data (init)', err);
+      }
+    });
   }
 
   async onPatientPicked(ev: { mrno: string, context?: string }) {

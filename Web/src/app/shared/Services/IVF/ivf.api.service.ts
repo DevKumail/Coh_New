@@ -46,4 +46,8 @@ export class IVFApiService {
   InsertPatientRelation(payload: any): Observable<any> {
     return this.api.post('IVFDashboard/InsertPatientRelation', payload);
   }
+
+  GenerateIVFMain(payload: any): Observable<any> {
+    return this.api.post('IVFDashboard/GenerateIVFMain', payload);
+  }
 }
