@@ -28,21 +28,21 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
   selector: 'app-ivf-patient-summary',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    NgIcon, 
+    CommonModule,
+    ReactiveFormsModule,
+    NgIcon,
     IvfSideMenuComponent,
-    IvfPsDemographicComponent, 
-    IvfPsMedicalHistoryComponent, 
-    IvfPsPathologyResultsComponent, 
-    IvfPsLabOrdersComponent, 
+    IvfPsDemographicComponent,
+    IvfPsMedicalHistoryComponent,
+    IvfPsPathologyResultsComponent,
+    IvfPsLabOrdersComponent,
     SemenListComponent,
-    IvfPsBillingComponent, 
-    IvfPsMessageComponent, 
-    IvfPsCycleComponent, 
+    IvfPsBillingComponent,
+    IvfPsMessageComponent,
+    IvfPsCycleComponent,
     IvfPsSwitchPartnerComponent,
-    AdvanceSearchModalComponent, 
-    SocialHistoryComponent, 
+    AdvanceSearchModalComponent,
+    SocialHistoryComponent,
     FamilyHistoryComponent
   ],
   templateUrl: './ivf-patient-summary.component.html',
@@ -52,10 +52,10 @@ export class IvfPatientSummaryComponent implements OnInit {
   leftCollapsed = false;
   selectedId: string = 'demographic';
   offset = 120; // px: used in CSS var --patient-summary-offset
-  isCoupleLink : boolean = false;
+  isCoupleLink: boolean = false;
   isivfstart: boolean = false;
   PrimaryPatientData: any = [];
-  PrimaryPatientDataVisitAccountNo: any;
+  PrimaryPatientDataAppId: any;
   SecondaryPatientData: any;
   patientBannerService = inject(PatientBannerService);
   router = inject(Router);
@@ -74,24 +74,24 @@ export class IvfPatientSummaryComponent implements OnInit {
         this.PrimaryPatientData = data.table2[0] || [];
         this.patientBannerService.selectedVisit$.subscribe((visit: any) => {
           if (visit) {
-            this.PrimaryPatientDataVisitAccountNo = visit.visitAccDisplay;
+            this.PrimaryPatientDataAppId = visit.appointmentId;
           }
         });
 
-      this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
-      console.log("IVF Patient Data",data)
+
+      }
+    });
+
+    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+      console.log("IVF Patient Data", data)
       if (data) {
         this.SecondaryPatientData = data?.couple || [];
-        if(data?.couple?.female && data?.couple?.male){
+        if (data?.couple?.female && data?.couple?.male) {
           this.isCoupleLink = true;
-          this.isivfstart = data?.IsIVFmain || false;
-        } 
+          this.isivfstart = data?.couple?.isIVFmain || false;
+        }
       }
     });
-      }
-    });
-
-
 
 
 
@@ -106,29 +106,39 @@ export class IvfPatientSummaryComponent implements OnInit {
     this.selectedId = id;
   }
 
-  GotoDashboard(){
+  GotoDashboard() {
     this.router.navigate(['/ivf/dashboard']);
   }
 
-  StartIvf(){
+  StartIvf() {
 
-      const secondaryMrs = [
-        this.SecondaryPatientData.female.mrNo,
-        this.SecondaryPatientData.male.mrNo
+    const primaryMrNo = Number(this?.PrimaryPatientData?.mrNo);
+
+    // Collect secondary MR numbers
+    const secondaryMrs = [
+      Number(this.SecondaryPatientData.female.mrNo),
+      Number(this.SecondaryPatientData.male.mrNo)
     ];
+
+    // Filter ONLY unmatched MR
+    const unmatchedMr = secondaryMrs.filter(mr => mr !== primaryMrNo);
+
     const body: any = {
-        primaryMrNo: this?.PrimaryPatientData?.mrNo || '',
-        secondaryMrNo: secondaryMrs.filter(mr => mr !== this?.PrimaryPatientData?.mrNo) || '',
-        visitAccountNo: this.PrimaryPatientDataVisitAccountNo || '',
-        primaryIsMale: this?.PrimaryPatientData?.gender === 'Male' || false,
-    }
+      primaryMrNo: primaryMrNo,
+      secondaryMrNo: unmatchedMr[0] || '',
+      appId: this.PrimaryPatientDataAppId || '',
+      primaryIsMale: this?.PrimaryPatientData?.gender === 'Male' || false,
+    };
+
+    console.log(body);
+
     this.ivfapi.GenerateIVFMain(body).subscribe({
       next: (res: any) => {
-      this.isivfstart = true;
-      console.log("IVF Patient Data",res)
+        this.isivfstart = true;
+        console.log("IVF Patient Data", res)
       },
       error: (err: any) => {
-      console.error('Failed to update IVF patient data (init)', err);
+        console.error('Failed to update IVF patient data (init)', err);
       }
     });
   }

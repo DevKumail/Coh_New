@@ -83,20 +83,13 @@ export class IVFHomeComponent {
   }
   ngOnInit() {      
       this.patientBannerService.setIsbanneropen(false);
-      // If an MRNo already exists in patient banner data, call GetCouple once
-
-
     this.patientSubscription = this.patientBannerService.patientData$
-    // .pipe(
-    //     filter((data: any) => !!data?.table2?.[0]?.mrNo),
-    //     distinctUntilChanged((prev, curr) =>
-    //         prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
-    // )
-    //   )
       .subscribe((data: any) => {
-         this.PrimaryPatientData = data;
+        this.PrimaryPatientData = data;
+        this.getgetCoupleData();
         this.handleCoupleResponse(data);
       });
+      // this.getgetCoupleData();
 
 
 
@@ -124,11 +117,14 @@ export class IVFHomeComponent {
   private ivfSearchSub: any;
 
   ngAfterViewInit() {
-    // subscribe once the component is initialized in the view
-    this.ivfSearchSub = this.ivfSearch.search$.subscribe(mrNo => {
-      if (!mrNo) return;
-      // Call IVF API and ensure patient banner does not open
-      this.ivfApi.getCoupleData(mrNo).subscribe({
+    this.getgetCoupleData();
+  }
+
+
+  getgetCoupleData(){
+    const mrNo = this.PrimaryPatientData?.table2?.[0]?.mrNo;
+    if (!mrNo) return;
+    this.ivfApi.getCoupleData(mrNo).subscribe({
         next: (res: any) => {
           console.log('IVF couple data (from ivf-home):', res);
           this.handleCoupleResponse(res);
@@ -144,7 +140,6 @@ export class IVFHomeComponent {
           console.error('Failed to fetch IVF couple data', err);
         }
       });
-    });
   }
 
   ngOnDestroy(): void {
@@ -212,15 +207,16 @@ export class IVFHomeComponent {
       Swal.fire('Validation Error', 'Secondary Patient MrNo is a required field. Please Link a patient.', 'warning');
       return;
     }
-
+    
     const body : any = {
       primaryMrNo: this.PrimaryPatientData?.table2?.[0]?.mrNo,
       secondaryMrNo: SelactData?.mrNo,
     }
-
+    
     this.ivfApi.InsertPatientRelation(body).subscribe({
       next: (res: any) => {
         Swal.fire('Success', 'Patient Link Successfully', 'success');
+        this.getgetCoupleData();
       try { 
        } catch {}
     },
