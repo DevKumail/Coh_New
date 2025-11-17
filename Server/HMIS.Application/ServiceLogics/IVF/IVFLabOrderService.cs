@@ -79,11 +79,13 @@ namespace HMIS.Application.ServiceLogics.IVF
                 UpdatedDate = ParseDate(hdrEntity.UpdatedDate),
                 OrderControlCode = hdrEntity.OrderControlCode,
                 OrderStatus = hdrEntity.OrderStatus,
+                OrderStatusEnum = ParseStatus(hdrEntity.OrderStatus, hdrEntity.IsSigned),
                 IsHL7MsgCreated = hdrEntity.IsHl7msgCreated,
                 IsHL7MessageGeneratedForPhilips = hdrEntity.IsHl7messageGeneratedForPhilips,
                 IsSigned = hdrEntity.IsSigned,
                 oldMRNo = hdrEntity.OldMrno,
-                HL7MessageId = hdrEntity.Hl7messageId
+                HL7MessageId = hdrEntity.Hl7messageId,
+                OrderNumber = hdrEntity.OrderNumber
             };
 
             var details = await _db.LabOrderSetDetail
@@ -124,9 +126,10 @@ namespace HMIS.Application.ServiceLogics.IVF
 
         public async Task<IEnumerable<LabOrderSetHeaderDTO>> GetOrderSetsByMrnoAsync(long mrno)
         {
-            var list = await _db.LabOrderSet
-                .Where(x => x.Mrno == mrno)
-                .Select(h => new LabOrderSetHeaderDTO
+            var list = await (
+                from h in _db.LabOrderSet
+                where h.Mrno == mrno
+                select new LabOrderSetHeaderDTO
                 {
                     OrderSetId = h.LabOrderSetId,
                     MRNo = h.Mrno ?? 0,
@@ -139,13 +142,31 @@ namespace HMIS.Application.ServiceLogics.IVF
                     UpdatedDate = ParseDate(h.UpdatedDate),
                     OrderControlCode = h.OrderControlCode,
                     OrderStatus = h.OrderStatus,
+                    OrderStatusEnum = ParseStatus(h.OrderStatus, h.IsSigned),
                     IsHL7MsgCreated = h.IsHl7msgCreated,
                     IsHL7MessageGeneratedForPhilips = h.IsHl7messageGeneratedForPhilips,
                     IsSigned = h.IsSigned,
                     oldMRNo = h.OldMrno,
-                    HL7MessageId = h.Hl7messageId
-                })
-                .ToListAsync();
+                    HL7MessageId = h.Hl7messageId,
+                    OrderNumber = h.OrderNumber,
+                    SampleTypeId = (
+                        from d in _db.LabOrderSetDetail
+                        join t in _db.LabTests on d.LabTestId equals t.LabTestId into tleft
+                        from t in tleft.DefaultIfEmpty()
+                        where d.OrderSetId == h.LabOrderSetId && !(d.IsDeleted ?? false)
+                        select t.SampleTypeId
+                    ).FirstOrDefault(),
+                    SampleTypeName = (
+                        from d in _db.LabOrderSetDetail
+                        join t in _db.LabTests on d.LabTestId equals t.LabTestId into tleft
+                        from t in tleft.DefaultIfEmpty()
+                        join st in _db.LabSampleTypes on t.SampleTypeId equals st.SampleTypeId into sleft
+                        from st in sleft.DefaultIfEmpty()
+                        where d.OrderSetId == h.LabOrderSetId && !(d.IsDeleted ?? false)
+                        select st.SampleName
+                    ).FirstOrDefault()
+                }
+            ).ToListAsync();
             return list;
         }
 
@@ -157,25 +178,44 @@ namespace HMIS.Application.ServiceLogics.IVF
                         join d in _db.LabOrderSetDetail on h.LabOrderSetId equals d.OrderSetId
                         join t in _db.LabTests on d.LabTestId equals t.LabTestId into tleft
                         from t in tleft.DefaultIfEmpty()
+                        join st in _db.LabSampleTypes on t.SampleTypeId equals st.SampleTypeId into sleft
+                        from st in sleft.DefaultIfEmpty()
                         join emp in _db.Hremployee on (long?)h.ProviderId equals (long?)emp.EmployeeId into eleft
                         from emp in eleft.DefaultIfEmpty()
                         where !(d.IsDeleted ?? false)
-                        select new IVFOrderGridRowDTO
+                        select new
                         {
-                            OrderSetId = h.LabOrderSetId,
-                            OrderSetDetailId = d.OrderSetDetailId,
-                            OrderNumber = h.LabOrderSetId.ToString().PadLeft(10, '0'),
-                            SampleDepDate = SafeDate(h.OrderDate, "dd.MM.yyyy"),
-                            Time = SafeDate(h.OrderDate, "HH:mm"),
+                            h.LabOrderSetId,
+                            h.OrderNumber,
+                            h.OrderDate,
                             Clinician = emp != null ? emp.FullName : string.Empty,
-                            Name = t != null ? t.LabName : null,
-                            Material = t != null ? t.LabUnit : null,
-                            Laboratory = (d.IsInternalTest ?? false) ? "Internal" : "External",
-                            Status = (h.IsSigned ?? false) ? "✔" : (h.OrderStatus ?? "—"),
-                            Comment = d.Pcomments
+                            d.OrderSetDetailId,
+                            d.VisitOrderNo,
+                            d.CollectDate,
+                            d.IsInternalTest,
+                            d.Pcomments,
+                            TestName = t != null ? t.LabName : null,
+                            SampleName = st != null ? st.SampleName : null,
+                            Status = (h.IsSigned ?? false) ? "✔" : (h.OrderStatus ?? "—")
                         };
 
-            return await query.ToListAsync();
+            var rows = await query.ToListAsync();
+            return rows.Select(x => new IVFOrderGridRowDTO
+            {
+                OrderSetId = x.LabOrderSetId,
+                OrderSetDetailId = x.OrderSetDetailId,
+                OrderNumber = (x.VisitOrderNo.HasValue
+                    ? x.VisitOrderNo.Value.ToString().PadLeft(10, '0')
+                    : x.OrderSetDetailId.ToString().PadLeft(10, '0')),
+                SampleDepDate = x.CollectDate.HasValue ? x.CollectDate.Value.ToString("dd.MM.yyyy") : string.Empty,
+                Time = x.CollectDate.HasValue ? x.CollectDate.Value.ToString("HH:mm") : string.Empty,
+                Clinician = x.Clinician,
+                Name = x.TestName,
+                Material = x.SampleName,
+                Laboratory = (x.IsInternalTest ?? false) ? "Internal" : "External",
+                Status = x.Status,
+                Comment = x.Pcomments
+            }).ToList();
         }
 
         public async Task<long> CreateOrderSetAsync(CreateUpdateLabOrderSetDTO payload)
@@ -184,6 +224,13 @@ namespace HMIS.Application.ServiceLogics.IVF
             try
             {
                 var h = payload.Header;
+                var resolvedCreate = ResolveStatus(h.OrderStatusEnum, h.OrderStatus, h.IsSigned);
+                // Determine order number: use provided or generate next serial
+                long? orderNumber = h.OrderNumber;
+                if (!orderNumber.HasValue || orderNumber.Value == 0)
+                {
+                    orderNumber = await GetNextOrderNumberAsync();
+                }
                 var hdr = new LabOrderSet
                 {
                     Mrno = h.MRNo,
@@ -195,12 +242,13 @@ namespace HMIS.Application.ServiceLogics.IVF
                     UpdatedBy = h.UpdatedBy?.ToString(),
                     UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null,
                     OrderControlCode = h.OrderControlCode,
-                    OrderStatus = h.OrderStatus,
+                    OrderStatus = resolvedCreate.status,
                     IsHl7msgCreated = h.IsHL7MsgCreated,
                     IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips,
-                    IsSigned = h.IsSigned,
+                    IsSigned = resolvedCreate.isSigned,
                     OldMrno = h.oldMRNo,
-                    Hl7messageId = (int?)h.HL7MessageId
+                    Hl7messageId = (int?)h.HL7MessageId,
+                    OrderNumber = orderNumber
                 };
                 _db.LabOrderSet.Add(hdr);
                 await _db.SaveChangesAsync();
@@ -211,6 +259,12 @@ namespace HMIS.Application.ServiceLogics.IVF
                 {
                     foreach (var d in payload.Details)
                     {
+                        // Ensure per-test VisitOrderNo uniqueness
+                        long? visitOrderNo = d.VisitOrderNo;
+                        if (!visitOrderNo.HasValue || visitOrderNo.Value == 0)
+                        {
+                            visitOrderNo = await GetNextVisitOrderNoAsync();
+                        }
                         var ent = new LabOrderSetDetail
                         {
                             OrderSetId = orderSetId,
@@ -223,7 +277,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                             IsInternalTest = d.IsInternalTest,
                             RadiologySide = d.RadiologySide,
                             ProfileLabTestId = d.ProfileLabTestID,
-                            VisitOrderNo = d.VisitOrderNo,
+                            VisitOrderNo = visitOrderNo,
                             ResultExpectedDate = d.ResultExpectedDate,
                             ReferralName = d.ReferralName,
                             ReferralId = d.ReferralId,
@@ -260,6 +314,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                 if (hdr == null) return false;
 
                 var h = payload.Header;
+                var resolvedUpdate = ResolveStatus(h.OrderStatusEnum, h.OrderStatus, h.IsSigned);
                 hdr.Mrno = h.MRNo;
                 hdr.ProviderId = h.ProviderId;
                 hdr.OrderDate = FormatDate(h.OrderDate);
@@ -269,12 +324,16 @@ namespace HMIS.Application.ServiceLogics.IVF
                 hdr.UpdatedBy = h.UpdatedBy?.ToString();
                 hdr.UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null;
                 hdr.OrderControlCode = h.OrderControlCode;
-                hdr.OrderStatus = h.OrderStatus;
+                hdr.OrderStatus = resolvedUpdate.status;
                 hdr.IsHl7msgCreated = h.IsHL7MsgCreated;
                 hdr.IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips;
-                hdr.IsSigned = h.IsSigned;
+                hdr.IsSigned = resolvedUpdate.isSigned;
                 hdr.OldMrno = h.oldMRNo;
                 hdr.Hl7messageId = (int?)h.HL7MessageId;
+                if (h.OrderNumber.HasValue && h.OrderNumber.Value != 0)
+                {
+                    hdr.OrderNumber = h.OrderNumber;
+                }
 
                 // Soft delete existing details
                 var existing = await _db.LabOrderSetDetail.Where(d => d.OrderSetId == orderSetId).ToListAsync();
@@ -288,6 +347,12 @@ namespace HMIS.Application.ServiceLogics.IVF
                 {
                     foreach (var d in payload.Details)
                     {
+                        // Ensure per-test VisitOrderNo uniqueness on update as well
+                        long? visitOrderNo = d.VisitOrderNo;
+                        if (!visitOrderNo.HasValue || visitOrderNo.Value == 0)
+                        {
+                            visitOrderNo = await GetNextVisitOrderNoAsync();
+                        }
                         var ent = new LabOrderSetDetail
                         {
                             OrderSetId = orderSetId,
@@ -300,7 +365,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                             IsInternalTest = d.IsInternalTest,
                             RadiologySide = d.RadiologySide,
                             ProfileLabTestId = d.ProfileLabTestID,
-                            VisitOrderNo = d.VisitOrderNo,
+                            VisitOrderNo = visitOrderNo,
                             ResultExpectedDate = d.ResultExpectedDate,
                             ReferralName = d.ReferralName,
                             ReferralId = d.ReferralId,
@@ -345,7 +410,8 @@ namespace HMIS.Application.ServiceLogics.IVF
                 else
                 {
                     foreach (var d in details) d.IsDeleted = true;
-                    hdr.OrderStatus = (hdr.OrderStatus ?? string.Empty) + "_DELETED";
+                    hdr.OrderStatus = "DELETED";
+                    hdr.IsSigned = false;
                 }
                 await _db.SaveChangesAsync();
                 await tx.CommitAsync();
@@ -375,6 +441,71 @@ namespace HMIS.Application.ServiceLogics.IVF
         {
             if (DateTime.TryParse(s, out var dt)) return dt.ToString(format);
             return string.Empty;
+        }
+
+        private static (string? status, bool? isSigned) ResolveStatus(LabOrderStatus? statusEnum, string? fallbackStatus, bool? fallbackIsSigned)
+        {
+            if (!statusEnum.HasValue)
+            {
+                return (fallbackStatus, fallbackIsSigned);
+            }
+
+            switch (statusEnum.Value)
+            {
+                case LabOrderStatus.New:
+                    return ("New", false);
+                case LabOrderStatus.InProgress:
+                    return ("IN_PROGRESS", false);
+                case LabOrderStatus.SampleCollected:
+                    return ("SAMPLE_COLLECTED", false);
+                case LabOrderStatus.Completed:
+                    return ("COMPLETED", true);
+                case LabOrderStatus.Cancel:
+                    return ("CANCEL", false);
+                default:
+                    return (fallbackStatus, fallbackIsSigned);
+            }
+        }
+
+        private async Task<long> GetNextOrderNumberAsync()
+        {
+            var max = await _db.LabOrderSet
+                .Select(x => (long?)(x.OrderNumber ?? 0))
+                .MaxAsync();
+            return (max ?? 0) + 1;
+        }
+
+        private async Task<long> GetNextVisitOrderNoAsync()
+        {
+            var max = await _db.LabOrderSetDetail
+                .Select(x => (long?)(x.VisitOrderNo ?? 0))
+                .MaxAsync();
+            return (max ?? 0) + 1;
+        }
+
+        private static LabOrderStatus? ParseStatus(string? status, bool? isSigned)
+        {
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                return (isSigned ?? false) ? LabOrderStatus.Completed : LabOrderStatus.New;
+            }
+
+            switch (status.Trim().ToUpperInvariant())
+            {
+                case "New":
+                    return LabOrderStatus.New;
+                case "IN_PROGRESS":
+                    return LabOrderStatus.InProgress;
+                case "SAMPLE_COLLECTED":
+                    return LabOrderStatus.SampleCollected;
+                case "COMPLETED":
+                    return LabOrderStatus.Completed;
+                case "CANCEL":
+                case "CANCELED":
+                    return LabOrderStatus.Cancel;
+                default:
+                    return (isSigned ?? false) ? LabOrderStatus.Completed : LabOrderStatus.New;
+            }
         }
     }
 }

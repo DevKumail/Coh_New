@@ -19,7 +19,7 @@ namespace HMIS.Web.Controllers.IVF
 
         // GET: /api/IVFLabTests/Tree?investigationTypeId=23&laboratoryId=<guid>
         [HttpGet("Tree")]
-        public async Task<IActionResult> GetTree([FromQuery] int? investigationTypeId, [FromQuery] Guid? laboratoryId)
+        public async Task<IActionResult> GetTree([FromQuery] int? investigationTypeId, [FromQuery] int? laboratoryId)
         {
             var result = await _service.GetLabTestTree(investigationTypeId, laboratoryId);
             return Ok(result);

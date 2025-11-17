@@ -91,6 +91,8 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
               <thead class="table-light">
                 <tr>
                   <th style="width:18%">Test</th>
+                  <th style="width:14%">Material</th>
+                  <th style="width:10%">Status</th>
                   <th style="width:14%">Ref. Physician</th>
                   <th style="width:14%">Notify Role</th>
                   <th style="width:14%">Receiver</th>
@@ -102,6 +104,8 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
               <tbody>
                 <tr *ngFor="let s of selected">
                   <td class="text-truncate">{{ s.name }} ({{ s.cpt }})</td>
+                  <td class="text-truncate">{{ s.sampleTypeName || '-' }}</td>
+                  <td>{{ s.status || 'New' }}</td>
                   <td>
                     <select class="form-select form-select-sm" [(ngModel)]="details[s.id].refPhysicianId">
                       <option [ngValue]="null">Select...</option>
@@ -124,7 +128,7 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
                   <td><input class="form-control form-control-sm" [(ngModel)]="details[s.id].comments"></td>
                 </tr>
                 <tr *ngIf="selected.length===0">
-                  <td colspan="7" class="text-center text-muted">No test selected</td>
+                  <td colspan="9" class="text-center text-muted">No test selected</td>
                 </tr>
               </tbody>
             </table>
@@ -153,7 +157,7 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
   isLoadingTree = false;
   expandedIds = new Set<number>();
 
-  selected: Array<{ id: number; name: string; cpt: string }> = [];
+  selected: Array<{ id: number; name: string; cpt: string; sampleTypeId?: number | null; sampleTypeName?: string; status?: string }> = [];
   details: Record<number, any> = {};
   search = '';
 
@@ -270,7 +274,14 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
     const checked = !!ev?.target?.checked;
     if (checked) {
       if (!this.selected.some(s => s.id === n.id)) {
-        const item = { id: n.id, name: n.label, cpt: n.cptCode || '' };
+        const item = {
+          id: n.id,
+          name: n.label,
+          cpt: n.cptCode || '',
+          sampleTypeId: n.sampleTypeId ?? null,
+          sampleTypeName: n.sampleTypeName || '',
+          status: 'New'
+        };
         this.selected = [...this.selected, item];
         if (!this.details[n.id]) this.details[n.id] = this.defaultDetails();
       }
@@ -286,7 +297,13 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
   clearAll() { this.selected = []; this.details = {}; }
 
   onSave() {
-    const perTests = this.selected.map(s => ({ ...s, details: this.details[s.id] || this.defaultDetails() }));
+    const perTests = this.selected.map(s => ({
+      ...s,
+      details: {
+        status: this.mapStatusToBackend(s.status || 'New'),
+        ...(this.details[s.id] || this.defaultDetails())
+      }
+    }));
     this.save.emit({ tests: perTests, details: this.form });
   }
 
@@ -317,7 +334,7 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
       const cpt = d.cptCode || '';
       const name = cpt || `Test ${id}`;
       if (!this.selected.some(s => s.id === id)) {
-        this.selected.push({ id, name, cpt });
+        this.selected.push({ id, name, cpt, status: this.mapStatusFromBackend(d.status) });
       }
       this.details[id] = {
         refPhysicianId: d.referralId ?? null,
@@ -328,6 +345,28 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
         comments: d.pComments ?? ''
       };
     });
+  }
+
+  private mapStatusToBackend(ui: string): string {
+    const s = (ui || '').toLowerCase();
+    if (s === 'new') return 'NEW';
+    if (s === 'open') return 'OPEN';
+    if (s === 'in progress') return 'IN_PROGRESS';
+    if (s === 'sample collected') return 'SAMPLE_COLLECTED';
+    if (s === 'completed') return 'COMPLETED';
+    if (s === 'cancel') return 'CANCEL';
+    return 'NEW';
+  }
+
+  private mapStatusFromBackend(api: string | null | undefined): string {
+    const s = (api || '').toUpperCase();
+    if (s === 'NEW') return 'New';
+    if (s === 'OPEN') return 'Open';
+    if (s === 'IN_PROGRESS') return 'In Progress';
+    if (s === 'SAMPLE_COLLECTED') return 'Sample Collected';
+    if (s === 'COMPLETED') return 'Completed';
+    if (s === 'CANCEL') return 'Cancel';
+    return 'New';
   }
 
 }

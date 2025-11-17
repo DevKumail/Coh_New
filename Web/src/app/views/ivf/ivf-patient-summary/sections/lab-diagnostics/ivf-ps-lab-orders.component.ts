@@ -5,17 +5,19 @@ import { IvfConfirmDialogComponent } from './ivf-confirm-dialog.component';
 import { AddLabOrderComponent } from './add-lab-order.component';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { IvfCreateLabOrderDto } from '@/app/shared/Services/IVF/dtos/ivf-lab-orders.dto';
+import { SampleCollectionComponent } from './sample-collection.component';
+import { OrderCompletionComponent } from './order-completion.component';
 
 @Component({
   selector: 'app-ivf-ps-lab-orders',
   standalone: true,
-  imports: [CommonModule, GenericPaginationComponent, AddLabOrderComponent, IvfConfirmDialogComponent],
+  imports: [CommonModule, GenericPaginationComponent, AddLabOrderComponent, IvfConfirmDialogComponent, SampleCollectionComponent, OrderCompletionComponent],
   styles: [`
     .skeleton-loader { background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius:4px; }
     @keyframes loading { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   `],
   template: `
-    <div class="px-2 py-2" *ngIf="!showOrderPage; else addOrderPage">
+    <div class="px-2 py-2" *ngIf="!showOrderPage && !showCollectPage && !showCompletePage; else addOrderPage">
       <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Lab orders</span>
@@ -35,7 +37,7 @@ import { IvfCreateLabOrderDto } from '@/app/shared/Services/IVF/dtos/ivf-lab-ord
                   <th>Laboratory</th>
                   <th>Status</th>
                   <th>Comment</th>
-                  <th style="width:120px">Actions</th>
+                  <th style="width:220px">Actions</th>
                 </tr>
               </thead>
               <tbody class="table-group-divider">
@@ -53,12 +55,18 @@ import { IvfCreateLabOrderDto } from '@/app/shared/Services/IVF/dtos/ivf-lab-ord
                     <td>{{ o.name }}</td>
                     <td>{{ o.material }}</td>
                     <td>{{ o.laboratory }}</td>
-                    <td>{{ o.states }}</td>
+                    <td>{{ o.status }}</td>
                     <td>{{ o.comment }}</td>
                     <td>
                       <div class="d-flex gap-1 justify-content-center">
                         <button class="btn btn-sm btn-outline-primary" (click)="openEdit(o)" title="Edit" aria-label="Edit">
                           ✎
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" (click)="openCollect(o)" title="Collect sample" aria-label="Collect sample">
+                          🧪
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" (click)="openComplete(o)" title="Complete order" aria-label="Complete order">
+                          ✔
                         </button>
                         <button class="btn btn-sm btn-outline-danger" [disabled]="!o.orderSetId" (click)="confirmDelete(o)" title="Delete" aria-label="Delete">
                           🗑
@@ -84,14 +92,32 @@ import { IvfCreateLabOrderDto } from '@/app/shared/Services/IVF/dtos/ivf-lab-ord
     </div>
 
     <ng-template #addOrderPage>
-      <app-add-lab-order
-        [mrNo]="currentMrNo"
-        [mode]="modalMode"
-        [orderId]="editingRow?.orderSetId"
-        [initialOrder]="editingOrder"
-        (cancel)="closeOrderPage()"
-        (save)="onOrderModalSave($event)">
-      </app-add-lab-order>
+      <ng-container *ngIf="showOrderPage">
+        <app-add-lab-order
+          [mrNo]="currentMrNo"
+          [mode]="modalMode"
+          [orderId]="editingRow?.orderSetId"
+          [initialOrder]="editingOrder"
+          (cancel)="closeOrderPage()"
+          (save)="onOrderModalSave($event)">
+        </app-add-lab-order>
+      </ng-container>
+      <ng-container *ngIf="showCollectPage">
+        <app-sample-collection
+          [order]="editingRow"
+          [tests]="editingTests"
+          (cancel)="closeCollectPage()"
+          (collected)="onCollected($event)">
+        </app-sample-collection>
+      </ng-container>
+      <ng-container *ngIf="showCompletePage">
+        <app-order-completion
+          [order]="editingRow"
+          [tests]="editingTests"
+          (cancel)="closeCompletePage()"
+          (completed)="onCompleted($event)">
+        </app-order-completion>
+      </ng-container>
     </ng-template>
 
     <!-- Duplicate Confirmation -->
@@ -127,6 +153,10 @@ export class IvfPsLabOrdersComponent implements OnInit {
   modalMode: 'create' | 'edit' = 'create';
   editingRow: any = null;
   editingOrder: any = null;
+  // Collection/Completion UI state
+  showCollectPage = false;
+  showCompletePage = false;
+  editingTests: any[] = [];
 
   // Duplicate confirmation state
   showDuplicateDialog = false;
@@ -137,23 +167,7 @@ export class IvfPsLabOrdersComponent implements OnInit {
   showDeleteDialog = false;
   deleteMessage = 'Are you sure you want to delete this lab order?';
   pendingDelete: { orderSetId?: number | string } | null = null;
-  ordersRows: any[] = [
-    {
-      orderNumber: '0000002040', sampleDate: '30.01.2025', time: '10:00', clinician: 'Mr JF',
-      name: 'E2', note: '', parameter: 'E2', material: 'Serum', laboratory: 'Internal',
-      states: '—', patientStatus: '—', comment: ''
-    },
-    {
-      orderNumber: '0000002289', sampleDate: '14.01.2025', time: '12:29', clinician: 'Doe, John Dr.',
-      name: 'Cycling Hormons', note: '', parameter: 'FSH', material: 'Serum', laboratory: 'Internal',
-      states: '✔', patientStatus: '—', comment: ''
-    },
-    {
-      orderNumber: '0000002290', sampleDate: '14.01.2025', time: '12:31', clinician: 'Doe, Jane Dr.',
-      name: 'Blood count', note: '', parameter: 'CBC', material: 'EDTA blood', laboratory: 'Internal',
-      states: '⛔', patientStatus: '—', comment: ''
-    }
-  ];
+  ordersRows: any[] = [];
 
   constructor(private ivfApi: IVFApiService) {}
 
@@ -174,6 +188,7 @@ export class IvfPsLabOrdersComponent implements OnInit {
   }
 
   loadOrders(mrno: string | number) {
+    debugger;
     this.isLoading = true;
     this.ivfApi.getLabOrdersByMrNo(mrno, 'grid').subscribe({
       next: (rows: any[]) => {
@@ -186,9 +201,10 @@ export class IvfPsLabOrdersComponent implements OnInit {
           name: r.name,
           material: r.material,
           laboratory: r.laboratory,
-          states: r.state,
+          status: r.status,
           comment: r.comment
         }));
+        debugger
         this.ordersRows = mapped;
         this.totalItems = this.ordersRows.length;
       },
@@ -219,6 +235,64 @@ export class IvfPsLabOrdersComponent implements OnInit {
   }
 
   closeOrderPage() { this.showOrderPage = false; this.editingOrder = null; }
+
+  // Sample collection flow (UI only)
+  openCollect(row: any) {
+    this.editingRow = row;
+    this.isLoading = true;
+    const finish = (tests: any[]) => {
+      this.editingTests = (tests || []).map(t => ({ ...t, selected: true }));
+      this.showCollectPage = true;
+      this.isLoading = false;
+    };
+    if (row?.orderSetId) {
+      this.ivfApi.getLabOrderById(row.orderSetId).subscribe({
+        next: (res: any) => {
+          const details = Array.isArray(res?.details) ? res.details : [];
+          const mapped = details.map((d: any) => ({ id: d.labTestId, cpt: d.cptCode, name: d.cptCode, sampleTypeName: d.sampleTypeName, status: d.status }));
+          finish(mapped);
+        },
+        error: () => { finish([]); },
+        complete: () => {}
+      });
+    } else {
+      finish([]);
+    }
+  }
+  closeCollectPage() { this.showCollectPage = false; this.editingTests = []; }
+  onCollected(payload: any) {
+    // UI-only: pretend collection succeeded and return to list
+    this.closeCollectPage();
+  }
+
+  // Order completion flow (UI only)
+  openComplete(row: any) {
+    this.editingRow = row;
+    this.isLoading = true;
+    const finish = (tests: any[]) => {
+      this.editingTests = (tests || []).map(t => ({ ...t, done: false }));
+      this.showCompletePage = true;
+      this.isLoading = false;
+    };
+    if (row?.orderSetId) {
+      this.ivfApi.getLabOrderById(row.orderSetId).subscribe({
+        next: (res: any) => {
+          const details = Array.isArray(res?.details) ? res.details : [];
+          const mapped = details.map((d: any) => ({ id: d.labTestId, cpt: d.cptCode, name: d.cptCode, sampleTypeName: d.sampleTypeName, status: d.status }));
+          finish(mapped);
+        },
+        error: () => { finish([]); },
+        complete: () => {}
+      });
+    } else {
+      finish([]);
+    }
+  }
+  closeCompletePage() { this.showCompletePage = false; this.editingTests = []; }
+  onCompleted(payload: any) {
+    // UI-only: pretend completion succeeded and return to list
+    this.closeCompletePage();
+  }
 
   onOrderModalSave(payload: { tests: any[]; details: any; header?: any }) {
     // Mock duplicate check: assume any test with name containing 'E2' is duplicate
@@ -266,7 +340,7 @@ export class IvfPsLabOrdersComponent implements OnInit {
         createdBy: 0,
         createdDate: nowIso,
         orderControlCode: 'NW',
-        orderStatus: 'NEW',
+        orderStatus: 'OPEN',
         isHL7MsgCreated: false,
         isHL7MessageGeneratedForPhilips: false,
         isSigned: false,
@@ -280,7 +354,9 @@ export class IvfPsLabOrdersComponent implements OnInit {
         cptCode: t.cpt,
         orderQuantity: 1,
         investigationTypeId: 23,
-        billOnOrder: 0
+        billOnOrder: 0,
+        sampleTypeId: (t?.sampleTypeId ?? null),
+        status: (t?.details?.status ?? 'NEW')
       }))
     };
 

@@ -49,8 +49,6 @@ public partial class LabTests
 
     public int? BillOnOrder { get; set; }
 
-    public Guid? LaboratoryId { get; set; }
-
     [Column("InvestigationTypeID")]
     public int? InvestigationTypeId { get; set; }
 
@@ -65,4 +63,16 @@ public partial class LabTests
     public bool? DisableSelection { get; set; }
 
     public bool? IsDeleted { get; set; }
+
+    public int? LaboratoryId { get; set; }
+
+    public int? SampleTypeId { get; set; }
+
+    [ForeignKey("LaboratoryId")]
+    [InverseProperty("LabTests")]
+    public virtual Laboratories? Laboratory { get; set; }
+
+    [ForeignKey("SampleTypeId")]
+    [InverseProperty("LabTests")]
+    public virtual LabSampleTypes? SampleType { get; set; }
 }

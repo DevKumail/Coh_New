@@ -3,6 +3,16 @@ using System.Collections.Generic;
 
 namespace HMIS.Application.DTOs.IVFDTOs
 {
+    public enum LabOrderStatus
+    {
+        New = 1,
+        InProgress = 2,
+        SampleCollected = 3,
+        Completed = 4,
+        Cancel = 5
+       
+    }
+
     public class LabOrderSetHeaderDTO
     {
         public long OrderSetId { get; set; }
@@ -16,11 +26,15 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public DateTime? UpdatedDate { get; set; }
         public string? OrderControlCode { get; set; }
         public string? OrderStatus { get; set; }
+        public LabOrderStatus? OrderStatusEnum { get; set; }
         public bool? IsHL7MsgCreated { get; set; }
         public bool? IsHL7MessageGeneratedForPhilips { get; set; }
         public bool? IsSigned { get; set; }
         public string? oldMRNo { get; set; }
         public long? HL7MessageId { get; set; }
+        public long? OrderNumber { get; set; }
+        public int? SampleTypeId { get; set; }
+        public string? SampleTypeName { get; set; }
     }
 
     public class LabOrderSetDetailDTO
