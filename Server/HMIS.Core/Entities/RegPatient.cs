@@ -154,6 +154,12 @@ public partial class RegPatient
     [InverseProperty("Patient")]
     public virtual ICollection<Insured> Insured { get; set; } = new List<Insured>();
 
+    [InverseProperty("FemalePatient")]
+    public virtual ICollection<Ivfmain> IvfmainFemalePatient { get; set; } = new List<Ivfmain>();
+
+    [InverseProperty("MalePatient")]
+    public virtual ICollection<Ivfmain> IvfmainMalePatient { get; set; } = new List<Ivfmain>();
+
     [ForeignKey("PatientBloodGroupId")]
     [InverseProperty("RegPatient")]
     public virtual RegBloodGroup? PatientBloodGroup { get; set; }
@@ -169,6 +175,12 @@ public partial class RegPatient
 
     [InverseProperty("Patient")]
     public virtual ICollection<RegPatientEmployer> RegPatientEmployer { get; set; } = new List<RegPatientEmployer>();
+
+    [InverseProperty("Patient")]
+    public virtual ICollection<RegPatientRelation> RegPatientRelationPatient { get; set; } = new List<RegPatientRelation>();
+
+    [InverseProperty("RelatedPatient")]
+    public virtual ICollection<RegPatientRelation> RegPatientRelationRelatedPatient { get; set; } = new List<RegPatientRelation>();
 
     [InverseProperty("Patient")]
     public virtual ICollection<SchAppointment> SchAppointment { get; set; } = new List<SchAppointment>();

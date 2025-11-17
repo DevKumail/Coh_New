@@ -184,5 +184,12 @@ namespace HMIS.Web.Controllers.Configuration
                 return StatusCode(500, new { message = "An error occurred while fetching categories with values.", error = ex.Message });
             }
         }
+
+        [HttpGet("GetDropDownValuesByName")]
+        public async Task<IActionResult> GetDropdowns([FromQuery] string page)
+        {
+            var dropdowns = await _dropDownService.GetDropdownsForPage(page);
+            return Ok(dropdowns);
+        }
     }
 }
