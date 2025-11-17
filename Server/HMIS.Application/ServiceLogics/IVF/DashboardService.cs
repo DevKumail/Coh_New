@@ -67,12 +67,12 @@ namespace HMIS.Application.ServiceLogics.IVF
                 target.Picture = r.Picture;
                 target.Gender = r.Gender;
             }
-            var IVFMainExists = await conn.QueryAsync<bool>(
+            var IVFMainExists = await conn.QueryFirstOrDefaultAsync<bool>(
                 "IVF_DoesMainExists",
                 new { MrNo },
                 commandType: CommandType.StoredProcedure
             );
-            dto.IsIVFmain = Convert.ToBoolean(IVFMainExists)== true ? false : true; 
+            dto.IsIVFmain = IVFMainExists;
             return (true, dto);
         }
 
