@@ -79,6 +79,10 @@ public partial class IvfmaleSemenSample
 
     public DateTime? UpdatedAt { get; set; }
 
+    public bool IsDeleted { get; set; }
+
+    public int? DeletedBy { get; set; }
+
     [ForeignKey("AppearanceId")]
     [InverseProperty("IvfmaleSemenSampleAppearance")]
     public virtual DropdownConfiguration? Appearance { get; set; }
