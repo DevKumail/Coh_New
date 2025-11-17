@@ -1153,8 +1153,6 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhgeneral>(entity =>
         {
-            entity.HasOne(d => d.Category).WithMany(p => p.IvfmaleFhgeneral).HasConstraintName("FK_IVFMaleFHGeneral_DropdownCategory");
-
             entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhgeneral)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHGeneral_IVFMaleFertilityHistory");

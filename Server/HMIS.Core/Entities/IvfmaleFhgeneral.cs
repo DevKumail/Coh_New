@@ -33,12 +33,6 @@ public partial class IvfmaleFhgeneral
     [StringLength(30)]
     public string? InfertilityType { get; set; }
 
-    public long? CategoryId { get; set; }
-
-    [ForeignKey("CategoryId")]
-    [InverseProperty("IvfmaleFhgeneral")]
-    public virtual DropdownCategory? Category { get; set; }
-
     [ForeignKey("IvfmaleFhid")]
     [InverseProperty("IvfmaleFhgeneral")]
     public virtual IvfmaleFertilityHistory IvfmaleFh { get; set; } = null!;
