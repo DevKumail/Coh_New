@@ -38,4 +38,12 @@ export class IVFApiService {
   getNotifyRoles(): Observable<any> {
     return this.api.get('IVFLabOrders/notify-roles');
   }
+
+  GetOppositeGenderPatients(payload: any, currentPage: number, pageSize: number): Observable<any> {
+    return this.api.get(`IVFDashboard/GetOppositeGenderPatients?gender=${payload.gender}&page=${currentPage}&rowsPerPage=${pageSize}&mrno=${payload.mrno}&phone=${payload.phone}&emiratesId=${payload.emiratesId}&name=${payload.name}`);
+  }
+
+  InsertPatientRelation(payload: any): Observable<any> {
+    return this.api.post('IVFDashboard/InsertPatientRelation', payload);
+  }
 }

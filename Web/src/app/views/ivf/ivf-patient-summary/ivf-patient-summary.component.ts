@@ -21,6 +21,7 @@ import { DemographicApiServices } from '@/app/shared/Services/Demographic/demogr
 import { LoaderService } from '@core/services/loader.service';
 import { SocialHistoryComponent } from '../../clinical/social-history/social-history.component';
 import { FamilyHistoryComponent } from '../../clinical/family-history/family-history.component';
+import { log } from 'node:console';
 
 @Component({
   selector: 'app-ivf-patient-summary',
@@ -50,7 +51,8 @@ export class IvfPatientSummaryComponent implements OnInit {
   leftCollapsed = false;
   selectedId: string = 'demographic';
   offset = 120; // px: used in CSS var --patient-summary-offset
-  isCoupleLink = false;
+  isCoupleLink : boolean = false;
+  isivfstart: boolean = false;
   patientBannerService = inject(PatientBannerService);
   router = inject(Router);
   modalTrigger = inject(ModalTriggerService);
@@ -59,17 +61,19 @@ export class IvfPatientSummaryComponent implements OnInit {
 
   ngOnInit(): void {
     // Auto-open Advanced Filter modal when no patient is loaded
+
     this.patientBannerService.patientData$.subscribe(data => {
       if (!data) {
         this.modalTrigger.openModal('advance-filter-modal', 'ivf-patient-summary');
       }
     });
-
     this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+      console.log("IVF Patient Data",data)
       if (data) {
         if(data?.couple?.female && data?.couple?.male){
           this.isCoupleLink = true;
-        }
+          this.isivfstart = data?.IsIVFmain || false;
+        } 
       }
     });
 
@@ -86,10 +90,9 @@ export class IvfPatientSummaryComponent implements OnInit {
   }
 
   GotoDashboard(){
-    this.router.navigate(['/ivf/ivf-home']);
+    this.router.navigate(['/ivf/dashboard']);
   }
 
-  isivfstart: boolean = false;
   StartIvf(){
     this.isivfstart = true;
   }
