@@ -54,6 +54,9 @@ public partial class DropdownConfiguration
     [InverseProperty("CategoryIdPrevInfectionsNavigation")]
     public virtual ICollection<IvfmaleFhinfections> IvfmaleFhinfectionsCategoryIdPrevInfectionsNavigation { get; set; } = new List<IvfmaleFhinfections>();
 
+    [InverseProperty("PrevIllnessCategory")]
+    public virtual ICollection<IvfmaleFhprevIllness> IvfmaleFhprevIllness { get; set; } = new List<IvfmaleFhprevIllness>();
+
     [InverseProperty("CategoryIdClinicalVaricoceleNavigation")]
     public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdClinicalVaricoceleNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
 
