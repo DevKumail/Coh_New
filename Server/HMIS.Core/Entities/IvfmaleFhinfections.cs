@@ -26,6 +26,18 @@ public partial class IvfmaleFhinfections
 
     public long CategoryIdDiagnosisOfInfection { get; set; }
 
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
     [ForeignKey("CategoryIdDiagnosisOfInfection")]
     [InverseProperty("IvfmaleFhinfectionsCategoryIdDiagnosisOfInfectionNavigation")]
     public virtual DropdownConfiguration CategoryIdDiagnosisOfInfectionNavigation { get; set; } = null!;

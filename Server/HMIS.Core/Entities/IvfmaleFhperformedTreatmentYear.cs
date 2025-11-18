@@ -24,6 +24,18 @@ public partial class IvfmaleFhperformedTreatmentYear
     [StringLength(40)]
     public string? Year { get; set; }
 
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
     [ForeignKey("IvfmaleFhperformedTreatmentId")]
     [InverseProperty("IvfmaleFhperformedTreatmentYear")]
     public virtual IvfmaleFhperformedTreatment IvfmaleFhperformedTreatment { get; set; } = null!;

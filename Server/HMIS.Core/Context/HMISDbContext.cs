@@ -1135,6 +1135,9 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.IvfmaleFhid).HasName("PK__IVFMaleF__354FB852D85F5098");
 
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.AdiposityCategory).WithMany(p => p.IvfmaleFertilityHistoryAdiposityCategory).HasConstraintName("FK_IVFMaleFertilityHistory_DropdownConfiguration2");
 
             entity.HasOne(d => d.CftrcarrierCategory).WithMany(p => p.IvfmaleFertilityHistoryCftrcarrierCategory).HasConstraintName("FK_IVFMaleFertilityHistory_DropdownConfiguration1");
@@ -1154,6 +1157,9 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhfurtherPlanning>(entity =>
         {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.IvfmaleFhgeneral).WithMany(p => p.IvfmaleFhfurtherPlanning)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHFurtherPlanning_IVFMaleFHGeneral");
@@ -1161,6 +1167,9 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhgeneral>(entity =>
         {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.InfertilityTypeCategory).WithMany(p => p.IvfmaleFhgeneral).HasConstraintName("FK_IVFMaleFHGeneral_DropdownConfiguration");
 
             entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhgeneral)
@@ -1170,6 +1179,9 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhgenetics>(entity =>
         {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.CategoryIdInheritanceNavigation).WithMany(p => p.IvfmaleFhgenetics).HasConstraintName("FK_IVFMaleFHGenetics_DropdownConfiguration");
 
             entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhgenetics).HasConstraintName("FK_IVFMaleFHGenetics_IVFMaleFertilityHistory");
@@ -1177,6 +1189,9 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhillness>(entity =>
         {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.EndocrinopathiesCategory).WithMany(p => p.IvfmaleFhillnessEndocrinopathiesCategory).HasConstraintName("FK_IVFMaleFHIllness_DropdownConfiguration");
 
             entity.HasOne(d => d.IvfmaleFhgeneral).WithMany(p => p.IvfmaleFhillness).HasConstraintName("FK_IVFMaleFHIllness_IVFMaleFHGeneral");
@@ -1186,6 +1201,9 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhillnessIdiopathic>(entity =>
         {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.IvfmaleFhidiopathic).WithMany()
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHIllnessIdiopathic_IVFMaleFHIdiopathic");
@@ -1199,6 +1217,9 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.IvfmaleFhimpairmentFactorId).HasName("PK__IVFMaleF__D1E703FA6E8AA473");
 
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhimpairmentFactor)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHImpairmentFactor_MaleFH");
@@ -1206,6 +1227,9 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhinfections>(entity =>
         {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.CategoryIdDiagnosisOfInfectionNavigation).WithMany(p => p.IvfmaleFhinfectionsCategoryIdDiagnosisOfInfectionNavigation)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHInfections_DropdownConfiguration1");
@@ -1223,6 +1247,9 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.IvfmaleFhperformedTreatmentId).HasName("PK_IVFMaleFHGeneralPerformedTreatment");
 
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.IvfmaleFhgeneral).WithMany(p => p.IvfmaleFhperformedTreatment)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHGeneralPerformedTreatment_IVFMaleFHGeneral");
@@ -1230,6 +1257,9 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhperformedTreatmentYear>(entity =>
         {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.IvfmaleFhperformedTreatment).WithMany(p => p.IvfmaleFhperformedTreatmentYear)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHPerformedTreatmentYear_IVFMaleFHPerformedTreatment");
@@ -1238,6 +1268,9 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<IvfmaleFhprevIllness>(entity =>
         {
             entity.HasKey(e => e.IvfmaleFhprevIllnessId).HasName("PK__IVFMaleF__9DF3C0CDB7BE7BF5");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
             entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhprevIllness)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -1252,6 +1285,9 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.IvfmaleFhsemenAnalysisId).HasName("PK__IVFMaleF__4603CA5EEC612133");
 
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhsemenAnalysis)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHSemenAnalysis_MaleFH");
@@ -1259,6 +1295,9 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhtesticlesAndSem>(entity =>
         {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.CategoryIdClinicalVaricoceleNavigation).WithMany(p => p.IvfmaleFhtesticlesAndSemCategoryIdClinicalVaricoceleNavigation).HasConstraintName("FK_IVFMaleFHTesticlesAndSem_DropdownConfiguration4");
 
             entity.HasOne(d => d.CategoryIdDistalSeminalTractNavigation).WithMany(p => p.IvfmaleFhtesticlesAndSemCategoryIdDistalSeminalTractNavigation).HasConstraintName("FK_IVFMaleFHTesticlesAndSem_DropdownConfiguration6");

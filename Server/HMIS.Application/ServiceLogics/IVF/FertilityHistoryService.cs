@@ -5,15 +5,17 @@ using HMIS.Core.Context;
 using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Data;
+using System.Linq;
+using System.Text.Json;
 
 namespace HMIS.Application.ServiceLogics.IVF
 {
     public interface IFertilityHistoryService
     {
         Task<(bool IsSuccess, object? Data)> GetAllFertilityHistory(string ivfmainid, PaginationInfo pagination);
-        Task<(bool IsSuccess, object? Data)> GetFertilityHistoryById(string ivfmainid);
+        Task<(bool IsSuccess, object? Data)> GetFertilityHistoryById(string IVFMaleFHId);
+        Task<(bool IsSuccess, object? Data)> DeleteMaleFertilityHistoryAsync(string IVFMaleFHId, string DeletedBy);
         Task<Result<int>> CreateMaleFertilityHistoryAsync(IVFMaleFertilityHistoryDto dto);
     }
     internal class FertilityHistoryService : IFertilityHistoryService
@@ -26,9 +28,27 @@ namespace HMIS.Application.ServiceLogics.IVF
             _context = db;
         }
 
-        public async Task<(bool IsSuccess, object? Data)> GetFertilityHistoryById(string ivfmainid)
+
+        public async Task<(bool IsSuccess, object? Data)> DeleteMaleFertilityHistoryAsync(string IVFMaleFHId, string DeletedBy)
         {
-            if (string.IsNullOrWhiteSpace(ivfmainid))
+            using var conn = _dapper.CreateConnection();
+            try {
+                var Message = conn.ExecuteAsync("IVF_SoftDeleteFertilityHistory", new
+                {
+                    IVFMaleFHId,
+                    DeletedBy
+                });
+                return (true, Message);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public async Task<(bool IsSuccess, object? Data)> GetFertilityHistoryById(string IVFMaleFHId)
+        {
+            if (string.IsNullOrWhiteSpace(IVFMaleFHId))
             {
                 return (false, null);
             }
@@ -36,26 +56,40 @@ namespace HMIS.Application.ServiceLogics.IVF
             using var conn = _dapper.CreateConnection();
             try
             {
-                var data = (await conn.QueryAsync<IVFMaleFertilityHistoryReadDTO>(
+                // SQL Server FOR JSON PATH returns JSON as a string
+                var jsonResult = await conn.ExecuteScalarAsync<string>(
                     "IVF_GetFertilityHistory",
-                    new { IVFMainId = ivfmainid },
-                    commandType: CommandType.StoredProcedure)).ToList();
+                    new { IVFMaleFHId },
+                    commandType: CommandType.StoredProcedure
+                );
 
-                var filtered = data
-                    .Where(d => d != null && (d.IVFMaleFHId.HasValue || d.IVFMainId.HasValue))
-                    .ToList();
-
-                if (filtered.Count == 0)
+                if (string.IsNullOrWhiteSpace(jsonResult))
+                {
                     return (false, null);
+                }
 
-                return (true, filtered);
+                // Deserialize JSON to DTO
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    PropertyNamingPolicy = null,
+                    NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
+                };
+
+                var dto = JsonSerializer.Deserialize<IVFMaleFertilityHistoryDto>(jsonResult, options);
+
+                if (dto == null)
+                {
+                    return (false, null);
+                }
+
+                return (true, dto);
             }
-            catch
+            catch (Exception ex)
             {
                 return (false, null);
             }
         }
-
         public async Task<(bool IsSuccess, object? Data)> GetAllFertilityHistory(string ivfmainid, PaginationInfo pagination)
         {
             // Basic validations

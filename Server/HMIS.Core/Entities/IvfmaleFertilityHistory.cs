@@ -35,6 +35,18 @@ public partial class IvfmaleFertilityHistory
     [Column("CFTRCarrierCategoryId")]
     public long? CftrcarrierCategoryId { get; set; }
 
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
     [ForeignKey("AdiposityCategoryId")]
     [InverseProperty("IvfmaleFertilityHistoryAdiposityCategory")]
     public virtual DropdownConfiguration? AdiposityCategory { get; set; }

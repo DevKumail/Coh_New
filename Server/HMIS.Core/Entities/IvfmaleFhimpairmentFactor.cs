@@ -18,6 +18,18 @@ public partial class IvfmaleFhimpairmentFactor
 
     public long ImpairmentFactorCategoryId { get; set; }
 
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
     [ForeignKey("IvfmaleFhid")]
     [InverseProperty("IvfmaleFhimpairmentFactor")]
     public virtual IvfmaleFertilityHistory IvfmaleFh { get; set; } = null!;
