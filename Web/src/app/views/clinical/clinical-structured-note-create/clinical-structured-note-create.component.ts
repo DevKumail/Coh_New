@@ -26,17 +26,15 @@ import { LoaderService } from '@core/services/loader.service';
     QuestionViewComponent,
     NotesComponent
   ],
-  selector: 'app-clinical-note-create',
-  templateUrl: './clinical-note-create.component.html',
-  styleUrls: ['./clinical-note-create.component.scss']
+  selector: 'app-clinical-structured-note-create',
+  templateUrl: './clinical-structured-note-create.component.html',
+  styleUrls: ['./clinical-structured-note-create.component.scss']
 })
-export class ClinicalNoteCreateComponent implements OnInit {
+export class ClinicalStructuredNoteCreateComponent implements OnInit {
   clinicalForm: FormGroup;
   data: any = "";
   clinicalNotesList: any = {};
-  recognition: any;
   spokenText: string = '';
-  voicetext: string = '';
   fontSize: number = 16;
   isBold: boolean = false;
   isItalic: boolean = false;
@@ -52,16 +50,12 @@ export class ClinicalNoteCreateComponent implements OnInit {
   appointmentID: number = 0;
   visible: boolean = false;
   SearchPatientData: any
-  mediaRecorder: any;
-  audioChunks: any[] = [];
-  voiceBlob: Blob | null = null;
   selectedProviders: any = 0;
   selectedNotes: any = 0;
   db: any;
-    private patientDataSubscription: Subscription | undefined;
+  private patientDataSubscription: Subscription | undefined;
 
   dbReady: Promise<void> = Promise.resolve();
-  audioUrl: SafeUrl | null = null; // keep SafeUrl only
   providers: any[] = [];
   clinicalNotes: any[] = [];
 
@@ -70,9 +64,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
   viewNoteResponse: boolean = false;
   nodeData: any;
 
-  recording = false;
-  isListening: boolean | null = null;
-
   cacheItems: string[] = ['Provider'];
 
   private subscriptions: Subscription[] = [];
@@ -80,19 +71,17 @@ export class ClinicalNoteCreateComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService,
-    // private messageService: MessageService,
-         private loader: LoaderService,
+    private loader: LoaderService,
     private router: Router,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-     private PatientData: PatientBannerService
+    private PatientData: PatientBannerService
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
       note: [null, Validators.required],
-      description: [''],
-      voicetext: ['']
+      description: ['']
     });
   }
 
@@ -120,16 +109,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
       });
 
     this.FillCache();
-
-    // Read query params and pre-populate form
-    this.route.queryParams.subscribe(params => {
-      if (params['provider']) {
-        this.clinicalForm.patchValue({ provider: params['provider'] });
-      }
-      if (params['template']) {
-        this.clinicalForm.patchValue({ note: params['template'] });
-      }
-    });
 
     // subscribe to provider selection changes (value is the selected code)
     const providerCtrl = this.clinicalForm.get('provider');
@@ -166,17 +145,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
       this.dataquestion = data;
       console.log(" json Data Question", this.dataquestion);
     });
-  }
-
-  // --- recording small helpers -------------------------------------------
-  startRecording() {
-    this.recording = true;
-    console.log("Recording started");
-  }
-
-  stopRecording() {
-    this.recording = false;
-    console.log("Recording stopped");
   }
 
   // --- populate dropdowns / cache ---------------------------------------
@@ -244,95 +212,76 @@ export class ClinicalNoteCreateComponent implements OnInit {
 
   }
 
-  // --- speech recognition (live transcription) ---------------------------
-  startListening() {
-    // ...existing code...
-    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-    if (!SpeechRecognition) {
-    //   this.messageService.add({ severity: 'warn', summary: 'Not Supported', detail: 'SpeechRecognition is not supported in this browser.' });
+  // --- submit form without voice recording -------------------
+  submitVoice() {
+    if (this.clinicalForm.invalid) {
+      Swal.fire('Error', 'Please fill all required fields.', 'error');
+      this.clinicalForm.markAllAsTouched();
       return;
     }
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.continuous = true;
 
-    recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        .map((result: any) => result[0].transcript)
-        .join('');
-      this.voicetext = transcript;
-      // keep reactive form in sync
-      this.clinicalForm.patchValue({ voicetext: this.voicetext });
+    const formValue = this.clinicalForm.value;
+    const providerCode = Number(formValue.provider) || this.selectedProviders;
+    const noteId = Number(formValue.note) || this.selectedNotes;
+
+    const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
+    this.createdBy = current_User.userName || '';
+    this.updatedBy = current_User.userName || '';
+    this.signedBy = false;
+
+    const selectedNoteId = noteId;
+    const selectedNote = this.clinicalNotes.find(note => note.pathId === selectedNoteId);
+    const noteName = selectedNote ? selectedNote.pathName : '';
+
+    const note = {
+      noteTitle: noteName,
+      createdBy: this.createdBy,
+      updatedBy: this.updatedBy,
+      description: formValue.description,
+      signedBy: this.signedBy,
+      createdOn: new Date(),
+      mrNo: this.mrNo,
+      appointmentId: this.SelectedVisit.appointmentId,
+      pathId: selectedNoteId
     };
-    recognition.onerror = (err: any) => {
-      console.error('Speech recognition error', err);
-    };
-    recognition.start();
-    this.isListening = true;
-    recognition.onend = () => { this.isListening = false; };
-    this.recognition = recognition;
-  }
 
-  stopListening(): void {
-    this.isListening = false;
-    if (this.recognition) {
-      try { this.recognition.stop(); } catch {}
-    }
-  }
-
-  // --- voice recording to Blob ------------------------------------------
-    startVoiceRecording() {
-    if (this.selectedNotes > 0) {
-      this.recording = true;
-        this.isListening = false;
-        this.ganricfunction();
-    }
-    else {
-      Swal.fire('Warning', 'Please select Note Template first.', 'warning');
-    }
-  }
-
-
-  ganricfunction(){
-         navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-        this.mediaRecorder = new MediaRecorder(stream);
-
-        this.audioChunks = [];
-
-        this.mediaRecorder.ondataavailable = (event: any) => {
-          this.audioChunks.push(event.data);
-        };
-
-        this.mediaRecorder.onstop = () => {
-          this.voiceBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-          this.audioUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(this.voiceBlob));
-        };
-
-        this.mediaRecorder.start();
-
-
-      }).catch((err) => {
-        console.error('Microphone access denied:', err);
-      });
-  }
-
-  stopVoiceRecording() {
-    this.recording = false;
-    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
-      try {
-     this.ganricfunction();
-        this.mediaRecorder.stop();
-      } catch (e) {
-        console.error('Error stopping recorder:', e);
-      }
+    if (navigator.onLine) {
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out")), 300000)
+      );
+      this.loader.show();
+      Promise.race([this.clinicalApiService.InsertSpeech(note), timeout])
+        .then((response: any) => {
+          if (response != null && response != "") {
+            this.dataquestion = response;
+            this.nodeData = response.node;
+            this.viewNoteResponse = true;
+            this.clinicalForm.reset();
+            Swal.fire('Success', 'Note created successfully.', 'success');
+            this.loader.hide();
+          } else {
+            this.loader.hide();
+            throw new Error('Creation failed');
+          }
+        })
+        .catch((error: any) => {
+          console.error('Creation failed:', error);
+          this.saveNoteOffline(note);
+          Swal.fire('Offline Save', 'Saved offline due to network/server error.', 'info');
+          this.loader.hide();
+        });
     } else {
-      Swal.fire('Warning', 'No active recording to stop.', 'warning');
+      this.saveNoteOffline(note);
+      Swal.fire('Offline', 'Note saved offline and will be synced later.', 'info');
+      this.loader.hide();
     }
   }
+  cancel() {
+    this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
 
+  }
   // --- offline storage (IndexedDB) --------------------------------------
   initIndexedDB() {
-    // ...existing code...
     this.dbReady = new Promise((resolve, reject) => {
       const request = indexedDB.open('ClinicalNotesDB', 2);
       request.onupgradeneeded = () => {
@@ -354,10 +303,12 @@ export class ClinicalNoteCreateComponent implements OnInit {
   }
 
   async saveNoteOffline(note: any) {
-    // ...existing code...
     this.initIndexedDB();
     await this.dbReady;
-    if (!this.db) { console.error('DB not initialized'); return; }
+    if (!this.db) {
+      console.error('DB not initialized');
+      return;
+    }
     const tx = this.db.transaction(["notes"], 'readwrite');
     const store = tx.objectStore('notes');
     const req = store.add(note);
@@ -365,104 +316,13 @@ export class ClinicalNoteCreateComponent implements OnInit {
     req.onerror = (event: any) => console.error('Error saving note offline:', event);
   }
 
-  // --- submit recorded voice (upload or offline save) -------------------
-  submitVoice() {
-    if (this.clinicalForm.invalid) {
-        Swal.fire('Error', 'Please fill all required fields.', 'error');
-      this.clinicalForm.markAllAsTouched();
-      return;
-    }
-
-    const formValue = this.clinicalForm.value;
-    // ensure numeric conversion
-    const providerCode = Number(formValue.provider) || this.selectedProviders;
-    const noteId = Number(formValue.note) || this.selectedNotes;
-
-
-    if (!this.voiceBlob) {
-      alert('No voice recording available!');
-      return;
-    }
-    const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
-    this.createdBy = current_User.userName || '';
-    this.updatedBy = current_User.userName || '';
-    this.signedBy = false;
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      const base64data = reader.result?.toString().split(',')[1] || '';
-
-      // find selected note using reactive form value (not legacy property)
-      const selectedNoteId = noteId;
-      const selectedNote = this.clinicalNotes.find(note => note.pathId === selectedNoteId);
-      const noteName = selectedNote ? selectedNote.pathName : '';
-
-      const note = {
-        noteTitle: noteName,
-        createdBy: this.createdBy,
-        updatedBy: this.updatedBy,
-        description: formValue.description,
-        signedBy: this.signedBy,
-        voiceFile: base64data,
-        createdOn: new Date(),
-        mrNo: this.mrNo,
-        appointmentId: this.SelectedVisit.appointmentId,
-        pathId: selectedNoteId
-      };
-
-      if (navigator.onLine) {
-        const timeout = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Request timed out")), 300000)
-        );
-this.loader.show();
-        Promise.race([ this.clinicalApiService.InsertSpeech(note), timeout ])
-          .then((response: any) => {
-            if (response != null && response != "") {
-              this.dataquestion = response;
-              this.nodeData = response.node;
-              this.viewNoteResponse = true;
-              this.audioUrl = null;
-              this.voiceBlob = null;
-              this.clinicalForm.reset();
-              Swal.fire('Success', 'Note uploaded successfully.', 'success');
-                this.loader.hide();
-            //   this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Note uploaded successfully.' });
-            } else {
-                this.loader.hide();
-              throw new Error('Upload failed');
-            }
-          })
-          .catch((error: any) => {
-            console.error('Upload failed:', error);
-            this.saveNoteOffline(note);
-            Swal.fire('Offline Save', 'Saved offline due to network/server error.', 'info');
-            this.loader.hide();
-            // this.messageService.add({ severity: 'error', summary: 'Offline Save', detail: 'Saved offline due to network/server error.' });
-          });
-      } else {
-        this.saveNoteOffline(note);
-        Swal.fire('Offline', 'Note saved offline and will be synced later.', 'info');
-        this.loader.hide();
-        // this.messageService.add({ severity: 'info', summary: 'Offline', detail: 'Note saved offline and will be synced later.' });
-      }
-    };
-
-    reader.readAsDataURL(this.voiceBlob);
-  }
-  cancel() {
-    this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
-
-  }
   // --- additional submit used elsewhere in old code ---------------------
   submit() {
-    // ...existing code...
     if (!this.mrNo) {
-    //   this.messageService.add({ severity: 'Error', summary: 'MRNo is not Found' });
-    Swal.fire('Error', 'MRNo is not Found please load patient', 'error');
+      Swal.fire('Error', 'MRNo is not Found please load patient', 'error');
       return;
     }
 
-    // this.clinicalNotesList.AppointmentId = this.SelectedVisit.appointmentId;
     this.clinicalNotesList.NoteTitle = this.noteTitle;
     this.clinicalNotesList.CreatedBy = this.createdBy;
     this.clinicalNotesList.SignedBy = this.signedBy;
@@ -470,10 +330,8 @@ this.loader.show();
     this.clinicalNotesList.UpdatedBy = this.updatedBy;
     this.clinicalNotesList.mrNo = this.mrNo;
     this.clinicalNotesList.NoteText = this.spokenText;
-    this.clinicalNotesList.VoiceText = this.voicetext;
     this.clinicalApiService.InsertSpeech(this.clinicalNotesList).then(() => {
-        Swal.fire('Success', 'Appointment has been Created', 'success');
-    //   this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Appointment has been Created' });
+      Swal.fire('Success', 'Appointment has been Created', 'success');
       this.router.navigate(['/clinical/clinical-notes']);
     });
   }
@@ -482,12 +340,11 @@ this.loader.show();
 
   }
 
-
   resetForm(){
     this.clinicalForm.reset();
   }
+
   ngOnDestroy(): void {
-    // cleanup subscriptions
     this.subscriptions.forEach(s => s.unsubscribe());
   }
 }

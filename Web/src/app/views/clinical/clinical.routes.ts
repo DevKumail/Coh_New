@@ -4,8 +4,6 @@ import { MedicalHistoryComponent } from './medical-history/medical-history.compo
 import { FavoritesComponent } from './favorites/favorites.component';
 import { ProblemComponent } from './problem/problem.component';
 import { AllergiesComponent } from './allergies/allergies.component';
-import { Component } from 'lucide-angular';
-import { AppointmentsComponent } from '../Scheduling/appointments/appointments.component';
 import { modulePermissionGuard } from '@core/guards/module-permission.guard';
 import { VitalSignsComponent } from './vital-signs/vital-signs.component';
 import { ImmunizationsComponent } from './immunizations/immunizations.component';
@@ -14,6 +12,9 @@ import { SocialHistoryComponent } from './social-history/social-history.componen
 import { FamilyHistoryComponent } from './family-history/family-history.component';
 import { ClinicalNoteComponent } from './clinical-note/clinical-note.component';
 import { ClinicalNoteCreateComponent } from './clinical-note-create/clinical-note-create.component';
+import {ClinicalStructuredNoteCreateComponent} from './clinical-structured-note-create/clinical-structured-note-create.component';
+import {ClinicalFreeTextNoteCreateComponent} from './clinical-free-text-note-create/clinical-free-text-note-create.component';
+import { PatientSummaryComponent } from '../patient-summary/patient-summary.component';
 
 export const CLINICAL_ROUTES: Routes = [
   {
@@ -95,9 +96,34 @@ export const CLINICAL_ROUTES: Routes = [
         data: { module: 'Clinical', component: 'Family History', title: 'Family History' }
       },
       {
+        path: 'notes',
+        canActivate: [modulePermissionGuard],
+        component: ClinicalNoteComponent,
+        data: { module: 'Clinical', component: 'Notes', title: 'Notes' }
+      },
+      {
         path:'create-notes',
         canActivate:[modulePermissionGuard],
         component:ClinicalNoteCreateComponent,
+        data: { module: 'Clinical', component: 'Immunizations', title: 'Immunizations' }
+      },
+        {
+        path:'create-structured-notes',
+        canActivate:[modulePermissionGuard],
+        component:ClinicalStructuredNoteCreateComponent,
+        data: { module: 'Clinical', component: 'Immunizations', title: 'Immunizations' }
+      },
+      {
+        path:'create-free-text-notes',
+        canActivate:[modulePermissionGuard],
+        component:ClinicalFreeTextNoteCreateComponent,
+        data: { module: 'Clinical', component: 'Immunizations', title: 'Immunizations' }
+      },
+
+         {
+        path:'patient-summary/:id',
+        canActivate:[modulePermissionGuard],
+        component:PatientSummaryComponent,
         data: { module: 'Clinical', component: 'Immunizations', title: 'Immunizations' }
       },
     ]
