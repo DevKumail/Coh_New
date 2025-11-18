@@ -2,11 +2,14 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { SemenAddEditComponent } from '../semen-add-edit/semen-add-edit.component';
+import { NgIconComponent } from '@ng-icons/core';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-semen-list',
   standalone: true,
-  imports: [CommonModule, SemenAddEditComponent],
+  imports: [CommonModule, SemenAddEditComponent,NgIconComponent
+],
   templateUrl: './semen-list.component.html',
   styleUrls: ['./semen-list.component.scss']
 })
@@ -39,19 +42,19 @@ export class SemenListComponent {
           id: x.sampleId || x.id || 0,
           collectionDate: x.collectionDateTime ? new Date(x.collectionDateTime).toLocaleDateString() : '',
           thawingDate: x.thawingDateTime ? new Date(x.thawingDateTime).toLocaleDateString() : '',
-          time: x.analysisStartTime || '',
-          sampleId: x.sampleCode || '',
-          purpose: x.purposeName || x.purposeId || '',
-          method: x.collectionMethodName || x.collectionMethodId || '',
-          vol: x.observations?.[0]?.volumeML ?? '',
-          conc: x.observations?.[0]?.concentrationPerML ?? '',
-          totalCountM: x.observations?.[0]?.totalSpermCount ?? '',
-          whoA: x.observations?.[0]?.motility?.whO_AB_Percent ?? '',
-          whoC: x.observations?.[0]?.motility?.whO_C_Percent ?? '',
-          whoD: x.observations?.[0]?.motility?.whO_D_Percent ?? '',
-          norm: x.observations?.[0]?.morphology?.morphologyNormalPercent ?? '',
-          cryoStatus: x.cryoStatusName || x.cryoStatusId || '',
-          status: x.statusName || x.statusId || '',
+          time: x.analysisStartTime || '-',
+          sampleCode: x.sampleCode || '-',
+          purpose: x.purpose || '-',
+          method: x.collectionMethod || '-',
+          vol: x.volumeML ?? '-',
+          conc: x.concentrationPerML ?? '-',
+          totalCountM: x.totalSpermCount ?? '-',
+          whoA: x.whO_AB_Percent ?? '-',
+          whoC: x.whO_C_Percent ?? '-',
+          whoD: x.whO_D_Percent ?? '-',
+          norm: x.morphologyNormalPercent ?? '-',
+          cryoStatus: x.cryoStatus || '-',
+          status: x.status || '-',
         }));
         this.isLoading = false;
       },
@@ -73,7 +76,42 @@ export class SemenListComponent {
     });
   }
 
-  delete(row: any) {
-    // TODO: Wire delete endpoint when available
+  delete(id: any) {
+    const sampleId = Number(id);
+    if (!sampleId) return;
+    // const ok = confirm('Delete this sample?');
+    // if (!ok) return;
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action cannot be undone!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isLoading = true;
+        this.ivf.DeleteMaleSemenSample(sampleId).subscribe({
+          next: _ => { this.isLoading = false; this.load();
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'The sample has been deleted.',
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 1500
+            });
+           },
+          error: _ => { this.isLoading = false;
+            Swal.fire({
+              title: 'Error!',
+              text: 'The sample could not be deleted.',
+              icon: 'error',
+              showConfirmButton: false,
+              timer: 1500
+            });
+           }
+        });
+      }
+    });
   }
 }

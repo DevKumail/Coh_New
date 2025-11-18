@@ -62,4 +62,9 @@ export class IVFApiService {
   GetMaleSemenSampleById(sampleId: number): Observable<any> {
     return this.api.get(`IVFMaleSemanAnalysis/GetSampleById/${sampleId}`);
   }
+
+  DeleteMaleSemenSample(sampleId: number): Observable<any> {
+    // Backend endpoint: IVFMaleSemanAnalysis/DeleteSample/{id}
+    return this.api.delete(`IVFMaleSemanAnalysis/DeleteSample/${sampleId}`);
+  }
 }
