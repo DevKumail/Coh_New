@@ -24,14 +24,29 @@ public partial class DropdownConfiguration
     [InverseProperty("DropdownConfiguration")]
     public virtual DropdownCategory Category { get; set; } = null!;
 
+    [InverseProperty("AdiposityCategory")]
+    public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistoryAdiposityCategory { get; set; } = new List<IvfmaleFertilityHistory>();
+
     [InverseProperty("CftrcarrierCategory")]
     public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistoryCftrcarrierCategory { get; set; } = new List<IvfmaleFertilityHistory>();
 
     [InverseProperty("ChromosomeAnalysisCategory")]
     public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistoryChromosomeAnalysisCategory { get; set; } = new List<IvfmaleFertilityHistory>();
 
+    [InverseProperty("GenerallyHealthyCategory")]
+    public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistoryGenerallyHealthyCategory { get; set; } = new List<IvfmaleFertilityHistory>();
+
+    [InverseProperty("InfertilityTypeCategory")]
+    public virtual ICollection<IvfmaleFhgeneral> IvfmaleFhgeneral { get; set; } = new List<IvfmaleFhgeneral>();
+
     [InverseProperty("CategoryIdInheritanceNavigation")]
     public virtual ICollection<IvfmaleFhgenetics> IvfmaleFhgenetics { get; set; } = new List<IvfmaleFhgenetics>();
+
+    [InverseProperty("EndocrinopathiesCategory")]
+    public virtual ICollection<IvfmaleFhillness> IvfmaleFhillnessEndocrinopathiesCategory { get; set; } = new List<IvfmaleFhillness>();
+
+    [InverseProperty("PreviousTumorCategory")]
+    public virtual ICollection<IvfmaleFhillness> IvfmaleFhillnessPreviousTumorCategory { get; set; } = new List<IvfmaleFhillness>();
 
     [InverseProperty("CategoryIdDiagnosisOfInfectionNavigation")]
     public virtual ICollection<IvfmaleFhinfections> IvfmaleFhinfectionsCategoryIdDiagnosisOfInfectionNavigation { get; set; } = new List<IvfmaleFhinfections>();

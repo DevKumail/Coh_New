@@ -194,8 +194,6 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<IvfmaleFhgenetics> IvfmaleFhgenetics { get; set; }
 
-    public virtual DbSet<IvfmaleFhidiopathic> IvfmaleFhidiopathic { get; set; }
-
     public virtual DbSet<IvfmaleFhillness> IvfmaleFhillness { get; set; }
 
     public virtual DbSet<IvfmaleFhillnessIdiopathic> IvfmaleFhillnessIdiopathic { get; set; }
@@ -1137,9 +1135,13 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.IvfmaleFhid).HasName("PK__IVFMaleF__354FB852D85F5098");
 
+            entity.HasOne(d => d.AdiposityCategory).WithMany(p => p.IvfmaleFertilityHistoryAdiposityCategory).HasConstraintName("FK_IVFMaleFertilityHistory_DropdownConfiguration2");
+
             entity.HasOne(d => d.CftrcarrierCategory).WithMany(p => p.IvfmaleFertilityHistoryCftrcarrierCategory).HasConstraintName("FK_IVFMaleFertilityHistory_DropdownConfiguration1");
 
             entity.HasOne(d => d.ChromosomeAnalysisCategory).WithMany(p => p.IvfmaleFertilityHistoryChromosomeAnalysisCategory).HasConstraintName("FK_IVFMaleFertilityHistory_DropdownConfiguration");
+
+            entity.HasOne(d => d.GenerallyHealthyCategory).WithMany(p => p.IvfmaleFertilityHistoryGenerallyHealthyCategory).HasConstraintName("FK_IVFMaleFertilityHistory_DropdownConfiguration3");
 
             entity.HasOne(d => d.Ivfmain).WithMany(p => p.IvfmaleFertilityHistory)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -1159,6 +1161,8 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhgeneral>(entity =>
         {
+            entity.HasOne(d => d.InfertilityTypeCategory).WithMany(p => p.IvfmaleFhgeneral).HasConstraintName("FK_IVFMaleFHGeneral_DropdownConfiguration");
+
             entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhgeneral)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHGeneral_IVFMaleFertilityHistory");
@@ -1173,7 +1177,11 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhillness>(entity =>
         {
+            entity.HasOne(d => d.EndocrinopathiesCategory).WithMany(p => p.IvfmaleFhillnessEndocrinopathiesCategory).HasConstraintName("FK_IVFMaleFHIllness_DropdownConfiguration");
+
             entity.HasOne(d => d.IvfmaleFhgeneral).WithMany(p => p.IvfmaleFhillness).HasConstraintName("FK_IVFMaleFHIllness_IVFMaleFHGeneral");
+
+            entity.HasOne(d => d.PreviousTumorCategory).WithMany(p => p.IvfmaleFhillnessPreviousTumorCategory).HasConstraintName("FK_IVFMaleFHIllness_DropdownConfiguration1");
         });
 
         modelBuilder.Entity<IvfmaleFhillnessIdiopathic>(entity =>

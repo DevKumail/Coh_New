@@ -21,10 +21,9 @@ public partial class IvfmaleFertilityHistory
 
     public long ProviderId { get; set; }
 
-    [StringLength(100)]
-    public string? Adiposity { get; set; }
+    public long? AdiposityCategoryId { get; set; }
 
-    public bool? GenerallyHealthy { get; set; }
+    public long? GenerallyHealthyCategoryId { get; set; }
 
     [StringLength(250)]
     public string? LongTermMedication { get; set; }
@@ -36,6 +35,10 @@ public partial class IvfmaleFertilityHistory
     [Column("CFTRCarrierCategoryId")]
     public long? CftrcarrierCategoryId { get; set; }
 
+    [ForeignKey("AdiposityCategoryId")]
+    [InverseProperty("IvfmaleFertilityHistoryAdiposityCategory")]
+    public virtual DropdownConfiguration? AdiposityCategory { get; set; }
+
     [ForeignKey("CftrcarrierCategoryId")]
     [InverseProperty("IvfmaleFertilityHistoryCftrcarrierCategory")]
     public virtual DropdownConfiguration? CftrcarrierCategory { get; set; }
@@ -43,6 +46,10 @@ public partial class IvfmaleFertilityHistory
     [ForeignKey("ChromosomeAnalysisCategoryId")]
     [InverseProperty("IvfmaleFertilityHistoryChromosomeAnalysisCategory")]
     public virtual DropdownConfiguration? ChromosomeAnalysisCategory { get; set; }
+
+    [ForeignKey("GenerallyHealthyCategoryId")]
+    [InverseProperty("IvfmaleFertilityHistoryGenerallyHealthyCategory")]
+    public virtual DropdownConfiguration? GenerallyHealthyCategory { get; set; }
 
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfmaleFertilityHistory")]
