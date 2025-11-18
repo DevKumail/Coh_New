@@ -138,7 +138,6 @@ export class MedicalHistoryBasicComponent implements OnInit {
   }
 
   get filteredIllnessesOptions(): string[] {
-    debugger
     const q = this.searchIllness.trim().toLowerCase();
     if (q.length <= 3) return this.illnessesOptions;
     return this.illnessesOptions.filter(o => o.toLowerCase().includes(q));

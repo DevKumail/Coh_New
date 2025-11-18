@@ -124,67 +124,102 @@ export class MedicalHistoryComponent {
         } 
       }
     });
+    // Build General section object
+    const generalSection = {
+      ivfMaleFHGeneralId: 0,
+      ivfMaleFHId: 0,
+      hasChildren: !!general?.hasChildren,
+      girls: general?.girls ?? 0,
+      boys: general?.boys ?? 0,
+      infertileSince: general?.infertileSince || '',
+      andrologicalDiagnosisPerformed: !!general?.andrologicalDiagnosisPerformed,
+      date: general?.andrologicalDiagnosisDate ? new Date(general.andrologicalDiagnosisDate).toISOString() : null,
+      infertilityType: Number(general?.infertilityType) || 0,
+      furtherPlanning: {
+        ivfMaleFHFurtherPlanningId: 0,
+        ivfMaleFHGeneralId: 0,
+        semenAnalysis: !!general?.semenAnalysis,
+        morphologicalExamination: !!general?.morphologicalExamination,
+        serologicalExamination: !!general?.serologicalExamination,
+        andrologicalUrologicalConsultation: !!general?.andrologicalUrologicalConsultation,
+        dnaFragmentation: !!general?.dnaFragmentation,
+        spermFreezing: !!general?.spermFreezing
+      },
+      illness: {
+        ivfMaleFHIllnessId: 0,
+        ivfMaleFHGeneralId: 0,
+        idiopathic: !!general?.idiopathic,
+        mumpsAfterPuberty: !!general?.mumpsAfterPuberty,
+        endocrinopathies: Number(general?.endocrinopathies) || 0,
+        previousTumor: Number(general?.previousTumor) || 0,
+        hepatitis: !!general?.hepatitis,
+        hepatitisDetails: general?.hepatitisDetail || '',
+        existingAllergies: !!general?.existingAllergies,
+        existingAllergiesDetails: general?.existingAllergiesDetail || '',
+        chronicIllnesses: general?.chronicIllnesses || '',
+        otherDiseases: general?.otherDiseases || '',
+        idiopathicIds: Array.isArray(general?.idiopathicSelections) ? general.idiopathicSelections : []
+      },
+      performedTreatment: {
+        ivfMaleFHPerformedTreatmentId: 0,
+        ivfMaleFHGeneralId: 0,
+        alreadyTreated: !!general?.alreadyTreated,
+        notes: general?.treatmentNote || '',
+        treatmentYears: [] as any[]
+      }
+    };
+
+    // Determine if General has any meaningful values
+    const hasGeneralData = (
+      !!generalSection.hasChildren ||
+      (generalSection.girls ?? 0) > 0 ||
+      (generalSection.boys ?? 0) > 0 ||
+      (generalSection.infertileSince || '').trim().length > 0 ||
+      !!generalSection.andrologicalDiagnosisPerformed ||
+      !!general?.andrologicalDiagnosisDate ||
+      (generalSection.infertilityType ?? 0) > 0 ||
+      !!generalSection.furtherPlanning.semenAnalysis ||
+      !!generalSection.furtherPlanning.morphologicalExamination ||
+      !!generalSection.furtherPlanning.serologicalExamination ||
+      !!generalSection.furtherPlanning.andrologicalUrologicalConsultation ||
+      !!generalSection.furtherPlanning.dnaFragmentation ||
+      !!generalSection.furtherPlanning.spermFreezing ||
+      !!generalSection.illness.idiopathic ||
+      !!generalSection.illness.mumpsAfterPuberty ||
+      (generalSection.illness.endocrinopathies ?? 0) > 0 ||
+      (generalSection.illness.previousTumor ?? 0) > 0 ||
+      !!generalSection.illness.hepatitis ||
+      !!generalSection.illness.existingAllergies ||
+      (generalSection.illness.chronicIllnesses || '').trim().length > 0 ||
+      (generalSection.illness.otherDiseases || '').trim().length > 0 ||
+      (generalSection.illness.idiopathicIds || []).length > 0 ||
+      !!generalSection.performedTreatment.alreadyTreated ||
+      (generalSection.performedTreatment.notes || '').trim().length > 0
+    );
+
+    // Genetics section: currently only medicalOpinion is captured
+    const geneticsSection = {
+      ivfMaleFHGeneticsId: 0,
+      ivfMaleFHId: 0,
+      genetics: '',
+      categoryIdInheritance: 0,
+      medicalOpinion: this.geneticsTab?.editorContent || ''
+    };
+    const hasGeneticsData = (geneticsSection.medicalOpinion || '').trim().length > 0 || geneticsSection.categoryIdInheritance > 0 || (geneticsSection.genetics || '').trim().length > 0;
+
     const payload: any = {
-      ivfMaleFHId: 0 ,
+      ivfMaleFHId: 0,
       ivfMainId: MainId || 0,
       date: basic?.date ? new Date(basic.date).toISOString() : null,
       providerId: basic?.attendingClinician || 0,
-      adiposity: getNameById('IVFFertilityHistory:Adiposity', basic?.adiposity) || '',
-      generallyHealthy: toBoolFromGH(basic?.generallyHealthy),
+      adiposityCategoryId: Number(basic?.adiposity) || 0,
+      generallyHealthyCategoryId: Number(basic?.generallyHealthy) || 0,
       longTermMedication: basic?.longTermMedication || '',
       noOfPregnanciesAchieved: basic?.pregnanciesAchieved ?? 0,
       chromosomeAnalysisCategoryId: Number(chromosomeAnalysisCategoryId) || 0,
-      cftrCarrier: getNameById('IVFFertilityHistory:CFTRCarrier', basic?.cftrCarrier) || '',
-      general: {
-        ivfMaleFHGeneralId: 0,
-        ivfMaleFHId: 0,
-        hasChildren: !!general?.hasChildren,
-        girls: general?.girls ?? 0,
-        boys: general?.boys ?? 0,
-        infertileSince: general?.infertileSince || '',
-        andrologicalDiagnosisPerformed: !!general?.andrologicalDiagnosisPerformed,
-        date: general?.andrologicalDiagnosisDate ? new Date(general.andrologicalDiagnosisDate).toISOString() : null,
-        infertilityType: getNameById('IVFFertilityHistory:InfertilityType', general?.infertilityType) || '',
-        furtherPlanning: {
-          ivfMaleFHFurtherPlanningId: 0,
-          ivfMaleFHGeneralId: 0,
-          semenAnalysis: !!general?.semenAnalysis,
-          morphologicalExamination: !!general?.morphologicalExamination,
-          serologicalExamination: !!general?.serologicalExamination,
-          andrologicalUrologicalConsultation: !!general?.andrologicalUrologicalConsultation,
-          dnaFragmentation: !!general?.dnaFragmentation,
-          spermFreezing: !!general?.spermFreezing
-        },
-        illness: {
-          ivfMaleFHIllnessId: 0,
-          ivfMaleFHGeneralId: 0,
-          idiopathic: !!general?.idiopathic,
-          mumpsAfterPuberty: !!general?.mumpsAfterPuberty,
-          endocrinopathies: getNameById('IVFFertilityHistory:Endocrinopathies', general?.endocrinopathies) || '',
-          previousTumor: getNameById('IVFFertilityHistory:PreviousTumor', general?.previousTumor) || '',
-          hepatitis: !!general?.hepatitis,
-          hepatitisDetails: general?.hepatitisDetail || '',
-          existingAllergies: !!general?.existingAllergies,
-          existingAllergiesDetails: general?.existingAllergiesDetail || '',
-          chronicIllnesses: general?.chronicIllnesses || '',
-          otherDiseases: general?.otherDiseases || '',
-          idiopathicIds: Array.isArray(general?.idiopathicSelections) ? general.idiopathicSelections : []
-        },
-        performedTreatment: {
-          ivfMaleFHPerformedTreatmentId: 0,
-          ivfMaleFHGeneralId: 0,
-          alreadyTreated: !!general?.alreadyTreated,
-          notes: general?.treatmentNote || '',
-          treatmentYears: [] as any[]
-        }
-      },
-      genetics: {
-        ivfMaleFHGeneticsId: 0,
-        ivfMaleFHId: 0,
-        genetics: '',
-        categoryIdInheritance: 0,
-        medicalOpinion: this.geneticsTab?.editorContent || ''
-      },
+      cFTRCarrierCategoryId: Number(basic?.cftrCarrier) || 0,
+      general: hasGeneralData ? generalSection : {},
+      genetics: hasGeneticsData ? geneticsSection : {},
       testiclesAndSem: {},
       impairmentFactors: [],
       prevIllnesses: [],
