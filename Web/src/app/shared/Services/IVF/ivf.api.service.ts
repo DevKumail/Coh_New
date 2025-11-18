@@ -40,7 +40,7 @@ export class IVFApiService {
   }
 
   getMaleFertilityHistory(ivfMainId: number, page: number = 1, rowsPerPage: number = 10): Observable<any> {
-    return this.api.get('IVFFertilityHistory/GetFertilityHistory', {
+    return this.api.get('IVFFertilityHistory/GetAllFertilityHistory', {
       ivfmainid: ivfMainId,
       page,
       rowsPerPage,

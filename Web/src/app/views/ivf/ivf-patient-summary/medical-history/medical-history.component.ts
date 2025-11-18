@@ -14,6 +14,7 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
 import { Page } from '@/app/shared/enum/dropdown.enum';
 import { NgIconComponent } from '@ng-icons/core';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-medical-history',
@@ -92,7 +93,7 @@ export class MedicalHistoryComponent {
     if(ivfMainId){
       this.ivfservice.getMaleFertilityHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
           next: (res: any) => {
-            this.historyRows = res?.rows || res?.data || res?.items || res || [];
+            this.historyRows = res?.fertilityHistory|| [];
             this.totalrecord = res?.total || res?.count || (Array.isArray(this.historyRows) ? this.historyRows.length : 0);
             this.isLoadingHistory = false;
           },
@@ -254,12 +255,13 @@ export class MedicalHistoryComponent {
       (generalSection.performedTreatment.notes || '').trim().length > 0
     );
 
-    // Genetics section: currently only medicalOpinion is captured
+    // Genetics section from reactive form + editor
+    const geneticsRaw = this.geneticsTab?.geneticsForm?.getRawValue?.() || {};
     const geneticsSection = {
-      ivfMaleFHGeneticsId: 0,
-      ivfMaleFHId: 0,
-      genetics: '',
-      categoryIdInheritance: 0,
+      ivfMaleFHGeneticsId: null,
+      ivfMaleFHId: MainId || 0,
+      genetics: geneticsRaw?.genes || '',
+      categoryIdInheritance: Number(geneticsRaw?.inheritance) || 0,
       medicalOpinion: this.geneticsTab?.editorContent || ''
     };
     const hasGeneticsData = (geneticsSection.medicalOpinion || '').trim().length > 0 || geneticsSection.categoryIdInheritance > 0 || (geneticsSection.genetics || '').trim().length > 0;
@@ -303,13 +305,22 @@ export class MedicalHistoryComponent {
 
     this.ivfservice.createOrUpdateMaleFertilityHistory(payload).subscribe({
       next: (res) => {
-        console.log('Saved successfully', res);
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Fertility History saved successfully',
+        });
         // Return to list and refresh
-        this.showForm = false;
+        this.isCreateUpdate = false;
+        this.showAdd = false;
         this.loadFertilityHistory(1);
       },
       error: (err) => {
-        console.error('Save failed', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to save Fertility History',
+        });
       }
     });
   }
