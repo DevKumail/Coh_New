@@ -116,10 +116,17 @@ export class MedicalHistoryComponent {
     };
 
     const chromosomeAnalysisCategoryId = basic?.chromosomeAnalysis || 0;
-
+  var MainId
+    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+      if (data) {
+        if (data?.couple?.ivfMainId != null) {
+           MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
+        } 
+      }
+    });
     const payload: any = {
-      ivfMaleFHId: 0,
-      ivfMainId: 0,
+      ivfMaleFHId: 0 ,
+      ivfMainId: MainId || 0,
       date: basic?.date ? new Date(basic.date).toISOString() : null,
       providerId: basic?.attendingClinician || 0,
       adiposity: getNameById('IVFFertilityHistory:Adiposity', basic?.adiposity) || '',
