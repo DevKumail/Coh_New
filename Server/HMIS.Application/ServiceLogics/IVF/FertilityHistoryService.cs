@@ -1,3 +1,4 @@
+using Dapper;
 using HMIS.Application.DTOs.IVFDTOs;
 using HMIS.Application.DTOs.SpLocalModel;
 using HMIS.Core.Context;
@@ -5,6 +6,7 @@ using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Data;
 
 namespace HMIS.Application.ServiceLogics.IVF
 {
@@ -34,17 +36,8 @@ namespace HMIS.Application.ServiceLogics.IVF
             {
                 return (false, null);
             }
-            if (!int.TryParse(ivfmainid, out var ivfMainIdInt))
-            {
-                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
-            }
             var page = pagination?.Page ?? 1;
             var rows = pagination?.RowsPerPage ?? 10;
-            if (page <= 0 || rows <= 0)
-            {
-                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
-            }
-
             using var conn = _dapper.CreateConnection();
             try
             {
