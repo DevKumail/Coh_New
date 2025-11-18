@@ -234,6 +234,10 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<LabOrderSetDetail> LabOrderSetDetail { get; set; }
 
+    public virtual DbSet<LabResultsMain> LabResultsMain { get; set; }
+
+    public virtual DbSet<LabResultsObservation> LabResultsObservation { get; set; }
+
     public virtual DbSet<LabSampleTypes> LabSampleTypes { get; set; }
 
     public virtual DbSet<LabTests> LabTests { get; set; }
@@ -1133,7 +1137,9 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.IvfmaleFhid).HasName("PK__IVFMaleF__354FB852D85F5098");
 
-            entity.HasOne(d => d.ChromosomeAnalysisCategory).WithMany(p => p.IvfmaleFertilityHistory).HasConstraintName("FK_IVFMaleFertilityHistory_DropdownConfiguration");
+            entity.HasOne(d => d.CftrcarrierCategory).WithMany(p => p.IvfmaleFertilityHistoryCftrcarrierCategory).HasConstraintName("FK_IVFMaleFertilityHistory_DropdownConfiguration1");
+
+            entity.HasOne(d => d.ChromosomeAnalysisCategory).WithMany(p => p.IvfmaleFertilityHistoryChromosomeAnalysisCategory).HasConstraintName("FK_IVFMaleFertilityHistory_DropdownConfiguration");
 
             entity.HasOne(d => d.Ivfmain).WithMany(p => p.IvfmaleFertilityHistory)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -1363,6 +1369,11 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsRadiologyTest).HasComment("2 = Pathalogy\r\n1 = Lab\r\n0 = Radiology");
 
             entity.HasOne(d => d.SampleType).WithMany(p => p.LabOrderSetDetail).HasConstraintName("FK_LabOrderSetDetail_SampleTypes");
+        });
+
+        modelBuilder.Entity<LabResultsObservation>(entity =>
+        {
+            entity.Property(e => e.LabObservationId).ValueGeneratedOnAdd();
         });
 
         modelBuilder.Entity<LabSampleTypes>(entity =>
