@@ -11,7 +11,7 @@ namespace HMIS.Application.ServiceLogics.IVF
 {
     public interface IFertilityHistoryService
     {
-        Task<(bool IsSuccess, DashboardReadDTO Data)> GetFertilityHistory(string ivfmainid, PaginationInfo pagination);
+        Task<(bool IsSuccess, object? Data)> GetFertilityHistory(string ivfmainid, PaginationInfo pagination);
         Task<Result<int>> CreateMaleFertilityHistoryAsync(IVFMaleFertilityHistoryDto dto);
     }
     internal class FertilityHistoryService : IFertilityHistoryService
@@ -24,18 +24,18 @@ namespace HMIS.Application.ServiceLogics.IVF
             _context = db;
         }
 
-        public async Task<(bool IsSuccess, DashboardReadDTO Data)> GetFertilityHistory(string ivfmainid, PaginationInfo pagination)
+        public async Task<(bool IsSuccess, object? Data)> GetFertilityHistory(string ivfmainid, PaginationInfo pagination)
         {
             // Basic validations
             if (string.IsNullOrWhiteSpace(ivfmainid))
             {
-                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
+                return (false, null);
             }
             var page = pagination?.Page ?? 1;
             var rows = pagination?.RowsPerPage ?? 10;
             if (page <= 0 || rows <= 0)
             {
-                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
+                return (false, null);
             }
 
             using var conn = _dapper.CreateConnection();
