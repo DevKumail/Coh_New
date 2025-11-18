@@ -143,13 +143,11 @@ export class IVFHomeComponent {
   }
 
   ngOnDestroy(): void {
-  if (this.patientSubscription) {
-    this.patientSubscription.unsubscribe();
-  }
+
     this.patientBannerService.setIsbanneropen(true);
-    if (this.ivfSearchSub) {
-      this.ivfSearchSub.unsubscribe();
-    }
+    // if (this.ivfSearchSub) {
+    //   this.ivfSearchSub.unsubscribe();
+    // }
   }
 
   viewSummary(side: 'female' | 'male') {
@@ -159,17 +157,23 @@ export class IVFHomeComponent {
   }
 
   private handleCoupleResponse(res: any) {
+    debugger
+    this.patientBannerService.setIVFPatientData(null);
     this.couple = res?.couple ?? res ?? null;
     try {
       const hasFemale = !!this.couple?.female;
       const hasMale = !!this.couple?.male;
       if (!hasFemale && !hasMale && !this.noCoupleAlertShown) {
         this.noCoupleAlertShown = true;
+        this.patientBannerService.setIVFPatientData(null);
         // Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       }
       if (hasFemale || hasMale) {
         this.noCoupleAlertShown = false;
+        this.patientBannerService.setIVFPatientData(null);
+        this.patientBannerService.setIVFPatientData(res);
       } else if(hasFemale && hasMale){
+        this.patientBannerService.setIVFPatientData(null);
         this.patientBannerService.setIVFPatientData(res);
       }
     } catch {}
