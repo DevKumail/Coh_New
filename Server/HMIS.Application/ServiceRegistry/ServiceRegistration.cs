@@ -3,6 +3,7 @@ using HMIS.Application.ServiceLogics;
 using HMIS.Application.ServiceLogics.Cryo;
 using HMIS.Application.ServiceLogics.IVF;
 using HMIS.ApplicationImplementations;
+using HMIS.Core.Entities;
 using HMIS.Service.Implementations;
 using HMIS.Service.ServiceLogics;
 using Microsoft.Extensions.Configuration;
@@ -49,6 +50,7 @@ namespace HMIS.Application
             services.AddScoped<IIVFLabService, IVFLabService>();
             services.AddScoped<IIVFLabOrderService, IVFLabOrderService>();
             services.AddScoped<IIVFMaleSemenService, IVFMaleSemenService>();
+            services.AddScoped<IFertilityHistoryService, FertilityHistoryService>();
 
 
 
