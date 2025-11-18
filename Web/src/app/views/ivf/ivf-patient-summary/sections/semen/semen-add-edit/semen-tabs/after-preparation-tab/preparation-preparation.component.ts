@@ -15,6 +15,7 @@ export class PreparationPreparationComponent implements OnChanges {
   @Input() hrEmployees: Array<{ name: string; providerId: number }> = [];
   form: FormGroup;
   methodsOptions: Array<{ id: number; name: string }> = [];
+  private pendingSelectedMethodIds: number[] | null = null;
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -35,12 +36,28 @@ export class PreparationPreparationComponent implements OnChanges {
       const items = this.dropdowns?.['IVFSemanAnalysis:Preperation'] || [];
       this.methodsOptions = items.map(x => ({ id: x.valueId, name: x.name }));
       this.rebuildMethods();
+      // If we had pending selections (from patch) apply them now that options exist
+      if (this.pendingSelectedMethodIds && this.methodsOptions.length) {
+        this.applySelectedMethods(this.pendingSelectedMethodIds);
+        this.pendingSelectedMethodIds = null;
+      }
     }
   }
 
   private rebuildMethods() {
     const fa = this.fb.array(this.methodsOptions.map(() => new FormControl(false)));
     this.form.setControl('methods', fa);
+  }
+
+  private applySelectedMethods(selectedMethodIds: number[]) {
+    // Ensure controls length matches options
+    if ((this.methodsFA?.length || 0) !== this.methodsOptions.length) {
+      this.rebuildMethods();
+    }
+    this.methodsFA.controls.forEach((ctl, idx) => {
+      const method = this.methodsOptions[idx];
+      ctl.setValue(!!(method && selectedMethodIds.includes(method.id)), { emitEvent: false });
+    });
   }
 
   onMethodToggle(idx: any) {
@@ -63,6 +80,14 @@ export class PreparationPreparationComponent implements OnChanges {
       .map(i => this.methodsOptions[i])
       .filter(x => !!x)
       .map(x => ({ id: 0, preparationId: 0, preparationMethodId: x.id, createdAt: new Date().toISOString() }));
+    // If no values at all, return null to skip
+    const noDate = !v.prepDate;
+    const noTime = !time;
+    const noPrepBy = !v.prepBy || Number(v.prepBy) === 0;
+    const noMethods = selectedMethods.length === 0;
+    if (noDate && noTime && noPrepBy && noMethods) {
+      return null;
+    }
 
     return {
       preparationId: 0,
@@ -112,11 +137,11 @@ export class PreparationPreparationComponent implements OnChanges {
       prepBy: p.preparedById || '',
     });
     const selectedMethodIds: number[] = (p.preparationMethods || []).map((m: any) => m.preparationMethodId);
-    // Ensure methods controls match current options length
-    this.rebuildMethods();
-    this.methodsFA.controls.forEach((ctl, idx) => {
-      const method = this.methodsOptions[idx];
-      ctl.setValue(!!(method && selectedMethodIds.includes(method.id)), { emitEvent: false });
-    });
+    // If options not ready yet, store and apply on ngOnChanges; else apply now
+    if (!this.methodsOptions.length) {
+      this.pendingSelectedMethodIds = selectedMethodIds;
+    } else {
+      this.applySelectedMethods(selectedMethodIds);
+    }
   }
 }

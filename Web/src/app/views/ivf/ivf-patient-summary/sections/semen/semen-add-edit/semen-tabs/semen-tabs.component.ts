@@ -65,4 +65,35 @@ export class SemenTabsComponent implements AfterViewInit {
     const prep = afterObs?.preparations?.[0] || null;
     try { this.prepTab?.patchFromPreparation?.(prep); } catch {}
   }
+
+  private hasValues(obj: any): boolean {
+    if (!obj) return false;
+    const values = Object.values(obj);
+    return values.some((v: any) => {
+      if (typeof v === 'boolean') return v === true;
+      if (typeof v === 'number') return v !== 0 && !Number.isNaN(v);
+      if (typeof v === 'string') return v.trim().length > 0;
+      if (Array.isArray(v)) return v.length > 0;
+      return false;
+    });
+  }
+
+  hasNativeValues(): boolean {
+    const v = this.nativeTab?.form?.value;
+    return this.hasValues(v);
+  }
+
+  hasAfterValues(): boolean {
+    const v = this.afterParamTab?.form?.value;
+    return this.hasValues(v);
+  }
+
+  hasPreparationValues(): boolean {
+    const fv: any = this.prepTab?.form?.value || {};
+    const methodsSelected = !!this.prepTab?.methodsFA?.controls?.some(c => !!c.value);
+    const hasDate = !!fv.prepDate;
+    const hasTime = typeof fv.prepTime === 'string' && fv.prepTime.trim().length > 0;
+    const hasBy = !!fv.prepBy && Number(fv.prepBy) > 0;
+    return hasDate || hasTime || hasBy || methodsSelected;
+  }
 }

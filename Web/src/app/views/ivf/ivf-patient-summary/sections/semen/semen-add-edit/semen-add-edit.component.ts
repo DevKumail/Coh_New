@@ -8,6 +8,7 @@ import { Page } from '@/app/shared/enum/dropdown.enum';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import Swal from 'sweetalert2';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 
 @Component({
   selector: 'app-semen-add-edit',
@@ -32,6 +33,7 @@ export class SemenAddEditComponent implements OnChanges {
   constructor(
     private fb: FormBuilder,
     private ivfservice: IVFApiService,
+    private patientBannerService: PatientBannerService,
     private sharedservice: SharedService
 
   ) {
@@ -218,25 +220,40 @@ export class SemenAddEditComponent implements OnChanges {
     const collectionDateTime = this.combineDateTime(h.collectionDate, h.collectionTime);
     const thawingDateTime = this.combineDateTime(h.thawingDate, h.thawingTime);
 
-    const nativeObs = this.tabs?.getNativeObservation();
-    const afterObs = this.tabs?.getAfterObservation();
-    const prep = this.tabs?.getPreparation();
-
-    if (afterObs && prep) {
-      afterObs.preparations = [prep];
+    const observations: any[] = [];
+    // Native only if user entered some values
+    if (this.tabs?.hasNativeValues?.()) {
+      const n = this.tabs?.getNativeObservation();
+      if (n) observations.push(n);
     }
-
-    const observations = [
-      ...(nativeObs ? [nativeObs] : []),
-      ...(afterObs ? [afterObs] : []),
-    ];
+    // After-preparation only if user entered some values
+    if (this.tabs?.hasAfterValues?.()) {
+      const a = this.tabs?.getAfterObservation();
+      if (a) {
+        if (this.tabs?.hasPreparationValues?.()) {
+          const p = this.tabs?.getPreparation();
+          if (p) a.preparations = [p];
+        } else {
+          // Explicitly send empty array when no preparation values
+          a.preparations = [];
+        }
+        observations.push(a);
+      }
+    }
 
     const d = this.diag?.getValue?.() || { diagnosis: null, finding: null, note: null, approvalStatus: 'Pending' };
     const approval = String(d.approvalStatus || 'Pending');
-
+  var MainId
+    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+      if (data) {
+        if (data?.couple?.ivfMainId != null) {
+           MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
+        } 
+      }
+    });
     const payload = {
       sampleId: this.model?.sampleId ?? 0,
-      ivfMainId: this.model?.ivfMainId ?? 0,
+      ivfMainId: this.model?.ivfMainId  || MainId,
       sampleCode: h.sampleId || '',
       collectionDateTime,
       thawingDateTime,
