@@ -33,15 +33,10 @@ namespace HMIS.Application.ServiceLogics.IVF
 
             try
             {
-                // Validate required fields
-                if (dto.IVFMainId <= 0)
+                // Validate minimally: at least an identifier to locate or create
+                if (!dto.IVFMaleFHId.HasValue && !dto.IVFMainId.HasValue)
                 {
-                    return Result<int>.Failure("IVFMainId is required");
-                }
-
-                if (dto.ProviderId <= 0)
-                {
-                    return Result<int>.Failure("ProviderId is required");
+                    return Result<int>.Failure("Either IVFMaleFHId or IVFMainId must be provided");
                 }
 
                 // Upsert main fertility history
@@ -52,24 +47,39 @@ namespace HMIS.Application.ServiceLogics.IVF
                         .FirstOrDefaultAsync(x => x.IvfmaleFhid == dto.IVFMaleFHId.Value);
                     if (fertilityHistory == null)
                     {
-                        fertilityHistory = new IvfmaleFertilityHistory { IvfmainId = dto.IVFMainId };
+                        if (!dto.IVFMainId.HasValue)
+                            return Result<int>.Failure("IVFMainId is required to create new record");
+                        fertilityHistory = new IvfmaleFertilityHistory { IvfmainId = dto.IVFMainId.Value };
                         _context.IvfmaleFertilityHistory.Add(fertilityHistory);
                     }
                 }
                 else
                 {
-                    fertilityHistory = new IvfmaleFertilityHistory { IvfmainId = dto.IVFMainId };
-                    _context.IvfmaleFertilityHistory.Add(fertilityHistory);
+                    // Try to find an existing record by IVFMainId; create if not found
+                    if (!dto.IVFMainId.HasValue)
+                        return Result<int>.Failure("IVFMainId is required to locate or create record");
+                    fertilityHistory = await _context.IvfmaleFertilityHistory
+                        .FirstOrDefaultAsync(x => x.IvfmainId == dto.IVFMainId.Value) ?? new IvfmaleFertilityHistory { IvfmainId = dto.IVFMainId.Value };
+                    if (fertilityHistory.IvfmaleFhid == 0)
+                    {
+                        // For a new record, require ProviderId and Date as entity requires them
+                        if (!dto.ProviderId.HasValue || !dto.Date.HasValue)
+                            return Result<int>.Failure("ProviderId and Date are required to create a new record");
+                        fertilityHistory.Date = dto.Date.Value;
+                        fertilityHistory.ProviderId = dto.ProviderId.Value;
+                        _context.IvfmaleFertilityHistory.Add(fertilityHistory);
+                    }
                 }
 
-                fertilityHistory.Date = dto.Date;
-                fertilityHistory.ProviderId = dto.ProviderId;
-                fertilityHistory.Adiposity = dto.Adiposity;
-                fertilityHistory.GenerallyHealthy = dto.GenerallyHealthy;
-                fertilityHistory.LongTermMedication = dto.LongTermMedication;
-                fertilityHistory.NoOfPregnanciesAchieved = dto.NoOfPregnanciesAchieved;
-                fertilityHistory.ChromosomeAnalysisCategoryId = dto.ChromosomeAnalysisCategoryId;
-                fertilityHistory.Cftrcarrier = dto.CFTRCarrier;
+                // Partial update only when values provided
+                if (dto.Date.HasValue) fertilityHistory.Date = dto.Date.Value;
+                if (dto.ProviderId.HasValue) fertilityHistory.ProviderId = dto.ProviderId.Value;
+                if (dto.AdiposityCategoryId.HasValue) fertilityHistory.AdiposityCategoryId = dto.AdiposityCategoryId.Value;
+                if (dto.GenerallyHealthyCategoryId.HasValue) fertilityHistory.GenerallyHealthyCategoryId = dto.GenerallyHealthyCategoryId.Value;
+                if (dto.LongTermMedication != null) fertilityHistory.LongTermMedication = dto.LongTermMedication;
+                if (dto.NoOfPregnanciesAchieved.HasValue) fertilityHistory.NoOfPregnanciesAchieved = dto.NoOfPregnanciesAchieved.Value;
+                if (dto.ChromosomeAnalysisCategoryId.HasValue) fertilityHistory.ChromosomeAnalysisCategoryId = dto.ChromosomeAnalysisCategoryId.Value;
+                if (dto.CFTRCarrierCategoryId.HasValue) fertilityHistory.CftrcarrierCategoryId = dto.CFTRCarrierCategoryId.Value;
 
                 await _context.SaveChangesAsync();
 
@@ -94,13 +104,13 @@ namespace HMIS.Application.ServiceLogics.IVF
                         if (general.IvfmaleFhgeneralId == 0) _context.IvfmaleFhgeneral.Add(general);
                     }
 
-                    general.HasChildren = dto.General.HasChildren;
-                    general.Girls = dto.General.Girls;
-                    general.Boys = dto.General.Boys;
-                    general.InfertileSince = dto.General.InfertileSince;
-                    general.AndrologicalDiagnosisPerformed = dto.General.AndrologicalDiagnosisPerformed;
-                    general.Date = dto.General.Date;
-                    general.InfertilityType = dto.General.InfertilityType;
+                    if (dto.General.HasChildren.HasValue) general.HasChildren = dto.General.HasChildren;
+                    if (dto.General.Girls.HasValue) general.Girls = dto.General.Girls;
+                    if (dto.General.Boys.HasValue) general.Boys = dto.General.Boys;
+                    if (dto.General.InfertileSince != null) general.InfertileSince = dto.General.InfertileSince;
+                    if (dto.General.AndrologicalDiagnosisPerformed.HasValue) general.AndrologicalDiagnosisPerformed = dto.General.AndrologicalDiagnosisPerformed;
+                    if (dto.General.Date.HasValue) general.Date = dto.General.Date;
+                    if (dto.General.InfertilityTypeCategoryId.HasValue) general.InfertilityTypeCategoryId = dto.General.InfertilityTypeCategoryId.Value;
 
                     await _context.SaveChangesAsync();
 
@@ -120,12 +130,12 @@ namespace HMIS.Application.ServiceLogics.IVF
                         }
                         if (furtherPlanning.IvfmaleFhfurtherPlanningId == 0) _context.IvfmaleFhfurtherPlanning.Add(furtherPlanning);
 
-                        furtherPlanning.SemenAnalysis = dto.General.FurtherPlanning.SemenAnalysis;
-                        furtherPlanning.MorphologicalExamination = dto.General.FurtherPlanning.MorphologicalExamination;
-                        furtherPlanning.SerologicalExamination = dto.General.FurtherPlanning.SerologicalExamination;
-                        furtherPlanning.AndrologicalUrologicalConsultation = dto.General.FurtherPlanning.AndrologicalUrologicalConsultation;
-                        furtherPlanning.Dnafragmentation = dto.General.FurtherPlanning.DNAFragmentation;
-                        furtherPlanning.SpermFreezing = dto.General.FurtherPlanning.SpermFreezing;
+                        if (dto.General.FurtherPlanning.SemenAnalysis.HasValue) furtherPlanning.SemenAnalysis = dto.General.FurtherPlanning.SemenAnalysis.Value;
+                        if (dto.General.FurtherPlanning.MorphologicalExamination.HasValue) furtherPlanning.MorphologicalExamination = dto.General.FurtherPlanning.MorphologicalExamination.Value;
+                        if (dto.General.FurtherPlanning.SerologicalExamination.HasValue) furtherPlanning.SerologicalExamination = dto.General.FurtherPlanning.SerologicalExamination.Value;
+                        if (dto.General.FurtherPlanning.AndrologicalUrologicalConsultation.HasValue) furtherPlanning.AndrologicalUrologicalConsultation = dto.General.FurtherPlanning.AndrologicalUrologicalConsultation.Value;
+                        if (dto.General.FurtherPlanning.DNAFragmentation.HasValue) furtherPlanning.Dnafragmentation = dto.General.FurtherPlanning.DNAFragmentation.Value;
+                        if (dto.General.FurtherPlanning.SpermFreezing.HasValue) furtherPlanning.SpermFreezing = dto.General.FurtherPlanning.SpermFreezing.Value;
                     }
 
                     // Create Illness if provided
@@ -142,38 +152,41 @@ namespace HMIS.Application.ServiceLogics.IVF
                         }
                         if (illness.IvfmaleFhillnessId == 0) _context.IvfmaleFhillness.Add(illness);
 
-                        illness.Idiopathic = dto.General.Illness.Idiopathic;
-                        illness.MumpsAfterPuberty = dto.General.Illness.MumpsAfterPuberty;
-                        illness.Endocrinopathies = dto.General.Illness.Endocrinopathies;
-                        illness.PreviousTumor = dto.General.Illness.PreviousTumor;
-                        illness.Hepatitis = dto.General.Illness.Hepatitis;
-                        illness.HepatitisDetails = dto.General.Illness.HepatitisDetails;
-                        illness.ExistingAllergies = dto.General.Illness.ExistingAllergies;
-                        illness.ExistingAllergiesDetails = dto.General.Illness.ExistingAllergiesDetails;
-                        illness.ChronicIllnesses = dto.General.Illness.ChronicIllnesses;
-                        illness.OtherDiseases = dto.General.Illness.OtherDiseases;
+                        if (dto.General.Illness.Idiopathic.HasValue) illness.Idiopathic = dto.General.Illness.Idiopathic;
+                        if (dto.General.Illness.MumpsAfterPuberty.HasValue) illness.MumpsAfterPuberty = dto.General.Illness.MumpsAfterPuberty;
+                        if (dto.General.Illness.EndocrinopathiesCategoryId.HasValue) illness.EndocrinopathiesCategoryId = dto.General.Illness.EndocrinopathiesCategoryId.Value;
+                        if (dto.General.Illness.PreviousTumorCategoryId.HasValue) illness.PreviousTumorCategoryId = dto.General.Illness.PreviousTumorCategoryId.Value;
+                        if (dto.General.Illness.Hepatitis.HasValue) illness.Hepatitis = dto.General.Illness.Hepatitis;
+                        if (dto.General.Illness.HepatitisDetails != null) illness.HepatitisDetails = dto.General.Illness.HepatitisDetails;
+                        if (dto.General.Illness.ExistingAllergies.HasValue) illness.ExistingAllergies = dto.General.Illness.ExistingAllergies;
+                        if (dto.General.Illness.ExistingAllergiesDetails != null) illness.ExistingAllergiesDetails = dto.General.Illness.ExistingAllergiesDetails;
+                        if (dto.General.Illness.ChronicIllnesses != null) illness.ChronicIllnesses = dto.General.Illness.ChronicIllnesses;
+                        if (dto.General.Illness.OtherDiseases != null) illness.OtherDiseases = dto.General.Illness.OtherDiseases;
 
                         await _context.SaveChangesAsync();
 
                         int illnessId = illness.IvfmaleFhillnessId;
 
-                        // Create Illness-Idiopathic mappings if provided
-                        if (dto.General.Illness.IdiopathicIds != null && dto.General.Illness.IdiopathicIds.Any())
+                        // Create Illness-Idiopathic mappings if provided (replace semantics)
+                        if (dto.General.Illness.IdiopathicIds != null)
                         {
                             // replace existing mappings
                             var existingIdiopathics = await _context.IvfmaleFhillnessIdiopathic.Where(m => m.IvfmaleFhillnessId == illnessId).ToListAsync();
                             if (existingIdiopathics.Any())
                                 _context.IvfmaleFhillnessIdiopathic.RemoveRange(existingIdiopathics);
 
-                            foreach (var idiopathicId in dto.General.Illness.IdiopathicIds)
+                            if (dto.General.Illness.IdiopathicIds.Any())
                             {
-                                var illnessIdiopathic = new IvfmaleFhillnessIdiopathic
+                                foreach (var idiopathicId in dto.General.Illness.IdiopathicIds)
                                 {
-                                    IvfmaleFhillnessId = illnessId,
-                                    IvfmaleFhidiopathicId = idiopathicId
-                                };
+                                    var illnessIdiopathic = new IvfmaleFhillnessIdiopathic
+                                    {
+                                        IvfmaleFhillnessId = illnessId,
+                                        IvfmaleFhidiopathicId = idiopathicId
+                                    };
 
-                                _context.IvfmaleFhillnessIdiopathic.Add(illnessIdiopathic);
+                                    _context.IvfmaleFhillnessIdiopathic.Add(illnessIdiopathic);
+                                }
                             }
                         }
                     }
@@ -192,32 +205,34 @@ namespace HMIS.Application.ServiceLogics.IVF
                         }
                         if (performedTreatment.IvfmaleFhperformedTreatmentId == 0) _context.IvfmaleFhperformedTreatment.Add(performedTreatment);
 
-                        performedTreatment.AlreadyTreated = dto.General.PerformedTreatment.AlreadyTreated;
-                        performedTreatment.Notes = dto.General.PerformedTreatment.Notes;
+                        if (dto.General.PerformedTreatment.AlreadyTreated.HasValue) performedTreatment.AlreadyTreated = dto.General.PerformedTreatment.AlreadyTreated;
+                        if (dto.General.PerformedTreatment.Notes != null) performedTreatment.Notes = dto.General.PerformedTreatment.Notes;
 
                         await _context.SaveChangesAsync();
 
                         int performedTreatmentId = performedTreatment.IvfmaleFhperformedTreatmentId;
 
-                        // Create Treatment Years if provided
-                        if (dto.General.PerformedTreatment.TreatmentYears != null &&
-                            dto.General.PerformedTreatment.TreatmentYears.Any())
+                        // Create Treatment Years if provided (replace semantics)
+                        if (dto.General.PerformedTreatment.TreatmentYears != null)
                         {
                             // replace existing years
                             var existingYears = await _context.IvfmaleFhperformedTreatmentYear.Where(y => y.IvfmaleFhperformedTreatmentId == performedTreatmentId).ToListAsync();
                             if (existingYears.Any()) _context.IvfmaleFhperformedTreatmentYear.RemoveRange(existingYears);
 
-                            foreach (var yearDto in dto.General.PerformedTreatment.TreatmentYears)
+                            if (dto.General.PerformedTreatment.TreatmentYears.Any())
                             {
-                                var treatmentYear = new IvfmaleFhperformedTreatmentYear
+                                foreach (var yearDto in dto.General.PerformedTreatment.TreatmentYears)
                                 {
-                                    IvfmaleFhperformedTreatmentId = performedTreatmentId,
-                                    TreatmentType = yearDto.TreatmentType,
-                                    TreatmentNumber = yearDto.TreatmentNumber,
-                                    Year = yearDto.Year
-                                };
+                                    var treatmentYear = new IvfmaleFhperformedTreatmentYear
+                                    {
+                                        IvfmaleFhperformedTreatmentId = performedTreatmentId,
+                                        TreatmentType = yearDto.TreatmentType,
+                                        TreatmentNumber = yearDto.TreatmentNumber,
+                                        Year = yearDto.Year
+                                    };
 
-                                _context.IvfmaleFhperformedTreatmentYear.Add(treatmentYear);
+                                    _context.IvfmaleFhperformedTreatmentYear.Add(treatmentYear);
+                                }
                             }
                         }
                     }
@@ -239,9 +254,9 @@ namespace HMIS.Application.ServiceLogics.IVF
                     }
                     if (genetics.IvfmaleFhgeneticsId == 0) _context.IvfmaleFhgenetics.Add(genetics);
 
-                    genetics.Genetics = dto.Genetics.Genetics;
-                    genetics.CategoryIdInheritance = dto.Genetics.CategoryIdInheritance;
-                    genetics.MedicalOpinion = dto.Genetics.MedicalOpinion;
+                    if (dto.Genetics.Genetics != null) genetics.Genetics = dto.Genetics.Genetics;
+                    if (dto.Genetics.CategoryIdInheritance.HasValue) genetics.CategoryIdInheritance = dto.Genetics.CategoryIdInheritance;
+                    if (dto.Genetics.MedicalOpinion != null) genetics.MedicalOpinion = dto.Genetics.MedicalOpinion;
                 }
 
                 // Create Testicles and Sem record if provided
@@ -258,24 +273,24 @@ namespace HMIS.Application.ServiceLogics.IVF
                     }
                     if (testiclesAndSem.IvfmaleFhtesticlesAndSemId == 0) _context.IvfmaleFhtesticlesAndSem.Add(testiclesAndSem);
 
-                    testiclesAndSem.PrimaryHypogonadotropy = dto.TesticlesAndSem.PrimaryHypogonadotropy;
-                    testiclesAndSem.SecondaryHypogonadotropy = dto.TesticlesAndSem.SecondaryHypogonadotropy;
-                    testiclesAndSem.RetractileTestes = dto.TesticlesAndSem.RetractileTestes;
-                    testiclesAndSem.CategoryIdTesticle = dto.TesticlesAndSem.CategoryIdTesticle;
-                    testiclesAndSem.CategoryIdKryptorchidism = dto.TesticlesAndSem.CategoryIdKryptorchidism;
-                    testiclesAndSem.CategoryIdOrchitis = dto.TesticlesAndSem.CategoryIdOrchitis;
-                    testiclesAndSem.TesticleVolumeLeft = dto.TesticlesAndSem.TesticleVolumeLeft;
-                    testiclesAndSem.TesticleVolumeRight = dto.TesticlesAndSem.TesticleVolumeRight;
-                    testiclesAndSem.Varicocele = dto.TesticlesAndSem.Varicocele;
-                    testiclesAndSem.OperatedVaricocele = dto.TesticlesAndSem.OperatedVaricocele;
-                    testiclesAndSem.CategoryIdInstrumentalVaricocele = dto.TesticlesAndSem.CategoryIdInstrumentalVaricocele;
-                    testiclesAndSem.CategoryIdClinicalVaricocele = dto.TesticlesAndSem.CategoryIdClinicalVaricocele;
-                    testiclesAndSem.ObstipationOfSpermaticDuct = dto.TesticlesAndSem.ObstipationOfSpermaticDuct;
-                    testiclesAndSem.CategoryIdProximalSeminalTract = dto.TesticlesAndSem.CategoryIdProximalSeminalTract;
-                    testiclesAndSem.CategoryIdDistalSeminalTract = dto.TesticlesAndSem.CategoryIdDistalSeminalTract;
-                    testiclesAndSem.CategoryIdEtiologicalDiagnosis = dto.TesticlesAndSem.CategoryIdEtiologicalDiagnosis;
-                    testiclesAndSem.Inflammation = dto.TesticlesAndSem.Inflammation;
-                    testiclesAndSem.Note = dto.TesticlesAndSem.Note;
+                    if (dto.TesticlesAndSem.PrimaryHypogonadotropy.HasValue) testiclesAndSem.PrimaryHypogonadotropy = dto.TesticlesAndSem.PrimaryHypogonadotropy;
+                    if (dto.TesticlesAndSem.SecondaryHypogonadotropy.HasValue) testiclesAndSem.SecondaryHypogonadotropy = dto.TesticlesAndSem.SecondaryHypogonadotropy;
+                    if (dto.TesticlesAndSem.RetractileTestes.HasValue) testiclesAndSem.RetractileTestes = dto.TesticlesAndSem.RetractileTestes;
+                    if (dto.TesticlesAndSem.CategoryIdTesticle.HasValue) testiclesAndSem.CategoryIdTesticle = dto.TesticlesAndSem.CategoryIdTesticle;
+                    if (dto.TesticlesAndSem.CategoryIdKryptorchidism.HasValue) testiclesAndSem.CategoryIdKryptorchidism = dto.TesticlesAndSem.CategoryIdKryptorchidism;
+                    if (dto.TesticlesAndSem.CategoryIdOrchitis.HasValue) testiclesAndSem.CategoryIdOrchitis = dto.TesticlesAndSem.CategoryIdOrchitis;
+                    if (dto.TesticlesAndSem.TesticleVolumeLeft != null) testiclesAndSem.TesticleVolumeLeft = dto.TesticlesAndSem.TesticleVolumeLeft;
+                    if (dto.TesticlesAndSem.TesticleVolumeRight != null) testiclesAndSem.TesticleVolumeRight = dto.TesticlesAndSem.TesticleVolumeRight;
+                    if (dto.TesticlesAndSem.Varicocele.HasValue) testiclesAndSem.Varicocele = dto.TesticlesAndSem.Varicocele;
+                    if (dto.TesticlesAndSem.OperatedVaricocele.HasValue) testiclesAndSem.OperatedVaricocele = dto.TesticlesAndSem.OperatedVaricocele;
+                    if (dto.TesticlesAndSem.CategoryIdInstrumentalVaricocele.HasValue) testiclesAndSem.CategoryIdInstrumentalVaricocele = dto.TesticlesAndSem.CategoryIdInstrumentalVaricocele;
+                    if (dto.TesticlesAndSem.CategoryIdClinicalVaricocele.HasValue) testiclesAndSem.CategoryIdClinicalVaricocele = dto.TesticlesAndSem.CategoryIdClinicalVaricocele;
+                    if (dto.TesticlesAndSem.ObstipationOfSpermaticDuct.HasValue) testiclesAndSem.ObstipationOfSpermaticDuct = dto.TesticlesAndSem.ObstipationOfSpermaticDuct;
+                    if (dto.TesticlesAndSem.CategoryIdProximalSeminalTract.HasValue) testiclesAndSem.CategoryIdProximalSeminalTract = dto.TesticlesAndSem.CategoryIdProximalSeminalTract;
+                    if (dto.TesticlesAndSem.CategoryIdDistalSeminalTract.HasValue) testiclesAndSem.CategoryIdDistalSeminalTract = dto.TesticlesAndSem.CategoryIdDistalSeminalTract;
+                    if (dto.TesticlesAndSem.CategoryIdEtiologicalDiagnosis.HasValue) testiclesAndSem.CategoryIdEtiologicalDiagnosis = dto.TesticlesAndSem.CategoryIdEtiologicalDiagnosis;
+                    if (dto.TesticlesAndSem.Inflammation.HasValue) testiclesAndSem.Inflammation = dto.TesticlesAndSem.Inflammation;
+                    if (dto.TesticlesAndSem.Note != null) testiclesAndSem.Note = dto.TesticlesAndSem.Note;
 
                     await _context.SaveChangesAsync();
 
@@ -295,84 +310,93 @@ namespace HMIS.Application.ServiceLogics.IVF
                         }
                         if (infections.IvfmaleFhinfectionsId == 0) _context.IvfmaleFhinfections.Add(infections);
 
-                        infections.Urethritis = dto.TesticlesAndSem.Infections.Urethritis;
-                        infections.Prostatitis = dto.TesticlesAndSem.Infections.Prostatitis;
-                        infections.Epididymitis = dto.TesticlesAndSem.Infections.Epididymitis;
-                        infections.CategoryIdPrevInfections = dto.TesticlesAndSem.Infections.CategoryIdPrevInfections;
-                        infections.CategoryIdDiagnosisOfInfection = dto.TesticlesAndSem.Infections.CategoryIdDiagnosisOfInfection;
+                        if (dto.TesticlesAndSem.Infections.Urethritis.HasValue) infections.Urethritis = dto.TesticlesAndSem.Infections.Urethritis;
+                        if (dto.TesticlesAndSem.Infections.Prostatitis.HasValue) infections.Prostatitis = dto.TesticlesAndSem.Infections.Prostatitis;
+                        if (dto.TesticlesAndSem.Infections.Epididymitis.HasValue) infections.Epididymitis = dto.TesticlesAndSem.Infections.Epididymitis;
+                        if (dto.TesticlesAndSem.Infections.CategoryIdPrevInfections.HasValue) infections.CategoryIdPrevInfections = dto.TesticlesAndSem.Infections.CategoryIdPrevInfections.Value;
+                        if (dto.TesticlesAndSem.Infections.CategoryIdDiagnosisOfInfection.HasValue) infections.CategoryIdDiagnosisOfInfection = dto.TesticlesAndSem.Infections.CategoryIdDiagnosisOfInfection.Value;
                     }
                 }
 
-                // Create Impairment Factors if provided
-                if (dto.ImpairmentFactors != null && dto.ImpairmentFactors.Any())
+                // Create Impairment Factors if provided (replace semantics)
+                if (dto.ImpairmentFactors != null)
                 {
                     // replace existing factors
                     var existingFactors = await _context.IvfmaleFhimpairmentFactor.Where(f => f.IvfmaleFhid == maleFHId).ToListAsync();
                     if (existingFactors.Any()) _context.IvfmaleFhimpairmentFactor.RemoveRange(existingFactors);
 
-                    foreach (var factorDto in dto.ImpairmentFactors)
+                    if (dto.ImpairmentFactors.Any())
                     {
-                        var impairmentFactor = new IvfmaleFhimpairmentFactor
+                        foreach (var factorDto in dto.ImpairmentFactors)
                         {
-                            IvfmaleFhid = maleFHId,
-                            ImpairmentFactor = factorDto.ImpairmentFactor
-                        };
+                            var impairmentFactor = new IvfmaleFhimpairmentFactor
+                            {
+                                IvfmaleFhid = maleFHId,
+                                ImpairmentFactor = factorDto.ImpairmentFactor
+                            };
 
-                        _context.IvfmaleFhimpairmentFactor.Add(impairmentFactor);
+                            _context.IvfmaleFhimpairmentFactor.Add(impairmentFactor);
+                        }
                     }
                 }
 
-                // Create Previous Illnesses if provided
-                if (dto.PrevIllnesses != null && dto.PrevIllnesses.Any())
+                // Create Previous Illnesses if provided (replace semantics)
+                if (dto.PrevIllnesses != null)
                 {
                     // replace existing previous illnesses
                     var existingPrevIllness = await _context.IvfmaleFhprevIllness.Where(p => p.IvfmaleFhid == maleFHId).ToListAsync();
                     if (existingPrevIllness.Any()) _context.IvfmaleFhprevIllness.RemoveRange(existingPrevIllness);
 
-                    foreach (var prevIllnessDto in dto.PrevIllnesses)
+                    if (dto.PrevIllnesses.Any())
                     {
-                        if (string.IsNullOrWhiteSpace(prevIllnessDto.ICDCode))
+                        foreach (var prevIllnessDto in dto.PrevIllnesses)
                         {
-                            continue;
+                            if (string.IsNullOrWhiteSpace(prevIllnessDto.ICDCode))
+                            {
+                                continue;
+                            }
+
+                            var prevIllness = new IvfmaleFhprevIllness
+                            {
+                                IvfmaleFhid = maleFHId,
+                                Icdcode = prevIllnessDto.ICDCode
+                            };
+
+                            _context.IvfmaleFhprevIllness.Add(prevIllness);
                         }
-
-                        var prevIllness = new IvfmaleFhprevIllness
-                        {
-                            IvfmaleFhid = maleFHId,
-                            Icdcode = prevIllnessDto.ICDCode
-                        };
-
-                        _context.IvfmaleFhprevIllness.Add(prevIllness);
                     }
                 }
 
-                // Create Semen Analyses if provided
-                if (dto.SemenAnalyses != null && dto.SemenAnalyses.Any())
+                // Create Semen Analyses if provided (replace semantics)
+                if (dto.SemenAnalyses != null)
                 {
                     // replace existing semen analyses
                     var existingAnalyses = await _context.IvfmaleFhsemenAnalysis.Where(s => s.IvfmaleFhid == maleFHId).ToListAsync();
                     if (existingAnalyses.Any()) _context.IvfmaleFhsemenAnalysis.RemoveRange(existingAnalyses);
 
-                    foreach (var analysisDto in dto.SemenAnalyses)
+                    if (dto.SemenAnalyses.Any())
                     {
-                        var semenAnalysis = new IvfmaleFhsemenAnalysis
+                        foreach (var analysisDto in dto.SemenAnalyses)
                         {
-                            IvfmaleFhid = maleFHId,
-                            Date = analysisDto.Date,
-                            Id = analysisDto.ID,
-                            MotileNo = analysisDto.MotileNo,
-                            CollectionMethod = analysisDto.CollectionMethod,
-                            ConcentrationNative = analysisDto.ConcentrationNative,
-                            ConcentrationAfterPrep = analysisDto.ConcentrationAfterPrep,
-                            OverallMotilityNative = analysisDto.OverallMotilityNative,
-                            OverallMotilityPrep = analysisDto.OverallMotilityPrep,
-                            ProgressiveMotilityNativ = analysisDto.ProgressiveMotilityNativ,
-                            ProgressiveMotilityPrep = analysisDto.ProgressiveMotilityPrep,
-                            NormalFormsNative = analysisDto.NormalFormsNative,
-                            NormalFormsPrep = analysisDto.NormalFormsPrep
-                        };
+                            var semenAnalysis = new IvfmaleFhsemenAnalysis
+                            {
+                                IvfmaleFhid = maleFHId,
+                                Date = analysisDto.Date,
+                                Id = analysisDto.ID,
+                                MotileNo = analysisDto.MotileNo,
+                                CollectionMethod = analysisDto.CollectionMethod,
+                                ConcentrationNative = analysisDto.ConcentrationNative,
+                                ConcentrationAfterPrep = analysisDto.ConcentrationAfterPrep,
+                                OverallMotilityNative = analysisDto.OverallMotilityNative,
+                                OverallMotilityPrep = analysisDto.OverallMotilityPrep,
+                                ProgressiveMotilityNativ = analysisDto.ProgressiveMotilityNativ,
+                                ProgressiveMotilityPrep = analysisDto.ProgressiveMotilityPrep,
+                                NormalFormsNative = analysisDto.NormalFormsNative,
+                                NormalFormsPrep = analysisDto.NormalFormsPrep
+                            };
 
-                        _context.IvfmaleFhsemenAnalysis.Add(semenAnalysis);
+                            _context.IvfmaleFhsemenAnalysis.Add(semenAnalysis);
+                        }
                     }
                 }
 
