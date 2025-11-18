@@ -6,12 +6,13 @@ using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Data;
 
 namespace HMIS.Application.ServiceLogics.IVF
 {
     public interface IFertilityHistoryService
     {
-        Task<(bool IsSuccess, DashboardReadDTO Data)> GetFertilityHistory(string ivfmainid, PaginationInfo pagination);
+        Task<(bool IsSuccess, object? Data)> GetAllFertilityHistory(string ivfmainid, PaginationInfo pagination);
         Task<Result<int>> CreateMaleFertilityHistoryAsync(IVFMaleFertilityHistoryDto dto);
     }
     internal class FertilityHistoryService : IFertilityHistoryService
@@ -24,45 +25,32 @@ namespace HMIS.Application.ServiceLogics.IVF
             _context = db;
         }
 
-        public async Task<(bool IsSuccess, DashboardReadDTO Data)> GetFertilityHistory(string ivfmainid, PaginationInfo pagination)
+        public async Task<(bool IsSuccess, object? Data)> GetAllFertilityHistory(string ivfmainid, PaginationInfo pagination)
         {
             // Basic validations
             if (string.IsNullOrWhiteSpace(ivfmainid))
             {
-                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
+                return (false, null);
+            }
+            if (!int.TryParse(ivfmainid, out var ivfMainIdInt))
+            {
+                return (false, null);
             }
             var page = pagination?.Page ?? 1;
             var rows = pagination?.RowsPerPage ?? 10;
-            if (page <= 0 || rows <= 0)
-            {
-                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
-            }
-
             using var conn = _dapper.CreateConnection();
             try
             {
-                using var grid = await conn.QueryMultipleAsync(
+                var data = (await conn.QueryAsync(
                     "IVF_GetAllFertilityHistory",
-                    new { IVFMainId = ivfmainid, Page = page, RowsPerPage = rows },
-                    commandType: System.Data.CommandType.StoredProcedure);
+                    new { PageNumber = page, PageSize = rows, IVFMainId = ivfMainIdInt },
+                    commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                var female = await grid.ReadFirstOrDefaultAsync<FemaleDemographicDTO>();
-                var male = await grid.ReadFirstOrDefaultAsync<MaleDemographicDTO>();
-                int? mainId = null;
-                var mainIdRow = await grid.ReadFirstOrDefaultAsync<int?>();
-                if (mainIdRow.HasValue) mainId = mainIdRow.Value;
-
-                var dto = new DashboardReadDTO
-                {
-                    Female = female,
-                    Male = male,
-                    IVFMainId = mainId
-                };
-                return (true, dto);
+                return (true, data);
             }
             catch
             {
-                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
+                return (false, null);
             }
         }
         public async Task<Result<int>> CreateMaleFertilityHistoryAsync(IVFMaleFertilityHistoryDto dto)

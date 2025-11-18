@@ -21,14 +21,26 @@ namespace HMIS.Web.Controllers.IVF
             _service = service;
         }
 
-        [HttpGet("GetFertilityHistory")]
-        public async Task<IActionResult> GetFertilityHistory([FromQuery] string ivfmainid, [FromQuery] int? page = 1, [FromQuery] int? rowsPerPage = 10)
+        [HttpGet("GetAllFertilityHistory")]
+        public async Task<IActionResult> GetAllFertilityHistory([FromQuery] string ivfmainid, [FromQuery] int? page = 1, [FromQuery] int? rowsPerPage = 10)
         {
-            var fertilityHistory = await _service.GetFertilityHistory(
-                ivfmainid, 
-                new PaginationInfo { Page = page, RowsPerPage = rowsPerPage
-                });
-            return Ok(new { fertilityHistory = fertilityHistory.Data });
+            if (string.IsNullOrWhiteSpace(ivfmainid))
+                return BadRequest(new { message = "ivfmainid is required" });
+            if (!int.TryParse(ivfmainid, out _))
+                return BadRequest(new { message = "ivfmainid must be an integer" });
+            var pg = page ?? 1;
+            var rp = rowsPerPage ?? 10;
+            if (pg <= 0 || rp <= 0)
+                return BadRequest(new { message = "page and rowsPerPage must be greater than zero" });
+
+            var result = await _service.GetAllFertilityHistory(
+                ivfmainid,
+                new PaginationInfo { Page = pg, RowsPerPage = rp });
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = "Unable to fetch fertility history" });
+
+            return Ok(new { fertilityHistory = result.Data });
         }
 
         [HttpPost("CreateUpdateMaleFertilityHistory")]
