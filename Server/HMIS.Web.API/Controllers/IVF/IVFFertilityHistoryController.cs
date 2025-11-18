@@ -21,6 +21,23 @@ namespace HMIS.Web.Controllers.IVF
             _service = service;
         }
 
+        [HttpGet("GetFertilityHistoryById")]
+        public async Task<IActionResult> GetFertilityHistoryById([FromQuery] string ivfmainid)
+        {
+            if (string.IsNullOrWhiteSpace(ivfmainid))
+                return BadRequest(new { message = "ivfmainid is required" });
+            if (!int.TryParse(ivfmainid, out _))
+                return BadRequest(new { message = "ivfmainid must be an integer" });
+           
+            var result = await _service.GetFertilityHistoryById(
+                ivfmainid);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = "Unable to fetch fertility history" });
+
+            return Ok(new { fertilityHistory = result.Data });
+        }
+        
         [HttpGet("GetAllFertilityHistory")]
         public async Task<IActionResult> GetAllFertilityHistory([FromQuery] string ivfmainid, [FromQuery] int? page = 1, [FromQuery] int? rowsPerPage = 10)
         {
@@ -30,9 +47,6 @@ namespace HMIS.Web.Controllers.IVF
                 return BadRequest(new { message = "ivfmainid must be an integer" });
             var pg = page ?? 1;
             var rp = rowsPerPage ?? 10;
-            if (pg <= 0 || rp <= 0)
-                return BadRequest(new { message = "page and rowsPerPage must be greater than zero" });
-
             var result = await _service.GetAllFertilityHistory(
                 ivfmainid,
                 new PaginationInfo { Page = pg, RowsPerPage = rp });
@@ -42,7 +56,6 @@ namespace HMIS.Web.Controllers.IVF
 
             return Ok(new { fertilityHistory = result.Data });
         }
-
         [HttpPost("CreateUpdateMaleFertilityHistory")]
         public async Task<IActionResult> CreateUpdateMaleFertilityHistory([FromBody] IVFMaleFertilityHistoryDto dto)
         {
