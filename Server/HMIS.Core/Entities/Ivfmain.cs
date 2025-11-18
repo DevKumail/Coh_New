@@ -17,7 +17,11 @@ public partial class Ivfmain
 
     public long FemalePatientId { get; set; }
 
-    public long VisitAccountNo { get; set; }
+    public long AppId { get; set; }
+
+    [ForeignKey("AppId")]
+    [InverseProperty("Ivfmain")]
+    public virtual SchAppointment App { get; set; } = null!;
 
     [ForeignKey("FemalePatientId")]
     [InverseProperty("IvfmainFemalePatient")]
@@ -32,8 +36,4 @@ public partial class Ivfmain
     [ForeignKey("MalePatientId")]
     [InverseProperty("IvfmainMalePatient")]
     public virtual RegPatient MalePatient { get; set; } = null!;
-
-    [ForeignKey("VisitAccountNo")]
-    [InverseProperty("Ivfmain")]
-    public virtual BlpatientVisit VisitAccountNoNavigation { get; set; } = null!;
 }

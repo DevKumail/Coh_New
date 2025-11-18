@@ -13,6 +13,9 @@ public partial class IvfmaleFhgenetics
     [Column("IVFMaleFHGeneticsId")]
     public int IvfmaleFhgeneticsId { get; set; }
 
+    [Column("IVFMaleFHId")]
+    public int? IvfmaleFhid { get; set; }
+
     [StringLength(100)]
     public string? Genetics { get; set; }
 
@@ -23,4 +26,8 @@ public partial class IvfmaleFhgenetics
     [ForeignKey("CategoryIdInheritance")]
     [InverseProperty("IvfmaleFhgenetics")]
     public virtual DropdownConfiguration? CategoryIdInheritanceNavigation { get; set; }
+
+    [ForeignKey("IvfmaleFhid")]
+    [InverseProperty("IvfmaleFhgenetics")]
+    public virtual IvfmaleFertilityHistory? IvfmaleFh { get; set; }
 }

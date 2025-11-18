@@ -152,7 +152,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             {
                 MalePatientId = maleId,
                 FemalePatientId = femaleId,
-                VisitAccountNo = dto.VisitAccountNo
+               // VisitAccountNo = dto.VisitAccountNo
             };
 
             _db.Ivfmain.Add(entity);

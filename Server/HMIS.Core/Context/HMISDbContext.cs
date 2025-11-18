@@ -1116,6 +1116,10 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.IvfmainId).HasName("PK__IVFMain__3F8F07820127E48F");
 
+            entity.HasOne(d => d.App).WithMany(p => p.Ivfmain)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFMain_Visit");
+
             entity.HasOne(d => d.FemalePatient).WithMany(p => p.IvfmainFemalePatient)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMain_FemalePatient");
@@ -1123,10 +1127,6 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.MalePatient).WithMany(p => p.IvfmainMalePatient)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMain_MalePatient");
-
-            entity.HasOne(d => d.VisitAccountNoNavigation).WithMany(p => p.Ivfmain)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_IVFMain_Visit");
         });
 
         modelBuilder.Entity<IvfmaleFertilityHistory>(entity =>
@@ -1153,8 +1153,6 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfmaleFhgeneral>(entity =>
         {
-            entity.HasOne(d => d.Category).WithMany(p => p.IvfmaleFhgeneral).HasConstraintName("FK_IVFMaleFHGeneral_DropdownCategory");
-
             entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhgeneral)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHGeneral_IVFMaleFertilityHistory");
@@ -1163,6 +1161,8 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<IvfmaleFhgenetics>(entity =>
         {
             entity.HasOne(d => d.CategoryIdInheritanceNavigation).WithMany(p => p.IvfmaleFhgenetics).HasConstraintName("FK_IVFMaleFHGenetics_DropdownConfiguration");
+
+            entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhgenetics).HasConstraintName("FK_IVFMaleFHGenetics_IVFMaleFertilityHistory");
         });
 
         modelBuilder.Entity<IvfmaleFhillness>(entity =>
