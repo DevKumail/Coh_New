@@ -13,6 +13,7 @@ namespace HMIS.Application.ServiceLogics.IVF
     public interface IFertilityHistoryService
     {
         Task<(bool IsSuccess, object? Data)> GetAllFertilityHistory(string ivfmainid, PaginationInfo pagination);
+        Task<(bool IsSuccess, object? Data)> GetFertilityHistoryById(string ivfmainid);
         Task<Result<int>> CreateMaleFertilityHistoryAsync(IVFMaleFertilityHistoryDto dto);
     }
     internal class FertilityHistoryService : IFertilityHistoryService
@@ -23,6 +24,36 @@ namespace HMIS.Application.ServiceLogics.IVF
         {
             _dapper = dapper;
             _context = db;
+        }
+
+        public async Task<(bool IsSuccess, object? Data)> GetFertilityHistoryById(string ivfmainid)
+        {
+            if (string.IsNullOrWhiteSpace(ivfmainid))
+            {
+                return (false, null);
+            }
+
+            using var conn = _dapper.CreateConnection();
+            try
+            {
+                var data = (await conn.QueryAsync<IVFMaleFertilityHistoryReadDTO>(
+                    "IVF_GetFertilityHistory",
+                    new { IVFMainId = ivfmainid },
+                    commandType: CommandType.StoredProcedure)).ToList();
+
+                var filtered = data
+                    .Where(d => d != null && (d.IVFMaleFHId.HasValue || d.IVFMainId.HasValue))
+                    .ToList();
+
+                if (filtered.Count == 0)
+                    return (false, null);
+
+                return (true, filtered);
+            }
+            catch
+            {
+                return (false, null);
+            }
         }
 
         public async Task<(bool IsSuccess, object? Data)> GetAllFertilityHistory(string ivfmainid, PaginationInfo pagination)
@@ -226,22 +257,17 @@ namespace HMIS.Application.ServiceLogics.IVF
                         // Create Illness-Idiopathic mappings if provided (replace semantics)
                         if (dto.General.Illness.IdiopathicIds != null)
                         {
-                            // replace existing mappings
-                            var existingIdiopathics = await _context.IvfmaleFhillnessIdiopathic.Where(m => m.IvfmaleFhillnessId == illnessId).ToListAsync();
-                            if (existingIdiopathics.Any())
-                                _context.IvfmaleFhillnessIdiopathic.RemoveRange(existingIdiopathics);
+                            // Since the entity is keyless and cannot be tracked for writes, use raw SQL via EF context
+                            await _context.Database.ExecuteSqlRawAsync(
+                                "DELETE FROM IVFMaleFHIllnessIdiopathic WHERE IVFMaleFHIllnessId = {0}", illnessId);
 
                             if (dto.General.Illness.IdiopathicIds.Any())
                             {
                                 foreach (var idiopathicId in dto.General.Illness.IdiopathicIds)
                                 {
-                                    var illnessIdiopathic = new IvfmaleFhillnessIdiopathic
-                                    {
-                                        IvfmaleFhillnessId = illnessId,
-                                        IvfmaleFhidiopathicId = idiopathicId
-                                    };
-
-                                    _context.IvfmaleFhillnessIdiopathic.Add(illnessIdiopathic);
+                                    await _context.Database.ExecuteSqlRawAsync(
+                                        "INSERT INTO IVFMaleFHIllnessIdiopathic (IVFMaleFHIllnessId, IVFMaleFHIdiopathicId) VALUES ({0}, {1})",
+                                        illnessId, idiopathicId);
                                 }
                             }
                         }
