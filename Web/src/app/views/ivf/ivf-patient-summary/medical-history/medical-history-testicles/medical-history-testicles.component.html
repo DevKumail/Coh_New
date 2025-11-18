@@ -22,18 +22,21 @@
             <label>Testicle</label>
             <select class="form-select form-select-sm">
               <option value="" selected>Select</option>
+              <option *ngFor="let o of opts('IVFFertilityHistory:Testicle')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-6">
             <label>Kryptorchidism</label>
             <select class="form-select form-select-sm">
               <option value="" selected>Select</option>
+              <option *ngFor="let o of opts('IVFFertilityHistory:Kryptorchidism')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-6">
             <label>Orchitis</label>
             <select class="form-select form-select-sm">
               <option value="" selected>Select</option>
+              <option *ngFor="let o of opts('IVFFertilityHistory:Orchitis')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-6">
@@ -68,12 +71,14 @@
             <label>Instrumental varicocele</label>
             <select class="form-select form-select-sm">
               <option value="" selected>Select</option>
+              <option *ngFor="let o of opts('IVFFertilityHistory:InstrumentalVaricocele')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-6">
             <label>Clinical varicocele</label>
             <select class="form-select form-select-sm">
               <option value="" selected>Select</option>
+              <option *ngFor="let o of opts('IVFFertilityHistory:ClinicalVaricocele')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
         </div>
@@ -96,18 +101,21 @@
             <label>Proximal seminal tract</label>
             <select class="form-select form-select-sm">
               <option value="" selected>Select</option>
+              <option *ngFor="let o of opts('IVFFertilityHistory:ProximalSeminalTract')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-4">
             <label>Distal seminal tract</label>
             <select class="form-select form-select-sm">
               <option value="" selected>Select</option>
+              <option *ngFor="let o of opts('IVFFertilityHistory:DistalSeminalTract')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-4">
            <label class="small">Etiological diagnosis</label>
            <select class="form-select form-select-sm">
              <option value="" selected>Select</option>
+             <option *ngFor="let o of opts('IVFFertilityHistory:EtiologicalDiagnosis')" [value]="o.valueId">{{ o.name }}</option>
            </select>
          </div>
         </div>
@@ -151,12 +159,14 @@
           <label>Prev. infections</label>
           <select class="form-select form-select-sm">
             <option value="" selected>Select</option>
+            <option *ngFor="let o of opts('IVFFertilityHistory:PrevInfections')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
         <div class="col-md-6 form-group">
           <label>Diagnosis of infection</label>
           <select class="form-select form-select-sm">
             <option value="" selected>Select</option>
+            <option *ngFor="let o of opts('IVFFertilityHistory:DiagnosisOfInfection')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
       </div>

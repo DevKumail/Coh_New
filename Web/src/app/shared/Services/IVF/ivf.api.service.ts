@@ -35,6 +35,10 @@ export class IVFApiService {
     return this.api.get('IVFLabOrders/ref-physicians', { employeeTypeId });
   }
 
+  createOrUpdateMaleFertilityHistory(payload: any): Observable<any> {
+    return this.api.post('IVFFertilityHistory/CreateUpdateMaleFertilityHistory', payload);
+  }
+
   getNotifyRoles(): Observable<any> {
     return this.api.get('IVFLabOrders/notify-roles');
   }

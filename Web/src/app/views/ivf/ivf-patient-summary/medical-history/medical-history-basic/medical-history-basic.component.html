@@ -12,8 +12,7 @@
             <label for="attendingClinician">Attending clinician</label>
             <select class="form-select" id="attendingClinician" formControlName="attendingClinician">
               <option value="" disabled selected>Select clinician</option>
-              <option value="Dr. Smith">Dr. Smith</option>
-              <option value="Dr. Johnson">Dr. Johnson</option>
+              <option *ngFor="let p of hrEmployees" [value]="p.providerId">{{ p.name }}</option>
             </select>
           </div>
         </div>
@@ -23,9 +22,7 @@
             <label for="adiposity">Adiposity</label>
             <select class="form-select" id="adiposity" formControlName="adiposity">
               <option value="" disabled selected>Select adiposity</option>
-              <option value="Normal">Normal</option>
-              <option value="Overweight">Overweight</option>
-              <option value="Obese">Obese</option>
+              <option *ngFor="let o of opts('IVFFertilityHistory:Adiposity')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
         </div>
@@ -33,29 +30,9 @@
           <div class="form-group mb-2">
             <label for="generallyHealthy">Generally healthy</label>
             <select class="form-select" id="generallyHealthy" formControlName="generallyHealthy">
-              <option value="Not specified">Not specified</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
+              <option value="" disabled selected>Select option</option>
+              <option *ngFor="let o of opts('IVFFertilityHistory:GenerallyHealthy')" [value]="o.valueId">{{ o.name }}</option>
             </select>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="form-group mb-2">
-            <label for="weight">Weight [kg]</label>
-            <input type="number" class="form-control" id="weight" formControlName="weight" placeholder="Enter weight">
-          </div>
-        </div>
-        <div class="col-md-3">
-        <div class="form-group mb-2">
-          <label for="height">Height [cm]</label>
-          <input type="number" class="form-control" id="height" formControlName="height" placeholder="Enter height">
-        </div>
-        </div>
-        <div class="col-md-3">
-          <div class="form-group mb-2">
-            <label for="bmi">BMI</label>
-            <input type="text" class="form-control" id="bmi" formControlName="bmi" placeholder="Auto-calculated" readonly>
           </div>
         </div>
         <div class="col-md-3">
@@ -79,9 +56,7 @@
           <label for="chromosomeAnalysis">Chromosome analysis</label>
           <select class="form-select" id="chromosomeAnalysis" formControlName="chromosomeAnalysis">
             <option value="" disabled selected>Select analysis</option>
-            <option value="Normal">Normal</option>
-            <option value="Abnormal">Abnormal</option>
-            <option value="Not done">Not done</option>
+            <option *ngFor="let o of opts('IVFFertilityHistory:ChromosomeAnalysis')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
       </div>
@@ -90,271 +65,178 @@
           <label for="cftrCarrier">CFTR carrier</label>
           <select class="form-select" id="cftrCarrier" formControlName="cftrCarrier">
             <option value="" disabled selected>Select carrier status</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-            <option value="Unknown">Unknown</option>
+            <option *ngFor="let o of opts('IVFFertilityHistory:CFTRCarrier')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
       </div>
     </div>
     <!-- ========== TOP SIDE END ========== -->
 
-    <!-- ========== PREVIOUS ILLNESSES START ========== -->
-    <div class="card col-md-12 px-3 py-2">
-      <div class="form-group " formArrayName="previousIllnesses">
-        <label class="d-block fw-bold">Previous illnesses, ordered by relevance (max 4)</label>
-        <div class="row">
-          <div class="col-md-6">
-            <div *ngFor="let illness of previousIllnesses.controls.slice(0, 2); let i = index" class="mb-2">
-              <div class="input-group">
-                <span class="input-group-text">{{ i + 1 }}.</span>
-                <select class="form-select" [formControlName]="i">
-                  <option value="">Select illness</option>
-                  <option value="Diabetes">Diabetes</option>
-                  <option value="Hypertension">Hypertension</option>
-                  <option value="Heart disease">Heart disease</option>
-                  <option value="Cancer">Cancer</option>
-                  <option value="Thyroid disorder">Thyroid disorder</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div *ngFor="let illness of previousIllnesses.controls.slice(2, 4); let i = index" class="mb-2">
-              <div class="input-group">
-                <span class="input-group-text">{{ i + 3 }}.</span>
-                <select class="form-select" [formControlName]="i + 2">
-                  <option value="">Select illness</option>
-                  <option value="Diabetes">Diabetes</option>
-                  <option value="Hypertension">Hypertension</option>
-                  <option value="Heart disease">Heart disease</option>
-                  <option value="Cancer">Cancer</option>
-                  <option value="Thyroid disorder">Thyroid disorder</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
+    <div class="row g-2">
+      <!-- ========== PREVIOUS ILLNESSES (DROPDOWN MULTI-SELECT) START ========== -->
+      <div class="col-md-6">
+        <div class="card px-3 py-2">
+          <div class="form-group">
+            <label class="d-block fw-bold mb-1">Previous illnesses</label>
+            <div class="dropdown w-100">
+              <button class="form-select text-start dropdown-toggle d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="text-truncate">
+                  <span *ngIf="selectedIllnesses.length === 0" class="text-muted">Select illnesses...</span>
+                  <span *ngIf="selectedIllnesses.length > 0">{{ selectedIllnesses.join(', ') }}</span>
+                </span>
+                <i class="bi bi-caret-down-fill ms-2"></i>
+              </button>
+              <ul class="dropdown-menu w-100" data-bs-auto-close="outside">
+                <li class="px-2 py-1">
+                  <input type="text" class="form-control form-control-sm" placeholder="Search..." [(ngModel)]="searchIllness" [ngModelOptions]="{standalone: true}">
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li *ngFor="let opt of filteredIllnessesOptions" class="px-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" [checked]="isSelected(opt)" (click)="$event.stopPropagation()" (change)="toggleIllness(opt)">
+                    <label class="form-check-label" (click)="$event.preventDefault(); $event.stopPropagation(); toggleIllness(opt)">{{ opt }}</label>
+                  </div>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- ========== PREVIOUS ILLNESSES END ========== -->
+      <!-- ========== PREVIOUS ILLNESSES (DROPDOWN MULTI-SELECT) END ========== -->
 
-    <!-- ========== FERTILITY IMPAIRMENT FACTORS (FULL WIDTH) START ========== -->
-    <div class="card col-md-12 px-3 py-2">
-      <div class="form-group" formArrayName="fertilityFactors">
-        <label class="d-block fw-bold">Fertility impairment factors, ordered by relevance (max 4)</label>
-        <div class="row">
-          <div class="col-md-6">
-            <div *ngFor="let factor of fertilityFactors.controls.slice(0, 2); let i = index" class="mb-2">
-              <div class="input-group">
-                <span class="input-group-text">{{ i + 1 }}.</span>
-                <select class="form-select" [formControlName]="i">
-                  <option value="">Select factor</option>
-                  <option value="Male factor">Male factor</option>
-                  <option value="Ovulation disorder">Ovulation disorder</option>
-                  <option value="Tubal factor">Tubal factor</option>
-                  <option value="Endometriosis">Endometriosis</option>
-                  <option value="Unexplained">Unexplained</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div *ngFor="let factor of fertilityFactors.controls.slice(2, 4); let i = index" class="mb-2">
-              <div class="input-group">
-                <span class="input-group-text">{{ i + 3 }}.</span>
-                <select class="form-select" [formControlName]="i + 2">
-                  <option value="">Select factor</option>
-                  <option value="Male factor">Male factor</option>
-                  <option value="Ovulation disorder">Ovulation disorder</option>
-                  <option value="Tubal factor">Tubal factor</option>
-                  <option value="Endometriosis">Endometriosis</option>
-                  <option value="Unexplained">Unexplained</option>
-                </select>
-              </div>
+      <!-- ========== FERTILITY IMPAIRMENT FACTORS (DROPDOWN MULTI-SELECT) START ========== -->
+      <div class="col-md-6">
+        <div class="card px-3 py-2">
+          <div class="form-group">
+            <label class="d-block fw-bold">Fertility impairment factors</label>
+            <div class="dropdown w-100">
+              <button class="form-select text-start dropdown-toggle d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="text-truncate">
+                  <span *ngIf="selectedFactors.length === 0" class="text-muted">Select factors...</span>
+                  <span *ngIf="selectedFactors.length > 0">{{ selectedFactors.join(', ') }}</span>
+                </span>
+                <i class="bi bi-caret-down-fill ms-2"></i>
+              </button>
+              <ul class="dropdown-menu w-100" data-bs-auto-close="outside">
+                <li class="px-2 py-1">
+                  <input type="text" class="form-control form-control-sm" placeholder="Search..." [(ngModel)]="searchFactor" [ngModelOptions]="{standalone: true}">
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li *ngFor="let opt of filteredFactorsOptions" class="px-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" [checked]="isFactorSelected(opt)" (click)="$event.stopPropagation()" (change)="toggleFactor(opt)">
+                    <label class="form-check-label" (click)="$event.preventDefault(); $event.stopPropagation(); toggleFactor(opt)">{{ opt }}</label>
+                  </div>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
       </div>
+      <!-- ========== FERTILITY IMPAIRMENT FACTORS (DROPDOWN MULTI-SELECT) END ========== -->
     </div>
-    <!-- ========== FERTILITY IMPAIRMENT FACTORS (FULL WIDTH) END ========== -->
 
     <!-- ========== SEMEN ANALYSIS SECTION START ========== -->
-    <div class="row">
-    <div class="col-md-6">
-    <div class="card px-3 py-2">
+    <div class="card px-3 py-2 mb-0">
+      <div class="d-flex justify-content-between align-items-center">
+        <label class="fw-bold">Basis semen analysis</label>
+        <button type="button" class="btn btn-sm btn-primary" (click)="addAnalysis()">
+          <i class="bi bi-plus-lg"></i> Add semen analysis
+        </button>
+      </div>
+      <div class="mt-2" formArrayName="analyses">
+        <div class="card px-3 py-2 mb-2" *ngFor="let a of analyses.controls; let i = index" [formGroupName]="i">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <h6 class="mb-0">Analysis {{ i + 1 }}</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeAnalysis(i)" *ngIf="analyses.length > 1">
+              <i class="bi bi-trash"></i> Remove
+            </button>
+          </div>
 
-      <div class="form-group mb-2">
-        <label class="fw-bold mt-2">Basis semen analysis 1</label>
-        
-        <div class="row">
-          <div class="col-md-6 mb-2">
-            <label for="semenAnalysis1" class="text-nowrap">Semen analysis (Date, ID, #Motile)</label>
-            <div class="input-group">
-              <select class="form-select" id="semenAnalysis1" formControlName="semenAnalysis1">
-                <option value="" disabled selected>Select analysis</option>
-                <option value="Analysis 1">Analysis 1</option>
-                <option value="Analysis 2">Analysis 2</option>
-              </select>
-              <!-- <button class="btn btn-outline-secondary" type="button">
-                <i class="bi bi-pencil"></i>
-              </button> -->
+          <div class="row g-1">
+            <div class="col-md-3">
+              <label class="small">Date</label>
+              <input type="date" class="form-control" formControlName="date">
+            </div>
+            <div class="col-md-3">
+              <label class="small">ID</label>
+              <input type="text" class="form-control" formControlName="id" placeholder="ID">
+            </div>
+            <div class="col-md-3">
+              <label class="small">#Motile</label>
+              <div class="input-group">
+                <input type="number" class="form-control" formControlName="motile" placeholder="#">
+                <span class="input-group-text">#</span>
+              </div>
+            </div>
+          <!-- </div>
+
+          <div class="row g-2 mt-1"> -->
+            <div class="col-md-3">
+              <label>Collection method</label>
+              <input type="text" class="form-control" formControlName="collectionMethod" placeholder="Enter method">
             </div>
           </div>
-  
-          <div class="col-md-6 mb-2">
-            <label for="collectionMethod1">Collection method</label>
-            <input type="text" class="form-control" id="collectionMethod1" formControlName="collectionMethod1" placeholder="Enter method">
-          </div>
-        </div>
 
-        <div class="row mb-2">
-          <div class="col-6"></div>
-          <div class="col-3 text-center">
-            <span class="fw-bold">Native</span>
+          <div class="row mb-2 mt-2">
+            <div class="col-6"></div>
+            <div class="col-3 text-center">
+              <span class="fw-bold">Native</span>
+            </div>
+            <div class="col-3 text-center">
+              <span class="fw-bold">After prep.</span>
+            </div>
           </div>
-          <div class="col-3 text-center">
-            <span class="fw-bold">After prep.</span>
-          </div>
-        </div>
 
-        <div class="row mb-2">
-          <div class="col-6">
-            <label>Concentration [10⁶/ml]</label>
+          <div class="row mb-2">
+            <div class="col-6">
+              <label>Concentration [10⁶/ml]</label>
+            </div>
+            <div class="col-3">
+              <input type="number" class="form-control form-control-sm" formControlName="concentrationNative" placeholder="0">
+            </div>
+            <div class="col-3">
+              <input type="number" class="form-control form-control-sm" formControlName="concentrationAfterPrep" placeholder="0">
+            </div>
           </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="concentration1Native" placeholder="0">
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="concentration1AfterPrep" placeholder="0">
-          </div>
-        </div>
 
-        <div class="row mb-2">
-          <div class="col-6">
-            <label>Overall motility [%]</label>
+          <div class="row mb-2">
+            <div class="col-6">
+              <label>Overall motility [%]</label>
+            </div>
+            <div class="col-3">
+              <input type="number" class="form-control form-control-sm" formControlName="overallMotilityNative" placeholder="0">
+            </div>
+            <div class="col-3">
+              <input type="number" class="form-control form-control-sm" formControlName="overallMotilityAfterPrep" placeholder="0">
+            </div>
           </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="overallMotility1Native" placeholder="0">
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="overallMotility1AfterPrep" placeholder="0">
-          </div>
-        </div>
 
-        <div class="row mb-2">
-          <div class="col-6">
-            <label>Progressive motility [%]</label>
+          <div class="row mb-2">
+            <div class="col-6">
+              <label>Progressive motility [%]</label>
+            </div>
+            <div class="col-3">
+              <input type="number" class="form-control form-control-sm" formControlName="progressiveMotilityNative" placeholder="0">
+            </div>
+            <div class="col-3">
+              <input type="number" class="form-control form-control-sm" formControlName="progressiveMotilityAfterPrep" placeholder="0">
+            </div>
           </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="progressiveMotility1Native" placeholder="0">
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="progressiveMotility1AfterPrep" placeholder="0">
-          </div>
-        </div>
 
-        <div class="row mb-2">
-          <div class="col-6">
-            <label>Normal forms [%]</label>
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="normalForms1Native" placeholder="0">
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="normalForms1AfterPrep" placeholder="0">
+          <div class="row mb-2">
+            <div class="col-6">
+              <label>Normal forms [%]</label>
+            </div>
+            <div class="col-3">
+              <input type="number" class="form-control form-control-sm" formControlName="normalFormsNative" placeholder="0">
+            </div>
+            <div class="col-3">
+              <input type="number" class="form-control form-control-sm" formControlName="normalFormsAfterPrep" placeholder="0">
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    </div>
-    <div class="col-md-6">
-    <div class="card px-3 py-2">
-      <div class="form-group mb-2">
-        <label class="fw-bold mt-2">Basis semen analysis 2</label>
-        
-        <div class="row">
-          <div class="col-md-6 mb-2">
-            <label for="semenAnalysis2" class="text-nowrap">Semen analysis (Date, ID, #Motile)</label>
-            <div class="input-group">
-              <select class="form-select" id="semenAnalysis2" formControlName="semenAnalysis2">
-              <option value="" disabled selected>Select analysis</option>
-              <option value="Analysis 1">Analysis 1</option>
-              <option value="Analysis 2">Analysis 2</option>
-            </select>
-            <!-- <button class="btn btn-outline-secondary" type="button">
-              <i class="bi bi-pencil"></i>
-            </button> -->
-          </div>
-          </div>
-
-          <div class="col-md-6 mb-2">
-          <label for="collectionMethod2">Collection method</label>
-          <input type="text" class="form-control" id="collectionMethod2" formControlName="collectionMethod2" placeholder="Enter method">
-        </div>
-        </div>
-
-        <div class="row mb-2">
-          <div class="col-6"></div>
-          <div class="col-3 text-center">
-            <span class="fw-bold">Native</span>
-          </div>
-          <div class="col-3 text-center">
-            <span class="fw-bold">After prep.</span>
-          </div>
-        </div>
-
-        <div class="row mb-2">
-          <div class="col-6">
-            <label>Concentration [10⁶/ml]</label>
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="concentration2Native" placeholder="0">
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="concentration2AfterPrep" placeholder="0">
-          </div>
-        </div>
-
-        <div class="row mb-2">
-          <div class="col-6">
-            <label>Overall motility [%]</label>
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="overallMotility2Native" placeholder="0">
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="overallMotility2AfterPrep" placeholder="0">
-          </div>
-        </div>
-
-        <div class="row mb-2">
-          <div class="col-6">
-            <label>Progressive motility [%]</label>
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="progressiveMotility2Native" placeholder="0">
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="progressiveMotility2AfterPrep" placeholder="0">
-          </div>
-        </div>
-
-        <div class="row mb-2">
-          <div class="col-6">
-            <label>Normal forms [%]</label>
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="normalForms2Native" placeholder="0">
-          </div>
-          <div class="col-3">
-            <input type="number" class="form-control form-control-sm" formControlName="normalForms2AfterPrep" placeholder="0">
-          </div>
-        </div>
-      </div>
-    </div>
     </div>
     <!-- ========== SEMEN ANALYSIS SECTION END ========== -->
 </div>
