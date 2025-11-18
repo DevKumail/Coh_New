@@ -1,6 +1,4 @@
-﻿using Org.BouncyCastle.Asn1.Cms;
-
-namespace HMIS.Application.DTOs.IVFDTOs
+﻿namespace HMIS.Core.DTOs
 {
     public class IVFMaleSemenSampleDto
     {
@@ -150,7 +148,17 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public int SampleId { get; set; }
         public string SampleCode { get; set; }
         public DateTime CollectionDateTime { get; set; }
+        public DateTime? ThawingDateTime { get; set; }
         public string Purpose { get; set; }
+        public string CollectionMethod { get; set; }
+        public decimal? VolumeML { get; set; }
+        public decimal? ConcentrationPerML { get; set; }
+        public int? TotalSpermCount { get; set; }
+        public decimal? WHO_AB_Percent { get; set; }
+        public decimal? WHO_C_Percent { get; set; }
+        public decimal? WHO_D_Percent { get; set; }
+        public decimal? MorphologyNormalPercent { get; set; }
+        public string CryoStatus { get; set; }
         public string Status { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }

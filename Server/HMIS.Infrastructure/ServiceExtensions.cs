@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using HMIS.Infrastructure.IRepositories;
+using HMIS.Infrastructure.Repositories.IVF;
+using Microsoft.Extensions.DependencyInjection;
 namespace HMIS.Infrastructure
 {
     public static class ServiceExtensions
@@ -6,14 +8,8 @@ namespace HMIS.Infrastructure
         public static void AddApplicationLayer(this IServiceCollection services)
         {
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            //services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-            //services.AddMediatR(Assembly.GetExecutingAssembly());
-            //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            ////services.AddScoped<IDataShapeHelper<Position>, DataShapeHelper<Position>>();
-            ////services.AddScoped<IDataShapeHelper<Employee>, DataShapeHelper<Employee>>();
-            //services.AddScoped<IModelHelper, ModelHelper>();
-            //services.AddScoped<IUserSessionHelper, UserSessionHelper>();
-            // services.AddScoped<IMockData, MockData>();
+            services.AddScoped<IIVFMaleSemenRepository, IVFMaleSemenRepository>();
+
         }
     }
 }

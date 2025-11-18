@@ -1,5 +1,6 @@
 ﻿using HMIS.Application.DTOs.IVFDTOs;
 using HMIS.Application.ServiceLogics.IVF;
+using HMIS.Core.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

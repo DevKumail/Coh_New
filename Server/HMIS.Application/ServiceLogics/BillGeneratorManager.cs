@@ -2,7 +2,7 @@
 using AutoMapper.Configuration.Annotations;
 using Dapper;
 using HMIS.Infrastructure.ORM;
-using HMIS.Infrastructure.Repository;
+using HMIS.Infrastructure.Repositories;
 using HMIS.Core.Entities;
 using HMIS.Application.DTOs.BillGeneratorDTOs;
 using HMIS.Application.Implementations;
