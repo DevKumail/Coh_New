@@ -591,7 +591,7 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
             .catch(() => {});
     }
 
-    cacheItems: string[] = ['Provider', 'BLUniversalToothCodes'];
+        cacheItems: string[] = ['Provider', 'BLUniversalToothCodes'];
 
     onRowSelect(diagnosis: any, modal: any) {
         this.procedureForm.patchValue({

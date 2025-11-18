@@ -345,6 +345,9 @@ public partial class SchAppointment
     [InverseProperty("Appointment")]
     public virtual ICollection<InsuranceEligibility> InsuranceEligibility { get; set; } = new List<InsuranceEligibility>();
 
+    [InverseProperty("App")]
+    public virtual ICollection<Ivfmain> Ivfmain { get; set; } = new List<Ivfmain>();
+
     [ForeignKey("PatientId")]
     [InverseProperty("SchAppointment")]
     public virtual RegPatient? Patient { get; set; }

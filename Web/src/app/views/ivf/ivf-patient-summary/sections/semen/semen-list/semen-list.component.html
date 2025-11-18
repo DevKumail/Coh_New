@@ -9,7 +9,7 @@
   <div class="card-body p-0">
     <ng-container *ngIf="showAdd; else listView">
       <div class="p-2">
-        <app-semen-add-edit (click)="$event.stopPropagation()"></app-semen-add-edit>
+        <app-semen-add-edit [model]="editModel" (saved)="onSaved($event)" (back)="onCancel()" (click)="$event.stopPropagation()"></app-semen-add-edit>
       </div>
     </ng-container>
     <ng-template #listView>
@@ -32,12 +32,13 @@
             <th>Norm. [%]</th>
             <th>Cryo status</th>
             <th>Status</th>
+            <th style="width:100px">Actions</th>
           </tr>
         </thead>
         <tbody class="table-group-divider">
           <ng-container *ngIf="isLoading">
             <tr *ngFor="let i of [1,2,3]">
-              <td colspan="15" class="text-start"><div class="placeholder-wave"><span class="placeholder col-12"></span></div></td>
+              <td colspan="16" class="text-start"><div class="placeholder-wave"><span class="placeholder col-12"></span></div></td>
             </tr>
           </ng-container>
           <ng-container *ngIf="!isLoading">
@@ -57,9 +58,13 @@
               <td>{{ r.norm }}</td>
               <td>{{ r.cryoStatus }}</td>
               <td>{{ r.status }}</td>
+              <td>
+                <button class="btn btn-sm btn-link" title="Edit" (click)="edit(r)"><i class="bi bi-pencil-square"></i></button>
+                <button class="btn btn-sm btn-link text-danger" title="Delete" (click)="delete(r)"><i class="bi bi-trash"></i></button>
+              </td>
             </tr>
             <tr *ngIf="rows.length===0">
-              <td colspan="15">No data found</td>
+              <td colspan="16">No data found</td>
             </tr>
           </ng-container>
         </tbody>

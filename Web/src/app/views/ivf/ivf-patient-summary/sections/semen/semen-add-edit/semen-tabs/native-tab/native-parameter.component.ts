@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -32,6 +32,8 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
   ]
 })
 export class NativeParameterComponent {
+  @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
+  @Input() labelFor: (key: string) => string = (k) => k;
    form: FormGroup;
   protected readonly calculatorIcon = LucideCalculator;
   // Calculator modal state
@@ -229,5 +231,95 @@ export class NativeParameterComponent {
     this.form.get('excessResidualCytoplasm')?.setValue(r(this.morphologyPerc.excess));
     this.form.get('tzi')?.setValue(r(this.morphologyPerc.tzi));
     modalRef.close();
+  }
+
+  // Build observation payload using this tab's values
+  buildObservation(observationType: 'Native' | 'AfterPreparation'): any {
+    const v = this.form.value as any;
+    return {
+      observationId: 0,
+      sampleId: 0,
+      observationType,
+      volumeML: v.volume ?? 0,
+      phValue: v.ph ?? 0,
+      concentrationPerML: v.concentration ?? 0,
+      concLessThanPointOne: !!v.concLtPointOne,
+      vitalityPercent: v.vitality ?? 0,
+      leukocytesml: v.leukocytes ?? 0,
+      roundCellsml: v.roundCells ?? 0,
+      quantificationPossibleId: v.quantPossible ?? 0,
+      totalSpermCount: v.totalSpermCountM ?? 0,
+      peroxidasePositive: v.peroxidasePositive ?? 0,
+      immunobeadAdherentPercent: v.immunobeadPercentAdherent ?? 0,
+      marTesPercent: v.marAdherentPercent ?? 0,
+      maR_IgG_Percent: v.marIgGPercent ?? 0,
+      maR_IgA_Percent: v.marIgAPercent ?? 0,
+      createdBy: 0,
+      updatedBy: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      motility: {
+        motilityId: 0,
+        observationId: 0,
+        whO_AB_Percent: v.whoB ?? 0,
+        whO_C_Percent: v.whoC ?? 0,
+        whO_D_Percent: v.whoD ?? 0,
+        progressiveMotile: v.numberOfProgMotile ?? 0,
+        overallMotilityPercent: v.overallMotility ?? 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      morphology: {
+        morphologyId: 0,
+        observationId: 0,
+        morphologyNormalPercent: v.normalForms ?? 0,
+        headDefectsPercent: v.headDefects ?? 0,
+        neckMidpieceDefectsPercent: v.neckDefects ?? 0,
+        tailDefectsPercent: v.tailDefects ?? 0,
+        ercPercent: v.excessResidualCytoplasm ?? 0,
+        multipleDefectsPercent: v.multipleDefects ?? 0,
+        teratozoospermiaIndex: v.tzi ?? 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      preparations: [] as any[],
+    };
+  }
+
+  // Patch from observation model
+  patchFromObservation(obs: any) {
+    if (!obs) return;
+    const m = obs || {};
+    const mot = m.motility || {};
+    const mor = m.morphology || {};
+    this.form.patchValue({
+      volume: m.volumeML ?? null,
+      ph: m.phValue ?? null,
+      concentration: m.concentrationPerML ?? null,
+      vitality: m.vitalityPercent ?? null,
+      leukocytes: m.leukocytesml ?? null,
+      roundCells: m.roundCellsml ?? null,
+      concLtPointOne: !!m.concLessThanPointOne,
+      quantPossible: m.quantificationPossibleId ?? '',
+      totalSpermCountM: m.totalSpermCount ?? null,
+      peroxidasePositive: m.peroxidasePositive ?? null,
+      immunobeadPercentAdherent: m.immunobeadAdherentPercent ?? null,
+      marAdherentPercent: m.marTesPercent ?? null,
+      marIgGPercent: m.maR_IgG_Percent ?? null,
+      marIgAPercent: m.maR_IgA_Percent ?? null,
+      whoA: mot.whO_AB_Percent ?? null,
+      whoB: null,
+      whoC: mot.whO_C_Percent ?? null,
+      whoD: mot.whO_D_Percent ?? null,
+      numberOfProgMotile: mot.progressiveMotile ?? null,
+      overallMotility: mot.overallMotilityPercent ?? null,
+      normalForms: mor.morphologyNormalPercent ?? null,
+      headDefects: mor.headDefectsPercent ?? null,
+      neckDefects: mor.neckMidpieceDefectsPercent ?? null,
+      tailDefects: mor.tailDefectsPercent ?? null,
+      excessResidualCytoplasm: mor.ercPercent ?? null,
+      multipleDefects: mor.multipleDefectsPercent ?? null,
+      tzi: mor.teratozoospermiaIndex ?? null,
+    });
   }
 }

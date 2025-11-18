@@ -16,16 +16,41 @@ public partial class IvfmaleFhsemenAnalysis
     [Column("IVFMaleFHId")]
     public int IvfmaleFhid { get; set; }
 
-    [Column(TypeName = "decimal(5, 2)")]
-    public decimal? Concentration { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime? Date { get; set; }
 
-    public int? OverallMotility { get; set; }
+    [Column("ID")]
+    public int? Id { get; set; }
 
-    [StringLength(50)]
-    public string? ProgressiveMotility { get; set; }
+    [StringLength(30)]
+    public string? MotileNo { get; set; }
 
-    [StringLength(50)]
-    public string? NormalForms { get; set; }
+    [StringLength(70)]
+    public string? CollectionMethod { get; set; }
+
+    [StringLength(30)]
+    public string? ConcentrationNative { get; set; }
+
+    [StringLength(30)]
+    public string? ConcentrationAfterPrep { get; set; }
+
+    [StringLength(30)]
+    public string? OverallMotilityNative { get; set; }
+
+    [StringLength(30)]
+    public string? OverallMotilityPrep { get; set; }
+
+    [StringLength(30)]
+    public string? ProgressiveMotilityNativ { get; set; }
+
+    [StringLength(30)]
+    public string? ProgressiveMotilityPrep { get; set; }
+
+    [StringLength(30)]
+    public string? NormalFormsNative { get; set; }
+
+    [StringLength(30)]
+    public string? NormalFormsPrep { get; set; }
 
     [ForeignKey("IvfmaleFhid")]
     [InverseProperty("IvfmaleFhsemenAnalysis")]

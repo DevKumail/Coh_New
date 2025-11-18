@@ -49,6 +49,9 @@ public partial class IvfmaleFertilityHistory
     public virtual ICollection<IvfmaleFhgeneral> IvfmaleFhgeneral { get; set; } = new List<IvfmaleFhgeneral>();
 
     [InverseProperty("IvfmaleFh")]
+    public virtual ICollection<IvfmaleFhgenetics> IvfmaleFhgenetics { get; set; } = new List<IvfmaleFhgenetics>();
+
+    [InverseProperty("IvfmaleFh")]
     public virtual ICollection<IvfmaleFhimpairmentFactor> IvfmaleFhimpairmentFactor { get; set; } = new List<IvfmaleFhimpairmentFactor>();
 
     [InverseProperty("IvfmaleFh")]
