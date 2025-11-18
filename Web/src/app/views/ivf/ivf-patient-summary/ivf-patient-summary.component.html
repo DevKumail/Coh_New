@@ -1,4 +1,4 @@
-<div class="mt-1 p-0" [style.--patient-summary-offset.px]="offset">
+<div class="mt-1 p-0" [style.--patient-summary-offset.px]="offset" *ngIf="isCoupleLink && isivfstart">
   <div class="row layout-relative">
 
     <button type="button" class="toggle-btn left" (click)="toggleLeft()" [attr.aria-expanded]="!leftCollapsed">
@@ -38,6 +38,32 @@
     </div>
   </div>
 </div>
+
+
+<div *ngIf="!isivfstart || !isCoupleLink" class="row g-3 align-items-center justify-content-center my-4">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="card h-100 compact-card">
+          <div class="card-body d-flex justify-content-center align-items-center text-center" style="min-height: 280px">
+            <div *ngIf="!isCoupleLink">
+              <div class="display-6 text-warning">!</div>
+              <!-- <div class="fw-semibold mb-1">Validation Error</div> -->
+              <div class="fw-semibold mb-1">this patient has no partner go to IVF dashboard and link a partner...</div>
+              <button type="button" 
+              class="btn btn-success " 
+              (click)="GotoDashboard()">Go to IVF Dashboard</button>
+            </div>
+
+            <div *ngIf="isCoupleLink">
+              <div class="display-6 text-warning">!</div>
+              <div class="fw-semibold mb-1">Start IVF Process.......</div>
+              <button type="button" 
+              class="btn btn-success" 
+              (click)="StartIvf()">Start</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
 <!-- Advanced Filter Modal (patient search) -->
 <app-advance-search-modal (onPatientSelect)="onPatientPicked($event)"></app-advance-search-modal>

@@ -1,21 +1,4 @@
-<div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <div class="fw-bold">Semen analysis - Add/Edit</div>
-        <div class="d-flex gap-2">
-            <!-- Save button -->
-            <button class="btn btn-sm btn-primary" (click)="onSave()">
-                Save
-            </button>
-            <!-- Cancel/Back button -->
-            <button
-                class="btn btn-sm btn-outline-secondary"
-                (click)="onCancel()"
-            >
-                Cancel
-            </button>
-        </div>
-    </div>
-
+  <div class="card shadow-sm">
   <div class="card-body">
     <form [formGroup]="form" class="row g-1">
       <div class="row w-100" >
@@ -85,30 +68,29 @@
       
       <!-- Purpose (dropdown)--> 
       <div class="col-lg-3 col-md-4 col-sm-6">
-        <label class="form-label">Purpose</label>
+        <label class="form-label">{{ labelFor('IVFSemanAnalysis:Purpose') }}</label>
         <select class="form-select" formControlName="purpose">
-          <option value="">Select Purpose</option>
-          <option value="diagnostic">Diagnostic</option>
-          <option value="cryo">Cryopreservation</option>
-          <option value="donor">Donor screening</option>
+          <option value="">Select {{ labelFor('IVFSemanAnalysis:Purpose') }}</option>
+          <option *ngFor="let o of dropdowns['IVFSemanAnalysis:Purpose']" [value]="o.valueId">{{ o.name }}</option>
         </select>
       </div>
       
       <!-- Collection method (dropdown) -->
       <div class="col-lg-3 col-md-4 col-sm-6">
-        <label class="form-label">Collection method</label>
+        <label class="form-label">{{ labelFor('IVFSemanAnalysis:CollectionMethod') }}</label>
         <select class="form-select" formControlName="collectionMethod">
-          <option value="">Select Collection method</option>
-          <option>Natural</option>
-          <option>Condom</option>
-          <option>Vibro/Electro</option>
+          <option value="">Select {{ labelFor('IVFSemanAnalysis:CollectionMethod') }}</option>
+          <option *ngFor="let o of dropdowns['IVFSemanAnalysis:CollectionMethod']" [value]="o.valueId">{{ o.name }}</option>
         </select>
       </div>
       
       <!-- Collection place -->
       <div class="col-lg-3 col-md-4 col-sm-6">
-        <label class="form-label">Collection place</label>
-        <input type="text" class="form-control" formControlName="collectionPlace" placeholder="Enter collection place" />
+        <label class="form-label">{{ labelFor('IVFSemanAnalysis:CollectionPlace') }}</label>
+        <select class="form-select" formControlName="collectionPlace">
+          <option value="">Select {{ labelFor('IVFSemanAnalysis:CollectionPlace') }}</option>
+          <option *ngFor="let o of dropdowns['IVFSemanAnalysis:CollectionPlace']" [value]="o.valueId">{{ o.name }}</option>
+        </select>
       </div>
       
       <!-- Collection difficulties -->
@@ -122,40 +104,34 @@
         <label class="form-label">Analysed by</label>
           <select class="form-select" formControlName="analysedBy">
           <option value="">Select Provider</option>
-          <option>Dr. A</option>
-          <option>Dr. B</option>
-          <option>Dr. C</option>
+          <option *ngFor="let p of hrEmployees" [value]="p.providerId">{{ p.name }}</option>
         </select>
       </div>
       
       <!-- Appearance (dropdown) -->
       <div class="col-lg-3 col-md-4 col-sm-6">
-        <label class="form-label">Appearance</label>
+        <label class="form-label">{{ labelFor('IVFSemanAnalysis:Appearance') }}</label>
         <select class="form-select" formControlName="appearance">
-          <option value="">Select Appearance</option>
-          <option>Normal</option>
-          <option>Abnormal</option>
+          <option value="">Select {{ labelFor('IVFSemanAnalysis:Appearance') }}</option>
+          <option *ngFor="let o of dropdowns['IVFSemanAnalysis:Appearance']" [value]="o.valueId">{{ o.name }}</option>
         </select>
       </div>
       
       <!-- Smell (dropdown) -->
       <div class="col-lg-3 col-md-4 col-sm-6">
-        <label class="form-label">Smell</label>
+        <label class="form-label">{{ labelFor('IVFSemanAnalysis:Smell') }}</label>
         <select class="form-select" formControlName="smell">
-          <option value="">Select Smell</option>
-          <option>Typical</option>
-          <option>Atypical</option>
+          <option value="">Select {{ labelFor('IVFSemanAnalysis:Smell') }}</option>
+          <option *ngFor="let o of dropdowns['IVFSemanAnalysis:Smell']" [value]="o.valueId">{{ o.name }}</option>
         </select>
       </div>
       
       <!-- Viscosity (dropdown) -->
       <div class="col-lg-3 col-md-4 col-sm-6">
-        <label class="form-label">Viscosity</label>
+        <label class="form-label">{{ labelFor('IVFSemanAnalysis:Viscosity') }}</label>
         <select class="form-select" formControlName="viscosity">
-          <option value="">Select Viscosity</option>
-          <option>Normal</option>
-          <option>High</option>
-          <option>Low</option>
+          <option value="">Select {{ labelFor('IVFSemanAnalysis:Viscosity') }}</option>
+          <option *ngFor="let o of dropdowns['IVFSemanAnalysis:Viscosity']" [value]="o.valueId">{{ o.name }}</option>
         </select>
       </div>
       
@@ -183,14 +159,60 @@
         <input type="number" class="form-control" formControlName="dnaFragmented" placeholder="Enter % value" />
       </div>
       
-      <!-- Agglutination (checkbox, reactive) -->
-      <div class="col-lg-3 col-md-4 col-sm-4 d-flex align-items-center">
-        <div class="form-check">
+
+          <!-- Agglutination (checkbox, reactive)  -->
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label">Agglutination</label>
           <input class="form-check-input" type="checkbox" formControlName="agglutination" id="agglutinationChk">
-          <label class="form-check-label" for="agglutinationChk">Agglutination</label>
-        </div>
       </div>
 
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label">Time between collection and usage</label>
+        <input type="time" class="form-control" formControlName="timeBetweenCollectionAndUsage" />
+      </div>
+
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label">Number of insem. motile sperms [x10^6]</label>
+        <input type="number" class="form-control" formControlName="numberOfInsemMotile" />
+      </div>
+
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label">Inseminated amount [ml]</label>
+        <input type="number" class="form-control" formControlName="inseminatedAmountMl" />
+      </div>
+
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label">24h Motility rate [%]</label>
+        <input type="number" class="form-control" formControlName="rate24hMotility" />
+      </div>
+
+
+      <!-- Agglutination (checkbox, reactive) -->
+    
+         <!-- <div class="row g-2 mt-2">
+
+
+      <div class="col-7 d-flex align-items-center">
+        <label class="form-label mb-0">Number of insem. motile sperms [x10^6]</label>
+      </div>
+      <div class="col-5">
+        <input type="number" class="form-control" formControlName="numberOfInsemMotile" />
+      </div>
+
+      <div class="col-7 d-flex align-items-center">
+        <label class="form-label mb-0">Inseminated amount [ml]</label>
+      </div>
+      <div class="col-5">
+        <input type="number" class="form-control" formControlName="inseminatedAmountMl" />
+      </div>
+
+      <div class="col-7 d-flex align-items-center">
+        <label class="form-label mb-0">24h Motility rate [%]</label>
+      </div>
+      <div class="col-5">
+        <input type="number" class="form-control" formControlName="rate24hMotility" />
+      </div>
+    </div> -->
      
 
       <!-- Divider -->
@@ -198,17 +220,18 @@
 
       <!-- Parameter / Files Tabs Card -->
       <div class="col-8">
-        <app-semen-tabs></app-semen-tabs>
+        <app-semen-tabs [dropdowns]="dropdowns" [labelFor]="labelFor" [hrEmployees]="hrEmployees"></app-semen-tabs>
       </div>
       <div class="col-4">
-        <app-semen-diagnosis-approval></app-semen-diagnosis-approval>
+       
+        <app-semen-diagnosis-approval [dropdowns]="dropdowns" [labelFor]="labelFor" [hrEmployees]="hrEmployees"></app-semen-diagnosis-approval>
       </div>
 
       <!-- Footer actions -->
       <div class="col-12 d-flex justify-content-end gap-2 mt-2">
         <button type="button" class="btn btn-outline-secondary btn-sm">Generate letter</button>
         <button type="button" class="btn btn-sm btn-light" (click)="onCancel()">Cancel</button>
-        <button type="button" class="btn btn-sm btn-success" (click)="onSave()">OK</button>
+        <button type="button" class="btn btn-sm btn-success" (click)="onSave()">Save</button>
       </div>
     </form>
     

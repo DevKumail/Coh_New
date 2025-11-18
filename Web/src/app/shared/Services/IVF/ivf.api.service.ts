@@ -38,4 +38,33 @@ export class IVFApiService {
   getNotifyRoles(): Observable<any> {
     return this.api.get('IVFLabOrders/notify-roles');
   }
+
+  GetOppositeGenderPatients(payload: any, currentPage: number, pageSize: number): Observable<any> {
+    return this.api.get(`IVFDashboard/GetOppositeGenderPatients?gender=${payload.gender}&page=${currentPage}&rowsPerPage=${pageSize}&mrno=${payload.mrno}&phone=${payload.phone}&emiratesId=${payload.emiratesId}&name=${payload.name}`);
+  }
+
+  InsertPatientRelation(payload: any): Observable<any> {
+    return this.api.post('IVFDashboard/InsertPatientRelation', payload);
+  }
+
+  GenerateIVFMain(payload: any): Observable<any> {
+    return this.api.post('IVFDashboard/GenerateIVFMain', payload);
+  }
+
+  InsertOrUpdateMaleSemenAnalysis(payload: any): Observable<any> {
+    return this.api.post('IVFMaleSemanAnalysis/InsertOrUpdate', payload);
+  }
+
+  GetAllMaleSemenAnalysis(page: number = 1, pageSize: number = 10): Observable<any> {
+    return this.api.get('IVFMaleSemanAnalysis/GetAll', { page, pageSize });
+  }
+
+  GetMaleSemenSampleById(sampleId: number): Observable<any> {
+    return this.api.get(`IVFMaleSemanAnalysis/GetSampleById/${sampleId}`);
+  }
+
+  DeleteMaleSemenSample(sampleId: number): Observable<any> {
+    // Backend endpoint: IVFMaleSemanAnalysis/DeleteSample/{id}
+    return this.api.delete(`IVFMaleSemanAnalysis/DeleteSample/${sampleId}`);
+  }
 }

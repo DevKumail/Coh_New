@@ -6,6 +6,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
     {
         public FemaleDemographicDTO Female { get; set; } // null if absent
         public MaleDemographicDTO Male { get; set; }     // null if absent
+        public object? IVFMainId { get; set; }     // null if absent
     }
 
     public class FemaleDemographicDTO : BaseDemographicDTO { }

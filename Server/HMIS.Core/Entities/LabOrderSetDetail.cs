@@ -82,4 +82,10 @@ public partial class LabOrderSetDetail
 
     [Column(TypeName = "datetime")]
     public DateTime? PerformDate { get; set; }
+
+    public int? SampleTypeId { get; set; }
+
+    [ForeignKey("SampleTypeId")]
+    [InverseProperty("LabOrderSetDetail")]
+    public virtual LabSampleTypes? SampleType { get; set; }
 }

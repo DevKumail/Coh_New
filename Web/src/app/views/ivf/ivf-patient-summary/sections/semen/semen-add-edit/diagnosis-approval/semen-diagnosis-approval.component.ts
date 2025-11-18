@@ -1,16 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-semen-diagnosis-approval',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgbNavModule],
+  imports: [CommonModule,FilledOnValueDirective, ReactiveFormsModule, NgbNavModule],
   templateUrl: './semen-diagnosis-approval.component.html',
   styleUrls: ['./semen-diagnosis-approval.component.scss']
 })
 export class SemenDiagnosisApprovalComponent {
+  @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
+  @Input() labelFor: (key: string) => string = (k) => k;
+  @Input() hrEmployees: Array<{ name: string; providerId: number }> = [];
   form: FormGroup;
   active = 1;
 
@@ -20,10 +24,14 @@ export class SemenDiagnosisApprovalComponent {
       finding: ['Normal'],
       note: [''],
       approvalStatus: ['Pending'],
-      timeBetweenCollectionAndUsage: ['00:00'],
-      numberOfInsemMotile: [null],
-      inseminatedAmountMl: [null],
-      rate24hMotility: [null],
+      // timeBetweenCollectionAndUsage: ['00:00'],
+      // numberOfInsemMotile: [null],
+      // inseminatedAmountMl: [null],
+      // rate24hMotility: [null],
     });
+  }
+
+  getValue() {
+    return this.form.value;
   }
 }

@@ -23,4 +23,64 @@ public partial class DropdownConfiguration
     [ForeignKey("CategoryId")]
     [InverseProperty("DropdownConfiguration")]
     public virtual DropdownCategory Category { get; set; } = null!;
+
+    [InverseProperty("ChromosomeAnalysisCategory")]
+    public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistory { get; set; } = new List<IvfmaleFertilityHistory>();
+
+    [InverseProperty("CategoryIdInheritanceNavigation")]
+    public virtual ICollection<IvfmaleFhgenetics> IvfmaleFhgenetics { get; set; } = new List<IvfmaleFhgenetics>();
+
+    [InverseProperty("CategoryIdDiagnosisOfInfectionNavigation")]
+    public virtual ICollection<IvfmaleFhinfections> IvfmaleFhinfectionsCategoryIdDiagnosisOfInfectionNavigation { get; set; } = new List<IvfmaleFhinfections>();
+
+    [InverseProperty("CategoryIdPrevInfectionsNavigation")]
+    public virtual ICollection<IvfmaleFhinfections> IvfmaleFhinfectionsCategoryIdPrevInfectionsNavigation { get; set; } = new List<IvfmaleFhinfections>();
+
+    [InverseProperty("CategoryIdClinicalVaricoceleNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdClinicalVaricoceleNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdDistalSeminalTractNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdDistalSeminalTractNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdEtiologicalDiagnosisNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdEtiologicalDiagnosisNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdInstrumentalVaricoceleNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdInstrumentalVaricoceleNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdKryptorchidismNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdKryptorchidismNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdOrchitisNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdOrchitisNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdProximalSeminalTractNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdProximalSeminalTractNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("CategoryIdTesticleNavigation")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSemCategoryIdTesticleNavigation { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
+
+    [InverseProperty("QuantificationPossible")]
+    public virtual ICollection<IvfmaleSemenObservation> IvfmaleSemenObservation { get; set; } = new List<IvfmaleSemenObservation>();
+
+    [InverseProperty("PreparationMethod")]
+    public virtual ICollection<IvfmaleSemenObservationPreparationMethod> IvfmaleSemenObservationPreparationMethod { get; set; } = new List<IvfmaleSemenObservationPreparationMethod>();
+
+    [InverseProperty("Appearance")]
+    public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleAppearance { get; set; } = new List<IvfmaleSemenSample>();
+
+    [InverseProperty("CollectionMethod")]
+    public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleCollectionMethod { get; set; } = new List<IvfmaleSemenSample>();
+
+    [InverseProperty("CollectionPlace")]
+    public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleCollectionPlace { get; set; } = new List<IvfmaleSemenSample>();
+
+    [InverseProperty("Purpose")]
+    public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSamplePurpose { get; set; } = new List<IvfmaleSemenSample>();
+
+    [InverseProperty("Smell")]
+    public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleSmell { get; set; } = new List<IvfmaleSemenSample>();
+
+    [InverseProperty("Viscosity")]
+    public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleViscosity { get; set; } = new List<IvfmaleSemenSample>();
 }

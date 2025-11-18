@@ -31,11 +31,15 @@ public partial class IvfmaleFertilityHistory
 
     public int? NoOfPregnanciesAchieved { get; set; }
 
-    public int? CategoryId { get; set; }
+    public long? ChromosomeAnalysisCategoryId { get; set; }
 
     [Column("CFTRCarrier")]
     [StringLength(50)]
     public string? Cftrcarrier { get; set; }
+
+    [ForeignKey("ChromosomeAnalysisCategoryId")]
+    [InverseProperty("IvfmaleFertilityHistory")]
+    public virtual DropdownConfiguration? ChromosomeAnalysisCategory { get; set; }
 
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfmaleFertilityHistory")]
@@ -45,6 +49,9 @@ public partial class IvfmaleFertilityHistory
     public virtual ICollection<IvfmaleFhgeneral> IvfmaleFhgeneral { get; set; } = new List<IvfmaleFhgeneral>();
 
     [InverseProperty("IvfmaleFh")]
+    public virtual ICollection<IvfmaleFhgenetics> IvfmaleFhgenetics { get; set; } = new List<IvfmaleFhgenetics>();
+
+    [InverseProperty("IvfmaleFh")]
     public virtual ICollection<IvfmaleFhimpairmentFactor> IvfmaleFhimpairmentFactor { get; set; } = new List<IvfmaleFhimpairmentFactor>();
 
     [InverseProperty("IvfmaleFh")]
@@ -52,6 +59,9 @@ public partial class IvfmaleFertilityHistory
 
     [InverseProperty("IvfmaleFh")]
     public virtual ICollection<IvfmaleFhsemenAnalysis> IvfmaleFhsemenAnalysis { get; set; } = new List<IvfmaleFhsemenAnalysis>();
+
+    [InverseProperty("IvfmaleFh")]
+    public virtual ICollection<IvfmaleFhtesticlesAndSem> IvfmaleFhtesticlesAndSem { get; set; } = new List<IvfmaleFhtesticlesAndSem>();
 
     [ForeignKey("ProviderId")]
     [InverseProperty("IvfmaleFertilityHistory")]

@@ -1,21 +1,13 @@
 ﻿using Dapper;
-using HMIS.Infrastructure.ORM;
-using HMIS.Infrastructure.Repository;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Data;
-using Microsoft.Data.SqlClient;
-using HMIS.Core.Entities;
-using Task = System.Threading.Tasks.Task;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using HMIS.Application.Implementations;
-using HMIS.Infrastructure.Helpers;
-using HMIS.Application.DTOs;
-using Microsoft.AspNetCore.Mvc;
 using HMIS.Application.DTOs.Registration;
 using HMIS.Application.DTOs.SpLocalModel;
+using HMIS.Application.Implementations;
 using HMIS.Core.Context;
+using HMIS.Core.Entities;
+using HMIS.Infrastructure.ORM;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
+using Task = System.Threading.Tasks.Task;
 
 namespace HMIS.Application.ServiceLogics
 {
@@ -26,7 +18,7 @@ namespace HMIS.Application.ServiceLogics
         {
             _context = context;
         }
-        public async Task<DataSet> TempDemoDB(long? TempId, string? Name, string? Address, int? PersonEthnicityTypeId, string? Mobile, string? DOB, string? Gender, int? Country, int? State, int? City, string? ZipCode, int? InsuredId, int? CarrierId,int? Page,int? Size,string? SortColumn,string? SortOrder)
+        public async Task<DataSet> TempDemoDB(long? TempId, string? Name, string? Address, int? PersonEthnicityTypeId, string? Mobile, string? DOB, string? Gender, int? Country, int? State, int? City, string? ZipCode, int? InsuredId, int? CarrierId, int? Page, int? Size, string? SortColumn, string? SortOrder)
         {
             try
             {
@@ -59,7 +51,7 @@ namespace HMIS.Application.ServiceLogics
 
                 param.Add("@Page", Page, DbType.Int32);
 
-                param.Add("@Size",Size,DbType.Int32);
+                param.Add("@Size", Size, DbType.Int32);
 
                 param.Add("@SortColumn", SortColumn, DbType.String);
 

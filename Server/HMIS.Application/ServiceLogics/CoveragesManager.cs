@@ -3,7 +3,7 @@ using GdPicture14;
 using HMIS.Infrastructure.Helpers;
 using HMIS.Infrastructure.ORM;
 using HMIS.Core.Entities;
-using HMIS.Infrastructure.Repository;
+using HMIS.Infrastructure.Repositories;
 using HMIS.Application.DTOs;
 using HMIS.Application.DTOs.Coverage;
 using HMIS.Application.Implementations;

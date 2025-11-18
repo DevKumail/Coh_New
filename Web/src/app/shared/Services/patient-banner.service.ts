@@ -35,16 +35,18 @@ export class PatientBannerService {
 
   data = new Subject<boolean>() 
 
-  constructor(private store: PatientBannerStoreService) {
+  constructor(
+    // private store: PatientBannerStoreService
+  ) {
     // Rehydrate from RxDB on service initialization
-    this.store.get().then((doc) => {
-      if (!doc) return;
-      if (doc.patientData !== undefined) this.patientDataSource.next(doc.patientData);
-      if (doc.visitAppointments !== undefined) this.visitAppointmentsSource.next(doc.visitAppointments);
-      if (doc.selectedVisit !== undefined) this.selectedVisit.next(doc.selectedVisit);
-      const payerInfo = (doc as any)?.payerInfo;
-      if (payerInfo !== undefined) this.payerInfo.next(payerInfo);
-    });
+    // this.store.get().then((doc) => {
+    //   if (!doc) return;
+    //   if (doc.patientData !== undefined) this.patientDataSource.next(doc.patientData);
+    //   if (doc.visitAppointments !== undefined) this.visitAppointmentsSource.next(doc.visitAppointments);
+    //   if (doc.selectedVisit !== undefined) this.selectedVisit.next(doc.selectedVisit);
+    //   const payerInfo = (doc as any)?.payerInfo;
+    //   if (payerInfo !== undefined) this.payerInfo.next(payerInfo);
+    // });
     // Legacy sessionStorage rehydration (commented)
     // try {
     //   const pdRaw = sessionStorage.getItem(this.STORAGE_KEYS.patientData);
@@ -61,27 +63,27 @@ export class PatientBannerService {
   }
 
   setPatientData(data: any) {
-    const prev = this.patientDataSource.value;
-    const prevMrNo = this.extractMrNo(prev);
-    const nextMrNo = this.extractMrNo(data);
+    // const prev = this.patientDataSource.value;
+    // const prevMrNo = this.extractMrNo(prev);
+    // const nextMrNo = this.extractMrNo(data);
 
     // If clearing, wipe all dependent state and RxDB doc
-    if (data === null || data === undefined) {
-      void this.clearAll();
-      return;
-    }
+    // if (data === null || data === undefined) {
+    //   void this.clearAll();
+    //   return;
+    // }
 
     // If switching to a different patient, reset dependent state
-    const isSwitch = prevMrNo && nextMrNo && prevMrNo !== nextMrNo;
+    // const isSwitch = prevMrNo && nextMrNo && prevMrNo !== nextMrNo;
     this.patientDataSource.next(data);
-    if (isSwitch) {
-      this.visitAppointmentsSource.next([]);
-      this.selectedVisit.next(null);
-      this.payerInfo.next([]);
-      void this.store.set({ patientData: data, visitAppointments: [], selectedVisit: null, payerInfo: [] } as any);
-    } else {
-      void this.store.set({ patientData: data });
-    }
+    // if (isSwitch) {
+    //   this.visitAppointmentsSource.next([]);
+    //   this.selectedVisit.next(null);
+    //   this.payerInfo.next([]);
+    //   // void this.store.set({ patientData: data, visitAppointments: [], selectedVisit: null, payerInfo: [] } as any);
+    // } else {
+    //   // void this.store.set({ patientData: data });
+    // }
     // Legacy sessionStorage (commented)
     // try {
     //   if (data === null || data === undefined) sessionStorage.removeItem(this.STORAGE_KEYS.patientData);
@@ -90,18 +92,12 @@ export class PatientBannerService {
   }
 
   getIVFPatientData(): any | null {
-    try {
-      const raw = {};
-      //  sessionStorage.getItem(this.STORAGE_KEYS.patientIVFData);     
-       return raw;
-    } catch {
-      return null;
-    }
+  return this.patientIVFData$ ?? null; 
   }
 
   setIVFPatientData(data: any) {
     this.patientIVFDataSource.next(data);
-    void this.store.set({ patientIVFData: data });
+    //void this.store.set({ patientIVFData: data });
     // Legacy sessionStorage (commented)
     // try {
     //   if (data === null || data === undefined) sessionStorage.removeItem(this.STORAGE_KEYS.patientData);
@@ -111,7 +107,7 @@ export class PatientBannerService {
 
   setVisitAppointments(appointments: any) {
     this.visitAppointmentsSource.next(appointments);
-    void this.store.set({ visitAppointments: appointments });
+    // void this.store.set({ visitAppointments: appointments });
     // Legacy sessionStorage (commented)
     // try {
     //   if (appointments === null || appointments === undefined) sessionStorage.removeItem(this.STORAGE_KEYS.visitAppointments);
@@ -121,7 +117,7 @@ export class PatientBannerService {
 
   setSelectedVisit(visit: any) {
     this.selectedVisit.next(visit);
-    void this.store.set({ selectedVisit: visit });
+    // void this.store.set({ selectedVisit: visit });
     // Legacy sessionStorage (commented)
     // try {
     //   if (visit === null || visit === undefined) sessionStorage.removeItem(this.STORAGE_KEYS.selectedVisit);
@@ -131,7 +127,7 @@ export class PatientBannerService {
 
   setPayerInfo(payerInfo: any[]) {
     this.payerInfo.next(payerInfo ?? []);
-    void this.store.set({ payerInfo: payerInfo ?? [] } as any);
+    // void this.store.set({ payerInfo: payerInfo ?? [] } as any);
     // Legacy sessionStorage (commented)
     // try {
     //   if (!payerInfo || payerInfo.length === 0) sessionStorage.removeItem(this.STORAGE_KEYS.payerInfo);
@@ -162,7 +158,7 @@ export class PatientBannerService {
     this.visitAppointmentsSource.next([]);
     this.selectedVisit.next(null);
     this.payerInfo.next([]);
-    await this.store.clear();
+    // await this.store.clear();
   }
 
   private extractMrNo(src: any): string | null {

@@ -307,6 +307,11 @@
               </div>
 
               <div class="col-md-3 col-sm-12">
+                <label for="name" class="form-label">{{ 'NAME' | translate }}:</label>
+                <input type="text" class="form-control" formControlName="name" id="name" placeholder="Enter Name">
+              </div>
+
+              <div class="col-md-3 col-sm-12">
                 <label for="phone" class="form-label">{{ 'PHONE' | translate }}:</label>
                 <input type="text" class="form-control" formControlName="phone" id="phone" placeholder="Enter Phone">
               </div>
@@ -358,8 +363,8 @@
 
       <app-generic-pagination 
       [totalItems]="PatientListTotalrecord" 
-      [pageSize]="PatientListPaginationInfo?.RowsPerPage"
-      [currentPage]="PatientListPaginationInfo?.Page" 
+      [pageSize]="PatientListPaginationInfo?.pageSize"
+      [currentPage]="PatientListPaginationInfo?.currentPage" 
       (pageChanged)="onPatientPageChanged($event)">
       </app-generic-pagination>
 

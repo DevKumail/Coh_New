@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using HMIS.Infrastructure.ORM;
-using HMIS.Infrastructure.Repository;
+using HMIS.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Data;

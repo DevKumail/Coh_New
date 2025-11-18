@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { SemenParameterDocumentsComponent } from './tabs/semen-parameter-documents.component';
@@ -28,6 +28,12 @@ export class SemenTabsComponent implements AfterViewInit {
   active = 1;
   nativeActive = 1;
   afterActive = 1;
+  @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
+  @Input() labelFor: (key: string) => string = (k) => k;
+  @Input() hrEmployees: Array<{ name: string; providerId: number }> = [];
+  @ViewChild(NativeParameterComponent) nativeTab?: NativeParameterComponent;
+  @ViewChild(PreparationParameterComponent) afterParamTab?: PreparationParameterComponent;
+  @ViewChild(PreparationPreparationComponent) prepTab?: PreparationPreparationComponent;
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -39,5 +45,24 @@ export class SemenTabsComponent implements AfterViewInit {
       this.afterActive = 1;
       this.cdr.detectChanges();
     });
+  }
+
+  getNativeObservation() {
+    return this.nativeTab?.buildObservation('Native');
+  }
+
+  getAfterObservation() {
+    return this.afterParamTab?.buildObservation();
+  }
+
+  getPreparation() {
+    return this.prepTab?.buildPreparation();
+  }
+
+  patchFromModel(nativeObs: any, afterObs: any) {
+    try { this.nativeTab?.patchFromObservation?.(nativeObs); } catch {}
+    try { this.afterParamTab?.patchFromObservation?.(afterObs); } catch {}
+    const prep = afterObs?.preparations?.[0] || null;
+    try { this.prepTab?.patchFromPreparation?.(prep); } catch {}
   }
 }

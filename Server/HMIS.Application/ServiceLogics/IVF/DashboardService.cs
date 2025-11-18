@@ -47,7 +47,7 @@ namespace HMIS.Application.ServiceLogics.IVF
 
             foreach (var r in rows)
             {
-                BaseDemographicDTO target = r.Gender switch
+                BaseDemographicDTO? target = r.Gender switch
                 {
                     "Male" => dto.Male = new MaleDemographicDTO(),
                     "Female" => dto.Female = new FemaleDemographicDTO(),
@@ -67,7 +67,9 @@ namespace HMIS.Application.ServiceLogics.IVF
                 target.Picture = r.Picture;
                 target.Gender = r.Gender;
             }
-
+            var IvfMainId = await conn.QueryFirstOrDefaultAsync("IVF_GetMainId", new { MrNo }, commandType: CommandType.StoredProcedure); 
+            
+            dto.IVFMainId = IvfMainId;
             return (true, dto);
         }
 
@@ -125,65 +127,29 @@ namespace HMIS.Application.ServiceLogics.IVF
             long maleId;
             long femaleId;
 
-            if (dto.PrimaryIsMale.HasValue)
+          
+            if (dto.PrimaryIsMale.Value)
             {
-                if (dto.PrimaryIsMale.Value)
-                {
-                    maleId = primary.PatientId;
-                    femaleId = secondary.PatientId;
-                }
-                else
-                {
-                    maleId = secondary.PatientId;
-                    femaleId = primary.PatientId;
-                }
+                maleId = primary.PatientId;
+                femaleId = secondary.PatientId;
             }
             else
             {
-                // Infer from RegPatientDetails -> RegGender by matching GenderId and taking RegGender.Gender
-                var primaryDetails = await _db.RegPatientDetails
-                    .Include(d => d.Gender)
-                    .FirstOrDefaultAsync(d => d.PatientId == primary.PatientId);
-
-                var secondaryDetails = await _db.RegPatientDetails
-                    .Include(d => d.Gender)
-                    .FirstOrDefaultAsync(d => d.PatientId == secondary.PatientId);
-
-                string pGender = primaryDetails?.Gender?.Gender?.Trim();
-                string sGender = secondaryDetails?.Gender?.Gender?.Trim();
-
-                bool pIsMale = !string.IsNullOrEmpty(pGender) && pGender.Equals("Male", StringComparison.OrdinalIgnoreCase);
-                bool pIsFemale = !string.IsNullOrEmpty(pGender) && pGender.Equals("Female", StringComparison.OrdinalIgnoreCase);
-                bool sIsMale = !string.IsNullOrEmpty(sGender) && sGender.Equals("Male", StringComparison.OrdinalIgnoreCase);
-                bool sIsFemale = !string.IsNullOrEmpty(sGender) && sGender.Equals("Female", StringComparison.OrdinalIgnoreCase);
-
-                if (pIsMale && sIsFemale)
-                {
-                    maleId = primary.PatientId;
-                    femaleId = secondary.PatientId;
-                }
-                else if (pIsFemale && sIsMale)
-                {
-                    maleId = secondary.PatientId;
-                    femaleId = primary.PatientId;
-                }
-                else
-                {
-                    return (false, 0, "Unable to infer genders from RegPatientDetails/RegGender. Provide PrimaryIsMale explicitly.");
-                }
+                maleId = secondary.PatientId;
+                femaleId = primary.PatientId;
             }
 
-            if (dto.VisitAccountNo <= 0)
-                return (false, 0, "VisitAccountNo is required");
+            if (dto.AppId <= 0)
+                return (false, 0, "Appointment ID is required");
 
-            var visitExists = await _db.BlpatientVisit.AnyAsync(v => v.VisitAccountNo == dto.VisitAccountNo);
-            if (!visitExists) return (false, 0, "VisitAccountNo not found");
+            var visitExists = await _db.SchAppointment.AnyAsync(v => v.AppId == dto.AppId);
+            if (!visitExists) return (false, 0, "Appointment ID not found");
 
             var entity = new Ivfmain
             {
                 MalePatientId = maleId,
                 FemalePatientId = femaleId,
-                VisitAccountNo = dto.VisitAccountNo
+                AppId = dto.AppId
             };
 
             _db.Ivfmain.Add(entity);

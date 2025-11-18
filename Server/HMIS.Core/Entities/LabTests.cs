@@ -66,7 +66,13 @@ public partial class LabTests
 
     public int? LaboratoryId { get; set; }
 
+    public int? SampleTypeId { get; set; }
+
     [ForeignKey("LaboratoryId")]
     [InverseProperty("LabTests")]
     public virtual Laboratories? Laboratory { get; set; }
+
+    [ForeignKey("SampleTypeId")]
+    [InverseProperty("LabTests")]
+    public virtual LabSampleTypes? SampleType { get; set; }
 }

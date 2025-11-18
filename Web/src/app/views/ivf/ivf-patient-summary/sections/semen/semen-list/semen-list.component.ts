@@ -1,38 +1,117 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { SemenAddEditComponent } from '../semen-add-edit/semen-add-edit.component';
+import { NgIconComponent } from '@ng-icons/core';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-semen-list',
   standalone: true,
-  imports: [CommonModule, SemenAddEditComponent],
+  imports: [CommonModule, SemenAddEditComponent,NgIconComponent
+],
   templateUrl: './semen-list.component.html',
   styleUrls: ['./semen-list.component.scss']
 })
 export class SemenListComponent {
   showAdd = false;
   isLoading = false;
-  rows = [
-    {
-      collectionDate: '01/09/2025',
-      thawingDate: '',
-      time: '12:00 AM',
-      sampleId: 'T-12',
-      purpose: 'Cryo sperm',
-      method: 'Cryo sperm',
-      vol: 2,
-      conc: 15,
-      totalCountM: 30,
-      whoA: 30,
-      whoC: 10,
-      whoD: 10,
-      norm: 4,
-      cryoStatus: '',
-      status: ''
-    }
-  ];
+  rows: any[] = [];
+  editModel: any = null;
+
+  constructor(private ivf: IVFApiService) {
+    this.load();
+  }
 
   openAdd() { this.showAdd = true; }
   onCancel() { this.showAdd = false; }
-  onSaved(_payload: any) { this.showAdd = false; }
+
+  onSaved(_payload: any) {
+    this.showAdd = false;
+    this.editModel = null;
+    this.load();
+  }
+
+  load(page: number = 1, pageSize: number = 10) {
+    this.isLoading = true;
+    this.ivf.GetAllMaleSemenAnalysis(page, pageSize).subscribe({
+      next: (res: any) => {
+        // Expecting res to have data array; adjust mapping if API differs
+        const data = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+        this.rows = (data || []).map((x: any) => ({
+          id: x.sampleId || x.id || 0,
+          collectionDate: x.collectionDateTime ? new Date(x.collectionDateTime).toLocaleDateString() : '',
+          thawingDate: x.thawingDateTime ? new Date(x.thawingDateTime).toLocaleDateString() : '',
+          time: x.analysisStartTime || '-',
+          sampleCode: x.sampleCode || '-',
+          purpose: x.purpose || '-',
+          method: x.collectionMethod || '-',
+          vol: x.volumeML ?? '-',
+          conc: x.concentrationPerML ?? '-',
+          totalCountM: x.totalSpermCount ?? '-',
+          whoA: x.whO_AB_Percent ?? '-',
+          whoC: x.whO_C_Percent ?? '-',
+          whoD: x.whO_D_Percent ?? '-',
+          norm: x.morphologyNormalPercent ?? '-',
+          cryoStatus: x.cryoStatus || '-',
+          status: x.status || '-',
+        }));
+        this.isLoading = false;
+      },
+      error: _ => { this.isLoading = false; this.rows = []; }
+    });
+  }
+
+  edit(row: any) {
+    const id = row?.id;
+    if (!id) { return; }
+    this.isLoading = true;
+    this.ivf.GetMaleSemenSampleById(id).subscribe({
+      next: (sample: any) => {
+        this.isLoading = false;
+        this.editModel = sample;
+        this.showAdd = true;
+      },
+      error: _ => { this.isLoading = false; }
+    });
+  }
+
+  delete(id: any) {
+    const sampleId = Number(id);
+    if (!sampleId) return;
+    // const ok = confirm('Delete this sample?');
+    // if (!ok) return;
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action cannot be undone!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isLoading = true;
+        this.ivf.DeleteMaleSemenSample(sampleId).subscribe({
+          next: _ => { this.isLoading = false; this.load();
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'The sample has been deleted.',
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 1500
+            });
+           },
+          error: _ => { this.isLoading = false;
+            Swal.fire({
+              title: 'Error!',
+              text: 'The sample could not be deleted.',
+              icon: 'error',
+              showConfirmButton: false,
+              timer: 1500
+            });
+           }
+        });
+      }
+    });
+  }
 }

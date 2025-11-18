@@ -265,7 +265,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 var configuration = await _context.DropdownConfiguration
-                    .FirstOrDefaultAsync(c => c.ValueId == valueId && !c.IsActive);
+                    .FirstOrDefaultAsync(c => c.ValueId == valueId && c.IsActive);
 
                 if (configuration == null) return false;
 
