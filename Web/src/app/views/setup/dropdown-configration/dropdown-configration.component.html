@@ -45,7 +45,7 @@
                                     <td>{{ record.categoryName || '-' }}</td>
                                     <td>{{ record.description || '-' }}</td>
                                     <td>
-                                        <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
+                                        <div class="dropdown-menu-end d-flex gap-2 px-2 py-1">
                                             <ng-icon name="tablerEdit" class="me-1" (click)="onAddUpdateDropdownConfiguration(standardModal,record.categoryId)">
                                             </ng-icon>
                                             <!-- <ng-icon name="tablerTrash" class="text-danger me-1" (click)="onDelete(record?.id)">
@@ -128,7 +128,7 @@
                                             </thead>
                                             <tbody class="table-group-divider text-center">
                                                 <tr *ngFor="let record of modalItems; let i = index">
-                                                    <td>{{ AddForm?.controls?.['categoryName']?.value || 'N/A' }}</td>
+                                                    <td>{{ currentCategoryName || 'N/A' }}</td>
                                                     <td>{{ record.valueName || 'N/A' }}</td>
                                                     <td>
                                                         <button *ngIf="!record.valueId" type="button" class="btn btn-outline-danger btn-sm" (click)="removeItemAt(i)" title="Remove">

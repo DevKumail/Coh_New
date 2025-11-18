@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dropdown-configration',
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -25,7 +26,7 @@ import Swal from 'sweetalert2';
     LucideAngularModule,
   ],
   templateUrl: './dropdown-configration.component.html',
-  styleUrl: './dropdown-configration.component.scss'
+  styleUrls: ['./dropdown-configration.component.scss']
 })
 export class DropdownConfigrationComponent {
   protected readonly homeIcon = LucideHome;
@@ -41,7 +42,6 @@ export class DropdownConfigrationComponent {
     RowsPerPage: 10,
   };
   dropdownlistlotalCount: number = 0;
-  modalService = new NgbModal();
   CatogaryListData: any = [];
   // Available categories for the dropdown (populate as needed)
   availableCategories: string[] = [
@@ -56,11 +56,13 @@ export class DropdownConfigrationComponent {
   // Validation flag for attempting to add mismatched category
   categoryMismatch: boolean = false;
   currentCategoryId: any = null;
+  currentCategoryName: string = '';
 
   constructor(
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService, 
     private loader: LoaderService,
+    private modalService: NgbModal,
   ) { }
 
   ngOnInit(): void {
@@ -100,12 +102,14 @@ this.loader.show();
     // prepare state and then load
     this.modalItems = [];
     this.currentCategoryId = categoryId;
+    this.currentCategoryName = '';
     this.clinicalApiService.GetCategoryWithValues(categoryId).then((res:any)=>{
       this.modalItems = res?.data?.values || [];
       this.AddForm.patchValue({
       categoryName: res?.data?.categoryName,
       // description: res?.data?.description,
     });
+    this.currentCategoryName = res?.data?.categoryName || '';
     this.loader.hide();
     })
     this.loader.hide();
