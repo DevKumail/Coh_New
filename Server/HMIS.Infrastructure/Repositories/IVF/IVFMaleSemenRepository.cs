@@ -43,7 +43,7 @@ namespace HMIS.Infrastructure.Repositories.IVF
 
             // Use QueryMultiple for multiple result sets
             using var multi = await connection.QueryMultipleAsync(
-                "IVFMaleSemenSample_GetById",
+                "IVF_MaleSemenSampleGetById",
                 new { SampleId = sampleId },
                 commandType: CommandType.StoredProcedure
             );

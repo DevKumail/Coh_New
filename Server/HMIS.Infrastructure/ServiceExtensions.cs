@@ -1,4 +1,5 @@
-﻿using HMIS.Infrastructure.IRepositories;
+﻿using HMIS.Infrastructure.Data;
+using HMIS.Infrastructure.IRepositories;
 using HMIS.Infrastructure.Repositories.IVF;
 using Microsoft.Extensions.DependencyInjection;
 namespace HMIS.Infrastructure
@@ -9,6 +10,7 @@ namespace HMIS.Infrastructure
         {
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IIVFMaleSemenRepository, IVFMaleSemenRepository>();
+            DapperTypeHandlers.RegisterTypeHandlers();
 
         }
     }
