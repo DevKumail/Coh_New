@@ -39,6 +39,14 @@ export class IVFApiService {
     return this.api.post('IVFFertilityHistory/CreateUpdateMaleFertilityHistory', payload);
   }
 
+  getMaleFertilityHistory(ivfMainId: number, page: number = 1, rowsPerPage: number = 10): Observable<any> {
+    return this.api.get('IVFFertilityHistory/GetFertilityHistory', {
+      ivfmainid: ivfMainId,
+      page,
+      rowsPerPage,
+    });
+  }
+
   getNotifyRoles(): Observable<any> {
     return this.api.get('IVFLabOrders/notify-roles');
   }

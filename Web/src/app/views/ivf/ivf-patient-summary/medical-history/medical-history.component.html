@@ -1,9 +1,13 @@
 <div class="medical-history-container">
   <div class="card">
-    <div class="card-header">
-      <h5>Fertility History</h5>
+      <div class="card-header d-flex align-items-center justify-content-between">
+    <div class="fw-bold">Fertility History</div>
+    <div>
+      <button class="btn btn-sm btn-primary" (click)="openAdd()" *ngIf="!showAdd">Add</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="onCancel()" *ngIf="showAdd">Back to list</button>
     </div>
-    <div class="card-body">
+  </div>
+    <div *ngIf="isCreateUpdate" class="card-body">
       <ul ngbNav #nav="ngbNav" [(activeId)]="activeTabId" [destroyOnHide]="false" class="nav nav-tabs mb-3">
         <li [ngbNavItem]="1">
           <a ngbNavLink href="javascript:void(0)">Basic</a>
@@ -32,6 +36,8 @@
       </ul>
       <div [ngbNavOutlet]="nav"></div>
 
+  
+
       <div class="d-flex justify-content-end gap-2 mt-3">
         <button type="button" class="btn btn-secondary" (click)="onCancel()">
           <i class="bi bi-x-circle me-1"></i> Cancel
@@ -41,5 +47,49 @@
         </button>
       </div>
     </div>
+
+        <!-- Fertility History List -->
+      <div *ngIf="!isCreateUpdate" class="card mt-3">
+        <div class="card-body p-2">
+          <div  class="table-responsive">
+            <table class="table table-sm table-striped align-middle mb-2">
+                      <thead>
+                        <tr>
+                        <th>Collection date</th>
+                        <th>Sample Code</th>
+                        <th>Purpose</th>
+                        <th>Collection method</th>
+                        <th>Status</th>
+                        <th style="width:100px">Actions</th>
+                        </tr>
+                      </thead>
+              <tbody>
+                <tr *ngFor="let r of historyRows; let i = index">
+                  <td>{{ r.collectionDate }}</td>
+                  <td>{{ r.sampleCode }}</td>
+                  <td>{{ r.purpose }}</td>
+                  <td>{{ r.method }}</td>
+                  <td>{{ r.status }}</td>
+                  <td>
+                    <ng-icon name="tablerEdit" class="me-1" style="cursor: pointer;" (click)="edit(r)"></ng-icon>
+                    <ng-icon name="tablerTrash" class="text-danger me-1" style="cursor: pointer;" (click)="delete(r.id)"></ng-icon>
+                  </td>
+                </tr>
+                <tr *ngIf="totalrecord === 0">
+                  <td colspan="6" class="text-center">
+                    <span>No Data Found </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+                    <app-generic-pagination 
+                    [totalItems]="totalrecord" 
+                    [pageSize]="PaginationInfo?.RowsPerPage"
+                    [currentPage]="PaginationInfo?.Page" 
+                    (pageChanged)="onPageChanged($event)">
+                    </app-generic-pagination>
+          </div>
+        </div>
+      </div>
   </div>
 </div>

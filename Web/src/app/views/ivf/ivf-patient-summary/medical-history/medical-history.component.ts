@@ -12,6 +12,8 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 import { Page } from '@/app/shared/enum/dropdown.enum';
+import { NgIconComponent } from '@ng-icons/core';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 
 @Component({
   selector: 'app-medical-history',
@@ -20,6 +22,8 @@ import { Page } from '@/app/shared/enum/dropdown.enum';
     CommonModule,
     FormsModule,
     NgbNavModule,
+    NgIconComponent,
+    GenericPaginationComponent,
     MedicalHistoryBasicComponent,
     MedicalHistoryGeneralComponent,
     MedicalHistoryTesticlesComponent,
@@ -38,6 +42,19 @@ export class MedicalHistoryComponent {
   dropdowns: any = [];
   cacheItems: string[] = ['Provider'];
   hrEmployees: any = [];
+  isCreateUpdate: boolean = false;
+  showAdd: boolean = false;
+  // Fertility history list state
+  isLoadingHistory = false;
+  historyRows: any[] = [];
+  PaginationInfo: any = {
+    Page: 1,
+    RowsPerPage: 10,
+  };
+  totalrecord = 0;
+
+  // Toggle between list (default) and form
+  showForm = false;
 
   @ViewChild(MedicalHistoryBasicComponent) basicTab?: MedicalHistoryBasicComponent;
   @ViewChild(MedicalHistoryGeneralComponent) generalTab?: MedicalHistoryGeneralComponent;
@@ -54,6 +71,46 @@ export class MedicalHistoryComponent {
 
   ngOnInit(): void {
     this.getAlldropdown();
+    // Load list by default
+    this.loadFertilityHistory();
+  }
+
+  openAdd(){
+    this.isCreateUpdate = true;
+    this.showAdd = true;
+  }
+
+  onCancel(){
+    this.isCreateUpdate = false;
+    this.showAdd = false;
+  }
+  loadFertilityHistory(page: number = this.PaginationInfo.Page) {
+    this.isLoadingHistory = true;
+    this.PaginationInfo.Page = page;
+    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+      const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
+    if(ivfMainId){
+      this.ivfservice.getMaleFertilityHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
+          next: (res: any) => {
+            this.historyRows = res?.rows || res?.data || res?.items || res || [];
+            this.totalrecord = res?.total || res?.count || (Array.isArray(this.historyRows) ? this.historyRows.length : 0);
+            this.isLoadingHistory = false;
+          },
+          error: () => {
+            this.historyRows = [];
+            this.isLoadingHistory = false;
+          }
+        });
+      }else{
+        this.historyRows = [];
+        this.isLoadingHistory = false;
+      }
+    });
+  }
+
+  onPageChanged(event: any) {
+    this.PaginationInfo.Page = event.page;
+    this.loadFertilityHistory();
   }
 
   // Store payload from service for dynamic labels/options
@@ -247,6 +304,9 @@ export class MedicalHistoryComponent {
     this.ivfservice.createOrUpdateMaleFertilityHistory(payload).subscribe({
       next: (res) => {
         console.log('Saved successfully', res);
+        // Return to list and refresh
+        this.showForm = false;
+        this.loadFertilityHistory(1);
       },
       error: (err) => {
         console.error('Save failed', err);
@@ -254,8 +314,15 @@ export class MedicalHistoryComponent {
     });
   }
 
-  onCancel() {
-    console.log('Cancelling medical history form...');
-    // Implement cancel logic
+  onAddClick() {
+    this.showForm = true;
+    // Optionally reset active tab
+    this.activeTabId = 1;
   }
+
+  edit(row: any) {
+ 
+  }
+
+  delete(id: any){}
 }
