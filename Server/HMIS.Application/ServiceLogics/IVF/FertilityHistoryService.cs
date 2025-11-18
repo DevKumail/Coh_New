@@ -1,3 +1,4 @@
+using Dapper;
 using HMIS.Application.DTOs.IVFDTOs;
 using HMIS.Application.DTOs.SpLocalModel;
 using HMIS.Core.Context;
@@ -23,9 +24,46 @@ namespace HMIS.Application.ServiceLogics.IVF
             _context = db;
         }
 
-        public Task<(bool IsSuccess, DashboardReadDTO Data)> GetFertilityHistory(string ivfmainid, PaginationInfo pagination)
+        public async Task<(bool IsSuccess, DashboardReadDTO Data)> GetFertilityHistory(string ivfmainid, PaginationInfo pagination)
         {
-            throw new NotImplementedException();
+            // Basic validations
+            if (string.IsNullOrWhiteSpace(ivfmainid))
+            {
+                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
+            }
+            var page = pagination?.Page ?? 1;
+            var rows = pagination?.RowsPerPage ?? 10;
+            if (page <= 0 || rows <= 0)
+            {
+                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
+            }
+
+            using var conn = _dapper.CreateConnection();
+            try
+            {
+                using var grid = await conn.QueryMultipleAsync(
+                    "IVF_GetAllFertilityHistory",
+                    new { IVFMainId = ivfmainid, Page = page, RowsPerPage = rows },
+                    commandType: System.Data.CommandType.StoredProcedure);
+
+                var female = await grid.ReadFirstOrDefaultAsync<FemaleDemographicDTO>();
+                var male = await grid.ReadFirstOrDefaultAsync<MaleDemographicDTO>();
+                int? mainId = null;
+                var mainIdRow = await grid.ReadFirstOrDefaultAsync<int?>();
+                if (mainIdRow.HasValue) mainId = mainIdRow.Value;
+
+                var dto = new DashboardReadDTO
+                {
+                    Female = female,
+                    Male = male,
+                    IVFMainId = mainId
+                };
+                return (true, dto);
+            }
+            catch
+            {
+                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
+            }
         }
         public async Task<Result<int>> CreateMaleFertilityHistoryAsync(IVFMaleFertilityHistoryDto dto)
         {
@@ -85,8 +123,19 @@ namespace HMIS.Application.ServiceLogics.IVF
 
                 int maleFHId = fertilityHistory.IvfmaleFhid;
 
-                // Create General record if provided
-                if (dto.General != null)
+                // Create General record only if any general data present
+                if (dto.General != null && (
+                        dto.General.HasChildren.HasValue ||
+                        dto.General.Girls.HasValue ||
+                        dto.General.Boys.HasValue ||
+                        dto.General.InfertileSince != null ||
+                        dto.General.AndrologicalDiagnosisPerformed.HasValue ||
+                        dto.General.Date.HasValue ||
+                        dto.General.InfertilityTypeCategoryId.HasValue ||
+                        dto.General.FurtherPlanning != null ||
+                        dto.General.Illness != null ||
+                        dto.General.PerformedTreatment != null
+                    ))
                 {
                     IvfmaleFhgeneral general;
                     if (dto.General.IVFMaleFHGeneralId.HasValue && dto.General.IVFMaleFHGeneralId.Value > 0)
@@ -116,8 +165,15 @@ namespace HMIS.Application.ServiceLogics.IVF
 
                     int generalId = general.IvfmaleFhgeneralId;
 
-                    // Create Further Planning if provided
-                    if (dto.General.FurtherPlanning != null)
+                    // Create Further Planning only if any field provided
+                    if (dto.General.FurtherPlanning != null && (
+                            dto.General.FurtherPlanning.SemenAnalysis.HasValue ||
+                            dto.General.FurtherPlanning.MorphologicalExamination.HasValue ||
+                            dto.General.FurtherPlanning.SerologicalExamination.HasValue ||
+                            dto.General.FurtherPlanning.AndrologicalUrologicalConsultation.HasValue ||
+                            dto.General.FurtherPlanning.DNAFragmentation.HasValue ||
+                            dto.General.FurtherPlanning.SpermFreezing.HasValue
+                        ))
                     {
                         IvfmaleFhfurtherPlanning furtherPlanning;
                         if (dto.General.FurtherPlanning.IVFMaleFHFurtherPlanningId.HasValue && dto.General.FurtherPlanning.IVFMaleFHFurtherPlanningId.Value > 0)
@@ -138,8 +194,20 @@ namespace HMIS.Application.ServiceLogics.IVF
                         if (dto.General.FurtherPlanning.SpermFreezing.HasValue) furtherPlanning.SpermFreezing = dto.General.FurtherPlanning.SpermFreezing.Value;
                     }
 
-                    // Create Illness if provided
-                    if (dto.General.Illness != null)
+                    // Create Illness only if any field provided
+                    if (dto.General.Illness != null && (
+                            dto.General.Illness.Idiopathic.HasValue ||
+                            dto.General.Illness.MumpsAfterPuberty.HasValue ||
+                            dto.General.Illness.EndocrinopathiesCategoryId.HasValue ||
+                            dto.General.Illness.PreviousTumorCategoryId.HasValue ||
+                            dto.General.Illness.Hepatitis.HasValue ||
+                            dto.General.Illness.HepatitisDetails != null ||
+                            dto.General.Illness.ExistingAllergies.HasValue ||
+                            dto.General.Illness.ExistingAllergiesDetails != null ||
+                            dto.General.Illness.ChronicIllnesses != null ||
+                            dto.General.Illness.OtherDiseases != null ||
+                            (dto.General.Illness.IdiopathicIds != null && dto.General.Illness.IdiopathicIds.Any())
+                        ))
                     {
                         IvfmaleFhillness illness;
                         if (dto.General.Illness.IVFMaleFHIllnessId.HasValue && dto.General.Illness.IVFMaleFHIllnessId.Value > 0)
@@ -191,8 +259,12 @@ namespace HMIS.Application.ServiceLogics.IVF
                         }
                     }
 
-                    // Create Performed Treatment if provided
-                    if (dto.General.PerformedTreatment != null)
+                    // Create Performed Treatment only if any field provided
+                    if (dto.General.PerformedTreatment != null && (
+                            dto.General.PerformedTreatment.AlreadyTreated.HasValue ||
+                            dto.General.PerformedTreatment.Notes != null ||
+                            (dto.General.PerformedTreatment.TreatmentYears != null && dto.General.PerformedTreatment.TreatmentYears.Any())
+                        ))
                     {
                         IvfmaleFhperformedTreatment performedTreatment;
                         if (dto.General.PerformedTreatment.IVFMaleFHPerformedTreatmentId.HasValue && dto.General.PerformedTreatment.IVFMaleFHPerformedTreatmentId.Value > 0)
@@ -240,8 +312,12 @@ namespace HMIS.Application.ServiceLogics.IVF
                     await _context.SaveChangesAsync();
                 }
 
-                // Create Genetics record if provided
-                if (dto.Genetics != null)
+                // Create Genetics record only if any field provided
+                if (dto.Genetics != null && (
+                        dto.Genetics.Genetics != null ||
+                        dto.Genetics.CategoryIdInheritance.HasValue ||
+                        dto.Genetics.MedicalOpinion != null
+                    ))
                 {
                     IvfmaleFhgenetics genetics;
                     if (dto.Genetics.IVFMaleFHGeneticsId.HasValue && dto.Genetics.IVFMaleFHGeneticsId.Value > 0)
@@ -259,8 +335,28 @@ namespace HMIS.Application.ServiceLogics.IVF
                     if (dto.Genetics.MedicalOpinion != null) genetics.MedicalOpinion = dto.Genetics.MedicalOpinion;
                 }
 
-                // Create Testicles and Sem record if provided
-                if (dto.TesticlesAndSem != null)
+                // Create Testicles and Sem record only if any field provided
+                if (dto.TesticlesAndSem != null && (
+                        dto.TesticlesAndSem.PrimaryHypogonadotropy.HasValue ||
+                        dto.TesticlesAndSem.SecondaryHypogonadotropy.HasValue ||
+                        dto.TesticlesAndSem.RetractileTestes.HasValue ||
+                        dto.TesticlesAndSem.CategoryIdTesticle.HasValue ||
+                        dto.TesticlesAndSem.CategoryIdKryptorchidism.HasValue ||
+                        dto.TesticlesAndSem.CategoryIdOrchitis.HasValue ||
+                        dto.TesticlesAndSem.TesticleVolumeLeft != null ||
+                        dto.TesticlesAndSem.TesticleVolumeRight != null ||
+                        dto.TesticlesAndSem.Varicocele.HasValue ||
+                        dto.TesticlesAndSem.OperatedVaricocele.HasValue ||
+                        dto.TesticlesAndSem.CategoryIdInstrumentalVaricocele.HasValue ||
+                        dto.TesticlesAndSem.CategoryIdClinicalVaricocele.HasValue ||
+                        dto.TesticlesAndSem.ObstipationOfSpermaticDuct.HasValue ||
+                        dto.TesticlesAndSem.CategoryIdProximalSeminalTract.HasValue ||
+                        dto.TesticlesAndSem.CategoryIdDistalSeminalTract.HasValue ||
+                        dto.TesticlesAndSem.CategoryIdEtiologicalDiagnosis.HasValue ||
+                        dto.TesticlesAndSem.Inflammation.HasValue ||
+                        dto.TesticlesAndSem.Note != null ||
+                        dto.TesticlesAndSem.Infections != null
+                    ))
                 {
                     IvfmaleFhtesticlesAndSem testiclesAndSem;
                     if (dto.TesticlesAndSem.IVFMaleFHTesticlesAndSemId.HasValue && dto.TesticlesAndSem.IVFMaleFHTesticlesAndSemId.Value > 0)
@@ -296,8 +392,14 @@ namespace HMIS.Application.ServiceLogics.IVF
 
                     int testiclesAndSemId = testiclesAndSem.IvfmaleFhtesticlesAndSemId;
 
-                    // Create Infections if provided
-                    if (dto.TesticlesAndSem.Infections != null)
+                    // Create Infections only if any field provided
+                    if (dto.TesticlesAndSem.Infections != null && (
+                            dto.TesticlesAndSem.Infections.Urethritis.HasValue ||
+                            dto.TesticlesAndSem.Infections.Prostatitis.HasValue ||
+                            dto.TesticlesAndSem.Infections.Epididymitis.HasValue ||
+                            dto.TesticlesAndSem.Infections.CategoryIdPrevInfections.HasValue ||
+                            dto.TesticlesAndSem.Infections.CategoryIdDiagnosisOfInfection.HasValue
+                        ))
                     {
                         IvfmaleFhinfections infections;
                         if (dto.TesticlesAndSem.Infections.IVFMaleFHInfectionsId.HasValue && dto.TesticlesAndSem.Infections.IVFMaleFHInfectionsId.Value > 0)
