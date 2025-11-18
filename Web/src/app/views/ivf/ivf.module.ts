@@ -34,6 +34,7 @@ export class IVFModule {
             this.ivfApi.getCoupleData(mrNo).subscribe({
               next: (res: any) => {
                 try {
+                  this.patientBannerService.setIVFPatientData(null);
                   this.patientBannerService.setIVFPatientData(res);
                 } catch {}
               },

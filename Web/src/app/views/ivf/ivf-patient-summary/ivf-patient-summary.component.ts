@@ -81,15 +81,25 @@ export class IvfPatientSummaryComponent implements OnInit {
 
       }
     });
-
+debugger
     this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
       console.log("IVF Patient Data", data)
       if (data) {
         this.SecondaryPatientData = data?.couple || [];
         if (data?.couple?.female && data?.couple?.male) {
           this.isCoupleLink = true;
-          this.isivfstart = data?.couple?.isIVFmain || false;
+          if(data?.couple?.ivfMainId != null){
+            this.isivfstart = true;
+          } else {
+            this.isivfstart = false;
+          }
+        } else {
+          this.isCoupleLink = false;
+          this.isivfstart = false;
         }
+      } else {
+        this.isCoupleLink = false;
+        this.isivfstart = false;
       }
     });
 
