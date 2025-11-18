@@ -23,9 +23,46 @@ namespace HMIS.Application.ServiceLogics.IVF
             _context = db;
         }
 
-        public Task<(bool IsSuccess, DashboardReadDTO Data)> GetFertilityHistory(string ivfmainid, PaginationInfo pagination)
+        public async Task<(bool IsSuccess, DashboardReadDTO Data)> GetFertilityHistory(string ivfmainid, PaginationInfo pagination)
         {
-            throw new NotImplementedException();
+            // Basic validations
+            if (string.IsNullOrWhiteSpace(ivfmainid))
+            {
+                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
+            }
+            var page = pagination?.Page ?? 1;
+            var rows = pagination?.RowsPerPage ?? 10;
+            if (page <= 0 || rows <= 0)
+            {
+                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
+            }
+
+            using var conn = _dapper.CreateConnection();
+            try
+            {
+                using var grid = await conn.QueryMultipleAsync(
+                    "IVF_GetAllFertilityHistory",
+                    new { IVFMainId = ivfmainid, Page = page, RowsPerPage = rows },
+                    commandType: System.Data.CommandType.StoredProcedure);
+
+                var female = await grid.ReadFirstOrDefaultAsync<FemaleDemographicDTO>();
+                var male = await grid.ReadFirstOrDefaultAsync<MaleDemographicDTO>();
+                int? mainId = null;
+                var mainIdRow = await grid.ReadFirstOrDefaultAsync<int?>();
+                if (mainIdRow.HasValue) mainId = mainIdRow.Value;
+
+                var dto = new DashboardReadDTO
+                {
+                    Female = female,
+                    Male = male,
+                    IVFMainId = mainId
+                };
+                return (true, dto);
+            }
+            catch
+            {
+                return (false, new DashboardReadDTO { Female = null!, Male = null!, IVFMainId = null });
+            }
         }
         public async Task<Result<int>> CreateMaleFertilityHistoryAsync(IVFMaleFertilityHistoryDto dto)
         {
