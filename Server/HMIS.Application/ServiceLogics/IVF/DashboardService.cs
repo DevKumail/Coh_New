@@ -47,7 +47,7 @@ namespace HMIS.Application.ServiceLogics.IVF
 
             foreach (var r in rows)
             {
-                BaseDemographicDTO target = r.Gender switch
+                BaseDemographicDTO? target = r.Gender switch
                 {
                     "Male" => dto.Male = new MaleDemographicDTO(),
                     "Female" => dto.Female = new FemaleDemographicDTO(),
@@ -67,12 +67,9 @@ namespace HMIS.Application.ServiceLogics.IVF
                 target.Picture = r.Picture;
                 target.Gender = r.Gender;
             }
-            var IVFMainExists = await conn.QueryFirstOrDefaultAsync<bool>(
-                "IVF_DoesMainExists",
-                new { MrNo },
-                commandType: CommandType.StoredProcedure
-            );
-            dto.IsIVFmain = IVFMainExists;
+            var IvfMainId = await conn.QueryFirstOrDefaultAsync("IVF_GetMainId", new { MrNo }, commandType: CommandType.StoredProcedure); 
+            
+            dto.IVFMainId = IvfMainId;
             return (true, dto);
         }
 
@@ -142,17 +139,17 @@ namespace HMIS.Application.ServiceLogics.IVF
                 femaleId = primary.PatientId;
             }
 
-            if (dto.VisitAccountNo <= 0)
-                return (false, 0, "VisitAccountNo is required");
+            if (dto.AppId <= 0)
+                return (false, 0, "Appointment ID is required");
 
-            var visitExists = await _db.BlpatientVisit.AnyAsync(v => v.VisitAccountNo == dto.VisitAccountNo);
-            if (!visitExists) return (false, 0, "VisitAccountNo not found");
+            var visitExists = await _db.SchAppointment.AnyAsync(v => v.AppId == dto.AppId);
+            if (!visitExists) return (false, 0, "Appointment ID not found");
 
             var entity = new Ivfmain
             {
                 MalePatientId = maleId,
                 FemalePatientId = femaleId,
-               // VisitAccountNo = dto.VisitAccountNo
+                AppId = dto.AppId
             };
 
             _db.Ivfmain.Add(entity);

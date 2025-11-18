@@ -4,7 +4,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
     {
         public string PrimaryMrNo { get; set; }
         public string SecondaryMrNo { get; set; }
-        public long VisitAccountNo { get; set; }
+        public long AppId { get; set; }
         public bool? PrimaryIsMale { get; set; }
     }
 }
