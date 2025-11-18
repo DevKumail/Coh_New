@@ -9,7 +9,7 @@ using HMIS.Core.Context;
 using HMIS.Core.Entities;
 using HMIS.Infrastructure.Helpers;
 using HMIS.Infrastructure.ORM;
-using HMIS.Infrastructure.Repository;
+using HMIS.Infrastructure.Repositories;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

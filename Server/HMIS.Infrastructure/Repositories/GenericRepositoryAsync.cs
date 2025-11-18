@@ -8,7 +8,7 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
-namespace HMIS.Infrastructure.Repository
+namespace HMIS.Infrastructure.Repositories
 {
     public class GenericRepositoryAsync<T> : IGenericRepositoryAsync<T> where T : class
     {
