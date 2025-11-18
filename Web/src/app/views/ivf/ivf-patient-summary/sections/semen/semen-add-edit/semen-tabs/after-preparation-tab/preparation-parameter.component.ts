@@ -24,6 +24,11 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
     .calc-inline .result { width: 100px; font-weight: 600; background-color: #f8f9fa; }
     .calc-inline .symbol { font-size: 1.1rem; margin: 0 .25rem; }
     .calc-inline .segment { display: flex; flex-direction: column; }
+    /* Chambers table */
+    .chambers-table table { width: 100%; border-collapse: collapse; }
+    .chambers-table th, .chambers-table td { border: 1px solid #e9ecef; padding: .25rem; text-align: center; }
+    .chambers-table th { background: #f8f9fa; font-weight: 600; }
+    .chambers-table input { width: 80px; padding: .125rem .25rem; text-align: center; height: 28px; }
     @media (max-width: 600px){
       .calc-inline .form-control { width: 88px; }
       .calc-inline .result { width: 96px; }
@@ -37,9 +42,15 @@ export class PreparationParameterComponent {
   form: FormGroup;
    protected readonly calculatorIcon = LucideCalculator;
    // Calculator modal state
-   concCount = 0; // Count result
-   concDilution = 1; // Dilution (factor)
-   concPortion = 1; // Portion (factor)
+  concCount = 0; // Count result
+  concDilution = 1; // Dilution (factor)
+  concPortion = 1; // Portion (factor)
+  // Chambers (A1..C3) counts
+  concChambers: Record<string, number | null> = {
+    A1: null, A2: null, A3: null,
+    B1: null, B2: null, B3: null,
+    C1: null, C2: null, C3: null,
+  };
    // Total items assessed for morphology (used to back-compute counts from percentages)
    private readonly totalMorphCount = 200;
  
@@ -63,6 +74,11 @@ export class PreparationParameterComponent {
      tail: null,
      excess: null,
      tzi: null,
+     headAbn: null,
+     neckAbn: null,
+     tailAbn: null,
+     excessAbn: null,
+     totalCount: null,
    };
  
    constructor(private fb: FormBuilder, private modalService: NgbModal) {
@@ -104,6 +120,15 @@ export class PreparationParameterComponent {
      if (!den) return 0;
      return +(num / den).toFixed(2); // [10^6/ml]
    }
+
+  get concAvgCount(): number {
+    const vals = Object.values(this.concChambers)
+      .map(v => (v === null || v === undefined ? NaN : Number(v)))
+      .filter(v => Number.isFinite(v)) as number[];
+    if (!vals.length) return 0;
+    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+    return +avg.toFixed(2);
+  }
  
    openConcCalc(tpl: any) {
      // initialize from current value if present
@@ -118,13 +143,58 @@ export class PreparationParameterComponent {
        this.concDilution = 1;
        this.concPortion = 1;
      }
+     // reset chambers
+     this.concChambers = {
+       A1: null, A2: null, A3: null,
+       B1: null, B2: null, B3: null,
+       C1: null, C2: null, C3: null,
+     };
      this.modalService.open(tpl, { centered: true, size: 'md' });
    }
  
    takeOverConc(modalRef: any) {
      this.form.get('concentration')?.setValue(this.concComputed);
      modalRef.close();
-   }
+  }
+
+  // Morphology keyboard modal helpers
+  openMorphKeyboard(tpl: any) {
+    this.modalService.open(tpl, { centered: true, size: 'md' });
+  }
+  incMorph(field: 'normal' | 'abnormal' | 'head' | 'neck' | 'tail' | 'excess', delta: number) {
+    const v = this.morphologyCalculater[field];
+    const n = (v === null || v === undefined || v === '') ? 0 : Number(v);
+    const next = Math.max(0, n + delta);
+    this.morphologyCalculater[field] = next;
+    this.computeMorphology();
+  }
+
+  // Motility state and helpers
+  motFast = 0;       // Fast progressive (A)
+  motSlow = 0;       // Slow progressive (B)
+  motLocal = 0;      // Locally motile
+  motNonLinear = 0;  // Non-linear motile
+  motImmotile = 0;   // Immotile (D)
+  private readonly totalMotilityCount = 200;
+  get motTotal(): number { return this.motFast + this.motSlow + this.motLocal + this.motNonLinear + this.motImmotile; }
+  get motPercAB(): number { const t = this.motTotal || 1; return +(((this.motFast + this.motSlow) / t) * 100).toFixed(2); }
+  get motPercC(): number { const t = this.motTotal || 1; return +(((this.motLocal + this.motNonLinear) / t) * 100).toFixed(2); }
+  get motPercD(): number { const t = this.motTotal || 1; return +((this.motImmotile / t) * 100).toFixed(2); }
+  openMotilityCalc(tpl: any) {
+    this.motFast = this.motSlow = this.motLocal = this.motNonLinear = this.motImmotile = 0;
+    this.modalService.open(tpl, { centered: true, size: 'md' });
+  }
+  incMot(field: 'motFast' | 'motSlow' | 'motLocal' | 'motNonLinear' | 'motImmotile', delta: number) {
+    const n = Math.max(0, Number((this as any)[field] || 0) + delta);
+    (this as any)[field] = n;
+  }
+  takeOverMotility(modalRef: any) {
+    this.form.get('whoAB')?.setValue(this.motPercAB);
+    this.form.get('whoC')?.setValue(this.motPercC);
+    this.form.get('whoD')?.setValue(this.motPercD);
+    this.form.get('overallMotility')?.setValue(this.motPercAB);
+    modalRef.close();
+  }
  
    openMorphCalc(tpl: any) {
      // Pull existing outer values (assumed as percentages) and map as counts with total=200
@@ -163,14 +233,14 @@ export class PreparationParameterComponent {
        excess: excess,
        round: true,
      };
-     this.morphologyPerc = { normal: null, abnormal: null, head: null, neck: null, tail: null, excess: null, tzi: null };
+     this.morphologyPerc = { normal: null, abnormal: null, head: null, neck: null, tail: null, excess: null, tzi: null, headAbn: null, neckAbn: null, tailAbn: null, excessAbn: null, totalCount: null };
      this.modalService.open(tpl, { centered: true, size: 'md' });
      // Auto-compute to fill the lower section immediately
      this.computeMorphology();
    }
  
    // Compute percentages and TZI from entered counts
-   computeMorphology() {
+  computeMorphology() {
      const m = this.morphologyCalculater;
      const toNum = (v: any) => (v === null || v === undefined || v === '' ? 0 : Number(v));
      const normal = toNum(m.normal);
@@ -182,9 +252,9 @@ export class PreparationParameterComponent {
  
      const total = normal + abnormal;
      if (total <= 0) {
-       this.morphologyPerc = { normal: 0, abnormal: 0, head: 0, neck: 0, tail: 0, excess: 0, tzi: 0 };
-       return;
-     }
+      this.morphologyPerc = { normal: 0, abnormal: 0, head: 0, neck: 0, tail: 0, excess: 0, tzi: 0, headAbn: 0, neckAbn: 0, tailAbn: 0, excessAbn: 0, totalCount: 0 };
+      return;
+    }
  
      const r = (x: number) => (m.round ? +x.toFixed(0) : +x.toFixed(2));
      // Percentages relative to total counted
@@ -195,21 +265,33 @@ export class PreparationParameterComponent {
      const pTail = r((tail / total) * 100);
      const pExcess = r((excess / total) * 100);
  
-     // Teratozoospermia Index (assumption): average number of defects per abnormal sperm
+     // Percentages of defects relative to abnormal only
+    const denomAbn = abnormal > 0 ? abnormal : 1;
+    const pHeadAbn = r((head / denomAbn) * 100);
+    const pNeckAbn = r((neck / denomAbn) * 100);
+    const pTailAbn = r((tail / denomAbn) * 100);
+    const pExcessAbn = r((excess / denomAbn) * 100);
+
+    // Teratozoospermia Index (assumption): average number of defects per abnormal sperm
      const denom = abnormal > 0 ? abnormal : 1; // avoid divide by zero
      const tziRaw = (head + neck + tail + excess) / denom;
      const pTzi = m.round ? +tziRaw.toFixed(0) : +tziRaw.toFixed(2);
  
      this.morphologyPerc = {
-       normal: pNormal,
-       abnormal: pAbnormal,
-       head: pHead,
-       neck: pNeck,
-       tail: pTail,
-       excess: pExcess,
-       tzi: pTzi,
-     };
-   }
+      normal: pNormal,
+      abnormal: pAbnormal,
+      head: pHead,
+      neck: pNeck,
+      tail: pTail,
+      excess: pExcess,
+      tzi: pTzi,
+      headAbn: pHeadAbn,
+      neckAbn: pNeckAbn,
+      tailAbn: pTailAbn,
+      excessAbn: pExcessAbn,
+      totalCount: total,
+    };
+  }
  
    takeOverMorph(modalRef: any) {
      // Ensure we have computed percentages

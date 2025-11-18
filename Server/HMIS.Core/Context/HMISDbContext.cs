@@ -1242,6 +1242,10 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfmaleFhprevIllness)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMaleFHPrevIllness_MaleFH");
+
+            entity.HasOne(d => d.PrevIllnessCategory).WithMany(p => p.IvfmaleFhprevIllness)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFMaleFHPrevIllness_DropdownConfiguration");
         });
 
         modelBuilder.Entity<IvfmaleFhsemenAnalysis>(entity =>

@@ -16,8 +16,7 @@ public partial class IvfmaleFhimpairmentFactor
     [Column("IVFMaleFHId")]
     public int IvfmaleFhid { get; set; }
 
-    [StringLength(150)]
-    public string? ImpairmentFactor { get; set; }
+    public long ImpairmentFactorCategoryId { get; set; }
 
     [ForeignKey("IvfmaleFhid")]
     [InverseProperty("IvfmaleFhimpairmentFactor")]
