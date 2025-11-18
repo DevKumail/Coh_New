@@ -81,5 +81,31 @@ namespace HMIS.Web.Controllers.IVF
             var items = await _service.GetReceiversByEmployeeTypeAsync(employeeTypeId);
             return Ok(items);
         }
+
+        // Collection details
+        [HttpGet("{orderSetId:long}/collection-details")]
+        public async Task<IActionResult> GetCollectionDetails(long orderSetId)
+        {
+            var rows = await _service.GetOrderCollectionDetailsAsync(orderSetId);
+            if (rows == null) return NotFound();
+            return Ok(rows);
+        }
+
+        // Sample collection
+        [HttpPost("{OrderSetId:long}/collect")]
+        public async Task<IActionResult> CollectSample(long OrderSetId, [FromBody] CollectSampleDTO payload)
+        {
+            var ok = await _service.CollectSampleAsync(OrderSetId, payload);
+            return ok ? NoContent() : NotFound();
+        }
+
+        // Complete order with results
+        [HttpPost("{orderSetDetailId:long}/complete")]
+        public async Task<IActionResult> Complete(long orderSetDetailId, [FromBody] CompleteLabOrderDTO payload)
+        {
+            var labResultId = await _service.CompleteOrderAsync(orderSetDetailId, payload);
+            if (labResultId == 0) return NotFound();
+            return Ok(new { labResultId });
+        }
     }
 }

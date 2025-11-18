@@ -24,8 +24,11 @@ public partial class DropdownConfiguration
     [InverseProperty("DropdownConfiguration")]
     public virtual DropdownCategory Category { get; set; } = null!;
 
+    [InverseProperty("CftrcarrierCategory")]
+    public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistoryCftrcarrierCategory { get; set; } = new List<IvfmaleFertilityHistory>();
+
     [InverseProperty("ChromosomeAnalysisCategory")]
-    public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistory { get; set; } = new List<IvfmaleFertilityHistory>();
+    public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistoryChromosomeAnalysisCategory { get; set; } = new List<IvfmaleFertilityHistory>();
 
     [InverseProperty("CategoryIdInheritanceNavigation")]
     public virtual ICollection<IvfmaleFhgenetics> IvfmaleFhgenetics { get; set; } = new List<IvfmaleFhgenetics>();

@@ -38,4 +38,25 @@ export class IVFApiService {
   getNotifyRoles(): Observable<any> {
     return this.api.get('IVFLabOrders/notify-roles');
   }
+
+  // New: collect sample for an entire order set (order-level)
+  collectLabOrder(orderSetId: number | string, body: { collectDate: string; userId: number }): Observable<any> {
+    return this.api.post(`IVFLabOrders/${orderSetId}/collect`, body);
+  }
+
+  // New: collect sample for a specific order set detail
+  collectLabOrderDetail(orderSetDetailId: number | string, body: { CollectDate: string; UserId: number }): Observable<any> {
+    return this.api.post(`IVFLabOrders/${orderSetDetailId}/collect`, body);
+  }
+
+  // New: complete a specific order set detail with results/observations
+  completeLabOrderDetail(orderSetDetailId: number | string, body: any): Observable<any> {
+    return this.api.post(`IVFLabOrders/${orderSetDetailId}/complete`, body);
+  }
+
+  // New: get full collection details for an order (per-test names, material)
+  // Proposed endpoint; adjust when your backend is ready
+  getOrderCollectionDetails(orderSetId: number | string): Observable<any> {
+    return this.api.get(`IVFLabOrders/${orderSetId}/collection-details`);
+  }
 }

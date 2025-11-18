@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { IvfConfirmDialogComponent } from './ivf-confirm-dialog.component';
@@ -7,16 +7,48 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { IvfCreateLabOrderDto } from '@/app/shared/Services/IVF/dtos/ivf-lab-orders.dto';
 import { SampleCollectionComponent } from './sample-collection.component';
 import { OrderCompletionComponent } from './order-completion.component';
+import { forkJoin, of } from 'rxjs';
+import { NgbToast, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-ivf-ps-lab-orders',
   standalone: true,
-  imports: [CommonModule, GenericPaginationComponent, AddLabOrderComponent, IvfConfirmDialogComponent, SampleCollectionComponent, OrderCompletionComponent],
+  imports: [
+    CommonModule, 
+    GenericPaginationComponent, 
+    AddLabOrderComponent, 
+    IvfConfirmDialogComponent, 
+    SampleCollectionComponent, 
+    OrderCompletionComponent,
+    NgbToast,
+    NgbToastModule
+  ],
   styles: [`
     .skeleton-loader { background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius:4px; }
     @keyframes loading { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   `],
   template: `
+    <!-- Toast Notifications -->
+    <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 70px; right: 20px; z-index: 1050;">
+      <ngb-toast 
+        *ngIf="showToast" 
+        [autohide]="true" 
+        [delay]="5000" 
+        (hidden)="showToast = false"
+        [class.bg-success]="toastType === 'success'"
+        [class.bg-danger]="toastType === 'danger'"
+        [class.bg-warning]="toastType === 'warning'"
+        [class.bg-info]="toastType === 'info'"
+        class="text-white">
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ toastMessage }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showToast = false"></button>
+        </div>
+      </ngb-toast>
+    </div>
+
     <div class="px-2 py-2" *ngIf="!showOrderPage && !showCollectPage && !showCompletePage; else addOrderPage">
       <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -157,6 +189,8 @@ export class IvfPsLabOrdersComponent implements OnInit {
   showCollectPage = false;
   showCompletePage = false;
   editingTests: any[] = [];
+  // Temporary: current user id (replace with actual auth user)
+  currentUserId: number = 1234;
 
   // Duplicate confirmation state
   showDuplicateDialog = false;
@@ -168,6 +202,11 @@ export class IvfPsLabOrdersComponent implements OnInit {
   deleteMessage = 'Are you sure you want to delete this lab order?';
   pendingDelete: { orderSetId?: number | string } | null = null;
   ordersRows: any[] = [];
+
+  // Toast notifications
+  showToast = false;
+  toastMessage = '';
+  toastType: 'success' | 'danger' | 'warning' | 'info' = 'info';
 
   constructor(private ivfApi: IVFApiService) {}
 
@@ -246,13 +285,38 @@ export class IvfPsLabOrdersComponent implements OnInit {
       this.isLoading = false;
     };
     if (row?.orderSetId) {
-      this.ivfApi.getLabOrderById(row.orderSetId).subscribe({
+      // Try new collection-details endpoint for full test name/material; fallback to getLabOrderById
+      this.ivfApi.getOrderCollectionDetails(row.orderSetId).subscribe({
         next: (res: any) => {
-          const details = Array.isArray(res?.details) ? res.details : [];
-          const mapped = details.map((d: any) => ({ id: d.labTestId, cpt: d.cptCode, name: d.cptCode, sampleTypeName: d.sampleTypeName, status: d.status }));
+          const details = Array.isArray(res) ? res : Array.isArray(res?.details) ? res.details : [];
+          const mapped = details.map((d: any) => ({
+            id: d.labTestId ?? d.testId,
+            orderSetDetailId: d.orderSetDetailId ?? d.id ?? d.labOrderSetDetailId,
+            cpt: d.cptCode ?? d.cpt,
+            name: d.testName ?? d.name ?? d.cptCode,
+            sampleTypeName: d.materialName ?? d.material ?? d.sampleTypeName ?? d.sampleType,
+            status: d.status
+          }));
           finish(mapped);
         },
-        error: () => { finish([]); },
+        error: () => {
+          this.ivfApi.getLabOrderById(row.orderSetId).subscribe({
+            next: (res: any) => {
+              const details = Array.isArray(res?.details) ? res.details : [];
+              const mapped = details.map((d: any) => ({
+                id: d.labTestId,
+                orderSetDetailId: d.orderSetDetailId ?? d.id ?? d.labOrderSetDetailId,
+                cpt: d.cptCode,
+                name: d.testName ?? d.cptCode,
+                sampleTypeName: d.sampleTypeName,
+                status: d.status
+              }));
+              finish(mapped);
+            },
+            error: () => { finish([]); },
+            complete: () => {}
+          });
+        },
         complete: () => {}
       });
     } else {
@@ -261,8 +325,23 @@ export class IvfPsLabOrdersComponent implements OnInit {
   }
   closeCollectPage() { this.showCollectPage = false; this.editingTests = []; }
   onCollected(payload: any) {
-    // UI-only: pretend collection succeeded and return to list
-    this.closeCollectPage();
+    // Order-level collect per new endpoint
+    const orderSetId = this.editingRow?.orderSetId;
+    if (!orderSetId) { this.closeCollectPage(); return; }
+    const date = payload?.form?.collectionDate;
+    const time = payload?.form?.collectionTime;
+    const collectDateIso = this.composeIso(date, time);
+    const userId = Number(payload?.form?.collectorId) || this.currentUserId;
+    this.isLoading = true;
+    this.ivfApi.collectLabOrder(orderSetId, { collectDate: collectDateIso, userId }).subscribe({
+      next: () => {},
+      error: () => {},
+      complete: () => {
+        this.isLoading = false;
+        this.closeCollectPage();
+        if (this.currentMrNo) this.loadOrders(this.currentMrNo);
+      }
+    });
   }
 
   // Order completion flow (UI only)
@@ -278,7 +357,14 @@ export class IvfPsLabOrdersComponent implements OnInit {
       this.ivfApi.getLabOrderById(row.orderSetId).subscribe({
         next: (res: any) => {
           const details = Array.isArray(res?.details) ? res.details : [];
-          const mapped = details.map((d: any) => ({ id: d.labTestId, cpt: d.cptCode, name: d.cptCode, sampleTypeName: d.sampleTypeName, status: d.status }));
+          const mapped = details.map((d: any) => ({
+            id: d.labTestId,
+            orderSetDetailId: d.orderSetDetailId ?? d.id ?? d.labOrderSetDetailId,
+            cpt: d.cptCode,
+            name: d.cptCode,
+            sampleTypeName: d.sampleTypeName,
+            status: d.status
+          }));
           finish(mapped);
         },
         error: () => { finish([]); },
@@ -290,11 +376,87 @@ export class IvfPsLabOrdersComponent implements OnInit {
   }
   closeCompletePage() { this.showCompletePage = false; this.editingTests = []; }
   onCompleted(payload: any) {
-    // UI-only: pretend completion succeeded and return to list
-    this.closeCompletePage();
+    // Call Complete API for each test in the order
+    const { completionData, tests } = payload;
+    
+    if (!completionData || !Array.isArray(tests) || tests.length === 0) { 
+      this.showNotification('No tests selected for completion', 'warning');
+      this.closeCompletePage(); 
+      return; 
+    }
+    
+    this.isLoading = true;
+    
+    // Set the userId from current user
+    completionData.userId = this.currentUserId;
+    
+    // For each test, call the complete API with the completion data
+    const apiCalls = tests.map((test: any) => {
+      if (!test.orderSetDetailId) return of(null);
+      
+      // Create a copy of the completion data for this test
+      const testCompletion = { ...completionData };
+      
+      // If this is the first test, use the main completion data
+      // Otherwise, create a new completion with some fields reset
+      if (tests.indexOf(test) > 0) {
+        testCompletion.accessionNumber = `${testCompletion.accessionNumber}-${tests.indexOf(test) + 1}`;
+        testCompletion.observations = testCompletion.observations.map((obs: any) => ({
+          ...obs,
+          observationIdentifierFullName: `${obs.observationIdentifierFullName} (${test.name || test.testName || test.cpt})`,
+          observationIdentifierShortName: `${obs.observationIdentifierShortName}_${tests.indexOf(test) + 1}`,
+          sequenceNo: obs.sequenceNo + (tests.indexOf(test) * 100) // Keep sequence numbers unique
+        }));
+      }
+      
+      return this.ivfApi.completeLabOrderDetail(test.orderSetDetailId, testCompletion);
+    }).filter(Boolean);
+    
+    if (apiCalls.length === 0) {
+      this.isLoading = false;
+      this.showNotification('No valid tests found to complete', 'warning');
+      this.closeCompletePage();
+      return;
+    }
+    
+    forkJoin(apiCalls).subscribe({
+      next: () => {
+        this.showNotification('Order completed successfully', 'success');
+      },
+      error: (error) => {
+        console.error('Error completing order:', error);
+        this.showNotification('Failed to complete order: ' + (error.error?.message || 'Unknown error'), 'danger');
+      },
+      complete: () => {
+        this.isLoading = false;
+        this.closeCompletePage();
+        if (this.currentMrNo) this.loadOrders(this.currentMrNo);
+      }
+    });
   }
 
-  onOrderModalSave(payload: { tests: any[]; details: any; header?: any }) {
+  // Show toast notification
+  showNotification(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info') {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    
+    // Auto hide after 5 seconds
+    setTimeout(() => {
+      this.showToast = false;
+    }, 5000);
+  }
+
+  // Compose ISO date from date and time strings
+  private composeIso(dateStr?: string, timeStr?: string): string {
+    const date = (dateStr || '').trim();
+    const time = (timeStr || '').trim();
+    if (!date) return new Date().toISOString();
+    const iso = time ? `${date}T${time}:00` : `${date}T00:00:00`;
+    return new Date(iso).toISOString();
+  }
+
+  onOrderModalSave(payload: { tests: any[]; details: any; header?: any }): void {
     // Mock duplicate check: assume any test with name containing 'E2' is duplicate
     const duplicates = payload.tests.filter(t => (t.name || '').toLowerCase().includes('e2'));
     if (duplicates.length > 0) {

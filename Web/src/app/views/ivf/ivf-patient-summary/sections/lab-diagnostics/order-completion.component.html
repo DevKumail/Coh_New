@@ -1,0 +1,187 @@
+<div class="card shadow">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div>
+      <div class="fw-bold">Order completion</div>
+      <div class="small text-muted">Order #: {{ order?.orderNumber || order?.orderSetId || '-' }}</div>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-secondary btn-sm" (click)="cancel.emit()">Back</button>
+      <button class="btn btn-success btn-sm" (click)="onComplete()" [disabled]="completionForm.invalid">
+        <i class="fas fa-check me-1"></i> Complete
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <!-- Test Information -->
+    <div class="form-section">
+      <h6 class="mb-3">Lab Result</h6>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Perform Date</label>
+          <div class="input-group">
+            <input class="form-control form-control-sm"
+                  placeholder="yyyy-mm-dd"
+                  [minDate]="minDate"
+                  [markDisabled]="isDisabled"
+                  ngbDatepicker
+                  #d="ngbDatepicker"
+                  [formControl]="performDateControl">
+            <button class="btn btn-outline-secondary btn-sm" 
+                   (click)="openDatePicker(d)" 
+                   type="button">
+              <i class="far fa-calendar-alt"></i>
+            </button>
+          </div>
+          <ngb-timepicker 
+            [(ngModel)]="currentTime" 
+            (ngModelChange)="onTimeChange($event)" 
+            [ngModelOptions]="{standalone: true}">
+          </ngb-timepicker>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Accession Number</label>
+          <input type="text" class="form-control form-control-sm" formControlName="accessionNumber">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Action</label>
+          <select class="form-select form-select-sm" formControlName="action">
+            <option value="">Select Action</option>
+            <option value="Reported">Reported</option>
+            <option value="Corrected">Corrected</option>
+            <option value="Final">Final</option>
+            <option value="Preliminary">Preliminary</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Reviewed By</label>
+          <input type="text" class="form-control form-control-sm" formControlName="reviewedBy">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Reviewed Date</label>
+          <input type="date" class="form-control form-control-sm" formControlName="reviewedDate">
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Details -->
+    <div class="form-section">
+      <h6 class="mb-3">Test Details</h6>
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Test Name</th>
+              <th>Material</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let test of tests">
+              <td>{{ test.name || test.testName || test.cpt }}</td>
+              <td>{{ test.material || test.materialName || test.sampleTypeName || '-' }}</td>
+              <td>{{ test.status || 'In Progress' }}</td>
+            </tr>
+            <tr *ngIf="tests.length === 0">
+              <td colspan="3" class="text-center text-muted">No tests selected</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Observations -->
+    <div class="form-section" formArrayName="observations">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">Observations</h6>
+        <button type="button" class="btn btn-primary btn-sm" (click)="addObservation()">
+          <i class="fas fa-plus me-1"></i> Add Observation
+        </button>
+      </div>
+      
+      <div *ngFor="let obs of observations.controls; let i = index" [formGroupName]="i" class="observation-row">
+        <div class="row g-3">
+          <div class="col-md-2">
+            <label class="form-label">Value Type</label>
+            <select class="form-select form-select-sm" formControlName="valueType">
+              <option value="">Select Type</option>
+              <option value="NM">Numeric (NM)</option>
+              <option value="ST">String (ST)</option>
+              <option value="CWE">Coded with Exceptions (CWE)</option>
+              <option value="DT">Date (DT)</option>
+              <option value="TM">Time (TM)</option>
+              <option value="TS">Time Stamp (TS)</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Observation Name</label>
+            <input type="text" class="form-control form-control-sm" formControlName="observationIdentifierFullName"
+                   placeholder="Full name">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Short Name</label>
+            <input type="text" class="form-control form-control-sm" formControlName="observationIdentifierShortName"
+                   placeholder="Short code">
+          </div>
+          <div class="col-md-1">
+            <label class="form-label">Value</label>
+            <input type="text" class="form-control form-control-sm" formControlName="observationValue">
+          </div>
+          <div class="col-md-1">
+            <label class="form-label">Units</label>
+            <input type="text" class="form-control form-control-sm" formControlName="units">
+          </div>
+          <div class="col-md-1">
+            <label class="form-label">Min</label>
+            <input type="text" class="form-control form-control-sm" formControlName="referenceRangeMin" placeholder="Min">
+          </div>
+          <div class="col-md-1">
+            <label class="form-label">Max</label>
+            <input type="text" class="form-control form-control-sm" formControlName="referenceRangeMax" placeholder="Max">
+          </div>
+          <div class="col-md-1 d-flex align-items-end">
+            <button type="button" class="btn btn-danger btn-sm" (click)="removeObservation(i)" 
+                    [disabled]="observations.length <= 1">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-2">
+            <label class="form-label">Status</label>
+            <select class="form-select form-select-sm" formControlName="resultStatus">
+              <option value="">Select Status</option>
+              <option value="F">Final</option>
+              <option value="P">Preliminary</option>
+              <option value="C">Corrected</option>
+              <option value="X">Cancelled</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Abnormal Flag</label>
+            <select class="form-select form-select-sm" formControlName="abnormalFlag">
+              <option value="">None</option>
+              <option value="H">High</option>
+              <option value="L">Low</option>
+              <option value="A">Abnormal</option>
+              <option value="N">Normal</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Remarks</label>
+            <input type="text" class="form-control form-control-sm" formControlName="remarks" placeholder="Additional notes">
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="weqayaScreening{{i}}" formControlName="weqayaScreening">
+              <label class="form-check-label" for="weqayaScreening{{i}}">
+                Weqaya Screening
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

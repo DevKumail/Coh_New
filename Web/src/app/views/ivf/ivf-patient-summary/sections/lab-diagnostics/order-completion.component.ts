@@ -1,88 +1,203 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgbDateStruct, NgbDatepicker, NgbDatepickerModule, NgbTimepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+export interface LabResultObservation {
+  valueType: string;
+  observationIdentifierFullName: string;
+  observationIdentifierShortName: string;
+  observationValue: string;
+  units: string;
+  referenceRangeMin: string;
+  referenceRangeMax: string;
+  abnormalFlag: string;
+  resultStatus: string;
+  observationDateTime: string;
+  analysisDateTime: string;
+  remarks: string;
+  weqayaScreening: boolean;
+  sequenceNo: number;
+}
 
 @Component({
   selector: 'app-order-completion',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
-    <div class="card shadow">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <div>
-          <div class="fw-bold">Order completion</div>
-          <div class="small text-muted">Order #: {{ order?.orderNumber || order?.orderSetId || '-' }}</div>
-        </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-secondary btn-sm" (click)="cancel.emit()">Back</button>
-          <button class="btn btn-success btn-sm" (click)="onComplete()" [disabled]="tests.length===0">Mark Completed</button>
-        </div>
-      </div>
-
-      <div class="card-body">
-        <div class="table-responsive border rounded">
-          <table class="table table-sm table-bordered align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th style="width:36px"></th>
-                <th>Test</th>
-                <th>Material</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let t of tests">
-                <td><input type="checkbox" class="form-check-input" [(ngModel)]="t.done"></td>
-                <td class="text-truncate">{{ t.name || t.cpt }}</td>
-                <td class="text-truncate">{{ t.sampleTypeName || '-' }}</td>
-                <td>{{ t.done ? 'Ready to complete' : (t.status || 'In Progress') }}</td>
-              </tr>
-              <tr *ngIf="tests.length===0">
-                <td colspan="4" class="text-center text-muted">No tests</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="row g-3 mt-3">
-          <div class="col-md-6">
-            <label class="form-label form-label-sm">Final remarks</label>
-            <textarea rows="3" class="form-control form-control-sm" [(ngModel)]="remarks"></textarea>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label form-label-sm">Verification</label>
-            <div class="form-check">
-              <input id="v1" type="checkbox" class="form-check-input" [(ngModel)]="verifiedByPhysician">
-              <label for="v1" class="form-check-label small">Verified by physician</label>
-            </div>
-            <div class="form-check">
-              <input id="v2" type="checkbox" class="form-check-input" [(ngModel)]="approved">
-              <label for="v2" class="form-check-label small">Approved</label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    NgbDatepickerModule,
+    NgbTimepickerModule
+  ],
+  templateUrl: './order-completion.component.html',
+  styles: [`
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+    .form-section {
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .observation-row {
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid #dee2e6;
+    }
+    .btn-add-observation {
+      margin-top: 1rem;
+    }
+  `]
 })
-export class OrderCompletionComponent {
+export class OrderCompletionComponent implements OnInit {
   @Input() order: any;
   @Input() tests: Array<any> = [];
   @Output() cancel = new EventEmitter<void>();
   @Output() completed = new EventEmitter<any>();
 
-  remarks = '';
-  verifiedByPhysician = false;
-  approved = false;
+  completionForm!: FormGroup; // Definite assignment assertion
+  currentDate: NgbDateStruct = {
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    day: new Date().getDate()
+  };
+  currentTime = { hour: new Date().getHours(), minute: new Date().getMinutes() };
+  
+  // For date picker
+  isDisabled = (date: NgbDateStruct, current?: { year: number; month: number }) => {
+    if (!date) return false;
+    const d = new Date(date.year, date.month - 1, date.day);
+    return d.getDay() === 0 || d.getDay() === 6; // Disable weekends
+  };
+  
+  minDate: NgbDateStruct = {
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    day: new Date().getDate()
+  };
+
+  constructor(
+    private fb: FormBuilder,
+    private modalService: NgbModal
+  ) {
+    this.initializeForm();
+  }
+
+  ngOnInit() {
+    // Initialize with current date and time
+    this.completionForm.patchValue({
+      performDate: this.currentDate,
+      entryDate: this.currentDate
+    });
+    // Add an initial observation
+    this.addObservation();
+  }
+
+  private initializeForm() {
+    this.completionForm = this.fb.group({
+      performDate: [this.currentDate, Validators.required],
+      entryDate: [this.currentDate, Validators.required],
+      accessionNumber: ['', Validators.required],
+      isDefault: [true],
+      principalResultInterpreter: [null],
+      action: ['', Validators.required],
+      reviewedBy: [''],
+      reviewedDate: [null],
+      performAtLabId: [null],
+      observations: this.fb.array([])
+    });
+  }
+
+
+  get observations(): FormArray {
+    return this.completionForm.get('observations') as FormArray;
+  }
+
+  get performDateControl(): FormControl {
+    return this.completionForm.get('performDate') as FormControl;
+  }
+
+  createObservation(): FormGroup {
+    return this.fb.group({
+      valueType: ['', Validators.required],
+      observationIdentifierFullName: ['', Validators.required],
+      observationIdentifierShortName: ['', Validators.required],
+      observationValue: ['', Validators.required],
+      units: [''],
+      referenceRangeMin: [''],
+      referenceRangeMax: [''],
+      abnormalFlag: [''],
+      resultStatus: [''],
+      observationDateTime: [new Date().toISOString()],
+      analysisDateTime: [new Date().toISOString()],
+      remarks: [''],
+      weqayaScreening: [false],
+      sequenceNo: [1]
+    });
+  }
+
+  addObservation() {
+    this.observations.push(this.createObservation());
+  }
+
+  removeObservation(index: number) {
+    this.observations.removeAt(index);
+  }
+
+  onTimeChange(time: { hour: number, minute: number }) {
+    this.currentTime = time;
+  }
+
+  onDateSelect(date: NgbDateStruct) {
+    this.completionForm.patchValue({
+      performDate: date
+    });
+  }
+
+  openDatePicker(datePicker: any) {
+    datePicker.toggle();
+  }
+
+  private formatDateForSubmission(date: NgbDateStruct, time: { hour: number, minute: number }): string {
+    const jsDate = new Date(date.year, date.month - 1, date.day, time.hour, time.minute);
+    return jsDate.toISOString();
+  }
 
   onComplete() {
+    if (this.completionForm.invalid) {
+      this.completionForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.completionForm.getRawValue();
+    
+    // Format the date and time for submission
+    const performDate = this.formatDateForSubmission(formValue.performDate, this.currentTime);
+    
     const payload = {
-      order: this.order,
-      completedTests: (this.tests || []).filter(t => t.done),
-      remarks: this.remarks,
-      verifiedByPhysician: this.verifiedByPhysician,
-      approved: this.approved
+      ...formValue,
+      performDate: performDate,
+      entryDate: new Date().toISOString(),
+      userId: 0, // Will be set by the parent
+      principalResultInterpreter: formValue.principalResultInterpreter || 0,
+      reviewedBy: formValue.reviewedBy || '',
+      reviewedDate: formValue.reviewedDate ? new Date(formValue.reviewedDate).toISOString() : null,
+      performAtLabId: formValue.performAtLabId || 0,
+      observations: formValue.observations.map((obs: any, index: number) => ({
+        ...obs,
+        sequenceNo: index + 1
+      }))
     };
-    this.completed.emit(payload);
+
+    this.completed.emit({
+      order: this.order,
+      completedTests: this.tests,
+      completionData: payload
+    });
   }
 }

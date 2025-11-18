@@ -21,6 +21,9 @@ namespace HMIS.Application.ServiceLogics.IVF
         Task<IEnumerable<OptionDTO>> GetRefPhysiciansAsync(int? employeeTypeId);
         Task<IEnumerable<OptionDTO>> GetNotifyRolesAsync();
         Task<IEnumerable<OptionDTO>> GetReceiversByEmployeeTypeAsync(int? employeeTypeId);
+        Task<bool> CollectSampleAsync(long OrderSetId, CollectSampleDTO payload);
+        Task<int> CompleteOrderAsync(long orderSetDetailId, CompleteLabOrderDTO payload);
+        Task<IEnumerable<OrderCollectionDetailsDTO>> GetOrderCollectionDetailsAsync(long orderSetId);
     }
 
     public class IVFLabOrderService : IIVFLabOrderService
@@ -29,6 +32,141 @@ namespace HMIS.Application.ServiceLogics.IVF
         public IVFLabOrderService(HMISDbContext db)
         {
             _db = db;
+        }
+
+        public async Task<IEnumerable<OrderCollectionDetailsDTO>> GetOrderCollectionDetailsAsync(long orderSetId)
+        {
+            var q = from d in _db.LabOrderSetDetail
+                    where d.OrderSetId == orderSetId && !(d.IsDeleted ?? false)
+                    join t in _db.LabTests on d.LabTestId equals t.LabTestId into tleft
+                    from t in tleft.DefaultIfEmpty()
+                    join st in _db.LabSampleTypes on t.SampleTypeId equals st.SampleTypeId into sleft
+                    from st in sleft.DefaultIfEmpty()
+                    select new OrderCollectionDetailsDTO
+                    {
+                        TestName = t != null ? t.LabName : string.Empty,
+                        Material = st != null ? st.SampleName : string.Empty,
+                        Status = (
+                            from h in _db.LabOrderSet
+                            where h.LabOrderSetId == d.OrderSetId
+                            select (h.IsSigned ?? false) ? "✔" : (h.OrderStatus ?? "—")
+                        ).FirstOrDefault()
+                    };
+
+            return await q.ToListAsync();
+        }
+
+        public async Task<bool> CollectSampleAsync(long OrderSetId, CollectSampleDTO payload)
+        {
+            try
+            {
+                var detail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetId == OrderSetId);
+                if (detail == null) return false;
+
+                detail.CollectDate = payload.CollectDate;
+                // Update header status to SAMPLE_COLLECTED via enum mapping
+                var header = await _db.LabOrderSet.FirstOrDefaultAsync(h => h.LabOrderSetId == detail.OrderSetId);
+                if (header != null)
+                {
+                    var resolved = ResolveStatus(LabOrderStatus.SampleCollected, header.OrderStatus, header.IsSigned);
+                    header.OrderStatus = resolved.status;
+                    header.IsSigned = resolved.isSigned;
+                    // Reflect collected date/time on header for display compatibility
+                    header.OrderDate = FormatDate(payload.CollectDate);
+                    header.UpdatedBy = payload.UserId.ToString();
+                    header.UpdatedDate = FormatDate(DateTime.UtcNow);
+                }
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<int> CompleteOrderAsync(long orderSetDetailId, CompleteLabOrderDTO payload)
+        {
+            // Load detail + header + test
+            var detail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetDetailId == orderSetDetailId);
+            if (detail == null) return 0;
+            var header = await _db.LabOrderSet.FirstOrDefaultAsync(h => h.LabOrderSetId == detail.OrderSetId);
+            if (header == null) return 0;
+
+            var test = await _db.LabTests.FirstOrDefaultAsync(t => t.LabTestId == detail.LabTestId);
+
+            // Create main result record
+            var main = new LabResultsMain
+            {
+                OrderSetDetailId = detail.OrderSetDetailId,
+                Mrno = (header.Mrno ?? 0).ToString(),
+                ProviderId = header.ProviderId,
+                TestName = test?.LabName ?? string.Empty,
+                TestNameAbbreviation = test?.LabAbreviation ?? (test?.LabName ?? string.Empty),
+                Cptcode = detail.Cptcode,
+                PerformDate = FormatY14(payload.PerformDate),
+                EntryDate = FormatY14(payload.EntryDate),
+                CreatedBy = payload.UserId.ToString(),
+                CreatedDate = FormatY14(DateTime.UtcNow),
+                UpdatedBy = payload.UserId.ToString(),
+                UpdatedDate = FormatY14(DateTime.UtcNow),
+                ReviewedBy = payload.ReviewedBy,
+                ReviewedDate = payload.ReviewedDate,
+                AccessionNumber = payload.AccessionNumber,
+                IsDefault = payload.IsDefault,
+                PrincipalResultInterpreter = payload.PrincipalResultInterpreter,
+                Action = payload.Action,
+                OldMrno = header.OldMrno,
+                SequenceNo = null,
+                PerformAtLabId = payload.PerformAtLabId
+            };
+            _db.Add(main);
+            await _db.SaveChangesAsync();
+
+            var labResultId = main.LabResultId;
+
+            // Insert observations using raw SQL because entity is keyless
+            if (payload.Observations != null && payload.Observations.Count > 0)
+            {
+                foreach (var obs in payload.Observations)
+                {
+                    await _db.Database.ExecuteSqlRawAsync(
+                        "INSERT INTO LabResultsObservation (ValueType, ObservationIdentifierFullName, ObservationIdentifierShortName, ObservationValue, Units, ReferenceRangeMin, ReferenceRangeMax, AbnormalFlag, ResultStatus, ObservationDateTime, AnalysisDateTime, CreatedBy, CreatedDate, UpdatedBy, UpdatedDate, Remarks, WeqayaScreening, SequenceNo, LabResultId) VALUES ({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18})",
+                        obs.ValueType,
+                        obs.ObservationIdentifierFullName,
+                        obs.ObservationIdentifierShortName,
+                        obs.ObservationValue,
+                        obs.Units,
+                        obs.ReferenceRangeMin,
+                        obs.ReferenceRangeMax,
+                        obs.AbnormalFlag,
+                        obs.ResultStatus,
+                        obs.ObservationDateTime.HasValue ? obs.ObservationDateTime.Value.ToString("yyyyMMddHHmmss") : null,
+                        obs.AnalysisDateTime.HasValue ? obs.AnalysisDateTime.Value.ToString("yyyyMMddHHmmss") : null,
+                        payload.UserId.ToString(),
+                        DateTime.UtcNow.ToString("yyyyMMddHHmmss"),
+                        payload.UserId.ToString(),
+                        DateTime.UtcNow.ToString("yyyyMMddHHmmss"),
+                        obs.Remarks,
+                        obs.WeqayaScreening,
+                        obs.SequenceNo,
+                        labResultId
+                    );
+                }
+            }
+
+            // Update detail and header statuses (Completed via enum mapping)
+            detail.PerformDate = payload.PerformDate;
+            if (header != null)
+            {
+                var resolved = ResolveStatus(LabOrderStatus.Completed, header.OrderStatus, header.IsSigned);
+                header.OrderStatus = resolved.status;
+                header.IsSigned = resolved.isSigned;
+                header.UpdatedBy = payload.UserId.ToString();
+                header.UpdatedDate = FormatDate(DateTime.UtcNow);
+            }
+            await _db.SaveChangesAsync();
+            return labResultId;
         }
         public async Task<IEnumerable<OptionDTO>> GetRefPhysiciansAsync(int? employeeTypeId)
         {
@@ -196,7 +334,8 @@ namespace HMIS.Application.ServiceLogics.IVF
                             d.Pcomments,
                             TestName = t != null ? t.LabName : null,
                             SampleName = st != null ? st.SampleName : null,
-                            Status = (h.IsSigned ?? false) ? "✔" : (h.OrderStatus ?? "—")
+                            IsSigned = (h.IsSigned ?? false),
+                            OrderStatus = h.OrderStatus
                         };
 
             var rows = await query.ToListAsync();
@@ -212,8 +351,8 @@ namespace HMIS.Application.ServiceLogics.IVF
                 Clinician = x.Clinician,
                 Name = x.TestName,
                 Material = x.SampleName,
-                Laboratory = (x.IsInternalTest ?? false) ? "Internal" : "External",
-                Status = x.Status,
+                Laboratory = "Internal",
+                Status = x.IsSigned ? "✔" : (x.OrderStatus ?? "—"),
                 Comment = x.Pcomments
             }).ToList();
         }
@@ -225,78 +364,113 @@ namespace HMIS.Application.ServiceLogics.IVF
             {
                 var h = payload.Header;
                 var resolvedCreate = ResolveStatus(h.OrderStatusEnum, h.OrderStatus, h.IsSigned);
-                // Determine order number: use provided or generate next serial
-                long? orderNumber = h.OrderNumber;
-                if (!orderNumber.HasValue || orderNumber.Value == 0)
-                {
-                    orderNumber = await GetNextOrderNumberAsync();
-                }
-                var hdr = new LabOrderSet
-                {
-                    Mrno = h.MRNo,
-                    ProviderId = h.ProviderId,
-                    OrderDate = FormatDate(h.OrderDate),
-                    VisitAccountNo = h.VisitAccountNo?.ToString(),
-                    CreatedBy = h.CreatedBy.ToString(),
-                    CreatedDate = FormatDate(h.CreatedDate),
-                    UpdatedBy = h.UpdatedBy?.ToString(),
-                    UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null,
-                    OrderControlCode = h.OrderControlCode,
-                    OrderStatus = resolvedCreate.status,
-                    IsHl7msgCreated = h.IsHL7MsgCreated,
-                    IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips,
-                    IsSigned = resolvedCreate.isSigned,
-                    OldMrno = h.oldMRNo,
-                    Hl7messageId = (int?)h.HL7MessageId,
-                    OrderNumber = orderNumber
-                };
-                _db.LabOrderSet.Add(hdr);
-                await _db.SaveChangesAsync();
+                var details = payload.Details ?? new List<LabOrderSetDetailDTO>();
 
-                var orderSetId = (long)hdr.LabOrderSetId;
-
-                if (payload.Details != null)
+                // If no details provided, still create a single order header
+                if (details.Count == 0)
                 {
-                    foreach (var d in payload.Details)
+                    long? orderNumber = h.OrderNumber;
+                    if (!orderNumber.HasValue || orderNumber.Value == 0)
                     {
-                        // Ensure per-test VisitOrderNo uniqueness
-                        long? visitOrderNo = d.VisitOrderNo;
-                        if (!visitOrderNo.HasValue || visitOrderNo.Value == 0)
-                        {
-                            visitOrderNo = await GetNextVisitOrderNoAsync();
-                        }
-                        var ent = new LabOrderSetDetail
-                        {
-                            OrderSetId = orderSetId,
-                            LabTestId = d.LabTestId,
-                            Cptcode = d.CPTCode,
-                            Pcomments = d.PComments,
-                            OrderQuantity = d.OrderQuantity,
-                            SendToLabId = d.SendToLabId,
-                            IsRadiologyTest = d.IsRadiologyTest,
-                            IsInternalTest = d.IsInternalTest,
-                            RadiologySide = d.RadiologySide,
-                            ProfileLabTestId = d.ProfileLabTestID,
-                            VisitOrderNo = visitOrderNo,
-                            ResultExpectedDate = d.ResultExpectedDate,
-                            ReferralName = d.ReferralName,
-                            ReferralId = d.ReferralId,
-                            SignedDate = d.SignedDate,
-                            ReferralTo = d.ReferralTo,
-                            CancelComments = d.CancelComments,
-                            InvestigationTypeId = d.InvestigationTypeId,
-                            OldOrderDetailId = d.OldOrderDetailId,
-                            RescheduledTo = d.RescheduledTo,
-                            BillOnOrder = d.BillOnOrder,
-                            IsDeleted = d.IsDeleted ?? false
-                        };
-                        _db.LabOrderSetDetail.Add(ent);
+                        orderNumber = await GetNextOrderNumberAsync();
                     }
+                    var singleHdr = new LabOrderSet
+                    {
+                        Mrno = h.MRNo,
+                        ProviderId = h.ProviderId,
+                        OrderDate = FormatDate(h.OrderDate),
+                        VisitAccountNo = h.VisitAccountNo?.ToString(),
+                        CreatedBy = h.CreatedBy.ToString(),
+                        CreatedDate = FormatDate(h.CreatedDate),
+                        UpdatedBy = h.UpdatedBy?.ToString(),
+                        UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null,
+                        OrderControlCode = h.OrderControlCode,
+                        OrderStatus = resolvedCreate.status,
+                        IsHl7msgCreated = h.IsHL7MsgCreated,
+                        IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips,
+                        IsSigned = resolvedCreate.isSigned,
+                        OldMrno = h.oldMRNo,
+                        Hl7messageId = (int?)h.HL7MessageId,
+                        OrderNumber = orderNumber
+                    };
+                    _db.LabOrderSet.Add(singleHdr);
+                    await _db.SaveChangesAsync();
+                    await tx.CommitAsync();
+                    return singleHdr.LabOrderSetId;
+                }
+
+                long firstCreatedId = 0;
+                foreach (var d in details)
+                {
+                    // Header per test
+                    long? orderNumber = h.OrderNumber;
+                    if (!orderNumber.HasValue || orderNumber.Value == 0)
+                    {
+                        orderNumber = await GetNextOrderNumberAsync();
+                    }
+                    var hdr = new LabOrderSet
+                    {
+                        Mrno = h.MRNo,
+                        ProviderId = h.ProviderId,
+                        OrderDate = FormatDate(h.OrderDate),
+                        VisitAccountNo = h.VisitAccountNo?.ToString(),
+                        CreatedBy = h.CreatedBy.ToString(),
+                        CreatedDate = FormatDate(h.CreatedDate),
+                        UpdatedBy = h.UpdatedBy?.ToString(),
+                        UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null,
+                        OrderControlCode = h.OrderControlCode,
+                        OrderStatus = resolvedCreate.status,
+                        IsHl7msgCreated = h.IsHL7MsgCreated,
+                        IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips,
+                        IsSigned = resolvedCreate.isSigned,
+                        OldMrno = h.oldMRNo,
+                        Hl7messageId = (int?)h.HL7MessageId,
+                        OrderNumber = orderNumber
+                    };
+                    _db.LabOrderSet.Add(hdr);
+                    await _db.SaveChangesAsync();
+
+                    var orderSetId = (long)hdr.LabOrderSetId;
+                    if (firstCreatedId == 0) firstCreatedId = orderSetId;
+
+                    // Ensure per-test VisitOrderNo uniqueness
+                    long? visitOrderNo = d.VisitOrderNo;
+                    if (!visitOrderNo.HasValue || visitOrderNo.Value == 0)
+                    {
+                        visitOrderNo = await GetNextVisitOrderNoAsync();
+                    }
+
+                    var ent = new LabOrderSetDetail
+                    {
+                        OrderSetId = orderSetId,
+                        LabTestId = d.LabTestId,
+                        Cptcode = d.CPTCode,
+                        Pcomments = d.PComments,
+                        OrderQuantity = d.OrderQuantity,
+                        SendToLabId = d.SendToLabId,
+                        IsRadiologyTest = d.IsRadiologyTest,
+                        IsInternalTest = d.IsInternalTest,
+                        RadiologySide = d.RadiologySide,
+                        ProfileLabTestId = d.ProfileLabTestID,
+                        VisitOrderNo = visitOrderNo,
+                        ResultExpectedDate = d.ResultExpectedDate,
+                        ReferralName = d.ReferralName,
+                        ReferralId = d.ReferralId,
+                        SignedDate = d.SignedDate,
+                        ReferralTo = d.ReferralTo,
+                        CancelComments = d.CancelComments,
+                        InvestigationTypeId = d.InvestigationTypeId,
+                        OldOrderDetailId = d.OldOrderDetailId,
+                        RescheduledTo = d.RescheduledTo,
+                        BillOnOrder = d.BillOnOrder,
+                        IsDeleted = d.IsDeleted ?? false
+                    };
+                    _db.LabOrderSetDetail.Add(ent);
                     await _db.SaveChangesAsync();
                 }
 
                 await tx.CommitAsync();
-                return orderSetId;
+                return firstCreatedId;
             }
             catch
             {
@@ -335,24 +509,26 @@ namespace HMIS.Application.ServiceLogics.IVF
                     hdr.OrderNumber = h.OrderNumber;
                 }
 
-                // Soft delete existing details
-                var existing = await _db.LabOrderSetDetail.Where(d => d.OrderSetId == orderSetId).ToListAsync();
-                foreach (var e in existing)
+                // Enforce single-detail per order: update or create one detail
+                var incomingDetails = payload.Details ?? new List<LabOrderSetDetailDTO>();
+                if (incomingDetails.Count > 1)
                 {
-                    e.IsDeleted = true;
+                    await tx.RollbackAsync();
+                    return false;
                 }
-                await _db.SaveChangesAsync();
 
-                if (payload.Details != null)
+                var existingDetail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetId == orderSetId);
+                if (incomingDetails.Count == 1)
                 {
-                    foreach (var d in payload.Details)
+                    var d = incomingDetails[0];
+                    long? visitOrderNo = d.VisitOrderNo;
+                    if (!visitOrderNo.HasValue || visitOrderNo.Value == 0)
                     {
-                        // Ensure per-test VisitOrderNo uniqueness on update as well
-                        long? visitOrderNo = d.VisitOrderNo;
-                        if (!visitOrderNo.HasValue || visitOrderNo.Value == 0)
-                        {
-                            visitOrderNo = await GetNextVisitOrderNoAsync();
-                        }
+                        visitOrderNo = await GetNextVisitOrderNoAsync();
+                    }
+
+                    if (existingDetail == null)
+                    {
                         var ent = new LabOrderSetDetail
                         {
                             OrderSetId = orderSetId,
@@ -379,6 +555,30 @@ namespace HMIS.Application.ServiceLogics.IVF
                             IsDeleted = d.IsDeleted ?? false
                         };
                         _db.LabOrderSetDetail.Add(ent);
+                    }
+                    else
+                    {
+                        existingDetail.LabTestId = d.LabTestId;
+                        existingDetail.Cptcode = d.CPTCode;
+                        existingDetail.Pcomments = d.PComments;
+                        existingDetail.OrderQuantity = d.OrderQuantity;
+                        existingDetail.SendToLabId = d.SendToLabId;
+                        existingDetail.IsRadiologyTest = d.IsRadiologyTest;
+                        existingDetail.IsInternalTest = d.IsInternalTest;
+                        existingDetail.RadiologySide = d.RadiologySide;
+                        existingDetail.ProfileLabTestId = d.ProfileLabTestID;
+                        existingDetail.VisitOrderNo = visitOrderNo;
+                        existingDetail.ResultExpectedDate = d.ResultExpectedDate;
+                        existingDetail.ReferralName = d.ReferralName;
+                        existingDetail.ReferralId = d.ReferralId;
+                        existingDetail.SignedDate = d.SignedDate;
+                        existingDetail.ReferralTo = d.ReferralTo;
+                        existingDetail.CancelComments = d.CancelComments;
+                        existingDetail.InvestigationTypeId = d.InvestigationTypeId;
+                        existingDetail.OldOrderDetailId = d.OldOrderDetailId;
+                        existingDetail.RescheduledTo = d.RescheduledTo;
+                        existingDetail.BillOnOrder = d.BillOnOrder;
+                        existingDetail.IsDeleted = d.IsDeleted ?? false;
                     }
                 }
 
@@ -443,6 +643,8 @@ namespace HMIS.Application.ServiceLogics.IVF
             return string.Empty;
         }
 
+        private static string FormatY14(DateTime dt) => dt.ToString("yyyyMMddHHmmss");
+
         private static (string? status, bool? isSigned) ResolveStatus(LabOrderStatus? statusEnum, string? fallbackStatus, bool? fallbackIsSigned)
         {
             if (!statusEnum.HasValue)
@@ -453,13 +655,13 @@ namespace HMIS.Application.ServiceLogics.IVF
             switch (statusEnum.Value)
             {
                 case LabOrderStatus.New:
-                    return ("New", false);
+                    return ("NEW", false);
                 case LabOrderStatus.InProgress:
-                    return ("IN_PROGRESS", false);
+                    return ("INPROG", false);
                 case LabOrderStatus.SampleCollected:
-                    return ("SAMPLE_COLLECTED", false);
+                    return ("COLLECT", false);
                 case LabOrderStatus.Completed:
-                    return ("COMPLETED", true);
+                    return ("DONE", true);
                 case LabOrderStatus.Cancel:
                     return ("CANCEL", false);
                 default:

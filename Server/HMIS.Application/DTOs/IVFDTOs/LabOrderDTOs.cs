@@ -79,4 +79,50 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public LabOrderSetHeaderDTO Header { get; set; }
         public List<LabOrderSetDetailDTO> Details { get; set; } = new();
     }
+
+    public class CollectSampleDTO
+    {
+        public DateTime CollectDate { get; set; }
+        public long UserId { get; set; }
+    }
+
+    public class LabResultObservationDTO
+    {
+        public string ValueType { get; set; }
+        public string ObservationIdentifierFullName { get; set; }
+        public string? ObservationIdentifierShortName { get; set; }
+        public string ObservationValue { get; set; }
+        public string? Units { get; set; }
+        public string? ReferenceRangeMin { get; set; }
+        public string? ReferenceRangeMax { get; set; }
+        public string? AbnormalFlag { get; set; }
+        public string ResultStatus { get; set; }
+        public DateTime? ObservationDateTime { get; set; }
+        public DateTime? AnalysisDateTime { get; set; }
+        public string? Remarks { get; set; }
+        public bool? WeqayaScreening { get; set; }
+        public int? SequenceNo { get; set; }
+    }
+
+    public class CompleteLabOrderDTO
+    {
+        public DateTime PerformDate { get; set; }
+        public DateTime EntryDate { get; set; }
+        public long UserId { get; set; }
+        public string? AccessionNumber { get; set; }
+        public bool? IsDefault { get; set; }
+        public long? PrincipalResultInterpreter { get; set; }
+        public string? Action { get; set; }
+        public string? ReviewedBy { get; set; }
+        public DateTime? ReviewedDate { get; set; }
+        public int? PerformAtLabId { get; set; }
+        public List<LabResultObservationDTO> Observations { get; set; } = new();
+    }
+
+    public class OrderCollectionDetailsDTO
+    {
+        public string TestName { get; set; }
+        public string Material { get; set; }
+        public string Status { get; set; }
+    }
 }
