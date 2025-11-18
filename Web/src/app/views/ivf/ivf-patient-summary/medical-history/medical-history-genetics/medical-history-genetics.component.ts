@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { QuillModule } from 'ngx-quill';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./medical-history-genetics.component.scss']
 })
 export class MedicalHistoryGeneticsComponent {
+  @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
   geneticsData = {
     // Add genetics and opinion related fields here
   };
@@ -27,4 +28,8 @@ export class MedicalHistoryGeneticsComponent {
       ['clean']
     ]
   };
+
+  opts(key: string) {
+    return this.dropdowns?.[key] || [];
+  }
 }

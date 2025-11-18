@@ -8,25 +8,25 @@
         <li [ngbNavItem]="1">
           <a ngbNavLink href="javascript:void(0)">Basic</a>
           <ng-template ngbNavContent>
-            <app-medical-history-basic></app-medical-history-basic>
+            <app-medical-history-basic [dropdowns]="dropdowns" [hrEmployees]="hrEmployees"></app-medical-history-basic>
           </ng-template>
         </li>
         <li [ngbNavItem]="2">
           <a ngbNavLink href="javascript:void(0)">General</a>
           <ng-template ngbNavContent>
-            <app-medical-history-general></app-medical-history-general>
+            <app-medical-history-general [dropdowns]="dropdowns"></app-medical-history-general>
           </ng-template>
         </li>
         <li [ngbNavItem]="3">
           <a ngbNavLink href="javascript:void(0)">Testicles and sem. tract</a>
           <ng-template ngbNavContent>
-            <app-medical-history-testicles></app-medical-history-testicles>
+            <app-medical-history-testicles [dropdowns]="dropdowns"></app-medical-history-testicles>
           </ng-template>
         </li>
         <li [ngbNavItem]="4">
           <a ngbNavLink href="javascript:void(0)">Genetics / Opinion</a>
           <ng-template ngbNavContent>
-            <app-medical-history-genetics></app-medical-history-genetics>
+            <app-medical-history-genetics [dropdowns]="dropdowns"></app-medical-history-genetics>
           </ng-template>
         </li>
       </ul>
