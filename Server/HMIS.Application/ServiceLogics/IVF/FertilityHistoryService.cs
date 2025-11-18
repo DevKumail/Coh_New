@@ -116,7 +116,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                     if (!dto.IVFMainId.HasValue)
                         return Result<int>.Failure("IVFMainId is required to locate or create record");
                     fertilityHistory = await _context.IvfmaleFertilityHistory
-                        .FirstOrDefaultAsync(x => x.IvfmainId == dto.IVFMainId.Value) ?? new IvfmaleFertilityHistory { IvfmainId = dto.IVFMainId.Value };
+                        .FirstOrDefaultAsync(x => x.IvfmaleFhid == dto.IVFMaleFHId.Value) ?? new IvfmaleFertilityHistory { IvfmainId = dto.IVFMainId.Value };
                     if (fertilityHistory.IvfmaleFhid == 0)
                     {
                         // For a new record, require ProviderId and Date as entity requires them
