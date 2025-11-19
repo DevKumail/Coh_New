@@ -7,37 +7,24 @@
     <form [formGroup]="clinicalForm" (ngSubmit)="submitVoice()">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-      <span>{{ 'CLINICAL_STRUCTURED_NOTE_CREATE' | translate }}</span>
+      <span>{{ dataquestion?.node?.noteTitle || ('CLINICAL_STRUCTURED_NOTE_CREATE' | translate) }}</span>
     </h5>
-
-         <div class="row">
-          <div class="col-12 d-flex justify-content-end gap-2">
-              <button class="btn btn-danger"
-               (click)="cancel()" type="button">{{ 'CANCEL' | translate }}</button>
-            <button class="btn btn-info" [disabled]="clinicalForm.invalid" type="submit">{{ 'SAVE' | translate }}</button>
-          </div>
-        </div>
-
+    <div class="d-flex gap-2 align-items-center">
+      <i class="bi bi-file-earmark-text text-primary fs-4 me-2"></i>
+      <button class="btn btn-danger" (click)="cancel()" type="button">{{ 'CANCEL' | translate }}</button>
+      <button class="btn btn-info" [disabled]="clinicalForm.invalid" type="submit">{{ 'SAVE' | translate }}</button>
+    </div>
   </div>
 
   <div class="card-body flex-grow-1 overflow-auto">
       <div >
         <div class="row g-3 mb-2">
           <div class="col-sm-4">
-            <label class="form-label">Provider <span class="text-danger">*</span></label>
-            <select class="form-select" formControlName="provider"
-              (change)="onProviderchange()">
-              <option value="null" disabled>Select Provider</option>
-              <option *ngFor="let p of providers" [value]="p.code">{{ p.name }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-4">
-            <label class="form-label">Template <span class="text-danger">*</span></label>
-            <select class="form-select" formControlName="note">
-              <option value="null" disabled>Select Template</option>
-              <option *ngFor="let n of clinicalNotes" [value]="n.pathId">{{ n.pathName }}</option>
-            </select>
+            <label class="form-label">Provider (For Signing) <span class="text-danger">*</span></label>
+            <input type="text" class="form-control"
+              [value]="getProviderName(clinicalForm.get('provider')?.value)"
+              readonly disabled>
+            <input type="hidden" formControlName="provider">
           </div>
 
           <div class="col-sm-4">

@@ -240,8 +240,8 @@ export class ClinicalNoteComponent {
         this.router.navigate(['/clinical/create-notes'], { queryParams });
         break;
       case 'freetext':
-        const freetextParams = Object.keys(queryParams).length > 0 ? { queryParams } : {};
-        this.router.navigate(['/clinical/create-free-text-notes'], freetextParams);
+        // Always pass params for freetext, even if empty
+        this.router.navigate(['/clinical/create-free-text-notes'], { queryParams });
         break;
     }
   }

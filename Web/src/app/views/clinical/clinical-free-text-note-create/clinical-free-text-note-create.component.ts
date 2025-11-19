@@ -65,6 +65,10 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
   private subscriptions: Subscription[] = [];
 
+  private queryParamProvider: any = null;
+  private queryParamTemplate: any = null;
+  hideTemplateDropdown: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService,
@@ -85,7 +89,6 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
   SelectedVisit: any;
   ngOnInit(): void {
-    debugger
     this.patientDataSubscription = this.PatientData.patientData$
       .pipe(
         filter((data: any) => !!data?.table2?.[0]?.mrNo),
@@ -99,32 +102,47 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
         this.mrNo = data?.table2?.[0]?.mrNo || '';
       });
 
-          this.PatientData.selectedVisit$.subscribe((data: any) => {
-        this.SelectedVisit = data;
-        console.log('Selected Visit medical-list', this.SelectedVisit);
-        if (this.SelectedVisit) {
-        }
-      });
+    this.PatientData.selectedVisit$.subscribe((data: any) => {
+      this.SelectedVisit = data;
+      console.log('Selected Visit medical-list', this.SelectedVisit);
+    });
+
+    // Read query parameters first
+    this.route.queryParams.subscribe(params => {
+      this.queryParamProvider = params['provider'] ? Number(params['provider']) : null;
+      this.queryParamTemplate = params['template'] ? Number(params['template']) : null;
+
+      console.log('Query params - Provider:', this.queryParamProvider, 'Template:', this.queryParamTemplate);
+
+      // If template is provided, hide the template dropdown
+      this.hideTemplateDropdown = !!this.queryParamTemplate;
+
+      // Set provider if provided
+      if (this.queryParamProvider) {
+        this.clinicalForm.patchValue({ provider: this.queryParamProvider });
+      }
+    });
 
     this.FillCache();
 
     // subscribe to provider selection changes (value is the selected code)
     const providerCtrl = this.clinicalForm.get('provider');
     if (providerCtrl) {
-        debugger
       const sub = providerCtrl.valueChanges.subscribe((val: any) => {
         const code = Number(val) || 0;
         this.selectedProviders = code;
-        this.GetNotesEmployeeId(code);
+
+        // Only load notes if no template was pre-selected
+        if (!this.queryParamTemplate) {
+          this.GetNotesEmployeeId(code);
+        }
       });
       this.subscriptions.push(sub);
     }
 
     // subscribe to note selection changes
     const noteCtrl: any = this.clinicalForm.get('note');
-    if (noteCtrl != null && noteCtrl != undefined && noteCtrl != 0) {
-        console.log('Note control initialized:', noteCtrl);
-
+    if (noteCtrl != null && noteCtrl != undefined) {
       const sub2 = noteCtrl.valueChanges.subscribe((val: any) => {
         const nid = Number(val) || 0;
         this.selectedNotes = nid;
@@ -132,7 +150,6 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
       });
       this.subscriptions.push(sub2);
     }
-
   }
 
   showDialog() { this.visible = true; }
@@ -161,12 +178,19 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   }
 
   FillDropDown(response: any) {
-    // ...existing code...
     const jParse = JSON.parse(JSON.stringify(response)).cache;
     let provider = JSON.parse(jParse).Provider;
     if (provider) {
       provider = provider.map((item: any) => ({ name: item.FullName, code: item.EmployeeId }));
       this.providers = provider;
+
+      // After providers are loaded, trigger template load if pre-selected
+      if (this.queryParamProvider && this.queryParamTemplate) {
+        this.selectedProviders = this.queryParamProvider;
+        this.selectedNotes = this.queryParamTemplate;
+        this.clinicalForm.patchValue({ note: this.queryParamTemplate });
+        this.GetNotesTemplate(this.queryParamTemplate);
+      }
     }
   }
 
@@ -342,7 +366,9 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     this.clinicalForm.reset();
   }
   ngOnDestroy(): void {
-    // cleanup subscriptions
+    if (this.patientDataSubscription) {
+      this.patientDataSubscription.unsubscribe();
+    }
     this.subscriptions.forEach(s => s.unsubscribe());
   }
 }

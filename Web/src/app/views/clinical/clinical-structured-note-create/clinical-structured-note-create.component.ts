@@ -68,6 +68,11 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
 
   private subscriptions: Subscription[] = [];
 
+  // Add new properties
+  isTemplatePreSelected: boolean = false;
+  preSelectedProvider: number = 0;
+  preSelectedTemplate: number = 0;
+
   constructor(
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService,
@@ -101,31 +106,43 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
         this.mrNo = data?.table2?.[0]?.mrNo || '';
       });
 
-          this.PatientData.selectedVisit$.subscribe((data: any) => {
-        this.SelectedVisit = data;
-        console.log('Selected Visit medical-list', this.SelectedVisit);
-        if (this.SelectedVisit) {
-        }
-      });
+    this.PatientData.selectedVisit$.subscribe((data: any) => {
+      this.SelectedVisit = data;
+      console.log('Selected Visit medical-list', this.SelectedVisit);
+    });
+
+    // Read query parameters
+    this.route.queryParams.subscribe(params => {
+      if (params['provider']) {
+        this.preSelectedProvider = Number(params['provider']);
+      }
+      if (params['template']) {
+        this.preSelectedTemplate = Number(params['template']);
+        this.isTemplatePreSelected = true;
+      }
+    });
 
     this.FillCache();
 
-    // subscribe to provider selection changes (value is the selected code)
+    // subscribe to provider selection changes
     const providerCtrl = this.clinicalForm.get('provider');
     if (providerCtrl) {
-        debugger
+      debugger
       const sub = providerCtrl.valueChanges.subscribe((val: any) => {
         const code = Number(val) || 0;
         this.selectedProviders = code;
-        this.GetNotesEmployeeId(code);
+        // Only load notes if template is not pre-selected
+        if (!this.isTemplatePreSelected) {
+          this.GetNotesEmployeeId(code);
+        }
       });
       this.subscriptions.push(sub);
     }
 
     // subscribe to note selection changes
     const noteCtrl: any = this.clinicalForm.get('note');
-    if (noteCtrl != null && noteCtrl != undefined && noteCtrl != 0) {
-        console.log('Note control initialized:', noteCtrl);
+    if (noteCtrl != null && noteCtrl != undefined) {
+      console.log('Note control initialized:', noteCtrl);
 
       const sub2 = noteCtrl.valueChanges.subscribe((val: any) => {
         const nid = Number(val) || 0;
@@ -134,7 +151,6 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       });
       this.subscriptions.push(sub2);
     }
-
   }
 
   // --- UI / dialog -------------------------------------------------------
@@ -155,12 +171,13 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       .then((response: any) => {
         if (response && response.cache) {
           this.FillDropDown(response);
+          // After cache is loaded, set pre-selected values
+          this.setPreSelectedValues();
         }
       })
       .catch((error: any) =>
-        // this.messageService.add({ severity: 'error', summary: 'Error', detail: error?.message || 'Failed to load cache' })
-      Swal.fire('Error', error?.message || 'Failed to load cache', 'error'
-      ));
+        Swal.fire('Error', error?.message || 'Failed to load cache', 'error')
+      );
   }
 
   FillDropDown(response: any) {
@@ -170,6 +187,22 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     if (provider) {
       provider = provider.map((item: any) => ({ name: item.FullName, code: item.EmployeeId }));
       this.providers = provider;
+    }
+  }
+
+  // Add new method to set pre-selected values
+  setPreSelectedValues() {
+    if (this.preSelectedProvider && this.preSelectedTemplate) {
+      // Set provider value
+      this.clinicalForm.patchValue({
+        provider: this.preSelectedProvider,
+        note: this.preSelectedTemplate
+      }, { emitEvent: false });
+
+      // Load the template directly
+      this.selectedProviders = this.preSelectedProvider;
+      this.selectedNotes = this.preSelectedTemplate;
+      this.GetNotesTemplate(this.preSelectedTemplate);
     }
   }
 
@@ -346,6 +379,11 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(s => s.unsubscribe());
+  }
+
+  getProviderName(providerCode: string): string {
+    const provider = this.providers?.find(p => p.code === providerCode);
+    return provider ? provider.name : '';
   }
 }
 
