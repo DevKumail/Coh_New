@@ -10,7 +10,7 @@ namespace HMIS.Application.ServiceLogics.IVF
     public interface IIVFMaleSemenService
     {
         Task<bool> InsertOrUpdateSemenSample(IVFMaleSemenSampleDto sampleDto);
-        Task<(IEnumerable<IVFMaleSemenSampleListDto> Data, int TotalCount)> GetAllSemenSamples(int page, int pageSize);
+        Task<(IEnumerable<IVFMaleSemenSampleListDto> Data, int TotalCount)> GetAllSemenSamples(int ivfMainId, int page, int pageSize);
         Task<IVFMaleSemenSampleDto> GetSemenSampleById(int sampleId);
         Task<bool> DeleteSemenSample(int sampleId, int? updatedBy);
         Task<bool> DeleteObservation(int observationId, int? updatedBy);
@@ -334,9 +334,9 @@ namespace HMIS.Application.ServiceLogics.IVF
         }
 
 
-        public async Task<(IEnumerable<IVFMaleSemenSampleListDto> Data, int TotalCount)> GetAllSemenSamples(int page, int pageSize)
+        public async Task<(IEnumerable<IVFMaleSemenSampleListDto> Data, int TotalCount)> GetAllSemenSamples(int ivfMainId, int page, int pageSize)
         {
-            return await _semenRepository.GetAllSemenSamples(page, pageSize);
+            return await _semenRepository.GetAllSemenSamples(ivfMainId,page, pageSize);
         }
 
         public async Task<IVFMaleSemenSampleDto> GetSemenSampleById(int sampleId)

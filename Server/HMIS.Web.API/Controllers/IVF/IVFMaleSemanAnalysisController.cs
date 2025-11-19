@@ -37,11 +37,11 @@ namespace HMIS.Web.Controllers.IVF
         }
 
         [HttpGet("GetAll")]
-        public async Task<ActionResult> GetAll(int page = 1, int pageSize = 10)
+        public async Task<ActionResult> GetAll([FromQuery] int ivfMainId,int page = 1, int pageSize = 10)
         {
             try
             {
-                var result = await _semenService.GetAllSemenSamples(page, pageSize);
+                var result = await _semenService.GetAllSemenSamples(ivfMainId,page, pageSize);
 
                 return Ok(new
                 {
