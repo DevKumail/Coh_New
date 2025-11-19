@@ -1,18 +1,18 @@
-<div class="testicles-form">
+<div class="testicles-form" [formGroup]="testiclesForm">
   <div class="card px-3 py-2 mb-2">
     <h6 class="fw-bold mb-1">Testicles</h6>
     <div class="row g-1 align-items-center">
       <div class="col-md-4">
         <div class="form-check mb-2">
-          <input class="form-check-input" type="checkbox" id="primaryHypogonadotropy">
+          <input class="form-check-input" type="checkbox" id="primaryHypogonadotropy" formControlName="primaryHypogonadotropy">
           <label class="form-check-label" for="primaryHypogonadotropy">Primary hypogonadotropy</label>
         </div>
         <div class="form-check mb-2">
-          <input class="form-check-input" type="checkbox" id="secondaryHypogonadotropy">
+          <input class="form-check-input" type="checkbox" id="secondaryHypogonadotropy" formControlName="secondaryHypogonadotropy">
           <label class="form-check-label" for="secondaryHypogonadotropy">Secondary hypogonadotropy</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="retractileTestes">
+          <input class="form-check-input" type="checkbox" id="retractileTestes" formControlName="retractileTestes">
           <label class="form-check-label" for="retractileTestes">Retractile testes</label>
         </div>
       </div>
@@ -20,21 +20,21 @@
         <div class="row g-1">
           <div class="form-group col-md-6">
             <label>Testicle</label>
-            <select class="form-select form-select-sm">
+            <select class="form-select form-select-sm" formControlName="categoryIdTesticle">
               <option value="" selected>Select</option>
               <option *ngFor="let o of opts('IVFFertilityHistory:Testicle')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-6">
             <label>Kryptorchidism</label>
-            <select class="form-select form-select-sm">
+            <select class="form-select form-select-sm" formControlName="categoryIdKryptorchidism">
               <option value="" selected>Select</option>
               <option *ngFor="let o of opts('IVFFertilityHistory:Kryptorchidism')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-6">
             <label>Orchitis</label>
-            <select class="form-select form-select-sm">
+            <select class="form-select form-select-sm" formControlName="categoryIdOrchitis">
               <option value="" selected>Select</option>
               <option *ngFor="let o of opts('IVFFertilityHistory:Orchitis')" [value]="o.valueId">{{ o.name }}</option>
             </select>
@@ -42,9 +42,9 @@
           <div class="form-group col-md-6">
             <label>Testicle volume: </label>
             <div class="d-flex align-items-center gap-2">
-              <input type="text" class="form-control form-control-sm" placeholder="left">
+              <input type="text" class="form-control form-control-sm" placeholder="left" formControlName="testicleVolumeLeft">
               <!-- <span class="small text-muted"></span> -->
-              <input type="text" class="form-control form-control-sm" placeholder="right">
+              <input type="text" class="form-control form-control-sm" placeholder="right" formControlName="testicleVolumeRight">
             </div>
           </div>
         </div>
@@ -57,11 +57,11 @@
     <div class="row g-1">
       <div class="col-md-4">
         <div class="form-check mb-2">
-          <input class="form-check-input" type="checkbox" id="varicocele">
+          <input class="form-check-input" type="checkbox" id="varicocele" formControlName="varicocele">
           <label class="form-check-label" for="varicocele">Varicocele</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="operatedVaricocele">
+          <input class="form-check-input" type="checkbox" id="operatedVaricocele" formControlName="operatedVaricocele">
           <label class="form-check-label" for="operatedVaricocele">Operated varicocele</label>
         </div>
       </div>
@@ -69,14 +69,14 @@
         <div class="row g-1">
           <div class="form-group col-md-6">
             <label>Instrumental varicocele</label>
-            <select class="form-select form-select-sm">
+            <select class="form-select form-select-sm" formControlName="categoryIdInstrumentalVaricocele">
               <option value="" selected>Select</option>
               <option *ngFor="let o of opts('IVFFertilityHistory:InstrumentalVaricocele')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-6">
             <label>Clinical varicocele</label>
-            <select class="form-select form-select-sm">
+            <select class="form-select form-select-sm" formControlName="categoryIdClinicalVaricocele">
               <option value="" selected>Select</option>
               <option *ngFor="let o of opts('IVFFertilityHistory:ClinicalVaricocele')" [value]="o.valueId">{{ o.name }}</option>
             </select>
@@ -91,7 +91,7 @@
     <div class="row g-2">
       <div class="col-md-12">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="obstipation">
+          <input class="form-check-input" type="checkbox" id="obstipation" formControlName="obstipationOfSpermaticDuct">
           <label class="form-check-label" for="obstipation">Obstipation of spermatic duct</label>
         </div>
       </div>
@@ -99,21 +99,21 @@
         <div class="row g-1">
           <div class="form-group col-md-4">
             <label>Proximal seminal tract</label>
-            <select class="form-select form-select-sm">
+            <select class="form-select form-select-sm" formControlName="categoryIdProximalSeminalTract">
               <option value="" selected>Select</option>
               <option *ngFor="let o of opts('IVFFertilityHistory:ProximalSeminalTract')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-4">
             <label>Distal seminal tract</label>
-            <select class="form-select form-select-sm">
+            <select class="form-select form-select-sm" formControlName="categoryIdDistalSeminalTract">
               <option value="" selected>Select</option>
               <option *ngFor="let o of opts('IVFFertilityHistory:DistalSeminalTract')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
           <div class="form-group col-md-4">
            <label class="small">Etiological diagnosis</label>
-           <select class="form-select form-select-sm">
+           <select class="form-select form-select-sm" formControlName="categoryIdEtiologicalDiagnosis">
              <option value="" selected>Select</option>
              <option *ngFor="let o of opts('IVFFertilityHistory:EtiologicalDiagnosis')" [value]="o.valueId">{{ o.name }}</option>
            </select>
@@ -125,29 +125,29 @@
 
   <div class="card px-3 py-2 mb-2 mt-4">
     <h6 class="fw-bold mb-2">Infections</h6>
-    <div class="row g-2">
+    <div class="row g-2" formGroupName="infections">
       <div class="col-md-6">
         <div class="form-check mb-1 ms-2">
-          <input class="form-check-input" type="checkbox" id="inflammation">
+          <input class="form-check-input" type="checkbox" id="inflammation" [checked]="inflammationComputed">
           <label class="form-check-label" for="inflammation">Inflammation</label>
         </div>
         <div class="card px-2 py-1">
           <div class="row">
             <div class="col-md-4">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="urethritis">
+                <input class="form-check-input" type="checkbox" id="urethritis" formControlName="urethritis">
                 <label class="form-check-label" for="urethritis">Urethritis</label>
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="prostatitis">
+                <input class="form-check-input" type="checkbox" id="prostatitis" formControlName="prostatitis">
                 <label class="form-check-label" for="prostatitis">Prostatitis</label>
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="epididymitis">
+                <input class="form-check-input" type="checkbox" id="epididymitis" formControlName="epididymitis">
                 <label class="form-check-label" for="epididymitis">Epididymitis</label>
               </div>
             </div>
@@ -157,14 +157,14 @@
       <div class="row g-1 col-md-6">
         <div class="col-md-6 form-group">
           <label>Prev. infections</label>
-          <select class="form-select form-select-sm">
+          <select class="form-select form-select-sm" formControlName="categoryIdPrevInfections">
             <option value="" selected>Select</option>
             <option *ngFor="let o of opts('IVFFertilityHistory:PrevInfections')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
         <div class="col-md-6 form-group">
           <label>Diagnosis of infection</label>
-          <select class="form-select form-select-sm">
+          <select class="form-select form-select-sm" formControlName="categoryIdDiagnosisOfInfection">
             <option value="" selected>Select</option>
             <option *ngFor="let o of opts('IVFFertilityHistory:DiagnosisOfInfection')" [value]="o.valueId">{{ o.name }}</option>
           </select>
@@ -175,6 +175,6 @@
 
   <div class="card px-3 py-2">
     <label class="fw-bold mb-1">Note</label>
-    <textarea class="form-control" rows="1" placeholder="Notes"></textarea>
+    <textarea class="form-control" rows="1" placeholder="Notes" formControlName="note"></textarea>
   </div>
 

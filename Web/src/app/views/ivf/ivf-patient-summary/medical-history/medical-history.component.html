@@ -73,14 +73,14 @@
         </ng-container>
         <ng-container *ngIf="!isLoadingHistory">
           <tr *ngFor="let r of historyRows; let i = index">
-            <td>{{ r.Adiposity }}</td>
-            <td>{{ r.GenerallyHealthy }}</td>
-            <td>{{ r.PregnanciesAchieved }}</td>
-            <td>{{ r.LongTermMedication }}</td>
-            <td>{{ r.TesticleStatus }}</td>
+            <td>{{ r.Adiposity || '-'}}</td>
+            <td>{{ r.GenerallyHealthy || '-' }}</td>
+            <td>{{ r.PregnanciesAchieved || '-' }}</td>
+            <td>{{ r.LongTermMedication || '-' }}</td>
+            <td>{{ r.TesticleStatus || '-' }}</td>
             <td>
-              <ng-icon name="tablerEdit" class="me-1" style="cursor: pointer;" (click)="edit(r)"></ng-icon>
-              <ng-icon name="tablerTrash" class="text-danger me-1" style="cursor: pointer;" (click)="delete(r.id)"></ng-icon>
+              <ng-icon name="tablerEdit" class="me-1" style="cursor: pointer;" (click)="openEditById(r.IVFMaleFHId)"></ng-icon>
+              <ng-icon name="tablerTrash" class="text-danger me-1" style="cursor: pointer;" (click)="delete(r.IVFMaleFHId)"></ng-icon>
             </td>
           </tr>
           <tr *ngIf="!historyRows || historyRows.length === 0">
