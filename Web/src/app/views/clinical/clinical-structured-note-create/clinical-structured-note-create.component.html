@@ -1,7 +1,7 @@
 <div class="d-flex row col-12 h-100">
 
     <div [ngClass]="{
-      'col-8': dataquestion?.node?.noteTitle,
+
       'col-12': !dataquestion?.node?.noteTitle
     }" class="card  mt-2 d-flex flex-column">
     <form [formGroup]="clinicalForm" (ngSubmit)="submitVoice()">
@@ -72,7 +72,7 @@
 </form>
 
 </div> <!-- card -->
-<div class="col-4 bg-dark text-white rounded fixed-height mt-2" *ngIf="dataquestion?.node?.noteTitle">
+<!-- <div class="col-4 bg-dark text-white rounded fixed-height mt-2" *ngIf="dataquestion?.node?.noteTitle">
     <app-notes></app-notes>
-</div>
+</div> -->
 </div>
