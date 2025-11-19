@@ -142,14 +142,14 @@ public class IVFMaleFHImpairmentFactorDto
 {
     public int? IVFMaleFHImpairmentFactorId { get; set; }
     public int? IVFMaleFHId { get; set; }
-    public long? ImpairmentFactorCategoryId { get; set; }
+    public string? ImpairmentFactor { get; set; }
 }
 
 public class IVFMaleFHPrevIllnessDto
 {
     public int? IVFMaleFHPrevIllnessId { get; set; }
     public int? IVFMaleFHId { get; set; }
-    public long? PrevIllnessCategoryId { get; set; }
+    public string? PrevIllness { get; set; }
 }
 
 public class IVFMaleFHSemenAnalysisDto
