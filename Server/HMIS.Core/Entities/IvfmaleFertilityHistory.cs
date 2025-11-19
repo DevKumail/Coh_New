@@ -17,9 +17,9 @@ public partial class IvfmaleFertilityHistory
     public int IvfmainId { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime Date { get; set; }
+    public DateTime? Date { get; set; }
 
-    public long ProviderId { get; set; }
+    public long? ProviderId { get; set; }
 
     public long? AdiposityCategoryId { get; set; }
 
@@ -87,5 +87,5 @@ public partial class IvfmaleFertilityHistory
 
     [ForeignKey("ProviderId")]
     [InverseProperty("IvfmaleFertilityHistory")]
-    public virtual Hremployee Provider { get; set; } = null!;
+    public virtual Hremployee? Provider { get; set; }
 }

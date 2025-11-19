@@ -239,4 +239,6 @@ public partial class Provider
     public bool? GrantAccessToMalaffi { get; set; }
 
     public byte? MalaffiRoleLevel { get; set; }
+
+    public int? EmployeeType { get; set; }
 }

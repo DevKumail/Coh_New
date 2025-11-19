@@ -22,7 +22,7 @@ namespace HMIS.Web.Controllers.IVF
             _service = service;
         }
 
-        [HttpDelete("{IVFMaleFHId}")]
+        [HttpDelete("DeleteFertilityHistoryMale/{IVFMaleFHId}")]
         public async Task<IActionResult> DeleteFertilityHistory([FromRoute]string IVFMaleFHId)
         {
             var userId = User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
