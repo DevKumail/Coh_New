@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using Microsoft.Data.SqlClient;
 
-namespace HMIS.Application.ServiceLogics.IVF
+namespace HMIS.Application.ServiceLogics.IVF.Dashboard
 {
     public interface IDashboardService
     {
@@ -19,11 +19,11 @@ namespace HMIS.Application.ServiceLogics.IVF
         Task<(bool IsSuccess, int RelationId, string Error)> InsertPatientRelation(InsertPatientRelationDTO dto);
     }
 
-    internal class DashboardService : IDashboardService
+    internal class IVFDashboardService : IDashboardService
     {
         private readonly DapperContext _dapper;
         private readonly HMISDbContext _db;
-        public DashboardService(DapperContext dapper, HMISDbContext db)
+        public IVFDashboardService(DapperContext dapper, HMISDbContext db)
         {
             _dapper = dapper;
             _db = db;
@@ -93,8 +93,8 @@ namespace HMIS.Application.ServiceLogics.IVF
                 new
                 {
                     Gender = opposite,
-                    Page = pagination?.Page,
-                    RowsPerPage = pagination?.RowsPerPage,
+                    pagination?.Page,
+                    pagination?.RowsPerPage,
                     MrNo = string.IsNullOrWhiteSpace(mrno) ? null : mrno?.Trim(),
                     Phone = string.IsNullOrWhiteSpace(phone) ? null : phone?.Trim(),
                     EmiratesId = string.IsNullOrWhiteSpace(emiratesId) ? null : emiratesId?.Trim(),

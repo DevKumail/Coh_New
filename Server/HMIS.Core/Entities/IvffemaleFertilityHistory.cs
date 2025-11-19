@@ -54,11 +54,19 @@ public partial class IvffemaleFertilityHistory
 
     public bool? HasAlternativePretreatments { get; set; }
 
-    public long? PrevIllnessesCategoryId { get; set; }
-
-    public long? SterilityFactorsCategoryId { get; set; }
-
     public string? Comment { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
 
     [ForeignKey("AdiposityCategoryId")]
     [InverseProperty("IvffemaleFertilityHistoryAdiposityCategory")]
@@ -80,6 +88,12 @@ public partial class IvffemaleFertilityHistory
     [InverseProperty("IvffemaleFertilityHistoryGenerallyHealthyCategory")]
     public virtual DropdownConfiguration? GenerallyHealthyCategory { get; set; }
 
+    [InverseProperty("IvffemaleFh")]
+    public virtual ICollection<IvffemaleFhimpairmentFactor> IvffemaleFhimpairmentFactor { get; set; } = new List<IvffemaleFhimpairmentFactor>();
+
+    [InverseProperty("IvffemaleFh")]
+    public virtual ICollection<IvffemaleFhprevIllness> IvffemaleFhprevIllness { get; set; } = new List<IvffemaleFhprevIllness>();
+
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvffemaleFertilityHistory")]
     public virtual Ivfmain Ivfmain { get; set; } = null!;
@@ -91,12 +105,4 @@ public partial class IvffemaleFertilityHistory
     [ForeignKey("PatencyRightCategoryId")]
     [InverseProperty("IvffemaleFertilityHistoryPatencyRightCategory")]
     public virtual DropdownConfiguration? PatencyRightCategory { get; set; }
-
-    [ForeignKey("PrevIllnessesCategoryId")]
-    [InverseProperty("IvffemaleFertilityHistoryPrevIllnessesCategory")]
-    public virtual DropdownConfiguration? PrevIllnessesCategory { get; set; }
-
-    [ForeignKey("SterilityFactorsCategoryId")]
-    [InverseProperty("IvffemaleFertilityHistorySterilityFactorsCategory")]
-    public virtual DropdownConfiguration? SterilityFactorsCategory { get; set; }
 }

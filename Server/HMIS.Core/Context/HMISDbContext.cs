@@ -186,6 +186,10 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<IvffemaleFertilityHistory> IvffemaleFertilityHistory { get; set; }
 
+    public virtual DbSet<IvffemaleFhimpairmentFactor> IvffemaleFhimpairmentFactor { get; set; }
+
+    public virtual DbSet<IvffemaleFhprevIllness> IvffemaleFhprevIllness { get; set; }
+
     public virtual DbSet<Ivfmain> Ivfmain { get; set; }
 
     public virtual DbSet<IvfmaleFertilityHistory> IvfmaleFertilityHistory { get; set; }
@@ -1121,6 +1125,9 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvffemaleFertilityHistory>(entity =>
         {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
             entity.HasOne(d => d.AdiposityCategory).WithMany(p => p.IvffemaleFertilityHistoryAdiposityCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration");
 
             entity.HasOne(d => d.CftrcarrierCategory).WithMany(p => p.IvffemaleFertilityHistoryCftrcarrierCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration3");
@@ -1138,19 +1145,41 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.PatencyLeftCategory).WithMany(p => p.IvffemaleFertilityHistoryPatencyLeftCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration5");
 
             entity.HasOne(d => d.PatencyRightCategory).WithMany(p => p.IvffemaleFertilityHistoryPatencyRightCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration4");
+        });
 
-            entity.HasOne(d => d.PrevIllnessesCategory).WithMany(p => p.IvffemaleFertilityHistoryPrevIllnessesCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration7");
+        modelBuilder.Entity<IvffemaleFhimpairmentFactor>(entity =>
+        {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
-            entity.HasOne(d => d.SterilityFactorsCategory).WithMany(p => p.IvffemaleFertilityHistorySterilityFactorsCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration8");
+            entity.HasOne(d => d.ImpairmentFactorNavigation).WithMany(p => p.IvffemaleFhimpairmentFactor)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFFemaleFHImpairmentFactor_BLMasterICD9CM");
+
+            entity.HasOne(d => d.IvffemaleFh).WithMany(p => p.IvffemaleFhimpairmentFactor)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFFemaleFHImpairmentFactor_IVFFemaleFertilityHistory");
+        });
+
+        modelBuilder.Entity<IvffemaleFhprevIllness>(entity =>
+        {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.IvffemaleFh).WithMany(p => p.IvffemaleFhprevIllness)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFFemaleFHPrevIllness_IVFFemaleFertilityHistory");
+
+            entity.HasOne(d => d.PrevIllnessNavigation).WithMany(p => p.IvffemaleFhprevIllness)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFFemaleFHPrevIllness_BLMasterICD9CM");
         });
 
         modelBuilder.Entity<Ivfmain>(entity =>
         {
             entity.HasKey(e => e.IvfmainId).HasName("PK__IVFMain__3F8F07820127E48F");
 
-            entity.HasOne(d => d.App).WithMany(p => p.Ivfmain)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_IVFMain_Visit");
+            entity.HasOne(d => d.App).WithMany(p => p.Ivfmain).HasConstraintName("FK_IVFMain_Visit");
 
             entity.HasOne(d => d.FemalePatient).WithMany(p => p.IvfmainFemalePatient)
                 .OnDelete(DeleteBehavior.ClientSetNull)
