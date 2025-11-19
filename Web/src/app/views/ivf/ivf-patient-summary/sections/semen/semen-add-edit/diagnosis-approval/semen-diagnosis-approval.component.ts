@@ -14,7 +14,7 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
 export class SemenDiagnosisApprovalComponent {
   @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
   @Input() labelFor: (key: string) => string = (k) => k;
-  @Input() hrEmployees: Array<{ name: string; providerId: number }> = [];
+  @Input() hrEmployees: Array<{ name: string; providerId: number; employeeType: number }> = [];
   form: FormGroup;
   active = 1;
 
