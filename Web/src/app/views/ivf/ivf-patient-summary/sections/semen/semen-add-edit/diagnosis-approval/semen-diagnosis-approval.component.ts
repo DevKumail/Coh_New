@@ -24,6 +24,7 @@ export class SemenDiagnosisApprovalComponent {
   searchDiagnosis = '';
   private diagnosisLimit = 50;
   private diagnosisLoading = false;
+  private selectedDiagnosis: Set<string> = new Set<string>();
 
   constructor(private fb: FormBuilder, private api: ApiService) {
     this.form = this.fb.group({
@@ -61,8 +62,27 @@ export class SemenDiagnosisApprovalComponent {
     }
   }
 
-  selectDiagnosis(label: string) {
-    this.form.patchValue({ diagnosis: label || 'Not specified' });
+  isDiagnosisSelected(label: string): boolean {
+    const code = (label || '').split(' | ')[0].trim();
+    return !!code && this.selectedDiagnosis.has(code);
+  }
+
+  toggleDiagnosis(label: string) {
+    const code = (label || '').split(' | ')[0].trim();
+    if (!code) return;
+    if (this.selectedDiagnosis.has(code)) {
+      this.selectedDiagnosis.delete(code);
+    } else {
+      this.selectedDiagnosis.add(code);
+    }
+  }
+
+  getSelectedDiagnosisCodes(): string[] {
+    return Array.from(this.selectedDiagnosis);
+  }
+
+  setSelectedDiagnosisCodes(codes: string[] | null | undefined) {
+    this.selectedDiagnosis = new Set<string>((codes || []).filter((x) => !!x).map((x) => String(x)));
   }
 
   private fetchDiagnosis(append: boolean = false) {
