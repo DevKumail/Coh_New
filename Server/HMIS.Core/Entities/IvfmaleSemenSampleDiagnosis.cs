@@ -14,9 +14,6 @@ public partial class IvfmaleSemenSampleDiagnosis
 
     public int SampleId { get; set; }
 
-    [Column("ICDCodeId")]
-    public int IcdcodeId { get; set; }
-
     [StringLength(50)]
     public string Finding { get; set; } = null!;
 
@@ -29,6 +26,16 @@ public partial class IvfmaleSemenSampleDiagnosis
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    [Column("DiagnosisICDId")]
+    public int? DiagnosisIcdid { get; set; }
+
+    [ForeignKey("DiagnosisIcdid")]
+    [InverseProperty("IvfmaleSemenSampleDiagnosis")]
+    public virtual IvfmaleSemenSampleDiagnosisIcdtype? DiagnosisIcd { get; set; }
+
+    [InverseProperty("Diagnosis")]
+    public virtual ICollection<IvfmaleSemenSampleDiagnosisIcdtype> IvfmaleSemenSampleDiagnosisIcdtype { get; set; } = new List<IvfmaleSemenSampleDiagnosisIcdtype>();
 
     [ForeignKey("SampleId")]
     [InverseProperty("IvfmaleSemenSampleDiagnosis")]
