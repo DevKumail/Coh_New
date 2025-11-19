@@ -21,7 +21,7 @@
   <div class="card px-3 py-2">
     <label class="fw-bold mb-2">Medical opinion</label>
     <quill-editor
-      [(ngModel)]="editorContent"
+      formControlName="editorContent"
       [modules]="quillModules"
       format="html"
       [styles]="{height: '300px'}">
