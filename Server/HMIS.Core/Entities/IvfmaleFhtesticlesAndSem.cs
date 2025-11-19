@@ -54,6 +54,18 @@ public partial class IvfmaleFhtesticlesAndSem
 
     public string? Note { get; set; }
 
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
     [ForeignKey("CategoryIdClinicalVaricocele")]
     [InverseProperty("IvfmaleFhtesticlesAndSemCategoryIdClinicalVaricoceleNavigation")]
     public virtual DropdownConfiguration? CategoryIdClinicalVaricoceleNavigation { get; set; }

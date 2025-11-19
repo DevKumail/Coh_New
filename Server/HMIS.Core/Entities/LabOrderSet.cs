@@ -65,4 +65,6 @@ public partial class LabOrderSet
 
     [Column("HL7MessageId")]
     public int? Hl7messageId { get; set; }
+
+    public long? OrderNumber { get; set; }
 }

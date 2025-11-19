@@ -74,6 +74,10 @@
             </ng-container>
           </tbody>
         </table>
+        <app-generic-pagination [totalItems]="totalrecord" [pageSize]="PaginationInfo?.RowsPerPage"
+        [currentPage]="PaginationInfo?.Page" (pageChanged)="onPageChanged($event)">
+      </app-generic-pagination>
+
       </div>
     </ng-template>
   </div>

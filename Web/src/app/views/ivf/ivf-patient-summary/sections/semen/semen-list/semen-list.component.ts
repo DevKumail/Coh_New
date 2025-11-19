@@ -4,12 +4,14 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { SemenAddEditComponent } from '../semen-add-edit/semen-add-edit.component';
 import { NgIconComponent } from '@ng-icons/core';
 import Swal from 'sweetalert2';
+import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 
 @Component({
   selector: 'app-semen-list',
   standalone: true,
-  imports: [CommonModule, SemenAddEditComponent,NgIconComponent
-],
+  imports: [CommonModule, SemenAddEditComponent, NgIconComponent, GenericPaginationComponent
+  ],
   templateUrl: './semen-list.component.html',
   styleUrls: ['./semen-list.component.scss']
 })
@@ -19,7 +21,13 @@ export class SemenListComponent {
   rows: any[] = [];
   editModel: any = null;
 
-  constructor(private ivf: IVFApiService) {
+  PaginationInfo: any = {
+    Page: 1,
+    RowsPerPage: 10,
+  };
+  totalrecord: number = 0;
+
+  constructor(private ivf: IVFApiService, private patientBannerService: PatientBannerService) {
     this.load();
   }
 
@@ -32,9 +40,17 @@ export class SemenListComponent {
     this.load();
   }
 
-  load(page: number = 1, pageSize: number = 10) {
+  load() {
     this.isLoading = true;
-    this.ivf.GetAllMaleSemenAnalysis(page, pageSize).subscribe({
+    var MainId : number = 0;
+    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+      if (data) {
+        if (data?.couple?.ivfMainId != null) {
+           MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
+        } 
+      }
+    });
+    this.ivf.GetAllMaleSemenAnalysis(MainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
       next: (res: any) => {
         // Expecting res to have data array; adjust mapping if API differs
         const data = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
@@ -56,6 +72,8 @@ export class SemenListComponent {
           cryoStatus: x.cryoStatus || '-',
           status: x.status || '-',
         }));
+
+        this.totalrecord = res.totalCount;
         this.isLoading = false;
       },
       error: _ => { this.isLoading = false; this.rows = []; }
@@ -92,7 +110,8 @@ export class SemenListComponent {
       if (result.isConfirmed) {
         this.isLoading = true;
         this.ivf.DeleteMaleSemenSample(sampleId).subscribe({
-          next: _ => { this.isLoading = false; this.load();
+          next: _ => {
+            this.isLoading = false; this.load();
             Swal.fire({
               title: 'Deleted!',
               text: 'The sample has been deleted.',
@@ -100,8 +119,9 @@ export class SemenListComponent {
               showConfirmButton: false,
               timer: 1500
             });
-           },
-          error: _ => { this.isLoading = false;
+          },
+          error: _ => {
+            this.isLoading = false;
             Swal.fire({
               title: 'Error!',
               text: 'The sample could not be deleted.',
@@ -109,9 +129,15 @@ export class SemenListComponent {
               showConfirmButton: false,
               timer: 1500
             });
-           }
+          }
         });
       }
     });
+  }
+
+
+  onPageChanged(page: number) {
+    this.PaginationInfo.Page = page;
+    this.load();
   }
 }

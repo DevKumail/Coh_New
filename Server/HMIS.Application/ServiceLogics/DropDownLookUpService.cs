@@ -1,11 +1,8 @@
-﻿using GdPicture.Internal.MSOfficeBinary.translator.Spreadsheet.XlsFileFormat.Records;
-using HMIS.Application.DTOs;
+﻿using HMIS.Application.DTOs;
 using HMIS.Application.DTOs.Configurations;
 using HMIS.Core.Context;
 using HMIS.Core.Entities;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 
 namespace HMIS.Application.ServiceLogics
@@ -29,13 +26,11 @@ namespace HMIS.Application.ServiceLogics
     public class DropDownLookUpService : IDropDownLookUpService
     {
         private readonly HMISDbContext _context;
-        private readonly IMemoryCache _cache;
 
 
-        public DropDownLookUpService(HMISDbContext context, IMemoryCache cache)
+        public DropDownLookUpService(HMISDbContext context)
         {
             _context = context;
-            _cache = cache;
 
         }
 
@@ -72,7 +67,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 var category = await _context.DropdownCategory
-                    .FirstOrDefaultAsync(c => c.CategoryId == categoryId );
+                    .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
 
                 if (category == null) return null;
 
@@ -97,7 +92,7 @@ namespace HMIS.Application.ServiceLogics
                 {
                     // Update existing category
                     var existingCategory = await _context.DropdownCategory
-                        .FirstOrDefaultAsync(c => c.CategoryId == categoryDto.CategoryId );
+                        .FirstOrDefaultAsync(c => c.CategoryId == categoryDto.CategoryId);
 
                     if (existingCategory == null) return false;
 
@@ -130,7 +125,7 @@ namespace HMIS.Application.ServiceLogics
             try
             {
                 var category = await _context.DropdownCategory
-                    .FirstOrDefaultAsync(c => c.CategoryId == categoryId );
+                    .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
 
                 if (category == null) return false;
 
@@ -250,8 +245,6 @@ namespace HMIS.Application.ServiceLogics
                 }
 
                 var savedCount = await _context.SaveChangesAsync();
-
-                InvalidateDropdownCache();
                 return savedCount > 0;
             }
             catch (Exception)
@@ -272,7 +265,6 @@ namespace HMIS.Application.ServiceLogics
                 configuration.IsActive = false;
 
                 await _context.SaveChangesAsync();
-                InvalidateDropdownCache();
 
                 return true;
             }
@@ -288,7 +280,7 @@ namespace HMIS.Application.ServiceLogics
             {
                 var category = await _context.DropdownCategory
                     .Include(c => c.DropdownConfiguration)
-                    .FirstOrDefaultAsync(c => c.CategoryId == categoryId );
+                    .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
 
                 if (category == null) return null;
 
@@ -298,7 +290,7 @@ namespace HMIS.Application.ServiceLogics
                     CategoryName = category.CategoryName,
                     Description = category.Description,
                     Values = category.DropdownConfiguration?
-                        .Where(c =>  c.IsActive)
+                        .Where(c => c.IsActive)
                         .OrderBy(c => c.SortOrder)
                         .ThenBy(c => c.ValueName)
                         .Select(c => new DropDownConfigurationDto
@@ -354,21 +346,15 @@ namespace HMIS.Application.ServiceLogics
 
         public async Task<Dictionary<string, List<DropDownItemDto>>> GetDropdownsForPage(string page)
         {
-            string cacheKey = "dropdowns_master";
-
-            if (_cache.TryGetValue(cacheKey, out Dictionary<string, List<DropDownItemDto>> cached))
-                return cached;
 
             var data = await LoadDropdownsFromDB(page);
-
-            _cache.Set(cacheKey, data, TimeSpan.FromHours(6));
 
             return data;
         }
 
         private async Task<Dictionary<string, List<DropDownItemDto>>> LoadDropdownsFromDB(string page)
         {
-            string pagePrefix = page + ":";  
+            string pagePrefix = page + ":";
 
             var result = new Dictionary<string, List<DropDownItemDto>>();
 
@@ -404,12 +390,5 @@ namespace HMIS.Application.ServiceLogics
 
             return result;
         }
-
-        private void InvalidateDropdownCache()
-        {
-            _cache.Remove("dropdowns_master");
-        }
-
-
     }
 }
