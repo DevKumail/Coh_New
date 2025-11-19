@@ -31,17 +31,131 @@ namespace HMIS.Application.ServiceLogics.IVF
 
         public async Task<(bool IsSuccess, object? Data)> DeleteMaleFertilityHistoryAsync(string IVFMaleFHId, string DeletedBy)
         {
-            using var conn = _dapper.CreateConnection();
-            try {
-                var Message = conn.ExecuteAsync("IVF_SoftDeleteFertilityHistory", new
+            // Convert and validate id
+            if (!int.TryParse(IVFMaleFHId, out var id))
+                return (false, "Invalid IVFMaleFHId");
+
+            int? deletedByInt = null;
+            if (int.TryParse(DeletedBy, out var db)) deletedByInt = db;
+
+            // Use EF Core transaction and perform soft-deletes across related entities
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Load main record
+                var main = await _context.IvfmaleFertilityHistory.FirstOrDefaultAsync(x => x.IvfmaleFhid == id);
+                if (main == null || (main.IsDeleted))
                 {
-                    IVFMaleFHId,
-                    DeletedBy
-                });
-                return (true, Message);
+                    await transaction.RollbackAsync();
+                    return (false, "Record not found or already deleted");
+                }
+
+                // Soft delete main
+                main.IsDeleted = true;
+                if (deletedByInt.HasValue) main.DeletedBy = deletedByInt.Value;
+
+                // General and related
+                var general = await _context.IvfmaleFhgeneral.FirstOrDefaultAsync(g => g.IvfmaleFhid == id);
+                if (general != null)
+                {
+                    general.IsDeleted = true;
+                    if (deletedByInt.HasValue) general.DeletedBy = deletedByInt.Value;
+
+                    // Further Planning
+                    var furtherPlanning = await _context.IvfmaleFhfurtherPlanning.Where(fp => fp.IvfmaleFhgeneralId == general.IvfmaleFhgeneralId).ToListAsync();
+                    foreach (var fp in furtherPlanning)
+                    {
+                        fp.IsDeleted = true;
+                        if (deletedByInt.HasValue) fp.DeletedBy = deletedByInt.Value;
+                    }
+
+                    // Illness and idiopathic junction
+                    var illness = await _context.IvfmaleFhillness.FirstOrDefaultAsync(i => i.IvfmaleFhgeneralId == general.IvfmaleFhgeneralId);
+                    if (illness != null)
+                    {
+                        illness.IsDeleted = true;
+                        if (deletedByInt.HasValue) illness.DeletedBy = deletedByInt.Value;
+
+                        // Try soft-deleting illness-idiopathic junction if column exists — use raw SQL but swallow errors
+                        try
+                        {
+                            await _context.Database.ExecuteSqlRawAsync("UPDATE IVFMaleFHIllnessIdiopathic SET IsDeleted = 1 WHERE IVFMaleFHIllnessId = {0}", illness.IvfmaleFhillnessId);
+                        }
+                        catch { /* ignore if table/column not present or mapping missing */ }
+                    }
+
+                    // PerformedTreatment and its years
+                    var performed = await _context.IvfmaleFhperformedTreatment.FirstOrDefaultAsync(p => p.IvfmaleFhgeneralId == general.IvfmaleFhgeneralId);
+                    if (performed != null)
+                    {
+                        performed.IsDeleted = true;
+                        if (deletedByInt.HasValue) performed.DeletedBy = deletedByInt.Value;
+
+                        var years = await _context.IvfmaleFhperformedTreatmentYear.Where(y => y.IvfmaleFhperformedTreatmentId == performed.IvfmaleFhperformedTreatmentId).ToListAsync();
+                        foreach (var y in years)
+                        {
+                            y.IsDeleted = true;
+                            if (deletedByInt.HasValue) y.DeletedBy = deletedByInt.Value;
+                        }
+                    }
+                }
+
+                // Genetics
+                var genetics = await _context.IvfmaleFhgenetics.Where(g => g.IvfmaleFhid == id).ToListAsync();
+                foreach (var g in genetics)
+                {
+                    g.IsDeleted = true;
+                    if (deletedByInt.HasValue) g.DeletedBy = deletedByInt.Value;
+                }
+
+                // TesticlesAndSem and infections
+                var testicles = await _context.IvfmaleFhtesticlesAndSem.FirstOrDefaultAsync(t => t.IvfmaleFhid == id);
+                if (testicles != null)
+                {
+                    testicles.IsDeleted = true;
+                    if (deletedByInt.HasValue) testicles.DeletedBy = deletedByInt.Value;
+
+                    var infections = await _context.IvfmaleFhinfections.Where(i => i.IvfmaleFhtesticlesAndSemId == testicles.IvfmaleFhtesticlesAndSemId).ToListAsync();
+                    foreach (var inf in infections)
+                    {
+                        inf.IsDeleted = true;
+                        if (deletedByInt.HasValue) inf.DeletedBy = deletedByInt.Value;
+                    }
+                }
+
+                // Impairment Factors
+                var factors = await _context.IvfmaleFhimpairmentFactor.Where(f => f.IvfmaleFhid == id).ToListAsync();
+                foreach (var f in factors)
+                {
+                    f.IsDeleted = true;
+                    if (deletedByInt.HasValue) f.DeletedBy = deletedByInt.Value;
+                }
+
+                // Previous Illnesses
+                var prevIll = await _context.IvfmaleFhprevIllness.Where(p => p.IvfmaleFhid == id).ToListAsync();
+                foreach (var p in prevIll)
+                {
+                    p.IsDeleted = true;
+                    if (deletedByInt.HasValue) p.DeletedBy = deletedByInt.Value;
+                }
+
+                // Semen Analyses
+                var semen = await _context.IvfmaleFhsemenAnalysis.Where(s => s.IvfmaleFhid == id).ToListAsync();
+                foreach (var s in semen)
+                {
+                    s.IsDeleted = true;
+                    if (deletedByInt.HasValue) s.DeletedBy = deletedByInt.Value;
+                }
+
+                // Save changes and commit
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return (true, new { Success = 1, Message = "Record successfully deleted" });
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 return (false, ex.Message);
             }
         }
@@ -90,6 +204,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                 return (false, null);
             }
         }
+
         public async Task<(bool IsSuccess, object? Data)> GetAllFertilityHistory(string ivfmainid, PaginationInfo pagination)
         {
             // Basic validations
@@ -106,12 +221,16 @@ namespace HMIS.Application.ServiceLogics.IVF
             using var conn = _dapper.CreateConnection();
             try
             {
-                var data = (await conn.QueryAsync(
+                using (var multi = await conn.QueryMultipleAsync(
                     "IVF_GetAllFertilityHistory",
                     new { PageNumber = page, PageSize = rows, IVFMainId = ivfMainIdInt },
-                    commandType: System.Data.CommandType.StoredProcedure)).ToList();
+                    commandType: CommandType.StoredProcedure))
+                {
+                    var data = (await multi.ReadAsync()).ToList();   // First resultset (rows)
+                    var totalCount = await multi.ReadFirstAsync<int>(); // Second resultset (count)
 
-                return (true, data);
+                    return (true, new { data, totalCount });
+                }
             }
             catch
             {
@@ -580,8 +699,8 @@ namespace HMIS.Application.ServiceLogics.IVF
     public class Result<T>
     {
         public bool IsSuccess { get; set; }
-        public T Data { get; set; }
-        public string ErrorMessage { get; set; }
+        public T? Data { get; set; }
+        public string? ErrorMessage { get; set; }
 
         public static Result<T> Success(T data)
         {

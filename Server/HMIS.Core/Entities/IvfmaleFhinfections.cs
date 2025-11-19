@@ -22,9 +22,9 @@ public partial class IvfmaleFhinfections
 
     public bool? Epididymitis { get; set; }
 
-    public long CategoryIdPrevInfections { get; set; }
+    public long? CategoryIdPrevInfections { get; set; }
 
-    public long CategoryIdDiagnosisOfInfection { get; set; }
+    public long? CategoryIdDiagnosisOfInfection { get; set; }
 
     public int? CreatedBy { get; set; }
 
@@ -40,11 +40,11 @@ public partial class IvfmaleFhinfections
 
     [ForeignKey("CategoryIdDiagnosisOfInfection")]
     [InverseProperty("IvfmaleFhinfectionsCategoryIdDiagnosisOfInfectionNavigation")]
-    public virtual DropdownConfiguration CategoryIdDiagnosisOfInfectionNavigation { get; set; } = null!;
+    public virtual DropdownConfiguration? CategoryIdDiagnosisOfInfectionNavigation { get; set; }
 
     [ForeignKey("CategoryIdPrevInfections")]
     [InverseProperty("IvfmaleFhinfectionsCategoryIdPrevInfectionsNavigation")]
-    public virtual DropdownConfiguration CategoryIdPrevInfectionsNavigation { get; set; } = null!;
+    public virtual DropdownConfiguration? CategoryIdPrevInfectionsNavigation { get; set; }
 
     [ForeignKey("IvfmaleFhtesticlesAndSemId")]
     [InverseProperty("IvfmaleFhinfections")]
