@@ -199,10 +199,11 @@ export class SemenAddEditComponent implements OnChanges {
 
         if (provider) {
             provider = provider.map(
-                (item: { EmployeeId: any; FullName: any }) => {
+                (item: { EmployeeId: any; FullName: any; EmployeeType: any }) => {
                     return {
                         name: item.FullName,
                         providerId: item.EmployeeId,
+                        employeeType: item.EmployeeType,
                     };
                 },
             );
@@ -422,9 +423,12 @@ export class SemenAddEditComponent implements OnChanges {
       return null;
     }
   }
+
 }
 
 function toNum(v: any): number {
   const n = Number(v);
   return isNaN(n) ? 0 : n;
 }
+
+

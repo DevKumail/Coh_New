@@ -12,7 +12,7 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
 export class PreparationPreparationComponent implements OnChanges {
   @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
   @Input() labelFor: (key: string) => string = (k) => k;
-  @Input() hrEmployees: Array<{ name: string; providerId: number }> = [];
+  @Input() hrEmployees: Array<{ name: string; providerId: number; employeeType: number }> = [];
   form: FormGroup;
   methodsOptions: Array<{ id: number; name: string }> = [];
   private pendingSelectedMethodIds: number[] | null = null;

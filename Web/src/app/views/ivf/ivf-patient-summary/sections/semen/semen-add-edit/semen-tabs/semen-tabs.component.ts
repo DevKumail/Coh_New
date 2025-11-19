@@ -30,7 +30,7 @@ export class SemenTabsComponent implements AfterViewInit {
   afterActive = 1;
   @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
   @Input() labelFor: (key: string) => string = (k) => k;
-  @Input() hrEmployees: Array<{ name: string; providerId: number }> = [];
+  @Input() hrEmployees: Array<{ name: string; providerId: number; employeeType: number }> = [];
   @ViewChild(NativeParameterComponent) nativeTab?: NativeParameterComponent;
   @ViewChild(PreparationParameterComponent) afterParamTab?: PreparationParameterComponent;
   @ViewChild(PreparationPreparationComponent) prepTab?: PreparationPreparationComponent;
