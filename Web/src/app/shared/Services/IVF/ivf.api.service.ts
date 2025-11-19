@@ -51,6 +51,7 @@ export class IVFApiService {
 
   // New: complete a specific order set detail with results/observations
   completeLabOrderDetail(orderSetDetailId: number | string, body: any): Observable<any> {
+    debugger
     return this.api.post(`IVFLabOrders/${orderSetDetailId}/complete`, body);
   }
 

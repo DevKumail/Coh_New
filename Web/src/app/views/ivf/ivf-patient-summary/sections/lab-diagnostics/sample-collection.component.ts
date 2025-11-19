@@ -18,7 +18,7 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
           <div class="small text-muted">Order #: {{ order?.orderNumber || order?.orderSetId || '-' }}</div>
         </div>
         <div class="d-flex gap-2">
-          <button class="btn btn-secondary btn-sm" (click)="cancel.emit()">Back</button>
+          <button class="btn btn-secondary btn-sm" (click)="cancel.emit()">Close</button>
           <button class="btn btn-primary btn-sm" (click)="onCollect()" [disabled]="!canCollect()">Collect</button>
         </div>
       </div>

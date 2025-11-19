@@ -88,7 +88,7 @@ namespace HMIS.Application.ServiceLogics.IVF
         public async Task<int> CompleteOrderAsync(long orderSetDetailId, CompleteLabOrderDTO payload)
         {
             // Load detail + header + test
-            var detail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetDetailId == orderSetDetailId);
+            var detail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetId == orderSetDetailId);
             if (detail == null) return 0;
             var header = await _db.LabOrderSet.FirstOrDefaultAsync(h => h.LabOrderSetId == detail.OrderSetId);
             if (header == null) return 0;
@@ -366,74 +366,42 @@ namespace HMIS.Application.ServiceLogics.IVF
                 var resolvedCreate = ResolveStatus(h.OrderStatusEnum, h.OrderStatus, h.IsSigned);
                 var details = payload.Details ?? new List<LabOrderSetDetailDTO>();
 
-                // If no details provided, still create a single order header
-                if (details.Count == 0)
+                // Generate order number ONCE per order set
+                long? orderNumber = h.OrderNumber;
+                if (!orderNumber.HasValue || orderNumber.Value == 0)
                 {
-                    long? orderNumber = h.OrderNumber;
-                    if (!orderNumber.HasValue || orderNumber.Value == 0)
-                    {
-                        orderNumber = await GetNextOrderNumberAsync();
-                    }
-                    var singleHdr = new LabOrderSet
-                    {
-                        Mrno = h.MRNo,
-                        ProviderId = h.ProviderId,
-                        OrderDate = FormatDate(h.OrderDate),
-                        VisitAccountNo = h.VisitAccountNo?.ToString(),
-                        CreatedBy = h.CreatedBy.ToString(),
-                        CreatedDate = FormatDate(h.CreatedDate),
-                        UpdatedBy = h.UpdatedBy?.ToString(),
-                        UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null,
-                        OrderControlCode = h.OrderControlCode,
-                        OrderStatus = resolvedCreate.status,
-                        IsHl7msgCreated = h.IsHL7MsgCreated,
-                        IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips,
-                        IsSigned = resolvedCreate.isSigned,
-                        OldMrno = h.oldMRNo,
-                        Hl7messageId = (int?)h.HL7MessageId,
-                        OrderNumber = orderNumber
-                    };
-                    _db.LabOrderSet.Add(singleHdr);
-                    await _db.SaveChangesAsync();
-                    await tx.CommitAsync();
-                    return singleHdr.LabOrderSetId;
+                    orderNumber = await GetNextOrderNumberAsync();
                 }
 
-                long firstCreatedId = 0;
+                // Always create a single header
+                var hdr = new LabOrderSet
+                {
+                    Mrno = h.MRNo,
+                    ProviderId = h.ProviderId,
+                    OrderDate = FormatDate(h.OrderDate),
+                    VisitAccountNo = h.VisitAccountNo?.ToString(),
+                    CreatedBy = h.CreatedBy.ToString(),
+                    CreatedDate = FormatDate(h.CreatedDate),
+                    UpdatedBy = h.UpdatedBy?.ToString(),
+                    UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null,
+                    OrderControlCode = h.OrderControlCode,
+                    OrderStatus = resolvedCreate.status,
+                    IsHl7msgCreated = h.IsHL7MsgCreated,
+                    IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips,
+                    IsSigned = resolvedCreate.isSigned,
+                    OldMrno = h.oldMRNo,
+                    Hl7messageId = (int?)h.HL7MessageId,
+                    OrderNumber = orderNumber
+                };
+
+                _db.LabOrderSet.Add(hdr);
+                await _db.SaveChangesAsync();
+
+                var orderSetId = (long)hdr.LabOrderSetId;
+
+                // Add all tests under the same header
                 foreach (var d in details)
                 {
-                    // Header per test
-                    long? orderNumber = h.OrderNumber;
-                    if (!orderNumber.HasValue || orderNumber.Value == 0)
-                    {
-                        orderNumber = await GetNextOrderNumberAsync();
-                    }
-                    var hdr = new LabOrderSet
-                    {
-                        Mrno = h.MRNo,
-                        ProviderId = h.ProviderId,
-                        OrderDate = FormatDate(h.OrderDate),
-                        VisitAccountNo = h.VisitAccountNo?.ToString(),
-                        CreatedBy = h.CreatedBy.ToString(),
-                        CreatedDate = FormatDate(h.CreatedDate),
-                        UpdatedBy = h.UpdatedBy?.ToString(),
-                        UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null,
-                        OrderControlCode = h.OrderControlCode,
-                        OrderStatus = resolvedCreate.status,
-                        IsHl7msgCreated = h.IsHL7MsgCreated,
-                        IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips,
-                        IsSigned = resolvedCreate.isSigned,
-                        OldMrno = h.oldMRNo,
-                        Hl7messageId = (int?)h.HL7MessageId,
-                        OrderNumber = orderNumber
-                    };
-                    _db.LabOrderSet.Add(hdr);
-                    await _db.SaveChangesAsync();
-
-                    var orderSetId = (long)hdr.LabOrderSetId;
-                    if (firstCreatedId == 0) firstCreatedId = orderSetId;
-
-                    // Ensure per-test VisitOrderNo uniqueness
                     long? visitOrderNo = d.VisitOrderNo;
                     if (!visitOrderNo.HasValue || visitOrderNo.Value == 0)
                     {
@@ -465,12 +433,17 @@ namespace HMIS.Application.ServiceLogics.IVF
                         BillOnOrder = d.BillOnOrder,
                         IsDeleted = d.IsDeleted ?? false
                     };
+
                     _db.LabOrderSetDetail.Add(ent);
+                }
+
+                if (details.Count > 0)
+                {
                     await _db.SaveChangesAsync();
                 }
 
                 await tx.CommitAsync();
-                return firstCreatedId;
+                return orderSetId;
             }
             catch
             {

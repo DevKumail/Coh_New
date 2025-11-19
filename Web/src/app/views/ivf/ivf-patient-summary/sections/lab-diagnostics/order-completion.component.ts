@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Input, Output, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgbDateStruct, NgbDatepicker, NgbDatepickerModule, NgbTimepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { forkJoin, of } from 'rxjs';
+import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 
 export interface LabResultObservation {
   valueType: string;
@@ -54,7 +56,7 @@ export interface LabResultObservation {
     }
   `]
 })
-export class OrderCompletionComponent implements OnInit {
+export class OrderCompletionComponent implements OnInit, OnChanges {
   @Input() order: any;
   @Input() tests: Array<any> = [];
   @Output() cancel = new EventEmitter<void>();
@@ -83,7 +85,8 @@ export class OrderCompletionComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private ivfApi: IVFApiService
   ) {
     this.initializeForm();
   }
@@ -98,17 +101,25 @@ export class OrderCompletionComponent implements OnInit {
     this.addObservation();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // Ensure Test Details grid refreshes as soon as tests input updates
+    if (changes['tests']) {
+      const current = changes['tests'].currentValue ?? [];
+      // Clone the array so Angular always sees a new reference
+      this.tests = Array.isArray(current) ? [...current] : [];
+    }
+  }
+
   private initializeForm() {
     this.completionForm = this.fb.group({
-      performDate: [this.currentDate, Validators.required],
-      entryDate: [this.currentDate, Validators.required],
-      accessionNumber: ['', Validators.required],
+      performDate: [this.currentDate],
+      entryDate: [this.currentDate],
       isDefault: [true],
       principalResultInterpreter: [null],
-      action: ['', Validators.required],
-      reviewedBy: [''],
-      reviewedDate: [null],
-      performAtLabId: [null],
+      action: ['Final'],
+      reviewedBy: ['System User'],
+      reviewedDate: [new Date().toISOString()],
+      performAtLabId: [0],
       observations: this.fb.array([])
     });
   }
@@ -124,20 +135,20 @@ export class OrderCompletionComponent implements OnInit {
 
   createObservation(): FormGroup {
     return this.fb.group({
-      valueType: ['', Validators.required],
-      observationIdentifierFullName: ['', Validators.required],
-      observationIdentifierShortName: ['', Validators.required],
-      observationValue: ['', Validators.required],
+      valueType: ['NM'],
+      observationIdentifierFullName: ['Result'],
+      observationIdentifierShortName: ['RES'],
+      observationValue: ['0'],
       units: [''],
       referenceRangeMin: [''],
       referenceRangeMax: [''],
-      abnormalFlag: [''],
-      resultStatus: [''],
+      abnormalFlag: ['N'],
+      resultStatus: ['F'],
       observationDateTime: [new Date().toISOString()],
       analysisDateTime: [new Date().toISOString()],
-      remarks: [''],
-      weqayaScreening: [false],
-      sequenceNo: [1]
+      remarks: ['Normal'],
+      weqayaScreening: [true],
+      sequenceNo: [0]
     });
   }
 
@@ -169,21 +180,17 @@ export class OrderCompletionComponent implements OnInit {
   }
 
   onComplete() {
-    if (this.completionForm.invalid) {
-      this.completionForm.markAllAsTouched();
-      return;
-    }
-
     const formValue = this.completionForm.getRawValue();
-    
+
     // Format the date and time for submission
     const performDate = this.formatDateForSubmission(formValue.performDate, this.currentTime);
-    
+
     const payload = {
       ...formValue,
       performDate: performDate,
       entryDate: new Date().toISOString(),
-      userId: 0, // Will be set by the parent
+      // UserId will eventually come from auth; for now 0 / backend default
+      userId: 0,
       principalResultInterpreter: formValue.principalResultInterpreter || 0,
       reviewedBy: formValue.reviewedBy || '',
       reviewedDate: formValue.reviewedDate ? new Date(formValue.reviewedDate).toISOString() : null,
@@ -194,10 +201,37 @@ export class OrderCompletionComponent implements OnInit {
       }))
     };
 
-    this.completed.emit({
-      order: this.order,
-      completedTests: this.tests,
-      completionData: payload
+    const tests = this.tests || [];
+    if (!Array.isArray(tests) || tests.length === 0) {
+      console.warn('No tests to complete');
+      return;
+    }
+
+    const apiCalls = tests.map((test: any, idx: number) => {
+      // Prefer orderSetDetailId; fallback to parent orderSetId so API still gets called
+      const detailId = test?.orderSetDetailId ?? this.order?.orderSetId;
+      if (!detailId) {
+        console.warn('Missing orderSetDetailId and orderSetId for test', test);
+        return of(null);
+      }
+
+      // Per-test payload copy; adjust accession/observations if needed later
+      const testPayload = { ...payload };
+      return this.ivfApi.completeLabOrderDetail(detailId, testPayload);
+    }).filter(Boolean) as any[];
+
+    if (apiCalls.length === 0) {
+      console.warn('No valid tests found to complete');
+      return;
+    }
+
+    forkJoin(apiCalls).subscribe({
+      next: (res) => {
+        console.log('Order completion success', res);
+      },
+      error: (err) => {
+        console.error('Order completion failed', err);
+      }
     });
   }
 }

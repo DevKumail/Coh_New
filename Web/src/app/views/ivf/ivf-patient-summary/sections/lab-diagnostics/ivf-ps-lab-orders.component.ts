@@ -8,7 +8,7 @@ import { IvfCreateLabOrderDto } from '@/app/shared/Services/IVF/dtos/ivf-lab-ord
 import { SampleCollectionComponent } from './sample-collection.component';
 import { OrderCompletionComponent } from './order-completion.component';
 import { forkJoin, of } from 'rxjs';
-import { NgbToast, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbToast, NgbToastModule, NgbModal, NgbModalRef, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-ivf-ps-lab-orders',
@@ -21,7 +21,8 @@ import { NgbToast, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
     SampleCollectionComponent, 
     OrderCompletionComponent,
     NgbToast,
-    NgbToastModule
+    NgbToastModule,
+    NgbModalModule
   ],
   styles: [`
     .skeleton-loader { background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius:4px; }
@@ -49,7 +50,7 @@ import { NgbToast, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
       </ngb-toast>
     </div>
 
-    <div class="px-2 py-2" *ngIf="!showOrderPage && !showCollectPage && !showCompletePage; else addOrderPage">
+    <div class="px-2 py-2" *ngIf="!showOrderPage && !showCompletePage; else addOrderPage">
       <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Lab orders</span>
@@ -94,7 +95,7 @@ import { NgbToast, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
                         <button class="btn btn-sm btn-outline-primary" (click)="openEdit(o)" title="Edit" aria-label="Edit">
                           ✎
                         </button>
-                        <button class="btn btn-sm btn-outline-secondary" (click)="openCollect(o)" title="Collect sample" aria-label="Collect sample">
+                        <button class="btn btn-sm btn-outline-secondary" (click)="openCollect(o)" [disabled]="isCollectDisabled(o)" title="Collect sample" aria-label="Collect sample">
                           🧪
                         </button>
                         <button class="btn btn-sm btn-outline-success" (click)="openComplete(o)" title="Complete order" aria-label="Complete order">
@@ -134,14 +135,6 @@ import { NgbToast, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
           (save)="onOrderModalSave($event)">
         </app-add-lab-order>
       </ng-container>
-      <ng-container *ngIf="showCollectPage">
-        <app-sample-collection
-          [order]="editingRow"
-          [tests]="editingTests"
-          (cancel)="closeCollectPage()"
-          (collected)="onCollected($event)">
-        </app-sample-collection>
-      </ng-container>
       <ng-container *ngIf="showCompletePage">
         <app-order-completion
           [order]="editingRow"
@@ -150,6 +143,16 @@ import { NgbToast, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
           (completed)="onCompleted($event)">
         </app-order-completion>
       </ng-container>
+    </ng-template>
+
+    <!-- Sample Collection Modal Content -->
+    <ng-template #collectModal>
+      <app-sample-collection
+        [order]="editingRow"
+        [tests]="editingTests"
+        (cancel)="closeCollectPage()"
+        (collected)="onCollected($event)">
+      </app-sample-collection>
     </ng-template>
 
     <!-- Duplicate Confirmation -->
@@ -208,7 +211,11 @@ export class IvfPsLabOrdersComponent implements OnInit {
   toastMessage = '';
   toastType: 'success' | 'danger' | 'warning' | 'info' = 'info';
 
-  constructor(private ivfApi: IVFApiService) {}
+  // Sample collection modal
+  @ViewChild('collectModal') collectModalTpl!: TemplateRef<any>;
+  private collectModalRef: NgbModalRef | null = null;
+
+  constructor(private ivfApi: IVFApiService, private modalService: NgbModal) {}
 
   ngOnInit(): void {
     if (this.currentMrNo) {
@@ -224,6 +231,11 @@ export class IvfPsLabOrdersComponent implements OnInit {
 
   onPageChanged(page: number) {
     this.currentPage = page;
+  }
+
+  isCollectDisabled(row: any): boolean {
+    const status = (row?.status || '').toString().toUpperCase();
+    return status === 'COLLECTED' || status === 'COMPLETED' || status === 'CANCELLED';
   }
 
   loadOrders(mrno: string | number) {
@@ -277,12 +289,24 @@ export class IvfPsLabOrdersComponent implements OnInit {
 
   // Sample collection flow (UI only)
   openCollect(row: any) {
+    if (this.isCollectDisabled(row)) {
+      this.showNotification('Sample already collected for this order', 'warning');
+      return;
+    }
     this.editingRow = row;
     this.isLoading = true;
     const finish = (tests: any[]) => {
       this.editingTests = (tests || []).map(t => ({ ...t, selected: true }));
-      this.showCollectPage = true;
       this.isLoading = false;
+      // Open sample collection inside a modal
+      if (this.collectModalRef) {
+        this.collectModalRef.close();
+      }
+      this.collectModalRef = this.modalService.open(this.collectModalTpl, {
+        size: 'lg',
+        backdrop: 'static',
+        keyboard: false
+      });
     };
     if (row?.orderSetId) {
       // Try new collection-details endpoint for full test name/material; fallback to getLabOrderById
@@ -323,7 +347,14 @@ export class IvfPsLabOrdersComponent implements OnInit {
       finish([]);
     }
   }
-  closeCollectPage() { this.showCollectPage = false; this.editingTests = []; }
+  closeCollectPage() {
+    this.showCollectPage = false;
+    this.editingTests = [];
+    if (this.collectModalRef) {
+      this.collectModalRef.close();
+      this.collectModalRef = null;
+    }
+  }
   onCollected(payload: any) {
     // Order-level collect per new endpoint
     const orderSetId = this.editingRow?.orderSetId;
@@ -354,20 +385,39 @@ export class IvfPsLabOrdersComponent implements OnInit {
       this.isLoading = false;
     };
     if (row?.orderSetId) {
-      this.ivfApi.getLabOrderById(row.orderSetId).subscribe({
+      // Prefer new collection-details endpoint so Test Details grid matches collection screen
+      this.ivfApi.getOrderCollectionDetails(row.orderSetId).subscribe({
         next: (res: any) => {
-          const details = Array.isArray(res?.details) ? res.details : [];
+          const details = Array.isArray(res) ? res : Array.isArray(res?.details) ? res.details : [];
           const mapped = details.map((d: any) => ({
-            id: d.labTestId,
+            id: d.labTestId ?? d.testId,
             orderSetDetailId: d.orderSetDetailId ?? d.id ?? d.labOrderSetDetailId,
-            cpt: d.cptCode,
-            name: d.cptCode,
-            sampleTypeName: d.sampleTypeName,
+            cpt: d.cptCode ?? d.cpt,
+            name: d.testName ?? d.name ?? d.cptCode,
+            sampleTypeName: d.materialName ?? d.material ?? d.sampleTypeName ?? d.sampleType,
             status: d.status
           }));
           finish(mapped);
         },
-        error: () => { finish([]); },
+        error: () => {
+          // Fallback to existing getLabOrderById if collection-details is not available
+          this.ivfApi.getLabOrderById(row.orderSetId).subscribe({
+            next: (res: any) => {
+              const details = Array.isArray(res?.details) ? res.details : [];
+              const mapped = details.map((d: any) => ({
+                id: d.labTestId,
+                orderSetDetailId: d.orderSetDetailId ?? d.id ?? d.labOrderSetDetailId,
+                cpt: d.cptCode,
+                name: d.testName ?? d.cptCode,
+                sampleTypeName: d.sampleTypeName,
+                status: d.status
+              }));
+              finish(mapped);
+            },
+            error: () => { finish([]); },
+            complete: () => {}
+          });
+        },
         complete: () => {}
       });
     } else {
@@ -377,7 +427,9 @@ export class IvfPsLabOrdersComponent implements OnInit {
   closeCompletePage() { this.showCompletePage = false; this.editingTests = []; }
   onCompleted(payload: any) {
     // Call Complete API for each test in the order
-    const { completionData, tests } = payload;
+    // OrderCompletionComponent emits { order, completedTests, completionData }
+    const completionData = payload?.completionData;
+    const tests = payload?.completedTests ?? payload?.tests;
     
     if (!completionData || !Array.isArray(tests) || tests.length === 0) { 
       this.showNotification('No tests selected for completion', 'warning');
