@@ -5,6 +5,7 @@ import { SemenAddEditComponent } from '../semen-add-edit/semen-add-edit.componen
 import { NgIconComponent } from '@ng-icons/core';
 import Swal from 'sweetalert2';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 
 @Component({
   selector: 'app-semen-list',
@@ -26,7 +27,7 @@ export class SemenListComponent {
   };
   totalrecord: number = 0;
 
-  constructor(private ivf: IVFApiService) {
+  constructor(private ivf: IVFApiService, private patientBannerService: PatientBannerService) {
     this.load();
   }
 
@@ -41,7 +42,15 @@ export class SemenListComponent {
 
   load() {
     this.isLoading = true;
-    this.ivf.GetAllMaleSemenAnalysis(this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
+    var MainId : number = 0;
+    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+      if (data) {
+        if (data?.couple?.ivfMainId != null) {
+           MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
+        } 
+      }
+    });
+    this.ivf.GetAllMaleSemenAnalysis(MainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
       next: (res: any) => {
         // Expecting res to have data array; adjust mapping if API differs
         const data = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);

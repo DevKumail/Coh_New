@@ -71,8 +71,8 @@ export class IVFApiService {
     return this.api.post('IVFMaleSemanAnalysis/InsertOrUpdate', payload);
   }
 
-  GetAllMaleSemenAnalysis(page: number = 1, pageSize: number = 10): Observable<any> {
-    return this.api.get('IVFMaleSemanAnalysis/GetAll', { page, pageSize });
+  GetAllMaleSemenAnalysis(ivfMainId: number, page: number = 1, pageSize: number = 10): Observable<any> {
+    return this.api.get('IVFMaleSemanAnalysis/GetAll', { ivfMainId, page, pageSize });
   }
 
   GetMaleSemenSampleById(sampleId: number): Observable<any> {
