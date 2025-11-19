@@ -120,13 +120,24 @@
     {
         public int DiagnosisId { get; set; }
         public int SampleId { get; set; }
-        public string ICDCode { get; set; }
         public string Finding { get; set; }
         public string Notes { get; set; }
         public int? CreatedBy { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+
+        // Multiple ICD codes for one diagnosis
+        public List<IVFMaleSemenSampleDiagnosisICDTypeDto> ICDTypes { get; set; }
+    }
+
+    public class IVFMaleSemenSampleDiagnosisICDTypeDto
+    {
+        public int DiagnosisICDId { get; set; }
+        public int DiagnosisId { get; set; }
+        public string ICDCode { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public string CreatedBy { get; set; }
     }
 
     public class IVFMaleSemenSampleApprovalStatusDto

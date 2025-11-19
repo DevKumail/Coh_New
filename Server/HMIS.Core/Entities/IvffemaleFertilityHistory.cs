@@ -56,7 +56,7 @@ public partial class IvffemaleFertilityHistory
 
     public long? PrevIllnessesCategoryId { get; set; }
 
-    public long? FertilityImpairmentFactorsCategoryId { get; set; }
+    public long? SterilityFactorsCategoryId { get; set; }
 
     public string? Comment { get; set; }
 
@@ -75,10 +75,6 @@ public partial class IvffemaleFertilityHistory
     [ForeignKey("FallopianTubeYearCategoryId")]
     [InverseProperty("IvffemaleFertilityHistoryFallopianTubeYearCategory")]
     public virtual DropdownConfiguration? FallopianTubeYearCategory { get; set; }
-
-    [ForeignKey("FertilityImpairmentFactorsCategoryId")]
-    [InverseProperty("IvffemaleFertilityHistoryFertilityImpairmentFactorsCategory")]
-    public virtual DropdownConfiguration? FertilityImpairmentFactorsCategory { get; set; }
 
     [ForeignKey("GenerallyHealthyCategoryId")]
     [InverseProperty("IvffemaleFertilityHistoryGenerallyHealthyCategory")]
@@ -99,4 +95,8 @@ public partial class IvffemaleFertilityHistory
     [ForeignKey("PrevIllnessesCategoryId")]
     [InverseProperty("IvffemaleFertilityHistoryPrevIllnessesCategory")]
     public virtual DropdownConfiguration? PrevIllnessesCategory { get; set; }
+
+    [ForeignKey("SterilityFactorsCategoryId")]
+    [InverseProperty("IvffemaleFertilityHistorySterilityFactorsCategory")]
+    public virtual DropdownConfiguration? SterilityFactorsCategory { get; set; }
 }

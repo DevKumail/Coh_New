@@ -286,23 +286,94 @@ namespace HMIS.Application.ServiceLogics.IVF
         {
             if (diagnosisDtos == null) return;
 
-            // Remove existing diagnoses and add new ones
-            var existingDiagnoses = _context.IvfmaleSemenSampleDiagnosis
-                .Where(d => d.SampleId == sampleId);
-            _context.IvfmaleSemenSampleDiagnosis.RemoveRange(existingDiagnoses);
+            // Get existing diagnoses to update or delete
+            var existingDiagnoses = await _context.IvfmaleSemenSampleDiagnosis
+                .Where(d => d.SampleId == sampleId)
+                .ToListAsync();
+
+            var existingDiagnosisIds = existingDiagnoses.Select(d => d.DiagnosisId).ToList();
+            var incomingDiagnosisIds = diagnosisDtos.Where(d => d.DiagnosisId > 0).Select(d => d.DiagnosisId).ToList();
+
+            // Delete diagnoses that are not in the incoming list
+            var diagnosesToDelete = existingDiagnoses.Where(d => !incomingDiagnosisIds.Contains(d.DiagnosisId)).ToList();
+            _context.IvfmaleSemenSampleDiagnosis.RemoveRange(diagnosesToDelete);
 
             foreach (var diagDto in diagnosisDtos)
             {
-                var diagnosis = new IvfmaleSemenSampleDiagnosis
+                IvfmaleSemenSampleDiagnosis diagnosis;
+
+                if (diagDto.DiagnosisId > 0)
                 {
-                    SampleId = sampleId,
-                    Icdcode = diagDto.ICDCode,
-                    Finding = diagDto.Finding,
-                    Notes = diagDto.Notes,
-                    CreatedBy = diagDto.CreatedBy,
-                    CreatedAt = DateTime.Now
-                };
-                _context.IvfmaleSemenSampleDiagnosis.Add(diagnosis);
+                    // Update existing diagnosis
+                    diagnosis = existingDiagnoses.FirstOrDefault(d => d.DiagnosisId == diagDto.DiagnosisId);
+                    if (diagnosis == null) continue;
+
+                    diagnosis.Finding = diagDto.Finding;
+                    diagnosis.Notes = diagDto.Notes;
+                    diagnosis.UpdatedBy = diagDto.UpdatedBy;
+                    diagnosis.UpdatedAt = DateTime.Now;
+                }
+                else
+                {
+                    // Create new diagnosis
+                    diagnosis = new IvfmaleSemenSampleDiagnosis
+                    {
+                        SampleId = sampleId,
+                        Finding = diagDto.Finding,
+                        Notes = diagDto.Notes,
+                        CreatedBy = diagDto.CreatedBy,
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.IvfmaleSemenSampleDiagnosis.Add(diagnosis);
+                }
+
+                await _context.SaveChangesAsync(); // Save to get DiagnosisId
+
+                // Handle multiple ICD Types
+                await HandleDiagnosisICDTypes(diagnosis.DiagnosisId, diagDto.ICDTypes);
+            }
+        }
+
+        private async System.Threading.Tasks.Task HandleDiagnosisICDTypes(int diagnosisId, List<IVFMaleSemenSampleDiagnosisICDTypeDto> icdTypeDtos)
+        {
+            if (icdTypeDtos == null) return;
+
+            // Get existing ICD types for this diagnosis
+            var existingICDTypes = await _context.IvfmaleSemenSampleDiagnosisIcdtype
+                .Where(i => i.DiagnosisId == diagnosisId)
+                .ToListAsync();
+
+            var existingICDTypeIds = existingICDTypes.Select(i => i.DiagnosisIcdid).ToList();
+            var incomingICDTypeIds = icdTypeDtos.Where(i => i.DiagnosisICDId > 0).Select(i => i.DiagnosisICDId).ToList();
+
+            // Delete ICD types that are not in the incoming list
+            var icdTypesToDelete = existingICDTypes.Where(i => !incomingICDTypeIds.Contains(i.DiagnosisIcdid)).ToList();
+            _context.IvfmaleSemenSampleDiagnosisIcdtype.RemoveRange(icdTypesToDelete);
+
+            foreach (var icdTypeDto in icdTypeDtos)
+            {
+                IvfmaleSemenSampleDiagnosisIcdtype icdType;
+
+                if (icdTypeDto.DiagnosisICDId > 0)
+                {
+                    // Update existing ICD type
+                    icdType = existingICDTypes.FirstOrDefault(i => i.DiagnosisIcdid == icdTypeDto.DiagnosisICDId);
+                    if (icdType == null) continue;
+
+                    icdType.Icdcode = icdTypeDto.ICDCode;
+                }
+                else
+                {
+                    // Create new ICD type
+                    icdType = new IvfmaleSemenSampleDiagnosisIcdtype
+                    {
+                        DiagnosisId = diagnosisId,
+                        Icdcode = icdTypeDto.ICDCode,
+                        CreatedBy = icdTypeDto.CreatedBy,
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.IvfmaleSemenSampleDiagnosisIcdtype.Add(icdType);
+                }
             }
         }
 
