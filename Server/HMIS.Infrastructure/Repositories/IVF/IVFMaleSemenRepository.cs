@@ -16,11 +16,12 @@ namespace HMIS.Infrastructure.Repositories.IVF
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task<(IEnumerable<IVFMaleSemenSampleListDto> Data, int TotalCount)> GetAllSemenSamples(int page, int pageSize)
+        public async Task<(IEnumerable<IVFMaleSemenSampleListDto> Data, int TotalCount)> GetAllSemenSamples(int ivfMainId, int page, int pageSize)
         {
             using var connection = new SqlConnection(_connectionString);
 
             var parameters = new DynamicParameters();
+            parameters.Add("@IVFMainId", ivfMainId);
             parameters.Add("@Page", page);
             parameters.Add("@PageSize", pageSize);
             parameters.Add("@TotalCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
