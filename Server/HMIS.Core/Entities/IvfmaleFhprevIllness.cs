@@ -16,7 +16,8 @@ public partial class IvfmaleFhprevIllness
     [Column("IVFMaleFHId")]
     public int IvfmaleFhid { get; set; }
 
-    public long PrevIllnessCategoryId { get; set; }
+    [StringLength(11)]
+    public string PrevIllness { get; set; } = null!;
 
     public int? CreatedBy { get; set; }
 
@@ -34,7 +35,7 @@ public partial class IvfmaleFhprevIllness
     [InverseProperty("IvfmaleFhprevIllness")]
     public virtual IvfmaleFertilityHistory IvfmaleFh { get; set; } = null!;
 
-    [ForeignKey("PrevIllnessCategoryId")]
+    [ForeignKey("PrevIllness")]
     [InverseProperty("IvfmaleFhprevIllness")]
-    public virtual DropdownConfiguration PrevIllnessCategory { get; set; } = null!;
+    public virtual BlmasterIcd9cm PrevIllnessNavigation { get; set; } = null!;
 }

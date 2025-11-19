@@ -59,10 +59,11 @@ namespace HMIS.Infrastructure.Repositories.IVF
             var preparations = (await multi.ReadAsync<IVFMaleSemenObservationPreparationDto>()).ToList();
             var preparationMethods = (await multi.ReadAsync<IVFMaleSemenObservationPreparationMethodDto>()).ToList();
             sample.Diagnoses = (await multi.ReadAsync<IVFMaleSemenSampleDiagnosisDto>()).ToList();
+            var icdTypes = (await multi.ReadAsync<IVFMaleSemenSampleDiagnosisICDTypeDto>()).ToList(); 
             sample.ApprovalStatus = await multi.ReadFirstOrDefaultAsync<IVFMaleSemenSampleApprovalStatusDto>();
 
             // Map related data
-            MapRelatedData(sample, motilities, morphologies, preparations, preparationMethods);
+            MapRelatedData(sample, motilities, morphologies, preparations, preparationMethods, icdTypes); 
 
             return sample;
         }
@@ -72,7 +73,8 @@ namespace HMIS.Infrastructure.Repositories.IVF
             List<IVFMaleSemenMotilityDto> motilities,
             List<IVFMaleSemenMorphologyDto> morphologies,
             List<IVFMaleSemenObservationPreparationDto> preparations,
-            List<IVFMaleSemenObservationPreparationMethodDto> preparationMethods)
+            List<IVFMaleSemenObservationPreparationMethodDto> preparationMethods,
+            List<IVFMaleSemenSampleDiagnosisICDTypeDto> icdTypes) 
         {
             foreach (var observation in sample.Observations)
             {
@@ -86,6 +88,14 @@ namespace HMIS.Infrastructure.Repositories.IVF
                         .Where(pm => pm.PreparationId == preparation.PreparationId)
                         .ToList();
                 }
+            }
+
+            // NEW: Map ICD types to diagnoses
+            foreach (var diagnosis in sample.Diagnoses)
+            {
+                diagnosis.ICDTypes = icdTypes
+                    .Where(icd => icd.DiagnosisId == diagnosis.DiagnosisId)
+                    .ToList();
             }
         }
     }
