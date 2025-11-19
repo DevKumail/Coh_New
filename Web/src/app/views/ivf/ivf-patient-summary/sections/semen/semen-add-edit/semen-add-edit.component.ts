@@ -169,7 +169,11 @@ export class SemenAddEditComponent implements OnChanges {
     const diag = (m.diagnoses && m.diagnoses[0]) || null;
     const appr = m.approvalStatus || null;
     const approvalStatus = appr?.isApproved ? 'Approved' : (appr?.isAttention ? 'Rejected' : 'Pending');
-    try { this.diag?.form.patchValue({ finding: diag?.finding ?? 'Normal', note: diag?.notes ?? '', approvalStatus }); } catch {}
+    try {
+      this.diag?.form.patchValue({ finding: diag?.finding ?? 'Normal', note: diag?.notes ?? '', approvalStatus });
+      const dxCodes = Array.isArray(diag?.icdTypes) ? diag.icdTypes.map((x: any) => x?.icdCode).filter((x: any) => !!x) : [];
+      this.diag?.setSelectedDiagnosisCodes?.(dxCodes);
+    } catch {}
 
     // Patch tabs (native, after-prep, preparation)
     const nativeObs = (m.observations || []).find((o: any) => o.observationType === 'Native');
@@ -252,6 +256,7 @@ export class SemenAddEditComponent implements OnChanges {
         } 
       }
     });
+    const dxCodes: string[] = (this.diag?.getSelectedDiagnosisCodes?.() || []) as string[];
     const payload = {
       sampleId: this.model?.sampleId ?? 0,
       ivfMainId: this.model?.ivfMainId  || MainId,
@@ -288,13 +293,21 @@ export class SemenAddEditComponent implements OnChanges {
         {
           diagnosisId: 0,
           sampleId: 0,
-          icdCodeId: 0,
           finding: d.finding || '',
           notes: d.note || '',
           createdBy: 0,
           updatedBy: 0,
           createdAt: nowIso,
           updatedAt: nowIso,
+          icdTypes: Array.isArray(dxCodes)
+            ? dxCodes.map(code => ({
+                diagnosisICDId: 0,
+                diagnosisId: 0,
+                icdCode: String(code || ''),
+                createdAt: nowIso,
+                createdBy: '0',
+              }))
+            : [],
         },
       ],
       approvalStatus: {

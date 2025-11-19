@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators, FormControl } from '@angular/forms';
+import { ApiService } from '@/app/core/services/api.service';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
@@ -15,28 +16,55 @@ export class MedicalHistoryBasicComponent implements OnInit {
   basicForm!: FormGroup;
   @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
   @Input() hrEmployees: Array<{ providerId: number | string; name: string }> = [];
-  illnessesOptions: string[] = [
-    'Diabetes',
-    'Hypertension',
-    'Heart disease',
-    'Cancer',
-    'Thyroid disorder',
-    'Other'
-  ];
+  illnessesOptions: string[] = [];
   searchIllness = '';
-  factorsOptions: string[] = [
-    'Male factor',
-    'Ovulation disorder',
-    'Tubal factor',
-    'Endometriosis',
-    'Unexplained'
-  ];
+  private illnessesLimit = 50;
+  private illnessesLoading = false;
+  factorsOptions: string[] = [];
   searchFactor = '';
+  private factorsLimit = 50;
+  private factorsLoading = false;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private api: ApiService) {}
 
   ngOnInit() {
     this.initializeForm();
+    // initial load
+    this.fetchIllnesses();
+    this.fetchFactors();
+  }
+
+  // ========== FACTORS (REMOTE SEARCH + INFINITE SCROLL) ==========
+  onFactorSearchChange(q: string) {
+    this.searchFactor = q || '';
+    this.factorsLimit = 50;
+    this.fetchFactors();
+  }
+
+  onFactorScroll(e: Event) {
+    const el = e.target as HTMLElement;
+    if (!el) return;
+    const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 24;
+    if (nearBottom && !this.factorsLoading) {
+      this.factorsLimit += 50;
+      this.fetchFactors(true);
+    }
+  }
+
+  private fetchFactors(append: boolean = false) {
+    this.factorsLoading = true;
+    const params: any = { searchKey: this.searchFactor || '', limit: this.factorsLimit };
+    this.api.get('Common/GetICDCodesBySearch', params).subscribe({
+      next: (res: any) => {
+        const items: any[] = Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : []);
+        const labels = items.map(it => this.icdLabel(it)).filter((s: any) => typeof s === 'string' && s.length > 0);
+        this.factorsOptions = append ? Array.from(new Set([...(this.factorsOptions || []), ...labels])) : labels;
+        this.factorsLoading = false;
+      },
+      error: () => {
+        this.factorsLoading = false;
+      }
+    });
   }
 
   initializeForm() {
@@ -116,6 +144,46 @@ export class MedicalHistoryBasicComponent implements OnInit {
     const selectEl = event.target as HTMLSelectElement;
     const selected = Array.from(selectEl.selectedOptions).map(o => o.value).filter(v => v !== '');
     this.previousIllnesses.setValue(selected);
+  }
+
+  onIllnessSearchChange(q: string) {
+    this.searchIllness = q || '';
+    this.illnessesLimit = 50;
+    this.fetchIllnesses();
+  }
+
+  onIllnessScroll(e: Event) {
+    const el = e.target as HTMLElement;
+    if (!el) return;
+    const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 24;
+    if (nearBottom && !this.illnessesLoading) {
+      this.illnessesLimit += 50;
+      this.fetchIllnesses(true);
+    }
+  }
+
+  private fetchIllnesses(append: boolean = false) {
+    this.illnessesLoading = true;
+    const params: any = { searchKey: this.searchIllness || '', limit: this.illnessesLimit };
+    this.api.get('Common/GetICDCodesBySearch', params).subscribe({
+      next: (res: any) => {
+        const items: any[] = Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : []);
+        const labels = items.map(it => this.icdLabel(it)).filter((s: any) => typeof s === 'string' && s.length > 0);
+        this.illnessesOptions = append ? Array.from(new Set([...(this.illnessesOptions || []), ...labels])) : labels;
+        this.illnessesLoading = false;
+      },
+      error: () => {
+        this.illnessesLoading = false;
+      }
+    });
+  }
+
+  private icdLabel(it: any): string {
+    if (typeof it === 'string') return it;
+    const code = it?.icdCode || it?.ICDCode || it?.code || '';
+    const descShort = it?.descriptionShort || it?.ICDName || it?.name || it?.description || it?.term || it?.icdName || '';
+    const label = [code, descShort].filter(Boolean).join(' | ');
+    return label || (descShort || code || '');
   }
 
   get selectedIllnesses(): string[] {

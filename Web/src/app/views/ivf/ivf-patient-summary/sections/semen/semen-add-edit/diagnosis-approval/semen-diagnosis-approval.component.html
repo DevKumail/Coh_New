@@ -7,12 +7,31 @@
           <div class="mt-2">
             <div class="mb-2">
               <label class="form-label">Diagnosis</label>
-              <select class="form-select" formControlName="diagnosis">
-                <option>Not specified</option>
-                <option>Azoospermia</option>
-                <option>Asthenozoospermia</option>
-                <option>Oligozoospermia</option>
-              </select>
+              <div class="dropdown w-100">
+                <button class="form-select text-start dropdown-toggle d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="text-truncate">
+                    <span *ngIf="getSelectedDiagnosisCodes().length === 0" class="text-muted">Select diagnosis...</span>
+                    <span *ngIf="getSelectedDiagnosisCodes().length > 0">{{ getSelectedDiagnosisCodes().join(', ') }}</span>
+                  </span>
+                  <i class="bi bi-caret-down-fill ms-2"></i>
+                </button>
+                <ul class="dropdown-menu w-100" data-bs-auto-close="outside">
+                  <li class="px-2 py-1 sticky-top bg-white" style="z-index: 10;">
+                    <input type="text" class="form-control form-control-sm" placeholder="Search..." [ngModel]="searchDiagnosis" (ngModelChange)="onDiagnosisSearchChange($event)" [ngModelOptions]="{standalone: true}">
+                  </li>
+                  <li><hr class="dropdown-divider m-0"></li>
+                  <li>
+                    <div style="max-height: 260px; overflow: auto;" (scroll)="onDiagnosisScroll($event)">
+                      <div *ngFor="let opt of diagnosisOptions" class="px-2 py-1">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" [checked]="isDiagnosisSelected(opt)" (click)="$event.stopPropagation()" (change)="toggleDiagnosis(opt)">
+                          <label class="form-check-label" (click)="$event.preventDefault(); $event.stopPropagation(); toggleDiagnosis(opt)">{{ opt }}</label>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
             </div>
             <div class="mb-2">
               <div class="form-label">Finding</div>
