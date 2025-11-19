@@ -11,7 +11,7 @@ import Tooltip from 'bootstrap/js/dist/tooltip';
   styleUrls: ['./ivf-side-menu.component.scss']
 })
 export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges {
-  @Input() selected: string = 'demographic';
+  @Input() selected: string = 'medical-history';
   @Input() collapsed: boolean = false;
   @Output() select = new EventEmitter<string>();
   @ViewChildren('menuLink') links!: QueryList<ElementRef<HTMLElement>>;
@@ -20,15 +20,13 @@ export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges
 
   // Match patient-summary structure: main menu + optional orders section
   mainItems = [
-    { id: 'demographic', label: 'Demographic', icon: 'tablerUsers' },
+    // { id: 'demographic', label: 'Demographic', icon: 'tablerUsers' },
     { id: 'medical-history', label: 'Fertility History', icon: 'tablerNotes' },
     { id: 'social-history', label: 'Social History', icon: 'tablerNotes' },
     { id: 'family-history', label: 'Family History', icon: 'tablerNotes' },
     { id: 'pathology-results', label: 'Pathology results', icon: 'tablerSearch' },
     { id: 'lab-orders', label: 'Lab orders', icon: 'tablerSearch' },
     { id: 'semen-analysis', label: 'Semen Analysis', icon: 'tablerSearch' },
-    { id: 'billing', label: 'Billing', icon: 'tablerReceipt' },
-    { id: 'message', label: 'Message', icon: 'tablerMessage2' },
     { id: 'cycle', label: 'Cycle', icon: 'tablerActivity' }
   ];
 

@@ -5,16 +5,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { IvfSideMenuComponent } from './ivf-side-menu/ivf-side-menu.component';
-import { IvfPsDemographicComponent } from './sections/demographic/ivf-ps-demographic.component';
-import { IvfPsMedicalHistoryComponent } from './sections/medical-history/ivf-ps-medical-history.component';
-import { IvfPsPathologyResultsComponent } from './sections/lab-diagnostics/ivf-ps-pathology-results.component';
-import { IvfPsLabOrdersComponent } from './sections/lab-diagnostics/ivf-ps-lab-orders.component';
-import { IvfPsSemenAnalysisComponent } from './sections/lab-diagnostics/ivf-ps-semen-analysis.component';
-import { SemenListComponent } from './sections/semen/semen-list/semen-list.component';
-import { IvfPsBillingComponent } from './sections/billing/ivf-ps-billing.component';
-import { IvfPsMessageComponent } from './sections/message/ivf-ps-message.component';
-import { IvfPsCycleComponent } from './sections/cycle/ivf-ps-cycle.component';
-import { IvfPsSwitchPartnerComponent } from './sections/switch-partner/ivf-ps-switch-partner.component';
+import { MedicalHistoryComponent } from './male-sections/medical-history/medical-history.component';
+import { IvfPsPathologyResultsComponent } from './male-sections/lab-diagnostics/ivf-ps-pathology-results.component';
+import { IvfPsLabOrdersComponent } from './male-sections/lab-diagnostics/ivf-ps-lab-orders.component';
+import { IvfPsSemenAnalysisComponent } from './male-sections/lab-diagnostics/ivf-ps-semen-analysis.component';
+import { SemenListComponent } from './male-sections/semen/semen-list/semen-list.component';
+import { IvfPsCycleComponent } from './male-sections/cycle/ivf-ps-cycle.component';
+import { IvfPsSwitchPartnerComponent } from './male-sections/switch-partner/ivf-ps-switch-partner.component';
 import { AdvanceSearchModalComponent } from '@/app/layouts/components/topbar/components/advance-search-modal/advance-search-modal.component';
 import { ModalTriggerService } from '@core/services/modal-trigger.service';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
@@ -32,13 +29,10 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
     ReactiveFormsModule,
     NgIcon,
     IvfSideMenuComponent,
-    IvfPsDemographicComponent,
-    IvfPsMedicalHistoryComponent,
+    MedicalHistoryComponent,
     IvfPsPathologyResultsComponent,
     IvfPsLabOrdersComponent,
     SemenListComponent,
-    IvfPsBillingComponent,
-    IvfPsMessageComponent,
     IvfPsCycleComponent,
     IvfPsSwitchPartnerComponent,
     AdvanceSearchModalComponent,
@@ -50,7 +44,7 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 })
 export class IvfPatientSummaryComponent implements OnInit {
   leftCollapsed = false;
-  selectedId: string = 'demographic';
+  selectedId: string = 'medical-history';
   offset = 120; // px: used in CSS var --patient-summary-offset
   isCoupleLink: boolean = false;
   isivfstart: boolean = false;
