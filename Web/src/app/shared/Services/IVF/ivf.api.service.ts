@@ -47,6 +47,10 @@ export class IVFApiService {
     });
   }
 
+  getFertilityHistoryById(ivfMaleFHId: number): Observable<any> {
+    return this.api.get('IVFFertilityHistory/GetFertilityHistoryById', { IVFMaleFHId: ivfMaleFHId });
+  }
+
   getNotifyRoles(): Observable<any> {
     return this.api.get('IVFLabOrders/notify-roles');
   }

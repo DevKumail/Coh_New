@@ -60,6 +60,7 @@ export class MedicalHistoryComponent {
   @ViewChild(MedicalHistoryBasicComponent) basicTab?: MedicalHistoryBasicComponent;
   @ViewChild(MedicalHistoryGeneralComponent) generalTab?: MedicalHistoryGeneralComponent;
   @ViewChild(MedicalHistoryGeneticsComponent) geneticsTab?: MedicalHistoryGeneticsComponent;
+  @ViewChild(MedicalHistoryTesticlesComponent) testiclesTab?: MedicalHistoryTesticlesComponent;
 
   constructor(
     private fb: FormBuilder,
@@ -74,6 +75,136 @@ export class MedicalHistoryComponent {
     this.getAlldropdown();
     // Load list by default
     this.loadFertilityHistory();
+  }
+
+  openEditById(ivfMaleFHId: number) {
+    this.isCreateUpdate = true;
+    this.showAdd = true;
+    this.ivfservice.getFertilityHistoryById(ivfMaleFHId).subscribe({
+      next: (res: any) => {
+        const fh = res?.fertilityHistory || res;
+        // Wait a tick to ensure child views are created
+        setTimeout(() => this.patchFertilityHistory(fh), 0);
+      }
+    });
+  }
+
+  private patchFertilityHistory(fh: any) {
+    if (!fh) return;
+    // Basic tab
+    const b = fh;
+    const basicPatch: any = {
+      date: b?.date ? b.date.substring(0, 10) : '',
+      attendingClinician: b?.providerId ?? '',
+      adiposity: b?.adiposityCategoryId ?? '',
+      generallyHealthy: b?.generallyHealthyCategoryId ?? '',
+      longTermMedication: b?.longTermMedication ?? '',
+      pregnanciesAchieved: b?.noOfPregnanciesAchieved ?? 0,
+      chromosomeAnalysis: b?.chromosomeAnalysisCategoryId ?? '',
+      cftrCarrier: b?.cftrCarrierCategoryId ?? ''
+    };
+    this.basicTab?.basicForm?.patchValue?.(basicPatch);
+    // Semen analyses
+    const list = Array.isArray(b?.semenAnalyses) ? b.semenAnalyses : [];
+    const arr = this.basicTab?.analyses;
+    if (arr) {
+      while (arr.length > 0) arr.removeAt(0);
+      list.forEach((it: any) => {
+        arr.push((this.basicTab as any)['createAnalysisGroup']());
+      });
+      list.forEach((it: any, i: number) => {
+        arr.at(i).patchValue({
+          date: it?.date ? it.date.substring(0, 10) : '',
+          id: it?.id ?? '',
+          motile: it?.motileNo ?? '',
+          collectionMethod: it?.collectionMethod ?? '',
+          concentrationNative: it?.concentrationNative ?? '',
+          concentrationAfterPrep: it?.concentrationAfterPrep ?? '',
+          overallMotilityNative: it?.overallMotilityNative ?? '',
+          overallMotilityAfterPrep: it?.overallMotilityPrep ?? '',
+          progressiveMotilityNative: it?.progressiveMotilityNativ ?? '',
+          progressiveMotilityAfterPrep: it?.progressiveMotilityPrep ?? '',
+          normalFormsNative: it?.normalFormsNative ?? '',
+          normalFormsAfterPrep: it?.normalFormsPrep ?? ''
+        });
+      });
+    }
+
+    // General tab
+    const g = fh?.general || {};
+    const ill = g?.illness || {};
+    const fp = g?.furtherPlanning || {};
+    const pt = g?.performedTreatment || {};
+    const generalPatch: any = {
+      hasChildren: !!g?.hasChildren,
+      girls: g?.girls ?? 0,
+      boys: g?.boys ?? 0,
+      andrologicalDiagnosisPerformed: !!g?.andrologicalDiagnosisPerformed,
+      andrologicalDiagnosisDate: g?.date ? g.date.substring(0, 10) : '',
+      infertileSince: g?.infertileSince ?? '',
+      infertilityType: g?.infertilityTypeCategoryId ?? '',
+      idiopathic: !!ill?.idiopathic,
+      idiopathicSelections: Array.isArray(ill?.idiopathicIds) ? ill.idiopathicIds : [],
+      mumpsAfterPuberty: !!ill?.mumpsAfterPuberty,
+      endocrinopathies: ill?.endocrinopathiesCategoryId ?? '',
+      previousTumor: ill?.previousTumorCategoryId ?? '',
+      hepatitis: !!ill?.hepatitis,
+      hepatitisDetail: ill?.hepatitisDetails ?? '',
+      existingAllergies: !!ill?.existingAllergies,
+      existingAllergiesDetail: ill?.existingAllergiesDetails ?? '',
+      chronicIllnesses: ill?.chronicIllnesses ?? '',
+      otherDiseases: ill?.otherDiseases ?? '',
+      semenAnalysis: !!fp?.semenAnalysis,
+      morphologicalExamination: !!fp?.morphologicalExamination,
+      serologicalExamination: !!fp?.serologicalExamination,
+      andrologicalUrologicalConsultation: !!fp?.andrologicalUrologicalConsultation,
+      dnaFragmentation: !!fp?.dnaFragmentation,
+      spermFreezing: !!fp?.spermFreezing,
+      alreadyTreated: !!pt?.alreadyTreated,
+      treatmentNote: pt?.notes ?? ''
+    };
+    this.generalTab?.generalForm?.patchValue?.(generalPatch);
+
+    // Genetics tab
+    const ge = fh?.genetics || {};
+    if (this.geneticsTab?.geneticsForm) {
+      this.geneticsTab.geneticsForm.patchValue({
+        genes: ge?.genetics ?? '',
+        inheritance: ge?.categoryIdInheritance ?? ''
+      });
+      this.geneticsTab.editorContent = ge?.medicalOpinion ?? '';
+    }
+
+    // Testicles & Seminal tract
+    const t = fh?.testiclesAndSem || null;
+    if (t && this.testiclesTab?.testiclesForm) {
+      this.testiclesTab.testiclesForm.patchValue({
+        primaryHypogonadotropy: !!t?.primaryHypogonadotropy,
+        secondaryHypogonadotropy: !!t?.secondaryHypogonadotropy,
+        retractileTestes: !!t?.retractileTestes,
+        categoryIdTesticle: t?.categoryIdTesticle ?? 0,
+        categoryIdKryptorchidism: t?.categoryIdKryptorchidism ?? 0,
+        categoryIdOrchitis: t?.categoryIdOrchitis ?? 0,
+        testicleVolumeLeft: t?.testicleVolumeLeft ?? '',
+        testicleVolumeRight: t?.testicleVolumeRight ?? '',
+        varicocele: !!t?.varicocele,
+        operatedVaricocele: !!t?.operatedVaricocele,
+        categoryIdInstrumentalVaricocele: t?.categoryIdInstrumentalVaricocele ?? 0,
+        categoryIdClinicalVaricocele: t?.categoryIdClinicalVaricocele ?? 0,
+        obstipationOfSpermaticDuct: !!t?.obstipationOfSpermaticDuct,
+        categoryIdProximalSeminalTract: t?.categoryIdProximalSeminalTract ?? 0,
+        categoryIdDistalSeminalTract: t?.categoryIdDistalSeminalTract ?? 0,
+        categoryIdEtiologicalDiagnosis: t?.categoryIdEtiologicalDiagnosis ?? 0,
+        note: t?.note ?? '',
+        infections: {
+          urethritis: !!t?.infections?.urethritis,
+          prostatitis: !!t?.infections?.prostatitis,
+          epididymitis: !!t?.infections?.epididymitis,
+          categoryIdPrevInfections: t?.infections?.categoryIdPrevInfections ?? 0,
+          categoryIdDiagnosisOfInfection: t?.infections?.categoryIdDiagnosisOfInfection ?? 0,
+        }
+      });
+    }
   }
 
   openAdd(){
@@ -159,6 +290,7 @@ export class MedicalHistoryComponent {
   onSave() {
     const basic = this.basicTab?.basicForm?.getRawValue?.() || {};
     const general = this.generalTab?.generalForm?.getRawValue?.() || {};
+    const testiclesRaw = this.testiclesTab?.getRawValue?.() || {};
 
     const getNameById = (key: string, id: number | string | null | undefined): string | null => {
       if (id == null || id === '') return null;
@@ -259,12 +391,70 @@ export class MedicalHistoryComponent {
     const geneticsRaw = this.geneticsTab?.geneticsForm?.getRawValue?.() || {};
     const geneticsSection = {
       ivfMaleFHGeneticsId: null,
-      ivfMaleFHId: MainId || 0,
+      ivfMaleFHId:  0,
       genetics: geneticsRaw?.genes || '',
       categoryIdInheritance: Number(geneticsRaw?.inheritance) || 0,
       medicalOpinion: this.geneticsTab?.editorContent || ''
     };
     const hasGeneticsData = (geneticsSection.medicalOpinion || '').trim().length > 0 || geneticsSection.categoryIdInheritance > 0 || (geneticsSection.genetics || '').trim().length > 0;
+
+    // Testicles & Seminal tract section
+    const testiclesSection = {
+      ivfMaleFHTesticlesAndSemId: 0,
+      ivfMaleFHId: 0,
+      primaryHypogonadotropy: !!testiclesRaw?.primaryHypogonadotropy,
+      secondaryHypogonadotropy: !!testiclesRaw?.secondaryHypogonadotropy,
+      retractileTestes: !!testiclesRaw?.retractileTestes,
+      categoryIdTesticle: Number(testiclesRaw?.categoryIdTesticle) || 0,
+      categoryIdKryptorchidism: Number(testiclesRaw?.categoryIdKryptorchidism) || 0,
+      categoryIdOrchitis: Number(testiclesRaw?.categoryIdOrchitis) || 0,
+      testicleVolumeLeft: testiclesRaw?.testicleVolumeLeft || '',
+      testicleVolumeRight: testiclesRaw?.testicleVolumeRight || '',
+      varicocele: !!testiclesRaw?.varicocele,
+      operatedVaricocele: !!testiclesRaw?.operatedVaricocele,
+      categoryIdInstrumentalVaricocele: Number(testiclesRaw?.categoryIdInstrumentalVaricocele) || 0,
+      categoryIdClinicalVaricocele: Number(testiclesRaw?.categoryIdClinicalVaricocele) || 0,
+      obstipationOfSpermaticDuct: !!testiclesRaw?.obstipationOfSpermaticDuct,
+      categoryIdProximalSeminalTract: Number(testiclesRaw?.categoryIdProximalSeminalTract) || 0,
+      categoryIdDistalSeminalTract: Number(testiclesRaw?.categoryIdDistalSeminalTract) || 0,
+      categoryIdEtiologicalDiagnosis: Number(testiclesRaw?.categoryIdEtiologicalDiagnosis) || 0,
+      inflammation: !!testiclesRaw?.inflammation,
+      note: testiclesRaw?.note || '',
+      infections: {
+        ivfMaleFHInfectionsId: 0,
+        ivfMaleFHTesticlesAndSemId: 0,
+        urethritis: !!testiclesRaw?.infections?.urethritis,
+        prostatitis: !!testiclesRaw?.infections?.prostatitis,
+        epididymitis: !!testiclesRaw?.infections?.epididymitis,
+        categoryIdPrevInfections: Number(testiclesRaw?.infections?.categoryIdPrevInfections) || 0,
+        categoryIdDiagnosisOfInfection: Number(testiclesRaw?.infections?.categoryIdDiagnosisOfInfection) || 0,
+      }
+    };
+    const hasTesticlesData = (
+      !!testiclesSection.primaryHypogonadotropy ||
+      !!testiclesSection.secondaryHypogonadotropy ||
+      !!testiclesSection.retractileTestes ||
+      (testiclesSection.categoryIdTesticle ?? 0) > 0 ||
+      (testiclesSection.categoryIdKryptorchidism ?? 0) > 0 ||
+      (testiclesSection.categoryIdOrchitis ?? 0) > 0 ||
+      (testiclesSection.testicleVolumeLeft || '').trim().length > 0 ||
+      (testiclesSection.testicleVolumeRight || '').trim().length > 0 ||
+      !!testiclesSection.varicocele ||
+      !!testiclesSection.operatedVaricocele ||
+      (testiclesSection.categoryIdInstrumentalVaricocele ?? 0) > 0 ||
+      (testiclesSection.categoryIdClinicalVaricocele ?? 0) > 0 ||
+      !!testiclesSection.obstipationOfSpermaticDuct ||
+      (testiclesSection.categoryIdProximalSeminalTract ?? 0) > 0 ||
+      (testiclesSection.categoryIdDistalSeminalTract ?? 0) > 0 ||
+      (testiclesSection.categoryIdEtiologicalDiagnosis ?? 0) > 0 ||
+      !!testiclesSection.inflammation ||
+      (testiclesSection.note || '').trim().length > 0 ||
+      !!testiclesSection.infections.urethritis ||
+      !!testiclesSection.infections.prostatitis ||
+      !!testiclesSection.infections.epididymitis ||
+      (testiclesSection.infections.categoryIdPrevInfections ?? 0) > 0 ||
+      (testiclesSection.infections.categoryIdDiagnosisOfInfection ?? 0) > 0
+    );
 
     const payload: any = {
       ivfMaleFHId: 0,
@@ -279,7 +469,7 @@ export class MedicalHistoryComponent {
       cFTRCarrierCategoryId: Number(basic?.cftrCarrier) || 0,
       general: hasGeneralData ? generalSection : {},
       genetics: hasGeneticsData ? geneticsSection : {},
-      testiclesAndSem: {},
+      testiclesAndSem: hasTesticlesData ? testiclesSection : {},
       impairmentFactors: [],
       prevIllnesses: [],
       semenAnalyses: (this.basicTab?.analyses?.controls || []).map((ctrl: any) => {
