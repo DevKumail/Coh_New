@@ -165,6 +165,21 @@ export class MedicalHistoryComponent {
       });
     }
 
+    // Preselect Basic multi-selects (codes only)
+    try {
+      const factorCodes = Array.isArray(fh?.impairmentFactors)
+        ? fh.impairmentFactors.map((x: any) => x?.impairmentFactor).filter((v: any) => !!v)
+        : [];
+      this.basicTab?.fertilityFactors?.setValue?.(factorCodes);
+    } catch {}
+
+    try {
+      const illnessCodes = Array.isArray(fh?.prevIllnesses)
+        ? fh.prevIllnesses.map((x: any) => x?.prevIllness).filter((v: any) => !!v)
+        : [];
+      this.basicTab?.previousIllnesses?.setValue?.(illnessCodes);
+    } catch {}
+
     // General tab
     const g = fh?.general || {};
     const ill = g?.illness || {};
@@ -571,6 +586,29 @@ export class MedicalHistoryComponent {
         };
       })
     };
+
+    // Populate impairmentFactors and prevIllnesses with only ICD codes from Basic tab
+    try {
+      const factorCodes: string[] = (this.basicTab?.fertilityFactors?.value || []) as string[];
+      payload.impairmentFactors = Array.isArray(factorCodes)
+        ? factorCodes.filter(x => !!x).map(code => ({
+            ivfMaleFHImpairmentFactorId: 0,
+            ivfMaleFHId: this.currentFhId ?? 0,
+            impairmentFactor: String(code)
+          }))
+        : [];
+    } catch {}
+
+    try {
+      const illnessCodes: string[] = (this.basicTab?.previousIllnesses?.value || []) as string[];
+      payload.prevIllnesses = Array.isArray(illnessCodes)
+        ? illnessCodes.filter(x => !!x).map(code => ({
+            ivfMaleFHPrevIllnessId: 0,
+            ivfMaleFHId: this.currentFhId ?? 0,
+            prevIllness: String(code)
+          }))
+        : [];
+    } catch {}
 
     this.ivfservice.createOrUpdateMaleFertilityHistory(payload).subscribe({
       next: (res) => {

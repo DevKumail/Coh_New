@@ -16,15 +16,12 @@
 
         <div [ngClass]="{ 'col-10': !leftCollapsed, 'col': leftCollapsed }" class="fixed-height">
           <ng-container *ngIf="(patientBannerService.patientData$ | async) as pdata; else emptyState">
-            <app-ivf-ps-demographic *ngIf="selectedId==='demographic'"></app-ivf-ps-demographic>
-            <app-ivf-ps-medical-history *ngIf="selectedId==='medical-history'"></app-ivf-ps-medical-history>
+            <app-medical-history *ngIf="selectedId==='medical-history'"></app-medical-history>
             <app-social-history *ngIf="selectedId==='social-history'"></app-social-history>
             <app-family-history *ngIf="selectedId==='family-history'"></app-family-history>
             <app-ivf-ps-pathology-results *ngIf="selectedId==='pathology-results'"></app-ivf-ps-pathology-results>
             <app-ivf-ps-lab-orders *ngIf="selectedId==='lab-orders'"></app-ivf-ps-lab-orders>
             <app-semen-list *ngIf="selectedId==='semen-analysis'"></app-semen-list>
-            <app-ivf-ps-billing *ngIf="selectedId==='billing'"></app-ivf-ps-billing>
-            <app-ivf-ps-message *ngIf="selectedId==='message'"></app-ivf-ps-message>
             <app-ivf-ps-cycle *ngIf="selectedId==='cycle'"></app-ivf-ps-cycle>
             <app-ivf-ps-switch-partner *ngIf="selectedId==='switch-partner'"></app-ivf-ps-switch-partner>
           </ng-container>
