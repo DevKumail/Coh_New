@@ -1,20 +1,18 @@
-﻿using HMIS.Infrastructure.Helpers;
-using HMIS.Core.Entities;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using System.Data;
+﻿using HMIS.Application.DTOs.CommonDTOs;
 using HMIS.Application.Implementations;
-using HMIS.Application.DTOs.CommonDTOs;
+using HMIS.Infrastructure.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using HMIS.Application.DTOs.SpLocalModel;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Data;
 using static HMIS.Application.DTOs.SpLocalModel.DemographicListModel;
 
 namespace HMIS.Web.Controllers.Common
 {
     [Route("api/[controller]")]
     [ApiController]
-     [Authorize]
+    [Authorize]
 
     public class CommonController : BaseApiController
     {
@@ -55,7 +53,7 @@ namespace HMIS.Web.Controllers.Common
 
         [HttpPost("GetCoverageAndRegPatient")]
         public async Task<IActionResult> GetCoverageAndRegPatient([FromBody] FilterDemographicList req)
-            {
+        {
             //table1 = REG_GetUniquePatientOld
 
             //MRNo = MRNo == "-1" ? string.Empty : MRNo;
@@ -68,10 +66,10 @@ namespace HMIS.Web.Controllers.Common
             }
 
             return BadRequest(result);
-        } 
+        }
         [HttpGet("GetRegPatientList")]
         public async Task<IActionResult> GetRegPatientList()
-            {
+        {
             DataSet result = await _commonManager.GetRegPatientDB();
 
 
@@ -91,7 +89,7 @@ namespace HMIS.Web.Controllers.Common
             try
             {
                 var result = await _commonManager.GetAppointmentDetailsByMRNo(PageNumber, PageSize, MRNo);
-                if (!result.isSuccess) 
+                if (!result.isSuccess)
                 {
                     return NoContent();
                 }
@@ -182,6 +180,22 @@ namespace HMIS.Web.Controllers.Common
 
             return BadRequest(result);
         }
+
+        [HttpGet("GetICDCodesBySearch")]
+        public async Task<IActionResult> GetICD9CodesBySearch([FromQuery] string? searchKey, [FromQuery] int limit = 50)
+        {
+            try
+            {
+
+                var result = await _commonManager.GetICDCodesBySearchKey(searchKey, limit);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
 
     }
 }
