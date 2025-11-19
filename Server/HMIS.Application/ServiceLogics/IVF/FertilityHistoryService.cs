@@ -598,7 +598,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                     {
                         foreach (var factorDto in dto.ImpairmentFactors)
                         {
-                            if (!factorDto.ImpairmentFactorCategoryId.HasValue)
+                            if (factorDto.ImpairmentFactor == null)
                             {
                                 // skip invalid items lacking required category id
                                 continue;
@@ -606,7 +606,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                             var impairmentFactor = new IvfmaleFhimpairmentFactor
                             {
                                 IvfmaleFhid = maleFHId,
-                                ImpairmentFactorCategoryId = factorDto.ImpairmentFactorCategoryId.Value
+                                ImpairmentFactor = factorDto.ImpairmentFactor
                             };
 
                             _context.IvfmaleFhimpairmentFactor.Add(impairmentFactor);
@@ -625,7 +625,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                     {
                         foreach (var prevIllnessDto in dto.PrevIllnesses)
                         {
-                            if (!prevIllnessDto.PrevIllnessCategoryId.HasValue)
+                            if (prevIllnessDto.PrevIllness == null)
                             {
                                 continue;
                             }
@@ -633,7 +633,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                             var prevIllness = new IvfmaleFhprevIllness
                             {
                                 IvfmaleFhid = maleFHId,
-                                PrevIllnessCategoryId = prevIllnessDto.PrevIllnessCategoryId.Value
+                                PrevIllness = prevIllnessDto.PrevIllness
                             };
 
                             _context.IvfmaleFhprevIllness.Add(prevIllness);

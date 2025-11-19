@@ -16,7 +16,8 @@ public partial class IvfmaleFhimpairmentFactor
     [Column("IVFMaleFHId")]
     public int IvfmaleFhid { get; set; }
 
-    public long ImpairmentFactorCategoryId { get; set; }
+    [StringLength(11)]
+    public string ImpairmentFactor { get; set; } = null!;
 
     public int? CreatedBy { get; set; }
 
@@ -29,6 +30,10 @@ public partial class IvfmaleFhimpairmentFactor
     public int? DeletedBy { get; set; }
 
     public bool IsDeleted { get; set; }
+
+    [ForeignKey("ImpairmentFactor")]
+    [InverseProperty("IvfmaleFhimpairmentFactor")]
+    public virtual BlmasterIcd9cm ImpairmentFactorNavigation { get; set; } = null!;
 
     [ForeignKey("IvfmaleFhid")]
     [InverseProperty("IvfmaleFhimpairmentFactor")]
