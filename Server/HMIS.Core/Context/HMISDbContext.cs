@@ -1138,7 +1138,7 @@ public partial class HMISDbContext : DbContext
 
             entity.HasOne(d => d.PatencyRightCategory).WithMany(p => p.IvffemaleFertilityHistoryPatencyRightCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration4");
 
-            entity.HasOne(d => d.PreillnessesCategory).WithMany(p => p.IvffemaleFertilityHistoryPreillnessesCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration7");
+            entity.HasOne(d => d.PrevIllnessesCategory).WithMany(p => p.IvffemaleFertilityHistoryPrevIllnessesCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration7");
         });
 
         modelBuilder.Entity<Ivfmain>(entity =>

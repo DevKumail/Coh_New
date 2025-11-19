@@ -14,9 +14,6 @@ public partial class IvfmaleSemenSampleDiagnosis
 
     public int SampleId { get; set; }
 
-    [Column("ICDCodeId")]
-    public int IcdcodeId { get; set; }
-
     [StringLength(50)]
     public string Finding { get; set; } = null!;
 
@@ -29,6 +26,10 @@ public partial class IvfmaleSemenSampleDiagnosis
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    [Column("ICDCode")]
+    [StringLength(100)]
+    public string? Icdcode { get; set; }
 
     [ForeignKey("SampleId")]
     [InverseProperty("IvfmaleSemenSampleDiagnosis")]

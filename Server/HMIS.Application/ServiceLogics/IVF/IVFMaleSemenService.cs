@@ -296,7 +296,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                 var diagnosis = new IvfmaleSemenSampleDiagnosis
                 {
                     SampleId = sampleId,
-                    IcdcodeId = diagDto.ICDCodeId,
+                    Icdcode = diagDto.ICDCode,
                     Finding = diagDto.Finding,
                     Notes = diagDto.Notes,
                     CreatedBy = diagDto.CreatedBy,

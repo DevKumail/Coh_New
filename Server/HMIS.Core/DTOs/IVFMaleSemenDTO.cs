@@ -120,7 +120,7 @@
     {
         public int DiagnosisId { get; set; }
         public int SampleId { get; set; }
-        public int ICDCodeId { get; set; }
+        public string ICDCode { get; set; }
         public string Finding { get; set; }
         public string Notes { get; set; }
         public int? CreatedBy { get; set; }
