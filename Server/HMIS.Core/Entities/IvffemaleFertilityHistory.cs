@@ -21,15 +21,17 @@ public partial class IvffemaleFertilityHistory
 
     public int? ProviderId { get; set; }
 
-    public int? UnprotectedIntercourseYear { get; set; }
+    [StringLength(15)]
+    public string? UnprotectedIntercourseYear { get; set; }
 
-    public int? UnprotectedIntercourseMonth { get; set; }
+    [StringLength(15)]
+    public string? UnprotectedIntercourseMonth { get; set; }
 
     public long? AdiposityCategoryId { get; set; }
 
     public long? GenerallyHealthyCategoryId { get; set; }
 
-    [StringLength(50)]
+    [StringLength(100)]
     public string? LongTermMedication { get; set; }
 
     public long? ChromosomeAnalysisCategoryId { get; set; }
@@ -52,9 +54,9 @@ public partial class IvffemaleFertilityHistory
 
     public bool? HasAlternativePretreatments { get; set; }
 
-    public long? PreillnessesCategoryId { get; set; }
+    public long? PrevIllnessesCategoryId { get; set; }
 
-    public long? FertilityImpairmentFactorsCategoryId { get; set; }
+    public long? SterilityFactorsCategoryId { get; set; }
 
     public string? Comment { get; set; }
 
@@ -74,10 +76,6 @@ public partial class IvffemaleFertilityHistory
     [InverseProperty("IvffemaleFertilityHistoryFallopianTubeYearCategory")]
     public virtual DropdownConfiguration? FallopianTubeYearCategory { get; set; }
 
-    [ForeignKey("FertilityImpairmentFactorsCategoryId")]
-    [InverseProperty("IvffemaleFertilityHistoryFertilityImpairmentFactorsCategory")]
-    public virtual DropdownConfiguration? FertilityImpairmentFactorsCategory { get; set; }
-
     [ForeignKey("GenerallyHealthyCategoryId")]
     [InverseProperty("IvffemaleFertilityHistoryGenerallyHealthyCategory")]
     public virtual DropdownConfiguration? GenerallyHealthyCategory { get; set; }
@@ -94,7 +92,11 @@ public partial class IvffemaleFertilityHistory
     [InverseProperty("IvffemaleFertilityHistoryPatencyRightCategory")]
     public virtual DropdownConfiguration? PatencyRightCategory { get; set; }
 
-    [ForeignKey("PreillnessesCategoryId")]
-    [InverseProperty("IvffemaleFertilityHistoryPreillnessesCategory")]
-    public virtual DropdownConfiguration? PreillnessesCategory { get; set; }
+    [ForeignKey("PrevIllnessesCategoryId")]
+    [InverseProperty("IvffemaleFertilityHistoryPrevIllnessesCategory")]
+    public virtual DropdownConfiguration? PrevIllnessesCategory { get; set; }
+
+    [ForeignKey("SterilityFactorsCategoryId")]
+    [InverseProperty("IvffemaleFertilityHistorySterilityFactorsCategory")]
+    public virtual DropdownConfiguration? SterilityFactorsCategory { get; set; }
 }

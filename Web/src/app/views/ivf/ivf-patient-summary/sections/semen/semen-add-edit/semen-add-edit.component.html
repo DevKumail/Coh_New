@@ -104,12 +104,15 @@
       
       <!-- Analysed by -->
       <div class="col-lg-3 col-md-4 col-sm-6">
-        <label class="form-label">Analysed by</label>
-          <select class="form-select" formControlName="analysedBy">
-          <option value="">Select Provider</option>
-          <option *ngFor="let p of hrEmployees" [value]="p.providerId">{{ p.name }}</option>
-        </select>
-      </div>
+  <label class="form-label">Analysed by</label>
+  <select class="form-select" formControlName="analysedBy">
+    <option value="">Select Provider</option>
+    <ng-container *ngFor="let p of hrEmployees">
+      <option *ngIf="p.employeeType === 15 || p.employeeType === 16" 
+              [value]="p.providerId">{{ p.name }}</option>
+    </ng-container>
+  </select>
+</div>
       
       <!-- Appearance (dropdown) -->
       <div class="col-lg-3 col-md-4 col-sm-6">

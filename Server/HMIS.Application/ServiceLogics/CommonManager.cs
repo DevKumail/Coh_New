@@ -1,15 +1,9 @@
 ﻿using Dapper;
-using DocumentFormat.OpenXml.Wordprocessing;
+using HMIS.Application.DTOs.CommonDTOs;
 using HMIS.Application.Implementations;
 using HMIS.Core.Context;
-using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static HMIS.Application.DTOs.SpLocalModel.DemographicListModel;
 
 namespace HMIS.Application.ServiceLogics
@@ -62,7 +56,7 @@ namespace HMIS.Application.ServiceLogics
             {
                 return new DataSet();
             }
-        } 
+        }
         public async Task<DataSet> GetCoverageAndRegPatientDB(FilterDemographicList req)
         {
             try
@@ -90,7 +84,7 @@ namespace HMIS.Application.ServiceLogics
             {
                 return new DataSet();
             }
-        }     
+        }
         public async Task<DataSet> GetRegPatientDB()
         {
             try
@@ -114,7 +108,7 @@ namespace HMIS.Application.ServiceLogics
         }
 
 
-        public async Task<(bool isSuccess, string message,DataSet ds)> GetAppointmentDetailsByMRNo(int? PageNumber, int? PageSize, string MRNo)
+        public async Task<(bool isSuccess, string message, DataSet ds)> GetAppointmentDetailsByMRNo(int? PageNumber, int? PageSize, string MRNo)
         {
             try
             {
@@ -135,7 +129,7 @@ namespace HMIS.Application.ServiceLogics
                     throw new Exception("No data found");
                 }
 
-                return (true , "" , ds);
+                return (true, "", ds);
             }
             catch (Exception ex)
             {
@@ -194,7 +188,37 @@ namespace HMIS.Application.ServiceLogics
             }
         }
 
+        public async Task<List<ICDItemDto>> GetICDCodesBySearchKey(string searchKey, int limit = 50)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@SearchKey", string.IsNullOrEmpty(searchKey) ? null : searchKey, DbType.String);
+                param.Add("@Limit", limit, DbType.Int32);
 
+                var result = await DapperHelper.GetDataSetBySPWithParams("BL_GetICDCodesBySearch", param);
 
+                if (result.Tables.Count > 0 && result.Tables[0].Rows.Count > 0)
+                {
+                    return result.Tables[0].AsEnumerable().Select(row => new ICDItemDto
+                    {
+                        ICDCode = row.Field<string>("ICD9Code") ?? string.Empty,
+                        DescriptionShort = row.Field<string>("DescriptionShort") ?? string.Empty,
+                        DescriptionLong = row.Field<string>("DescriptionLong") ?? string.Empty,
+                        Type = row.Field<string>("Type") ?? string.Empty,
+                        Status = row.Field<string>("Status") ?? string.Empty
+                    }).ToList();
+                }
+
+                return new List<ICDItemDto>();
+            }
+            catch (Exception ex)
+            {
+                // Log error here
+                throw new Exception($"Error searching ICD9 codes: {ex.Message}");
+            }
+        }
     }
+
 }
+

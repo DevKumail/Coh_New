@@ -36,9 +36,6 @@ public partial class DropdownConfiguration
     [InverseProperty("FallopianTubeYearCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryFallopianTubeYearCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
-    [InverseProperty("FertilityImpairmentFactorsCategory")]
-    public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryFertilityImpairmentFactorsCategory { get; set; } = new List<IvffemaleFertilityHistory>();
-
     [InverseProperty("GenerallyHealthyCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryGenerallyHealthyCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
@@ -48,8 +45,11 @@ public partial class DropdownConfiguration
     [InverseProperty("PatencyRightCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryPatencyRightCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
-    [InverseProperty("PreillnessesCategory")]
-    public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryPreillnessesCategory { get; set; } = new List<IvffemaleFertilityHistory>();
+    [InverseProperty("PrevIllnessesCategory")]
+    public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryPrevIllnessesCategory { get; set; } = new List<IvffemaleFertilityHistory>();
+
+    [InverseProperty("SterilityFactorsCategory")]
+    public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistorySterilityFactorsCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
     [InverseProperty("AdiposityCategory")]
     public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistoryAdiposityCategory { get; set; } = new List<IvfmaleFertilityHistory>();

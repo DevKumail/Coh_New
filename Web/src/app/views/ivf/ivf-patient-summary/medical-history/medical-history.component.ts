@@ -15,6 +15,7 @@ import { Page } from '@/app/shared/enum/dropdown.enum';
 import { NgIconComponent } from '@ng-icons/core';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import Swal from 'sweetalert2';
+import { LoaderService } from '@core/services/loader.service';
 
 @Component({
   selector: 'app-medical-history',
@@ -57,6 +58,18 @@ export class MedicalHistoryComponent {
   // Toggle between list (default) and form
   showForm = false;
 
+  // Track current record and section IDs when editing
+  private currentFhId: number | null = null;
+  private currentIds: {
+    generalId?: number | null,
+    illnessId?: number | null,
+    furtherPlanningId?: number | null,
+    performedTreatmentId?: number | null,
+    geneticsId?: number | null,
+    testiclesId?: number | null,
+    infectionsId?: number | null,
+  } = {};
+
   @ViewChild(MedicalHistoryBasicComponent) basicTab?: MedicalHistoryBasicComponent;
   @ViewChild(MedicalHistoryGeneralComponent) generalTab?: MedicalHistoryGeneralComponent;
   @ViewChild(MedicalHistoryGeneticsComponent) geneticsTab?: MedicalHistoryGeneticsComponent;
@@ -66,7 +79,8 @@ export class MedicalHistoryComponent {
     private fb: FormBuilder,
     private ivfservice: IVFApiService,
     private patientBannerService: PatientBannerService,
-    private sharedservice: SharedService
+    private sharedservice: SharedService,
+    private loderService: LoaderService
 
   ) {}
 
@@ -80,17 +94,38 @@ export class MedicalHistoryComponent {
   openEditById(ivfMaleFHId: number) {
     this.isCreateUpdate = true;
     this.showAdd = true;
+    this.loderService.show();
     this.ivfservice.getFertilityHistoryById(ivfMaleFHId).subscribe({
       next: (res: any) => {
         const fh = res?.fertilityHistory || res;
         // Wait a tick to ensure child views are created
         setTimeout(() => this.patchFertilityHistory(fh), 0);
+        this.loderService.hide();
+      },
+      error: () => {
+        this.loderService.hide();
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Something went wrong',
+        });
       }
     });
   }
 
   private patchFertilityHistory(fh: any) {
     if (!fh) return;
+    // capture IDs for update
+    this.currentFhId = fh?.ivfMaleFHId ?? null;
+    this.currentIds = {
+      generalId: fh?.general?.ivfMaleFHGeneralId ?? null,
+      illnessId: fh?.general?.illness?.ivfMaleFHIllnessId ?? null,
+      furtherPlanningId: fh?.general?.furtherPlanning?.ivfMaleFHFurtherPlanningId ?? null,
+      performedTreatmentId: fh?.general?.performedTreatment?.ivfMaleFHPerformedTreatmentId ?? null,
+      geneticsId: fh?.genetics?.ivfMaleFHGeneticsId ?? null,
+      testiclesId: fh?.testiclesAndSem?.ivfMaleFHTesticlesAndSemId ?? null,
+      infectionsId: fh?.testiclesAndSem?.infections?.ivfMaleFHInfectionsId ?? null,
+    };
     // Basic tab
     const b = fh;
     const basicPatch: any = {
@@ -135,6 +170,11 @@ export class MedicalHistoryComponent {
     const ill = g?.illness || {};
     const fp = g?.furtherPlanning || {};
     const pt = g?.performedTreatment || {};
+    const years = Array.isArray(pt?.treatmentYears) ? pt.treatmentYears : [];
+    const getYear = (type: string, num: number) => {
+      const it = years.find((y: any) => (y?.treatmentType === type) && (Number(y?.treatmentNumber) === num));
+      return it?.year ?? '';
+    };
     const generalPatch: any = {
       hasChildren: !!g?.hasChildren,
       girls: g?.girls ?? 0,
@@ -154,6 +194,16 @@ export class MedicalHistoryComponent {
       existingAllergiesDetail: ill?.existingAllergiesDetails ?? '',
       chronicIllnesses: ill?.chronicIllnesses ?? '',
       otherDiseases: ill?.otherDiseases ?? '',
+      // Performed treatment years (edit)
+      antiInflammatory1: getYear('Anti-inflammatory', 1),
+      antiInflammatory2: getYear('Anti-inflammatory', 2),
+      antiInflammatory3: getYear('Anti-inflammatory', 3),
+      hormonalTreatment1: getYear('Hormonal treatment', 1),
+      hormonalTreatment2: getYear('Hormonal treatment', 2),
+      hormonalTreatment3: getYear('Hormonal treatment', 3),
+      surgicalTreatment1: getYear('Surgical treatment', 1),
+      surgicalTreatment2: getYear('Surgical treatment', 2),
+      surgicalTreatment3: getYear('Surgical treatment', 3),
       semenAnalysis: !!fp?.semenAnalysis,
       morphologicalExamination: !!fp?.morphologicalExamination,
       serologicalExamination: !!fp?.serologicalExamination,
@@ -224,8 +274,8 @@ export class MedicalHistoryComponent {
     if(ivfMainId){
       this.ivfservice.getMaleFertilityHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
           next: (res: any) => {
-            this.historyRows = res?.fertilityHistory|| [];
-            this.totalrecord = res?.total || res?.count || (Array.isArray(this.historyRows) ? this.historyRows.length : 0);
+            this.historyRows = res?.fertilityHistory?.data|| [];
+            this.totalrecord = res?.fertilityHistory?.totalCount || 0;
             this.isLoadingHistory = false;
           },
           error: () => {
@@ -241,8 +291,8 @@ export class MedicalHistoryComponent {
   }
 
   onPageChanged(event: any) {
-    this.PaginationInfo.Page = event.page;
-    this.loadFertilityHistory();
+    this.PaginationInfo.Page = event;
+    this.loadFertilityHistory(event);
   }
 
   // Store payload from service for dynamic labels/options
@@ -288,6 +338,7 @@ export class MedicalHistoryComponent {
   }
 
   onSave() {
+    this.loderService.show();
     const basic = this.basicTab?.basicForm?.getRawValue?.() || {};
     const general = this.generalTab?.generalForm?.getRawValue?.() || {};
     const testiclesRaw = this.testiclesTab?.getRawValue?.() || {};
@@ -317,18 +368,18 @@ export class MedicalHistoryComponent {
     });
     // Build General section object
     const generalSection = {
-      ivfMaleFHGeneralId: 0,
-      ivfMaleFHId: 0,
+      ivfMaleFHGeneralId: this.currentIds.generalId ?? 0,
+      ivfMaleFHId: this.currentFhId ?? 0,
       hasChildren: !!general?.hasChildren,
       girls: general?.girls ?? 0,
       boys: general?.boys ?? 0,
       infertileSince: general?.infertileSince || '',
       andrologicalDiagnosisPerformed: !!general?.andrologicalDiagnosisPerformed,
       date: general?.andrologicalDiagnosisDate ? new Date(general.andrologicalDiagnosisDate).toISOString() : null,
-      infertilityType: toNumOrNull(general?.infertilityType),
+      infertilityTypeCategoryId: toNumOrNull(general?.infertilityType),
       furtherPlanning: {
-        ivfMaleFHFurtherPlanningId: 0,
-        ivfMaleFHGeneralId: 0,
+        ivfMaleFHFurtherPlanningId: this.currentIds.furtherPlanningId ?? 0,
+        ivfMaleFHGeneralId: this.currentIds.generalId ?? 0,
         semenAnalysis: !!general?.semenAnalysis,
         morphologicalExamination: !!general?.morphologicalExamination,
         serologicalExamination: !!general?.serologicalExamination,
@@ -337,12 +388,12 @@ export class MedicalHistoryComponent {
         spermFreezing: !!general?.spermFreezing
       },
       illness: {
-        ivfMaleFHIllnessId: 0,
-        ivfMaleFHGeneralId: 0,
+        ivfMaleFHIllnessId: this.currentIds.illnessId ?? 0,
+        ivfMaleFHGeneralId: this.currentIds.generalId ?? 0,
         idiopathic: !!general?.idiopathic,
         mumpsAfterPuberty: !!general?.mumpsAfterPuberty,
-        endocrinopathies: toNumOrNull(general?.endocrinopathies),
-        previousTumor: toNumOrNull(general?.previousTumor),
+        endocrinopathiesCategoryId: toNumOrNull(general?.endocrinopathies),
+        previousTumorCategoryId: toNumOrNull(general?.previousTumor),
         hepatitis: !!general?.hepatitis,
         hepatitisDetails: general?.hepatitisDetail || '',
         existingAllergies: !!general?.existingAllergies,
@@ -352,19 +403,47 @@ export class MedicalHistoryComponent {
         idiopathicIds: Array.isArray(general?.idiopathicSelections) ? general.idiopathicSelections : []
       },
       performedTreatment: {
-        ivfMaleFHPerformedTreatmentId: 0,
-        ivfMaleFHGeneralId: 0,
+        ivfMaleFHPerformedTreatmentId: this.currentIds.performedTreatmentId ?? 0,
+        ivfMaleFHGeneralId: this.currentIds.generalId ?? 0,
         alreadyTreated: !!general?.alreadyTreated,
         notes: general?.treatmentNote || '',
         treatmentYears: [] as any[]
       }
     };
 
+    // Build treatmentYears from three groups if fields are present; year comes from the corresponding input value
+    const treatmentYears: any[] = [];
+    const pushIf = (treatmentType: string, number: number, val: any) => {
+      const year = (val ?? '').toString().trim();
+      if (year.length > 0) {
+        treatmentYears.push({
+          ivfMaleFHPerformedTreatmentYearId: 0,
+          ivfMaleFHPerformedTreatmentId: this.currentIds.performedTreatmentId ?? 0,
+          treatmentType,
+          treatmentNumber: number,
+          year
+        });
+      }
+    };
+    // Anti-inflammatory 1..3
+    pushIf('Anti-inflammatory', 1, (general as any)?.antiInflammatory1);
+    pushIf('Anti-inflammatory', 2, (general as any)?.antiInflammatory2);
+    pushIf('Anti-inflammatory', 3, (general as any)?.antiInflammatory3);
+    // Hormonal treatment 1..3
+    pushIf('Hormonal treatment', 1, (general as any)?.hormonalTreatment1);
+    pushIf('Hormonal treatment', 2, (general as any)?.hormonalTreatment2);
+    pushIf('Hormonal treatment', 3, (general as any)?.hormonalTreatment3);
+    // Surgical treatment 1..3
+    pushIf('Surgical treatment', 1, (general as any)?.surgicalTreatment1);
+    pushIf('Surgical treatment', 2, (general as any)?.surgicalTreatment2);
+    pushIf('Surgical treatment', 3, (general as any)?.surgicalTreatment3);
+    generalSection.performedTreatment.treatmentYears = treatmentYears;
+
         // Genetics section from reactive form + editor
     const geneticsRaw = this.geneticsTab?.geneticsForm?.getRawValue?.() || {};
     const geneticsSection = {
-      ivfMaleFHGeneticsId: null,
-      ivfMaleFHId:  0,
+      ivfMaleFHGeneticsId: this.currentIds.geneticsId ?? null,
+      ivfMaleFHId:  this.currentFhId ?? 0,
       genetics: geneticsRaw?.genes || '',
       categoryIdInheritance: Number(geneticsRaw?.inheritance) || null,
       medicalOpinion: geneticsRaw?.editorContent ||  ''
@@ -380,7 +459,7 @@ export class MedicalHistoryComponent {
       (generalSection.infertileSince || '').trim().length > 0 ||
       !!generalSection.andrologicalDiagnosisPerformed ||
       !!general?.andrologicalDiagnosisDate ||
-      (generalSection.infertilityType ?? 0) > 0 ||
+      (generalSection.infertilityTypeCategoryId ?? 0) > 0 ||
       !!generalSection.furtherPlanning.semenAnalysis ||
       !!generalSection.furtherPlanning.morphologicalExamination ||
       !!generalSection.furtherPlanning.serologicalExamination ||
@@ -389,8 +468,8 @@ export class MedicalHistoryComponent {
       !!generalSection.furtherPlanning.spermFreezing ||
       !!generalSection.illness.idiopathic ||
       !!generalSection.illness.mumpsAfterPuberty ||
-      (generalSection.illness.endocrinopathies ?? 0) > 0 ||
-      (generalSection.illness.previousTumor ?? 0) > 0 ||
+      (generalSection.illness.endocrinopathiesCategoryId ?? 0) > 0 ||
+      (generalSection.illness.previousTumorCategoryId ?? 0) > 0 ||
       !!generalSection.illness.hepatitis ||
       !!generalSection.illness.existingAllergies ||
       (generalSection.illness.chronicIllnesses || '').trim().length > 0 ||
@@ -400,8 +479,8 @@ export class MedicalHistoryComponent {
       (generalSection.performedTreatment.notes || '').trim().length > 0
     );
     const testiclesSection = {
-      ivfMaleFHTesticlesAndSemId: 0,
-      ivfMaleFHId: 0,
+      ivfMaleFHTesticlesAndSemId: this.currentIds.testiclesId ?? 0,
+      ivfMaleFHId: this.currentFhId ?? 0,
       primaryHypogonadotropy: !!testiclesRaw?.primaryHypogonadotropy,
       secondaryHypogonadotropy: !!testiclesRaw?.secondaryHypogonadotropy,
       retractileTestes: !!testiclesRaw?.retractileTestes,
@@ -421,8 +500,8 @@ export class MedicalHistoryComponent {
       inflammation: !!(testiclesRaw?.infections?.urethritis || testiclesRaw?.infections?.prostatitis || testiclesRaw?.infections?.epididymitis),
       note: testiclesRaw?.note || '',
       infections: {
-        ivfMaleFHInfectionsId: 0,
-        ivfMaleFHTesticlesAndSemId: 0,
+        ivfMaleFHInfectionsId: this.currentIds.infectionsId ?? 0,
+        ivfMaleFHTesticlesAndSemId: this.currentIds.testiclesId ?? 0,
         urethritis: !!testiclesRaw?.infections?.urethritis,
         prostatitis: !!testiclesRaw?.infections?.prostatitis,
         epididymitis: !!testiclesRaw?.infections?.epididymitis,
@@ -457,7 +536,7 @@ export class MedicalHistoryComponent {
     );
 
     const payload: any = {
-      ivfMaleFHId: 0,
+      ivfMaleFHId: this.currentFhId ?? 0,
       ivfMainId: MainId || 0,
       date: basic?.date ? new Date(basic.date).toISOString() : null,
       providerId: toNumOrNull(basic?.attendingClinician),
@@ -500,6 +579,7 @@ export class MedicalHistoryComponent {
           title: 'Success',
           text: 'Fertility History saved successfully',
         });
+        this.loderService.hide();
         // Return to list and refresh
         this.isCreateUpdate = false;
         this.showAdd = false;
@@ -511,6 +591,7 @@ export class MedicalHistoryComponent {
           title: 'Error',
           text: 'Failed to save Fertility History',
         });
+        this.loderService.hide();
       }
     });
   }
@@ -521,9 +602,28 @@ export class MedicalHistoryComponent {
     this.activeTabId = 1;
   }
 
-  edit(row: any) {
- 
-  }
 
-  delete(id: any){}
+  delete(id: any){
+    if (!id) return;
+    Swal.fire({
+      title: 'Delete this record?',
+      text: 'This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ivfservice.deleteFertilityHistoryMale(Number(id)).subscribe({
+          next: () => {
+            Swal.fire({ icon: 'success', title: 'Deleted', text: 'Record deleted successfully' });
+            this.loadFertilityHistory(1);
+          },
+          error: () => {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete record' });
+          }
+        });
+      }
+    });
+  }
 }
