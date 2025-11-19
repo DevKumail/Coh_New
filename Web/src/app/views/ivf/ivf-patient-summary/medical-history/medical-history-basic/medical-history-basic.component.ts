@@ -191,16 +191,15 @@ export class MedicalHistoryBasicComponent implements OnInit {
   }
 
   isSelected(value: string): boolean {
-    return this.selectedIllnesses.includes(value);
+    const code = (value || '').split(' | ')[0].trim();
+    return !!code && this.selectedIllnesses.includes(code);
   }
 
   toggleIllness(value: string) {
+    const code = (value || '').split(' | ')[0].trim();
+    if (!code) return;
     const current = new Set(this.selectedIllnesses);
-    if (current.has(value)) {
-      current.delete(value);
-    } else {
-      current.add(value);
-    }
+    if (current.has(code)) current.delete(code); else current.add(code);
     this.previousIllnesses.setValue(Array.from(current));
     this.previousIllnesses.markAsDirty();
     this.previousIllnesses.markAsTouched();
@@ -218,16 +217,15 @@ export class MedicalHistoryBasicComponent implements OnInit {
   }
 
   isFactorSelected(value: string): boolean {
-    return this.selectedFactors.includes(value);
+    const code = (value || '').split(' | ')[0].trim();
+    return !!code && this.selectedFactors.includes(code);
   }
 
   toggleFactor(value: string) {
+    const code = (value || '').split(' | ')[0].trim();
+    if (!code) return;
     const current = new Set(this.selectedFactors);
-    if (current.has(value)) {
-      current.delete(value);
-    } else {
-      current.add(value);
-    }
+    if (current.has(code)) current.delete(code); else current.add(code);
     this.fertilityFactors.setValue(Array.from(current));
     this.fertilityFactors.markAsDirty();
     this.fertilityFactors.markAsTouched();
