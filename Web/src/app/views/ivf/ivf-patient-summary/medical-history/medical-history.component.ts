@@ -15,6 +15,7 @@ import { Page } from '@/app/shared/enum/dropdown.enum';
 import { NgIconComponent } from '@ng-icons/core';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import Swal from 'sweetalert2';
+import { LoaderService } from '@core/services/loader.service';
 
 @Component({
   selector: 'app-medical-history',
@@ -78,7 +79,8 @@ export class MedicalHistoryComponent {
     private fb: FormBuilder,
     private ivfservice: IVFApiService,
     private patientBannerService: PatientBannerService,
-    private sharedservice: SharedService
+    private sharedservice: SharedService,
+    private loderService: LoaderService
 
   ) {}
 
@@ -92,11 +94,21 @@ export class MedicalHistoryComponent {
   openEditById(ivfMaleFHId: number) {
     this.isCreateUpdate = true;
     this.showAdd = true;
+    this.loderService.show();
     this.ivfservice.getFertilityHistoryById(ivfMaleFHId).subscribe({
       next: (res: any) => {
         const fh = res?.fertilityHistory || res;
         // Wait a tick to ensure child views are created
         setTimeout(() => this.patchFertilityHistory(fh), 0);
+        this.loderService.hide();
+      },
+      error: () => {
+        this.loderService.hide();
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Something went wrong',
+        });
       }
     });
   }
@@ -262,8 +274,8 @@ export class MedicalHistoryComponent {
     if(ivfMainId){
       this.ivfservice.getMaleFertilityHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
           next: (res: any) => {
-            this.historyRows = res?.fertilityHistory|| [];
-            this.totalrecord = res?.total || res?.count || (Array.isArray(this.historyRows) ? this.historyRows.length : 0);
+            this.historyRows = res?.fertilityHistory?.data|| [];
+            this.totalrecord = res?.fertilityHistory?.totalCount || 0;
             this.isLoadingHistory = false;
           },
           error: () => {
@@ -279,8 +291,8 @@ export class MedicalHistoryComponent {
   }
 
   onPageChanged(event: any) {
-    this.PaginationInfo.Page = event.page;
-    this.loadFertilityHistory();
+    this.PaginationInfo.Page = event;
+    this.loadFertilityHistory(event);
   }
 
   // Store payload from service for dynamic labels/options
@@ -326,6 +338,7 @@ export class MedicalHistoryComponent {
   }
 
   onSave() {
+    this.loderService.show();
     const basic = this.basicTab?.basicForm?.getRawValue?.() || {};
     const general = this.generalTab?.generalForm?.getRawValue?.() || {};
     const testiclesRaw = this.testiclesTab?.getRawValue?.() || {};
@@ -566,6 +579,7 @@ export class MedicalHistoryComponent {
           title: 'Success',
           text: 'Fertility History saved successfully',
         });
+        this.loderService.hide();
         // Return to list and refresh
         this.isCreateUpdate = false;
         this.showAdd = false;
@@ -577,6 +591,7 @@ export class MedicalHistoryComponent {
           title: 'Error',
           text: 'Failed to save Fertility History',
         });
+        this.loderService.hide();
       }
     });
   }
@@ -587,9 +602,28 @@ export class MedicalHistoryComponent {
     this.activeTabId = 1;
   }
 
-  edit(row: any) {
- 
-  }
 
-  delete(id: any){}
+  delete(id: any){
+    if (!id) return;
+    Swal.fire({
+      title: 'Delete this record?',
+      text: 'This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ivfservice.deleteFertilityHistoryMale(Number(id)).subscribe({
+          next: () => {
+            Swal.fire({ icon: 'success', title: 'Deleted', text: 'Record deleted successfully' });
+            this.loadFertilityHistory(1);
+          },
+          error: () => {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete record' });
+          }
+        });
+      }
+    });
+  }
 }

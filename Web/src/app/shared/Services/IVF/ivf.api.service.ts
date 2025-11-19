@@ -51,8 +51,9 @@ export class IVFApiService {
     return this.api.get('IVFFertilityHistory/GetFertilityHistoryById', { IVFMaleFHId: ivfMaleFHId });
   }
 
-  deleteFertilityHistory(ivfMaleFHId: number): Observable<any> {
-    return this.api.delete(`IVFFertilityHistory/${ivfMaleFHId}`);
+
+  deleteFertilityHistoryMale(ivfMaleFHId: number): Observable<any> {
+    return this.api.delete(`IVFFertilityHistory/DeleteFertilityHistoryMale/${ivfMaleFHId}`);
   }
 
   getNotifyRoles(): Observable<any> {
