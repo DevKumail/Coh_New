@@ -66,7 +66,9 @@ export class IvfPatientSummaryComponent implements OnInit {
 
     this.patientBannerService.patientData$.subscribe(data => {
       if (!data) {
-        this.modalTrigger.openModal('advance-filter-modal', 'ivf-patient-summary');
+        // this.modalTrigger.openModal('advance-filter-modal', 'ivf-patient-summary');
+          this.isCoupleLink = false;
+          this.isivfstart = false;
       } else {
         this.PrimaryPatientData = data.table2[0] || [];
         this.patientBannerService.selectedVisit$.subscribe((visit: any) => {

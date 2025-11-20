@@ -31,8 +31,20 @@ export class MedicalHistoryBasicComponent implements OnInit {
   searchFactor = '';
   private factorsLimit = 50;
   private factorsLoading = false;
+  yearOptions: number[] = [];
+  minMonthYear: string = '';
+  maxMonthYear: string = '';
 
-  constructor(private fb: FormBuilder, private api: ApiService) {}
+  constructor(private fb: FormBuilder, private api: ApiService) {
+    // Generate year options (current year to last 25 years)
+    const currentYear = new Date().getFullYear();
+    this.yearOptions = Array.from({ length: 26 }, (_, i) => currentYear - i);
+    
+    // Set min and max for month input (last 25 years to current month)
+    const currentMonth = new Date().getMonth() + 1; // getMonth() returns 0-11
+    this.minMonthYear = `${currentYear - 25}-01`; // 25 years ago, January
+    this.maxMonthYear = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`; // Current year and month
+  }
 
   ngOnInit() {
     this.initializeForm();

@@ -22,7 +22,7 @@
           <label>Adiposity</label>
           <select class="form-select" formControlName="adiposity">
             <option value="" disabled selected>Select adiposity</option>
-            <option *ngFor="let o of opts('IVFFertilityHistory:Adiposity')" [value]="o.valueId">{{ o.name }}</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:Adioposity')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
 
@@ -30,7 +30,7 @@
           <label>Generally healthy</label>
           <select class="form-select" formControlName="generallyHealthy">
             <option value="" disabled selected>Select option</option>
-            <option *ngFor="let o of opts('IVFFertilityHistory:GenerallyHealthy')" [value]="o.valueId">{{ o.name }}</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:GenerallyHealthy')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
 
@@ -43,7 +43,7 @@
           <label>Chromosome analysis</label>
           <select class="form-select" formControlName="chromosomeAnalysis">
             <option value="" disabled selected>Select analysis</option>
-            <option *ngFor="let o of opts('IVFFertilityHistory:ChromosomeAnalysis')" [value]="o.valueId">{{ o.name }}</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:ChromosomeAnalysis')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
 
@@ -51,20 +51,20 @@
           <label>CFTR carrier</label>
           <select class="form-select" formControlName="cftrCarrier">
             <option value="" disabled selected>Select carrier status</option>
-            <option *ngFor="let o of opts('IVFFertilityHistory:CFTRCarrier')" [value]="o.valueId">{{ o.name }}</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:CFTRCarrier')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
 
         <div class="col-md-3">
           <label>Unprotected intercourse since</label>
-          <input type="month" class="form-control" formControlName="unprotectedMonthYear" placeholder="Enter unprotected intercourse since" />
+          <input type="month" class="form-control" formControlName="unprotectedMonthYear" [min]="minMonthYear" [max]="maxMonthYear" placeholder="Enter unprotected intercourse since" />
         </div>
 
         <div class="col-md-3">
           <label>Patency of the fallopian tube (right)</label>
           <select class="form-select" formControlName="patencyRight">
             <option value="" disabled selected>Select Patency status</option>
-            <option *ngFor="let o of opts('IVFFertilityHistory:CFTRCarrier')" [value]="o.valueId">{{ o.name }}</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:PatencyRight')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
 
@@ -72,7 +72,7 @@
           <label>Patency of the fallopian tube (left)</label>
           <select class="form-select" formControlName="patencyLeft">
             <option value="" disabled selected>Select Patency status</option>
-            <option *ngFor="let o of opts('IVFFertilityHistory:CFTRCarrier')" [value]="o.valueId">{{ o.name }}</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:PatencyLeft')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
 
@@ -80,7 +80,7 @@
           <label>Fallopian tube reviewed (year)</label>
           <select class="form-select" formControlName="fallopianYear">
             <option value="" disabled selected>Select year</option>
-            <option *ngFor="let o of opts('IVFFertilityHistory:CFTRCarrier')" [value]="o.valueId">{{ o.name }}</option>
+            <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
           </select>
         </div>
 

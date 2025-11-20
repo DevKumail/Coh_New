@@ -22,7 +22,7 @@
             <label for="adiposity">Adiposity</label>
             <select class="form-select" id="adiposity" formControlName="adiposity">
               <option value="" disabled selected>Select adiposity</option>
-              <option *ngFor="let o of opts('IVFFertilityHistory:Adiposity')" [value]="o.valueId">{{ o.name }}</option>
+              <option *ngFor="let o of opts('IVFMaleFertilityHistory:Adiposity')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
         </div>
@@ -31,7 +31,7 @@
             <label for="generallyHealthy">Generally healthy</label>
             <select class="form-select" id="generallyHealthy" formControlName="generallyHealthy">
               <option value="" disabled selected>Select option</option>
-              <option *ngFor="let o of opts('IVFFertilityHistory:GenerallyHealthy')" [value]="o.valueId">{{ o.name }}</option>
+              <option *ngFor="let o of opts('IVFMaleFertilityHistory:GenerallyHealthy')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
         </div>
@@ -56,7 +56,7 @@
           <label for="chromosomeAnalysis">Chromosome analysis</label>
           <select class="form-select" id="chromosomeAnalysis" formControlName="chromosomeAnalysis">
             <option value="" disabled selected>Select analysis</option>
-            <option *ngFor="let o of opts('IVFFertilityHistory:ChromosomeAnalysis')" [value]="o.valueId">{{ o.name }}</option>
+            <option *ngFor="let o of opts('IVFMaleFertilityHistory:ChromosomeAnalysis')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
       </div>
@@ -65,7 +65,7 @@
           <label for="cftrCarrier">CFTR carrier</label>
           <select class="form-select" id="cftrCarrier" formControlName="cftrCarrier">
             <option value="" disabled selected>Select carrier status</option>
-            <option *ngFor="let o of opts('IVFFertilityHistory:CFTRCarrier')" [value]="o.valueId">{{ o.name }}</option>
+            <option *ngFor="let o of opts('IVFMaleFertilityHistory:CFTRCarrier')" [value]="o.valueId">{{ o.name }}</option>
           </select>
         </div>
       </div>

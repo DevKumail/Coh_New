@@ -11,7 +11,7 @@
         <label class="form-group">Inheritance</label>
         <select class="form-select" formControlName="inheritance">
           <option value="" disabled selected>Select</option>
-          <option *ngFor="let o of opts('IVFFertilityHistory:Inheritance')" [value]="o.valueId">{{ o.name }}</option>
+          <option *ngFor="let o of opts('IVFMaleFertilityHistory:Inheritance')" [value]="o.valueId">{{ o.name }}</option>
         </select>
       </div>
     </div>
