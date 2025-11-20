@@ -1,7 +1,7 @@
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgIconComponent } from '@ng-icons/core';
@@ -32,8 +32,8 @@ import Swal from 'sweetalert2';
   templateUrl: './female-medical-history-list.component.html',
   styleUrl: './female-medical-history-list.component.scss'
 })
-export class FemaleMedicalHistoryListComponent {
-  @ViewChild(MedicalHistoryBasicComponent) basicComponent!: MedicalHistoryBasicComponent;
+export class FemaleMedicalHistoryListComponent implements AfterViewInit {
+  @ViewChild(MedicalHistoryBasicComponent, { static: false }) basicComponent!: MedicalHistoryBasicComponent;
   
   dropdowns: any = [];
   activeTabId: number = 1;
@@ -52,20 +52,29 @@ export class FemaleMedicalHistoryListComponent {
   currentIvfMainId: number | null = null;
   isEditMode: boolean = false;
   currentEditId: number = 0;
+  pendingEditData: any = null;
 
     constructor(
     private fb: FormBuilder,
     private ivfservice: IVFApiService,
     private patientBannerService: PatientBannerService,
     private sharedservice: SharedService,
-    private loderService: LoaderService
-
+    private loderService: LoaderService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.getAlldropdown();
     // Load list by default
     this.GetAllFemaleMedicalHistory();
+  }
+
+  ngAfterViewInit(): void {
+    // Check if there's pending edit data after view is initialized
+    if (this.pendingEditData && this.basicComponent) {
+      this.basicComponent.populateForm(this.pendingEditData);
+      this.pendingEditData = null;
+    }
   }
 
 
@@ -77,7 +86,6 @@ export class FemaleMedicalHistoryListComponent {
       this.sharedservice.getDropDownValuesByName(Page.IVFFemaleFertilityHistory).subscribe((res: any) => {
         this.AllDropdownValues = res;
         this.getAllDropdown(res);
-        console.log(this.AllDropdownValues);
       })
       this.FillCache();
     }
@@ -215,23 +223,38 @@ export class FemaleMedicalHistoryListComponent {
     this.ivfservice.GetFemaleFertilityHistoryById(id).subscribe({
       next: (response: any) => {
         this.loderService.hide();
+        
+        // Extract data from fertilityHistory object
+        const data = response?.fertilityHistory || response;
+        
         this.isCreateUpdate = true;
         this.showAdd = true;
         this.isEditMode = true;
         this.currentEditId = id;
+        this.pendingEditData = data;
         
-        // Wait for component to be rendered
-        setTimeout(() => {
-          if (this.basicComponent && response) {
-            this.basicComponent.populateForm(response);
-          }
-        }, 100);
+        // Try multiple times with increasing delays
+        this.tryPopulateForm(data, 0);
       },
       error: (error: any) => {
         this.loderService.hide();
         Swal.fire('Error', error?.error?.message || 'Failed to load fertility history', 'error');
       }
     });
+  }
+
+  private tryPopulateForm(data: any, attempt: number): void {
+    const maxAttempts = 5;
+    const delay = 100 * (attempt + 1);
+    
+    setTimeout(() => {
+      if (this.basicComponent && data) {
+        this.basicComponent.populateForm(data);
+        this.pendingEditData = null;
+      } else if (attempt < maxAttempts - 1) {
+        this.tryPopulateForm(data, attempt + 1);
+      }
+    }, delay);
   }
 
   delete(id: any){
@@ -273,8 +296,8 @@ export class FemaleMedicalHistoryListComponent {
         this.ivfservice.GetAllFemaleMedicalHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
           next: (res: any) => {
             this.isLoadingHistory = false;
-            this.ListData = res?.fertilityHistory || [];
-            this.totalrecord = res?.fertilityHistory?.totalrecord || 0;
+            this.ListData = res?.fertilityHistory?.data || [];
+            this.totalrecord = res?.fertilityHistory?.totalCount || 0;
           },
           error: () => {
             this.isLoadingHistory = false;
