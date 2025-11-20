@@ -1178,33 +1178,33 @@ public partial class HMISDbContext : DbContext
                 .HasConstraintName("FK_IVFFemaleFHPrevIllness_BLMasterICD9CM");
         });
 
-        modelBuilder.Entity<IvffemaleTreatmentCycle>(entity =>
-        {
-            entity.HasOne(d => d.CycleFromAmenorrheaCategory).WithMany(p => p.IvffemaleTreatmentCycleCycleFromAmenorrheaCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration1");
+        //modelBuilder.Entity<IvffemaleTreatmentCycle>(entity =>
+        //{
+        //    entity.HasOne(d => d.CycleFromAmenorrheaCategory).WithMany(p => p.IvffemaleTreatmentCycleCycleFromAmenorrheaCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration1");
 
-            entity.HasOne(d => d.IvffemaleFh).WithMany(p => p.IvffemaleTreatmentCycle).HasConstraintName("FK_IVFFemaleTreatmentCycle_IVFFemaleFertilityHistory");
+        //    entity.HasOne(d => d.IvffemaleFh).WithMany(p => p.IvffemaleTreatmentCycle).HasConstraintName("FK_IVFFemaleTreatmentCycle_IVFFemaleFertilityHistory");
 
-            entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvffemaleTreatmentCycle).HasConstraintName("FK_IVFFemaleTreatmentCycle_IVFMaleFertilityHistory");
+        //    entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvffemaleTreatmentCycle).HasConstraintName("FK_IVFFemaleTreatmentCycle_IVFMaleFertilityHistory");
 
-            entity.HasOne(d => d.MainIndicationCategory).WithMany(p => p.IvffemaleTreatmentCycleMainIndicationCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration2");
+        //    entity.HasOne(d => d.MainIndicationCategory).WithMany(p => p.IvffemaleTreatmentCycleMainIndicationCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration2");
 
-            entity.HasOne(d => d.PlannedSpermCollectionCategory).WithMany(p => p.IvffemaleTreatmentCyclePlannedSpermCollectionCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration6");
+        //    entity.HasOne(d => d.PlannedSpermCollectionCategory).WithMany(p => p.IvffemaleTreatmentCyclePlannedSpermCollectionCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration6");
 
-            entity.HasOne(d => d.ProtocolCategory).WithMany(p => p.IvffemaleTreatmentCycleProtocolCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration3");
+        //    entity.HasOne(d => d.ProtocolCategory).WithMany(p => p.IvffemaleTreatmentCycleProtocolCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration3");
 
-            entity.HasOne(d => d.StimulatedExternallyCategory).WithMany(p => p.IvffemaleTreatmentCycleStimulatedExternallyCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration5");
+        //    entity.HasOne(d => d.StimulatedExternallyCategory).WithMany(p => p.IvffemaleTreatmentCycleStimulatedExternallyCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration5");
 
-            entity.HasOne(d => d.StimulationPlannedCategory).WithMany(p => p.IvffemaleTreatmentCycleStimulationPlannedCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration4");
+        //    entity.HasOne(d => d.StimulationPlannedCategory).WithMany(p => p.IvffemaleTreatmentCycleStimulationPlannedCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration4");
 
-            entity.HasOne(d => d.TreatmentTypeCategory).WithMany(p => p.IvffemaleTreatmentCycleTreatmentTypeCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration");
-        });
+        //    entity.HasOne(d => d.TreatmentTypeCategory).WithMany(p => p.IvffemaleTreatmentCycleTreatmentTypeCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration");
+        //});
 
-        modelBuilder.Entity<IvffemaleTreatmentTypes>(entity =>
-        {
-            entity.HasOne(d => d.IvffemaleTreatmentCycle).WithMany(p => p.IvffemaleTreatmentTypes).HasConstraintName("FK_IVFFemaleTreatmentTypes_IVFFemaleTreatmentCycle");
+        //modelBuilder.Entity<IvffemaleTreatmentTypes>(entity =>
+        //{
+        //    entity.HasOne(d => d.IvffemaleTreatmentCycle).WithMany(p => p.IvffemaleTreatmentTypes).HasConstraintName("FK_IVFFemaleTreatmentTypes_IVFFemaleTreatmentCycle");
 
-            entity.HasOne(d => d.TreatmentCategory).WithMany(p => p.IvffemaleTreatmentTypes).HasConstraintName("FK_IVFFemaleTreatmentTypes_DropdownConfiguration");
-        });
+        //    entity.HasOne(d => d.TreatmentCategory).WithMany(p => p.IvffemaleTreatmentTypes).HasConstraintName("FK_IVFFemaleTreatmentTypes_DropdownConfiguration");
+        //});
 
         modelBuilder.Entity<Ivfmain>(entity =>
         {
