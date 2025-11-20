@@ -1,4 +1,4 @@
-<div class="basic-form" [formGroup]="basicForm">
+<div class="basic-form" *ngIf="basicForm" [formGroup]="basicForm">
 <div class="row">
 
   <!-- ========== TOP SIDE START ========== -->
@@ -222,6 +222,7 @@
       formControlName="editorContent"
       [modules]="quillModules"
       format="html"
+      placeholder="Enter medical opinion or notes..."
       [styles]="{height: '300px'}">
     </quill-editor>
   </div>

@@ -1,10 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators, FormControl } from '@angular/forms';
 import { ApiService } from '@/app/core/services/api.service';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
-import { QuillModule } from 'ngx-quill';
+import { QuillModule, QuillEditorComponent } from 'ngx-quill';
 
 @Component({
   selector: 'app-medical-history-basic',
@@ -20,6 +20,8 @@ import { QuillModule } from 'ngx-quill';
   styleUrls: ['./medical-history-basic.component.scss']
 })
 export class MedicalHistoryBasicComponent implements OnInit {
+  @ViewChild(QuillEditorComponent, { static: false }) quillEditor!: QuillEditorComponent;
+  
   basicForm!: FormGroup;
   @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
   @Input() hrEmployees: Array<{ providerId: number | string; name: string }> = [];
@@ -88,6 +90,7 @@ export class MedicalHistoryBasicComponent implements OnInit {
 
   initializeForm() {
     this.basicForm = this.fb.group({
+      ivfFemaleFHId: [0],
       date: [''],
       attendingClinician: [''],
       weight: [''],
@@ -112,7 +115,8 @@ export class MedicalHistoryBasicComponent implements OnInit {
       previousOperative: [''],
       ovarianStimulations: [''],
       IVFandICSI: [''],
-      alternativePretreatments: [false]
+      alternativePretreatments: [false],
+      editorContent: ['']
     });
   }
 
@@ -275,5 +279,110 @@ export class MedicalHistoryBasicComponent implements OnInit {
     const q = this.searchFactor.trim().toLowerCase();
     if (q.length <= 3) return this.factorsOptions;
     return this.factorsOptions.filter(o => o.toLowerCase().includes(q));
+  }
+
+  // Public method to get form data for parent component
+  getFormData(): any {
+    // Ensure editor content is synced to form
+    if (this.quillEditor && this.quillEditor.quillEditor) {
+      const editorHtml = this.quillEditor.quillEditor.root.innerHTML;
+      this.basicForm.patchValue({ editorContent: editorHtml });
+    }
+    
+    return this.basicForm.getRawValue();
+  }
+
+  // Public method to populate form with data (for edit)
+  populateForm(data: any): void {
+    if (!data) return;
+
+    // Parse unprotected intercourse year and month
+    let unprotectedMonthYear = '';
+    if (data.unprotectedIntercourseYear && data.unprotectedIntercourseMonth) {
+      const year = data.unprotectedIntercourseYear;
+      const month = String(data.unprotectedIntercourseMonth).padStart(2, '0');
+      unprotectedMonthYear = `${year}-${month}`;
+    }
+
+    // Parse fallopian year
+    const fallopianYear = data.fallopianTubeYear ? String(data.fallopianTubeYear) : '';
+
+    // Extract impairment factors
+    const sterilityFactors = data.impairmentFactors?.map((f: any) => f.impairmentFactor).filter((f: any) => f) || [];
+
+    // Extract previous illnesses
+    const previousIllnesses = data.prevIllnesses?.map((i: any) => i.prevIllness).filter((i: any) => i) || [];
+
+    // Handle null for IVF ICSI count
+    const ivfIcsiCount = data.ivfIcsiTreatmentsCount !== null && data.ivfIcsiTreatmentsCount !== undefined ? data.ivfIcsiTreatmentsCount : 0;
+
+    this.basicForm.patchValue({
+      ivfFemaleFHId: data.ivfFemaleFHId || 0,
+      date: data.date ? new Date(data.date).toISOString().split('T')[0] : '',
+      attendingClinician: data.providerId || '',
+      adiposity: data.adiposityCategoryId || '',
+      generallyHealthy: data.generallyHealthyCategoryId || '',
+      longTermMedication: data.longTermMedication || '',
+      chromosomeAnalysis: data.chromosomeAnalysisCategoryId || '',
+      cftrCarrier: data.cftrcarrierCategoryId || '',
+      patencyRight: data.patencyRightCategoryId || '',
+      patencyLeft: data.patencyLeftCategoryId || '',
+      fallopianYear: fallopianYear,
+      unprotectedMonthYear: unprotectedMonthYear,
+      previousOperative: data.prevOperativeTreatmentsCount ?? 0,
+      ovarianStimulations: data.ovarianStimulationsCount ?? 0,
+      IVFandICSI: ivfIcsiCount,
+      alternativePretreatments: data.hasAlternativePretreatments ?? false
+    });
+
+    // Set multi-select values
+    this.sterilityFactors.setValue(sterilityFactors);
+    this.previousIllnesses.setValue(previousIllnesses);
+
+    // Set Quill editor content
+    this.setQuillContent(data.comment, 0);
+  }
+
+  // Helper method to set Quill editor content with retry
+  private setQuillContent(content: string, attempt: number): void {
+    if (!content) return;
+    
+    const maxAttempts = 8;
+    const delay = 150 * (attempt + 1);
+    
+    setTimeout(() => {
+      if (this.quillEditor && this.quillEditor.quillEditor) {
+        try {
+          const delta = this.quillEditor.quillEditor.clipboard.convert({ html: content });
+          this.quillEditor.quillEditor.setContents(delta, 'silent');
+        } catch (error) {
+          try {
+            this.quillEditor.quillEditor.root.innerHTML = content;
+          } catch (e) {
+            // Silent fail
+          }
+        }
+      } else if (attempt < maxAttempts - 1) {
+        this.setQuillContent(content, attempt + 1);
+      }
+    }, delay);
+  }
+
+  // Public method to reset form
+  resetForm(): void {
+    this.basicForm.reset({
+      ivfFemaleFHId: 0,
+      alternativePretreatments: false,
+      previousOperative: 0,
+      ovarianStimulations: 0,
+      IVFandICSI: 0
+    });
+    this.sterilityFactors.setValue([]);
+    this.previousIllnesses.setValue([]);
+    
+    // Clear Quill editor
+    if (this.quillEditor && this.quillEditor.quillEditor) {
+      this.quillEditor.quillEditor.setText('');
+    }
   }
 }

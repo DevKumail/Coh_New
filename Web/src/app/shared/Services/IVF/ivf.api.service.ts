@@ -97,4 +97,16 @@ export class IVFApiService {
       rowsPerPage,
     });
   }
+
+  CreateUpdateFemaleFertilityHistory(payload: any): Observable<any> {
+    return this.api.post('IVFFertilityHistory/CreateUpdateFemaleFertilityHistory', payload);
+  }
+
+  GetFemaleFertilityHistoryById(ivfFemaleFHId: number): Observable<any> {
+    return this.api.get('IVFFertilityHistory/GetFemaleFertilityHistoryById', { IVFFemaleFHId: ivfFemaleFHId });
+  }
+
+  DeleteFemaleFertilityHistory(ivfFemaleFHId: number): Observable<any> {
+    return this.api.delete(`IVFFertilityHistory/DeleteFemaleFertilityHistory/${ivfFemaleFHId}`);
+  }
 }

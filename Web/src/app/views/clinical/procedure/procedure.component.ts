@@ -418,11 +418,11 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
 
         const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo;
         if (!mrNo) {
-            Swal.fire(
-                'Validation Error',
-                'MrNo is a required field. Please load a patient.',
-                'warning',
-            );
+            // Swal.fire(
+            //     'Validation Error',
+            //     'MrNo is a required field. Please load a patient.',
+            //     'warning',
+            // );
             return;
         }
 
@@ -480,11 +480,11 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
         }
 
         if (!this.SearchPatientData?.table2?.[0]?.mrNo) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Validation Error',
-                text: 'MrNo is a required field. Please load a patient.',
-            });
+            // Swal.fire({
+            //     icon: 'warning',
+            //     title: 'Validation Error',
+            //     text: 'MrNo is a required field. Please load a patient.',
+            // });
             return;
         }
 
