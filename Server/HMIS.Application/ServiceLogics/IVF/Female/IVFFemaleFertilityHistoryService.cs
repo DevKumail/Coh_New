@@ -39,7 +39,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Female
             {
                 // Call stored procedure that returns JSON (FOR JSON PATH)
                 var jsonResult = await conn.ExecuteScalarAsync<string>(
-                    "IVF_GetFemaleFertilityHistoryById",
+                    "IVF_GetFemaleFertilityHistory",
                     new { IVFFemaleFHId },
                     commandType: CommandType.StoredProcedure
                 );
@@ -59,7 +59,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Female
 
                     // If a female DTO exists, deserialize to it; otherwise fallback to JsonDocument
                     // Try to deserialize to a generic JsonDocument to be safe
-                    var doc = JsonSerializer.Deserialize<JsonElement>(jsonResult, options);
+                    var doc = JsonSerializer.Deserialize<IVFFemaleFertilityHistoryDto>(jsonResult, options);
                     return (true, doc);
                 }
                 catch
@@ -86,12 +86,16 @@ namespace HMIS.Application.ServiceLogics.IVF.Female
             using var conn = _dapper.CreateConnection();
             try
             {
-                var data = (await conn.QueryAsync(
+                using (var multi = await conn.QueryMultipleAsync(
                     "IVF_GetAllFemaleFertilityHistory",
                     new { PageNumber = page, PageSize = rows, IVFMainId = ivfMainIdInt },
-                    commandType: CommandType.StoredProcedure)).ToList();
+                    commandType: CommandType.StoredProcedure))
+                {
+                    var data = (await multi.ReadAsync()).ToList();   // First resultset (rows)
+                    var totalCount = await multi.ReadFirstAsync<int>(); // Second resultset (count)
 
-                return (true, data);
+                    return (true, new { data, totalCount });
+                }
             }
             catch
             {
