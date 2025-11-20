@@ -15,10 +15,75 @@ public partial class IvffemaleTreatmentCycle
 
     public long? TreatmentTypeCategoryId { get; set; }
 
+    public bool? OnlyInternalCycle { get; set; }
+
+    [Column("DateofLMP", TypeName = "datetime")]
+    public DateTime? DateofLmp { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? TherapyStartDate { get; set; }
+
+    public long? CycleFromAmenorrheaCategoryId { get; set; }
+
+    public long? MainIndicationCategoryId { get; set; }
+
+    public long? ProtocolCategoryId { get; set; }
+
+    public long? StimulationPlannedCategoryId { get; set; }
+
+    public long? StimulatedExternallyCategoryId { get; set; }
+
+    [StringLength(50)]
+    public string? LongTermMedication { get; set; }
+
+    public int? PlannedNo { get; set; }
+
+    public long? PlannedSpermCollectionCategoryId { get; set; }
+
+    [Column("IVFMaleFHId")]
+    public int? IvfmaleFhid { get; set; }
+
+    [Column("IVFFemaleFHId")]
+    public int? IvffemaleFhid { get; set; }
+
+    public string? CycleNote { get; set; }
+
+    [ForeignKey("CycleFromAmenorrheaCategoryId")]
+    [InverseProperty("IvffemaleTreatmentCycleCycleFromAmenorrheaCategory")]
+    public virtual DropdownConfiguration? CycleFromAmenorrheaCategory { get; set; }
+
+    [ForeignKey("IvffemaleFhid")]
     [InverseProperty("IvffemaleTreatmentCycle")]
-    public virtual ICollection<Table1> Table1 { get; set; } = new List<Table1>();
+    public virtual IvffemaleFertilityHistory? IvffemaleFh { get; set; }
+
+    [InverseProperty("IvffemaleTreatmentCycle")]
+    public virtual ICollection<IvffemaleTreatmentTypes> IvffemaleTreatmentTypes { get; set; } = new List<IvffemaleTreatmentTypes>();
+
+    [ForeignKey("IvfmaleFhid")]
+    [InverseProperty("IvffemaleTreatmentCycle")]
+    public virtual IvfmaleFertilityHistory? IvfmaleFh { get; set; }
+
+    [ForeignKey("MainIndicationCategoryId")]
+    [InverseProperty("IvffemaleTreatmentCycleMainIndicationCategory")]
+    public virtual DropdownConfiguration? MainIndicationCategory { get; set; }
+
+    [ForeignKey("PlannedSpermCollectionCategoryId")]
+    [InverseProperty("IvffemaleTreatmentCyclePlannedSpermCollectionCategory")]
+    public virtual DropdownConfiguration? PlannedSpermCollectionCategory { get; set; }
+
+    [ForeignKey("ProtocolCategoryId")]
+    [InverseProperty("IvffemaleTreatmentCycleProtocolCategory")]
+    public virtual DropdownConfiguration? ProtocolCategory { get; set; }
+
+    [ForeignKey("StimulatedExternallyCategoryId")]
+    [InverseProperty("IvffemaleTreatmentCycleStimulatedExternallyCategory")]
+    public virtual DropdownConfiguration? StimulatedExternallyCategory { get; set; }
+
+    [ForeignKey("StimulationPlannedCategoryId")]
+    [InverseProperty("IvffemaleTreatmentCycleStimulationPlannedCategory")]
+    public virtual DropdownConfiguration? StimulationPlannedCategory { get; set; }
 
     [ForeignKey("TreatmentTypeCategoryId")]
-    [InverseProperty("IvffemaleTreatmentCycle")]
+    [InverseProperty("IvffemaleTreatmentCycleTreatmentTypeCategory")]
     public virtual DropdownConfiguration? TreatmentTypeCategory { get; set; }
 }

@@ -43,7 +43,8 @@ public partial class IvffemaleFertilityHistory
 
     public long? PatencyLeftCategoryId { get; set; }
 
-    public long? FallopianTubeYearCategoryId { get; set; }
+    [StringLength(10)]
+    public string? FallopianTubeYear { get; set; }
 
     public int? PrevOperativeTreatmentsCount { get; set; }
 
@@ -80,10 +81,6 @@ public partial class IvffemaleFertilityHistory
     [InverseProperty("IvffemaleFertilityHistoryChromosomeAnalysisCategory")]
     public virtual DropdownConfiguration? ChromosomeAnalysisCategory { get; set; }
 
-    [ForeignKey("FallopianTubeYearCategoryId")]
-    [InverseProperty("IvffemaleFertilityHistoryFallopianTubeYearCategory")]
-    public virtual DropdownConfiguration? FallopianTubeYearCategory { get; set; }
-
     [ForeignKey("GenerallyHealthyCategoryId")]
     [InverseProperty("IvffemaleFertilityHistoryGenerallyHealthyCategory")]
     public virtual DropdownConfiguration? GenerallyHealthyCategory { get; set; }
@@ -93,6 +90,9 @@ public partial class IvffemaleFertilityHistory
 
     [InverseProperty("IvffemaleFh")]
     public virtual ICollection<IvffemaleFhprevIllness> IvffemaleFhprevIllness { get; set; } = new List<IvffemaleFhprevIllness>();
+
+    [InverseProperty("IvffemaleFh")]
+    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycle { get; set; } = new List<IvffemaleTreatmentCycle>();
 
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvffemaleFertilityHistory")]

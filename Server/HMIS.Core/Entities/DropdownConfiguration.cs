@@ -33,9 +33,6 @@ public partial class DropdownConfiguration
     [InverseProperty("ChromosomeAnalysisCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryChromosomeAnalysisCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
-    [InverseProperty("FallopianTubeYearCategory")]
-    public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryFallopianTubeYearCategory { get; set; } = new List<IvffemaleFertilityHistory>();
-
     [InverseProperty("GenerallyHealthyCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryGenerallyHealthyCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
@@ -45,8 +42,29 @@ public partial class DropdownConfiguration
     [InverseProperty("PatencyRightCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryPatencyRightCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
+    [InverseProperty("CycleFromAmenorrheaCategory")]
+    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleCycleFromAmenorrheaCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
+
+    [InverseProperty("MainIndicationCategory")]
+    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleMainIndicationCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
+
+    [InverseProperty("PlannedSpermCollectionCategory")]
+    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCyclePlannedSpermCollectionCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
+
+    [InverseProperty("ProtocolCategory")]
+    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleProtocolCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
+
+    [InverseProperty("StimulatedExternallyCategory")]
+    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleStimulatedExternallyCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
+
+    [InverseProperty("StimulationPlannedCategory")]
+    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleStimulationPlannedCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
+
     [InverseProperty("TreatmentTypeCategory")]
-    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycle { get; set; } = new List<IvffemaleTreatmentCycle>();
+    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleTreatmentTypeCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
+
+    [InverseProperty("TreatmentCategory")]
+    public virtual ICollection<IvffemaleTreatmentTypes> IvffemaleTreatmentTypes { get; set; } = new List<IvffemaleTreatmentTypes>();
 
     [InverseProperty("AdiposityCategory")]
     public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistoryAdiposityCategory { get; set; } = new List<IvfmaleFertilityHistory>();
