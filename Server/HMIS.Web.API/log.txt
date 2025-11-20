@@ -152,3 +152,17 @@
 }
 2025-11-17 14:42:56.655 [Information] PostAsync<R, S, T>: Using default timeout: 30000
 2025-11-17 14:42:59.076 [Information] TranscribeFile: https://api.deepgram.com/v1/listen Succeeded
+2025-11-20 16:31:07.167 [Information] DeepgramHttpClientOptions: OnPrem: False
+2025-11-20 16:31:07.179 [Information] DeepgramHttpClientOptions: APIVersion: v1
+2025-11-20 16:31:07.180 [Information] DeepgramHttpClientOptions: API KEY set from parameter
+2025-11-20 16:31:07.193 [Information] DeepgramHttpClientOptions: REST BaseAddress does not contain API version: api.deepgram.com
+2025-11-20 16:31:07.196 [Information] DeepgramHttpClientOptions: BaseAddress contains no protocol: api.deepgram.com/v1
+2025-11-20 16:31:07.197 [Information] DeepgramHttpClientOptions: BaseAddress: https://api.deepgram.com/v1
+2025-11-20 16:31:07.247 [Information] HttpClientFactory.Create: HttpClient ID: DEEPGRAM_HTTP_CLIENT
+2025-11-20 16:31:07.459 [Information] TranscribeFile: source: System.IO.MemoryStream
+2025-11-20 16:31:07.542 [Information] TranscribeFile: prerecordedSchema:
+{
+  "model": "nova-3"
+}
+2025-11-20 16:31:07.548 [Information] PostAsync<R, S, T>: Using default timeout: 30000
+2025-11-20 16:31:10.798 [Information] TranscribeFile: https://api.deepgram.com/v1/listen Succeeded

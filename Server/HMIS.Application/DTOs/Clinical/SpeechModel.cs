@@ -36,7 +36,7 @@ namespace HMIS.Application.DTOs.Clinical
         public string mrNo { get; set; }
         public int AppointmentId { get; set; }
         public bool SignedBy { get; set; }
-        public string VoiceFile { get; set; }
+        public string? VoiceFile { get; set; }
     }
 
     public class ClinicalNoteObj

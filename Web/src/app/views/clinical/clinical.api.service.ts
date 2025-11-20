@@ -340,17 +340,18 @@ private question = 'assets/question.json';
 
   }
 
-  
+
   GetCategoryWithValues(id: any) {
 	return this.api.get(`DropDownLookUp/GetCategoryWithValues/${id}`).toPromise();
   }
 
    AddUpdateCategory(data:any){
     return this.api.post(`DropDownLookUp/CreateOrUpdateConfiguration`,data).toPromise();
-   } 
+   }
 
    DeleteCategory(id:any){
     return this.api.delete(`DropDownLookUp/DeleteConfiguration/${id}`).toPromise();
    }
+
 
 }

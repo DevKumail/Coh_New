@@ -224,6 +224,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
 
   // GetNotesTemplate unchanged except it now receives numeric noteId
   GetNotesTemplate(noteId: any) {
+    debugger
     if (noteId == null || noteId == undefined) noteId = 0;
 
     this.selectedNotes = Number(noteId) || 0;
@@ -370,8 +371,8 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   }
 
   onProviderchange() {
-
   }
+
 
   resetForm(){
     this.clinicalForm.reset();

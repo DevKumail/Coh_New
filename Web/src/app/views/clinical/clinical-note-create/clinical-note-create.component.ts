@@ -346,8 +346,25 @@ export class ClinicalNoteCreateComponent implements OnInit {
         };
 
         this.mediaRecorder.onstop = () => {
+          // Revoke old URL to prevent memory leaks
+          if (this.audioUrl) {
+            const oldUrl = this.audioUrl.toString();
+            if (oldUrl.startsWith('blob:')) {
+              URL.revokeObjectURL(oldUrl);
+            }
+          }
+
+          // Clear audio URL first
+          this.audioUrl = null;
+          this.cdr.detectChanges();
+
+          // Create new blob and URL
           this.voiceBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-          this.audioUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(this.voiceBlob));
+          const url = URL.createObjectURL(this.voiceBlob);
+          this.audioUrl = this.sanitizer.bypassSecurityTrustUrl(url);
+
+          // Manually trigger change detection
+          this.cdr.detectChanges();
         };
 
         this.mediaRecorder.start();
@@ -507,18 +524,16 @@ this.loader.show();
   }
   cancel() {
     this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
-
   }
+
   // --- additional submit used elsewhere in old code ---------------------
   submit() {
     // ...existing code...
     if (!this.mrNo) {
-    //   this.messageService.add({ severity: 'Error', summary: 'MRNo is not Found' });
-    Swal.fire('Error', 'MRNo is not Found please load patient', 'error');
+      Swal.fire('Error', 'MRNo is not Found please load patient', 'error');
       return;
     }
 
-    // this.clinicalNotesList.AppointmentId = this.SelectedVisit.appointmentId;
     this.clinicalNotesList.NoteTitle = this.noteTitle;
     this.clinicalNotesList.CreatedBy = this.createdBy;
     this.clinicalNotesList.SignedBy = this.signedBy;
@@ -528,8 +543,7 @@ this.loader.show();
     this.clinicalNotesList.NoteText = this.spokenText;
     this.clinicalNotesList.VoiceText = this.voicetext;
     this.clinicalApiService.InsertSpeech(this.clinicalNotesList).then(() => {
-        Swal.fire('Success', 'Appointment has been Created', 'success');
-    //   this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Appointment has been Created' });
+      Swal.fire('Success', 'Appointment has been Created', 'success');
       this.router.navigate(['/clinical/clinical-notes']);
     });
   }
@@ -537,7 +551,6 @@ this.loader.show();
   onProviderchange() {
 
   }
-
 
   resetForm(){
     this.clinicalForm.reset();
@@ -548,13 +561,30 @@ this.loader.show();
   ngOnDestroy(): void {
     // cleanup subscriptions
     this.subscriptions.forEach(s => s.unsubscribe());
+
+    // Cleanup audio URL
+    if (this.audioUrl) {
+      const url = this.audioUrl.toString();
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    // Cleanup media recorder
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      try {
+        this.mediaRecorder.stop();
+      } catch (e) {
+        console.error('Error stopping recorder on destroy:', e);
+      }
+    }
   }
 
   getProviderName(providerCode: any): string {
-  if (!providerCode || !this.providers?.length) return '';
-  const provider = this.providers.find(p => p.code == providerCode);
-  return provider ? provider.name : '';
-}
+    if (!providerCode || !this.providers?.length) return '';
+    const provider = this.providers.find(p => p.code == providerCode);
+    return provider ? provider.name : '';
+  }
 }
 
 /* keep Question interface if needed by template/components */
