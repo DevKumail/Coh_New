@@ -68,7 +68,7 @@ export class FemaleMedicalHistoryListComponent {
       this.dropdowns = payload || {};
     }
     getAlldropdown() {
-      this.sharedservice.getDropDownValuesByName(Page.IVFFertilityHistory).subscribe((res: any) => {
+      this.sharedservice.getDropDownValuesByName(Page.IVFFemaleFertilityHistory).subscribe((res: any) => {
         this.AllDropdownValues = res;
         this.getAllDropdown(res);
         console.log(this.AllDropdownValues);
@@ -125,21 +125,21 @@ export class FemaleMedicalHistoryListComponent {
   GetAllFemaleMedicalHistory(){
     this.isLoadingHistory = true;
     this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
-          const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
-        if(ivfMainId){
-          this.ivfservice.GetAllFemaleMedicalHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
-              next: (res: any) => {
-                    this.isLoadingHistory = false;
-                    this.ListData = res.data;
-                    this.totalrecord = res.totalrecord;
-              },
-              error: () => {
-                this.isLoadingHistory = false;
-              }
-            });
-          }else{
+      const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
+      if(ivfMainId){
+        this.ivfservice.GetAllFemaleMedicalHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
+          next: (res: any) => {
+            this.isLoadingHistory = false;
+            this.ListData = res.data;
+            this.totalrecord = res.totalrecord;
+          },
+          error: () => {
             this.isLoadingHistory = false;
           }
         });
+      } else {
+        this.isLoadingHistory = false;
+      }
+    });
   }
 }

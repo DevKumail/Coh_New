@@ -50,7 +50,7 @@
             <label>Infertility type</label>
             <select class="form-select" formControlName="infertilityType">
               <option value="" disabled selected>Select type</option>
-              <option *ngFor="let o of opts('IVFFertilityHistory:InfertilityType')" [value]="o.valueId">{{ o.name }}</option>
+              <option *ngFor="let o of opts('IVFMaleFertilityHistory:InfertilityType')" [value]="o.valueId">{{ o.name }}</option>
             </select>
           </div>
         </div>
@@ -72,7 +72,7 @@
 
         <div class="card px-2 py-2 mb-1">
           <div class="row mb-1">
-            <div class="col-2" *ngFor="let o of opts('IVFFertilityHistory:Idiopathic')">
+            <div class="col-2" *ngFor="let o of opts('IVFMaleFertilityHistory:Idiopathic')">
               <div class="form-check">
                 <input class="form-check-input" type="checkbox"
                   [id]="'idiopathic_'+o.valueId"
@@ -96,7 +96,7 @@
               <label>Endocrinopathies</label>
               <select class="form-select" formControlName="endocrinopathies">
                 <option value="" disabled selected>Select condition</option>
-                <option *ngFor="let o of opts('IVFFertilityHistory:Endocrinopathies')" [value]="o.valueId">{{ o.name }}</option>
+                <option *ngFor="let o of opts('IVFMaleFertilityHistory:Endocrinopathies')" [value]="o.valueId">{{ o.name }}</option>
               </select>
             </div>
           </div>
@@ -106,7 +106,7 @@
               <label>Previous tumor</label>
               <select class="form-select" formControlName="previousTumor">
                 <option value="" disabled selected>Select tumor type</option>
-                <option *ngFor="let o of opts('IVFFertilityHistory:PreviousTumor')" [value]="o.valueId">{{ o.name }}</option>
+                <option *ngFor="let o of opts('IVFMaleFertilityHistory:PreviousTumor')" [value]="o.valueId">{{ o.name }}</option>
               </select>
             </div>
           </div>

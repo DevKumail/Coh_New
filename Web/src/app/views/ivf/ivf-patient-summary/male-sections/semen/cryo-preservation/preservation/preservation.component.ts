@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CryoStoragePlaceComponent } from '../cryo-storage-place/cryo-storage-place.component';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
+import { Page } from '@/app/shared/enum/dropdown.enum';
 
 @Component({
   selector: 'app-preservation',
@@ -17,6 +18,8 @@ export class PreservationComponent {
   showStorage: boolean = false;
   hrEmployees: any = [];
   cacheItems: string[] = ['Provider'];
+  AllDropdownValues: any = [];
+  dropdowns: any = [];
 
   constructor(
     private fb: FormBuilder,
@@ -31,7 +34,7 @@ export class PreservationComponent {
       patientId: [''],
       cryoContract: [''],
       cryopreservedBy: [''],
-      originallyFromClinic: [false],
+      originallyFromClinic: [''],
       storageDate: [null],
       storedBy: [''],
       typeOfMaterial: [''],
@@ -51,8 +54,26 @@ export class PreservationComponent {
 
   ngOnInit(): void {
     this.FillCache();
+    this.getAlldropdown();
   }
 
+
+      // Store payload from service for dynamic labels/options
+      getAllDropdown(payload: { [key: string]: Array<{ valueId: number; name: string }> }) {
+        this.dropdowns = payload || {};
+      }
+      getAlldropdown() {
+        this.sharedservice.getDropDownValuesByName(Page.IVFMaleCryoPreservation).subscribe((res: any) => {
+          this.AllDropdownValues = res;
+          this.getAllDropdown(res);
+          console.log(this.AllDropdownValues);
+        })
+        this.FillCache();
+      }
+
+  opts(key: string) {
+    return this.dropdowns?.[key] || [];
+  }
 
    FillCache() {
         this.sharedservice.getCacheItem({ entities: this.cacheItems }).subscribe((response: any) => {

@@ -39,7 +39,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Female
             {
                 // Call stored procedure that returns JSON (FOR JSON PATH)
                 var jsonResult = await conn.ExecuteScalarAsync<string>(
-                    "IVF_GetFemaleFertilityHistoryById",
+                    "IVF_GetFemaleFertilityHistory",
                     new { IVFFemaleFHId },
                     commandType: CommandType.StoredProcedure
                 );

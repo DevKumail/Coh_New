@@ -13,7 +13,9 @@ import Tooltip from 'bootstrap/js/dist/tooltip';
 export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() selected: string = 'medical-history';
   @Input() collapsed: boolean = false;
+  @Input() isMalesidebar: boolean = true;
   @Output() select = new EventEmitter<string>();
+  @Output() genderChange = new EventEmitter<'male' | 'female'>();
   @ViewChildren('menuLink') links!: QueryList<ElementRef<HTMLElement>>;
 
   private tooltips: Tooltip[] = [];
@@ -40,6 +42,10 @@ export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges
 
   onSelect(id: string) {
     this.select.emit(id);
+  }
+
+  onGenderToggle(g: 'male' | 'female') {
+    this.genderChange.emit(g);
   }
 
   ngAfterViewInit(): void {

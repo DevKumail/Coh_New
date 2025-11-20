@@ -48,8 +48,10 @@
 
                     <div class="col-3">
                         <label class="form-label">Originally from clinic</label>
-                        <input type="text" class="form-control" formControlName="originallyFromClinic"
-                            placeholder="Originally from clinic" />
+                        <select class="form-select" formControlName="originallyFromClinic">
+                            <option value="" disabled selected>Select</option>
+                            <option *ngFor="let o of opts('IVFMaleCryoPreservation:OriginallyFromClinic')" [value]="o.valueId">{{ o.name }}</option>
+                        </select>
                     </div>
 
                     <div class="col-3">
@@ -72,10 +74,8 @@
                     <div class="col-3">
                         <label class="form-label">Type of material</label>
                         <select class="form-select" formControlName="typeOfMaterial">
-                            <option value="" disabled>Select</option>
-                            <option value="Semen">Semen</option>
-                            <option value="Sperm">Sperm</option>
-                            <option value="Other">Other</option>
+                            <option value="" disabled selected>Select</option>
+                            <option *ngFor="let o of opts('IVFMaleCryoPreservation:Material')" [value]="o.valueId">{{ o.name }}</option>
                         </select>
                     </div>
 
@@ -92,10 +92,8 @@
                     <div class="col-3">
                         <label class="form-label">Status</label>
                         <select class="form-select" formControlName="status">
-                            <option value="" disabled>Select</option>
-                            <option>Active</option>
-                            <option>Disposed</option>
-                            <option>Used</option>
+                            <option value="" disabled selected>Select</option>
+                            <option *ngFor="let o of opts('IVFMaleCryoPreservation:Status')" [value]="o.valueId">{{ o.name }}</option>
                         </select>
                     </div>
 
@@ -169,10 +167,8 @@
                         <label class="form-label">Reason for research</label>
                         <select class="form-select" formControlName="reasonForResearch"
                             [disabled]="!form.get('forResearch')?.value">
-                            <option value="" disabled>Select</option>
-                            <option>Consent</option>
-                            <option>Quality issue</option>
-                            <option>Other</option>
+                            <option value="" disabled selected>Select</option>
+                            <option *ngFor="let o of opts('IVFMaleCryoPreservation:Research')" [value]="o.valueId">{{ o.name }}</option>
                         </select>
                         <!-- </div> -->
                     </div>
