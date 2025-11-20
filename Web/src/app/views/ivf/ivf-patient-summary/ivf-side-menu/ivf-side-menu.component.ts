@@ -27,7 +27,10 @@ export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges
     { id: 'pathology-results', label: 'Pathology results', icon: 'tablerSearch' },
     { id: 'lab-orders', label: 'Lab orders', icon: 'tablerSearch' },
     { id: 'semen-analysis', label: 'Semen Analysis', icon: 'tablerSearch' },
-    { id: 'cycle', label: 'Cycle', icon: 'tablerActivity' }
+    { id: 'cycle', label: 'Cycle', icon: 'tablerActivity' },
+    // { id: 'female-medical-history', label: 'Fertility History', icon: 'tablerNotes' },
+
+    
   ];
 
   switchItem = { id: 'switch-partner', label: 'Switch to partner', icon: 'tablerUsers' };

@@ -1,18 +1,28 @@
-<div class="card shadow-sm">
+<div class="card shadow-sm ms-1">
   <div class="card-header d-flex align-items-center justify-content-between">
     <div class="fw-bold">Semen analyses</div>
     <div>
-      <button class="btn btn-sm btn-primary" (click)="openAdd()" *ngIf="!showAdd">Add</button>
-      <button class="btn btn-sm btn-outline-secondary" (click)="onCancel()" *ngIf="showAdd">Back to list</button>
+      <button class="btn btn-sm btn-primary" (click)="openAdd()" *ngIf="!showAdd && !showPreservation">Add</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="onCancel()" *ngIf="showAdd || showPreservation">Back to list</button>
     </div>
   </div>
   <div class="card-body p-0">
-    <ng-container *ngIf="showAdd; else listView">
+    <!-- Exclusive view switch: Add -> Preservation -> List -->
+    <ng-container *ngIf="showAdd; else addElse">
       <div class="p-2">
         <app-semen-add-edit [model]="editModel" (saved)="onSaved($event)" (back)="onCancel()"
           (click)="$event.stopPropagation()"></app-semen-add-edit>
       </div>
     </ng-container>
+
+    <ng-template #addElse>
+      <ng-container *ngIf="showPreservation; else listView">
+        <div class="p-2">
+          <app-preservation></app-preservation>
+        </div>
+      </ng-container>
+    </ng-template>
+
     <ng-template #listView>
       <div class="table-responsive">
         <table class="table table-bordered text-center table-striped table-sm mb-0">
@@ -62,6 +72,8 @@
                 <td>{{ r.cryoStatus }}</td>
                 <td>{{ r.status }}</td>
                 <td>
+                  <ng-icon name="tablerTemperatureSnow" class="text-info me-1" style="cursor: pointer;" (click)="onClickPreservation()">
+                  </ng-icon>
                   <ng-icon name="tablerEdit" class="me-1" style="cursor: pointer;" (click)="edit(r)">
                   </ng-icon>
                   <ng-icon name="tablerTrash" class="text-danger me-1" style="cursor: pointer;" (click)="delete(r.id)">

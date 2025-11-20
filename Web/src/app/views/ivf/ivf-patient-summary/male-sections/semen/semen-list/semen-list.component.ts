@@ -6,11 +6,12 @@ import { NgIconComponent } from '@ng-icons/core';
 import Swal from 'sweetalert2';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { PreservationComponent } from '../cryo-preservation/preservation/preservation.component';
 
 @Component({
   selector: 'app-semen-list',
   standalone: true,
-  imports: [CommonModule, SemenAddEditComponent, NgIconComponent, GenericPaginationComponent
+  imports: [CommonModule, PreservationComponent, SemenAddEditComponent, NgIconComponent, GenericPaginationComponent
   ],
   templateUrl: './semen-list.component.html',
   styleUrls: ['./semen-list.component.scss']
@@ -18,6 +19,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 export class SemenListComponent {
   showAdd = false;
   isLoading = false;
+  showPreservation: boolean = false;
   rows: any[] = [];
   editModel: any = null;
 
@@ -31,8 +33,8 @@ export class SemenListComponent {
     this.load();
   }
 
-  openAdd() { this.showAdd = true; }
-  onCancel() { this.showAdd = false; }
+  openAdd() { this.showAdd = true; this.showPreservation = false; }
+  onCancel() { this.showAdd = false; this.showPreservation = false; this.editModel = null; }
 
   onSaved(_payload: any) {
     this.showAdd = false;
@@ -42,12 +44,12 @@ export class SemenListComponent {
 
   load() {
     this.isLoading = true;
-    var MainId : number = 0;
+    var MainId: number = 0;
     this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
       if (data) {
         if (data?.couple?.ivfMainId != null) {
-           MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
-        } 
+          MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
+        }
       }
     });
     this.ivf.GetAllMaleSemenAnalysis(MainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
@@ -135,6 +137,10 @@ export class SemenListComponent {
     });
   }
 
+  onClickPreservation() {
+    this.showPreservation = true;
+    this.showAdd = false;
+  }
 
   onPageChanged(page: number) {
     this.PaginationInfo.Page = page;

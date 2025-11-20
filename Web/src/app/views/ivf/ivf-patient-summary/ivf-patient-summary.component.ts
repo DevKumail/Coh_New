@@ -11,7 +11,6 @@ import { IvfPsLabOrdersComponent } from './male-sections/lab-diagnostics/ivf-ps-
 import { IvfPsSemenAnalysisComponent } from './male-sections/lab-diagnostics/ivf-ps-semen-analysis.component';
 import { SemenListComponent } from './male-sections/semen/semen-list/semen-list.component';
 import { IvfPsCycleComponent } from './male-sections/cycle/ivf-ps-cycle.component';
-import { IvfPsSwitchPartnerComponent } from './male-sections/switch-partner/ivf-ps-switch-partner.component';
 import { AdvanceSearchModalComponent } from '@/app/layouts/components/topbar/components/advance-search-modal/advance-search-modal.component';
 import { ModalTriggerService } from '@core/services/modal-trigger.service';
 import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
@@ -20,6 +19,7 @@ import { SocialHistoryComponent } from '../../clinical/social-history/social-his
 import { FamilyHistoryComponent } from '../../clinical/family-history/family-history.component';
 import { log } from 'node:console';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
+import { FemaleMedicalHistoryListComponent } from './female-section/female-medical-history-list/female-medical-history-list.component';
 
 @Component({
   selector: 'app-ivf-patient-summary',
@@ -34,10 +34,10 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
     IvfPsLabOrdersComponent,
     SemenListComponent,
     IvfPsCycleComponent,
-    IvfPsSwitchPartnerComponent,
     AdvanceSearchModalComponent,
     SocialHistoryComponent,
-    FamilyHistoryComponent
+    FamilyHistoryComponent,
+    FemaleMedicalHistoryListComponent
   ],
   templateUrl: './ivf-patient-summary.component.html',
   styleUrls: ['./ivf-patient-summary.component.scss']
@@ -48,6 +48,7 @@ export class IvfPatientSummaryComponent implements OnInit {
   offset = 120; // px: used in CSS var --patient-summary-offset
   isCoupleLink: boolean = false;
   isivfstart: boolean = false;
+  isMalesidebar: boolean = true;
   PrimaryPatientData: any = [];
   PrimaryPatientDataAppId: any;
   SecondaryPatientData: any;
@@ -57,6 +58,8 @@ export class IvfPatientSummaryComponent implements OnInit {
   demographicapi = inject(DemographicApiServices);
   loader = inject(LoaderService);
   ivfapi = inject(IVFApiService);
+
+  
 
   ngOnInit(): void {
     // Auto-open Advanced Filter modal when no patient is loaded
@@ -75,7 +78,7 @@ export class IvfPatientSummaryComponent implements OnInit {
 
       }
     });
-debugger
+
     this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
       console.log("IVF Patient Data", data)
       if (data) {
@@ -103,6 +106,10 @@ debugger
 
   toggleLeft(): void {
     this.leftCollapsed = !this.leftCollapsed;
+  }
+
+  setGender(g: 'male' | 'female') {
+    this.isMalesidebar = (g === 'male');
   }
 
 

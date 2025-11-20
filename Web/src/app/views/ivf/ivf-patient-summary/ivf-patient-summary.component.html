@@ -8,13 +8,16 @@
     <div class="col-12">
       <div class="row g-0">
 
+     
+
         <div [ngClass]="leftCollapsed ? 'col-auto' : 'col-2'" class="p-0 ms-0 mb-2 mb-sm-0 fixed-height d-flex">
           <div class="h-100 w-100">
             <app-ivf-side-menu [selected]="selectedId" (select)="onSelect($event)" [collapsed]="leftCollapsed"></app-ivf-side-menu>
           </div>
         </div>
 
-        <div [ngClass]="{ 'col-10': !leftCollapsed, 'col': leftCollapsed }" class="fixed-height">
+        <!-- Male panel -->
+        <div [ngClass]="{ 'col-10': !leftCollapsed, 'col': leftCollapsed }" class="fixed-height" >
           <ng-container *ngIf="(patientBannerService.patientData$ | async) as pdata; else emptyState">
             <app-medical-history *ngIf="selectedId==='medical-history'"></app-medical-history>
             <app-social-history *ngIf="selectedId==='social-history'"></app-social-history>
@@ -23,7 +26,6 @@
             <app-ivf-ps-lab-orders *ngIf="selectedId==='lab-orders'"></app-ivf-ps-lab-orders>
             <app-semen-list *ngIf="selectedId==='semen-analysis'"></app-semen-list>
             <app-ivf-ps-cycle *ngIf="selectedId==='cycle'"></app-ivf-ps-cycle>
-            <app-ivf-ps-switch-partner *ngIf="selectedId==='switch-partner'"></app-ivf-ps-switch-partner>
           </ng-container>
           <ng-template #emptyState>
             <div class="d-flex align-items-center justify-content-center h-100 text-muted">
@@ -31,6 +33,31 @@
             </div>
           </ng-template>
         </div>
+
+        <div [ngClass]="{ 'col-10': !leftCollapsed, 'col': leftCollapsed }" class="fixed-height" *ngIf="!isMalesidebar">
+          <ng-container *ngIf="(patientBannerService.patientData$ | async) as pdata; else emptyState">
+            <!-- <app-female-medical-history-list *ngIf="selectedId==='female-medical-history'"></app-female-medical-history-list> -->
+            <!-- <app-social-history *ngIf="selectedId==='social-history'"></app-social-history>
+            <app-family-history *ngIf="selectedId==='family-history'"></app-family-history> -->
+          </ng-container>
+        
+          <ng-template #emptyState>
+            <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+              Select or search a patient to load summary
+            </div>
+          </ng-template>
+        </div>
+
+              <div class="d-flex mb-2">
+          <div class="btn-group" role="group" aria-label="Gender toggle">
+            <button type="button" class="btn btn-sm" [class.btn-primary]="isMalesidebar" [class.btn-outline-primary]="!isMalesidebar" (click)="setGender('male')">Male</button>
+            <button type="button" class="btn btn-sm" [class.btn-primary]="!isMalesidebar" [class.btn-outline-primary]="isMalesidebar" (click)="setGender('female')">Female</button>
+          </div>
+        </div>
+           <!-- Gender toggle -->
+  
+
+
       </div>
     </div>
   </div>
