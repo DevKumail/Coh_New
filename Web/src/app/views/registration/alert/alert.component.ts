@@ -295,7 +295,7 @@ export class AlertComponent implements OnInit, AfterViewInit {
   };
   GetPatientAlertsData() {
     if (this.SearchPatientData == undefined) {
-      Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+      // Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       // this.loader.hide();
       return;
     }

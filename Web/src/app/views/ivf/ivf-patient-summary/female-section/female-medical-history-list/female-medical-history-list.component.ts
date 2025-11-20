@@ -273,8 +273,8 @@ export class FemaleMedicalHistoryListComponent {
         this.ivfservice.GetAllFemaleMedicalHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
           next: (res: any) => {
             this.isLoadingHistory = false;
-            this.ListData = res.data;
-            this.totalrecord = res.totalrecord;
+            this.ListData = res?.fertilityHistory || [];
+            this.totalrecord = res?.fertilityHistory?.totalrecord || 0;
           },
           error: () => {
             this.isLoadingHistory = false;

@@ -349,7 +349,7 @@ minDateValidator(otherControlName: string) {
   const userIdStr = sessionStorage.getItem('userId');
   const userId = userIdStr ? Number(userIdStr) : 0;
     if (!mrNo || !userId) {
-      Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+      // Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       // this.loader.hide();
       return;
     }
@@ -411,11 +411,11 @@ onPROBSubmit() {
     }
 
     if(!this.SearchPatientData?.table2?.[0]?.mrNo){
-      Swal.fire({
-        icon: 'warning',
-        title: 'Validation Error',
-        text: 'MrNo is a required field. Please load a patient.',
-      });
+      // Swal.fire({
+      //   icon: 'warning',
+      //   title: 'Validation Error',
+      //   text: 'MrNo is a required field. Please load a patient.',
+      // });
       return;
     }
      

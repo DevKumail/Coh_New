@@ -1,10 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators, FormControl } from '@angular/forms';
 import { ApiService } from '@/app/core/services/api.service';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
-import { QuillModule } from 'ngx-quill';
+import { QuillModule, QuillEditorComponent } from 'ngx-quill';
 
 @Component({
   selector: 'app-medical-history-basic',
@@ -20,6 +20,8 @@ import { QuillModule } from 'ngx-quill';
   styleUrls: ['./medical-history-basic.component.scss']
 })
 export class MedicalHistoryBasicComponent implements OnInit {
+  @ViewChild(QuillEditorComponent, { static: false }) quillEditor!: QuillEditorComponent;
+  
   basicForm!: FormGroup;
   @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
   @Input() hrEmployees: Array<{ providerId: number | string; name: string }> = [];
@@ -281,7 +283,17 @@ export class MedicalHistoryBasicComponent implements OnInit {
 
   // Public method to get form data for parent component
   getFormData(): any {
-    return this.basicForm.getRawValue();
+    // Ensure editor content is synced to form
+    if (this.quillEditor && this.quillEditor.quillEditor) {
+      const editorHtml = this.quillEditor.quillEditor.root.innerHTML;
+      this.basicForm.patchValue({ editorContent: editorHtml });
+    }
+    
+    const formData = this.basicForm.getRawValue();
+    console.log('Form Data from Basic Component:', formData);
+    console.log('Editor Content:', formData.editorContent);
+    console.log('Quill Editor Direct:', this.quillEditor?.quillEditor?.root?.innerHTML);
+    return formData;
   }
 
   // Public method to populate form with data (for edit)

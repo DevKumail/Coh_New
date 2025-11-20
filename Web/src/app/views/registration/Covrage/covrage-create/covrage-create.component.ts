@@ -700,7 +700,7 @@ export class CovrageCreateComponent implements OnInit {
             return;
         }
          if (!this.SearchPatientData) {
-              Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+            //   Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
               return;
             }
 
