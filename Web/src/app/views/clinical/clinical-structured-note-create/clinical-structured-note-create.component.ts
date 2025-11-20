@@ -224,7 +224,6 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
 
   // GetNotesTemplate unchanged except it now receives numeric noteId
   GetNotesTemplate(noteId: any) {
-    debugger
     if (noteId == null || noteId == undefined) noteId = 0;
 
     this.selectedNotes = Number(noteId) || 0;
@@ -264,8 +263,12 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     this.signedBy = false;
 
     const selectedNoteId = noteId;
-    const selectedNote = this.clinicalNotes.find(note => note.pathId === selectedNoteId);
-    const noteName = selectedNote ? selectedNote.pathName : '';
+    // Use dataquestion.node.noteTitle if available, otherwise search in clinicalNotes
+    let noteName = this.dataquestion?.node?.noteTitle || '';
+    if (!noteName) {
+      const selectedNote = this.clinicalNotes.find(note => note.pathId === selectedNoteId);
+      noteName = selectedNote ? selectedNote.pathName : '';
+    }
 
     const note = {
       noteTitle: noteName,
@@ -288,9 +291,12 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
         .then((response: any) => {
           if (response != null && response != "") {
             this.dataquestion = response;
-            this.nodeData = response.node;
+            this.nodeData = response.node || response;
+            this.viewquestion = true;
             this.viewNoteResponse = true;
-            this.clinicalForm.reset();
+            // Don't reset the form - keep provider and template selected
+            // Only reset description if needed
+            this.clinicalForm.patchValue({ description: '' });
             Swal.fire('Success', 'Note created successfully.', 'success');
             this.loader.hide();
           } else {

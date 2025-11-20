@@ -37,6 +37,7 @@ namespace HMIS.Application.DTOs.Clinical
         public int AppointmentId { get; set; }
         public bool SignedBy { get; set; }
         public string? VoiceFile { get; set; }
+        public int pathId { get; set; }
     }
 
     public class ClinicalNoteObj
@@ -44,7 +45,7 @@ namespace HMIS.Application.DTOs.Clinical
         public int Id { get; set; }
         //public long? PatientId { get; set; }
         public string NoteHtmltext { get; set; }
-        public string NoteText { get; set; }
+        public string? NoteText { get; set; }
         public DateTime? CreatedOn { get; set; }
         public string Mrno { get; set; }
         public int AppointmentId { get; set; }
@@ -57,6 +58,7 @@ namespace HMIS.Application.DTOs.Clinical
         public DateTime? VisitDate { get; set; }
         public bool? IsDeleted { get; set; }
         public string UpdatedBy { get; set; }
+        public int pathId { get; set; }
     }
 
 }
