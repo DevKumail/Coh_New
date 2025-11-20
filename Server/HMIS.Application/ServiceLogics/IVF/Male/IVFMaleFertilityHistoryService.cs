@@ -9,20 +9,20 @@ using System.Data;
 using System.Linq;
 using System.Text.Json;
 
-namespace HMIS.Application.ServiceLogics.IVF
+namespace HMIS.Application.ServiceLogics.IVF.Male
 {
-    public interface IFertilityHistoryService
+    public interface IIVFMaleFertilityHistoryService
     {
-        Task<(bool IsSuccess, object? Data)> GetAllFertilityHistory(string ivfmainid, PaginationInfo pagination);
-        Task<(bool IsSuccess, object? Data)> GetFertilityHistoryById(string IVFMaleFHId);
+        Task<(bool IsSuccess, object? Data)> GetAllMaleFertilityHistory(string ivfmainid, PaginationInfo pagination);
+        Task<(bool IsSuccess, object? Data)> GetMaleFertilityHistoryById(string IVFMaleFHId);
         Task<(bool IsSuccess, object? Data)> DeleteMaleFertilityHistoryAsync(string IVFMaleFHId, string DeletedBy);
         Task<Result<int>> CreateMaleFertilityHistoryAsync(IVFMaleFertilityHistoryDto dto);
     }
-    internal class FertilityHistoryService : IFertilityHistoryService
+    internal class IVFMaleFertilityHistoryService : IIVFMaleFertilityHistoryService
     {
         private readonly DapperContext _dapper;
         private readonly HMISDbContext _context;
-        public FertilityHistoryService(DapperContext dapper, HMISDbContext db)
+        public IVFMaleFertilityHistoryService(DapperContext dapper, HMISDbContext db)
         {
             _dapper = dapper;
             _context = db;
@@ -44,7 +44,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             {
                 // Load main record
                 var main = await _context.IvfmaleFertilityHistory.FirstOrDefaultAsync(x => x.IvfmaleFhid == id);
-                if (main == null || (main.IsDeleted))
+                if (main == null || main.IsDeleted)
                 {
                     await transaction.RollbackAsync();
                     return (false, "Record not found or already deleted");
@@ -160,7 +160,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             }
         }
 
-        public async Task<(bool IsSuccess, object? Data)> GetFertilityHistoryById(string IVFMaleFHId)
+        public async Task<(bool IsSuccess, object? Data)> GetMaleFertilityHistoryById(string IVFMaleFHId)
         {
             if (string.IsNullOrWhiteSpace(IVFMaleFHId))
             {
@@ -172,7 +172,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             {
                 // SQL Server FOR JSON PATH returns JSON as a string
                 var jsonResult = await conn.ExecuteScalarAsync<string>(
-                    "IVF_GetFertilityHistory",
+                    "IVF_GetMaleFertilityHistory",
                     new { IVFMaleFHId },
                     commandType: CommandType.StoredProcedure
                 );
@@ -205,7 +205,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             }
         }
 
-        public async Task<(bool IsSuccess, object? Data)> GetAllFertilityHistory(string ivfmainid, PaginationInfo pagination)
+        public async Task<(bool IsSuccess, object? Data)> GetAllMaleFertilityHistory(string ivfmainid, PaginationInfo pagination)
         {
             // Basic validations
             if (string.IsNullOrWhiteSpace(ivfmainid))
@@ -222,7 +222,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             try
             {
                 using (var multi = await conn.QueryMultipleAsync(
-                    "IVF_GetAllFertilityHistory",
+                    "IVF_GetAllMaleFertilityHistory",
                     new { PageNumber = page, PageSize = rows, IVFMainId = ivfMainIdInt },
                     commandType: CommandType.StoredProcedure))
                 {
@@ -378,7 +378,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                             dto.General.Illness.ExistingAllergiesDetails != null ||
                             dto.General.Illness.ChronicIllnesses != null ||
                             dto.General.Illness.OtherDiseases != null ||
-                            (dto.General.Illness.IdiopathicIds != null && dto.General.Illness.IdiopathicIds.Any())
+                            dto.General.Illness.IdiopathicIds != null && dto.General.Illness.IdiopathicIds.Any()
                         ))
                     {
                         IvfmaleFhillness illness;
@@ -430,7 +430,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                     if (dto.General.PerformedTreatment != null && (
                             dto.General.PerformedTreatment.AlreadyTreated.HasValue ||
                             dto.General.PerformedTreatment.Notes != null ||
-                            (dto.General.PerformedTreatment.TreatmentYears != null && dto.General.PerformedTreatment.TreatmentYears.Any())
+                            dto.General.PerformedTreatment.TreatmentYears != null && dto.General.PerformedTreatment.TreatmentYears.Any()
                         ))
                     {
                         IvfmaleFhperformedTreatment performedTreatment;
