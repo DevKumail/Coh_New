@@ -1,3 +1,4 @@
+using HMIS.Application.DTOs.IVFDTOs;
 using HMIS.Application.DTOs.SpLocalModel;
 using HMIS.Application.ServiceLogics.IVF.Female;
 using HMIS.Application.ServiceLogics.IVF.Male;
@@ -77,7 +78,13 @@ namespace HMIS.Web.Controllers.IVF
             if (!result.IsSuccess) return BadRequest(new { message = result.ErrorMessage });
             return Ok(new { id = result.Data });
         }
-
+        [HttpPost("CreateUpdateFemaleFertilityHistory")]
+        public async Task<IActionResult> CreateUpdateFemaleFertilityHistory([FromBody] IVFFemaleFertilityHistoryDto dto)
+        {
+            var result = await _femaleService.CreateOrUpdateFemaleFertilityHistoryAsync(dto);
+            if (!result.IsSuccess) return BadRequest(new { message = result.ErrorMessage });
+            return Ok(new { id = result.Data });
+        }
         [HttpGet("GetFemaleFertilityHistoryById")]
         public async Task<IActionResult> GetFemaleFertilityHistoryById([FromQuery] string IVFFemaleFHId)
         {

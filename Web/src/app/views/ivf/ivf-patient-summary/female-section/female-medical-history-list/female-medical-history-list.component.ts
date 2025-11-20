@@ -59,6 +59,7 @@ export class FemaleMedicalHistoryListComponent {
   ngOnInit(): void {
     this.getAlldropdown();
     // Load list by default
+    this.GetAllFemaleMedicalHistory();
   }
 
 
@@ -103,8 +104,15 @@ export class FemaleMedicalHistoryListComponent {
 
 
 
-  openAdd(){}
-  onCancel(){}
+  openAdd(){
+    this.isCreateUpdate = true;
+    this.showAdd = true;
+  }
+
+  onCancel(){
+    this.isCreateUpdate = false;
+    this.showAdd = false;
+  }
   onSave(){}
 
   onPageChanged(page: any){
@@ -113,4 +121,25 @@ export class FemaleMedicalHistoryListComponent {
 
   openEditById(id: any){}
   delete(id: any){}
+
+  GetAllFemaleMedicalHistory(){
+    this.isLoadingHistory = true;
+    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+          const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
+        if(ivfMainId){
+          this.ivfservice.GetAllFemaleMedicalHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
+              next: (res: any) => {
+                    this.isLoadingHistory = false;
+                    this.ListData = res.data;
+                    this.totalrecord = res.totalrecord;
+              },
+              error: () => {
+                this.isLoadingHistory = false;
+              }
+            });
+          }else{
+            this.isLoadingHistory = false;
+          }
+        });
+  }
 }

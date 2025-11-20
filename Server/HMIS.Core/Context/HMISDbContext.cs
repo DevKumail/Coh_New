@@ -190,6 +190,10 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<IvffemaleFhprevIllness> IvffemaleFhprevIllness { get; set; }
 
+    public virtual DbSet<IvffemaleTreatmentCycle> IvffemaleTreatmentCycle { get; set; }
+
+    public virtual DbSet<IvffemaleTreatmentTypes> IvffemaleTreatmentTypes { get; set; }
+
     public virtual DbSet<Ivfmain> Ivfmain { get; set; }
 
     public virtual DbSet<IvfmaleFertilityHistory> IvfmaleFertilityHistory { get; set; }
@@ -235,6 +239,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<IvfmaleSemenSampleDiagnosis> IvfmaleSemenSampleDiagnosis { get; set; }
 
     public virtual DbSet<IvfmaleSemenSampleDiagnosisIcdtype> IvfmaleSemenSampleDiagnosisIcdtype { get; set; }
+
+    public virtual DbSet<IvfstrawColors> IvfstrawColors { get; set; }
 
     public virtual DbSet<LabOrderSet> LabOrderSet { get; set; }
 
@@ -898,7 +904,6 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.ValueId).HasName("PK__Dropdown__93364E485C5ACFCE");
 
-            entity.Property(e => e.ValueId).ValueGeneratedNever();
             entity.Property(e => e.IsActive).HasDefaultValue(true);
 
             entity.HasOne(d => d.Category).WithMany(p => p.DropdownConfiguration)
@@ -1134,8 +1139,6 @@ public partial class HMISDbContext : DbContext
 
             entity.HasOne(d => d.ChromosomeAnalysisCategory).WithMany(p => p.IvffemaleFertilityHistoryChromosomeAnalysisCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration2");
 
-            entity.HasOne(d => d.FallopianTubeYearCategory).WithMany(p => p.IvffemaleFertilityHistoryFallopianTubeYearCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration6");
-
             entity.HasOne(d => d.GenerallyHealthyCategory).WithMany(p => p.IvffemaleFertilityHistoryGenerallyHealthyCategory).HasConstraintName("FK_IVFFemaleFertilityHistory_DropdownConfiguration1");
 
             entity.HasOne(d => d.Ivfmain).WithMany(p => p.IvffemaleFertilityHistory)
@@ -1174,6 +1177,34 @@ public partial class HMISDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFFemaleFHPrevIllness_BLMasterICD9CM");
         });
+
+        //modelBuilder.Entity<IvffemaleTreatmentCycle>(entity =>
+        //{
+        //    entity.HasOne(d => d.CycleFromAmenorrheaCategory).WithMany(p => p.IvffemaleTreatmentCycleCycleFromAmenorrheaCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration1");
+
+        //    entity.HasOne(d => d.IvffemaleFh).WithMany(p => p.IvffemaleTreatmentCycle).HasConstraintName("FK_IVFFemaleTreatmentCycle_IVFFemaleFertilityHistory");
+
+        //    entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvffemaleTreatmentCycle).HasConstraintName("FK_IVFFemaleTreatmentCycle_IVFMaleFertilityHistory");
+
+        //    entity.HasOne(d => d.MainIndicationCategory).WithMany(p => p.IvffemaleTreatmentCycleMainIndicationCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration2");
+
+        //    entity.HasOne(d => d.PlannedSpermCollectionCategory).WithMany(p => p.IvffemaleTreatmentCyclePlannedSpermCollectionCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration6");
+
+        //    entity.HasOne(d => d.ProtocolCategory).WithMany(p => p.IvffemaleTreatmentCycleProtocolCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration3");
+
+        //    entity.HasOne(d => d.StimulatedExternallyCategory).WithMany(p => p.IvffemaleTreatmentCycleStimulatedExternallyCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration5");
+
+        //    entity.HasOne(d => d.StimulationPlannedCategory).WithMany(p => p.IvffemaleTreatmentCycleStimulationPlannedCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration4");
+
+        //    entity.HasOne(d => d.TreatmentTypeCategory).WithMany(p => p.IvffemaleTreatmentCycleTreatmentTypeCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration");
+        //});
+
+        //modelBuilder.Entity<IvffemaleTreatmentTypes>(entity =>
+        //{
+        //    entity.HasOne(d => d.IvffemaleTreatmentCycle).WithMany(p => p.IvffemaleTreatmentTypes).HasConstraintName("FK_IVFFemaleTreatmentTypes_IVFFemaleTreatmentCycle");
+
+        //    entity.HasOne(d => d.TreatmentCategory).WithMany(p => p.IvffemaleTreatmentTypes).HasConstraintName("FK_IVFFemaleTreatmentTypes_DropdownConfiguration");
+        //});
 
         modelBuilder.Entity<Ivfmain>(entity =>
         {
@@ -1477,6 +1508,16 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.Diagnosis).WithMany(p => p.IvfmaleSemenSampleDiagnosisIcdtype)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__IVFMaleSe__Diagn__172E5549");
+        });
+
+        modelBuilder.Entity<IvfstrawColors>(entity =>
+        {
+            entity.HasKey(e => e.ColorId).HasName("PK__IVFStraw__8DA7674DA3E4BF8B");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysutcdatetime())");
         });
 
         modelBuilder.Entity<LabOrderSet>(entity =>

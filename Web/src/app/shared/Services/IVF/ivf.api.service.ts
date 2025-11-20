@@ -88,4 +88,13 @@ export class IVFApiService {
     // Backend endpoint: IVFMaleSemanAnalysis/DeleteSample/{id}
     return this.api.delete(`IVFMaleSemanAnalysis/DeleteSample/${sampleId}`);
   }
+
+
+    GetAllFemaleMedicalHistory(ivfMainId: number, page: number = 1, rowsPerPage: number = 10): Observable<any> {
+    return this.api.get('IVFFertilityHistory/GetAllFemaleFertilityHistory', {
+      ivfmainid: ivfMainId,
+      page,
+      rowsPerPage,
+    });
+  }
 }

@@ -1,7 +1,7 @@
 <div class="medical-history-container">
   <div class="card">
       <div class="card-header d-flex align-items-center justify-content-between">
-    <div class="fw-bold">Fertility History</div>
+    <div class="fw-bold">Female Fertility History</div>
     <div>
       <button class="btn btn-sm btn-primary" (click)="openAdd()" *ngIf="!showAdd">Add</button>
       <button class="btn btn-sm btn-outline-secondary" (click)="onCancel()" *ngIf="showAdd">Back to list</button>
@@ -15,7 +15,7 @@
             <app-medical-history-basic [dropdowns]="dropdowns" [hrEmployees]="hrEmployees"></app-medical-history-basic>
           </ng-template>
         </li>
-        <li [ngbNavItem]="2">
+        <!-- <li [ngbNavItem]="2">
           <a ngbNavLink href="javascript:void(0)">General</a>
           <ng-template ngbNavContent>
             <app-medical-history-general [dropdowns]="dropdowns"></app-medical-history-general>
@@ -26,7 +26,7 @@
           <ng-template ngbNavContent>
             <app-medical-history-general [dropdowns]="dropdowns"></app-medical-history-general>
           </ng-template>
-        </li>
+        </li> -->
       </ul>
       <div [ngbNavOutlet]="nav"></div>
 

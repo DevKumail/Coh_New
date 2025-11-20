@@ -55,6 +55,7 @@ namespace HMIS.Application
             services.AddScoped<IIVFMaleSemenService, IVFMaleSemenService>();
             services.AddScoped<IIVFMaleFertilityHistoryService, IVFMaleFertilityHistoryService>();
             services.AddScoped<IIVFFemaleFertilityHistoryService, IVFFemaleFertilityHistoryService>();
+            services.AddScoped<IIVFStrawColorService, IVFStrawColorService>();
 
 
 

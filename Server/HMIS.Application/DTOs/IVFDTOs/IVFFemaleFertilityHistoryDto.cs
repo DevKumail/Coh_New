@@ -14,6 +14,15 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public long? AdiposityCategoryId { get; set; }
         public long? GenerallyHealthyCategoryId { get; set; }
         public string? LongTermMedication { get; set; }
+        public long? ChromosomeAnalysisCategoryId { get; set; }
+        public long? CftrcarrierCategoryId { get; set; }
+        public long? PatencyRightCategoryId { get; set; }
+        public long? PatencyLeftCategoryId { get; set; }
+        public string? FallopianTubeYear { get; set; }
+        public int? PrevOperativeTreatmentsCount { get; set; }
+        public int? OvarianStimulationsCount { get; set; }
+        public int? IvfIcsiTreatmentsCount { get; set; }
+        public bool? HasAlternativePretreatments { get; set; }
         public string? Comment { get; set; }
 
         public int? CreatedBy { get; set; }

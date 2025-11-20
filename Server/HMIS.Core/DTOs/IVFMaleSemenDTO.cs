@@ -171,6 +171,8 @@
         public decimal? MorphologyNormalPercent { get; set; }
         public string CryoStatus { get; set; }
         public string Status { get; set; }
+        public int MalePatientId { get; set; }
+        public string? MalePatientName { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
     }

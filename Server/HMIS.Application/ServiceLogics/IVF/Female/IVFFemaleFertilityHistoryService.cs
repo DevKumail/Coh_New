@@ -125,7 +125,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Female
                     _context.IvffemaleFertilityHistory.Add(entity);
                 }
 
-                // Map simple fields (only mapping commonly used fields; extend as needed)
+                // Map simple fields (extend to match entity)
                 if (dto.IVFMainId.HasValue) entity.IvfmainId = dto.IVFMainId.Value;
                 if (dto.Date.HasValue) entity.Date = dto.Date.Value;
                 if (dto.ProviderId.HasValue) entity.ProviderId = dto.ProviderId.Value;
@@ -134,6 +134,15 @@ namespace HMIS.Application.ServiceLogics.IVF.Female
                 if (dto.AdiposityCategoryId.HasValue) entity.AdiposityCategoryId = dto.AdiposityCategoryId.Value;
                 if (dto.GenerallyHealthyCategoryId.HasValue) entity.GenerallyHealthyCategoryId = dto.GenerallyHealthyCategoryId.Value;
                 if (dto.LongTermMedication != null) entity.LongTermMedication = dto.LongTermMedication;
+                if (dto.ChromosomeAnalysisCategoryId.HasValue) entity.ChromosomeAnalysisCategoryId = dto.ChromosomeAnalysisCategoryId.Value;
+                if (dto.CftrcarrierCategoryId.HasValue) entity.CftrcarrierCategoryId = dto.CftrcarrierCategoryId.Value;
+                if (dto.PatencyRightCategoryId.HasValue) entity.PatencyRightCategoryId = dto.PatencyRightCategoryId.Value;
+                if (dto.PatencyLeftCategoryId.HasValue) entity.PatencyLeftCategoryId = dto.PatencyLeftCategoryId.Value;
+                if (dto.FallopianTubeYear != null) entity.FallopianTubeYear = dto.FallopianTubeYear;
+                if (dto.PrevOperativeTreatmentsCount.HasValue) entity.PrevOperativeTreatmentsCount = dto.PrevOperativeTreatmentsCount.Value;
+                if (dto.OvarianStimulationsCount.HasValue) entity.OvarianStimulationsCount = dto.OvarianStimulationsCount.Value;
+                if (dto.IvfIcsiTreatmentsCount.HasValue) entity.IvfIcsiTreatmentsCount = dto.IvfIcsiTreatmentsCount.Value;
+                if (dto.HasAlternativePretreatments.HasValue) entity.HasAlternativePretreatments = dto.HasAlternativePretreatments.Value;
                 if (dto.Comment != null) entity.Comment = dto.Comment;
 
                 // Set audit fields
