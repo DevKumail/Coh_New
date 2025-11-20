@@ -5,19 +5,10 @@
     }" class="card  mt-2 d-flex flex-column">
     <form [formGroup]="clinicalForm" (ngSubmit)="submitVoice()">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <div class="d-flex align-items-center gap-3 flex-grow-1">
-      <div class="d-flex flex-column w-100">
-        <label class="form-label mb-1">Note Title</label>
-        <input type="text" class="form-control w-100"
-          [value]="dataquestion?.node?.noteTitle || ('CLINICAL_AI_POWERED_NOTE_CREATE' | translate)"
-          readonly disabled>
-      </div>
-      <div class="d-flex flex-column w-100 ms-3">
-        <label class="form-label mb-1">Description</label>
-        <textarea class="form-control w-100" style="height: 45px;" placeholder="Description" formControlName="description"></textarea>
-      </div>
-    </div>
-    <div class="d-flex gap-2 align-items-center ms-3">
+    <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
+      <span>{{ dataquestion?.node?.noteTitle || ('CLINICAL_AI_POWERED_NOTE_CREATE' | translate) }}</span>
+    </h5>
+    <div class="d-flex gap-2 align-items-center">
       <i class="bi bi-file-earmark-text text-primary fs-4 me-2"></i>
       <button class="btn btn-danger" (click)="cancel()" type="button">{{ 'CANCEL' | translate }}</button>
       <button class="btn btn-info" [disabled]="clinicalForm.invalid" type="submit">{{ 'SAVE' | translate }}</button>
@@ -25,7 +16,7 @@
   </div>
 
   <div class="card-body flex-grow-1 overflow-auto">
-      <div>
+      <div >
         <div class="row g-3 mb-2">
           <div class="col-sm-4">
             <label class="form-label">Provider (For Signing) <span class="text-danger">*</span></label>
@@ -34,7 +25,29 @@
               readonly disabled>
             <input type="hidden" formControlName="provider">
           </div>
-        </div>
+
+          <div class="col-sm-4">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" style="height: 37px;" placeholder="Description" formControlName="description"></textarea>
+          </div>
+
+          <div class="col-sm-4 d-flex align-items-center">
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary mt-2" (click)="startVoiceRecording()" *ngIf="!recording" type="button">
+                <i class="bi bi-mic-fill me-1"></i> Start Speech
+              </button>
+              <button class="btn btn-warning mt-2" (click)="pauseVoiceRecording()" *ngIf="recording && !isPaused" type="button">
+                <i class="bi bi-pause-circle me-1"></i> Pause
+              </button>
+              <button class="btn btn-success mt-2" (click)="resumeVoiceRecording()" *ngIf="recording && isPaused" type="button">
+                <i class="bi bi-play-circle me-1"></i> Resume
+              </button>
+              <button class="btn btn-danger mt-2" [disabled]="isListening === true || isListening === null" (click)="stopVoiceRecording()" *ngIf="recording" type="button">
+                <i class="bi bi-stop-circle me-1"></i> Stop Speech
+              </button>
+            </div>
+          </div>
+
 
         <div class="row mb-3">
 
@@ -42,6 +55,7 @@
             <audio *ngIf="audioUrl" controls class="w-100" [src]="audioUrl"></audio>
             <p *ngIf="!audioUrl && voiceBlob" class="text-muted">Processing audio...</p>
           </div>
+        </div>
         </div>
 
         <div class="row mb-2">
