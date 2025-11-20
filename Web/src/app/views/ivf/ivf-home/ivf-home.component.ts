@@ -37,7 +37,6 @@ export class IVFHomeComponent {
   private noCoupleAlertShown = false;
   PatientList: any = [];
   PrimaryPatientData: any = [];
-  patientSubscription: Subscription | undefined;
   isLoading = false;
   modalRefInstance: any;
   modalService = new NgbModal();
@@ -83,8 +82,7 @@ export class IVFHomeComponent {
   }
   ngOnInit() {      
       this.patientBannerService.setIsbanneropen(false);
-    this.patientSubscription = this.patientBannerService.patientData$
-      .subscribe((data: any) => {
+    this.patientBannerService.patientData$.subscribe((data: any) => {
         this.PrimaryPatientData = data;
         this.getgetCoupleData();
         this.handleCoupleResponse(data);
@@ -122,19 +120,13 @@ export class IVFHomeComponent {
 
 
   getgetCoupleData(){
+    debugger
     const mrNo = this.PrimaryPatientData?.table2?.[0]?.mrNo;
     if (!mrNo) return;
     this.ivfApi.getCoupleData(mrNo).subscribe({
         next: (res: any) => {
           console.log('IVF couple data (from ivf-home):', res);
           this.handleCoupleResponse(res);
-          // Keep patient banner closed for IVF searches
-          try {
-            // this.patientBannerService.setPatientData(null);
-          } catch (e) {
-            // service may not be available in some contexts
-          }
-          // TODO: expose this data to the ivf component view (store in a property / pass to child)
         },
         error: (err: any) => {
           console.error('Failed to fetch IVF couple data', err);

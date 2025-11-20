@@ -286,8 +286,8 @@ export class MedicalHistoryComponent {
     this.PaginationInfo.Page = page;
     this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
       const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
-    if(ivfMainId){
-      this.ivfservice.getMaleFertilityHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
+      if(ivfMainId){
+        this.ivfservice.getMaleFertilityHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
           next: (res: any) => {
             this.historyRows = res?.fertilityHistory?.data|| [];
             this.totalrecord = res?.fertilityHistory?.totalCount || 0;
@@ -298,7 +298,7 @@ export class MedicalHistoryComponent {
             this.isLoadingHistory = false;
           }
         });
-      }else{
+      } else {
         this.historyRows = [];
         this.isLoadingHistory = false;
       }
@@ -318,7 +318,7 @@ export class MedicalHistoryComponent {
   
 
   getAlldropdown() {
-    this.sharedservice.getDropDownValuesByName(Page.IVFFertilityHistory).subscribe((res: any) => {
+    this.sharedservice.getDropDownValuesByName(Page.IVFMaleFertilityHistory).subscribe((res: any) => {
       this.AllDropdownValues = res;
       this.getAllDropdown(res);
       console.log(this.AllDropdownValues);
