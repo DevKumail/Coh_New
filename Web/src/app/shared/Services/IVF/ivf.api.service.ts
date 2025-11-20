@@ -40,7 +40,7 @@ export class IVFApiService {
   }
 
   getMaleFertilityHistory(ivfMainId: number, page: number = 1, rowsPerPage: number = 10): Observable<any> {
-    return this.api.get('IVFFertilityHistory/GetAllFertilityHistory', {
+    return this.api.get('IVFFertilityHistory/GetAllMaleFertilityHistory', {
       ivfmainid: ivfMainId,
       page,
       rowsPerPage,
@@ -48,12 +48,12 @@ export class IVFApiService {
   }
 
   getFertilityHistoryById(ivfMaleFHId: number): Observable<any> {
-    return this.api.get('IVFFertilityHistory/GetFertilityHistoryById', { IVFMaleFHId: ivfMaleFHId });
+    return this.api.get('IVFFertilityHistory/GetMaleFertilityHistoryById', { IVFMaleFHId: ivfMaleFHId });
   }
 
 
   deleteFertilityHistoryMale(ivfMaleFHId: number): Observable<any> {
-    return this.api.delete(`IVFFertilityHistory/DeleteFertilityHistoryMale/${ivfMaleFHId}`);
+    return this.api.delete(`IVFFertilityHistory/DeleteMaleFertilityHistory/${ivfMaleFHId}`);
   }
 
   getNotifyRoles(): Observable<any> {

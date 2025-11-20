@@ -1,0 +1,159 @@
+<form [formGroup]="form">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="fw-bold">Cryo storage place selection (Sperm)</div>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="onCancel()">Go back to form</button>
+            <!-- <button type="button" class="btn btn-sm btn-success" (click)="onOk()">OK</button> -->
+        </div>
+    </div>
+
+    <!-- Search / Filters -->
+    <div class="card mb-2">
+        <div class="card-body">
+            <div class="row g-1 align-items-end">
+
+                <div class="col-sm-3">
+                    <label class="form-label">Description</label>
+                    <input class="form-control" formControlName="description" placeholder="Description" />
+                </div>
+
+                <div class="col-sm-3">
+                    <label class="form-label">Level A</label>
+                    <input class="form-control" formControlName="levelA" placeholder="Level A" />
+                </div>
+
+                <div class="col-sm-3">
+                    <label class="form-label">Level B</label>
+                    <input class="form-control" formControlName="levelB" placeholder="Level B" />
+                </div>
+
+                <div class="col-sm-3">
+                    <label class="form-label">Level C</label>
+                    <input class="form-control" formControlName="levelC" placeholder="Level C" />
+                </div>
+            </div>
+
+            <!-- ⭐ FULL-WIDTH COLUMN  -->
+            <div class="card p-2 mt-2">
+                <div class="row g-1 align-items-end">
+                    <div class="col-sm-3">
+                        <label class="form-label"># Min free positions</label>
+                        <input class="form-check-input ms-2" type="checkbox" formControlName="minFreePositionsCheck" />
+                        <input class="form-control" formControlName="minFreePositions"
+                            placeholder="With free positions" />
+                    </div>
+
+                    <div class="col-sm-3">
+                        <label class="form-label"># Patients max.</label>
+                        <input class="form-check-input ms-2" type="checkbox" formControlName="maxPatientsCheck" />
+                        <input class="form-control" formControlName="maxPatients" placeholder="# Patients max." />
+                    </div>
+
+                    <div class="col-sm-3">
+                        <label class="form-label"># Samples max.</label>
+                        <input class="form-check-input ms-2" type="checkbox" formControlName="maxSamplesCheck" />
+                        <input class="form-control" formControlName="maxSamples" placeholder="# Samples max." />
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-label">Straw ID</label>
+                        <input class="form-check-input ms-2" type="checkbox" formControlName="strawIdCheck" />
+                        <input class="form-control" formControlName="strawId" placeholder="Straw ID" />
+                    </div>
+                </div>   
+            </div>
+            <div class="justify-content-end d-flex">
+                <button type="button" class="btn btn-primary ms-auto" (click)="search()">Search</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Content split: storages list and storage details -->
+    <div class="row g-2">
+        <!-- Storages table -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Storages</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height:420px;">
+                        <table class="table table-sm table-hover table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Level A</th>
+                                    <th>Level B</th>
+                                    <th>Level C</th>
+                                    <th># Patients</th>
+                                    <th># Samples</th>
+                                    <th># Free places</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let s of storages" (click)="onSelectStorage(s)"
+                                    [class.table-active]="s===selectedRow" style="cursor:pointer;">
+                                    <td>{{ s.description }}</td>
+                                    <td>{{ s.levelA }}</td>
+                                    <td>{{ s.levelB }}</td>
+                                    <td>{{ s.levelC }}</td>
+                                    <td>{{ s.patients }}</td>
+                                    <td>{{ s.samples }}</td>
+                                    <td>{{ s.free }}</td>
+                                </tr>
+                                <tr *ngIf="storages.length===0">
+                                    <td colspan="7" class="text-center py-3">No storages</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Storage details table -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Storage details</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height:420px;">
+                        <table class="table table-sm table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:40px">C.</th>
+                                    <th>C1</th>
+                                    <th>Patient</th>
+                                    <th>Patient ID</th>
+                                    <th>Straw ID</th>
+                                    <th>Pos.</th>
+                                    <th>Type of material</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let d of details">
+                                    <td>
+                                        <span class="d-inline-block" [style.background]="d.color"
+                                            style="width:16px;height:16px;border:1px solid #ddd;"></span>
+                                    </td>
+                                    <td>{{ d.c1 }}</td>
+                                    <td>{{ d.patient }}</td>
+                                    <td>{{ d.patientId }}</td>
+                                    <td>{{ d.strawId }}</td>
+                                    <td>{{ d.pos }}</td>
+                                    <td>{{ d.type }}</td>
+                                </tr>
+                                <tr *ngIf="details.length===0">
+                                    <td colspan="7" class="text-center py-3">No details</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer buttons for small screens -->
+    <div class="d-flex justify-content-end gap-2 mt-2 d-lg-none">
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">Cancel</button>
+        <button type="button" class="btn btn-success" (click)="onOk()">OK</button>
+    </div>
+</form>

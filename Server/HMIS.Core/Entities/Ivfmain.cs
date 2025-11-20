@@ -17,11 +17,11 @@ public partial class Ivfmain
 
     public long FemalePatientId { get; set; }
 
-    public long AppId { get; set; }
+    public long? AppId { get; set; }
 
     [ForeignKey("AppId")]
     [InverseProperty("Ivfmain")]
-    public virtual SchAppointment App { get; set; } = null!;
+    public virtual SchAppointment? App { get; set; }
 
     [ForeignKey("FemalePatientId")]
     [InverseProperty("IvfmainFemalePatient")]

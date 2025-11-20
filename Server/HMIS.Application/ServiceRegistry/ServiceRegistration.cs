@@ -2,6 +2,9 @@ using HMIS.Application.Implementations;
 using HMIS.Application.ServiceLogics;
 using HMIS.Application.ServiceLogics.Cryo;
 using HMIS.Application.ServiceLogics.IVF;
+using HMIS.Application.ServiceLogics.IVF.Dashboard;
+using HMIS.Application.ServiceLogics.IVF.Male;
+using HMIS.Application.ServiceLogics.IVF.Female;
 using HMIS.ApplicationImplementations;
 using HMIS.Core.Entities;
 using HMIS.Service.Implementations;
@@ -44,13 +47,14 @@ namespace HMIS.Application
             services.AddScoped<ILocalizationSpService, LocalizationSpService>();
             services.AddScoped<IPrescription, PrescriptionManager>();
             services.AddScoped<IAlertManager, AlertManager >();
-            services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<IDashboardService, IVFDashboardService>();
             services.AddScoped<ICryoManagementService, CryoManagementService>();
             services.AddScoped<IDropDownLookUpService, DropDownLookUpService>();
             services.AddScoped<IIVFLabService, IVFLabService>();
             services.AddScoped<IIVFLabOrderService, IVFLabOrderService>();
             services.AddScoped<IIVFMaleSemenService, IVFMaleSemenService>();
-            services.AddScoped<IFertilityHistoryService, FertilityHistoryService>();
+            services.AddScoped<IIVFMaleFertilityHistoryService, IVFMaleFertilityHistoryService>();
+            services.AddScoped<IIVFFemaleFertilityHistoryService, IVFFemaleFertilityHistoryService>();
 
 
 

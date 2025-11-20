@@ -1,0 +1,98 @@
+<div class="medical-history-container">
+  <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+    <div class="fw-bold">Fertility History</div>
+    <div>
+      <button class="btn btn-sm btn-primary" (click)="openAdd()" *ngIf="!showAdd">Add</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="onCancel()" *ngIf="showAdd">Back to list</button>
+    </div>
+  </div>
+    <div *ngIf="isCreateUpdate" class="card-body">
+      <ul ngbNav #nav="ngbNav" [(activeId)]="activeTabId" [destroyOnHide]="false" class="nav nav-tabs mb-3">
+        <li [ngbNavItem]="1">
+          <a ngbNavLink href="javascript:void(0)">Basic</a>
+          <ng-template ngbNavContent>
+            <app-medical-history-basic [dropdowns]="dropdowns" [hrEmployees]="hrEmployees"></app-medical-history-basic>
+          </ng-template>
+        </li>
+        <li [ngbNavItem]="2">
+          <a ngbNavLink href="javascript:void(0)">General</a>
+          <ng-template ngbNavContent>
+            <app-medical-history-general [dropdowns]="dropdowns"></app-medical-history-general>
+          </ng-template>
+        </li>
+           <li [ngbNavItem]="3">
+          <a ngbNavLink href="javascript:void(0)">Genetics</a>
+          <ng-template ngbNavContent>
+            <app-medical-history-general [dropdowns]="dropdowns"></app-medical-history-general>
+          </ng-template>
+        </li>
+      </ul>
+      <div [ngbNavOutlet]="nav"></div>
+
+  
+
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">
+          <i class="bi bi-x-circle me-1"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-success" (click)="onSave()">
+          <i class="bi bi-check-circle me-1"></i> OK
+        </button>
+      </div>
+    </div>
+
+        <!-- Fertility History List -->
+      <div *ngIf="!isCreateUpdate" class="card mt-3">
+        <div class="card-body p-2">
+          <div  class="table-responsive">
+            <table class="table table-bordered table-striped table-sm">
+                      <thead>
+                        <tr class="text-center">
+                        <th>Adiposity</th>
+                        <th>Generally healthy</th>
+                        <th>Number of Pregnancies achieved</th>
+                        <th>Long Term Medication</th>
+                        <th>Testicle Status</th>
+                        <th style="width:100px">Actions</th>
+                        </tr>
+                      </thead>
+              <tbody class="table-group-divider text-center">
+        <ng-container *ngIf="isLoadingHistory">
+          <tr *ngFor="let i of [1,2,3]">
+            <td colspan="6" class="text-start">
+              <div class="placeholder-wave"><span class="placeholder col-12"></span></div>
+            </td>
+          </tr>
+        </ng-container>
+        <ng-container *ngIf="!isLoadingHistory">
+          <tr *ngFor="let r of ListData; let i = index">
+            <td>{{ r.Adiposity || '-'}}</td>
+            <td>{{ r.GenerallyHealthy || '-' }}</td>
+            <td>{{ r.PregnanciesAchieved || '-' }}</td>
+            <td>{{ r.LongTermMedication || '-' }}</td>
+            <td>{{ r.TesticleStatus || '-' }}</td>
+            <td>
+              <ng-icon name="tablerEdit" class="me-1" style="cursor: pointer;" (click)="openEditById(r.IVFMaleFHId)"></ng-icon>
+              <ng-icon name="tablerTrash" class="text-danger me-1" style="cursor: pointer;" (click)="delete(r.IVFMaleFHId)"></ng-icon>
+            </td>
+          </tr>
+          <tr *ngIf="!ListData || ListData.length === 0">
+            <td colspan="6" class="text-center">
+              <span>No Data Found </span>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+            </table>
+                    <app-generic-pagination 
+                    [totalItems]="totalrecord" 
+                    [pageSize]="PaginationInfo?.RowsPerPage"
+                    [currentPage]="PaginationInfo?.Page" 
+                    (pageChanged)="onPageChanged($event)">
+                    </app-generic-pagination>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>

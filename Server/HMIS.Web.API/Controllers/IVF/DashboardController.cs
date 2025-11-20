@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using HMIS.Application.ServiceLogics.IVF;
 using HMIS.Application.DTOs.SpLocalModel;
 using HMIS.Application.DTOs.IVFDTOs;
+using HMIS.Application.ServiceLogics.IVF.Dashboard;
 
 
 namespace HMIS.Web.Controllers.IVF
