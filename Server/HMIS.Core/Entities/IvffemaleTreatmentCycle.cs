@@ -40,9 +40,28 @@ public partial class IvffemaleTreatmentCycle
 
     public long? PlannedSpermCollectionCategoryId { get; set; }
 
+    [Column("IVFMaleFHId")]
+    public int? IvfmaleFhid { get; set; }
+
+    [Column("IVFFemaleFHId")]
+    public int? IvffemaleFhid { get; set; }
+
+    public string? CycleNote { get; set; }
+
     [ForeignKey("CycleFromAmenorrheaCategoryId")]
     [InverseProperty("IvffemaleTreatmentCycleCycleFromAmenorrheaCategory")]
     public virtual DropdownConfiguration? CycleFromAmenorrheaCategory { get; set; }
+
+    [ForeignKey("IvffemaleFhid")]
+    [InverseProperty("IvffemaleTreatmentCycle")]
+    public virtual IvffemaleFertilityHistory? IvffemaleFh { get; set; }
+
+    [InverseProperty("IvffemaleTreatmentCycle")]
+    public virtual ICollection<IvffemaleTreatmentTypes> IvffemaleTreatmentTypes { get; set; } = new List<IvffemaleTreatmentTypes>();
+
+    [ForeignKey("IvfmaleFhid")]
+    [InverseProperty("IvffemaleTreatmentCycle")]
+    public virtual IvfmaleFertilityHistory? IvfmaleFh { get; set; }
 
     [ForeignKey("MainIndicationCategoryId")]
     [InverseProperty("IvffemaleTreatmentCycleMainIndicationCategory")]
