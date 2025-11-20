@@ -190,6 +190,8 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<IvffemaleFhprevIllness> IvffemaleFhprevIllness { get; set; }
 
+    public virtual DbSet<IvffemaleTreatmentCycle> IvffemaleTreatmentCycle { get; set; }
+
     public virtual DbSet<Ivfmain> Ivfmain { get; set; }
 
     public virtual DbSet<IvfmaleFertilityHistory> IvfmaleFertilityHistory { get; set; }
@@ -425,6 +427,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<TabDrugsName> TabDrugsName { get; set; }
 
     public virtual DbSet<TabDrugsNameBackup> TabDrugsNameBackup { get; set; }
+
+    public virtual DbSet<Table1> Table1 { get; set; }
 
     public virtual DbSet<Task> Task { get; set; }
 
@@ -898,7 +902,6 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.ValueId).HasName("PK__Dropdown__93364E485C5ACFCE");
 
-            entity.Property(e => e.ValueId).ValueGeneratedNever();
             entity.Property(e => e.IsActive).HasDefaultValue(true);
 
             entity.HasOne(d => d.Category).WithMany(p => p.DropdownConfiguration)
@@ -2257,6 +2260,13 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<TabDrugsNameBackup>(entity =>
         {
             entity.Property(e => e.NewDrugId).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<Table1>(entity =>
+        {
+            entity.HasKey(e => e.IvffemaleTreatmentSubTypeId).HasName("PK_Table_1_1");
+
+            entity.HasOne(d => d.IvffemaleTreatmentCycle).WithMany(p => p.Table1).HasConstraintName("FK_Table_1_IVFFemaleTreatmentCycle");
         });
 
         modelBuilder.Entity<Task>(entity =>
