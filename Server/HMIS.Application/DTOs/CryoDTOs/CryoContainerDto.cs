@@ -68,7 +68,7 @@ namespace HMIS.Application.DTOs.CryoDTOs
         public long LevelBID { get; set; }
         [Required(ErrorMessage = "StrawPosition is required.")]
         public int StrawPosition { get; set; }
-        public long? SampleID { get; set; }
+        public int? SampleID { get; set; }
         public string Status { get; set; } = "Available";
         public long? CreatedBy { get; set; }
         public long? UpdatedBy { get; set; }
