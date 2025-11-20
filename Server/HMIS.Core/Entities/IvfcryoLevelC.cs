@@ -18,8 +18,7 @@ public partial class IvfcryoLevelC
 
     public int StrawPosition { get; set; }
 
-    [Column("SampleID")]
-    public long? SampleId { get; set; }
+    public int? SampleId { get; set; }
 
     [StringLength(50)]
     public string Status { get; set; } = null!;
@@ -45,4 +44,8 @@ public partial class IvfcryoLevelC
     [ForeignKey("LevelBid")]
     [InverseProperty("IvfcryoLevelC")]
     public virtual IvfcryoLevelB LevelB { get; set; } = null!;
+
+    [ForeignKey("SampleId")]
+    [InverseProperty("IvfcryoLevelC")]
+    public virtual IvfmaleSemenSample? Sample { get; set; }
 }

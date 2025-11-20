@@ -1142,6 +1142,8 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.LevelB).WithMany(p => p.IvfcryoLevelC)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Cryo_Leve__Level__541767F8");
+
+            entity.HasOne(d => d.Sample).WithMany(p => p.IvfcryoLevelC).HasConstraintName("FK_IVFMaleCryoPreservation_Cryosamplelevelc");
         });
 
         modelBuilder.Entity<IvffemaleFertilityHistory>(entity =>
