@@ -106,14 +106,6 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<CptsInCptbyAppType> CptsInCptbyAppType { get; set; }
 
-    public virtual DbSet<CryoContainers> CryoContainers { get; set; }
-
-    public virtual DbSet<CryoLevelA> CryoLevelA { get; set; }
-
-    public virtual DbSet<CryoLevelB> CryoLevelB { get; set; }
-
-    public virtual DbSet<CryoLevelC> CryoLevelC { get; set; }
-
     public virtual DbSet<DeductiblePercent> DeductiblePercent { get; set; }
 
     public virtual DbSet<DocumentUpload> DocumentUpload { get; set; }
@@ -184,6 +176,14 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<InvestigationType> InvestigationType { get; set; }
 
+    public virtual DbSet<IvfcryoContainers> IvfcryoContainers { get; set; }
+
+    public virtual DbSet<IvfcryoLevelA> IvfcryoLevelA { get; set; }
+
+    public virtual DbSet<IvfcryoLevelB> IvfcryoLevelB { get; set; }
+
+    public virtual DbSet<IvfcryoLevelC> IvfcryoLevelC { get; set; }
+
     public virtual DbSet<IvffemaleFertilityHistory> IvffemaleFertilityHistory { get; set; }
 
     public virtual DbSet<IvffemaleFhadditionalMeasures> IvffemaleFhadditionalMeasures { get; set; }
@@ -191,6 +191,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<IvffemaleFhimpairmentFactor> IvffemaleFhimpairmentFactor { get; set; }
 
     public virtual DbSet<IvffemaleFhperformedAdditionalMeasures> IvffemaleFhperformedAdditionalMeasures { get; set; }
+
+    public virtual DbSet<IvffemaleFhpidembblastIndications> IvffemaleFhpidembblastIndications { get; set; }
 
     public virtual DbSet<IvffemaleFhpidpolarBodiesIndications> IvffemaleFhpidpolarBodiesIndications { get; set; }
 
@@ -203,6 +205,12 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<IvffemaleTreatmentTypes> IvffemaleTreatmentTypes { get; set; }
 
     public virtual DbSet<Ivfmain> Ivfmain { get; set; }
+
+    public virtual DbSet<IvfmaleCryoContracts> IvfmaleCryoContracts { get; set; }
+
+    public virtual DbSet<IvfmaleCryoPreservation> IvfmaleCryoPreservation { get; set; }
+
+    public virtual DbSet<IvfmaleCryoStraw> IvfmaleCryoStraw { get; set; }
 
     public virtual DbSet<IvfmaleFertilityHistory> IvfmaleFertilityHistory { get; set; }
 
@@ -841,51 +849,6 @@ public partial class HMISDbContext : DbContext
                 .HasConstraintName("FK_CPTsInCPTByAppType_CPTByAppType");
         });
 
-        modelBuilder.Entity<CryoContainers>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Cryo_Con__3214EC27B2AC8892");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
-        });
-
-        modelBuilder.Entity<CryoLevelA>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Cryo_Lev__3214EC27FFA90B71");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
-
-            entity.HasOne(d => d.Container).WithMany(p => p.CryoLevelA)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Cryo_Leve__Conta__43E1002F");
-        });
-
-        modelBuilder.Entity<CryoLevelB>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Cryo_Lev__3214EC27172594AE");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
-
-            entity.HasOne(d => d.LevelA).WithMany(p => p.CryoLevelB)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Cryo_Leve__Level__48A5B54C");
-        });
-
-        modelBuilder.Entity<CryoLevelC>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Cryo_Lev__3214EC270D952296");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.Status).HasDefaultValue("Available");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
-
-            entity.HasOne(d => d.LevelB).WithMany(p => p.CryoLevelC)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Cryo_Leve__Level__541767F8");
-        });
-
         modelBuilder.Entity<DeductiblePercent>(entity =>
         {
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
@@ -1136,6 +1099,51 @@ public partial class HMISDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Investig__3214EC07992AE891");
         });
 
+        modelBuilder.Entity<IvfcryoContainers>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Cryo_Con__3214EC27B2AC8892");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+        });
+
+        modelBuilder.Entity<IvfcryoLevelA>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Cryo_Lev__3214EC27FFA90B71");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.Container).WithMany(p => p.IvfcryoLevelA)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cryo_Leve__Conta__43E1002F");
+        });
+
+        modelBuilder.Entity<IvfcryoLevelB>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Cryo_Lev__3214EC27172594AE");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.LevelA).WithMany(p => p.IvfcryoLevelB)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cryo_Leve__Level__48A5B54C");
+        });
+
+        modelBuilder.Entity<IvfcryoLevelC>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Cryo_Lev__3214EC270D952296");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.Status).HasDefaultValue("Available");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.LevelB).WithMany(p => p.IvfcryoLevelC)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cryo_Leve__Level__541767F8");
+        });
+
         modelBuilder.Entity<IvffemaleFertilityHistory>(entity =>
         {
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
@@ -1177,6 +1185,13 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.IvffemaleFhadditionalMeasures).WithMany().HasConstraintName("FK_IVFFemaleFHPerformedAdditionalMeasures_IVFFemaleFHAdditionalMeasures");
 
             entity.HasOne(d => d.PerformedAdditionalMeasuresCategory).WithMany().HasConstraintName("FK_IVFFemaleFHPerformedAdditionalMeasures_DropdownConfiguration");
+        });
+
+        modelBuilder.Entity<IvffemaleFhpidembblastIndications>(entity =>
+        {
+            entity.HasOne(d => d.IvffemaleFhadditionalMeasures).WithMany(p => p.IvffemaleFhpidembblastIndications).HasConstraintName("FK_IVFFemaleFHPIDEMBBlastIndications_IVFFemaleFHAdditionalMeasures");
+
+            entity.HasOne(d => d.PidembblastIndicationCategory).WithMany(p => p.IvffemaleFhpidembblastIndications).HasConstraintName("FK_IVFFemaleFHPIDEMBBlastIndications_DropdownConfiguration");
         });
 
         modelBuilder.Entity<IvffemaleFhpidpolarBodiesIndications>(entity =>
@@ -1252,6 +1267,68 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.MalePatient).WithMany(p => p.IvfmainMalePatient)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFMain_MalePatient");
+        });
+
+        modelBuilder.Entity<IvfmaleCryoContracts>(entity =>
+        {
+            entity.HasKey(e => e.CryoContractId).HasName("PK__IVFMaleC__F73C263B85575133");
+
+            entity.Property(e => e.AutoRenew).HasDefaultValue(false);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysutcdatetime())");
+        });
+
+        modelBuilder.Entity<IvfmaleCryoPreservation>(entity =>
+        {
+            entity.HasKey(e => e.CryoPreservationId).HasName("PK__IVFMaleC__5027C62D65A8D4B9");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+            entity.Property(e => e.PreserveUsingCryoStorage).HasDefaultValue(true);
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.Color).WithMany(p => p.IvfmaleCryoPreservation).HasConstraintName("FK_IVFMaleCryoPreservation_Color");
+
+            entity.HasOne(d => d.CryoContract).WithMany(p => p.IvfmaleCryoPreservation).HasConstraintName("FK_IVFMaleCryoPreservation_CryoContract");
+
+            entity.HasOne(d => d.MaterialType).WithMany(p => p.IvfmaleCryoPreservationMaterialType).HasConstraintName("FK_IVFMaleCryoPreservation_MaterialType");
+
+            entity.HasOne(d => d.OriginallyFromClinic).WithMany(p => p.IvfmaleCryoPreservationOriginallyFromClinic).HasConstraintName("FK_IVFMaleCryoPreservation_OriginallyFromClinic");
+
+            entity.HasOne(d => d.ReasonForResearch).WithMany(p => p.IvfmaleCryoPreservationReasonForResearch).HasConstraintName("FK_IVFMaleCryoPreservation_ReasonForResearch");
+
+            entity.HasOne(d => d.Sample).WithMany(p => p.IvfmaleCryoPreservation)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFMaleCryoPreservation_sampleContract");
+
+            entity.HasOne(d => d.Status).WithMany(p => p.IvfmaleCryoPreservationStatus).HasConstraintName("FK_IVFMaleCryoPreservation_Status");
+
+            entity.HasOne(d => d.StoragePlace).WithMany(p => p.IvfmaleCryoPreservation).HasConstraintName("FK_IVFMaleCryoPreservation_CryoLevelC");
+        });
+
+        modelBuilder.Entity<IvfmaleCryoStraw>(entity =>
+        {
+            entity.HasKey(e => e.CryoStrawId).HasName("PK__IVFMaleC__02711F604B15B3D3");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+            entity.Property(e => e.Status).HasDefaultValue("Stored");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.Color).WithMany(p => p.IvfmaleCryoStraw).HasConstraintName("FK_IVFMaleCryoPreservation_Colorstraw");
+
+            entity.HasOne(d => d.CryoPreservation).WithMany(p => p.IvfmaleCryoStraw)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFMaleCryoPreservation_cryopreservation");
+
+            entity.HasOne(d => d.MaterialType).WithMany(p => p.IvfmaleCryoStraw).HasConstraintName("FK_IVFMaleCryoPreservation_materialtypestarw");
+
+            entity.HasOne(d => d.Sample).WithMany(p => p.IvfmaleCryoStraw)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFMaleCryoPreservation_sampleContractsraw");
+
+            entity.HasOne(d => d.StorageLevelC).WithMany(p => p.IvfmaleCryoStraw).HasConstraintName("FK_IVFMaleCryoPreservation_CryoLevelCstaw");
         });
 
         modelBuilder.Entity<IvfmaleFertilityHistory>(entity =>

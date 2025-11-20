@@ -100,6 +100,12 @@ public partial class IvfmaleSemenSample
     public virtual Ivfmain Ivfmain { get; set; } = null!;
 
     [InverseProperty("Sample")]
+    public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservation { get; set; } = new List<IvfmaleCryoPreservation>();
+
+    [InverseProperty("Sample")]
+    public virtual ICollection<IvfmaleCryoStraw> IvfmaleCryoStraw { get; set; } = new List<IvfmaleCryoStraw>();
+
+    [InverseProperty("Sample")]
     public virtual ICollection<IvfmaleSemenObservation> IvfmaleSemenObservation { get; set; } = new List<IvfmaleSemenObservation>();
 
     [InverseProperty("Sample")]

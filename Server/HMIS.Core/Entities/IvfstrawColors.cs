@@ -31,4 +31,10 @@ public partial class IvfstrawColors
     public DateTime? UpdatedAt { get; set; }
 
     public bool? IsDeleted { get; set; }
+
+    [InverseProperty("Color")]
+    public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservation { get; set; } = new List<IvfmaleCryoPreservation>();
+
+    [InverseProperty("Color")]
+    public virtual ICollection<IvfmaleCryoStraw> IvfmaleCryoStraw { get; set; } = new List<IvfmaleCryoStraw>();
 }

@@ -17,6 +17,9 @@ public partial class IvffemaleFhadditionalMeasures
     public string? GeneralCondition { get; set; }
 
     [InverseProperty("IvffemaleFhadditionalMeasures")]
+    public virtual ICollection<IvffemaleFhpidembblastIndications> IvffemaleFhpidembblastIndications { get; set; } = new List<IvffemaleFhpidembblastIndications>();
+
+    [InverseProperty("IvffemaleFhadditionalMeasures")]
     public virtual ICollection<IvffemaleFhpidpolarBodiesIndications> IvffemaleFhpidpolarBodiesIndications { get; set; } = new List<IvffemaleFhpidpolarBodiesIndications>();
 
     [InverseProperty("IvffemaleFhadditionalMeasures")]
