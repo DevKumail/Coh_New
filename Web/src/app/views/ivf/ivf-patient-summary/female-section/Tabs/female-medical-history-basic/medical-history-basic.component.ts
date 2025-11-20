@@ -88,6 +88,7 @@ export class MedicalHistoryBasicComponent implements OnInit {
 
   initializeForm() {
     this.basicForm = this.fb.group({
+      ivfFemaleFHId: [0],
       date: [''],
       attendingClinician: [''],
       weight: [''],
@@ -112,7 +113,8 @@ export class MedicalHistoryBasicComponent implements OnInit {
       previousOperative: [''],
       ovarianStimulations: [''],
       IVFandICSI: [''],
-      alternativePretreatments: [false]
+      alternativePretreatments: [false],
+      editorContent: ['']
     });
   }
 
@@ -275,5 +277,69 @@ export class MedicalHistoryBasicComponent implements OnInit {
     const q = this.searchFactor.trim().toLowerCase();
     if (q.length <= 3) return this.factorsOptions;
     return this.factorsOptions.filter(o => o.toLowerCase().includes(q));
+  }
+
+  // Public method to get form data for parent component
+  getFormData(): any {
+    return this.basicForm.getRawValue();
+  }
+
+  // Public method to populate form with data (for edit)
+  populateForm(data: any): void {
+    if (!data) return;
+
+    // Parse unprotected intercourse year and month
+    let unprotectedMonthYear = '';
+    if (data.unprotectedIntercourseYear && data.unprotectedIntercourseMonth) {
+      const year = data.unprotectedIntercourseYear;
+      const month = String(data.unprotectedIntercourseMonth).padStart(2, '0');
+      unprotectedMonthYear = `${year}-${month}`;
+    }
+
+    // Parse fallopian year
+    const fallopianYear = data.fallopianTubeYear ? String(data.fallopianTubeYear) : '';
+
+    // Extract impairment factors
+    const sterilityFactors = data.impairmentFactors?.map((f: any) => f.impairmentFactor) || [];
+
+    // Extract previous illnesses
+    const previousIllnesses = data.prevIllnesses?.map((i: any) => i.prevIllness) || [];
+
+    this.basicForm.patchValue({
+      ivfFemaleFHId: data.ivfFemaleFHId || 0,
+      date: data.date ? new Date(data.date).toISOString().split('T')[0] : '',
+      attendingClinician: data.providerId || '',
+      adiposity: data.adiposityCategoryId || '',
+      generallyHealthy: data.generallyHealthyCategoryId || '',
+      longTermMedication: data.longTermMedication || '',
+      chromosomeAnalysis: data.chromosomeAnalysisCategoryId || '',
+      cftrCarrier: data.cftrcarrierCategoryId || '',
+      patencyRight: data.patencyRightCategoryId || '',
+      patencyLeft: data.patencyLeftCategoryId || '',
+      fallopianYear: fallopianYear,
+      unprotectedMonthYear: unprotectedMonthYear,
+      previousOperative: data.prevOperativeTreatmentsCount || 0,
+      ovarianStimulations: data.ovarianStimulationsCount || 0,
+      IVFandICSI: data.ivfIcsiTreatmentsCount || 0,
+      alternativePretreatments: data.hasAlternativePretreatments || false,
+      editorContent: data.comment || ''
+    });
+
+    // Set multi-select values
+    this.sterilityFactors.setValue(sterilityFactors);
+    this.previousIllnesses.setValue(previousIllnesses);
+  }
+
+  // Public method to reset form
+  resetForm(): void {
+    this.basicForm.reset({
+      ivfFemaleFHId: 0,
+      alternativePretreatments: false,
+      previousOperative: 0,
+      ovarianStimulations: 0,
+      IVFandICSI: 0
+    });
+    this.sterilityFactors.setValue([]);
+    this.previousIllnesses.setValue([]);
   }
 }
