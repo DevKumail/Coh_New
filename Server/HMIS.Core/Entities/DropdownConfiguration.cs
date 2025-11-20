@@ -45,6 +45,9 @@ public partial class DropdownConfiguration
     [InverseProperty("PatencyRightCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryPatencyRightCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
+    [InverseProperty("TreatmentTypeCategory")]
+    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycle { get; set; } = new List<IvffemaleTreatmentCycle>();
+
     [InverseProperty("AdiposityCategory")]
     public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistoryAdiposityCategory { get; set; } = new List<IvfmaleFertilityHistory>();
 
