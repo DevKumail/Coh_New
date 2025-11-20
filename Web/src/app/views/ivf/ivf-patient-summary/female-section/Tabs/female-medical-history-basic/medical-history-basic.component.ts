@@ -4,11 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators, FormControl } from '@angular/forms';
 import { ApiService } from '@/app/core/services/api.service';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { QuillModule } from 'ngx-quill';
 
 @Component({
   selector: 'app-medical-history-basic',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, FilledOnValueDirective],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    FormsModule, 
+    FilledOnValueDirective,
+    QuillModule
+  ],
   templateUrl: './medical-history-basic.component.html',
   styleUrls: ['./medical-history-basic.component.scss']
 })
@@ -75,21 +82,42 @@ export class MedicalHistoryBasicComponent implements OnInit {
       height: [''],
       bmi: [{value: '', disabled: true}],
       adiposity: [''],
-      generallyHealthy: ['Not specified'],
+      generallyHealthy: [''],
       longTermMedication: [''],
-      pregnanciesAchieved: [0],
       chromosomeAnalysis: [''],
       cftrCarrier: [''],
+
+      patencyRight: [''],
+      patencyLeft: [''],
+      fallopianYear: [''],
       // Dynamic semen analyses
-      analyses: this.fb.array([this.createAnalysisGroup()]),
+      // analyses: this.fb.array([this.createAnalysisGroup()]),
       // Multi-selects
-      fertilityFactors: this.fb.control<string[]>([]),
-      previousIllnesses: this.fb.control<string[]>([])
+      sterilityFactors: this.fb.control<string[]>([]),
+      previousIllnesses: this.fb.control<string[]>([]),
+
+      unprotectedMonthYear: [''],
+      previousOperative: [''],
+      ovarianStimulations: [''],
+      IVFandICSI: [''],
+      alternativePretreatments: [false]
     });
   }
 
-  get fertilityFactors(): FormControl<string[] | null> {
-    return this.basicForm.get('fertilityFactors') as FormControl<string[] | null>;
+    quillModules = {
+    toolbar: [
+      [{ font: [] }],
+      [{ size: ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ color: [] }, { background: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ align: [] }],
+      ['clean']
+    ]
+  };
+
+  get sterilityFactors(): FormControl<string[] | null> {
+    return this.basicForm.get('sterilityFactors') as FormControl<string[] | null>;
   }
 
   get previousIllnesses(): FormControl<string[] | null> {
@@ -213,7 +241,7 @@ export class MedicalHistoryBasicComponent implements OnInit {
 
   // Fertility factors helpers
   get selectedFactors(): string[] {
-    return (this.fertilityFactors.value || []) as string[];
+    return (this.sterilityFactors.value || []) as string[];
   }
 
   isFactorSelected(value: string): boolean {
@@ -226,9 +254,9 @@ export class MedicalHistoryBasicComponent implements OnInit {
     if (!code) return;
     const current = new Set(this.selectedFactors);
     if (current.has(code)) current.delete(code); else current.add(code);
-    this.fertilityFactors.setValue(Array.from(current));
-    this.fertilityFactors.markAsDirty();
-    this.fertilityFactors.markAsTouched();
+    this.sterilityFactors.setValue(Array.from(current));
+    this.sterilityFactors.markAsDirty();
+    this.sterilityFactors.markAsTouched();
   }
 
   get filteredFactorsOptions(): string[] {

@@ -33,7 +33,7 @@ export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges
     
   ];
 
-  switchItem = { id: 'switch-partner', label: 'Switch to partner', icon: 'tablerUsers' };
+  // switchItem = { id: 'switch-partner', label: 'Switch to partner', icon: 'tablerUsers' };
 
   // Placeholder for potential future orders
   orderItems: Array<{ id: string; label: string; icon: string }> = [];

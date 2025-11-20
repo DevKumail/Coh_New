@@ -19,7 +19,13 @@
         <!-- Male panel -->
         <div [ngClass]="{ 'col-10': !leftCollapsed, 'col': leftCollapsed }" class="fixed-height" >
           <ng-container *ngIf="(patientBannerService.patientData$ | async) as pdata; else emptyState">
-            <app-medical-history *ngIf="selectedId==='medical-history'"></app-medical-history>
+            <div *ngIf="isMalesidebar">
+              <app-medical-history *ngIf="selectedId==='medical-history'"></app-medical-history>
+            </div>
+            <div *ngIf="!isMalesidebar">
+              <app-female-medical-history-list *ngIf="selectedId==='medical-history'"></app-female-medical-history-list>
+            </div>
+
             <app-social-history *ngIf="selectedId==='social-history'"></app-social-history>
             <app-family-history *ngIf="selectedId==='family-history'"></app-family-history>
             <app-ivf-ps-pathology-results *ngIf="selectedId==='pathology-results'"></app-ivf-ps-pathology-results>
@@ -33,21 +39,6 @@
             </div>
           </ng-template>
         </div>
-
-        <div [ngClass]="{ 'col-10': !leftCollapsed, 'col': leftCollapsed }" class="fixed-height" *ngIf="!isMalesidebar">
-          <ng-container *ngIf="(patientBannerService.patientData$ | async) as pdata; else emptyState">
-            <!-- <app-female-medical-history-list *ngIf="selectedId==='female-medical-history'"></app-female-medical-history-list> -->
-            <!-- <app-social-history *ngIf="selectedId==='social-history'"></app-social-history>
-            <app-family-history *ngIf="selectedId==='family-history'"></app-family-history> -->
-          </ng-container>
-        
-          <ng-template #emptyState>
-            <div class="d-flex align-items-center justify-content-center h-100 text-muted">
-              Select or search a patient to load summary
-            </div>
-          </ng-template>
-        </div>
-
               <div class="d-flex mb-2">
           <div class="btn-group" role="group" aria-label="Gender toggle">
             <button type="button" class="btn btn-sm" [class.btn-primary]="isMalesidebar" [class.btn-outline-primary]="!isMalesidebar" (click)="setGender('male')">Male</button>
