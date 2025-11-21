@@ -240,9 +240,11 @@ export class PreservationComponent implements OnInit, OnChanges {
       return d.toISOString();
     };
 
-    const payload = {
+    const existingId = (this.preservationData as any)?.existingPreservation?.cryoPreservationId ?? null;
+
+    // Build payloads for create vs update shapes
+    const createPayload = {
       sampleId: this.preservationData?.sampleId ?? 0,
-      cryoPreservationId: (this.preservationData as any)?.existingPreservation?.cryoPreservationId ?? null,
       preservationCode: v.storagePlace || '',
       freezingDateTime: toDateTime(v.freezingDate, v.freezingTime),
       cryopreservedById: Number(v.cryopreservedBy) || null,
@@ -264,8 +266,34 @@ export class PreservationComponent implements OnInit, OnChanges {
       createdBy: 0
     };
 
+    const updatePayload = {
+      cryoPreservationId: Number(existingId),
+      freezingDateTime: toDateTime(v.freezingDate, v.freezingTime),
+      cryopreservedById: Number(v.cryopreservedBy) || null,
+      originallyFromClinicId: Number(v.originallyFromClinic) || null,
+      storageDateTime: toDateTime(v.storageDate, null),
+      storedById: Number(v.storedBy) || null,
+      materialTypeId: Number(v.typeOfMaterial) || null,
+      strawStartNumber: Number(v.strawId) || null,
+      strawCount: Number(v.numberOfStraws) || 0,
+      statusId: Number(v.status) || null,
+      cryoContractId: Number(v.cryoContract) || null,
+      preserveUsingCryoStorage: !!v.useCryoStorage,
+      storagePlaceId: Number(v.storagePlaceId) || null,
+      position: v.position || '',
+      colorId: Number(v.colour1) || null,
+      forResearch: !!v.forResearch,
+      reasonForResearchId: Number(v.reasonForResearch) || null,
+      notes: v.note || '',
+      updatedBy: 0
+    };
+
     this.isSaving = true;
-    this.ivfApiService.CreateCryoPreservation(payload).subscribe({
+    const request$ = existingId
+      ? this.ivfApiService.UpdateCryoPreservation(updatePayload)
+      : this.ivfApiService.CreateCryoPreservation(createPayload);
+
+    request$.subscribe({
       next: (res) => {
         console.log('Cryo preservation saved', res);
         Swal.fire({

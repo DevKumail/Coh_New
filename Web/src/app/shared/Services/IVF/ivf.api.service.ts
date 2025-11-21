@@ -142,4 +142,8 @@ export class IVFApiService {
   GetCryoPreservationsBySampleId(sampleId: number): Observable<any> {
     return this.api.get(`IVFMaleCryoPreservation/GetCryoPreservationsBySampleId/${sampleId}`);
   }
+
+  UpdateCryoPreservation(payload: any): Observable<any> {
+    return this.api.put('IVFMaleCryoPreservation/UpdateCryoPreservation', payload);
+  }
 }
