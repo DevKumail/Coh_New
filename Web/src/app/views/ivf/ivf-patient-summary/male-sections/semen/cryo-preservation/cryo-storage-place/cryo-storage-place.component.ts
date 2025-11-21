@@ -20,6 +20,11 @@ export class CryoStoragePlaceComponent {
   storages: Array<any> = [];
   details: Array<any> = [];
 
+  // Dropdown sources
+  containers: Array<{ value: number; label: string }> = [];
+  levelAs: Array<{ value: number; label: string }> = [];
+  levelBs: Array<{ value: number; label: string }> = [];
+
   selectedRow: any = null;
 
   constructor(
@@ -27,9 +32,9 @@ export class CryoStoragePlaceComponent {
     private ivfApiService: IVFApiService
   ) {
     this.form = this.fb.group({
-      description: [''],
-      levelA: [''],
-      levelB: [''],
+      description: [null],
+      levelA: [{ value: null, disabled: true }],
+      levelB: [{ value: null, disabled: true }],
       levelC: [''],
       minFreePositionsCheck: [false],
       minFreePositions: [''],
@@ -40,10 +45,91 @@ export class CryoStoragePlaceComponent {
       strawIdCheck: [false],
       strawId: [''],
     });
+
+    // Load containers initially
+    this.loadContainers();
+
+    // On container change -> load level A, enable levelA, reset lower levels
+    this.form.get('description')?.valueChanges.subscribe((containerId: number) => {
+      this.levelAs = [];
+      this.levelBs = [];
+      this.form.get('levelA')?.reset();
+      this.form.get('levelB')?.reset();
+      this.form.get('levelA')?.disable();
+      this.form.get('levelB')?.disable();
+      if (containerId) {
+        this.ivfApiService.GetCryoLevelADropdown(containerId).subscribe({
+          next: (res: any) => {
+            this.levelAs = Array.isArray(res) ? res : (res?.data ?? []);
+            if (this.levelAs.length > 0) this.form.get('levelA')?.enable();
+          }
+        });
+      }
+    });
+
+    // On levelA change -> load level B, enable levelB
+    this.form.get('levelA')?.valueChanges.subscribe((levelAId: number) => {
+      this.levelBs = [];
+      this.form.get('levelB')?.reset();
+      this.form.get('levelB')?.disable();
+      if (levelAId) {
+        this.ivfApiService.GetCryoLevelBDropdown(levelAId).subscribe({
+          next: (res: any) => {
+            this.levelBs = Array.isArray(res) ? res : (res?.data ?? []);
+            if (this.levelBs.length > 0) this.form.get('levelB')?.enable();
+          }
+        });
+      }
+    });
+  }
+
+  private loadContainers() {
+    this.ivfApiService.GetCryoContainersDropdown().subscribe({
+      next: (res: any) => {
+        this.containers = Array.isArray(res) ? res : (res?.data ?? []);
+      }
+    });
   }
 
   search() {
-    // Placeholder for future API call; keep UI responsive
+    const payload = {
+      containerId: this.form.get('description')?.value ?? 0,
+      levelAId: this.form.get('levelA')?.value ?? 0,
+      levelBId: this.form.get('levelB')?.value ?? 0,
+      minFreePositions: this.form.get('minFreePositionsCheck')?.value
+        ? Number(this.form.get('minFreePositions')?.value || 0)
+        : 0,
+      maxPatients: this.form.get('maxPatientsCheck')?.value
+        ? Number(this.form.get('maxPatients')?.value || 0)
+        : 0,
+      maxSamples: this.form.get('maxSamplesCheck')?.value
+        ? Number(this.form.get('maxSamples')?.value || 0)
+        : 0,
+      strawId: this.form.get('strawIdCheck')?.value
+        ? (this.form.get('strawId')?.value || '')
+        : ''
+    };
+
+    // Clear grid then load
+    this.storages = [];
+    this.ivfApiService.SearchCryoStorages(payload).subscribe({
+      next: (res: any) => {
+        const data = Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : []);
+        this.storages = (data || []).map((x: any) => ({
+          description: x.description ?? x.description ?? '',
+          levelA: x.canister ?? x.canister ?? '',
+          levelB: x.goblet ?? x.goblet ?? '',
+          free: x.freePlaces ?? x.freePlaces ?? 0,
+          patients: x.patientCount ?? x.patientCount ?? 0,
+          samples: x.sampleCount ?? x.sampleCount ?? 0,
+          containerId: x.containerId ?? x.id ?? null,
+        }));
+      },
+      error: (err) => {
+        console.error('Cryo search failed', err);
+        this.storages = [];
+      }
+    });
   }
 
   nextAvailableSlot() {
@@ -95,5 +181,20 @@ export class CryoStoragePlaceComponent {
       storagePlace: row.description || '',
       position: `${row.levelA} ${row.levelB} ${row.position}`.trim()
     });
+  }
+
+  // Template (change) handlers to avoid missing-method errors
+  onDescriptionChange(val: any) {
+    const id = Number(val) || null;
+    if (this.form.get('description')?.value !== id) {
+      this.form.get('description')?.setValue(id);
+    }
+  }
+
+  onLevelAChange(val: any) {
+    const id = Number(val) || null;
+    if (this.form.get('levelA')?.value !== id) {
+      this.form.get('levelA')?.setValue(id);
+    }
   }
 }
