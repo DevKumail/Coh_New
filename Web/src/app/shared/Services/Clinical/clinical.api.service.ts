@@ -349,7 +349,7 @@ export class ClinicalApiService {
   }
   InsertSpeech(note: any) {
     debugger
-    return this.api.post(`Appointment/InsertSpeech`, note).toPromise();
+    return this.api.post(`EMRNotes/InsertSpeech`, note).toPromise();
   }
       SpeechtoText(MRNo:string, currentPage?: number, pageSize?: number) {
     return this.api.get(`Appointment/SpeechtoText?mrNo=${MRNo}&PageNumber=${currentPage}&PageSize=${pageSize}`).toPromise();

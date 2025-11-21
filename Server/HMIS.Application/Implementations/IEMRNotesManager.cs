@@ -1,4 +1,5 @@
-﻿using HMIS.Service.DTOs;
+﻿using HMIS.Application.DTOs.Clinical;
+using HMIS.Service.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace HMIS.Service.Implementations
         EMRNotesModel GetNoteQuestionBYPathId(int pathId);
 
         List<ProvierEMRNotesModel> EMRNotesGetByEmpId(long EmpId);
-
+        Task<nodeModel> InsertSpeech(ClinicalNoteObj note);
     }
 
     //public internal  IEMRNotesManager

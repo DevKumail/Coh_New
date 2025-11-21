@@ -1,0 +1,102 @@
+<div class="d-flex row col-12 h-100">
+
+    <div [ngClass]="{
+      'col-12': !dataquestion?.node?.noteTitle
+    }" class="card  mt-2 d-flex flex-column">
+    <form [formGroup]="clinicalForm" (ngSubmit)="submitVoice()">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
+
+  <!-- Note Title -->
+  <div class="d-flex align-items-center">
+    <label class="form-label mb-0 me-2" style="font-size: 0.875rem; font-weight: 600;">
+      Note Title
+    </label>
+    <input type="text"
+           class="form-control form-control-sm"
+           style="width: 300px; font-size: 0.875rem; background-color: #e9ecef; cursor: not-allowed;"
+           [value]="dataquestion?.node?.noteTitle || ('CLINICAL_STRUCTURED_NOTE_CREATE' | translate)"
+           readonly
+           disabled>
+  </div>
+
+  <!-- Description -->
+  <div class="d-flex align-items-center">
+    <label class="form-label mb-0 me-2" style="font-size: 0.875rem;">
+      Description
+    </label>
+    <textarea class="form-control"
+              style="width: 300px; height: 42px; font-size: 0.875rem;"
+              placeholder="Description"
+              formControlName="description">
+    </textarea>
+  </div>
+
+</div>
+    <div class="d-flex gap-2 align-items-end ms-3">
+      <i class="bi bi-file-earmark-text text-primary fs-4 me-2"></i>
+      <button class="btn btn-danger" (click)="cancel()" type="button">{{ 'CANCEL' | translate }}</button>
+      <button class="btn btn-info" [disabled]="clinicalForm.invalid" type="submit">{{ 'SAVE' | translate }}</button>
+    </div>
+  </div>
+
+  <div class="card-body flex-grow-1 overflow-auto">
+      <div >
+        <div class="row g-3 mb-2">
+          <div class="col-sm-4">
+            <label class="form-label" style="font-size: 0.875rem;">Provider (For Signing) <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" style="font-size: 0.875rem;"
+              [value]="getProviderName(clinicalForm.get('provider')?.value)"
+              readonly disabled>
+            <input type="hidden" formControlName="provider">
+          </div>
+        </div>
+      </div>
+
+    <!-- Bootstrap tabs -->
+    <div class="mt-2" *ngIf="dataquestion?.node?.noteTitle">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="structured-tab" data-bs-toggle="tab" data-bs-target="#structured" type="button" role="tab">
+            Structured Note Template
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="note-tab" data-bs-toggle="tab" data-bs-target="#note" type="button" role="tab">
+            Note
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content border border-top-0 p-3">
+        <div class="tab-pane fade show active" id="structured" role="tabpanel" aria-labelledby="structured-tab">
+          <div *ngIf="viewquestion" class="card p-3">
+            <h2 class="fw-bold text-decoration-underline">{{ dataquestion?.node?.noteTitle }}</h2>
+            <div *ngFor="let q of dataquestion?.node?.questions" class="mt-2">
+              <app-question-view [question]="q"></app-question-view>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="note" role="tabpanel" aria-labelledby="note-tab">
+          <div *ngIf="viewNoteResponse" class="card p-3">
+            <h2 class="fw-bold text-decoration-underline">{{ nodeData?.noteTitle }}</h2>
+            <div class="mt-2">
+              <app-question-item *ngFor="let question of nodeData?.questions" [question]="question"></app-question-item>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-2" *ngIf="!dataquestion?.node?.noteTitle">
+        <h3 style="text-align: center;">No Template Found!</h3>
+    </div>
+
+  </div> <!-- card-body -->
+</form>
+
+</div> <!-- card -->
+<!-- <div class="col-4 bg-dark text-white rounded fixed-height mt-2" *ngIf="dataquestion?.node?.noteTitle">
+    <app-notes></app-notes>
+</div>
+</div> -->

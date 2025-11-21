@@ -24,6 +24,11 @@ namespace HMIS.Application.ServiceLogics.Cryo
         Task<bool> DeleteLevelB(long levelBId, long? updatedBy);
         Task<bool> DeleteLevelC(long levelCId, long? updatedBy);
 
+        Task<List<CryoDropDownDto>> GetContainersDropdown();
+        Task<List<CryoDropDownDto>> GetLevelADropdown(long containerId);
+        Task<List<CryoDropDownDto>> GetLevelBDropdown(long levelAId);
+        Task<List<CryoStorageListDto>> SearchCryoStorages(CryoSearchRequestDto searchRequest);
+
     }
     public class CryoManagementService : ICryoManagementService
     {
@@ -598,6 +603,123 @@ namespace HMIS.Application.ServiceLogics.Cryo
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<CryoDropDownDto>> GetContainersDropdown()
+        {
+            return await _context.IvfcryoContainers
+                .Where(c => !c.IsDeleted)
+                .Select(c => new CryoDropDownDto
+                {
+                    Value = c.Id,
+                    Label = c.Description
+                })
+                .OrderBy(c => c.Label)
+                .ToListAsync();
+        }
+
+        public async Task<List<CryoDropDownDto>> GetLevelADropdown(long containerId)
+        {
+            return await _context.IvfcryoLevelA
+                .Where(a => a.ContainerId == containerId && !a.IsDeleted)
+                .Select(a => new CryoDropDownDto
+                {
+                    Value = a.Id,
+                    Label = a.CanisterCode
+                })
+                .OrderBy(a => a.Label)
+                .ToListAsync();
+        }
+
+        public async Task<List<CryoDropDownDto>> GetLevelBDropdown(long levelAId)
+        {
+            return await _context.IvfcryoLevelB
+                .Where(b => b.LevelAid == levelAId && !b.IsDeleted)
+                .Select(b => new CryoDropDownDto
+                {
+                    Value = b.Id,
+                    Label = b.CaneCode
+                })
+                .OrderBy(b => b.Label)
+                .ToListAsync();
+        }
+
+        public async Task<List<CryoStorageListDto>> SearchCryoStorages(CryoSearchRequestDto searchRequest)
+        {
+            var query = from levelC in _context.IvfcryoLevelC
+                        join levelB in _context.IvfcryoLevelB on levelC.LevelBid equals levelB.Id
+                        join levelA in _context.IvfcryoLevelA on levelB.LevelAid equals levelA.Id
+                        join container in _context.IvfcryoContainers on levelA.ContainerId equals container.Id
+                        where !levelC.IsDeleted && !levelB.IsDeleted && !levelA.IsDeleted && !container.IsDeleted
+                        select new { levelC, levelB, levelA, container };
+
+            // Apply filters
+            if (searchRequest.ContainerId.HasValue)
+                query = query.Where(x => x.container.Id == searchRequest.ContainerId.Value);
+
+            if (searchRequest.LevelAId.HasValue)
+                query = query.Where(x => x.levelA.Id == searchRequest.LevelAId.Value);
+
+            if (searchRequest.LevelBId.HasValue)
+                query = query.Where(x => x.levelB.Id == searchRequest.LevelBId.Value);
+
+            // Group by storage location to get aggregated data
+            var storageQuery = query.GroupBy(x => new
+            {
+                x.container.Description,
+                x.levelA.CanisterCode,
+                x.levelB.CaneCode
+            })
+            .Select(g => new
+            {
+                Description = g.Key.Description,
+                Canister = g.Key.CanisterCode,
+                Goblet = g.Key.CaneCode,
+                // Count distinct patients through IVFMain -> MalePatientId
+                PatientCount = g.Where(x => x.levelC.SampleId != null)
+                               .Select(x => x.levelC.Sample.Ivfmain.MalePatientId)
+                               .Distinct()
+                               .Count(),
+                SampleCount = g.Count(x => x.levelC.SampleId != null && x.levelC.Status != "Available"),
+                FreePlaces = g.Count(x => x.levelC.SampleId == null || x.levelC.Status == "Available"),
+                StrawIds = g.Where(x => x.levelC.SampleId != null)
+                           .Select(x => x.levelC.SampleId.ToString())
+            });
+
+            // Apply additional filters
+            if (searchRequest.MinFreePositions.HasValue)
+                storageQuery = storageQuery.Where(x => x.FreePlaces >= searchRequest.MinFreePositions.Value);
+
+            if (searchRequest.MaxPatients.HasValue)
+                storageQuery = storageQuery.Where(x => x.PatientCount <= searchRequest.MaxPatients.Value);
+
+            if (searchRequest.MaxSamples.HasValue)
+                storageQuery = storageQuery.Where(x => x.SampleCount <= searchRequest.MaxSamples.Value);
+
+            var result = await storageQuery.ToListAsync();
+
+            // Transform to final DTO
+            return result.Select(x => new CryoStorageListDto
+            {
+                Description = x.Description,
+                Canister = x.Canister,
+                Goblet = x.Goblet,
+                PatientCount = x.PatientCount,
+                SampleCount = x.SampleCount,
+                FreePlaces = x.FreePlaces,
+                StrawId = x.StrawIds.Any() ? string.Join(", ", x.StrawIds) : null
+            }).ToList();
+        }
+
+        // Helper method to get patient count through SampleId
+        private int GetPatientCount(IQueryable<IvfcryoLevelC> levelCQuery)
+        {
+            return (from levelC in levelCQuery
+                    join sample in _context.IvfmaleSemenSample on levelC.SampleId equals sample.SampleId
+                    join ivfMain in _context.Ivfmain on sample.IvfmainId equals ivfMain.IvfmainId
+                    select ivfMain.MalePatientId)
+                    .Distinct()
+                    .Count();
         }
 
     }
