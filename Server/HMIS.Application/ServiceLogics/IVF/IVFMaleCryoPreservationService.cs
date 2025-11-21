@@ -237,7 +237,19 @@ namespace HMIS.Application.ServiceLogics.IVF
                             preservationDto.CreatedBy);
                     }
 
-                    return true;
+                    // change cryolevelc table status
+
+                    if(preservationDto.StoragePlaceId > 0)
+                {
+                    var levelC = await _context.IvfcryoLevelC
+                                 .FirstOrDefaultAsync(cp => cp.Id == preservationDto.StoragePlaceId);
+
+                    levelC.Status = "Occupied";
+                    await _context.SaveChangesAsync();
+                }
+
+
+                return true;
                 }
                 catch (Exception ex)
                 {
