@@ -57,7 +57,7 @@
     <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
   </div>
 
-  <div class="modal-body">
+  <div class="modal-body" style="min-height: 500px; overflow: visible; padding-bottom: 200px;">
 
     <!-- Step 1: Select Note Type -->
     <div *ngIf="!selectedNoteType" class="card shadow-sm rounded-3 mb-3">
@@ -89,13 +89,13 @@
     </div>
 
     <!-- Step 2: Select Provider and Template -->
-    <div class="card shadow-sm rounded-3" *ngIf="selectedNoteType">
-      <div class="card-body">
+    <div class="card shadow-sm rounded-3" *ngIf="selectedNoteType" style="overflow: visible;">
+      <div class="card-body" style="overflow: visible; padding-bottom: 20px;">
         <h6 class="fw-bold mb-3">Step 2: Select Provider & Template
           <span class="text-muted small" *ngIf="selectedNoteType === 'freetext'">(Optional)</span>
         </h6>
 
-        <form [formGroup]="modalForm">
+        <form [formGroup]="modalForm" style="overflow: visible;">
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Provider
@@ -104,7 +104,7 @@
               <select class="form-select" formControlName="provider"
                 [class.is-invalid]="modalForm.get('provider')?.invalid && modalForm.get('provider')?.touched">
                 <option [value]="null" disabled>Select Provider</option>
-                <option *ngFor="let p of providers" [value]="p.code">{{ p.name }}</option>
+                <option *ngFor="let p of providers; trackBy: trackByCode" [value]="p.code">{{ p.name }}</option>
               </select>
               <div class="invalid-feedback" *ngIf="modalForm.get('provider')?.invalid && modalForm.get('provider')?.touched">
                 Please select a provider
@@ -118,7 +118,7 @@
               <select class="form-select" formControlName="note"
                 [class.is-invalid]="modalForm.get('note')?.invalid && modalForm.get('note')?.touched">
                 <option [value]="null" disabled>Select Template</option>
-                <option *ngFor="let n of clinicalNotes" [value]="n.pathId">{{ n.pathName }}</option>
+                <option *ngFor="let n of clinicalNotes; trackBy: trackByPathId" [value]="n.pathId">{{ n.pathName }}</option>
               </select>
               <div class="invalid-feedback" *ngIf="modalForm.get('note')?.invalid && modalForm.get('note')?.touched">
                 Please select a template
@@ -142,15 +142,15 @@
                   [disabled]="!isProviderSelected || clinicalNotes.length === 0 || modalForm.get('macro')?.value"
                   [class.is-invalid]="!modalForm.get('note')?.value && !modalForm.get('macro')?.value && modalForm.touched">
                   <option [value]="null" disabled>Select Template</option>
-                  <option *ngFor="let n of clinicalNotes" [value]="n.pathId">{{ n.pathName }}</option>
+                  <option *ngFor="let n of clinicalNotes; trackBy: trackByPathId" [value]="n.pathId">{{ n.pathName }}</option>
                 </select>
-                <small class="text-muted" *ngIf="!isProviderSelected">
+                <small class="text-muted d-block" *ngIf="!isProviderSelected">
                   Select a provider first to enable template
                 </small>
-                <small class="text-muted" *ngIf="isProviderSelected && clinicalNotes.length === 0">
+                <small class="text-muted d-block" *ngIf="isProviderSelected && clinicalNotes.length === 0">
                   No templates available
                 </small>
-                <small class="text-muted" *ngIf="modalForm.get('macro')?.value">
+                <small class="text-muted d-block" *ngIf="modalForm.get('macro')?.value">
                   Macro selected
                 </small>
               </div>
@@ -164,15 +164,15 @@
                   [disabled]="!isProviderSelected || macroList.length === 0 || modalForm.get('note')?.value"
                   [class.is-invalid]="!modalForm.get('note')?.value && !modalForm.get('macro')?.value && modalForm.touched">
                   <option [value]="null" disabled>Select Macro</option>
-                  <option *ngFor="let m of macroList" [value]="m.pathId">{{ m.pathName }}</option>
+                  <option *ngFor="let m of macroList; trackBy: trackByPathId" [value]="m.pathId">{{ m.pathName }}</option>
                 </select>
-                <small class="text-muted" *ngIf="!isProviderSelected">
+                <small class="text-muted d-block" *ngIf="!isProviderSelected">
                   Select a provider first to enable macro
                 </small>
-                <small class="text-muted" *ngIf="isProviderSelected && macroList.length === 0">
+                <small class="text-muted d-block" *ngIf="isProviderSelected && macroList.length === 0">
                   No macros available
                 </small>
-                <small class="text-muted" *ngIf="modalForm.get('note')?.value">
+                <small class="text-muted d-block" *ngIf="modalForm.get('note')?.value">
                   Template selected
                 </small>
               </div>
@@ -230,7 +230,7 @@
             </tr>
           </thead>
           <tbody class="table-group-divider">
-            <tr *ngFor="let data of speechtotxt; let i = index">
+            <tr *ngFor="let data of speechtotxt; trackBy: trackByIndex; let i = index">
               <td class="text-center">{{ (data.noteTitle || '-').trim() }}</td>
               <td class="text-center">{{ data.visitAccDisplay || '-' }}</td>
               <td class="text-center">{{ data.visitDate || '-' }}</td>
