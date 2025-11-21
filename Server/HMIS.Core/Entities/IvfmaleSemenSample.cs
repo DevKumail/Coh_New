@@ -95,9 +95,18 @@ public partial class IvfmaleSemenSample
     [InverseProperty("IvfmaleSemenSampleCollectionPlace")]
     public virtual DropdownConfiguration? CollectionPlace { get; set; }
 
+    [InverseProperty("Sample")]
+    public virtual ICollection<IvfcryoLevelC> IvfcryoLevelC { get; set; } = new List<IvfcryoLevelC>();
+
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfmaleSemenSample")]
     public virtual Ivfmain Ivfmain { get; set; } = null!;
+
+    [InverseProperty("Sample")]
+    public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservation { get; set; } = new List<IvfmaleCryoPreservation>();
+
+    [InverseProperty("Sample")]
+    public virtual ICollection<IvfmaleCryoStraw> IvfmaleCryoStraw { get; set; } = new List<IvfmaleCryoStraw>();
 
     [InverseProperty("Sample")]
     public virtual ICollection<IvfmaleSemenObservation> IvfmaleSemenObservation { get; set; } = new List<IvfmaleSemenObservation>();

@@ -20,7 +20,7 @@ import { FamilyHistoryComponent } from '../../clinical/family-history/family-his
 import { log } from 'node:console';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { FemaleMedicalHistoryListComponent } from './female-section/female-medical-history-list/female-medical-history-list.component';
-
+import { VitalSignsComponent } from '../../clinical/vital-signs/vital-signs.component';
 @Component({
   selector: 'app-ivf-patient-summary',
   standalone: true,
@@ -33,6 +33,7 @@ import { FemaleMedicalHistoryListComponent } from './female-section/female-medic
     IvfPsPathologyResultsComponent,
     IvfPsLabOrdersComponent,
     SemenListComponent,
+    VitalSignsComponent,
     IvfPsCycleComponent,
     AdvanceSearchModalComponent,
     SocialHistoryComponent,
