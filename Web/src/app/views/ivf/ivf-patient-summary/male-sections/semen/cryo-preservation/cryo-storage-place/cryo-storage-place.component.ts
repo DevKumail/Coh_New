@@ -189,6 +189,7 @@ export class CryoStoragePlaceComponent {
   loadSlot(row: any) {
     this.selected.emit({
       storagePlace: `${row.description} ${row.levelA} ${row.levelB}`.trim(),
+      storagePlaceId: row.levelCId,
       position: `${row.description} ${row.levelA}`.trim()
     });
   }

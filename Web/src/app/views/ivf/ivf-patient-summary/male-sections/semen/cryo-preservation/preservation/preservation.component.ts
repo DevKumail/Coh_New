@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CryoStoragePlaceComponent } from '../cryo-storage-place/cryo-storage-place.component';
@@ -6,6 +6,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import { Page } from '@/app/shared/enum/dropdown.enum';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-preservation',
@@ -14,8 +15,9 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
   templateUrl: './preservation.component.html',
   styleUrls: ['./preservation.component.scss']
 })
-export class PreservationComponent implements OnChanges {
+export class PreservationComponent implements OnInit, OnChanges {
   @Input() preservationData: any;
+  @Output() saved = new EventEmitter<void>();
   form: FormGroup;
   showStorage: boolean = false;
   hrEmployees: any = [];
@@ -23,6 +25,7 @@ export class PreservationComponent implements OnChanges {
   AllDropdownValues: any = [];
   dropdowns: any = [];
   strawColors: any[] = [];
+  isSaving = false;
 
   constructor(
     private fb: FormBuilder,
@@ -48,6 +51,7 @@ export class PreservationComponent implements OnChanges {
       numberOfStraws: [1],
       useCryoStorage: [true],
       storagePlace: ['', Validators.required],
+      storagePlaceId: [null],
       position: [''],
       colour: [''],
       colour1: [''],
@@ -180,7 +184,67 @@ export class PreservationComponent implements OnChanges {
 
 
 
-  submit() {}
+  submit() {
+    const v = this.form.getRawValue();
+
+    // Combine date and time helpers
+    const toDateTime = (dateStr: any, timeStr: any) => {
+      if (!dateStr) return null;
+      const d = new Date(dateStr);
+      const [hh, mm] = (timeStr || '00:00').split(':');
+      d.setHours(Number(hh || 0), Number(mm || 0), 0, 0);
+      return d.toISOString();
+    };
+
+    const payload = {
+      sampleId: this.preservationData?.sampleId ?? 0,
+      preservationCode: v.storagePlace || '',
+      freezingDateTime: toDateTime(v.freezingDate, v.freezingTime),
+      cryopreservedById: Number(v.cryopreservedBy) || null,
+      originallyFromClinicId: Number(v.originallyFromClinic) || null,
+      storageDateTime: toDateTime(v.storageDate, null),
+      storedById: Number(v.storedBy) || null,
+      materialTypeId: Number(v.typeOfMaterial) || null,
+      strawStartNumber: Number(v.strawId) || null,
+      strawCount: Number(v.numberOfStraws) || 0,
+      statusId: Number(v.status) || null,
+      cryoContractId: Number(v.cryoContract) || null,
+      preserveUsingCryoStorage: !!v.useCryoStorage,
+      storagePlaceId: Number(v.storagePlaceId) || null,
+      position: v.position || '',
+      colorId: Number(v.colour1) || null,
+      forResearch: !!v.forResearch,
+      reasonForResearchId: Number(v.reasonForResearch) || null,
+      notes: v.note || '',
+      createdBy: 0
+    };
+
+    this.isSaving = true;
+    this.ivfApiService.CreateCryoPreservation(payload).subscribe({
+      next: (res) => {
+        console.log('Cryo preservation saved', res);
+        Swal.fire({
+          icon: 'success',
+          title: 'Saved',
+          text: 'Cryo preservation saved successfully',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        this.saved.emit();
+      },
+      error: (err) => {
+        console.error('Failed to save cryo preservation', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Save failed',
+          text: 'Unable to save cryo preservation'
+        });
+      },
+      complete: () => {
+        this.isSaving = false;
+      }
+    });
+  }
 
   openStoragePlace(){
     this.showStorage = true;
@@ -195,16 +259,19 @@ export class PreservationComponent implements OnChanges {
       // Enable fields temporarily to set values
       this.form.get('storagePlace')?.enable();
       this.form.get('position')?.enable();
-      
+      this.form.get('storagePlaceId')?.enable();
+
       this.form.patchValue({
         storagePlace: e.storagePlace ?? '',
+        storagePlaceId: e.storagePlaceId ?? null,
         position: e.position ?? '',
         colour: e.colour ?? ''
       });
-      
+
       // Disable fields again
       this.form.get('storagePlace')?.disable();
       this.form.get('position')?.disable();
+      this.form.get('storagePlaceId')?.disable();
     }
     this.showStorage = false;
   }

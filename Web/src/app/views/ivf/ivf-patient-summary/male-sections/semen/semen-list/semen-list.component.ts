@@ -144,6 +144,7 @@ export class SemenListComponent {
   onClickPreservation(row: any) {
     this.preservationData = {
       collectionDateTime: row.collectionDateTime,
+      sampleId: row.id,
       malePatientId: row.malePatientId,
       malePatientName: row.malePatientName
     };
@@ -153,6 +154,11 @@ export class SemenListComponent {
 
   onPageChanged(page: number) {
     this.PaginationInfo.Page = page;
+    this.load();
+  }
+
+  onPreservationSaved() {
+    this.showPreservation = false;
     this.load();
   }
 }
