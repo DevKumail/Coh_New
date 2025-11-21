@@ -142,17 +142,44 @@ export class SemenListComponent {
   }
 
   onClickPreservation(row: any) {
-    this.preservationData = {
-      collectionDateTime: row.collectionDateTime,
-      malePatientId: row.malePatientId,
-      malePatientName: row.malePatientName
-    };
-    this.showPreservation = true;
-    this.showAdd = false;
+    this.isLoading = true;
+    const sampleId = row?.id;
+    this.ivf.GetCryoPreservationsBySampleId(sampleId).subscribe({
+      next: (res: any) => {
+        const existing = Array.isArray(res?.data) && res.data.length > 0 ? res.data[0] : null;
+        this.preservationData = {
+          collectionDateTime: row.collectionDateTime,
+          sampleId: row.id,
+          malePatientId: row.malePatientId,
+          malePatientName: row.malePatientName,
+          existingPreservation: existing
+        };
+        this.showPreservation = true;
+        this.showAdd = false;
+        this.isLoading = false;
+      },
+      error: _ => {
+        this.isLoading = false;
+        this.preservationData = {
+          collectionDateTime: row.collectionDateTime,
+          sampleId: row.id,
+          malePatientId: row.malePatientId,
+          malePatientName: row.malePatientName,
+          existingPreservation: null
+        };
+        this.showPreservation = true;
+        this.showAdd = false;
+      }
+    });
   }
 
   onPageChanged(page: number) {
     this.PaginationInfo.Page = page;
+    this.load();
+  }
+
+  onPreservationSaved() {
+    this.showPreservation = false;
     this.load();
   }
 }

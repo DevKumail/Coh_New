@@ -134,4 +134,12 @@ export class IVFApiService {
   SearchCryoStorages(payload: any): Observable<any> {
     return this.api.post('CryoManagement/search', payload);
   }
+
+  CreateCryoPreservation(payload: any): Observable<any> {
+    return this.api.post('IVFMaleCryoPreservation/CreateCryoPreservation', payload);
+  }
+
+  GetCryoPreservationsBySampleId(sampleId: number): Observable<any> {
+    return this.api.get(`IVFMaleCryoPreservation/GetCryoPreservationsBySampleId/${sampleId}`);
+  }
 }
