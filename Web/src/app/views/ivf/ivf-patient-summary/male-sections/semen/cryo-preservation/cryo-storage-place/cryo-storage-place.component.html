@@ -93,10 +93,10 @@
                                     <th>Description</th>
                                     <th>Level A</th>
                                     <th>Level B</th>
-                                    <th># Patients</th>
-                                    <th># Samples</th>
-                                    <th># Free places</th>
-                                    <th>Action</th>
+                                    <th style="text-align:center;"># Patients</th>
+                                    <th style="text-align:center;"># Samples</th>
+                                    <th style="text-align:center;"># Free places</th>
+                                    <th style="text-align:center;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -105,11 +105,17 @@
                                     <td>{{ s.description }}</td>
                                     <td>{{ s.levelA }}</td>
                                     <td>{{ s.levelB }}</td>
-                                    <td>{{ s.patients }}</td>
-                                    <td>{{ s.samples }}</td>
-                                    <td>{{ s.free }}</td>
-                                    <td>
-                                        <ng-icon *ngIf="s.free > 0" name="tablerRotateClockwise"
+                                    <td style="text-align:center;"> {{ s.patients }}</td>
+                                    <td style="text-align:center;"> {{ s.samples }}</td>
+                                    <td style="text-align:center;">
+                                        @if(s.levelCId > 0){
+                                            <span class="badge bg-success">{{ s.free }}</span>
+                                        } @else {
+                                            <span>-</span>
+                                        }
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <ng-icon *ngIf="s.levelCId > 0" name="tablerRotateClockwise"
                                              class="text-info me-1" style="cursor: pointer;"
                                              (click)="loadSlot(s); $event.stopPropagation()">
                                         </ng-icon>                                                                               
