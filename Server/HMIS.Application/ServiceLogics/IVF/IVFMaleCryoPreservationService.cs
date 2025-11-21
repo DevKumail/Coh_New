@@ -291,7 +291,18 @@ namespace HMIS.Application.ServiceLogics.IVF
                     preservation.UpdatedBy = preservationDto.UpdatedBy;
                     preservation.UpdatedAt = DateTime.UtcNow;
 
+                await _context.SaveChangesAsync();
+
+                if (preservationDto.StoragePlaceId != preservation.StoragePlaceId)
+                {
+                    var levelC = await _context.IvfcryoLevelC
+                                 .FirstOrDefaultAsync(cp => cp.Id == preservationDto.StoragePlaceId);
+
+                    levelC.Status = "Occupied";
+                    levelC.SampleId = preservation.SampleId;
+                    levelC.UpdatedAt = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
+                }
                     return true;
                 }
                 catch (Exception)
