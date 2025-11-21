@@ -33,7 +33,7 @@ export class PreparationPreparationComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['dropdowns']) {
-      const items = this.dropdowns?.['IVFSemanAnalysis:Preperation'] || [];
+      const items = this.dropdowns?.['IVFMaleSemanAnalysis:Preperation'] || [];
       this.methodsOptions = items.map(x => ({ id: x.valueId, name: x.name }));
       this.rebuildMethods();
       // If we had pending selections (from patch) apply them now that options exist

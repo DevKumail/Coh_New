@@ -291,7 +291,7 @@ export class AlertComponent implements OnInit, AfterViewInit {
 
   paginationInfo: any = {
     pageNumber: 1,
-    pageSize: 1,
+    pageSize: 5,
   };
   GetPatientAlertsData() {
     if (this.SearchPatientData == undefined) {
