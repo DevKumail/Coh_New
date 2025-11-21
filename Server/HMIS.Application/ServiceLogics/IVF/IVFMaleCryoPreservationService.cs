@@ -2,6 +2,7 @@
 using HMIS.Core.DTOs;
 using HMIS.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 
 namespace HMIS.Application.ServiceLogics.IVF
 {
@@ -245,6 +246,8 @@ namespace HMIS.Application.ServiceLogics.IVF
                                  .FirstOrDefaultAsync(cp => cp.Id == preservationDto.StoragePlaceId);
 
                     levelC.Status = "Occupied";
+                    levelC.SampleId = preservation.SampleId;
+                    levelC.UpdatedAt = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
                 }
 
