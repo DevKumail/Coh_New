@@ -127,6 +127,7 @@ export class CryoStoragePlaceComponent {
           free: x.freePlaces ?? x.freePlaces ?? 0,
           patients: x.patientCount ?? x.patientCount ?? 0,
           samples: x.sampleCount ?? x.sampleCount ?? 0,
+          levelCId: x.levelCId ?? x.levelCId ?? null,
           containerId: x.containerId ?? x.id ?? null,
         }));
       },
@@ -149,6 +150,7 @@ export class CryoStoragePlaceComponent {
             position: response.strawPosition,
             storageLocation: response.storageLocation,
             containerId: response.containerId,
+            levelCId: response.levelCId,
             free: 0,
             patients: 0,
             samples: 0,
@@ -166,6 +168,7 @@ export class CryoStoragePlaceComponent {
 
   onSelectStorage(s: any) { 
     this.showDetails = true;
+    this.selectedRow = s;
   }
 
   onCancel() { this.back.emit(); }
