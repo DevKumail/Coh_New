@@ -393,7 +393,7 @@ export class MedicationComponent {
         });
     }
     onDrugPageChanged(event: any) {
-        this.DrugPaginationInfo.Page = event.page;
+        this.DrugPaginationInfo.Page = event;
         this.SearchDrug();
     }
 

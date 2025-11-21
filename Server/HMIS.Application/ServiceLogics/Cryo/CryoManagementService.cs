@@ -708,7 +708,13 @@ namespace HMIS.Application.ServiceLogics.Cryo
                                     z.LevelC.Status == "Available")
                     ),
                     StrawIds = g.Where(z => z.LevelC != null && z.LevelC.SampleId != null)
-                                .Select(z => z.LevelC.SampleId.ToString())
+                                .Select(z => z.LevelC.SampleId.ToString()),
+
+                    FirstFreeLevelCId =
+            g.Where(z => z.LevelC.Id != null &&
+                         (z.LevelC.SampleId == null || z.LevelC.Status == "Available"))
+             .Select(z => z.LevelC.Id)
+             .FirstOrDefault()
                 };
 
             // Filters
@@ -732,7 +738,8 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 PatientCount = x.PatientCount,
                 SampleCount = x.SampleCount,
                 FreePlaces = x.FreePlaces,
-                StrawId = x.StrawIds.Any() ? string.Join(", ", x.StrawIds) : null
+                StrawId = x.StrawIds.Any() ? string.Join(", ", x.StrawIds) : null,
+                LevelCId = x.FirstFreeLevelCId
             }).ToList();
         }
         // Helper method to get patient count through SampleId
