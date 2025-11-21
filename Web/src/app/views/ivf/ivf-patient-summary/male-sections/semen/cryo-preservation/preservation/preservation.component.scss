@@ -1,0 +1,11 @@
+.color-dropdown {
+  option {
+    padding: 8px 10px 8px 40px;
+    font-size: 14px;
+    
+    &:not([value=""]) {
+      background-position: 5px center;
+      background-repeat: no-repeat;
+    }
+  }
+}

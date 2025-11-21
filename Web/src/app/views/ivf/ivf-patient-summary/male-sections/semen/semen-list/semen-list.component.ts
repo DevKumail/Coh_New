@@ -22,6 +22,7 @@ export class SemenListComponent {
   showPreservation: boolean = false;
   rows: any[] = [];
   editModel: any = null;
+  preservationData: any = null;
 
   PaginationInfo: any = {
     Page: 1,
@@ -59,6 +60,7 @@ export class SemenListComponent {
         this.rows = (data || []).map((x: any) => ({
           id: x.sampleId || x.id || 0,
           collectionDate: x.collectionDateTime ? new Date(x.collectionDateTime).toLocaleDateString() : '',
+          collectionDateTime: x.collectionDateTime,
           thawingDate: x.thawingDateTime ? new Date(x.thawingDateTime).toLocaleDateString() : '',
           time: x.analysisStartTime || '-',
           sampleCode: x.sampleCode || '-',
@@ -73,6 +75,8 @@ export class SemenListComponent {
           norm: x.morphologyNormalPercent ?? '-',
           cryoStatus: x.cryoStatus || '-',
           status: x.status || '-',
+          malePatientId: x.malePatientId,
+          malePatientName: x.malePatientName
         }));
 
         this.totalrecord = res.totalCount;
@@ -137,7 +141,12 @@ export class SemenListComponent {
     });
   }
 
-  onClickPreservation() {
+  onClickPreservation(row: any) {
+    this.preservationData = {
+      collectionDateTime: row.collectionDateTime,
+      malePatientId: row.malePatientId,
+      malePatientName: row.malePatientName
+    };
     this.showPreservation = true;
     this.showAdd = false;
   }

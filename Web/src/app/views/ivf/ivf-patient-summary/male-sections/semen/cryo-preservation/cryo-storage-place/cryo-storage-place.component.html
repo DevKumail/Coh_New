@@ -62,6 +62,7 @@
                 </div>   
             </div>
             <div class="justify-content-end d-flex">
+                <button type="button" class="btn btn-outline-secondary" (click)="nextAvailableSlot()">Next Available Slot</button>
                 <button type="button" class="btn btn-primary ms-auto" (click)="search()">Search</button>
             </div>
         </div>
@@ -82,10 +83,10 @@
                                     <th>Description</th>
                                     <th>Level A</th>
                                     <th>Level B</th>
-                                    <th>Level C</th>
                                     <th># Patients</th>
                                     <th># Samples</th>
                                     <th># Free places</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -94,12 +95,17 @@
                                     <td>{{ s.description }}</td>
                                     <td>{{ s.levelA }}</td>
                                     <td>{{ s.levelB }}</td>
-                                    <td>{{ s.levelC }}</td>
                                     <td>{{ s.patients }}</td>
                                     <td>{{ s.samples }}</td>
                                     <td>{{ s.free }}</td>
+                                    <td>
+                                        <button *ngIf="s.isNextAvailable" type="button" class="btn btn-sm btn-success" 
+                                                (click)="loadSlot(s); $event.stopPropagation()">
+                                            Load
+                                        </button>
+                                    </td>
                                 </tr>
-                                <tr *ngIf="storages.length===0">
+                                <tr *ngIf="storages.length === 0">
                                     <td colspan="7" class="text-center py-3">No storages</td>
                                 </tr>
                             </tbody>
@@ -140,7 +146,7 @@
                                     <td>{{ d.pos }}</td>
                                     <td>{{ d.type }}</td>
                                 </tr>
-                                <tr *ngIf="details.length===0">
+                                <tr *ngIf="details.length === 0">
                                     <td colspan="7" class="text-center py-3">No details</td>
                                 </tr>
                             </tbody>
