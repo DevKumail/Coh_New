@@ -109,4 +109,12 @@ export class IVFApiService {
   DeleteFemaleFertilityHistory(ivfFemaleFHId: number): Observable<any> {
     return this.api.delete(`IVFFertilityHistory/DeleteFemaleFertilityHistory/${ivfFemaleFHId}`);
   }
+
+  GetAllStrawColors(): Observable<any> {
+    return this.api.get('IVFMaleCryoPreservation/GetAllStrawColors');
+  }
+
+  GetNextAvailableStorageSlot(): Observable<any> {
+    return this.api.get('IVFMaleCryoPreservation/GetNextAvailableStorageSlot');
+  }
 }
