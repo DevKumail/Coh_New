@@ -2,10 +2,10 @@ import { GenericPaginationComponent } from '@/app/shared/generic-pagination/gene
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
-import { distinctUntilChanged, filter, Subscription } from 'rxjs';
+import { distinctUntilChanged, filter, Subscription, Subject, takeUntil, debounceTime } from 'rxjs';
 import Swal from 'sweetalert2';
 import { NgIconComponent } from '@ng-icons/core';
 import { Router } from '@angular/router';
@@ -23,7 +23,8 @@ import { LoaderService } from '@core/services/loader.service';
     NgIconComponent,
   ],
   templateUrl: './clinical-note.component.html',
-  styleUrl: './clinical-note.component.scss'
+  styleUrl: './clinical-note.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClinicalNoteComponent {
     SearchPatientData: any;
@@ -34,6 +35,10 @@ export class ClinicalNoteComponent {
       };
     clinicalnoteTotalItems: any= 0;
     private patientDataSubscription: Subscription | undefined;
+    private destroy$ = new Subject<void>();
+    private providersCache: any[] | null = null;
+    private notesCache = new Map<number, any[]>();
+    private macrosCache = new Map<number, any[]>();
 
     // Modal form and data
     modalForm: FormGroup;
@@ -50,7 +55,8 @@ export class ClinicalNoteComponent {
         private router: Router,
         private modalService: NgbModal,
         private fb: FormBuilder,
-        private loader: LoaderService
+        private loader: LoaderService,
+        private cdr: ChangeDetectorRef
     ) {
       this.modalForm = this.fb.group({
         provider: [null, Validators.required],
@@ -65,7 +71,8 @@ export class ClinicalNoteComponent {
           filter((data: any) => !!data?.table2?.[0]?.mrNo),
           distinctUntilChanged((prev, curr) =>
             prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
-          )
+          ),
+          takeUntil(this.destroy$)
         )
         .subscribe((data: any) => {
           console.log(' Subscription triggered with MRNO:', data?.table2?.[0]?.mrNo);
@@ -73,49 +80,61 @@ export class ClinicalNoteComponent {
           this.speechtoText();
         });
 
-        // Subscribe to provider changes
-        this.modalForm.get('provider')?.valueChanges.subscribe((val: any) => {
-          const code = Number(val) || 0;
-          this.isProviderSelected = !!val; // Set to true if provider has value
-          this.GetNotesEmployeeId(code);
-        });
+        // Debounce provider changes to avoid excessive API calls
+        this.modalForm.get('provider')?.valueChanges
+          .pipe(
+            debounceTime(300),
+            distinctUntilChanged(),
+            takeUntil(this.destroy$)
+          )
+          .subscribe((val: any) => {
+            const code = Number(val) || 0;
+            this.isProviderSelected = !!val;
+            this.GetNotesEmployeeId(code);
+          });
 
         // Subscribe to template changes - clear macro when template is selected
-        this.modalForm.get('note')?.valueChanges.subscribe((val: any) => {
-          if (val && this.selectedNoteType === 'structured') {
-            this.modalForm.patchValue({ macro: null }, { emitEvent: false });
-          }
-        });
+        this.modalForm.get('note')?.valueChanges
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((val: any) => {
+            if (val && this.selectedNoteType === 'structured') {
+              this.modalForm.patchValue({ macro: null }, { emitEvent: false });
+            }
+          });
 
         // Subscribe to macro changes - clear template when macro is selected
-        this.modalForm.get('macro')?.valueChanges.subscribe((val: any) => {
-          if (val && this.selectedNoteType === 'structured') {
-            this.modalForm.patchValue({ note: null }, { emitEvent: false });
-          }
-        });
-
-        this.modalForm.get('provider')?.valueChanges.subscribe(value => {
-            if (value) {
-            this.modalForm.get('note')?.enable();
-            this.modalForm.get('macro')?.enable();
-            } else {
-            this.modalForm.get('note')?.disable();
-            this.modalForm.get('macro')?.disable();
+        this.modalForm.get('macro')?.valueChanges
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((val: any) => {
+            if (val && this.selectedNoteType === 'structured') {
+              this.modalForm.patchValue({ note: null }, { emitEvent: false });
             }
-            });
+          });
+
+        this.modalForm.get('provider')?.valueChanges
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(value => {
+            if (value) {
+              this.modalForm.get('note')?.enable();
+              this.modalForm.get('macro')?.enable();
+            } else {
+              this.modalForm.get('note')?.disable();
+              this.modalForm.get('macro')?.disable();
+            }
+          });
     }
 
-        speechtoText() {
-        if(!this.SearchPatientData?.table2?.[0]?.mrNo) {
+    speechtoText() {
+      if(!this.SearchPatientData?.table2?.[0]?.mrNo) {
         Swal.fire('Error', 'MRN not found for the Load patient', 'error');
         return;
-        }
-    const MRN = this.SearchPatientData?.table2?.[0]?.mrNo;
-      this.apiservice.SpeechtoText(MRN, this.pagegination.currentPage,this.pagegination.pageSize).then((res: any) => {
-      console.log('Speech To Text RESULT: ', res);
-
+      }
+      const MRN = this.SearchPatientData?.table2?.[0]?.mrNo;
+      this.apiservice.SpeechtoText(MRN, this.pagegination.currentPage, this.pagegination.pageSize).then((res: any) => {
+        console.log('Speech To Text RESULT: ', res);
         this.speechtotxt = res.table1;
         this.clinicalnoteTotalItems = res.table2[0]?.totalCount || 0;
+        this.cdr.markForCheck();
       });
     }
 
@@ -123,8 +142,27 @@ export class ClinicalNoteComponent {
     this.modalForm.reset();
     this.clinicalNotes = [];
     this.selectedNoteType = '';
-    this.FillCache();
-    this.modalService.open(content, { centered: true, size: 'lg' });
+    this.isProviderSelected = false;
+
+    // Load providers from cache if available
+    if (this.providersCache) {
+      this.providers = this.providersCache;
+      this.cdr.markForCheck();
+      this.modalService.open(content, {
+        centered: true,
+        size: 'lg',
+        scrollable: false,
+        backdrop: 'static'
+      });
+    } else {
+      this.FillCache();
+      this.modalService.open(content, {
+        centered: true,
+        size: 'lg',
+        scrollable: false,
+        backdrop: 'static'
+      });
+    }
   }
 
   selectNoteType(type: string) {
@@ -155,6 +193,7 @@ export class ClinicalNoteComponent {
     providerCtrl?.updateValueAndValidity();
     noteCtrl?.updateValueAndValidity();
     macroCtrl?.updateValueAndValidity();
+    this.cdr.markForCheck();
   }
 
   FillCache() {
@@ -163,6 +202,7 @@ export class ClinicalNoteComponent {
       .then((response: any) => {
         if (response && response.cache) {
           this.FillDropDown(response);
+          this.cdr.markForCheck();
         }
       })
       .catch((error: any) =>
@@ -176,6 +216,7 @@ export class ClinicalNoteComponent {
     if (provider) {
       provider = provider.map((item: any) => ({ name: item.FullName, code: item.EmployeeId }));
       this.providers = provider;
+      this.providersCache = provider; // Cache for future use
     }
   }
 
@@ -184,19 +225,35 @@ export class ClinicalNoteComponent {
     const selectedProvider = Number(providerCode) || 0;
     if (selectedProvider === 250) providerCode = 197;
 
+    // Check cache first
+    if (this.notesCache.has(providerCode)) {
+      this.clinicalNotes = this.notesCache.get(providerCode) || [];
+      this.macroList = this.macrosCache.get(providerCode) || [];
+      this.modalForm.patchValue({ note: null, macro: null });
+      this.cdr.markForCheck();
+      return;
+    }
+
     this.clinicalNotes = [];
     this.macroList = [];
     this.modalForm.patchValue({ note: null, macro: null });
     this.loader.show();
 
     this.apiservice.EMRNotesGetByEmpId(providerCode).then((res: any) => {
-      this.clinicalNotes = res.result || [];
-      // For now, using same API for macro - will be updated in future
-      this.macroList = res.result || [];
+      const notes = res.result || [];
+      this.clinicalNotes = notes;
+      this.macroList = notes;
+
+      // Cache the results
+      this.notesCache.set(providerCode, notes);
+      this.macrosCache.set(providerCode, notes);
+
       this.loader.hide();
+      this.cdr.markForCheck();
     }).catch((e: any) => {
       Swal.fire('Error', 'Error loading notes', 'error');
       this.loader.hide();
+      this.cdr.markForCheck();
     });
   }
 
@@ -243,6 +300,7 @@ export class ClinicalNoteComponent {
         // Always pass params for freetext, even if empty
         this.router.navigate(['/clinical/create-free-text-notes'], { queryParams });
         break;
+
     }
   }
 
@@ -267,7 +325,8 @@ export class ClinicalNoteComponent {
     this.modalForm.reset();
     this.clinicalNotes = [];
     this.macroList = [];
-    this.isProviderSelected = false; // Reset when going back
+    this.isProviderSelected = false;
+    this.cdr.markForCheck();
   }
 
   async onallergiePageChanged(page: number) {
@@ -275,7 +334,23 @@ export class ClinicalNoteComponent {
     await this.speechtoText();
   }
 
+  // TrackBy functions for ngFor optimization
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackByCode(index: number, item: any): any {
+    return item.code || index;
+  }
+
+  trackByPathId(index: number, item: any): any {
+    return item.pathId || index;
+  }
+
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+
     if (this.patientDataSubscription) {
       this.patientDataSubscription.unsubscribe();
     }

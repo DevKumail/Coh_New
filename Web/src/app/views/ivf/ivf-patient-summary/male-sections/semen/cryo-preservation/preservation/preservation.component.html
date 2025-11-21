@@ -13,10 +13,20 @@
                     </div>
 
                     <div class="col-6">
-                        <label class="form-label">Date of freezing</label>
+                        <label class="form-label">Date of freezing <span class="text-danger">*</span></label>
                         <div class="d-flex gap-2">
-                            <input type="date" class="form-control" formControlName="freezingDate" />
-                            <input type="time" class="form-control" formControlName="freezingTime" />
+                            <div class="flex-fill">
+                                <input type="date" class="form-control" formControlName="freezingDate" [class.is-invalid]="form.get('freezingDate')?.invalid && form.get('freezingDate')?.touched" />
+                                <div class="invalid-feedback" *ngIf="form.get('freezingDate')?.invalid && form.get('freezingDate')?.touched">
+                                    Freezing date is required
+                                </div>
+                            </div>
+                            <div class="flex-fill">
+                                <input type="time" class="form-control" formControlName="freezingTime" [class.is-invalid]="form.get('freezingTime')?.invalid && form.get('freezingTime')?.touched" />
+                                <div class="invalid-feedback" *ngIf="form.get('freezingTime')?.invalid && form.get('freezingTime')?.touched">
+                                    Freezing time is required
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -72,11 +82,14 @@
                     </div>
 
                     <div class="col-3">
-                        <label class="form-label">Type of material</label>
-                        <select class="form-select" formControlName="typeOfMaterial">
+                        <label class="form-label">Type of material <span class="text-danger">*</span></label>
+                        <select class="form-select" formControlName="typeOfMaterial" [class.is-invalid]="form.get('typeOfMaterial')?.invalid && form.get('typeOfMaterial')?.touched">
                             <option value="" disabled selected>Select</option>
                             <option *ngFor="let o of opts('IVFMaleCryoPreservation:Material')" [value]="o.valueId">{{ o.name }}</option>
                         </select>
+                        <div class="invalid-feedback" *ngIf="form.get('typeOfMaterial')?.invalid && form.get('typeOfMaterial')?.touched">
+                            Type of material is required
+                        </div>
                     </div>
 
                     <div class="col-3">
@@ -122,32 +135,44 @@
                             </div>
 
                             <div class="col-6">
-                                <label class="form-label">Storage place</label>
-                                <input type="text" class="form-control" formControlName="storagePlace"
-                                    placeholder="Click here for see Cryo Storage" (click)="openStoragePlace()" />
+                                <label class="form-label">Storage place <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" formControlName="storagePlace"
+                                        placeholder="click search storage to Storage Place " [class.is-invalid]="form.get('storagePlace')?.invalid && form.get('storagePlace')?.touched" />
+                                    <button class="btn btn-outline-secondary" type="button" (click)="openStoragePlace()">
+                                        <i class="bi bi-search"></i> Search Storage
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback d-block" *ngIf="form.get('storagePlace')?.invalid && form.get('storagePlace')?.touched">
+                                    Storage place is required
+                                </div>
                             </div>
 
                             <div class="col-3">
                                 <label class="form-label">Position</label>
                                 <input type="text" class="form-control" formControlName="position"
-                                    placeholder="Position" [disabled]="!form.get('useCryoStorage')?.value" />
+                                    placeholder="Position" />
                             </div>
                             <div class="col-3">
                                 <label class="form-label">Colour</label>
 
                                 <div class="d-flex gap-2">
-                                    <select class="form-select" formControlName="colour1">
-                                        <option value="" disabled>Select colour</option>
-                                        <option>red</option>
-                                        <option>blue</option>
-                                        <option>green</option>
+                                    <select class="form-select color-dropdown" formControlName="colour1" 
+                                            [style.background-color]="getSelectedColor('colour1')">
+                                        <option value="" disabled selected>Select colour</option>
+                                        <option *ngFor="let color of strawColors" [value]="color.colorId" 
+                                                [style.color]="color.colorCode">
+                                            {{ color.colorDescription }}
+                                        </option>
                                     </select>
 
-                                    <select class="form-select" formControlName="colour1">
-                                        <option value="" disabled>Select colour</option>
-                                        <option>red</option>
-                                        <option>blue</option>
-                                        <option>green</option>
+                                    <select class="form-select color-dropdown" formControlName="colour2"
+                                            [style.background-color]="getSelectedColor('colour2')">
+                                        <option value="" disabled selected>Select colour</option>
+                                        <option *ngFor="let color of strawColors" [value]="color.colorId"
+                                                [style.color]="color.colorCode">
+                                            {{ color.colorDescription }}
+                                        </option>
                                     </select>
 
                                 </div>

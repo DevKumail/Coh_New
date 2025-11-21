@@ -109,4 +109,29 @@ export class IVFApiService {
   DeleteFemaleFertilityHistory(ivfFemaleFHId: number): Observable<any> {
     return this.api.delete(`IVFFertilityHistory/DeleteFemaleFertilityHistory/${ivfFemaleFHId}`);
   }
+
+  GetAllStrawColors(): Observable<any> {
+    return this.api.get('IVFMaleCryoPreservation/GetAllStrawColors');
+  }
+
+  GetNextAvailableStorageSlot(): Observable<any> {
+    return this.api.get('IVFMaleCryoPreservation/GetNextAvailableStorageSlot');
+  }
+
+  // Cryo Management dropdowns
+  GetCryoContainersDropdown(): Observable<any> {
+    return this.api.get('CryoManagement/containers/dropdown');
+  }
+
+  GetCryoLevelADropdown(containerId: number): Observable<any> {
+    return this.api.get(`CryoManagement/levela/dropdown/${containerId}`);
+  }
+
+  GetCryoLevelBDropdown(levelAId: number): Observable<any> {
+    return this.api.get(`CryoManagement/levelb/dropdown/${levelAId}`);
+  }
+
+  SearchCryoStorages(payload: any): Observable<any> {
+    return this.api.post('CryoManagement/search', payload);
+  }
 }
