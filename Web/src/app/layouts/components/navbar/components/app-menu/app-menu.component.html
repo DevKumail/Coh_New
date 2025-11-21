@@ -6,12 +6,6 @@
                 <span class="menu-text">{{ 'DASHBOARD' | translate }}</span>
             </a>
         </li>
-        <li class="nav-item" [class.active]="router.url === '/patient-summary'">
-            <a href="javascript:void(0)" class="nav-link" (click)="onPatientSummaryClick()">
-                <ng-icon name="tablerUser" class="menu-icon"></ng-icon>
-                <span class="menu-text">{{ 'PATIENT_CHART' | translate }}</span>
-            </a>
-        </li>
         @for (item of menuItems; track $index) {
         @if (!hasSubMenu(item)) {
         <li class="nav-item">

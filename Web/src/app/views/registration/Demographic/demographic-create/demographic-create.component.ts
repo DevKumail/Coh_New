@@ -314,6 +314,26 @@ export class DemographicCreateComponent implements OnInit, AfterViewInit {
         }
     }
 
+    // Convert dd/MM/yyyy format to ISO DateTime format (yyyy-MM-ddTHH:mm:ss) for backend
+    private formatToISO(dateStr: string | null): string | null {
+        if (!dateStr) return null;
+        try {
+            // Check if already in ISO format
+            if (dateStr.includes('T')) return dateStr;
+            
+            // Parse dd/MM/yyyy format
+            const match = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (match) {
+                const [, day, month, year] = match;
+                // Create ISO format: yyyy-MM-ddT00:00:00
+                return `${year}-${month}-${day}T00:00:00`;
+            }
+            return null;
+        } catch {
+            return null;
+        }
+    }
+
     initializeForm() {
 
         this.demographicForm = this.fb.group({
@@ -1214,7 +1234,7 @@ onSubmit() {
             vipPatient: !!formData.VIPPatient,
             practice: formData.practice || '',
             personEthnicityTypeId: formData.PersonEthnicityTypeId || 0,
-            patientBirthDate: formData.PatientBirthDate || null,
+            patientBirthDate: this.formatToISO(formData.PatientBirthDate) || null,
             personDriversLicenseNo: formData.PersonDriversLicenseNo || '',
             patientBloodGroupId: formData.PatientBloodGroupId || 0,
             patientPicture: normalizedPicture,
@@ -1236,7 +1256,7 @@ onSubmit() {
             pregnant: !!formData.Pregnant,
             drugHistConsent: !!formData.DrugHistConsent,
             exemptReporting: !!formData.ExemptReporting,
-            dateofDeath: this.demographicForm.get('DeathDate')?.value || null,
+            dateofDeath: this.formatToISO(this.demographicForm.get('DeathDate')?.value) || null,
             causeofDeath: formData.causeofDeath || '',
             preferredName: formData.preferredName || '',
             primarycarephysicianPcp: formData.primarycarephysicianPcp || '',

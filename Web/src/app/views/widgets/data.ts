@@ -322,18 +322,18 @@ export const statisticWidgets: StatisticWidget1Type[] = [
         description: 'Total Tasks',
         label: '+3 New',
         icon: 'tablerChecklist',
-        count: {value: 124},
+        count: {value: 12},
         variant: 'primary',
-        totalCount: {value: 12450}
+        totalCount: {value: 124}
     },
     {
         title: 'Messages',
         description: 'Total Messages',
         label: '+5 New',
         icon: 'tablerMessageCircle',
-        count: {value: 69.5, suffix: 'k'},
+        count: {value: 1.2, suffix: 'k'},
         variant: 'purple',
-        totalCount: {value: 32.1, suffix: 'M'}
+        totalCount: {value: 3.4, suffix: 'k'}
     },
     {
         title: 'Approvals',

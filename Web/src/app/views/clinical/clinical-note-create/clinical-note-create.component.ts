@@ -71,11 +71,16 @@ export class ClinicalNoteCreateComponent implements OnInit {
   nodeData: any;
 
   recording = false;
+  isPaused = false;
   isListening: boolean | null = null;
 
   cacheItems: string[] = ['Provider'];
 
   private subscriptions: Subscription[] = [];
+  isTemplatePreSelected: boolean = false;
+  selectedTemplateName: string = 'Clinical Note';
+  preSelectedProvider: number | null = null;
+  preSelectedTemplateId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -121,14 +126,38 @@ export class ClinicalNoteCreateComponent implements OnInit {
 
     this.FillCache();
 
+    // Read query params and pre-populate form
+    this.route.queryParams.subscribe(params => {
+      if (params['provider']) {
+        this.preSelectedProvider = Number(params['provider']);
+        this.clinicalForm.patchValue({ provider: params['provider'] });
+      }
+      if (params['template']) {
+        this.isTemplatePreSelected = true;
+        const templateId = Number(params['template']);
+        this.preSelectedTemplateId = templateId;
+        this.clinicalForm.patchValue({ note: templateId });
+        this.selectedNotes = templateId;
+        // Load template immediately
+        this.GetNotesTemplate(templateId);
+        // Load notes to get template name
+        if (this.preSelectedProvider) {
+          this.GetNotesEmployeeId(this.preSelectedProvider);
+        }
+      }
+    });
+
     // subscribe to provider selection changes (value is the selected code)
     const providerCtrl = this.clinicalForm.get('provider');
     if (providerCtrl) {
-        debugger
+      debugger
       const sub = providerCtrl.valueChanges.subscribe((val: any) => {
         const code = Number(val) || 0;
         this.selectedProviders = code;
-        this.GetNotesEmployeeId(code);
+        // Only reload notes if template is not pre-selected
+        if (!this.isTemplatePreSelected) {
+          this.GetNotesEmployeeId(code);
+        }
       });
       this.subscriptions.push(sub);
     }
@@ -136,12 +165,15 @@ export class ClinicalNoteCreateComponent implements OnInit {
     // subscribe to note selection changes
     const noteCtrl: any = this.clinicalForm.get('note');
     if (noteCtrl != null && noteCtrl != undefined && noteCtrl != 0) {
-        console.log('Note control initialized:', noteCtrl);
+      console.log('Note control initialized:', noteCtrl);
 
       const sub2 = noteCtrl.valueChanges.subscribe((val: any) => {
-        const nid = Number(val) || 0;
-        this.selectedNotes = nid;
-        this.GetNotesTemplate(nid);
+        // Only handle changes if template is not pre-selected
+        if (!this.isTemplatePreSelected) {
+          const nid = Number(val) || 0;
+          this.selectedNotes = nid;
+          this.GetNotesTemplate(nid);
+        }
       });
       this.subscriptions.push(sub2);
     }
@@ -199,15 +231,29 @@ export class ClinicalNoteCreateComponent implements OnInit {
     if (providerCode == null || providerCode == undefined) providerCode = 0;
     this.selectedProviders = Number(providerCode) || 0;
     if (this.selectedProviders === 250) providerCode = 197;
-    this.clinicalNotes = [];
-    this.clinicalForm.patchValue({ note: null });
+
+    // Don't clear note dropdown if template is pre-selected
+    if (!this.isTemplatePreSelected) {
+      this.clinicalNotes = [];
+      this.clinicalForm.patchValue({ note: null });
+    }
+
     this.loader.show();
     this.clinicalApiService.EMRNotesGetByEmpId(providerCode).then((res: any) => {
       this.clinicalNotes = res.result || [];
-        this.loader.hide();
+
+      // Set selected template name if pre-selected
+      if (this.isTemplatePreSelected && this.preSelectedTemplateId) {
+        const selectedNote = this.clinicalNotes.find(n => n.pathId === this.preSelectedTemplateId);
+        if (selectedNote) {
+          this.selectedTemplateName = selectedNote.pathName;
+          this.cdr.detectChanges();
+        }
+      }
+
+      this.loader.hide();
     }).catch((e: any) =>
-        Swal.fire('Error', 'Error loading notes', 'error')
-    //   this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading notes' })
+      Swal.fire('Error', 'Error loading notes', 'error')
     ).finally(() => this.loader.hide());
   }
 
@@ -225,10 +271,15 @@ export class ClinicalNoteCreateComponent implements OnInit {
       this.dataquestion = res;
       this.viewquestion = true;
       this.nodeData = res;
-          this.loader.hide();
+
+      // Set template name from response
+      if (res?.node?.noteTitle) {
+        this.selectedTemplateName = res.node.noteTitle;
+      }
+
+      this.loader.hide();
     }).catch(() =>
-    //   this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading template' })
-    Swal.fire('Error', 'Error loading template', 'error')
+      Swal.fire('Error', 'Error loading template', 'error')
     ).finally(() => this.loader.hide());
     }
 
@@ -274,8 +325,9 @@ export class ClinicalNoteCreateComponent implements OnInit {
     startVoiceRecording() {
     if (this.selectedNotes > 0) {
       this.recording = true;
-        this.isListening = false;
-        this.ganricfunction();
+      this.isPaused = false;
+      this.isListening = false;
+      this.ganricfunction();
     }
     else {
       Swal.fire('Warning', 'Please select Note Template first.', 'warning');
@@ -294,8 +346,25 @@ export class ClinicalNoteCreateComponent implements OnInit {
         };
 
         this.mediaRecorder.onstop = () => {
+          // Revoke old URL to prevent memory leaks
+          if (this.audioUrl) {
+            const oldUrl = this.audioUrl.toString();
+            if (oldUrl.startsWith('blob:')) {
+              URL.revokeObjectURL(oldUrl);
+            }
+          }
+
+          // Clear audio URL first
+          this.audioUrl = null;
+          this.cdr.detectChanges();
+
+          // Create new blob and URL
           this.voiceBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-          this.audioUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(this.voiceBlob));
+          const url = URL.createObjectURL(this.voiceBlob);
+          this.audioUrl = this.sanitizer.bypassSecurityTrustUrl(url);
+
+          // Manually trigger change detection
+          this.cdr.detectChanges();
         };
 
         this.mediaRecorder.start();
@@ -306,11 +375,25 @@ export class ClinicalNoteCreateComponent implements OnInit {
       });
   }
 
+  pauseVoiceRecording() {
+    if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+      this.mediaRecorder.pause();
+      this.isPaused = true;
+    }
+  }
+
+  resumeVoiceRecording() {
+    if (this.mediaRecorder && this.mediaRecorder.state === 'paused') {
+      this.mediaRecorder.resume();
+      this.isPaused = false;
+    }
+  }
+
   stopVoiceRecording() {
     this.recording = false;
+    this.isPaused = false;
     if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
       try {
-     this.ganricfunction();
         this.mediaRecorder.stop();
       } catch (e) {
         console.error('Error stopping recorder:', e);
@@ -439,17 +522,18 @@ this.loader.show();
 
     reader.readAsDataURL(this.voiceBlob);
   }
+  cancel() {
+    this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
+  }
 
   // --- additional submit used elsewhere in old code ---------------------
   submit() {
     // ...existing code...
     if (!this.mrNo) {
-    //   this.messageService.add({ severity: 'Error', summary: 'MRNo is not Found' });
-    Swal.fire('Error', 'MRNo is not Found please load patient', 'error');
+      Swal.fire('Error', 'MRNo is not Found please load patient', 'error');
       return;
     }
 
-    // this.clinicalNotesList.AppointmentId = this.SelectedVisit.appointmentId;
     this.clinicalNotesList.NoteTitle = this.noteTitle;
     this.clinicalNotesList.CreatedBy = this.createdBy;
     this.clinicalNotesList.SignedBy = this.signedBy;
@@ -459,8 +543,7 @@ this.loader.show();
     this.clinicalNotesList.NoteText = this.spokenText;
     this.clinicalNotesList.VoiceText = this.voicetext;
     this.clinicalApiService.InsertSpeech(this.clinicalNotesList).then(() => {
-        Swal.fire('Success', 'Appointment has been Created', 'success');
-    //   this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Appointment has been Created' });
+      Swal.fire('Success', 'Appointment has been Created', 'success');
       this.router.navigate(['/clinical/clinical-notes']);
     });
   }
@@ -469,13 +552,38 @@ this.loader.show();
 
   }
 
-
   resetForm(){
     this.clinicalForm.reset();
+    this.isTemplatePreSelected = false;
+    this.selectedTemplateName = 'Clinical Note';
   }
+
   ngOnDestroy(): void {
     // cleanup subscriptions
     this.subscriptions.forEach(s => s.unsubscribe());
+
+    // Cleanup audio URL
+    if (this.audioUrl) {
+      const url = this.audioUrl.toString();
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    // Cleanup media recorder
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      try {
+        this.mediaRecorder.stop();
+      } catch (e) {
+        console.error('Error stopping recorder on destroy:', e);
+      }
+    }
+  }
+
+  getProviderName(providerCode: any): string {
+    if (!providerCode || !this.providers?.length) return '';
+    const provider = this.providers.find(p => p.code == providerCode);
+    return provider ? provider.name : '';
   }
 }
 

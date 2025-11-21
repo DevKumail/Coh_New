@@ -17,7 +17,7 @@ export class StatisticsWidgetComponent {
     @Input() item!: any
 
     Roles = Roles;
-    currentRoleId: number = Number(sessionStorage.getItem('empId') || 0);
+    currentRoleId: number = Number(sessionStorage.getItem('empId') || 1);
 
     // Decide visibility per item title. Adjust mappings as needed.
     canShowItem(item: any): boolean {
