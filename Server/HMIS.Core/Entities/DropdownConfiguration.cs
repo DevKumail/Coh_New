@@ -42,6 +42,9 @@ public partial class DropdownConfiguration
     [InverseProperty("PatencyRightCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryPatencyRightCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
+    [InverseProperty("PidembblastIndicationCategory")]
+    public virtual ICollection<IvffemaleFhpidembblastIndications> IvffemaleFhpidembblastIndications { get; set; } = new List<IvffemaleFhpidembblastIndications>();
+
     [InverseProperty("PidpolarBodiesIndicationCategory")]
     public virtual ICollection<IvffemaleFhpidpolarBodiesIndications> IvffemaleFhpidpolarBodiesIndications { get; set; } = new List<IvffemaleFhpidpolarBodiesIndications>();
 
@@ -71,6 +74,21 @@ public partial class DropdownConfiguration
 
     [InverseProperty("TreatmentCategory")]
     public virtual ICollection<IvffemaleTreatmentTypes> IvffemaleTreatmentTypes { get; set; } = new List<IvffemaleTreatmentTypes>();
+
+    [InverseProperty("MaterialType")]
+    public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservationMaterialType { get; set; } = new List<IvfmaleCryoPreservation>();
+
+    [InverseProperty("OriginallyFromClinic")]
+    public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservationOriginallyFromClinic { get; set; } = new List<IvfmaleCryoPreservation>();
+
+    [InverseProperty("ReasonForResearch")]
+    public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservationReasonForResearch { get; set; } = new List<IvfmaleCryoPreservation>();
+
+    [InverseProperty("Status")]
+    public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservationStatus { get; set; } = new List<IvfmaleCryoPreservation>();
+
+    [InverseProperty("MaterialType")]
+    public virtual ICollection<IvfmaleCryoStraw> IvfmaleCryoStraw { get; set; } = new List<IvfmaleCryoStraw>();
 
     [InverseProperty("AdiposityCategory")]
     public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistoryAdiposityCategory { get; set; } = new List<IvfmaleFertilityHistory>();
