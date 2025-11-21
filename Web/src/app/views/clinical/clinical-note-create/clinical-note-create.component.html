@@ -1,5 +1,4 @@
 <div class="d-flex row col-12 h-100">
-
     <div [ngClass]="{
       'col-8': dataquestion?.node?.noteTitle,
       'col-12': !dataquestion?.node?.noteTitle
@@ -7,48 +6,41 @@
     <form [formGroup]="clinicalForm" (ngSubmit)="submitVoice()">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-      <span>{{ 'CLINICAL_CREATE' | translate }}</span>
+      <span>{{ dataquestion?.node?.noteTitle || ('CLINICAL_AI_POWERED_NOTE_CREATE' | translate) }}</span>
     </h5>
-
-         <div class="row">
-          <div class="col-12 d-flex justify-content-end gap-2">
-              <button class="btn btn-danger"
-               type="button">{{ 'CANCEL' | translate }}</button>
-            <button class="btn btn-info" [disabled]="clinicalForm.invalid" type="submit">{{ 'SAVE' | translate }}</button>
-          </div>
-        </div>
-
+    <div class="d-flex gap-2 align-items-center">
+      <i class="bi bi-file-earmark-text text-primary fs-4 me-2"></i>
+      <button class="btn btn-danger" (click)="cancel()" type="button">{{ 'CANCEL' | translate }}</button>
+      <button class="btn btn-info" [disabled]="clinicalForm.invalid" type="submit">{{ 'SAVE' | translate }}</button>
+    </div>
   </div>
 
   <div class="card-body flex-grow-1 overflow-auto">
       <div >
         <div class="row g-3 mb-2">
-          <div class="col-sm-3">
-            <label class="form-label">Provider <span class="text-danger">*</span></label>
-            <select class="form-select" formControlName="provider"
-              (change)="onProviderchange()">
-              <option value="null" disabled>Select Provider</option>
-              <option *ngFor="let p of providers" [value]="p.code">{{ p.name }}</option>
-            </select>
+          <div class="col-sm-4">
+            <label class="form-label">Provider (For Signing) <span class="text-danger">*</span></label>
+            <input type="text" class="form-control"
+              [value]="getProviderName(clinicalForm.get('provider')?.value)"
+              readonly disabled>
+            <input type="hidden" formControlName="provider">
           </div>
 
-          <div class="col-sm-3">
-            <label class="form-label">Notes <span class="text-danger">*</span></label>
-            <select class="form-select" formControlName="note">
-              <option value="null" disabled>Select Note</option>
-              <option *ngFor="let n of clinicalNotes" [value]="n.pathId">{{ n.pathName }}</option>
-            </select>
-          </div>
-
-          <div class="col-sm-3">
+          <div class="col-sm-4">
             <label class="form-label">Description</label>
             <textarea class="form-control" style="height: 37px;" placeholder="Description" formControlName="description"></textarea>
           </div>
 
-          <div class="col-sm-3 d-flex align-items-center">
+          <div class="col-sm-4 d-flex align-items-center">
             <div class="d-flex gap-2">
               <button class="btn btn-primary mt-2" (click)="startVoiceRecording()" *ngIf="!recording" type="button">
                 <i class="bi bi-mic-fill me-1"></i> Start Speech
+              </button>
+              <button class="btn btn-warning mt-2" (click)="pauseVoiceRecording()" *ngIf="recording && !isPaused" type="button">
+                <i class="bi bi-pause-circle me-1"></i> Pause
+              </button>
+              <button class="btn btn-success mt-2" (click)="resumeVoiceRecording()" *ngIf="recording && isPaused" type="button">
+                <i class="bi bi-play-circle me-1"></i> Resume
               </button>
               <button class="btn btn-danger mt-2" [disabled]="isListening === true || isListening === null" (click)="stopVoiceRecording()" *ngIf="recording" type="button">
                 <i class="bi bi-stop-circle me-1"></i> Stop Speech
@@ -79,13 +71,6 @@
           </div>
         </div>
 
-        <!-- <div class="row">
-          <div class="col-12 d-flex justify-content-end gap-2">
-              <button class="btn btn-danger"
-               type="button">{{ 'CANCEL' | translate }}</button>
-            <button class="btn btn-info" [disabled]="clinicalForm.invalid" type="submit">{{ 'SAVE' | translate }}</button>
-          </div>
-        </div> -->
       </div>
 
     <!-- Bootstrap tabs -->
@@ -110,7 +95,6 @@
 
         <div class="tab-pane fade" id="note" role="tabpanel" aria-labelledby="note-tab">
           <div *ngIf="viewNoteResponse" class="card p-3">
-            <h2 class="fw-bold text-decoration-underline">{{ nodeData?.noteTitle }}</h2>
             <div class="mt-2">
               <app-question-item *ngFor="let question of nodeData?.questions" [question]="question"></app-question-item>
             </div>
