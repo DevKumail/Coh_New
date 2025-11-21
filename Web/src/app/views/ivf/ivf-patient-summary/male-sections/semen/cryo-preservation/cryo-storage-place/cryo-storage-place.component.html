@@ -81,7 +81,8 @@
     <!-- Content split: storages list and storage details -->
     <div class="row g-2">
         <!-- Storages table -->
-        <div class="col-lg-6">
+        <div [ngClass]="showDetails ? 'col-lg-6' : 'col-lg-12'">
+
             <div class="card h-100">
                 <div class="card-header">Storages</div>
                 <div class="card-body p-0">
@@ -100,7 +101,7 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let s of storages" (click)="onSelectStorage(s)"
-                                    [class.table-active]="s===selectedRow" style="cursor:pointer;">
+                                    [ngStyle]="s===selectedRow ? {'background-color':'#ffe8cc'} : null" style="cursor:pointer;">
                                     <td>{{ s.description }}</td>
                                     <td>{{ s.levelA }}</td>
                                     <td>{{ s.levelB }}</td>
@@ -108,10 +109,10 @@
                                     <td>{{ s.samples }}</td>
                                     <td>{{ s.free }}</td>
                                     <td>
-                                        <button *ngIf="s.isNextAvailable" type="button" class="btn btn-sm btn-success" 
-                                                (click)="loadSlot(s); $event.stopPropagation()">
-                                            Load
-                                        </button>
+                                        <ng-icon *ngIf="s.free > 0" name="tablerRotateClockwise"
+                                             class="text-info me-1" style="cursor: pointer;"
+                                             (click)="loadSlot(s); $event.stopPropagation()">
+                                        </ng-icon>                                                                               
                                     </td>
                                 </tr>
                                 <tr *ngIf="storages.length === 0">
@@ -125,10 +126,11 @@
         </div>
 
         <!-- Storage details table -->
-        <div class="col-lg-6">
+        <div class="col-lg-6" *ngIf="showDetails">
             <div class="card h-100">
                 <div class="card-header">Storage details</div>
                 <div class="card-body p-0">
+
                     <div class="table-responsive" style="max-height:420px;">
                         <table class="table table-sm table-bordered mb-0">
                             <thead class="table-light">

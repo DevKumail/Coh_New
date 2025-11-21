@@ -2,13 +2,17 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
+import { provideIcons } from '@ng-icons/core';
+import { tablerRotateClockwise } from '@ng-icons/tabler-icons';
+import { NgIconComponent } from '@ng-icons/core';
 
 @Component({
   selector: 'app-cryo-storage-place',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NgIconComponent],
   templateUrl: './cryo-storage-place.component.html',
-  styleUrls: ['./cryo-storage-place.component.scss']
+  styleUrls: ['./cryo-storage-place.component.scss'],
+  providers: [provideIcons({ tablerRotateClockwise })]
 })
 export class CryoStoragePlaceComponent {
   @Output() back = new EventEmitter<void>();
@@ -26,6 +30,7 @@ export class CryoStoragePlaceComponent {
   levelBs: Array<{ value: number; label: string }> = [];
 
   selectedRow: any = null;
+  showDetails = false;
 
   constructor(
     private fb: FormBuilder,
@@ -159,7 +164,9 @@ export class CryoStoragePlaceComponent {
     });
   }
 
-  onSelectStorage(s: any) { this.selectedRow = s; }
+  onSelectStorage(s: any) { 
+    this.showDetails = true;
+  }
 
   onCancel() { this.back.emit(); }
 
@@ -178,8 +185,8 @@ export class CryoStoragePlaceComponent {
 
   loadSlot(row: any) {
     this.selected.emit({
-      storagePlace: row.description || '',
-      position: `${row.levelA} ${row.levelB} ${row.position}`.trim()
+      storagePlace: `${row.description} ${row.levelA} ${row.levelB}`.trim(),
+      position: `${row.description} ${row.levelA}`.trim()
     });
   }
 
