@@ -70,6 +70,7 @@ namespace HMIS.Application.DTOs.CryoDTOs
         public int StrawPosition { get; set; }
         public int? SampleID { get; set; }
         public string Status { get; set; } = "Available";
+        public long? StatusId { get; set; } 
         public long? CreatedBy { get; set; }
         public long? UpdatedBy { get; set; }
         public DateTime? CreatedAt { get; set; } = DateTime.Now;

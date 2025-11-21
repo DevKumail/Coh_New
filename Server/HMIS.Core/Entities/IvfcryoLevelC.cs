@@ -20,9 +20,6 @@ public partial class IvfcryoLevelC
 
     public int? SampleId { get; set; }
 
-    [StringLength(50)]
-    public string Status { get; set; } = null!;
-
     public long? CreatedBy { get; set; }
 
     public long? UpdatedBy { get; set; }
@@ -34,6 +31,8 @@ public partial class IvfcryoLevelC
     public DateTime UpdatedAt { get; set; }
 
     public bool IsDeleted { get; set; }
+
+    public long? StatusId { get; set; }
 
     [InverseProperty("StoragePlace")]
     public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservation { get; set; } = new List<IvfmaleCryoPreservation>();
@@ -48,4 +47,8 @@ public partial class IvfcryoLevelC
     [ForeignKey("SampleId")]
     [InverseProperty("IvfcryoLevelC")]
     public virtual IvfmaleSemenSample? Sample { get; set; }
+
+    [ForeignKey("StatusId")]
+    [InverseProperty("IvfcryoLevelC")]
+    public virtual DropdownConfiguration? Status { get; set; }
 }

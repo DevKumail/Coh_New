@@ -26,8 +26,8 @@
         public decimal? InseminationMotileSperms { get; set; }
         public decimal? InseminatedAmountML { get; set; }
         public decimal? Motility24hPercent { get; set; }
-        public int? CryoStatusId { get; set; }
-        public int? StatusId { get; set; }
+        public long? CryoStatusId { get; set; }
+        public long? StatusId { get; set; }
         public int? CreatedBy { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }

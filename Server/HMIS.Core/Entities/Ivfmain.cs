@@ -28,6 +28,9 @@ public partial class Ivfmain
     public virtual RegPatient FemalePatient { get; set; } = null!;
 
     [InverseProperty("Ivfmain")]
+    public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisode { get; set; } = new List<IvfdashboardTreatmentEpisode>();
+
+    [InverseProperty("Ivfmain")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistory { get; set; } = new List<IvffemaleFertilityHistory>();
 
     [InverseProperty("Ivfmain")]

@@ -67,10 +67,6 @@ public partial class IvfmaleSemenSample
     [Column(TypeName = "decimal(5, 2)")]
     public decimal? Motility24hPercent { get; set; }
 
-    public int? CryoStatusId { get; set; }
-
-    public int? StatusId { get; set; }
-
     public int? CreatedBy { get; set; }
 
     public int? UpdatedBy { get; set; }
@@ -83,6 +79,10 @@ public partial class IvfmaleSemenSample
 
     public int? DeletedBy { get; set; }
 
+    public long? StatusId { get; set; }
+
+    public long? CryoStatusId { get; set; }
+
     [ForeignKey("AppearanceId")]
     [InverseProperty("IvfmaleSemenSampleAppearance")]
     public virtual DropdownConfiguration? Appearance { get; set; }
@@ -94,6 +94,10 @@ public partial class IvfmaleSemenSample
     [ForeignKey("CollectionPlaceId")]
     [InverseProperty("IvfmaleSemenSampleCollectionPlace")]
     public virtual DropdownConfiguration? CollectionPlace { get; set; }
+
+    [ForeignKey("CryoStatusId")]
+    [InverseProperty("IvfmaleSemenSampleCryoStatus")]
+    public virtual DropdownConfiguration? CryoStatus { get; set; }
 
     [InverseProperty("Sample")]
     public virtual ICollection<IvfcryoLevelC> IvfcryoLevelC { get; set; } = new List<IvfcryoLevelC>();
@@ -124,6 +128,10 @@ public partial class IvfmaleSemenSample
     [ForeignKey("SmellId")]
     [InverseProperty("IvfmaleSemenSampleSmell")]
     public virtual DropdownConfiguration? Smell { get; set; }
+
+    [ForeignKey("StatusId")]
+    [InverseProperty("IvfmaleSemenSampleStatus")]
+    public virtual DropdownConfiguration? Status { get; set; }
 
     [ForeignKey("ViscosityId")]
     [InverseProperty("IvfmaleSemenSampleViscosity")]

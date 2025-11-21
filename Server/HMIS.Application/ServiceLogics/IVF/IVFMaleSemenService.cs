@@ -101,8 +101,8 @@ namespace HMIS.Application.ServiceLogics.IVF
             sample.InseminationMotileSperms = dto.InseminationMotileSperms;
             sample.InseminatedAmountMl = dto.InseminatedAmountML;
             sample.Motility24hPercent = dto.Motility24hPercent;
-            sample.CryoStatusId = dto.CryoStatusId;
-            sample.StatusId = dto.StatusId;
+            sample.CryoStatusId = dto.CryoStatusId > 0?dto.CryoStatusId:null;
+            sample.StatusId = 200;
             sample.UpdatedBy = dto.UpdatedBy;
         }
 

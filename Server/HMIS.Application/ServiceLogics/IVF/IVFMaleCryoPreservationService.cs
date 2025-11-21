@@ -227,7 +227,6 @@ namespace HMIS.Application.ServiceLogics.IVF
                     };
 
                     _context.IvfmaleCryoPreservation.Add(preservation);
-                    await _context.SaveChangesAsync();
 
                     // Generate straws if count is specified
                     if (preservationDto.StrawStartNumber.HasValue && preservationDto.StrawCount.HasValue)
@@ -238,20 +237,32 @@ namespace HMIS.Application.ServiceLogics.IVF
                             preservationDto.CreatedBy);
                     }
 
-                    // change cryolevelc table status
+                // change cryolevelc table status
 
-                    if(preservationDto.StoragePlaceId > 0)
+                if (preservationDto.StoragePlaceId > 0)
                 {
                     var levelC = await _context.IvfcryoLevelC
-                                 .FirstOrDefaultAsync(cp => cp.Id == preservationDto.StoragePlaceId);
+                                     .FirstOrDefaultAsync(cp => cp.Id == preservationDto.StoragePlaceId);
 
-                    levelC.Status = "Occupied";
-                    levelC.SampleId = preservation.SampleId;
-                    levelC.UpdatedAt = DateTime.UtcNow;
-                    await _context.SaveChangesAsync();
+                    if (levelC != null)
+                    {
+                        levelC.StatusId = preservationDto.StatusId;
+                        levelC.SampleId = preservationDto.SampleId;
+                        levelC.UpdatedAt = DateTime.UtcNow;
+                    }
+
+                        var semenSample = await _context.IvfmaleSemenSample
+                                             .FirstOrDefaultAsync(ss => ss.SampleId == preservationDto.SampleId);
+
+                        if (semenSample != null)
+                        {
+                            semenSample.CryoStatusId = preservationDto.StatusId;
+                            semenSample.UpdatedAt = DateTime.UtcNow;
+                        }
                 }
 
 
+                await _context.SaveChangesAsync();
                 return true;
                 }
                 catch (Exception ex)
@@ -276,7 +287,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                     var levelC = await _context.IvfcryoLevelC
                                  .FirstOrDefaultAsync(cp => cp.Id == preservationDto.StoragePlaceId);
 
-                    levelC.Status = "Occupied";
+                   // levelC.Status = "Occupied";
                     levelC.SampleId = preservation.SampleId;
                     levelC.UpdatedAt = DateTime.UtcNow;
                 }
@@ -350,7 +361,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             public async Task<IEnumerable<IVFCryoStorageLocationDto>> GetAvailableStorageLocations()
             {
                 var availableLocations = await _context.IvfcryoLevelC
-                    .Where(lc => lc.Status == "Available" && !lc.IsDeleted)
+                    .Where(lc => lc.StatusId == 196 && !lc.IsDeleted)
                     .Include(lc => lc.LevelB)
                     .ThenInclude(lb => lb.LevelA)
                     .ThenInclude(la => la.Container)
@@ -373,7 +384,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             public async Task<NextAvailableSlotDto?> GetNextAvailableStorageSlot()
             {
                 var nextAvailable = await _context.IvfcryoLevelC
-                    .Where(lc => lc.Status == "Available" && !lc.IsDeleted)
+                    .Where(lc => lc.StatusId == 196 && !lc.IsDeleted)
                     .Include(lc => lc.LevelB)
                     .ThenInclude(lb => lb.LevelA)
                     .ThenInclude(la => la.Container)
@@ -402,13 +413,13 @@ namespace HMIS.Application.ServiceLogics.IVF
                         .FirstOrDefaultAsync(cp => cp.CryoPreservationId == cryoPreservationId && !(cp.IsDeleted ?? false));
 
                     var storageLocation = await _context.IvfcryoLevelC
-                        .FirstOrDefaultAsync(lc => lc.Id == storageLevelCId && lc.Status == "Available" && !lc.IsDeleted);
+                        .FirstOrDefaultAsync(lc => lc.Id == storageLevelCId && lc.StatusId == 196 && !lc.IsDeleted);
 
                     if (preservation == null || storageLocation == null)
                         return false;
 
                     // Update storage location status
-                    storageLocation.Status = "Occupied";
+                    //storageLocation.Status = "Occupied";
                     storageLocation.SampleId = preservation.SampleId;
                     storageLocation.UpdatedBy = updatedBy;
                     storageLocation.UpdatedAt = DateTime.UtcNow;

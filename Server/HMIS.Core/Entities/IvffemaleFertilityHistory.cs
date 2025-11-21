@@ -91,9 +91,6 @@ public partial class IvffemaleFertilityHistory
     [InverseProperty("IvffemaleFh")]
     public virtual ICollection<IvffemaleFhprevIllness> IvffemaleFhprevIllness { get; set; } = new List<IvffemaleFhprevIllness>();
 
-    [InverseProperty("IvffemaleFh")]
-    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycle { get; set; } = new List<IvffemaleTreatmentCycle>();
-
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvffemaleFertilityHistory")]
     public virtual Ivfmain Ivfmain { get; set; } = null!;

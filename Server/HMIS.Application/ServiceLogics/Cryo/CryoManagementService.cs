@@ -111,10 +111,10 @@ namespace HMIS.Application.ServiceLogics.Cryo
                                     {
                                         var levelCEntity = new IvfcryoLevelC
                                         {
-                                            LevelBid = levelBEntity.Id, // Now LevelB ID is available
+                                            LevelBid = levelBEntity.Id, 
                                             StrawPosition = levelC.StrawPosition,
                                             SampleId = levelC.SampleID,
-                                            Status = levelC.Status,
+                                            StatusId = 196,
                                             CreatedBy = levelC.CreatedBy,
                                             CreatedAt = DateTime.Now
                                         };
@@ -323,7 +323,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                     {
                         levelCEntity.StrawPosition = levelCDto.StrawPosition;
                         levelCEntity.SampleId = levelCDto.SampleID;
-                        levelCEntity.Status = levelCDto.Status;
+                        levelCEntity.StatusId = 196;
                         levelCEntity.UpdatedBy = null;
                         levelCEntity.UpdatedAt = DateTime.Now;
                     }
@@ -336,7 +336,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                         LevelBid = levelB.Id, // Now LevelB ID is properly set
                         StrawPosition = levelCDto.StrawPosition,
                         SampleId = levelCDto.SampleID,
-                        Status = levelCDto.Status,
+                        StatusId = 196,
                         CreatedBy = null,
                         CreatedAt = DateTime.Now
                     };
@@ -513,7 +513,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                                         LevelBID = c.LevelBid,
                                         StrawPosition = c.StrawPosition,
                                         SampleID = c.SampleId,
-                                        Status = c.Status,
+                                        StatusId = c.StatusId,
                                         CreatedBy = c.CreatedBy,
                                         UpdatedBy = c.UpdatedBy,
                                         CreatedAt = c.CreatedAt,
@@ -700,19 +700,19 @@ namespace HMIS.Application.ServiceLogics.Cryo
                     // Sample count
                     SampleCount = g.Count(z => z.LevelC != null &&
                                                z.LevelC.SampleId != null &&
-                                               z.LevelC.Status != "Available"),
+                                               z.LevelC.StatusId != 196),
                     // Free slots = total slots - occupied
                     FreePlaces = (
                         g.Count(z => z.LevelC == null ||        // no LevelC = free slot
                                     z.LevelC.SampleId == null ||
-                                    z.LevelC.Status == "Available")
+                                    z.LevelC.StatusId == 196)
                     ),
                     StrawIds = g.Where(z => z.LevelC != null && z.LevelC.SampleId != null)
                                 .Select(z => z.LevelC.SampleId.ToString()),
 
                     FirstFreeLevelCId =
             g.Where(z => z.LevelC.Id != null &&
-                         (z.LevelC.SampleId == null || z.LevelC.Status == "Available"))
+                         (z.LevelC.SampleId == null || z.LevelC.StatusId == 196))
              .Select(z => z.LevelC.Id)
              .FirstOrDefault()
                 };
