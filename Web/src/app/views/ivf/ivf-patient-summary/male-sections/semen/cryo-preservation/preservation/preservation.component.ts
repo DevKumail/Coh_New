@@ -113,6 +113,50 @@ export class PreservationComponent implements OnInit, OnChanges {
     this.form.get('collectionDate')?.disable();
     this.form.get('collectionTime')?.disable();
     this.form.get('patientId')?.disable();
+
+    // If an existing preservation is passed, prefill all relevant fields
+    const existing = (this.preservationData as any)?.existingPreservation;
+    if (existing) {
+      // Helpers to split date/time
+      const toDateInput = (dt: string | null) => dt ? new Date(dt).toISOString().split('T')[0] : null;
+      const toTimeInput = (dt: string | null) => {
+        if (!dt) return null;
+        const d = new Date(dt);
+        return d.toTimeString().split(' ')[0].substring(0,5);
+      };
+
+      // Enable storage fields temporarily
+      this.form.get('storagePlace')?.enable();
+      this.form.get('position')?.enable();
+      this.form.get('storagePlaceId')?.enable();
+
+      this.form.patchValue({
+        freezingDate: toDateInput(existing.freezingDateTime),
+        freezingTime: toTimeInput(existing.freezingDateTime),
+        cryopreservedBy: existing.cryopreservedById ?? null,
+        originallyFromClinic: existing.originallyFromClinicId ?? null,
+        storageDate: toDateInput(existing.storageDateTime),
+        storedBy: existing.storedById ?? null,
+        typeOfMaterial: existing.materialTypeId ?? null,
+        strawId: existing.strawStartNumber ?? null,
+        numberOfStraws: existing.strawCount ?? 0,
+        status: existing.statusId ?? null,
+        cryoContract: existing.cryoContractId ?? null,
+        useCryoStorage: !!existing.preserveUsingCryoStorage,
+        storagePlace: existing.preservationCode ?? '',
+        storagePlaceId: existing.storagePlaceId ?? null,
+        position: existing.position ?? '',
+        colour1: existing.colorId ?? null,
+        forResearch: !!existing.forResearch,
+        reasonForResearch: existing.reasonForResearchId ?? null,
+        note: existing.notes ?? ''
+      });
+
+      // Disable again
+      this.form.get('storagePlace')?.disable();
+      this.form.get('position')?.disable();
+      this.form.get('storagePlaceId')?.disable();
+    }
   }
 
   loadStrawColors(): void {
@@ -198,6 +242,7 @@ export class PreservationComponent implements OnInit, OnChanges {
 
     const payload = {
       sampleId: this.preservationData?.sampleId ?? 0,
+      cryoPreservationId: (this.preservationData as any)?.existingPreservation?.cryoPreservationId ?? null,
       preservationCode: v.storagePlace || '',
       freezingDateTime: toDateTime(v.freezingDate, v.freezingTime),
       cryopreservedById: Number(v.cryopreservedBy) || null,
