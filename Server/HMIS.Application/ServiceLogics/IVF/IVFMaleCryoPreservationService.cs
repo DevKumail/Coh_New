@@ -271,7 +271,17 @@ namespace HMIS.Application.ServiceLogics.IVF
                     if (preservation == null)
                         return false;
 
-                    preservation.FreezingDateTime = preservationDto.FreezingDateTime;
+                if (preservationDto.StoragePlaceId != preservation.StoragePlaceId)
+                {
+                    var levelC = await _context.IvfcryoLevelC
+                                 .FirstOrDefaultAsync(cp => cp.Id == preservationDto.StoragePlaceId);
+
+                    levelC.Status = "Occupied";
+                    levelC.SampleId = preservation.SampleId;
+                    levelC.UpdatedAt = DateTime.UtcNow;
+                }
+
+                preservation.FreezingDateTime = preservationDto.FreezingDateTime;
                     preservation.CryopreservedById = preservationDto.CryopreservedById;
                     preservation.OriginallyFromClinicId = preservationDto.OriginallyFromClinicId;
                     preservation.StorageDateTime = preservationDto.StorageDateTime;
@@ -293,16 +303,7 @@ namespace HMIS.Application.ServiceLogics.IVF
 
                 await _context.SaveChangesAsync();
 
-                if (preservationDto.StoragePlaceId != preservation.StoragePlaceId)
-                {
-                    var levelC = await _context.IvfcryoLevelC
-                                 .FirstOrDefaultAsync(cp => cp.Id == preservationDto.StoragePlaceId);
-
-                    levelC.Status = "Occupied";
-                    levelC.SampleId = preservation.SampleId;
-                    levelC.UpdatedAt = DateTime.UtcNow;
-                    await _context.SaveChangesAsync();
-                }
+              
                     return true;
                 }
                 catch (Exception)
