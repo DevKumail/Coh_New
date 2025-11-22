@@ -17,15 +17,21 @@ public partial class Ivfmain
 
     public long FemalePatientId { get; set; }
 
-    public long AppId { get; set; }
+    public long? AppId { get; set; }
 
     [ForeignKey("AppId")]
     [InverseProperty("Ivfmain")]
-    public virtual SchAppointment App { get; set; } = null!;
+    public virtual SchAppointment? App { get; set; }
 
     [ForeignKey("FemalePatientId")]
     [InverseProperty("IvfmainFemalePatient")]
     public virtual RegPatient FemalePatient { get; set; } = null!;
+
+    [InverseProperty("Ivfmain")]
+    public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisode { get; set; } = new List<IvfdashboardTreatmentEpisode>();
+
+    [InverseProperty("Ivfmain")]
+    public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistory { get; set; } = new List<IvffemaleFertilityHistory>();
 
     [InverseProperty("Ivfmain")]
     public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistory { get; set; } = new List<IvfmaleFertilityHistory>();

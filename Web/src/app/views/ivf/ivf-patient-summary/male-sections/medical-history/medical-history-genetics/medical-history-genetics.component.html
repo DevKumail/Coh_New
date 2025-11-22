@@ -1,0 +1,30 @@
+<div class="genetics-form" [formGroup]="geneticsForm">
+  <!-- Genetics row -->
+  <div class="card px-3 py-2 mb-1">
+    <h5 class="fw-bold mb-1">Genetics</h5>
+    <div class="row g-2 align-items-end">
+      <div class="col-md-8">
+        <label class="form-group">Genes</label>
+        <input type="text" class="form-control" placeholder="" formControlName="genes">
+      </div>
+      <div class="col-md-4">
+        <label class="form-group">Inheritance</label>
+        <select class="form-select" formControlName="inheritance">
+          <option value="" disabled selected>Select</option>
+          <option *ngFor="let o of opts('IVFMaleFertilityHistory:Inheritance')" [value]="o.valueId">{{ o.name }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medical opinion area -->
+  <div class="card px-3 py-2">
+    <label class="fw-bold mb-2">Medical opinion</label>
+    <quill-editor
+      formControlName="editorContent"
+      [modules]="quillModules"
+      format="html"
+      [styles]="{height: '300px'}">
+    </quill-editor>
+  </div>
+</div>

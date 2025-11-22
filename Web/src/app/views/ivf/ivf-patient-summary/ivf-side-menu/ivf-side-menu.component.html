@@ -1,4 +1,17 @@
 <div class="nav flex-column nav-pills text-white side-menu" [class.collapsed]="collapsed" role="tablist" aria-orientation="vertical">
+  <div class="px-2 pt-2 pb-1" *ngIf="!collapsed">
+    <div class="btn-group w-100" role="group" aria-label="Gender toggle">
+      <button type="button"
+              class="btn btn-sm"
+              [ngClass]="isMalesidebar ? 'btn-light' : 'btn-outline-light'"
+              (click)="onGenderToggle('male')">Male</button>
+      <button type="button"
+              class="btn btn-sm"
+              [ngClass]="!isMalesidebar ? 'btn-light' : 'btn-outline-light'"
+              (click)="onGenderToggle('female')">Female</button>
+    </div>
+  </div>
+
   <ng-container *ngFor="let item of mainItems">
     <a #menuLink class="nav-link text-white d-flex align-items-center gap-2"
        [class.active]="selected === item.id"
@@ -24,11 +37,11 @@
 
   <div class="menu-divider my-2"></div>
 
-  <a #menuLink class="nav-link text-white d-flex align-items-center gap-2"
+  <!-- <a #menuLink class="nav-link text-white d-flex align-items-center gap-2"
      [class.active]="selected === switchItem.id"
      (click)="onSelect(switchItem.id)"
      [attr.data-label]="switchItem.label">
     <ng-icon [name]="switchItem.icon" class="me-1"></ng-icon>
     <span class="label" *ngIf="!collapsed">{{ switchItem.label }}</span>
-  </a>
+  </a> -->
 </div>

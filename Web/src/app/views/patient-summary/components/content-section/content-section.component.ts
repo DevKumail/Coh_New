@@ -56,7 +56,11 @@ export class ContentSectionComponent implements OnInit {
       if (this.SearchPatientData?.table2?.[0]?.mrNo) {
         this.mrno = this.SearchPatientData?.table2?.[0]?.mrNo;
         this.GetAllList();
-      } 
+      } else {
+        Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+        this.empltyAllList();
+        return;
+      }
     });       
         this.GetAllList();
   }
@@ -73,28 +77,7 @@ export class ContentSectionComponent implements OnInit {
   isLoadingProcedure: boolean = false;
   isLoadingEncounters: boolean = false;
 
-  Encounters: any[] = [
-    {
-      appDateTime: '2025-07-30 10:00 AM',
-      purposeOfVisit: 'Follow-up',
-      providerId: 'Dr. John Doe'
-    },
-    {
-      appDateTime: '2025-07-29 02:00 PM',
-      purposeOfVisit: 'Initial Visit',
-      providerId: 'Dr. Jane Smith'
-    },
-    {
-      appDateTime: '2025-07-29 02:00 PM',
-      purposeOfVisit: 'Initial Visit',
-      providerId: 'Dr. Jane Smith'
-    },
-    {
-      appDateTime: '2025-07-29 02:00 PM',
-      purposeOfVisit: 'Initial Visit',
-      providerId: 'Dr. Jane Smith'
-    }
-  ];
+
 
   medicalHistory: any[] = [];
   MHPaginationInfo: any = {
@@ -109,8 +92,26 @@ export class ContentSectionComponent implements OnInit {
   }
   PLtotalRecord: number = 0;
 
+  empltyAllList(){
+    this.medicalHistory = [];
+    this.MHtotalRecord = 0;
+    this.problemList = [];
+    this.PLtotalRecord = 0;
+    this.allergieTotalItems = 0;
+    this.MyAllergiesData = [];
+    this.currentMedicationTotalItems = 0;
+    this.currentMedicationData = [];
+    this.totalimmunizationCount = 0;
+    this.immunizationList = [];
+    this.procedureTotalItems = 0;
+    this.procedureHistoryData = [];
+    this.EncounterTotalRecord = 0;
+    this.EncounterData = [];
+
+
+  }
   GetAllList() {
-    if (this.mrno == 0) {
+    if (this.mrno == 0 || this.mrno == null || this.mrno == undefined) {
       Swal.fire({
         icon: 'warning',
         title: 'Warning',

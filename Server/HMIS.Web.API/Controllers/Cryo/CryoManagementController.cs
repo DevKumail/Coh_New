@@ -137,5 +137,62 @@ namespace HMIS.Web.Controllers.Cryo
             }
         }
 
+        [HttpGet("containers/dropdown")]
+        public async Task<ActionResult<List<CryoDropDownDto>>> GetContainersDropdown()
+        {
+            try
+            {
+                var containers = await _cryoService.GetContainersDropdown();
+                return Ok(containers);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching containers.", error = ex.Message });
+            }
+        }
+
+        [HttpGet("levela/dropdown/{containerId}")]
+        public async Task<ActionResult<List<CryoDropDownDto>>> GetLevelADropdown(long containerId)
+        {
+            try
+            {
+                var levelA = await _cryoService.GetLevelADropdown(containerId);
+                return Ok(levelA);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching canisters.", error = ex.Message });
+            }
+        }
+
+        [HttpGet("levelb/dropdown/{levelAId}")]
+        public async Task<ActionResult<List<CryoDropDownDto>>> GetLevelBDropdown(long levelAId)
+        {
+            try
+            {
+                var levelB = await _cryoService.GetLevelBDropdown(levelAId);
+                return Ok(levelB);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching goblets.", error = ex.Message });
+            }
+        }
+
+        // Search API
+        [HttpPost("search")]
+        public async Task<ActionResult<List<CryoStorageListDto>>> SearchCryoStorages([FromBody] CryoSearchRequestDto searchRequest)
+        {
+            try
+            {
+                var results = await _cryoService.SearchCryoStorages(searchRequest);
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while searching cryo storages.", error = ex.Message });
+            }
+        }
+
     }
 }

@@ -76,7 +76,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             bool NodeMatchesFilter(LabRow r)
             {
                 bool invMatch = !investigationTypeId.HasValue || r.InvestigationTypeID == investigationTypeId;
-                bool labMatch = !laboratoryId.HasValue || r.LaboratoryId == laboratoryId;
+                bool labMatch = !laboratoryId.HasValue; //|| r.LaboratoryId == laboratoryId;
                 return invMatch && labMatch;
             }
 
@@ -132,8 +132,6 @@ namespace HMIS.Application.ServiceLogics.IVF
             public bool? IsProfile { get; set; }
             public int? InvestigationTypeID { get; set; }
             public int? LaboratoryId { get; set; }
-            public int? SampleTypeId { get; set; }
-            public string SampleTypeName { get; set; }
         }
     }
 }

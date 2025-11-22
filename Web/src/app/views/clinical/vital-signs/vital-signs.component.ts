@@ -310,7 +310,7 @@ PageInfo: any = {
      this.vitalSignsPagedData = [];
     this.vitalTotalItems = 0
     if (!this.SearchPatientData?.table2?.[0]?.mrNo) {
-      Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+      // Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       return;
     }
 

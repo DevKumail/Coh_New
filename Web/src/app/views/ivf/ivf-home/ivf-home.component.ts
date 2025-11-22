@@ -11,9 +11,10 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { NgIcon } from '@ng-icons/core';
 import { Router } from '@angular/router';
-import { take } from 'rxjs/operators';
+import { distinctUntilChanged, filter, take } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { Subscription } from 'rxjs';
  
 
 @Component({
@@ -35,6 +36,7 @@ export class IVFHomeComponent {
   couple: { female?: any; male?: any } | null = null;
   private noCoupleAlertShown = false;
   PatientList: any = [];
+  PrimaryPatientData: any = [];
   isLoading = false;
   modalRefInstance: any;
   modalService = new NgbModal();
@@ -65,84 +67,79 @@ export class IVFHomeComponent {
   constructor(
     private fb: FormBuilder, 
     private router: Router,
-    private secureStorage: SecureStorageService,
     private patientBannerService : PatientBannerService,
+    private ivfApi: IVFApiService
   ) {
     this.SearchPatientForm = this.fb.group({
       mrNo: [''],
+      name: [''],
       phone: [''],
       emiratesId: [''],
     });
     this.form = this.fb.group({
-      femaleId: ['5'],
+      femaleId: [''],
     });
   }
-  ngOnInit() {
-    console.log('IVF Home initialized', this.patientBannerService.getPatientData());
-    // Ensure patient banner stays closed on IVF Home
-    // try {
-    //   this.patientBannerService.setPatientData(null);
-    //   this.patientBannerService.setVisitAppointments([] as any);
-    //   this.patientBannerService.setSelectedVisit(null);
-    // } catch {}
-
-    this.patientBannerService.setIsbanneropen(false);
-
-    // If an MRNo already exists in patient banner data, call GetCouple once
-    this.patientBannerService.patientData$.pipe(take(1)).subscribe((pd: any) => {
-      const mrNo = pd?.table2?.[0]?.mrNo
-      if (!mrNo) return;
-      this.ivfApi.getCoupleData(String(mrNo)).subscribe({
-        next: (res: any) => {
-          this.handleCoupleResponse(res);
-          // keep banner closed even after fetching
-          try { 
-            // this.patientBannerService.setPatientData(null);
-
-           } catch {}
-          // TODO: handle couple data if needed
-        },
-        error: (err: any) => {
-          console.error('Failed to fetch IVF couple data (init)', err);
-        }
+  ngOnInit() {      
+      this.patientBannerService.setIsbanneropen(false);
+    this.patientBannerService.patientData$.subscribe((data: any) => {
+        this.PrimaryPatientData = data;
+        this.getgetCoupleData();
+        this.handleCoupleResponse(data);
       });
-    });
+      // this.getgetCoupleData();
+
+
+
+    //   this.patientBannerService.getPatientData().subscribe((pd: any) => {
+    //     const mrNo = pd?.table2?.[0]?.mrNo;
+    //     debugger
+    //     if (!mrNo) return;
+    //     this.PrimaryPatientData = pd?.table2?.[0] || []; 
+    //     console.log('IVF Home initialized', this.PrimaryPatientData);
+    //     this.ivfApi.getCoupleData(String(mrNo)).subscribe({
+    //       next: (res: any) => {
+    //         this.handleCoupleResponse(res);
+    //       try { 
+    //        } catch {}
+    //     },
+    //     error: (err: any) => {
+    //       console.error('Failed to fetch IVF couple data (init)', err);
+    //     }
+    //   });
+    // });
   }
 
   // subscribe to IVF search events published by topbar
   private ivfSearch = inject(IvfSearchService);
-  private ivfApi = inject(IVFApiService);
   private ivfSearchSub: any;
 
   ngAfterViewInit() {
-    // subscribe once the component is initialized in the view
-    this.ivfSearchSub = this.ivfSearch.search$.subscribe(mrNo => {
-      if (!mrNo) return;
-      // Call IVF API and ensure patient banner does not open
-      this.ivfApi.getCoupleData(mrNo).subscribe({
+    this.getgetCoupleData();
+  }
+
+
+  getgetCoupleData(){
+    debugger
+    const mrNo = this.PrimaryPatientData?.table2?.[0]?.mrNo;
+    if (!mrNo) return;
+    this.ivfApi.getCoupleData(mrNo).subscribe({
         next: (res: any) => {
           console.log('IVF couple data (from ivf-home):', res);
           this.handleCoupleResponse(res);
-          // Keep patient banner closed for IVF searches
-          try {
-            // this.patientBannerService.setPatientData(null);
-          } catch (e) {
-            // service may not be available in some contexts
-          }
-          // TODO: expose this data to the ivf component view (store in a property / pass to child)
         },
         error: (err: any) => {
           console.error('Failed to fetch IVF couple data', err);
         }
       });
-    });
   }
 
   ngOnDestroy(): void {
+
     this.patientBannerService.setIsbanneropen(true);
-    if (this.ivfSearchSub) {
-      this.ivfSearchSub.unsubscribe();
-    }
+    // if (this.ivfSearchSub) {
+    //   this.ivfSearchSub.unsubscribe();
+    // }
   }
 
   viewSummary(side: 'female' | 'male') {
@@ -152,23 +149,33 @@ export class IVFHomeComponent {
   }
 
   private handleCoupleResponse(res: any) {
-    // API returns { couple: { female, male } }
+    debugger
+    this.patientBannerService.setIVFPatientData(null);
     this.couple = res?.couple ?? res ?? null;
     try {
       const hasFemale = !!this.couple?.female;
       const hasMale = !!this.couple?.male;
       if (!hasFemale && !hasMale && !this.noCoupleAlertShown) {
         this.noCoupleAlertShown = true;
-        Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+        this.patientBannerService.setIVFPatientData(null);
+        // Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       }
       if (hasFemale || hasMale) {
         this.noCoupleAlertShown = false;
+        this.patientBannerService.setIVFPatientData(null);
+        this.patientBannerService.setIVFPatientData(res);
+      } else if(hasFemale && hasMale){
+        this.patientBannerService.setIVFPatientData(null);
+        this.patientBannerService.setIVFPatientData(res);
       }
     } catch {}
   }
 
 
   async openLinkaPatient(modalRef: TemplateRef<any>) {
+
+
+
       this.modalRefInstance = this.modalService.open(modalRef, {
       backdrop: 'static',
       size: 'xl',
@@ -188,16 +195,62 @@ export class IVFHomeComponent {
      
     console.log("SELECTED DATA",SelactData)
     this.form.patchValue({ femaleId: SelactData?.name });
+
+    if(!this.PrimaryPatientData?.table2?.[0]?.mrNo){
+      Swal.fire('Validation Error', 'Primary Patient MrNo is a required field. Please load a patient.', 'warning');
+      return;
+    } else if(!SelactData?.mrNo){
+      Swal.fire('Validation Error', 'Secondary Patient MrNo is a required field. Please Link a patient.', 'warning');
+      return;
+    }
+    
+    const body : any = {
+      primaryMrNo: this.PrimaryPatientData?.table2?.[0]?.mrNo,
+      secondaryMrNo: SelactData?.mrNo,
+    }
+    
+    this.ivfApi.InsertPatientRelation(body).subscribe({
+      next: (res: any) => {
+        Swal.fire('Success', 'Patient Link Successfully', 'success');
+        this.getgetCoupleData();
+      try { 
+       } catch {}
+    },
+    error: (err: any) => {
+      console.error('Failed to fetch IVF couple data', err);
+    }
+  });
+    
     modal.close(SelactData); 
   }
 
   SearchPatient(){
+    debugger
     this.isLoading = true;
+    this.PatientListPaginationInfo.currentPage = 1;
     this.PatientList = [];
+    const body: any = {
+      gender: this.PrimaryPatientData?.table2?.[0]?.gender || 'Unknown',
+      mrno: this.SearchPatientForm.value.mrNo,
+      phone: this.SearchPatientForm.value.phone,
+      emiratesId: this.SearchPatientForm.value.emiratesId,
+      name: this.SearchPatientForm.value.name
+    }
+    this.ivfApi.GetOppositeGenderPatients(body,this.PatientListPaginationInfo.currentPage,this.PatientListPaginationInfo.pageSize).subscribe({
+      next: (res: any) => {
+        this.PatientList = res?.data || [];
+        this.PatientListTotalrecord = res?.total || 0;
+        this.isLoading = false;
+      },
+      error: (err: any) => {
+        console.error('Failed to fetch IVF couple data', err);
+        this.isLoading = false;
+      }
+    })
   }
 
   onPatientPageChanged(event: any) {
-    this.PatientListPaginationInfo = event;
+    this.PatientListPaginationInfo.currentPage = event;
     this.SearchPatient();
   }
 

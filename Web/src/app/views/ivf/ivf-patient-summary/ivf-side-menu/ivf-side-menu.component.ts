@@ -11,34 +11,47 @@ import Tooltip from 'bootstrap/js/dist/tooltip';
   styleUrls: ['./ivf-side-menu.component.scss']
 })
 export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges {
-  @Input() selected: string = 'demographic';
+  @Input() selected: string = 'medical-history';
   @Input() collapsed: boolean = false;
+  @Input() isMalesidebar: boolean = true;
   @Output() select = new EventEmitter<string>();
+  @Output() genderChange = new EventEmitter<'male' | 'female'>();
   @ViewChildren('menuLink') links!: QueryList<ElementRef<HTMLElement>>;
 
   private tooltips: Tooltip[] = [];
 
-  // Match patient-summary structure: main menu + optional orders section
-  mainItems = [
-    { id: 'demographic', label: 'Demographic', icon: 'tablerUsers' },
+  // All menu items
+  private allMenuItems = [
     { id: 'medical-history', label: 'Fertility History', icon: 'tablerNotes' },
     { id: 'social-history', label: 'Social History', icon: 'tablerNotes' },
     { id: 'family-history', label: 'Family History', icon: 'tablerNotes' },
+    { id: 'vital-signs', label: 'Vital Signs', icon: 'tablerNotes' },
     { id: 'pathology-results', label: 'Pathology results', icon: 'tablerSearch' },
     { id: 'lab-orders', label: 'Lab orders', icon: 'tablerSearch' },
     { id: 'semen-analysis', label: 'Semen Analysis', icon: 'tablerSearch' },
-    { id: 'billing', label: 'Billing', icon: 'tablerReceipt' },
-    { id: 'message', label: 'Message', icon: 'tablerMessage2' },
-    { id: 'cycle', label: 'Cycle', icon: 'tablerActivity' }
+  ];
+  
+  // Female-only menu items (limited items)
+  private femaleOnlyItems = [
+    { id: 'medical-history', label: 'Fertility History', icon: 'tablerNotes' },
+    { id: 'social-history', label: 'Social History', icon: 'tablerNotes' },
+    { id: 'family-history', label: 'Family History', icon: 'tablerNotes' },
+    { id: 'vital-signs', label: 'Vital Signs', icon: 'tablerNotes' },
+    // { id: 'cycle', label: 'Cycle', icon: 'tablerActivity' },
   ];
 
-  switchItem = { id: 'switch-partner', label: 'Switch to partner', icon: 'tablerUsers' };
+  // Dynamic main items based on gender
+  mainItems = this.allMenuItems;
 
   // Placeholder for potential future orders
   orderItems: Array<{ id: string; label: string; icon: string }> = [];
 
   onSelect(id: string) {
     this.select.emit(id);
+  }
+
+  onGenderToggle(g: 'male' | 'female') {
+    this.genderChange.emit(g);
   }
 
   ngAfterViewInit(): void {
@@ -50,6 +63,17 @@ export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges
     if ('collapsed' in changes) {
       this.refreshTooltips();
     }
+    
+    // Update menu items when gender changes
+    if ('isMalesidebar' in changes) {
+      this.updateMenuItems();
+    }
+  }
+
+  private updateMenuItems(): void {
+    // If male is selected, show all items
+    // If female is selected, show only limited items
+    this.mainItems = this.isMalesidebar ? this.allMenuItems : this.femaleOnlyItems;
   }
 
   ngOnDestroy(): void {

@@ -89,3 +89,27 @@
 .flyout-title {
   font-size: 14px;
 }
+
+// Gender toggle text colors in sidebar header
+.side-menu .btn-group .btn-light {
+  color: #000000;
+  font-weight: 600;
+}
+
+.side-menu .btn-group .btn-outline-light {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+// Hover / focus states so text always visible
+.side-menu .btn-group .btn-light:hover,
+.side-menu .btn-group .btn-light:focus {
+  color: #000000;
+}
+
+.side-menu .btn-group .btn-outline-light:hover,
+.side-menu .btn-group .btn-outline-light:focus {
+  background-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+}

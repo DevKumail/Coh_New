@@ -1,0 +1,228 @@
+<div class="basic-form" *ngIf="basicForm" [formGroup]="basicForm">
+<div class="row">
+
+  <!-- ========== TOP SIDE START ========== -->
+  <div class="col-12">
+    <div class="card p-2">
+      <div class="row g-2">
+        <div class="col-md-3">
+          <label>Date of fertility history</label>
+          <input type="date" class="form-control" formControlName="date" />
+        </div>
+
+        <div class="col-md-3">
+          <label>Attending clinician</label>
+          <select class="form-select" formControlName="attendingClinician">
+            <option value="" disabled selected>Select clinician</option>
+            <option *ngFor="let p of hrEmployees" [value]="p.providerId">{{ p.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label>Adiposity</label>
+          <select class="form-select" formControlName="adiposity">
+            <option value="" disabled selected>Select adiposity</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:Adioposity')" [value]="o.valueId">{{ o.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label>Generally healthy</label>
+          <select class="form-select" formControlName="generallyHealthy">
+            <option value="" disabled selected>Select option</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:GenerallyHealthy')" [value]="o.valueId">{{ o.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label>Long-term medication</label>
+          <input type="text" class="form-control" formControlName="longTermMedication" placeholder="Enter long term medication" />
+        </div>
+
+        <div class="col-md-3">
+          <label>Chromosome analysis</label>
+          <select class="form-select" formControlName="chromosomeAnalysis">
+            <option value="" disabled selected>Select analysis</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:ChromosomeAnalysis')" [value]="o.valueId">{{ o.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label>CFTR carrier</label>
+          <select class="form-select" formControlName="cftrCarrier">
+            <option value="" disabled selected>Select carrier status</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:CFTRCarrier')" [value]="o.valueId">{{ o.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label>Unprotected intercourse since</label>
+          <input type="month" class="form-control" formControlName="unprotectedMonthYear" [min]="minMonthYear" [max]="maxMonthYear" placeholder="Enter unprotected intercourse since" />
+        </div>
+
+        <div class="col-md-3">
+          <label>Patency of the fallopian tube (right)</label>
+          <select class="form-select" formControlName="patencyRight">
+            <option value="" disabled selected>Select Patency status</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:PatencyRight')" [value]="o.valueId">{{ o.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label>Patency of the fallopian tube (left)</label>
+          <select class="form-select" formControlName="patencyLeft">
+            <option value="" disabled selected>Select Patency status</option>
+            <option *ngFor="let o of opts('IVFFemaleFertilityHistory:PatencyLeft')" [value]="o.valueId">{{ o.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label>Fallopian tube reviewed (year)</label>
+          <select class="form-select" formControlName="fallopianYear">
+            <option value="" disabled selected>Select year</option>
+            <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========== PREVIOUS TREATMENTS ========== -->
+  <div class="col-12 mt-0">
+    <div class="card p-2">
+
+      <label class="form-label">Previous treatments (reproductive health measures)</label>
+
+      <div class="row g-3">
+
+        <div class="col-md-3">
+          <label># of Previous operative treatments</label>
+          <input type="number" class="form-control" formControlName="previousOperative" placeholder="0" />
+        </div>
+
+        <div class="col-md-3">
+          <label># of ovarian stimulations, inseminations</label>
+          <input type="number" class="form-control" formControlName="ovarianStimulations" placeholder="0"/>
+        </div>
+
+        <div class="col-md-3">
+          <label># of IVF and ICSI treatments</label>
+          <input type="number" class="form-control" formControlName="IVFandICSI" placeholder="0" />
+        </div>
+
+        <div class="col-md-3 d-flex align-items-center">
+          <input class="form-check-input me-2" type="checkbox" formControlName="alternativePretreatments">
+          <label class="form-label mb-0">Alternative pretreatments</label>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+  <!-- ========== TOP SIDE END ========== -->
+
+  <div class="row g-2">
+    <!-- ========== PREVIOUS ILLNESSES (DROPDOWN MULTI-SELECT) START ========== -->
+    <div class="col-md-6">
+      <div class="card px-3 py-2">
+        <div class="form-group">
+          <label class="d-block fw-bold mb-1">Previous illnesses</label>
+          <div class="dropdown w-100">
+            <button class="form-select text-start dropdown-toggle d-flex justify-content-between align-items-center"
+              type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="text-truncate">
+                <span *ngIf="selectedIllnesses.length === 0" class="text-muted">Select illnesses...</span>
+                <span *ngIf="selectedIllnesses.length > 0">{{ selectedIllnesses.join(', ') }}</span>
+              </span>
+              <i class="bi bi-caret-down-fill ms-2"></i>
+            </button>
+            <ul class="dropdown-menu w-100" data-bs-auto-close="outside">
+              <li class="px-2 py-1 sticky-top bg-white" style="z-index: 10;">
+                <input type="text" class="form-control form-control-sm" placeholder="Search..."
+                  [ngModel]="searchIllness" (ngModelChange)="onIllnessSearchChange($event)"
+                  [ngModelOptions]="{standalone: true}">
+              </li>
+              <li>
+                <hr class="dropdown-divider m-0">
+              </li>
+              <li>
+                <div style="max-height: 260px; overflow: auto;" (scroll)="onIllnessScroll($event)">
+                  <div *ngFor="let opt of filteredIllnessesOptions" class="px-2 py-1">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" [checked]="isSelected(opt)"
+                        (click)="$event.stopPropagation()" (change)="toggleIllness(opt)">
+                      <label class="form-check-label"
+                        (click)="$event.preventDefault(); $event.stopPropagation(); toggleIllness(opt)">{{ opt
+                        }}</label>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ========== PREVIOUS ILLNESSES (DROPDOWN MULTI-SELECT) END ========== -->
+
+    <!-- ========== FERTILITY IMPAIRMENT FACTORS (DROPDOWN MULTI-SELECT) START ========== -->
+    <div class="col-md-6">
+      <div class="card px-3 py-2">
+        <div class="form-group">
+          <label class="d-block fw-bold">Sterility factors, ordered by relevance</label>
+          <div class="dropdown w-100">
+            <button class="form-select text-start dropdown-toggle d-flex justify-content-between align-items-center"
+              type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="text-truncate">
+                <span *ngIf="selectedFactors.length === 0" class="text-muted">Select Sterility factors...</span>
+                <span *ngIf="selectedFactors.length > 0">{{ selectedFactors.join(', ') }}</span>
+              </span>
+              <i class="bi bi-caret-down-fill ms-2"></i>
+            </button>
+            <ul class="dropdown-menu w-100" data-bs-auto-close="outside">
+              <li class="px-2 py-1 sticky-top bg-white" style="z-index: 10;">
+                <input type="text" class="form-control form-control-sm" placeholder="Search..." [ngModel]="searchFactor"
+                  (ngModelChange)="onFactorSearchChange($event)" [ngModelOptions]="{standalone: true}">
+              </li>
+              <li>
+                <hr class="dropdown-divider m-0">
+              </li>
+              <li>
+                <div style="max-height: 260px; overflow: auto;" (scroll)="onFactorScroll($event)">
+                  <div *ngFor="let opt of filteredFactorsOptions" class="px-2 py-1">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" [checked]="isFactorSelected(opt)"
+                        (click)="$event.stopPropagation()" (change)="toggleFactor(opt)">
+                      <label class="form-check-label"
+                        (click)="$event.preventDefault(); $event.stopPropagation(); toggleFactor(opt)">{{ opt }}</label>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ========== FERTILITY IMPAIRMENT FACTORS (DROPDOWN MULTI-SELECT) END ========== -->
+  </div>
+
+</div>
+
+
+  <!-- Medical opinion area -->
+  <div class="card px-3 py-2">
+    <label class="fw-bold mb-2">Medical opinion / note</label>
+    <quill-editor
+      formControlName="editorContent"
+      [modules]="quillModules"
+      format="html"
+      placeholder="Enter medical opinion or notes..."
+      [styles]="{height: '300px'}">
+    </quill-editor>
+  </div>

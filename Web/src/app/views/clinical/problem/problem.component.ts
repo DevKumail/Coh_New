@@ -347,9 +347,9 @@ minDateValidator(otherControlName: string) {
   this.problemTotalItems = 0;
   const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo;
   const userIdStr = sessionStorage.getItem('userId');
-  const userId = userIdStr ? Number(userIdStr) : 0;
-    if (!mrNo || !userId) {
-      Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+  const userId = userIdStr ? Number(userIdStr) : 2;
+    if (!mrNo) {
+      // Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       // this.loader.hide();
       return;
     }
@@ -357,7 +357,7 @@ minDateValidator(otherControlName: string) {
   await this.clinicalApiService.GetPatientProblemData(
     false,
     mrNo,
-    userId,
+    userId || 2,
     this.MHPaginationInfo.Page,
     this.MHPaginationInfo.RowsPerPage
   ).then((res: any) => {
@@ -411,11 +411,11 @@ onPROBSubmit() {
     }
 
     if(!this.SearchPatientData?.table2?.[0]?.mrNo){
-      Swal.fire({
-        icon: 'warning',
-        title: 'Validation Error',
-        text: 'MrNo is a required field. Please load a patient.',
-      });
+      // Swal.fire({
+      //   icon: 'warning',
+      //   title: 'Validation Error',
+      //   text: 'MrNo is a required field. Please load a patient.',
+      // });
       return;
     }
      

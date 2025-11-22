@@ -8,13 +8,206 @@
 
       <i class="pi pi-sync"
         style="background-color: #3B82F6;color: rgb(228, 228, 230);font-size:1.5rem"></i>
-   <button
+<button
   type="button"
   class="btn btn-success"
-  (click)="buttonRoute('/clinical/create-notes')">
+  (click)="openNoteTypeModal(noteTypeModal)">
   <ng-icon style="margin-bottom: 1px;" class="me-2 ms-1" name="tablerPlus"></ng-icon>
   {{ 'ADD' | translate }}
 </button>
+
+<!-- MODAL TEMPLATE -->
+<ng-template #noteTypeModal let-modal>
+
+  <style>
+    .note-option {
+      padding: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 16px;
+      font-weight: 500;
+      border: 2px solid transparent;
+    }
+    .note-option:hover {
+      transform: scale(1.02);
+      opacity: 0.9;
+    }
+    .note-option.selected {
+      border-color: #0d6efd;
+      box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+    }
+
+    .bg-structured {
+      background-color: #e7f1ff;
+      border-left: 5px solid #0d6efd;
+    }
+    .bg-ai {
+      background-color: #fff3cd;
+      border-left: 5px solid #ffca2c;
+    }
+    .bg-free {
+      background-color: #e9f7ef;
+      border-left: 5px solid #198754;
+    }
+  </style>
+
+  <div class="modal-header">
+    <h5 class="modal-title fw-bold">Create Clinical Note</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body" style="min-height: 500px; overflow: visible; padding-bottom: 200px;">
+
+    <!-- Step 1: Select Note Type -->
+    <div *ngIf="!selectedNoteType" class="card shadow-sm rounded-3 mb-3">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">Step 1: Select Note Type</h6>
+
+        <div class="note-option bg-structured mb-3 d-flex align-items-center gap-3"
+             [class.selected]="selectedNoteType === 'structured'"
+             (click)="selectNoteType('structured')">
+          <i class="bi bi-file-earmark-text fs-4 text-primary"></i>
+          <span>Structured Template</span>
+        </div>
+
+        <div class="note-option bg-ai mb-3 d-flex align-items-center gap-3"
+             [class.selected]="selectedNoteType === 'ai'"
+             (click)="selectNoteType('ai')">
+          <i class="bi bi-cpu fs-4 text-warning"></i>
+          <span>AI Powered Structured Note</span>
+        </div>
+
+        <div class="note-option bg-free d-flex align-items-center gap-3"
+             [class.selected]="selectedNoteType === 'freetext'"
+             (click)="selectNoteType('freetext')">
+          <i class="bi bi-pencil-square fs-4 text-success"></i>
+          <span>Free Text Note</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Step 2: Select Provider and Template -->
+    <div class="card shadow-sm rounded-3" *ngIf="selectedNoteType" style="overflow: visible;">
+      <div class="card-body" style="overflow: visible; padding-bottom: 20px;">
+        <h6 class="fw-bold mb-3">Step 2: Select Provider & Template
+          <span class="text-muted small" *ngIf="selectedNoteType === 'freetext'">(Optional)</span>
+        </h6>
+
+        <form [formGroup]="modalForm" style="overflow: visible;">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Provider
+                <span class="text-danger" *ngIf="selectedNoteType !== 'freetext'">*</span>
+              </label>
+              <select class="form-select" formControlName="provider"
+                [class.is-invalid]="modalForm.get('provider')?.invalid && modalForm.get('provider')?.touched">
+                <option [value]="null" disabled>Select Provider</option>
+                <option *ngFor="let p of providers; trackBy: trackByCode" [value]="p.code">{{ p.name }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="modalForm.get('provider')?.invalid && modalForm.get('provider')?.touched">
+                Please select a provider
+              </div>
+            </div>
+
+            <div class="col-md-6" *ngIf="selectedNoteType !== 'structured'">
+              <label class="form-label">Template
+                <span class="text-danger" *ngIf="selectedNoteType !== 'freetext'">*</span>
+              </label>
+              <select class="form-select" formControlName="note"
+                [class.is-invalid]="modalForm.get('note')?.invalid && modalForm.get('note')?.touched">
+                <option [value]="null" disabled>Select Template</option>
+                <option *ngFor="let n of clinicalNotes; trackBy: trackByPathId" [value]="n.pathId">{{ n.pathName }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="modalForm.get('note')?.invalid && modalForm.get('note')?.touched">
+                Please select a template
+              </div>
+              <small class="text-muted" *ngIf="!isProviderSelected">
+                Select a provider first to enable template
+              </small>
+              <small class="text-muted" *ngIf="isProviderSelected && clinicalNotes.length === 0">
+                No templates available
+              </small>
+            </div>
+
+            <!-- For Structured Notes: Show Template and Macro with mutual exclusivity -->
+            <ng-container *ngIf="selectedNoteType === 'structured'">
+              <div class="col-md-6">
+                <label class="form-label">Template
+                  <span class="text-danger">*</span>
+                  <span class="text-muted small">(Select either Template or Macro)</span>
+                </label>
+                <select class="form-select" formControlName="note"
+                  [disabled]="!isProviderSelected || clinicalNotes.length === 0 || modalForm.get('macro')?.value"
+                  [class.is-invalid]="!modalForm.get('note')?.value && !modalForm.get('macro')?.value && modalForm.touched">
+                  <option [value]="null" disabled>Select Template</option>
+                  <option *ngFor="let n of clinicalNotes; trackBy: trackByPathId" [value]="n.pathId">{{ n.pathName }}</option>
+                </select>
+                <small class="text-muted d-block" *ngIf="!isProviderSelected">
+                  Select a provider first to enable template
+                </small>
+                <small class="text-muted d-block" *ngIf="isProviderSelected && clinicalNotes.length === 0">
+                  No templates available
+                </small>
+                <small class="text-muted d-block" *ngIf="modalForm.get('macro')?.value">
+                  Macro selected
+                </small>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Macro
+                  <span class="text-danger">*</span>
+                  <span class="text-muted small">(OR)</span>
+                </label>
+                <select class="form-select" formControlName="macro"
+                  [disabled]="!isProviderSelected || macroList.length === 0 || modalForm.get('note')?.value"
+                  [class.is-invalid]="!modalForm.get('note')?.value && !modalForm.get('macro')?.value && modalForm.touched">
+                  <option [value]="null" disabled>Select Macro</option>
+                  <option *ngFor="let m of macroList; trackBy: trackByPathId" [value]="m.pathId">{{ m.pathName }}</option>
+                </select>
+                <small class="text-muted d-block" *ngIf="!isProviderSelected">
+                  Select a provider first to enable macro
+                </small>
+                <small class="text-muted d-block" *ngIf="isProviderSelected && macroList.length === 0">
+                  No macros available
+                </small>
+                <small class="text-muted d-block" *ngIf="modalForm.get('note')?.value">
+                  Template selected
+                </small>
+              </div>
+
+              <div class="col-12" *ngIf="!modalForm.get('note')?.value && !modalForm.get('macro')?.value && modalForm.touched">
+                <small class="text-danger">Please select either Template or Macro</small>
+              </div>
+            </ng-container>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary"
+            *ngIf="selectedNoteType"
+            (click)="goBackToStep1()">
+      <i class="bi bi-arrow-left me-2"></i>Back
+    </button>
+    <button type="button" class="btn btn-light" (click)="modal.dismiss()">
+      Cancel
+    </button>
+    <button type="button" class="btn btn-primary"
+            (click)="createNote(modal)"
+            [disabled]="!isCreateEnabled()">
+      Create
+    </button>
+  </div>
+
+</ng-template>
+
+
+
 
       </div>
     </div>
@@ -25,22 +218,25 @@
 
           <thead class="align-middle thead-sm">
             <tr>
-              <th class="text-center">{{ 'MRNO' | translate }}</th>
+
               <th class="text-center">{{ 'NOTE_TITLE' | translate }}</th>
               <th class="text-center">{{ 'VISIT_NO' | translate }}</th>
               <th class="text-center">{{ 'VISIT_DATE' | translate }}</th>
               <th class="text-center">{{ 'CREATED_BY' | translate }}</th>
+              <th class="text-center">{{ 'CREATED_DATE' | translate }}</th>
+              <th class="text-center">{{ 'SIGNED_BY' | translate }}</th>
               <th class="text-center">{{ 'VOICE_NOTE' | translate }}</th>
 
             </tr>
           </thead>
           <tbody class="table-group-divider">
-            <tr *ngFor="let data of speechtotxt; let i = index">
-              <td class="text-center">{{ data.mrNo || '-' }} </td>
+            <tr *ngFor="let data of speechtotxt; trackBy: trackByIndex; let i = index">
               <td class="text-center">{{ (data.noteTitle || '-').trim() }}</td>
               <td class="text-center">{{ data.visitAccDisplay || '-' }}</td>
               <td class="text-center">{{ data.visitDate || '-' }}</td>
               <td class="text-center">{{ data.createdBy || '-' }}</td>
+              <td class="text-center">{{ data.createdOn || '-' }} </td>
+              <td class="text-center">{{ data.signedBy || '-' }} </td>
               <td style="font-size: 12px">
                 <audio
                   *ngIf="data.voiceSafeUrl || data.notePath"

@@ -59,4 +59,16 @@ public partial class BlmasterIcd9cm
 
     [InverseProperty("Icd9codeNavigation")]
     public virtual ICollection<BlsuperBillDiagnosis> BlsuperBillDiagnosis { get; set; } = new List<BlsuperBillDiagnosis>();
+
+    [InverseProperty("ImpairmentFactorNavigation")]
+    public virtual ICollection<IvffemaleFhimpairmentFactor> IvffemaleFhimpairmentFactor { get; set; } = new List<IvffemaleFhimpairmentFactor>();
+
+    [InverseProperty("PrevIllnessNavigation")]
+    public virtual ICollection<IvffemaleFhprevIllness> IvffemaleFhprevIllness { get; set; } = new List<IvffemaleFhprevIllness>();
+
+    [InverseProperty("ImpairmentFactorNavigation")]
+    public virtual ICollection<IvfmaleFhimpairmentFactor> IvfmaleFhimpairmentFactor { get; set; } = new List<IvfmaleFhimpairmentFactor>();
+
+    [InverseProperty("PrevIllnessNavigation")]
+    public virtual ICollection<IvfmaleFhprevIllness> IvfmaleFhprevIllness { get; set; } = new List<IvfmaleFhprevIllness>();
 }

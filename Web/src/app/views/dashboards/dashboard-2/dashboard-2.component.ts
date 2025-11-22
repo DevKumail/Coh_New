@@ -63,24 +63,24 @@ export class Dashboard2Component {
     // Editable data sources (modify these arrays as needed)
     AllAppoinment = {
         salesData : [
-            { name: 'NOT_YET_ARRIVED', value: 15 },
-            { name: 'CHECK_IN', value: 20 },
-            { name: 'READY', value: 10 },
-            { name: 'SEEN', value: 15 },
-            { name: 'BILLED', value: 15 },
-            { name: 'CHECK_OUT', value: 20 },
+            { name: 'NOT_YET_ARRIVED', value: 1 },
+            { name: 'CHECK_IN', value: 1 },
+            { name: 'READY', value: 2 },
+            { name: 'SEEN', value: 0 },
+            { name: 'BILLED', value: 0 },
+            { name: 'CHECK_OUT', value: 1 },
         ],
         title : 'APPOINTMENT',
-        value: 95,
+        value: 5,
     }
 
     Notes = {
         Data : [
-            { name: 'PENDING', value: 100 },
-            { name: 'COMPLETED', value: 50 }
+            { name: 'PENDING', value: 10 },
+            { name: 'COMPLETED', value: 5 }
         ],
         title : 'NOTES',
-        value: 150,
+        value: 15,
     }
 
     Result = {
@@ -89,7 +89,7 @@ export class Dashboard2Component {
             { name: 'NON_REVIEW', value: 40 }
         ],
         title : 'RESULT',
-        value: 110,
+        value: 11,
     }
 
 
@@ -99,7 +99,7 @@ export class Dashboard2Component {
             { name: 'UNPAID', value: 10 }
         ],
         title: 'BILLED',
-        value: 50
+        value: 5,
     }
 
     statistics: any[] = [
@@ -229,9 +229,9 @@ export class Dashboard2Component {
             description: 'TOTAL_TASKS',
             label: '3 New',
             icon: 'tablerChecklist',
-            count: {value: 124},
+            count: {value: 12},
             variant: 'primary',
-            totalCount: {value: 12450}
+            totalCount: {value: 124}
         },
         {
             showpie: false,
@@ -239,9 +239,9 @@ export class Dashboard2Component {
             description: 'TOTAL_MESSAGES',
             label: '5 New',
             icon: 'tablerMessageCircle',
-            count: {value: 69.5, suffix: 'k'},
+            count: {value: 1.2, suffix: 'k'},
             variant: 'purple',
-            totalCount: {value: 32.1, suffix: 'M'}
+            totalCount: {value: 3.4, suffix: 'k'}
         }
     ]
 

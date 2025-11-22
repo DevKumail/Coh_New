@@ -3,29 +3,125 @@
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
-  
+
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
   }
-  
+
   .create-button button {
     margin-top: 4px;
   }
-  
+
   /* Style for the table */
   .p-datatable-sm {
     width: 100%;
     overflow: auto!important;
   }
-  
+
   /* Adjust styles for table headers and rows as needed */
   .p-datatable-sm th,
   .p-datatable-sm td {
     font-size: 14px;
   }
-  
+
   /* You can add more specific styles for the table headers and rows as per your design */
-  
+
+  // Force dropdowns to open downwards
+  ::ng-deep .modal-body {
+    select.form-select {
+      // Ensure dropdown opens downward
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+
+  // Prevent Bootstrap from opening dropdowns upwards
+  .modal-body .form-select {
+    // Override any upward dropdown behavior
+    position: relative;
+
+    &[aria-expanded="true"] {
+      // Ensure sufficient space below for dropdown
+      margin-bottom: 0;
+    }
+  }
+
+  // Add minimum height to modal body to prevent dropdown cutoff
+  ::ng-deep .modal-body {
+    min-height: 400px;
+    overflow-y: visible;
+
+    .card-body {
+      overflow: visible;
+    }
+
+    form {
+      overflow: visible;
+    }
+  }
+
+  // Ensure modal has enough space
+  ::ng-deep .modal-dialog {
+    overflow: visible;
+
+    .modal-content {
+      overflow: visible;
+    }
+  }
+
+  // Ensure dropdown options appear below the select element
+  ::ng-deep .modal-body {
+    position: relative;
+    overflow: visible !important;
+
+    .card {
+      overflow: visible !important;
+    }
+
+    .card-body {
+      overflow: visible !important;
+    }
+
+    form {
+      overflow: visible !important;
+    }
+
+    .row {
+      overflow: visible !important;
+    }
+
+    [class*="col-"] {
+      overflow: visible !important;
+    }
+  }
+
+  // Ensure modal content doesn't clip dropdowns
+  ::ng-deep .modal-content {
+    overflow: visible !important;
+  }
+
+  ::ng-deep .modal-dialog {
+    overflow: visible !important;
+  }
+
+  // Force native select dropdown to open downwards
+  .form-select {
+    position: relative;
+    z-index: 1;
+  }
+
+  // Add space only at the bottom of modal for dropdown expansion
+  ::ng-deep .modal-body {
+    padding-bottom: 180px !important;
+  }
+
+  // Ensure small text doesn't add extra spacing
+  small {
+    display: block;
+    margin-top: 0.25rem;
+    line-height: 1.2;
+  }

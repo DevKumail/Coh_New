@@ -67,10 +67,6 @@ public partial class IvfmaleSemenSample
     [Column(TypeName = "decimal(5, 2)")]
     public decimal? Motility24hPercent { get; set; }
 
-    public int? CryoStatusId { get; set; }
-
-    public int? StatusId { get; set; }
-
     public int? CreatedBy { get; set; }
 
     public int? UpdatedBy { get; set; }
@@ -82,6 +78,10 @@ public partial class IvfmaleSemenSample
     public bool IsDeleted { get; set; }
 
     public int? DeletedBy { get; set; }
+
+    public long? StatusId { get; set; }
+
+    public long? CryoStatusId { get; set; }
 
     [ForeignKey("AppearanceId")]
     [InverseProperty("IvfmaleSemenSampleAppearance")]
@@ -95,9 +95,22 @@ public partial class IvfmaleSemenSample
     [InverseProperty("IvfmaleSemenSampleCollectionPlace")]
     public virtual DropdownConfiguration? CollectionPlace { get; set; }
 
+    [ForeignKey("CryoStatusId")]
+    [InverseProperty("IvfmaleSemenSampleCryoStatus")]
+    public virtual DropdownConfiguration? CryoStatus { get; set; }
+
+    [InverseProperty("Sample")]
+    public virtual ICollection<IvfcryoLevelC> IvfcryoLevelC { get; set; } = new List<IvfcryoLevelC>();
+
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfmaleSemenSample")]
     public virtual Ivfmain Ivfmain { get; set; } = null!;
+
+    [InverseProperty("Sample")]
+    public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservation { get; set; } = new List<IvfmaleCryoPreservation>();
+
+    [InverseProperty("Sample")]
+    public virtual ICollection<IvfmaleCryoStraw> IvfmaleCryoStraw { get; set; } = new List<IvfmaleCryoStraw>();
 
     [InverseProperty("Sample")]
     public virtual ICollection<IvfmaleSemenObservation> IvfmaleSemenObservation { get; set; } = new List<IvfmaleSemenObservation>();
@@ -115,6 +128,10 @@ public partial class IvfmaleSemenSample
     [ForeignKey("SmellId")]
     [InverseProperty("IvfmaleSemenSampleSmell")]
     public virtual DropdownConfiguration? Smell { get; set; }
+
+    [ForeignKey("StatusId")]
+    [InverseProperty("IvfmaleSemenSampleStatus")]
+    public virtual DropdownConfiguration? Status { get; set; }
 
     [ForeignKey("ViscosityId")]
     [InverseProperty("IvfmaleSemenSampleViscosity")]

@@ -6,6 +6,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
     {
         public FemaleDemographicDTO Female { get; set; } // null if absent
         public MaleDemographicDTO Male { get; set; }     // null if absent
+        public object? IVFMainId { get; set; }     // null if absent
     }
 
     public class FemaleDemographicDTO : BaseDemographicDTO { }
@@ -22,6 +23,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public string EID { get; set; }
         public string Nationality { get; set; }
         public System.Byte[]  Picture { get; set; }
+        public string Gender { get; set; }
     }
 
 }

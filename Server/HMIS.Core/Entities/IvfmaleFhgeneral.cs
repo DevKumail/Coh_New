@@ -30,8 +30,23 @@ public partial class IvfmaleFhgeneral
     [Column(TypeName = "datetime")]
     public DateTime? Date { get; set; }
 
-    [StringLength(30)]
-    public string? InfertilityType { get; set; }
+    public long? InfertilityTypeCategoryId { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    [ForeignKey("InfertilityTypeCategoryId")]
+    [InverseProperty("IvfmaleFhgeneral")]
+    public virtual DropdownConfiguration? InfertilityTypeCategory { get; set; }
 
     [ForeignKey("IvfmaleFhid")]
     [InverseProperty("IvfmaleFhgeneral")]

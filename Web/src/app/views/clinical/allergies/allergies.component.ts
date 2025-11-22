@@ -369,7 +369,7 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
     this.allergieTotalItems = 0;
     const mrno = this.SearchPatientData.table2[0].mrNo
     if(!mrno){
-      Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+      // Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       // this.loader.hide();
       return;
     }
@@ -471,7 +471,7 @@ submit() {
   }
 
   if(this.SearchPatientData == undefined){
-    Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+    // Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
     return;
   }
 

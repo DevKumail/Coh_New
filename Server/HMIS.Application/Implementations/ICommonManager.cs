@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HMIS.Application.DTOs.CommonDTOs;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -17,5 +18,7 @@ namespace HMIS.Application.Implementations
         Task<DataSet> GetInsurrancePayerInfo(long MRNo);
         Task<DataSet> GetDemographicDB(string VisitAccountDisplay);
         Task<(bool isSuccess, string message, DataSet ds)> GetAppointmentDetailsByMRNo(int? PageNumber, int? PageSize, string MRNo);
+        Task<List<ICDItemDto>> GetICDCodesBySearchKey(string searchKey, int limit = 50);
+
     }
 }

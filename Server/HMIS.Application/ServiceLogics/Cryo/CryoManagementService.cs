@@ -24,6 +24,11 @@ namespace HMIS.Application.ServiceLogics.Cryo
         Task<bool> DeleteLevelB(long levelBId, long? updatedBy);
         Task<bool> DeleteLevelC(long levelCId, long? updatedBy);
 
+        Task<List<CryoDropDownDto>> GetContainersDropdown();
+        Task<List<CryoDropDownDto>> GetLevelADropdown(long containerId);
+        Task<List<CryoDropDownDto>> GetLevelBDropdown(long levelAId);
+        Task<List<CryoStorageListDto>> SearchCryoStorages(CryoSearchRequestDto searchRequest);
+
     }
     public class CryoManagementService : ICryoManagementService
     {
@@ -37,7 +42,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
         private bool Exist(long? id)
         {
             if (id == null || id == 0) return false;
-            return _context.CryoContainers.Any(c => c.Id == id);
+            return _context.IvfcryoContainers.Any(c => c.Id == id);
         }
 
         public async Task<bool> InsertOrUpdateCryoContainer(CryoContainerDto containerDto)
@@ -49,7 +54,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 if (!exist)
                 {
                     // Create new container
-                    var container = new CryoContainers
+                    var container = new IvfcryoContainers
                     {
                         FacilityId = containerDto.FacilityID,
                         Description = containerDto.Description,
@@ -61,7 +66,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                         CreatedAt = DateTime.Now
                     };
 
-                    _context.CryoContainers.Add(container);
+                    _context.IvfcryoContainers.Add(container);
                     await _context.SaveChangesAsync(); // Save to get Container ID
 
                     // Add nested levels
@@ -69,28 +74,28 @@ namespace HMIS.Application.ServiceLogics.Cryo
                     {
                         foreach (var levelA in containerDto.LevelA)
                         {
-                            var levelAEntity = new CryoLevelA
+                            var levelAEntity = new IvfcryoLevelA
                             {
                                 ContainerId = container.Id,
                                 CanisterCode = levelA.CanisterCode,
                                 CreatedBy = levelA.CreatedBy,
                                 CreatedAt = DateTime.Now
                             };
-                            _context.CryoLevelA.Add(levelAEntity);
+                            _context.IvfcryoLevelA.Add(levelAEntity);
                             await _context.SaveChangesAsync(); // Save to get LevelA ID
 
                             // Process all LevelB entities for this LevelA first
-                            var levelBEntities = new List<CryoLevelB>();
+                            var levelBEntities = new List<IvfcryoLevelB>();
                             foreach (var levelB in levelA.LevelB)
                             {
-                                var levelBEntity = new CryoLevelB
+                                var levelBEntity = new IvfcryoLevelB
                                 {
                                     LevelAid = levelAEntity.Id, // Now LevelA ID is available
                                     CaneCode = levelB.CaneCode,
                                     CreatedBy = levelB.CreatedBy,
                                     CreatedAt = DateTime.Now
                                 };
-                                _context.CryoLevelB.Add(levelBEntity);
+                                _context.IvfcryoLevelB.Add(levelBEntity);
                                 levelBEntities.Add(levelBEntity);
                             }
                             await _context.SaveChangesAsync(); // Save all LevelB to get their IDs
@@ -104,16 +109,16 @@ namespace HMIS.Application.ServiceLogics.Cryo
                                 {
                                     foreach (var levelC in levelB.LevelC)
                                     {
-                                        var levelCEntity = new CryoLevelC
+                                        var levelCEntity = new IvfcryoLevelC
                                         {
-                                            LevelBid = levelBEntity.Id, // Now LevelB ID is available
+                                            LevelBid = levelBEntity.Id, 
                                             StrawPosition = levelC.StrawPosition,
                                             SampleId = levelC.SampleID,
-                                            Status = levelC.Status,
+                                            StatusId = 196,
                                             CreatedBy = levelC.CreatedBy,
                                             CreatedAt = DateTime.Now
                                         };
-                                        _context.CryoLevelC.Add(levelCEntity);
+                                        _context.IvfcryoLevelC.Add(levelCEntity);
                                     }
                                 }
                             }
@@ -125,10 +130,10 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 else
                 {
                     // Update existing container
-                    var container = await _context.CryoContainers
-                        .Include(c => c.CryoLevelA)
-                            .ThenInclude(a => a.CryoLevelB)
-                                .ThenInclude(b => b.CryoLevelC)
+                    var container = await _context.IvfcryoContainers
+                        .Include(c => c.IvfcryoLevelA)
+                            .ThenInclude(a => a.IvfcryoLevelB)
+                                .ThenInclude(b => b.IvfcryoLevelC)
                         .FirstOrDefaultAsync(c => c.Id == containerDto.ID && !c.IsDeleted);
 
                     if (container == null) return false;
@@ -155,7 +160,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
             }
         }
 
-        private async System.Threading.Tasks.Task UpdateLevelAEntities(CryoContainers container, List<CryoLevelADto>? levelADtos)
+        private async System.Threading.Tasks.Task UpdateLevelAEntities(IvfcryoContainers container, List<CryoLevelADto>? levelADtos)
         {
             if (levelADtos == null) return;
 
@@ -165,7 +170,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 .ToList();
 
             // Soft delete LevelA entities not in the DTO
-            var levelAToDelete = container.CryoLevelA
+            var levelAToDelete = container.IvfcryoLevelA
                 .Where(a => !a.IsDeleted && !existingLevelAIds.Contains(a.Id))
                 .ToList();
 
@@ -176,17 +181,17 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 levelA.UpdatedBy = container.UpdatedBy;
 
                 // Also soft delete child entities
-                await SoftDeleteLevelBEntities(levelA.CryoLevelB.Where(b => !b.IsDeleted).ToList(), null);
+                await SoftDeleteLevelBEntities(levelA.IvfcryoLevelB.Where(b => !b.IsDeleted).ToList(), null);
             }
 
             foreach (var levelADto in levelADtos)
             {
-                CryoLevelA? levelAEntity;
+                IvfcryoLevelA? levelAEntity;
 
                 if (levelADto.ID.HasValue && levelADto.ID.Value > 0)
                 {
                     // Update existing LevelA
-                    levelAEntity = container.CryoLevelA.FirstOrDefault(a => a.Id == levelADto.ID && !a.IsDeleted);
+                    levelAEntity = container.IvfcryoLevelA.FirstOrDefault(a => a.Id == levelADto.ID && !a.IsDeleted);
                     if (levelAEntity != null)
                     {
                         levelAEntity.CanisterCode = levelADto.CanisterCode;
@@ -201,16 +206,16 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 else
                 {
                     // Add new LevelA
-                    levelAEntity = new CryoLevelA
+                    levelAEntity = new IvfcryoLevelA
                     {
                         ContainerId = container.Id,
                         CanisterCode = levelADto.CanisterCode,
                         CreatedBy = levelADto.CreatedBy ?? container.UpdatedBy,
                         CreatedAt = DateTime.Now
                     };
-                    _context.CryoLevelA.Add(levelAEntity);
+                    _context.IvfcryoLevelA.Add(levelAEntity);
                     await _context.SaveChangesAsync(); 
-                    container.CryoLevelA.Add(levelAEntity);
+                    container.IvfcryoLevelA.Add(levelAEntity);
                 }
 
                 // Handle LevelB for this LevelA
@@ -221,7 +226,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
             }
         }
 
-        private async System.Threading.Tasks.Task UpdateLevelBEntities(CryoLevelA levelA, List<CryoLevelBDto>? levelBDtos, string updatedBy)
+        private async System.Threading.Tasks.Task UpdateLevelBEntities(IvfcryoLevelA levelA, List<CryoLevelBDto>? levelBDtos, string updatedBy)
         {
             if (levelBDtos == null) return;
 
@@ -231,7 +236,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 .ToList();
 
             // Soft delete LevelB entities not in the DTO
-            var levelBToDelete = levelA.CryoLevelB
+            var levelBToDelete = levelA.IvfcryoLevelB
                 .Where(b => !b.IsDeleted && !existingLevelBIds.Contains(b.Id))
                 .ToList();
 
@@ -242,17 +247,17 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 levelB.UpdatedBy = null;
 
                 // Also soft delete child entities
-                await SoftDeleteLevelCEntities(levelB.CryoLevelC.Where(c => !c.IsDeleted).ToList(), updatedBy);
+                await SoftDeleteLevelCEntities(levelB.IvfcryoLevelC.Where(c => !c.IsDeleted).ToList(), updatedBy);
             }
 
             foreach (var levelBDto in levelBDtos)
             {
-                CryoLevelB? levelBEntity;
+                IvfcryoLevelB? levelBEntity;
 
                 if (levelBDto.ID.HasValue && levelBDto.ID.Value > 0)
                 {
                     // Update existing LevelB
-                    levelBEntity = levelA.CryoLevelB.FirstOrDefault(b => b.Id == levelBDto.ID && !b.IsDeleted);
+                    levelBEntity = levelA.IvfcryoLevelB.FirstOrDefault(b => b.Id == levelBDto.ID && !b.IsDeleted);
                     if (levelBEntity != null)
                     {
                         levelBEntity.CaneCode = levelBDto.CaneCode;
@@ -267,16 +272,16 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 else
                 {
                     // Add new LevelB
-                    levelBEntity = new CryoLevelB
+                    levelBEntity = new IvfcryoLevelB
                     {
                         LevelAid = levelA.Id,
                         CaneCode = levelBDto.CaneCode,
                         CreatedBy = null,
                         CreatedAt = DateTime.Now
                     };
-                    _context.CryoLevelB.Add(levelBEntity);
+                    _context.IvfcryoLevelB.Add(levelBEntity);
                     await _context.SaveChangesAsync(); 
-                    levelA.CryoLevelB.Add(levelBEntity);
+                    levelA.IvfcryoLevelB.Add(levelBEntity);
                 }
 
                 // Handle LevelC for this LevelB
@@ -287,7 +292,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
             }
         }
 
-        private async System.Threading.Tasks.Task UpdateLevelCEntities(CryoLevelB levelB, List<CryoLevelCDto>? levelCDtos, string updatedBy)
+        private async System.Threading.Tasks.Task UpdateLevelCEntities(IvfcryoLevelB levelB, List<CryoLevelCDto>? levelCDtos, string updatedBy)
         {
             if (levelCDtos == null) return;
 
@@ -297,7 +302,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 .ToList();
 
             // Soft delete LevelC entities not in the DTO
-            var levelCToDelete = levelB.CryoLevelC
+            var levelCToDelete = levelB.IvfcryoLevelC
                 .Where(c => !c.IsDeleted && !existingLevelCIds.Contains(c.Id))
                 .ToList();
 
@@ -313,12 +318,12 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 if (levelCDto.ID.HasValue && levelCDto.ID.Value > 0)
                 {
                     // Update existing LevelC
-                    var levelCEntity = levelB.CryoLevelC.FirstOrDefault(c => c.Id == levelCDto.ID && !c.IsDeleted);
+                    var levelCEntity = levelB.IvfcryoLevelC.FirstOrDefault(c => c.Id == levelCDto.ID && !c.IsDeleted);
                     if (levelCEntity != null)
                     {
                         levelCEntity.StrawPosition = levelCDto.StrawPosition;
                         levelCEntity.SampleId = levelCDto.SampleID;
-                        levelCEntity.Status = levelCDto.Status;
+                        levelCEntity.StatusId = 196;
                         levelCEntity.UpdatedBy = null;
                         levelCEntity.UpdatedAt = DateTime.Now;
                     }
@@ -326,32 +331,32 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 else
                 {
                     // Add new LevelC
-                    var levelCEntity = new CryoLevelC
+                    var levelCEntity = new IvfcryoLevelC
                     {
                         LevelBid = levelB.Id, // Now LevelB ID is properly set
                         StrawPosition = levelCDto.StrawPosition,
                         SampleId = levelCDto.SampleID,
-                        Status = levelCDto.Status,
+                        StatusId = 196,
                         CreatedBy = null,
                         CreatedAt = DateTime.Now
                     };
-                    _context.CryoLevelC.Add(levelCEntity);
+                    _context.IvfcryoLevelC.Add(levelCEntity);
                 }
             }
         }
 
-        private async System.Threading.Tasks.Task SoftDeleteLevelBEntities(List<CryoLevelB> levelBs, string updatedBy)
+        private async System.Threading.Tasks.Task SoftDeleteLevelBEntities(List<IvfcryoLevelB> levelBs, string updatedBy)
         {
             foreach (var levelB in levelBs)
             {
                 levelB.IsDeleted = true;
                 levelB.UpdatedAt = DateTime.Now;
                 levelB.UpdatedBy = null;
-                await SoftDeleteLevelCEntities(levelB.CryoLevelC.Where(c => !c.IsDeleted).ToList(), updatedBy);
+                await SoftDeleteLevelCEntities(levelB.IvfcryoLevelC.Where(c => !c.IsDeleted).ToList(), updatedBy);
             }
         }
 
-        private async System.Threading.Tasks.Task SoftDeleteLevelCEntities(List<CryoLevelC> levelCs, string updatedBy)
+        private async System.Threading.Tasks.Task SoftDeleteLevelCEntities(List<IvfcryoLevelC> levelCs, string updatedBy)
         {
             foreach (var levelC in levelCs)
             {
@@ -367,7 +372,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
         {
             try
             {
-                var query = _context.CryoContainers
+                var query = _context.IvfcryoContainers
                     .Where(c => !c.IsDeleted);
 
                 int totalCount = await query.CountAsync();
@@ -401,10 +406,10 @@ namespace HMIS.Application.ServiceLogics.Cryo
 
         public async Task<bool> DeleteCryoContainer(long containerId, long? updatedBy)
         {
-            var container = await _context.CryoContainers
-                .Include(c => c.CryoLevelA)
-                    .ThenInclude(a => a.CryoLevelB)
-                        .ThenInclude(b => b.CryoLevelC)
+            var container = await _context.IvfcryoContainers
+                .Include(c => c.IvfcryoLevelA)
+                    .ThenInclude(a => a.IvfcryoLevelB)
+                        .ThenInclude(b => b.IvfcryoLevelC)
                 .FirstOrDefaultAsync(c => c.Id == containerId);
 
             if (container == null || (container.GetType().GetProperty("IsDeleted") != null && (bool?)container.GetType().GetProperty("IsDeleted")?.GetValue(container) == true))
@@ -416,9 +421,9 @@ namespace HMIS.Application.ServiceLogics.Cryo
             container.UpdatedAt = DateTime.Now;
 
             // Soft delete LevelA
-            if (container.CryoLevelA != null)
+            if (container.IvfcryoLevelA != null)
             {
-                foreach (var levelA in container.CryoLevelA)
+                foreach (var levelA in container.IvfcryoLevelA)
                 {
                     if (levelA.GetType().GetProperty("IsDeleted") != null)
                         levelA.GetType().GetProperty("IsDeleted")?.SetValue(levelA, true);
@@ -426,9 +431,9 @@ namespace HMIS.Application.ServiceLogics.Cryo
                     levelA.UpdatedAt = DateTime.Now;
 
                     // Soft delete LevelB
-                    if (levelA.CryoLevelB != null)
+                    if (levelA.IvfcryoLevelB != null)
                     {
-                        foreach (var levelB in levelA.CryoLevelB)
+                        foreach (var levelB in levelA.IvfcryoLevelB)
                         {
                             if (levelB.GetType().GetProperty("IsDeleted") != null)
                                 levelB.GetType().GetProperty("IsDeleted")?.SetValue(levelB, true);
@@ -436,9 +441,9 @@ namespace HMIS.Application.ServiceLogics.Cryo
                             levelB.UpdatedAt = DateTime.Now;
 
                             // Soft delete LevelC
-                            if (levelB.CryoLevelC != null)
+                            if (levelB.IvfcryoLevelC != null)
                             {
-                                foreach (var levelC in levelB.CryoLevelC)
+                                foreach (var levelC in levelB.IvfcryoLevelC)
                                 {
                                     if (levelC.GetType().GetProperty("IsDeleted") != null)
                                         levelC.GetType().GetProperty("IsDeleted")?.SetValue(levelC, true);
@@ -456,10 +461,10 @@ namespace HMIS.Application.ServiceLogics.Cryo
         }
         public async Task<CryoContainerDto?> GetCryoContainerById(long id)
         {
-            var container = await _context.CryoContainers
-                .Include(c => c.CryoLevelA)
-                    .ThenInclude(a => a.CryoLevelB)
-                        .ThenInclude(b => b.CryoLevelC)
+            var container = await _context.IvfcryoContainers
+                .Include(c => c.IvfcryoLevelA)
+                    .ThenInclude(a => a.IvfcryoLevelB)
+                        .ThenInclude(b => b.IvfcryoLevelC)
                 .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
 
             if (container == null)
@@ -478,7 +483,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 UpdatedBy = container.UpdatedBy,
                 CreatedAt = container.CreatedAt,
                 UpdatedAt = container.UpdatedAt,
-                LevelA = container.CryoLevelA?
+                LevelA = container.IvfcryoLevelA?
                     .Where(a => !a.IsDeleted)
                     .Select(a => new CryoLevelADto
                     {
@@ -489,7 +494,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                         UpdatedBy = a.UpdatedBy,
                         CreatedAt = a.CreatedAt,
                         UpdatedAt = a.UpdatedAt,
-                        LevelB = a.CryoLevelB?
+                        LevelB = a.IvfcryoLevelB?
                             .Where(b => !b.IsDeleted)
                             .Select(b => new CryoLevelBDto
                             {
@@ -500,7 +505,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                                 UpdatedBy = b.UpdatedBy,
                                 CreatedAt = b.CreatedAt,
                                 UpdatedAt = b.UpdatedAt,
-                                LevelC = b.CryoLevelC?
+                                LevelC = b.IvfcryoLevelC?
                                     .Where(c => !c.IsDeleted)
                                     .Select(c => new CryoLevelCDto
                                     {
@@ -508,7 +513,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                                         LevelBID = c.LevelBid,
                                         StrawPosition = c.StrawPosition,
                                         SampleID = c.SampleId,
-                                        Status = c.Status,
+                                        StatusId = c.StatusId,
                                         CreatedBy = c.CreatedBy,
                                         UpdatedBy = c.UpdatedBy,
                                         CreatedAt = c.CreatedAt,
@@ -521,9 +526,9 @@ namespace HMIS.Application.ServiceLogics.Cryo
 
         public async Task<bool> DeleteLevelA(long levelAId, long? updatedBy)
         {
-            var levelA = await _context.CryoLevelA
-                .Include(a => a.CryoLevelB)
-                    .ThenInclude(b => b.CryoLevelC)
+            var levelA = await _context.IvfcryoLevelA
+                .Include(a => a.IvfcryoLevelB)
+                    .ThenInclude(b => b.IvfcryoLevelC)
                 .FirstOrDefaultAsync(a => a.Id == levelAId && !a.IsDeleted);
 
             if (levelA == null)
@@ -533,17 +538,17 @@ namespace HMIS.Application.ServiceLogics.Cryo
             levelA.UpdatedBy = updatedBy;
             levelA.UpdatedAt = DateTime.Now;
 
-            if (levelA.CryoLevelB != null)
+            if (levelA.IvfcryoLevelB != null)
             {
-                foreach (var levelB in levelA.CryoLevelB)
+                foreach (var levelB in levelA.IvfcryoLevelB)
                 {
                     levelB.IsDeleted = true;
                     levelB.UpdatedBy = updatedBy;
                     levelB.UpdatedAt = DateTime.Now;
 
-                    if (levelB.CryoLevelC != null)
+                    if (levelB.IvfcryoLevelC != null)
                     {
-                        foreach (var levelC in levelB.CryoLevelC)
+                        foreach (var levelC in levelB.IvfcryoLevelC)
                         {
                             levelC.IsDeleted = true;
                             levelC.UpdatedBy = updatedBy;
@@ -559,8 +564,8 @@ namespace HMIS.Application.ServiceLogics.Cryo
 
         public async Task<bool> DeleteLevelB(long levelBId, long? updatedBy)
         {
-            var levelB = await _context.CryoLevelB
-                .Include(b => b.CryoLevelC)
+            var levelB = await _context.IvfcryoLevelB
+                .Include(b => b.IvfcryoLevelC)
                 .FirstOrDefaultAsync(b => b.Id == levelBId && !b.IsDeleted);
 
             if (levelB == null)
@@ -570,9 +575,9 @@ namespace HMIS.Application.ServiceLogics.Cryo
             levelB.UpdatedBy = updatedBy;
             levelB.UpdatedAt = DateTime.Now;
 
-            if (levelB.CryoLevelC != null)
+            if (levelB.IvfcryoLevelC != null)
             {
-                foreach (var levelC in levelB.CryoLevelC)
+                foreach (var levelC in levelB.IvfcryoLevelC)
                 {
                     levelC.IsDeleted = true;
                     levelC.UpdatedBy = updatedBy;
@@ -586,7 +591,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
 
         public async Task<bool> DeleteLevelC(long levelCId, long? updatedBy)
         {
-            var levelC = await _context.CryoLevelC
+            var levelC = await _context.IvfcryoLevelC
                 .FirstOrDefaultAsync(c => c.Id == levelCId && !c.IsDeleted);
 
             if (levelC == null)
@@ -598,6 +603,160 @@ namespace HMIS.Application.ServiceLogics.Cryo
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<CryoDropDownDto>> GetContainersDropdown()
+        {
+            return await _context.IvfcryoContainers
+                .Where(c => !c.IsDeleted)
+                .Select(c => new CryoDropDownDto
+                {
+                    Value = c.Id,
+                    Label = c.Description
+                })
+                .OrderBy(c => c.Label)
+                .ToListAsync();
+        }
+
+        public async Task<List<CryoDropDownDto>> GetLevelADropdown(long containerId)
+        {
+            return await _context.IvfcryoLevelA
+                .Where(a => a.ContainerId == containerId && !a.IsDeleted)
+                .Select(a => new CryoDropDownDto
+                {
+                    Value = a.Id,
+                    Label = a.CanisterCode
+                })
+                .OrderBy(a => a.Label)
+                .ToListAsync();
+        }
+
+        public async Task<List<CryoDropDownDto>> GetLevelBDropdown(long levelAId)
+        {
+            return await _context.IvfcryoLevelB
+                .Where(b => b.LevelAid == levelAId && !b.IsDeleted)
+                .Select(b => new CryoDropDownDto
+                {
+                    Value = b.Id,
+                    Label = b.CaneCode
+                })
+                .OrderBy(b => b.Label)
+                .ToListAsync();
+        }
+
+        public async Task<List<CryoStorageListDto>> SearchCryoStorages(CryoSearchRequestDto searchRequest)
+        {
+            // 1. Base LevelB join with LevelA + Container
+            var baseQuery = from levelB in _context.IvfcryoLevelB
+                            join levelA in _context.IvfcryoLevelA on levelB.LevelAid equals levelA.Id
+                            join container in _context.IvfcryoContainers on levelA.ContainerId equals container.Id
+                            where !levelB.IsDeleted && !levelA.IsDeleted && !container.IsDeleted
+                            select new
+                            {
+                                levelB,
+                                levelA,
+                                container
+                            };
+
+            // Filters
+            if (searchRequest.ContainerId >0)
+                baseQuery = baseQuery.Where(x => x.container.Id == searchRequest.ContainerId.Value);
+
+            if (searchRequest.LevelAId>0)
+                baseQuery = baseQuery.Where(x => x.levelA.Id == searchRequest.LevelAId.Value);
+
+            if (searchRequest.LevelBId>0)
+                baseQuery = baseQuery.Where(x => x.levelB.Id == searchRequest.LevelBId.Value);
+
+            // 2. LEFT JOIN LevelC
+            var storageQuery =
+                from b in baseQuery
+                join c in _context.IvfcryoLevelC.Where(lc => !lc.IsDeleted)
+                      on b.levelB.Id equals c.LevelBid into levelCGroup
+                from lc in levelCGroup.DefaultIfEmpty()
+                select new
+                {
+                    b.container.Description,
+                    b.levelA.CanisterCode,
+                    b.levelB.CaneCode,
+                    LevelBId = b.levelB.Id,
+                    LevelC = lc
+                };
+
+            // 3. Group and calculate counts
+            var groupedQuery =
+                from x in storageQuery
+                group x by new { x.Description, x.CanisterCode, x.CaneCode, x.LevelBId } into g
+                select new
+                {
+                    g.Key.Description,
+                    Canister = g.Key.CanisterCode,
+                    Goblet = g.Key.CaneCode,
+                    // Distinct Patients
+                    PatientCount = g.Where(z => z.LevelC != null && z.LevelC.SampleId != null)
+                        .Select(z => z.LevelC.Sample.Ivfmain.MalePatientId)
+                        .Distinct()
+                        .Count(),
+                    // Sample count
+                    SampleCount = g.Count(z => z.LevelC != null &&
+                                               z.LevelC.SampleId != null &&
+                                               z.LevelC.StatusId != 196),
+                    // Free slots = total slots - occupied
+                    FreePlaces = (
+                        g.Count(z => z.LevelC == null ||        // no LevelC = free slot
+                                    z.LevelC.SampleId == null ||
+                                    z.LevelC.StatusId == 196)
+                    ),
+                    StrawIds = g.Where(z => z.LevelC != null && z.LevelC.SampleId != null)
+                                .Select(z => z.LevelC.SampleId.ToString()),
+
+                    FirstFreeLevelCId =
+            g.Where(z => z.LevelC.Id != null &&
+                         (z.LevelC.SampleId == null || z.LevelC.StatusId == 196))
+             .Select(z => z.LevelC.Id)
+             .FirstOrDefault(),
+
+                    NLevelCId = g.Where(z => z.LevelC != null && z.LevelC.SampleId != null)
+                                .Select(z => z.LevelC.Id).FirstOrDefault()
+
+
+                };
+
+            // Filters
+            if (searchRequest.MinFreePositions>0)
+                groupedQuery = groupedQuery.Where(x => x.FreePlaces >= searchRequest.MinFreePositions.Value);
+
+            if (searchRequest.MaxPatients>0)
+                groupedQuery = groupedQuery.Where(x => x.PatientCount <= searchRequest.MaxPatients.Value);
+
+            if (searchRequest.MaxSamples>0)
+                groupedQuery = groupedQuery.Where(x => x.SampleCount <= searchRequest.MaxSamples.Value);
+
+            var data = await groupedQuery.ToListAsync();
+
+            // Final DTO mapping
+            return data.Select(x => new CryoStorageListDto
+            {
+                Description = x.Description,
+                Canister = x.Canister,
+                Goblet = x.Goblet,
+                PatientCount = x.PatientCount,
+                SampleCount = x.SampleCount,
+                FreePlaces = x.FreePlaces,
+                StrawId = x.StrawIds.Any() ? string.Join(", ", x.StrawIds) : null,
+                LevelCId = x.FirstFreeLevelCId,
+                NLevelCId = x.NLevelCId
+            }).ToList();
+        }
+        // Helper method to get patient count through SampleId
+        private int GetPatientCount(IQueryable<IvfcryoLevelC> levelCQuery)
+        {
+            return (from levelC in levelCQuery
+                    join sample in _context.IvfmaleSemenSample on levelC.SampleId equals sample.SampleId
+                    join ivfMain in _context.Ivfmain on sample.IvfmainId equals ivfMain.IvfmainId
+                    select ivfMain.MalePatientId)
+                    .Distinct()
+                    .Count();
         }
 
     }

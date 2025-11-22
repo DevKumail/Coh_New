@@ -291,11 +291,11 @@ export class AlertComponent implements OnInit, AfterViewInit {
 
   paginationInfo: any = {
     pageNumber: 1,
-    pageSize: 1,
+    pageSize: 5,
   };
   GetPatientAlertsData() {
     if (this.SearchPatientData == undefined) {
-      Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
+      // Swal.fire('Validation Error', 'MrNo is a required field. Please load a patient.', 'warning');
       // this.loader.hide();
       return;
     }

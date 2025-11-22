@@ -1,0 +1,42 @@
+<div class="card shadow-sm">
+  <div class="card-header p-2">
+    <ul ngbNav #nav="ngbNav" [(activeId)]="active" [destroyOnHide]="false" class="nav nav-tabs">
+      <li [ngbNavItem]="1">
+        <a ngbNavLink>Native</a>
+        <ng-template ngbNavContent>
+          <div class="p-2">
+            <ul ngbNav #native="ngbNav" [(activeId)]="nativeActive" [destroyOnHide]="false" class="nav nav-pills small mb-2">
+              <li [ngbNavItem]="1"><a ngbNavLink>Parameter</a><ng-template ngbNavContent><app-native-parameter [dropdowns]="dropdowns" [labelFor]="labelFor"></app-native-parameter></ng-template></li>
+              <li [ngbNavItem]="2"><a ngbNavLink>Files</a><ng-template ngbNavContent><app-semen-files></app-semen-files></ng-template></li>
+            </ul>
+            <div [ngbNavOutlet]="native"></div>
+          </div>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="2">
+        <a ngbNavLink>After Preparation</a>
+        <ng-template ngbNavContent>
+          <div class="p-2">
+            <ul ngbNav #prep="ngbNav" [(activeId)]="afterActive" [destroyOnHide]="false" class="nav nav-pills small mb-2">
+              <li [ngbNavItem]="1"><a ngbNavLink>Parameter</a><ng-template ngbNavContent><app-preparation-parameter [dropdowns]="dropdowns" [labelFor]="labelFor"></app-preparation-parameter></ng-template></li>
+              <li [ngbNavItem]="2"><a ngbNavLink>Files</a><ng-template ngbNavContent><app-semen-files></app-semen-files></ng-template></li>
+              <li [ngbNavItem]="3"><a ngbNavLink>Preparation</a><ng-template ngbNavContent><app-preparation-preparation [dropdowns]="dropdowns" [labelFor]="labelFor" [hrEmployees]="hrEmployees"></app-preparation-preparation></ng-template></li>
+            </ul>
+            <div [ngbNavOutlet]="prep"></div>
+          </div>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="3">
+        <a ngbNavLink>Documents</a>
+        <ng-template ngbNavContent>
+          <div class="p-2">
+            <app-semen-parameter-documents></app-semen-parameter-documents>
+          </div>
+        </ng-template>
+      </li>
+    </ul>
+  </div>
+  <div class="card-body p-0">
+    <div [ngbNavOutlet]="nav"></div>
+  </div>
+</div>

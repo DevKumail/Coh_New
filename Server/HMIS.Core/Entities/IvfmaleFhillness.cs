@@ -20,11 +20,9 @@ public partial class IvfmaleFhillness
 
     public bool? MumpsAfterPuberty { get; set; }
 
-    [StringLength(50)]
-    public string? Endocrinopathies { get; set; }
+    public long? EndocrinopathiesCategoryId { get; set; }
 
-    [StringLength(50)]
-    public string? PreviousTumor { get; set; }
+    public long? PreviousTumorCategoryId { get; set; }
 
     public bool? Hepatitis { get; set; }
 
@@ -42,7 +40,27 @@ public partial class IvfmaleFhillness
     [StringLength(200)]
     public string? OtherDiseases { get; set; }
 
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    [ForeignKey("EndocrinopathiesCategoryId")]
+    [InverseProperty("IvfmaleFhillnessEndocrinopathiesCategory")]
+    public virtual DropdownConfiguration? EndocrinopathiesCategory { get; set; }
+
     [ForeignKey("IvfmaleFhgeneralId")]
     [InverseProperty("IvfmaleFhillness")]
     public virtual IvfmaleFhgeneral? IvfmaleFhgeneral { get; set; }
+
+    [ForeignKey("PreviousTumorCategoryId")]
+    [InverseProperty("IvfmaleFhillnessPreviousTumorCategory")]
+    public virtual DropdownConfiguration? PreviousTumorCategory { get; set; }
 }

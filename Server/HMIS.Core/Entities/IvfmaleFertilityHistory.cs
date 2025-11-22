@@ -17,14 +17,13 @@ public partial class IvfmaleFertilityHistory
     public int IvfmainId { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime Date { get; set; }
+    public DateTime? Date { get; set; }
 
-    public long ProviderId { get; set; }
+    public long? ProviderId { get; set; }
 
-    [StringLength(100)]
-    public string? Adiposity { get; set; }
+    public long? AdiposityCategoryId { get; set; }
 
-    public bool? GenerallyHealthy { get; set; }
+    public long? GenerallyHealthyCategoryId { get; set; }
 
     [StringLength(250)]
     public string? LongTermMedication { get; set; }
@@ -36,6 +35,22 @@ public partial class IvfmaleFertilityHistory
     [Column("CFTRCarrierCategoryId")]
     public long? CftrcarrierCategoryId { get; set; }
 
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    [ForeignKey("AdiposityCategoryId")]
+    [InverseProperty("IvfmaleFertilityHistoryAdiposityCategory")]
+    public virtual DropdownConfiguration? AdiposityCategory { get; set; }
+
     [ForeignKey("CftrcarrierCategoryId")]
     [InverseProperty("IvfmaleFertilityHistoryCftrcarrierCategory")]
     public virtual DropdownConfiguration? CftrcarrierCategory { get; set; }
@@ -43,6 +58,10 @@ public partial class IvfmaleFertilityHistory
     [ForeignKey("ChromosomeAnalysisCategoryId")]
     [InverseProperty("IvfmaleFertilityHistoryChromosomeAnalysisCategory")]
     public virtual DropdownConfiguration? ChromosomeAnalysisCategory { get; set; }
+
+    [ForeignKey("GenerallyHealthyCategoryId")]
+    [InverseProperty("IvfmaleFertilityHistoryGenerallyHealthyCategory")]
+    public virtual DropdownConfiguration? GenerallyHealthyCategory { get; set; }
 
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfmaleFertilityHistory")]
@@ -68,5 +87,5 @@ public partial class IvfmaleFertilityHistory
 
     [ForeignKey("ProviderId")]
     [InverseProperty("IvfmaleFertilityHistory")]
-    public virtual Hremployee Provider { get; set; } = null!;
+    public virtual Hremployee? Provider { get; set; }
 }

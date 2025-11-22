@@ -202,9 +202,14 @@ export const horizontalMenuItems: MenuItemType[] = [
         isCollapsed: true,
         children: [
             {
-                label: 'Alerts',
-                icon: 'tablerBell',
-                url: '/registration/alerts',
+                label: 'Demographics',
+                icon: 'tablerUsers',
+                url: '/registration/demographics',
+            },
+            {
+                label: 'Temporary Patient Demographics',
+                icon: 'tablerUserPlus',
+                url: '/registration/temporary-patient-demographics',
             },
             {
                 label: 'Coverages',
@@ -212,24 +217,41 @@ export const horizontalMenuItems: MenuItemType[] = [
                 url: '/registration/coverages',
             },
             {
-                label: 'Demographics',
-                icon: 'tablerUsers',
-                url: '/registration/demographics',
-            },
-
-            {
                 label: 'Alerts',
                 icon: 'tablerBell',
                 url: '/registration/alerts',
             },
-            {
-                label: 'Temporary Patient Demographics',
-                icon: 'tablerUserPlus',
-                url: '/registration/temporary-patient-demographics',
-            },
         ],
     },
 
+      {
+        label: 'Scheduling',
+        icon: 'tablerCalendarEvent',
+        module: 'Scheduling',
+        isCollapsed: true,
+        children: [
+            {
+                label: 'View Appointments',
+                icon: 'tablerCalendar',
+                url: '/scheduling/view appointments',
+            },
+            {
+                label: 'Appointment Dashboard',
+                icon: 'tablerLayoutDashboard',
+                url: '/scheduling/appointment dashboard',
+            },
+            // {
+            //     label: 'Create Appointment',
+            //     icon: 'tablerPlus',
+            //     url: '/scheduling/create appointment',
+            // },
+            // {
+            //     label: 'Filter Appointments',
+            //     icon: 'tablerFilter',
+            //     url: '/scheduling/Filter',
+            // },
+        ],
+    },
     // {
     //     label: 'Clinical',
     //     icon: 'tablerStethoscope', // Use appropriate icon
@@ -281,14 +303,14 @@ export const horizontalMenuItems: MenuItemType[] = [
     // },
 
 
-    {
-        label: 'cryo management',
-        icon: 'tablerRocket',
-        module: 'Cryo Manager',
-        url: '/cryo/cryo-management',
+    // {
+    //     label: 'cryo management',
+    //     icon: 'tablerRocket',
+    //     module: 'Cryo Manager',
+    //     url: '/cryo/cryo-management',
         
-    },
-    {
+    // },
+ {
         label: 'IVF',
         icon: 'tablerHeartHandshake',
         module: 'IVF', // this is used by PermissionService
@@ -306,51 +328,35 @@ export const horizontalMenuItems: MenuItemType[] = [
             }
         ]
     },
-
     {
-        label: 'Billing',
-        icon: 'tablerReceipt', // Use receipt icon for billing module
-        module: 'Billing', // this is used by PermissionService
+        label: 'Patient Chart',
+        icon: 'tablerUser',
+        module: 'Patient Chart',
+        url: '/patient-summary'
+    },
+    {
+        label: 'Setup',
+        icon: 'tablerHeartHandshake',
+        module: 'IVF', // this is used by PermissionService
         isCollapsed: true,
         children: [
             {
-                label: 'Charge Capture',
-                icon: 'tablerReceipt',
-                url: '/billing/charge capture',
-            },
-        ],
-    },
-
-
-
-    {
-        label: 'Scheduling',
-        icon: 'tablerCalendarEvent',
-        module: 'Scheduling',
-        isCollapsed: true,
-        children: [
-            {
-                label: 'View Appointments',
-                icon: 'tablerCalendar',
-                url: '/scheduling/view appointments',
+                label: 'Dropdown Configuration',
+                icon: 'tablerUsers',
+                url: '/setup/dropdown-configuration'
             },
             {
-                label: 'Appointment Dashboard',
-                icon: 'tablerLayoutDashboard',
-                url: '/scheduling/appointment dashboard',
-            },
-            // {
-            //     label: 'Create Appointment',
-            //     icon: 'tablerPlus',
-            //     url: '/scheduling/create appointment',
-            // },
-            // {
-            //     label: 'Filter Appointments',
-            //     icon: 'tablerFilter',
-            //     url: '/scheduling/Filter',
-            // },
-        ],
+                label: 'Cryo Management',
+                icon: 'tablerFiles',
+                url: '/cryo/cryo-management'
+            }
+        ]
     },
+   
+
+
+
+  
 
 
 

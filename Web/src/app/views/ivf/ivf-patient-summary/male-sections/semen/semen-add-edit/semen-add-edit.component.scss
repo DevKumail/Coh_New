@@ -1,0 +1,87 @@
+:host .form-control.mb-2,
+:host .form-select.mb-2 {
+  margin-bottom: 0 !important;
+}
+
+/* Top summary cards styling */
+:host .top-cards > .card {
+  padding: 0.75rem 0.75rem 0.5rem;
+  border: 0 !important;
+  border-radius: 0.5rem;
+  background-color: #f8f9fb;
+  box-shadow: 0 .25rem .75rem rgba(0,0,0,.06) !important;
+}
+
+:host .top-cards > .card .form-label {
+  margin-bottom: 0.25rem;
+}
+
+/* Global label and spacing styles for all nested semen components */
+:host ::ng-deep .form-label {
+  font-weight: 400;
+  margin-bottom: 0.25rem;
+}
+
+:host ::ng-deep .card .fw-semibold {
+  font-weight: 600;
+}
+
+:host ::ng-deep .card .row.g-1 > [class*='col-'],
+:host ::ng-deep .card .row.g-2 > [class*='col-'] {
+  margin-bottom: 0.5rem;
+}
+
+:host ::ng-deep .form-control,
+:host ::ng-deep .form-select {
+  transition: box-shadow .2s ease, transform .1s ease;
+  box-shadow: none;
+  will-change: box-shadow, transform;
+}
+
+:host ::ng-deep .form-control:hover,
+:host ::ng-deep .form-select:hover {
+  box-shadow: 0 .25rem .75rem rgba(0,0,0,.08);
+  transform: translateY(-1px);
+}
+
+:host ::ng-deep .form-control:focus,
+:host ::ng-deep .form-select:focus {
+  box-shadow: 0 0 0 .2rem rgba(13,110,253,.15), 0 .25rem .75rem rgba(0,0,0,.08);
+  transform: translateY(-1px);
+}
+
+:host ::ng-deep .card {
+  border: 0 !important;
+  box-shadow: 0 .25rem .75rem rgba(0,0,0,.06) !important;
+  transition: box-shadow .2s ease, transform .1s ease;
+  border-radius: .5rem;
+  background-color: #f8f9fb;
+}
+
+:host ::ng-deep .card:hover {
+  box-shadow: 0 .5rem 1.25rem rgba(0,0,0,.12) !important;
+}
+
+/* Remove borders from card parts so shadow is visible on all sides */
+:host ::ng-deep .card-header,
+:host ::ng-deep .card-footer {
+  border: 0 !important;
+  background-color: #f8f9fb;
+}
+
+/* Ensure inputs stay pure white for readability */
+:host ::ng-deep .form-control,
+:host ::ng-deep .form-select {
+  background-color: #fff;
+}
+
+/* Guard against bootstrap border utilities accidentally re-adding borders */
+:host ::ng-deep .card.border,
+:host ::ng-deep .card.border-1,
+:host ::ng-deep .card.border-2,
+:host ::ng-deep .card.border-3,
+:host ::ng-deep .card.border-dark,
+:host ::ng-deep .card.border-light,
+:host ::ng-deep .card.border-secondary {
+  border: 0 !important;
+}

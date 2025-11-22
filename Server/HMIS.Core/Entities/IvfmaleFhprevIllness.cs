@@ -16,11 +16,26 @@ public partial class IvfmaleFhprevIllness
     [Column("IVFMaleFHId")]
     public int IvfmaleFhid { get; set; }
 
-    [Column("ICDCode")]
-    [StringLength(50)]
-    public string Icdcode { get; set; } = null!;
+    [StringLength(11)]
+    public string PrevIllness { get; set; } = null!;
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
 
     [ForeignKey("IvfmaleFhid")]
     [InverseProperty("IvfmaleFhprevIllness")]
     public virtual IvfmaleFertilityHistory IvfmaleFh { get; set; } = null!;
+
+    [ForeignKey("PrevIllness")]
+    [InverseProperty("IvfmaleFhprevIllness")]
+    public virtual BlmasterIcd9cm PrevIllnessNavigation { get; set; } = null!;
 }
