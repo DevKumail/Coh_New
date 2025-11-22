@@ -1,0 +1,67 @@
+<form [formGroup]="form" class="container-fluid">
+  <div class="center-form">
+    <div class="row g-3 align-items-center">
+      <div class="col-12 col-md-5 text-start">
+        <label class="form-label mb-0">Planned additional measures :</label>
+      </div>
+      <div class="col-12 col-md-7">
+        <select class="form-select" formControlName="plannedAdditionalMeasures">
+          <option value="" selected disabled>Select planned additional measures</option>
+          <option>PGT-A</option>
+          <option>PGT-M</option>
+          <option>PGT-SR</option>
+          <option>Embryo glue</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-5 text-start">
+        <label class="form-label mb-0">Performed additional measures :</label>
+      </div>
+      <div class="col-12 col-md-7">
+        <select class="form-select" formControlName="performedAdditionalMeasures">
+          <option value="" selected disabled>Select performed additional measures</option>
+          <option>PGT-A</option>
+          <option>PGT-M</option>
+          <option>PGT-SR</option>
+          <option>Embryo glue</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-5 text-start">
+        <label class="form-label mb-0">PID (Polar bodies) Indication :</label>
+      </div>
+      <div class="col-12 col-md-7">
+        <select class="form-select" formControlName="pidPolarBodiesIndication">
+          <option value="" selected disabled>Select indication</option>
+          <option>Not specified</option>
+          <option>Medical</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-5 text-start">
+        <label class="form-label mb-0">PID (EMB/Blast.) Indication :</label>
+      </div>
+      <div class="col-12 col-md-7">
+        <select class="form-select" formControlName="pidEmbBlastIndication">
+          <option value="" selected disabled>Select indication</option>
+          <option>Not specified</option>
+          <option>Medical</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-5 text-start">
+        <label class="form-label mb-0">Genetic condition :</label>
+      </div>
+      <div class="col-12 col-md-7">
+        <select class="form-select" formControlName="geneticCondition">
+          <option value="" selected disabled>Select genetic condition</option>
+          <option>Not specified</option>
+          <option>Aneuploidy</option>
+          <option>Monogenic</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</form>

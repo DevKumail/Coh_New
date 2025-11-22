@@ -1,0 +1,16 @@
+/* Center the additional measures form and keep rows aligned */
+.center-form {
+  max-width: 780px; /* adjust as needed */
+  margin: 0 auto;
+}
+
+/* Make labels align baseline with controls a bit nicer */
+.form-label {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+/* Ensure selects have consistent height */
+select.form-select {
+  min-height: 38px;
+}

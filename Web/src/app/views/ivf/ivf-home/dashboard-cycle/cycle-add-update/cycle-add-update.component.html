@@ -1,0 +1,35 @@
+<div class="card">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='general'" (click)="setTab('general')">General</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='additional'" (click)="setTab('additional')">Additional measures</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='documents'" (click)="setTab('documents')">Documents</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='accounting'" (click)="setTab('accounting')">Accounting</button></li>
+    </ul>
+    <button type="button" class="btn-close ms-2" aria-label="Close" (click)="onCancel()"></button>
+  </div>
+  <div class="card-body">
+
+    <ng-container *ngIf="activeTab==='general'">
+      <app-general></app-general>
+    </ng-container>
+
+    <ng-container *ngIf="activeTab==='additional'">
+      <app-additional-measures></app-additional-measures>
+    </ng-container>
+    <ng-container *ngIf="activeTab==='documents'">
+      <app-documents></app-documents>
+    </ng-container>
+    <ng-container *ngIf="activeTab==='accounting'">
+      <app-accounting></app-accounting>
+    </ng-container>
+
+    <div class="card-footer d-flex justify-content-end mt-2">
+    <button type="button" class="btn btn-light" (click)="onCancel()">Cancel</button>
+    <button type="button" class="btn btn-primary ms-2" [disabled]="isSaving" (click)="onSave(null)">
+      <span *ngIf="isSaving" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      Save
+    </button>
+    </div>
+</div>
+</div>
