@@ -285,7 +285,8 @@ export class PreservationComponent implements OnInit, OnChanges {
       forResearch: !!v.forResearch,
       reasonForResearchId: Number(v.reasonForResearch) || null,
       notes: v.note || '',
-      updatedBy: 0
+      updatedBy: 0,
+      preservationCode: v.storagePlace || ''
     };
 
     this.isSaving = true;

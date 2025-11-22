@@ -81,5 +81,7 @@
         public long? ReasonForResearchId { get; set; }
         public string? Notes { get; set; }
         public int? UpdatedBy { get; set; }
+        public string PreservationCode { get; set; } 
+
     }
 }

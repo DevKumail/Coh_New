@@ -151,7 +151,7 @@ export class CryoStoragePlaceComponent {
             storageLocation: response.storageLocation,
             containerId: response.containerId,
             levelCId: response.levelCId,
-            free: 0,
+            free: response.freePlaces,
             patients: 0,
             samples: 0,
             isNextAvailable: true
@@ -169,8 +169,40 @@ export class CryoStoragePlaceComponent {
   onSelectStorage(s: any) { 
     this.showDetails = true;
     this.selectedRow = s;
-  }
+   this.loadStorageDetails();
 
+  }
+loadStorageDetails() {
+  this.details = [];
+
+    const payload = {
+    levelCId: this.selectedRow?.levelCId || 0  
+  };
+
+  this.ivfApiService
+    .GetStorageDetails(payload)
+    .subscribe({
+      next: (res: any) => {
+        const data = Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : [res]);
+
+        this.details = (data || []).map((x: any) => ({
+          color: x.color1 || '',                  // for the colored square
+          patientName: x.patientName || '',
+          patientId: x.patientId || '',
+          strawId: x.strawId || '',
+          position: x.position || '',
+          typeOfMaterial: x.typeOfMaterial || '',
+          description: x.description || '',
+          levelA: x.levelA || '',
+          levelB: x.levelB || ''
+        }));
+      },
+      error: (err) => {
+        console.error('Failed to load storage details', err);
+        this.details = [];
+      }
+    });
+}
   onCancel() { this.back.emit(); }
 
   onOk() {

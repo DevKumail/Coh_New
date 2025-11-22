@@ -19,6 +19,9 @@ export class IVFApiService {
     return this.api.post('IVFLabOrders', payload);
   }
 
+  GetStorageDetails(payload: any): Observable<any> {
+  return this.api.post('IVFMaleCryoPreservation/storage-details', payload);
+}
   getLabOrdersByMrNo(mrno: string | number, view: 'grid' | 'list' = 'grid'): Observable<any> {
     return this.api.get(`IVFLabOrders/by-mrno/${mrno}`, { view });
   }

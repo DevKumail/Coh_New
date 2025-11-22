@@ -221,5 +221,24 @@ namespace HMIS.Web.Controllers.IVF
                     return StatusCode(500, new { message = "An error occurred while generating straws.", error = ex.Message });
                 }
             }
+
+        [HttpPost("storage-details")]
+        public async Task<IActionResult> GetStorageDetails([FromBody] CryoStorageDetailRequestDto request)
+        {
+            try
+            {
+                var details = await _cryoPreservationService.GetCryoStorageDetailsByLevelCId(request);
+
+                if (details == null)
+                    return NotFound("Storage location not found");
+
+                return Ok(details);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error retrieving storage details");
+            }
         }
+
+    }
     }
