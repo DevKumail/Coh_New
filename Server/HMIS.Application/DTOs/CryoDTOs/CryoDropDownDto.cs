@@ -28,6 +28,8 @@
         public int FreePlaces { get; set; }
         public string? StrawId { get; set; }
         public long? LevelCId { get; set; }
+        public long? NLevelCId { get; set; }
+
 
     }
 }

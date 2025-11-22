@@ -129,6 +129,7 @@ export class CryoStoragePlaceComponent {
           samples: x.sampleCount ?? x.sampleCount ?? 0,
           levelCId: x.levelCId ?? x.levelCId ?? null,
           containerId: x.containerId ?? x.id ?? null,
+          NLevelC : x.nLevelCId ?? x.nLevelCId ?? null
         }));
       },
       error: (err) => {
@@ -173,11 +174,16 @@ export class CryoStoragePlaceComponent {
 
   }
 loadStorageDetails() {
-  this.details = [];
+   this.details = [];
 
-    const payload = {
-    levelCId: this.selectedRow?.levelCId || 0  
-  };
+  const payload: { levelCId: number } = { levelCId: 0 };
+  
+ if (this.selectedRow?.patients > 0 && this.selectedRow?.free === 0) {
+  payload.levelCId = this.selectedRow?.NLevelC || 0;
+} else {
+  payload.levelCId = this.selectedRow?.levelCId || 0;
+}
+   
 
   this.ivfApiService
     .GetStorageDetails(payload)
