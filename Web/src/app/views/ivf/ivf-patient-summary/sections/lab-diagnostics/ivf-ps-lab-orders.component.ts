@@ -9,6 +9,8 @@ import { SampleCollectionComponent } from './sample-collection.component';
 import { OrderCompletionComponent } from './order-completion.component';
 import { forkJoin, of } from 'rxjs';
 import { NgbToast, NgbToastModule, NgbModal, NgbModalRef, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import Swal from 'sweetalert2';
+import { LucideAngularModule, Edit, TestTube, Check, Trash2, XCircle } from 'lucide-angular';
 
 @Component({
   selector: 'app-ivf-ps-lab-orders',
@@ -22,11 +24,19 @@ import { NgbToast, NgbToastModule, NgbModal, NgbModalRef, NgbModalModule } from 
     OrderCompletionComponent,
     NgbToast,
     NgbToastModule,
-    NgbModalModule
+    NgbModalModule,
+    LucideAngularModule
   ],
   styles: [`
     .skeleton-loader { background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius:4px; }
     @keyframes loading { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .cursor-pointer { cursor: pointer; }
+    .child-row-bg { background-color: #f9fafb; }
+    .child-container { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; }
+    .child-row-bg.show .child-container { max-height: 500px; }
+    .btn-link { text-decoration: none; }
+    .btn-link:hover { text-decoration: none; }
+    .btn-link:disabled { opacity: 0.4; }
   `],
   template: `
     <!-- Toast Notifications -->
@@ -65,50 +75,103 @@ import { NgbToast, NgbToastModule, NgbModal, NgbModalRef, NgbModalModule } from 
                   <th>Sample dep date</th>
                   <th>Time</th>
                   <th>Clinician</th>
-                  <th>Name</th>
                   <th>Material</th>
                   <th>Laboratory</th>
                   <th>Status</th>
                   <th>Comment</th>
-                  <th style="width:220px">Actions</th>
+                  <th style="width:250px">Actions</th>
                 </tr>
               </thead>
               <tbody class="table-group-divider">
                 <ng-container *ngIf="isLoading">
                   <tr *ngFor="let i of [1,2,3]">
-                    <td colspan="12"><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
+                    <td colspan="9"><div class="skeleton-loader" style="height: 20px; width: 100%;"></div></td>
                   </tr>
                 </ng-container>
                 <ng-container *ngIf="!isLoading">
-                  <tr *ngFor="let o of pagedRows">
-                    <td>{{ o.orderNumber }}</td>
-                    <td>{{ o.sampleDate }}</td>
-                    <td>{{ o.time }}</td>
-                    <td>{{ o.clinician }}</td>
-                    <td>{{ o.name }}</td>
-                    <td>{{ o.material }}</td>
-                    <td>{{ o.laboratory }}</td>
-                    <td>{{ o.status }}</td>
-                    <td>{{ o.comment }}</td>
-                    <td>
-                      <div class="d-flex gap-1 justify-content-center">
-                        <button class="btn btn-sm btn-outline-primary" (click)="openEdit(o)" title="Edit" aria-label="Edit">
-                          ✎
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary" (click)="openCollect(o)" [disabled]="isCollectDisabled(o)" title="Collect sample" aria-label="Collect sample">
-                          🧪
-                        </button>
-                        <button class="btn btn-sm btn-outline-success" (click)="openComplete(o)" title="Complete order" aria-label="Complete order">
-                          ✔
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" [disabled]="!o.orderSetId" (click)="confirmDelete(o)" title="Delete" aria-label="Delete">
-                          🗑
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                  <ng-container *ngFor="let o of pagedRows">
+                    <!-- Parent row -->
+                    <tr class="cursor-pointer" (click)="toggleExpand(o)" [class.table-active]="expandedRow === o">
+                      <td>{{ o.orderNumber }}</td>
+                      <td>{{ o.sampleDate }}</td>
+                      <td>{{ o.time }}</td>
+                      <td>{{ o.clinician }}</td>
+                      <td>{{ o.material }}</td>
+                      <td>{{ o.laboratory }}</td>
+                      <td>{{ o.status }}</td>
+                      <td>{{ o.comment }}</td>
+                      <td>
+                        <div class="d-flex gap-1 justify-content-center">
+                          <button class="btn btn-sm btn-link text-primary p-1" (click)="openEdit(o); $event.stopPropagation()" title="Edit" aria-label="Edit">
+                            <i-lucide [img]="Edit" [size]="16"></i-lucide>
+                          </button>
+                          <button class="btn btn-sm btn-link text-secondary p-1" (click)="openCollect(o); $event.stopPropagation()" [disabled]="isCollectDisabled(o)" title="Collect sample" aria-label="Collect sample">
+                            <i-lucide [img]="TestTube" [size]="16"></i-lucide>
+                          </button>
+                          <button class="btn btn-sm btn-link text-success p-1" (click)="markOrderComplete(o); $event.stopPropagation()" [disabled]="isMarkCompleteDisabled(o)" title="Mark as complete" aria-label="Mark as complete">
+                            <i-lucide [img]="Check" [size]="16"></i-lucide>
+                          </button>
+                          <button class="btn btn-sm btn-link text-warning p-1" [disabled]="!o.orderSetId" (click)="cancelOrder(o); $event.stopPropagation()" title="Cancel" aria-label="Cancel">
+                            <i-lucide [img]="XCircle" [size]="16"></i-lucide>
+                          </button>
+                          <button class="btn btn-sm btn-link text-danger p-1" [disabled]="!o.orderSetId" (click)="confirmDelete(o); $event.stopPropagation()" title="Delete" aria-label="Delete">
+                            <i-lucide [img]="Trash2" [size]="16"></i-lucide>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <!-- Child row: tests for this order -->
+                    <tr class="child-row-bg" [class.show]="expandedRow === o">
+                      <td colspan="9" class="text-start">
+                        <div class="child-container">
+                          <ng-container *ngIf="o.tests?.length; else noTests">
+                            <div class="fw-semibold mb-2">Tests in this order</div>
+                            <div class="table-responsive">
+                              <table class="table table-sm table-bordered mb-0">
+                                <thead class="table-light">
+                                  <tr>
+                                    <th style="width: 40px;">#</th>
+                                    <th>Test</th>
+                                    <th>Material</th>
+                                    <th>Status</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr *ngFor="let t of o.tests; let i = index">
+                                    <td>{{ i + 1 }}</td>
+                                    <td class="text-truncate">{{ t.name || t.cpt }}</td>
+                                    <td class="text-truncate">{{ t.sampleTypeName || '-' }}</td>
+                                    <td>{{ t.status || 'New' }}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                            <div class="mt-2">
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                (click)="openComplete(o); $event.stopPropagation()">
+                                Observations
+                              </button>
+                            </div>
+                          </ng-container>
+                          <ng-template #noTests>
+                            <span class="text-muted">No tests found for this order.</span>
+                            <div class="mt-2">
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                (click)="openComplete(o); $event.stopPropagation()">
+                                Observations
+                              </button>
+                            </div>
+                          </ng-template>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-container>
                   <tr *ngIf="totalItems === 0">
-                    <td colspan="12">No data found</td>
+                    <td colspan="9">No data found</td>
                   </tr>
                 </ng-container>
               </tbody>
@@ -177,10 +240,18 @@ import { NgbToast, NgbToastModule, NgbModal, NgbModalRef, NgbModalModule } from 
   `
 })
 export class IvfPsLabOrdersComponent implements OnInit {
+  // Lucide icons
+  readonly Edit = Edit;
+  readonly TestTube = TestTube;
+  readonly Check = Check;
+  readonly Trash2 = Trash2;
+  readonly XCircle = XCircle;
+
   isLoading = false;
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
+  expandedRow: any | null = null;
   currentMrNo: string | null = '1006'; // plug actual MRN via PatientBanner later
 
   // Add Order page state
@@ -233,9 +304,53 @@ export class IvfPsLabOrdersComponent implements OnInit {
     this.currentPage = page;
   }
 
+  toggleExpand(row: any) {
+    if (this.expandedRow === row) {
+      this.expandedRow = null;
+      return;
+    }
+    this.expandedRow = row;
+
+    // Lazy-load tests for this order when first expanded
+    if (!row?.tests && row?.orderSetId) {
+      this.ivfApi.getOrderCollectionDetails(row.orderSetId).subscribe({
+        next: (res: any) => {
+          const details = Array.isArray(res)
+            ? res
+            : Array.isArray(res?.details) ? res.details : [];
+          row.tests = details.map((d: any) => ({
+            id: d.labTestId ?? d.testId,
+            orderSetDetailId: d.orderSetDetailId ?? d.id ?? d.labOrderSetDetailId,
+            cpt: d.cptCode ?? d.cpt,
+            name: d.testName ?? d.name ?? d.cptCode,
+            sampleTypeName: d.materialName ?? d.material ?? d.sampleTypeName ?? d.sampleType,
+            status: d.status
+          }));
+        },
+        error: () => {
+          row.tests = [];
+        }
+      });
+    }
+  }
+
   isCollectDisabled(row: any): boolean {
-    const status = (row?.status || '').toString().toUpperCase();
-    return status === 'COLLECTED' || status === 'COMPLETED' || status === 'CANCELLED';
+    const statusId = (row?.statusId || '').toString();
+    // Do not allow collecting on completed/cancelled orders at row level (status 4 = Completed, status 5 = Cancelled)
+    return statusId === '4' || statusId === '5';
+  }
+
+  isMarkCompleteDisabled(row: any): boolean {
+    const statusId = (row?.statusId || '').toString();
+    // Block mark complete only for already completed/cancelled orders (status 4 = Completed, status 5 = Cancelled)
+    return statusId === '4' || statusId === '5';
+  }
+
+  private isCollectedStatus(status: any): boolean {
+    debugger
+    const s = (status || '').toString().toUpperCase();
+    // Handle 'COLLECTED', 'SAMPLE COLLECTED', etc.
+    return s === '4' || s.includes('4') || s.includes('Sample Collected');
   }
 
   loadOrders(mrno: string | number) {
@@ -243,18 +358,43 @@ export class IvfPsLabOrdersComponent implements OnInit {
     this.isLoading = true;
     this.ivfApi.getLabOrdersByMrNo(mrno, 'grid').subscribe({
       next: (rows: any[]) => {
-        const mapped = (rows || []).map(r => ({
-          orderSetId: r.orderSetId,
-          orderNumber: r.orderNumber,
-          sampleDate: r.sampleDepDate,
-          time: r.time,
-          clinician: r.clinician,
-          name: r.name,
-          material: r.material,
-          laboratory: r.laboratory,
-          status: r.status,
-          comment: r.comment
-        }));
+        const mapped = (rows || []).map(r => {
+          const children = Array.isArray(r.children) ? r.children : [];
+
+          const tests = children.map((c: any) => ({
+            id: c.labTestId ?? c.labTestID ?? c.id ?? null,
+            orderSetDetailId: c.orderSetDetailId ?? c.orderSetDetailID ?? c.id,
+            cpt: c.cptCode ?? c.cpt,
+            name: c.name ?? c.testName ?? c.cptCode,
+            sampleTypeName: c.material ?? c.sampleTypeName,
+            status: c.status,
+            comment: c.comment
+          }));
+
+          const firstTest = tests[0];
+
+          const name = r.name
+            ?? (tests.length === 1 ? firstTest?.name
+              : tests.length > 1 ? `${tests.length} tests` : '');
+
+          const material = r.material
+            ?? (firstTest?.sampleTypeName ?? '');
+
+          return {
+            orderSetId: r.orderSetId,
+            orderNumber: r.orderNumber,
+            sampleDate: r.sampleDepDate,
+            time: r.time,
+            clinician: r.clinician,
+            name,
+            material,
+            laboratory: r.laboratory,
+            status: r.status,
+            statusId: r.statusId,
+            comment: r.comment,
+            tests
+          };
+        });
         debugger
         this.ordersRows = mapped;
         this.totalItems = this.ordersRows.length;
@@ -294,10 +434,8 @@ export class IvfPsLabOrdersComponent implements OnInit {
       return;
     }
     this.editingRow = row;
-    this.isLoading = true;
     const finish = (tests: any[]) => {
       this.editingTests = (tests || []).map(t => ({ ...t, selected: true }));
-      this.isLoading = false;
       // Open sample collection inside a modal
       if (this.collectModalRef) {
         this.collectModalRef.close();
@@ -308,6 +446,14 @@ export class IvfPsLabOrdersComponent implements OnInit {
         keyboard: false
       });
     };
+
+    // If tests are already present on the row (from backend children), reuse them
+    if (Array.isArray(row.tests) && row.tests.length) {
+      finish(row.tests);
+      return;
+    }
+
+    this.isLoading = true;
     if (row?.orderSetId) {
       // Try new collection-details endpoint for full test name/material; fallback to getLabOrderById
       this.ivfApi.getOrderCollectionDetails(row.orderSetId).subscribe({
@@ -321,6 +467,7 @@ export class IvfPsLabOrdersComponent implements OnInit {
             sampleTypeName: d.materialName ?? d.material ?? d.sampleTypeName ?? d.sampleType,
             status: d.status
           }));
+          this.isLoading = false;
           finish(mapped);
         },
         error: () => {
@@ -335,6 +482,7 @@ export class IvfPsLabOrdersComponent implements OnInit {
                 sampleTypeName: d.sampleTypeName,
                 status: d.status
               }));
+              this.isLoading = false;
               finish(mapped);
             },
             error: () => { finish([]); },
@@ -356,20 +504,139 @@ export class IvfPsLabOrdersComponent implements OnInit {
     }
   }
   onCollected(payload: any) {
-    // Order-level collect per new endpoint
+    // Per-test sample collection: collect against each test/detail
     const orderSetId = this.editingRow?.orderSetId;
     if (!orderSetId) { this.closeCollectPage(); return; }
+
     const date = payload?.form?.collectionDate;
     const time = payload?.form?.collectionTime;
     const collectDateIso = this.composeIso(date, time);
     const userId = Number(payload?.form?.collectorId) || this.currentUserId;
+    const tests = this.editingTests || [];
+
+    // Only collect for tests that are not already collected (e.g. 'Sample Collected')
+    const toCollect = tests.filter(t => {
+      return !this.isCollectedStatus(t?.status);
+    });
+
+    if (toCollect.length === 0) {
+      this.showNotification('All tests are already collected for this order', 'info');
+      this.closeCollectPage();
+      return;
+    }
+
     this.isLoading = true;
-    this.ivfApi.collectLabOrder(orderSetId, { collectDate: collectDateIso, userId }).subscribe({
-      next: () => {},
-      error: () => {},
+    const apiCalls = toCollect.map(t => {
+      const detailId = t?.orderSetDetailId;
+      if (!detailId) { return of(null); }
+      return this.ivfApi.collectLabOrderDetail(detailId, {
+        CollectDate: collectDateIso,
+        UserId: userId
+      });
+    }).filter(Boolean);
+
+    if (apiCalls.length === 0) {
+      this.isLoading = false;
+      this.showNotification('No valid tests found to collect', 'warning');
+      this.closeCollectPage();
+      return;
+    }
+
+    forkJoin(apiCalls).subscribe({
+      next: (responses) => {
+        this.isLoading = false;
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Sample collected successfully',
+          showConfirmButton: true,
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: 'btn btn-primary'
+          }
+        });
+        
+        this.closeCollectPage();
+        if (this.currentMrNo) this.loadOrders(this.currentMrNo);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        
+        console.error('Error collecting samples:', error);
+        
+        // Extract error message
+        let errorMessage = 'Failed to collect sample';
+        
+        if (error?.error) {
+          if (typeof error.error === 'string') {
+            errorMessage = error.error;
+          } else if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.error?.error) {
+            errorMessage = error.error.error;
+          }
+        } else if (error?.statusText && error?.statusText !== 'Unknown Error') {
+          errorMessage = error.statusText;
+        }
+        
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage,
+          showConfirmButton: true,
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: 'btn btn-danger'
+          }
+        });
+        
+        this.closeCollectPage();
+        if (this.currentMrNo) this.loadOrders(this.currentMrNo);
+      }
+    });
+  }
+
+  // Order completion flow (UI only)
+  markOrderComplete(row: any) {
+    debugger
+    const orderSetId = row?.orderSetId;
+    if (!orderSetId) {
+      this.showNotification('Order id is missing; cannot mark complete', 'warning');
+      return;
+    }
+
+    // Check if already completed or cancelled
+    const rowStatus = (row?.statusId || '').toString();
+    if (rowStatus === '4') {
+      this.showNotification('This order is already marked as completed', 'info');
+      return;
+    }
+    if (rowStatus === '5') {
+      this.showNotification('This order has been cancelled and cannot be completed', 'warning');
+      return;
+    }
+
+    // Check if sample is collected (status must be 3)
+    if (rowStatus !== '3') {
+      this.showNotification('Sample must be collected before marking as complete', 'warning');
+      return;
+    }
+
+    // Mark order as complete with status 4
+    this.isLoading = true;
+    const status = 4; // Completed
+    this.ivfApi.markLabOrderComplete(orderSetId, status).subscribe({
+      next: () => {
+        this.showNotification('Order marked as complete', 'success');
+      },
+      error: (error) => {
+        console.error('Error marking order complete:', error);
+        const errorMsg = error.error?.message || error.error || 'Unknown error';
+        this.showNotification('Failed to mark order complete: ' + errorMsg, 'danger');
+      },
       complete: () => {
         this.isLoading = false;
-        this.closeCollectPage();
         if (this.currentMrNo) this.loadOrders(this.currentMrNo);
       }
     });
@@ -461,7 +728,7 @@ export class IvfPsLabOrdersComponent implements OnInit {
         }));
       }
       
-      return this.ivfApi.completeLabOrderDetail(test.orderSetDetailId, testCompletion);
+      return this.ivfApi.addLabOrderObservations(test.orderSetDetailId, testCompletion);
     }).filter(Boolean);
     
     if (apiCalls.length === 0) {
@@ -472,31 +739,75 @@ export class IvfPsLabOrdersComponent implements OnInit {
     }
     
     forkJoin(apiCalls).subscribe({
-      next: () => {
-        this.showNotification('Order completed successfully', 'success');
+      next: (responses) => {
+        this.isLoading = false;
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Observations added successfully',
+          showConfirmButton: true,
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: 'btn btn-primary'
+          }
+        });
+        
+        this.closeCompletePage();
+        if (this.currentMrNo) this.loadOrders(this.currentMrNo);
       },
       error: (error) => {
-        console.error('Error completing order:', error);
-        this.showNotification('Failed to complete order: ' + (error.error?.message || 'Unknown error'), 'danger');
-      },
-      complete: () => {
         this.isLoading = false;
+        
+        console.error('Error completing order:', error);
+        
+        // Extract error message
+        let errorMessage = 'Failed to add observations';
+        
+        if (error?.error) {
+          if (typeof error.error === 'string') {
+            errorMessage = error.error;
+          } else if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.error?.error) {
+            errorMessage = error.error.error;
+          }
+        } else if (error?.statusText && error?.statusText !== 'Unknown Error') {
+          errorMessage = error.statusText;
+        }
+        
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage,
+          showConfirmButton: true,
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: 'btn btn-danger'
+          }
+        });
+        
         this.closeCompletePage();
         if (this.currentMrNo) this.loadOrders(this.currentMrNo);
       }
     });
   }
 
-  // Show toast notification
+  // Show notification using SweetAlert (theme standard)
   showNotification(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info') {
-    this.toastMessage = message;
-    this.toastType = type;
-    this.showToast = true;
-    
-    // Auto hide after 5 seconds
-    setTimeout(() => {
-      this.showToast = false;
-    }, 5000);
+    const icon: 'success' | 'error' | 'warning' | 'info' =
+      type === 'danger' ? 'error' :
+      type === 'warning' ? 'warning' :
+      type === 'info' ? 'info' : 'success';
+
+    Swal.fire({
+      icon,
+      title: icon === 'success' ? 'Success' : icon === 'error' ? 'Error' : 'Notice',
+      text: message,
+      showConfirmButton: false,
+      timer: 2000,
+      buttonsStyling: false
+    });
   }
 
   // Compose ISO date from date and time strings
@@ -576,12 +887,125 @@ export class IvfPsLabOrdersComponent implements OnInit {
 
     this.isLoading = true;
     this.ivfApi.createLabOrder(body).subscribe({
-      next: () => {
+      next: (response) => {
+        this.isLoading = false;
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Order created successfully',
+          showConfirmButton: true,
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: 'btn btn-primary'
+          }
+        });
+        
         if (mrNoNum) { this.loadOrders(mrNoNum); }
         this.closeOrderPage();
       },
-      error: () => {},
-      complete: () => { this.isLoading = false; }
+      error: (error) => {
+        this.isLoading = false;
+        
+        // Extract error message
+        let errorMessage = 'Failed to create order';
+        
+        if (error?.error) {
+          if (typeof error.error === 'string') {
+            errorMessage = error.error;
+          } else if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.error?.error) {
+            errorMessage = error.error.error;
+          }
+        } else if (error?.statusText && error?.statusText !== 'Unknown Error') {
+          errorMessage = error.statusText;
+        }
+        
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage,
+          showConfirmButton: true,
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: 'btn btn-danger'
+          }
+        });
+      }
+    });
+  }
+
+  cancelOrder(row: any) {
+    if (!row?.orderSetId) return;
+    debugger
+    Swal.fire({
+      title: 'Cancel Order',
+      text: `Are you sure you want to cancel order #${row.orderNumber}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, cancel it',
+      cancelButtonText: 'No',
+      buttonsStyling: false,
+      customClass: {
+        confirmButton: 'btn btn-warning me-2',
+        cancelButton: 'btn btn-secondary'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isLoading = true;
+        this.ivfApi.cancelLabOrder(row.orderSetId).subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Order cancelled successfully',
+              showConfirmButton: true,
+              buttonsStyling: false,
+              customClass: {
+                confirmButton: 'btn btn-primary'
+              }
+            });
+            
+            // Reload orders grid
+            if (this.currentMrNo) this.loadOrders(this.currentMrNo);
+          },
+          error: (error) => {
+            this.isLoading = false;
+            
+            // Extract only the meaningful error message from response
+            let errorMessage = 'Failed to cancel order';
+            
+            if (error?.error) {
+              if (typeof error.error === 'string') {
+                errorMessage = error.error;
+              } else if (error.error?.message) {
+                errorMessage = error.error.message;
+              } else if (error.error?.error) {
+                errorMessage = error.error.error;
+              }
+            } else if (error?.statusText && error?.statusText !== 'Unknown Error') {
+              errorMessage = error.statusText;
+            }
+            
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: errorMessage,
+              showConfirmButton: true,
+              buttonsStyling: false,
+              customClass: {
+                confirmButton: 'btn btn-danger'
+              }
+            });
+            
+            // Reload orders grid even on error
+            if (this.currentMrNo) this.loadOrders(this.currentMrNo);
+          }
+        });
+      }
     });
   }
 

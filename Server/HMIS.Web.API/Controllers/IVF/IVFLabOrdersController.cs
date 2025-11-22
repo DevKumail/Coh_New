@@ -39,6 +39,13 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(rows);
         }
 
+        [HttpGet("pathology-results/{mrno:long}")]
+        public async Task<IActionResult> GetPathologyResults(long mrno, [FromQuery] string? search)
+        {
+            var rows = await _service.GetPathologyResultsAsync(mrno, search);
+            return Ok(rows);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateUpdateLabOrderSetDTO payload)
         {
@@ -92,20 +99,46 @@ namespace HMIS.Web.Controllers.IVF
         }
 
         // Sample collection
-        [HttpPost("{OrderSetId:long}/collect")]
-        public async Task<IActionResult> CollectSample(long OrderSetId, [FromBody] CollectSampleDTO payload)
+        [HttpPost("{orderSetDetailId:long}/collect")]
+        public async Task<IActionResult> CollectSample(long orderSetDetailId, [FromBody] CollectSampleDTO payload)
         {
-            var ok = await _service.CollectSampleAsync(OrderSetId, payload);
+            var ok = await _service.CollectSampleAsync(orderSetDetailId, payload);
             return ok ? NoContent() : NotFound();
         }
 
-        // Complete order with results
-        [HttpPost("{orderSetDetailId:long}/complete")]
+        [HttpPost("{orderSetDetailId:long}/observations")]
         public async Task<IActionResult> Complete(long orderSetDetailId, [FromBody] CompleteLabOrderDTO payload)
         {
             var labResultId = await _service.CompleteOrderAsync(orderSetDetailId, payload);
             if (labResultId == 0) return NotFound();
             return Ok(new { labResultId });
+        }
+        [HttpPost("{orderSetId:long}/mark-complete")]
+        public async Task<IActionResult> MarkComplete([FromRoute] long orderSetId,[FromBody] LabOrderStatus status)
+        {
+            var labResultId = await _service.MarkCompleteOrderAsync(orderSetId, status);
+
+            if (labResultId == 0)
+                return NotFound("Order set not found or already completed.");
+
+            if (labResultId == -1)
+                return BadRequest("Cannot mark as complete until all test samples are collected.");
+
+            return Ok(new { labResultId, orderSetId, status });
+        }
+
+        [HttpPost("{orderSetId:long}/cancel")]
+        public async Task<IActionResult> CancelOrder(long orderSetId, [FromBody] CancelOrderDTO payload)
+        {
+            var result = await _service.CancelOrderAsync(orderSetId, payload);
+            
+            if (result == 0)
+                return NotFound("Order not found.");
+            
+            if (result == -1)
+                return BadRequest("Marked complete order cannot be canceled.");
+            
+            return Ok(new { message = "Order cancelled successfully", orderSetId });
         }
     }
 }

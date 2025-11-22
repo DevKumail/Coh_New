@@ -2,16 +2,20 @@ import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
+import { LucideAngularModule, ChevronDown, ChevronRight, ChevronUp, X } from 'lucide-angular';
 
 @Component({
   selector: 'app-add-lab-order',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   styles: [`
     .h-56 { max-height: 56vh; }
-    .tree-toggle { font-size: 18px; line-height: 1; color: #0d6efd; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; }
+    .tree-toggle { font-size: 18px; line-height: 1; color: #0d6efd; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+    .tree-toggle:hover { text-decoration: none; color: #0a58ca; }
     .tree-toggle:focus { box-shadow: none; }
     .move-btn { font-size: 16px; line-height: 1; }
+    .btn-link { text-decoration: none; }
+    .btn-link:hover { text-decoration: none; opacity: 0.8; }
   `],
   template: `
     <div class="card shadow">
@@ -50,8 +54,10 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
                 <ul class="list-unstyled mb-0">
                   <li *ngFor="let n of nodes" class="mb-1">
                     <div class="d-flex align-items-center gap-2">
-                      <button *ngIf="n.children?.length" class="btn btn-sm btn-link p-0 tree-toggle" (click)="toggleExpand(n.id)" [attr.aria-label]="isExpanded(n.id) ? 'Collapse' : 'Expand'">{{ isExpanded(n.id) ? '▾' : '▸' }}</button>
-                      <span *ngIf="!n.children?.length" style="width:16px"></span>
+                      <button *ngIf="n.children?.length" class="btn btn-sm btn-link p-0 tree-toggle" (click)="toggleExpand(n.id)" [attr.aria-label]="isExpanded(n.id) ? 'Collapse' : 'Expand'">
+                        <i-lucide [img]="isExpanded(n.id) ? ChevronDown : ChevronRight" [size]="16"></i-lucide>
+                      </button>
+                      <span *ngIf="!n.children?.length" style="width:22px"></span>
                       <input *ngIf="n.selectable" class="form-check-input" type="checkbox" [checked]="isSelected(n.id)" (change)="onLeafToggle(n, $event)">
                       <span class="text-truncate">{{ n.label }}<span *ngIf="n.cptCode"> ({{ n.cptCode }})</span></span>
                     </div>
@@ -72,10 +78,16 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
               <div class="d-flex flex-wrap gap-2">
                 <div class="badge bg-secondary d-inline-flex align-items-center gap-2 p-2" *ngFor="let s of selected; let i=index">
                   <span class="text-truncate" style="max-width:220px">{{ s.name }} ({{ s.cpt }})</span>
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-light py-0 move-btn" (click)="moveUp(i)" title="Move up">↑</button>
-                    <button class="btn btn-light py-0 move-btn" (click)="moveDown(i)" title="Move down">↓</button>
-                    <button class="btn btn-light py-0" (click)="removeById(s.id)" title="Remove">×</button>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-link text-white p-0 move-btn" (click)="moveUp(i)" title="Move up">
+                      <i-lucide [img]="ChevronUp" [size]="14"></i-lucide>
+                    </button>
+                    <button class="btn btn-link text-white p-0 move-btn" (click)="moveDown(i)" title="Move down">
+                      <i-lucide [img]="ChevronDown" [size]="14"></i-lucide>
+                    </button>
+                    <button class="btn btn-link text-white p-0" (click)="removeById(s.id)" title="Remove">
+                      <i-lucide [img]="X" [size]="14"></i-lucide>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -139,6 +151,12 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
   `
 })
 export class AddLabOrderComponent implements OnInit, OnChanges {
+  // Lucide icons
+  readonly ChevronDown = ChevronDown;
+  readonly ChevronRight = ChevronRight;
+  readonly ChevronUp = ChevronUp;
+  readonly X = X;
+
   @Input() mrNo: string | null = null;
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() orderId?: string | number;

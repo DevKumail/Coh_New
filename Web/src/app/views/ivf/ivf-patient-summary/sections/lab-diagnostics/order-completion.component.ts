@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgbDateStruct, NgbDatepicker, NgbDatepickerModule, NgbTimepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, Observable } from 'rxjs';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 
 export interface LabResultObservation {
@@ -107,6 +107,7 @@ export class OrderCompletionComponent implements OnInit, OnChanges {
       const current = changes['tests'].currentValue ?? [];
       // Clone the array so Angular always sees a new reference
       this.tests = Array.isArray(current) ? [...current] : [];
+      console.log('Tests updated:', this.tests);
     }
   }
 
@@ -133,8 +134,21 @@ export class OrderCompletionComponent implements OnInit, OnChanges {
     return this.completionForm.get('performDate') as FormControl;
   }
 
+  isTestAlreadyUsed(testId: string, currentObservationIndex: number): boolean {
+    const observations = this.observations.value;
+    return observations.some((obs: any, index: number) => 
+      index !== currentObservationIndex && obs.selectedTest === testId
+    );
+  }
+
   createObservation(): FormGroup {
+    const today = new Date();
+    const dateString = today.getFullYear() + '-' + 
+                      String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                      String(today.getDate()).padStart(2, '0');
+    
     return this.fb.group({
+      selectedTest: [''],
       valueType: ['NM'],
       observationIdentifierFullName: ['Result'],
       observationIdentifierShortName: ['RES'],
@@ -144,8 +158,8 @@ export class OrderCompletionComponent implements OnInit, OnChanges {
       referenceRangeMax: [''],
       abnormalFlag: ['N'],
       resultStatus: ['F'],
-      observationDateTime: [new Date().toISOString()],
-      analysisDateTime: [new Date().toISOString()],
+      observationDateTime: [dateString],
+      analysisDateTime: [dateString],
       remarks: ['Normal'],
       weqayaScreening: [true],
       sequenceNo: [0]
@@ -174,63 +188,84 @@ export class OrderCompletionComponent implements OnInit, OnChanges {
     datePicker.toggle();
   }
 
-  private formatDateForSubmission(date: NgbDateStruct, time: { hour: number, minute: number }): string {
-    const jsDate = new Date(date.year, date.month - 1, date.day, time.hour, time.minute);
+  private formatDateForSubmission(date: NgbDateStruct): string {
+    const jsDate = new Date(date.year, date.month - 1, date.day, 0, 0, 0);
     return jsDate.toISOString();
+  }
+
+  private convertDateToISO(dateString: string): string {
+    if (!dateString) return new Date().toISOString();
+    const date = new Date(dateString);
+    return date.toISOString();
   }
 
   onComplete() {
     const formValue = this.completionForm.getRawValue();
 
-    // Format the date and time for submission
-    const performDate = this.formatDateForSubmission(formValue.performDate, this.currentTime);
+    // Format the date for submission
+    const performDate = this.formatDateForSubmission(formValue.performDate);
 
-    const payload = {
-      ...formValue,
-      performDate: performDate,
-      entryDate: new Date().toISOString(),
-      // UserId will eventually come from auth; for now 0 / backend default
-      userId: 0,
-      principalResultInterpreter: formValue.principalResultInterpreter || 0,
-      reviewedBy: formValue.reviewedBy || '',
-      reviewedDate: formValue.reviewedDate ? new Date(formValue.reviewedDate).toISOString() : null,
-      performAtLabId: formValue.performAtLabId || 0,
-      observations: formValue.observations.map((obs: any, index: number) => ({
-        ...obs,
-        sequenceNo: index + 1
-      }))
-    };
+    // Group observations by selected test
+    const observationsByTest = new Map<string, any[]>();
+    
+    formValue.observations.forEach((obs: any, index: number) => {
+      const selectedTestId = obs.selectedTest;
+      if (!selectedTestId || selectedTestId === '') {
+        console.warn('Observation has no test selected, skipping', obs);
+        return;
+      }
+      
+      if (!observationsByTest.has(selectedTestId)) {
+        observationsByTest.set(selectedTestId, []);
+      }
+      
+      // Remove selectedTest field and convert dates to ISO format
+      const { selectedTest, ...observationData } = obs;
+      observationsByTest.get(selectedTestId)!.push({
+        ...observationData,
+        observationDateTime: this.convertDateToISO(observationData.observationDateTime),
+        analysisDateTime: this.convertDateToISO(observationData.analysisDateTime),
+        sequenceNo: observationsByTest.get(selectedTestId)!.length + 1
+      });
+    });
 
-    const tests = this.tests || [];
-    if (!Array.isArray(tests) || tests.length === 0) {
-      console.warn('No tests to complete');
+    if (observationsByTest.size === 0) {
+      console.warn('No observations with selected tests found');
       return;
     }
 
-    const apiCalls = tests.map((test: any, idx: number) => {
-      // Prefer orderSetDetailId; fallback to parent orderSetId so API still gets called
-      const detailId = test?.orderSetDetailId ?? this.order?.orderSetId;
-      if (!detailId) {
-        console.warn('Missing orderSetDetailId and orderSetId for test', test);
-        return of(null);
-      }
-
-      // Per-test payload copy; adjust accession/observations if needed later
-      const testPayload = { ...payload };
-      return this.ivfApi.completeLabOrderDetail(detailId, testPayload);
-    }).filter(Boolean) as any[];
+    // Create API calls only for tests that have observations
+    const apiCalls: Observable<any>[] = [];
+    
+    observationsByTest.forEach((observations, testId) => {
+      const payload = {
+        performDate: performDate,
+        entryDate: new Date().toISOString(),
+        userId: 0,
+        isDefault: formValue.isDefault ?? true,
+        principalResultInterpreter: formValue.principalResultInterpreter || 0,
+        action: formValue.action || 'Final',
+        reviewedBy: formValue.reviewedBy || 'System User',
+        reviewedDate: formValue.reviewedDate ? new Date(formValue.reviewedDate).toISOString() : null,
+        performAtLabId: formValue.performAtLabId || 0,
+        observations: observations
+      };
+      
+      apiCalls.push(this.ivfApi.addLabOrderObservations(testId, payload));
+    });
 
     if (apiCalls.length === 0) {
-      console.warn('No valid tests found to complete');
+      console.warn('No valid API calls to make');
       return;
     }
 
     forkJoin(apiCalls).subscribe({
       next: (res) => {
-        console.log('Order completion success', res);
+        console.log('Observations added successfully', res);
+        this.completed.emit({ success: true });
       },
       error: (err) => {
-        console.error('Order completion failed', err);
+        console.error('Failed to add observations', err);
       }
     });
   }

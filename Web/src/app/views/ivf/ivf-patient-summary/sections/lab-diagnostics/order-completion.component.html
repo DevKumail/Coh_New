@@ -33,11 +33,6 @@
               <i class="far fa-calendar-alt"></i>
             </button>
           </div>
-          <ngb-timepicker 
-            [(ngModel)]="currentTime" 
-            (ngModelChange)="onTimeChange($event)" 
-            [ngModelOptions]="{standalone: true}">
-          </ngb-timepicker>
         </div>
         <div class="col-md-3">
           <label class="form-label">Action</label>
@@ -94,6 +89,7 @@
           <thead class="table-light">
             <tr>
               <th style="width: 60px;">Default Result</th>
+              <th style="width: 400px;">Test</th>
               <th>Value Type</th>
               <th>Element Name</th>
               <th>Abbreviation</th>
@@ -113,6 +109,17 @@
             <tr *ngFor="let obs of observations.controls; let i = index" [formGroupName]="i">
               <td class="text-center">
                 <input class="form-check-input" type="checkbox" formControlName="weqayaScreening">
+              </td>
+              <td>
+                <select class="form-select form-select-sm" formControlName="selectedTest">
+                  <option [value]="''">Select Test</option>
+                  <option *ngFor="let test of tests" 
+                          [value]="test.orderSetDetailId || test.id"
+                          [disabled]="isTestAlreadyUsed(test.orderSetDetailId || test.id, i)">
+                    {{ test.name || test.testName || test.cpt }}
+                    {{ isTestAlreadyUsed(test.orderSetDetailId || test.id, i) ? ' (Already used)' : '' }}
+                  </option>
+                </select>
               </td>
               <td>
                 <select class="form-select form-select-sm" formControlName="valueType">
@@ -162,10 +169,10 @@
                 </select>
               </td>
               <td>
-                <input type="datetime-local" class="form-control form-control-sm" formControlName="observationDateTime">
+                <input type="date" class="form-control form-control-sm" formControlName="observationDateTime">
               </td>
               <td>
-                <input type="datetime-local" class="form-control form-control-sm" formControlName="analysisDateTime">
+                <input type="date" class="form-control form-control-sm" formControlName="analysisDateTime">
               </td>
               <td>
                 <input type="text" class="form-control form-control-sm" formControlName="remarks">

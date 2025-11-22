@@ -121,8 +121,43 @@ namespace HMIS.Application.DTOs.IVFDTOs
 
     public class OrderCollectionDetailsDTO
     {
+        public long OrderSetDetailId { get; set; }
+        public long LabTestId { get; set; }
         public string TestName { get; set; }
         public string Material { get; set; }
         public string Status { get; set; }
+    }
+
+    public class PathologyObservationDTO
+    {
+        public int? SequenceNo { get; set; }
+        public string? Observation { get; set; }
+        public string? Abbreviation { get; set; }
+        public string? Value { get; set; }
+        public string? Unit { get; set; }
+        public string? ReferenceRangeMin { get; set; }
+        public string? ReferenceRangeMax { get; set; }
+        public string? Status { get; set; }
+        public string? Note { get; set; }
+    }
+
+    public class PathologyResultDTO
+    {
+        public int LabResultId { get; set; }
+        public long? OrderSetDetailId { get; set; }
+        public long MRNo { get; set; }
+        public DateTime PerformDate { get; set; }
+        public string? TestName { get; set; }
+        public string? TestAbbreviation { get; set; }
+        public string? CptCode { get; set; }
+        public string? Sample { get; set; }
+        public string? Clinician { get; set; }
+        public List<PathologyObservationDTO> Observations { get; set; } = new();
+    }
+
+    public class CancelOrderDTO
+    {
+        public long UserId { get; set; }
+        public DateTime CancelDate { get; set; }
     }
 }

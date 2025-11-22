@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HMIS.Application.DTOs.IVFDTOs;
 using HMIS.Core.Context;
 using HMIS.Core.Entities;
+using HMIS.Infrastructure.ORM;
 using Microsoft.EntityFrameworkCore;
 using Task = System.Threading.Tasks.Task;
 
@@ -14,16 +15,19 @@ namespace HMIS.Application.ServiceLogics.IVF
     {
         Task<LabOrderSetReadDTO?> GetOrderSetAsync(long orderSetId);
         Task<IEnumerable<LabOrderSetHeaderDTO>> GetOrderSetsByMrnoAsync(long mrno);
-        Task<IEnumerable<IVFOrderGridRowDTO>> GetOrderGridByMrnoAsync(long mrno);
+        Task<IEnumerable<IVFOrderGridParentDTO>> GetOrderGridByMrnoAsync(long mrno);
         Task<long> CreateOrderSetAsync(CreateUpdateLabOrderSetDTO payload);
         Task<bool> UpdateOrderSetAsync(long orderSetId, CreateUpdateLabOrderSetDTO payload);
         Task<bool> DeleteOrderSetAsync(long orderSetId, bool hardDelete = false);
         Task<IEnumerable<OptionDTO>> GetRefPhysiciansAsync(int? employeeTypeId);
         Task<IEnumerable<OptionDTO>> GetNotifyRolesAsync();
         Task<IEnumerable<OptionDTO>> GetReceiversByEmployeeTypeAsync(int? employeeTypeId);
-        Task<bool> CollectSampleAsync(long OrderSetId, CollectSampleDTO payload);
+        Task<bool> CollectSampleAsync(long orderSetDetailId, CollectSampleDTO payload);
+        Task<long> MarkCompleteOrderAsync(long orderSetId, LabOrderStatus status);
         Task<int> CompleteOrderAsync(long orderSetDetailId, CompleteLabOrderDTO payload);
         Task<IEnumerable<OrderCollectionDetailsDTO>> GetOrderCollectionDetailsAsync(long orderSetId);
+        Task<IEnumerable<PathologyResultDTO>> GetPathologyResultsAsync(long mrno, string? search);
+        Task<int> CancelOrderAsync(long orderSetId, CancelOrderDTO payload);
     }
 
     public class IVFLabOrderService : IIVFLabOrderService
@@ -44,6 +48,8 @@ namespace HMIS.Application.ServiceLogics.IVF
                     from st in sleft.DefaultIfEmpty()
                     select new OrderCollectionDetailsDTO
                     {
+                        OrderSetDetailId = d.OrderSetDetailId,
+                        LabTestId = d.LabTestId,
                         TestName = t != null ? t.LabName : string.Empty,
                         Material = st != null ? st.SampleName : string.Empty,
                         Status = (
@@ -56,11 +62,119 @@ namespace HMIS.Application.ServiceLogics.IVF
             return await q.ToListAsync();
         }
 
-        public async Task<bool> CollectSampleAsync(long OrderSetId, CollectSampleDTO payload)
+        public async Task<IEnumerable<PathologyResultDTO>> GetPathologyResultsAsync(long mrno, string? search)
+        {
+            var mrnoString = mrno.ToString();
+
+            var sql = @"
+SELECT
+    r.LabResultId,
+    r.OrderSetDetailId,
+    r.MRNo      AS Mrno,
+    r.TestName,
+    r.TestNameAbbreviation,
+    r.CPTCode   AS Cptcode,
+    r.PerformDate,
+    st.SampleName,
+    emp.FullName AS Clinician
+FROM LabResultsMain r
+LEFT JOIN LabOrderSetDetail d ON r.OrderSetDetailId = d.OrderSetDetailId
+LEFT JOIN LabTests t ON d.LabTestId = t.LabTestId
+LEFT JOIN LabSampleTypes st ON t.SampleTypeId = st.SampleTypeId
+LEFT JOIN HREmployee emp ON r.ProviderId = emp.EmployeeId
+WHERE r.MRNo = @Mrno";
+
+            string? term = null;
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                term = search.Trim().ToUpperInvariant();
+                sql += @"
+AND (
+    UPPER(r.TestName) LIKE '%' + @Term + '%'
+    OR UPPER(r.TestNameAbbreviation) LIKE '%' + @Term + '%'
+    OR UPPER(r.CPTCode) LIKE '%' + @Term + '%'
+)";
+            }
+
+            var mainRows = (await DapperHelper.QueryAsync<PathologyMainRow>(sql, new { Mrno = mrnoString, Term = term })).ToList();
+            if (mainRows.Count == 0)
+            {
+                return new List<PathologyResultDTO>();
+            }
+
+            var labResultIds = mainRows.Select(x => x.LabResultId).ToList();
+
+            var observations = await _db.LabResultsObservation
+                .Where(o => o.LabResultId.HasValue && labResultIds.Contains(o.LabResultId.Value))
+                .ToListAsync();
+
+            // Group by OrderSetDetailId to combine multiple LabResultIds for the same test
+            var grouped = mainRows
+                .GroupBy(x => new { x.OrderSetDetailId, x.TestName, x.TestNameAbbreviation, x.Cptcode })
+                .Select(g =>
+                {
+                    var first = g.First();
+                    var mrParsed = TryParseLong(first.Mrno);
+                    
+                    // Get all LabResultIds for this group
+                    var groupLabResultIds = g.Select(x => x.LabResultId).ToList();
+                    
+                    // Combine all observations from all LabResultIds in this group
+                    var obsList = observations
+                        .Where(o => o.LabResultId.HasValue && groupLabResultIds.Contains(o.LabResultId.Value))
+                        .OrderBy(o => o.SequenceNo)
+                        .Select(o => new PathologyObservationDTO
+                        {
+                            SequenceNo = o.SequenceNo,
+                            Observation = o.ObservationIdentifierFullName,
+                            Abbreviation = o.ObservationIdentifierShortName,
+                            Value = o.ObservationValue,
+                            Unit = o.Units,
+                            ReferenceRangeMin = o.ReferenceRangeMin,
+                            ReferenceRangeMax = o.ReferenceRangeMax,
+                            Status = o.ResultStatus,
+                            Note = o.Remarks
+                        })
+                        .ToList();
+
+                    return new PathologyResultDTO
+                    {
+                        LabResultId = first.LabResultId,
+                        OrderSetDetailId = first.OrderSetDetailId,
+                        MRNo = mrParsed,
+                        PerformDate = ParseDate(first.PerformDate),
+                        TestName = first.TestName,
+                        TestAbbreviation = first.TestNameAbbreviation,
+                        CptCode = first.Cptcode,
+                        Sample = first.SampleName,
+                        Clinician = first.Clinician,
+                        Observations = obsList
+                    };
+                })
+                .OrderByDescending(r => r.PerformDate)
+                .ToList();
+
+            return grouped;
+        }
+
+        private class PathologyMainRow
+        {
+            public int LabResultId { get; set; }
+            public long? OrderSetDetailId { get; set; }
+            public string Mrno { get; set; }
+            public string TestName { get; set; }
+            public string TestNameAbbreviation { get; set; }
+            public string Cptcode { get; set; }
+            public string PerformDate { get; set; }
+            public string? SampleName { get; set; }
+            public string? Clinician { get; set; }
+        }
+
+        public async Task<bool> CollectSampleAsync(long orderSetDetailId, CollectSampleDTO payload)
         {
             try
             {
-                var detail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetId == OrderSetId);
+                var detail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetDetailId == orderSetDetailId);
                 if (detail == null) return false;
 
                 detail.CollectDate = payload.CollectDate;
@@ -85,10 +199,53 @@ namespace HMIS.Application.ServiceLogics.IVF
             }
         }
 
+        public async Task<long> MarkCompleteOrderAsync(long orderSetId, LabOrderStatus status)
+        {
+            var orderSet = await _db.LabOrderSet.FirstOrDefaultAsync(o => o.LabOrderSetId == orderSetId);
+            if (orderSet == null)
+            {
+                return 0;
+            }
+
+            // If trying to mark as Completed, ensure all tests for this order have their samples collected
+            if (status == LabOrderStatus.Completed)
+            {
+                var details = await _db.LabOrderSetDetail
+                    .Where(d => d.OrderSetId == orderSetId && !(d.IsDeleted ?? false))
+                    .ToListAsync();
+
+                if (details.Count == 0)
+                {
+                    return 0;
+                }
+
+                if (details.Any(d => !d.CollectDate.HasValue))
+                {
+                    // Signal to caller that not all samples are collected yet
+                    return -1;
+                }
+            }
+
+            var resolved = ResolveStatus(status, orderSet.OrderStatus, orderSet.IsSigned);
+
+            // If already in the same resolved status/signature, treat as success without extra write
+            if (orderSet.OrderStatus == resolved.status && orderSet.IsSigned == resolved.isSigned)
+            {
+                return orderSet.LabOrderSetId;
+            }
+
+            orderSet.OrderStatus = resolved.status;
+            orderSet.IsSigned = resolved.isSigned;
+            orderSet.UpdatedDate = FormatDate(DateTime.UtcNow);
+
+            await _db.SaveChangesAsync();
+            return orderSet.LabOrderSetId;
+        }
+
         public async Task<int> CompleteOrderAsync(long orderSetDetailId, CompleteLabOrderDTO payload)
         {
             // Load detail + header + test
-            var detail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetId == orderSetDetailId);
+            var detail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetDetailId == orderSetDetailId);
             if (detail == null) return 0;
             var header = await _db.LabOrderSet.FirstOrDefaultAsync(h => h.LabOrderSetId == detail.OrderSetId);
             if (header == null) return 0;
@@ -308,7 +465,7 @@ namespace HMIS.Application.ServiceLogics.IVF
             return list;
         }
 
-        public async Task<IEnumerable<IVFOrderGridRowDTO>> GetOrderGridByMrnoAsync(long mrno)
+        public async Task<IEnumerable<IVFOrderGridParentDTO>> GetOrderGridByMrnoAsync(long mrno)
         {
             // Join header + active details + lab test meta for display columns
             var query = from h in _db.LabOrderSet
@@ -339,22 +496,45 @@ namespace HMIS.Application.ServiceLogics.IVF
                         };
 
             var rows = await query.ToListAsync();
-            return rows.Select(x => new IVFOrderGridRowDTO
-            {
-                OrderSetId = x.LabOrderSetId,
-                OrderSetDetailId = x.OrderSetDetailId,
-                OrderNumber = (x.VisitOrderNo.HasValue
-                    ? x.VisitOrderNo.Value.ToString().PadLeft(10, '0')
-                    : x.OrderSetDetailId.ToString().PadLeft(10, '0')),
-                SampleDepDate = x.CollectDate.HasValue ? x.CollectDate.Value.ToString("dd.MM.yyyy") : string.Empty,
-                Time = x.CollectDate.HasValue ? x.CollectDate.Value.ToString("HH:mm") : string.Empty,
-                Clinician = x.Clinician,
-                Name = x.TestName,
-                Material = x.SampleName,
-                Laboratory = "Internal",
-                Status = x.IsSigned ? "✔" : (x.OrderStatus ?? "—"),
-                Comment = x.Pcomments
-            }).ToList();
+
+            // Group by OrderSetId to build parent + children structure
+            var grouped = rows
+                .GroupBy(x => x.LabOrderSetId)
+                .Select(g => new IVFOrderGridParentDTO
+                {
+                    OrderSetId = g.Key,
+                    OrderNumber = g.First().OrderNumber.HasValue
+                        ? g.First().OrderNumber.Value.ToString().PadLeft(10, '0')
+                        : g.First().LabOrderSetId.ToString().PadLeft(10, '0'),
+                    SampleDepDate = g.First().CollectDate.HasValue ? g.First().CollectDate.Value.ToString("dd.MM.yyyy") : string.Empty,
+                    Time = g.First().CollectDate.HasValue ? g.First().CollectDate.Value.ToString("HH:mm") : string.Empty,
+                    Clinician = g.First().Clinician,
+                    Material = g.First().SampleName,
+                    Laboratory = "Internal",
+                    Status = FormatStatusForView(g.First().OrderStatus, g.First().IsSigned),
+                    StatusId = GetStatusIdForView(g.First().OrderStatus, g.First().IsSigned),
+                    Comment = g.First().Pcomments,
+                    Children = g.Select(x => new IVFOrderGridRowDTO
+                    {
+                        OrderSetId = x.LabOrderSetId,
+                        OrderSetDetailId = x.OrderSetDetailId,
+                        OrderNumber = (x.VisitOrderNo.HasValue
+                            ? x.VisitOrderNo.Value.ToString().PadLeft(10, '0')
+                            : x.OrderSetDetailId.ToString().PadLeft(10, '0')),
+                        SampleDepDate = x.CollectDate.HasValue ? x.CollectDate.Value.ToString("dd.MM.yyyy") : string.Empty,
+                        Time = x.CollectDate.HasValue ? x.CollectDate.Value.ToString("HH:mm") : string.Empty,
+                        Clinician = x.Clinician,
+                        Name = x.TestName,
+                        Material = x.SampleName,
+                        Laboratory = "Internal",
+                        Status = FormatStatusForView(x.OrderStatus, x.IsSigned),
+                        StatusId = GetStatusIdForView(x.OrderStatus, x.IsSigned),
+                        Comment = x.Pcomments
+                    }).ToList()
+                })
+                .ToList();
+
+            return grouped;
         }
 
         public async Task<long> CreateOrderSetAsync(CreateUpdateLabOrderSetDTO payload)
@@ -596,6 +776,39 @@ namespace HMIS.Application.ServiceLogics.IVF
                 throw;
             }
         }
+
+        public async Task<int> CancelOrderAsync(long orderSetId, CancelOrderDTO payload)
+        {
+            await using var tx = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                var header = await _db.LabOrderSet.FirstOrDefaultAsync(h => h.LabOrderSetId == orderSetId);
+                if (header == null) return 0; // Order not found
+
+                // Check if order can be cancelled (not already completed)
+                if (header.IsSigned == true || header.OrderStatus == "4")
+                {
+                    return -1; // Cannot cancel completed orders
+                }
+
+                // Update header status to Cancel
+                var resolved = ResolveStatus(LabOrderStatus.Cancel, header.OrderStatus, header.IsSigned);
+                header.OrderStatus = resolved.status;
+                header.IsSigned = resolved.isSigned;
+                header.UpdatedBy = payload.UserId.ToString();
+                header.UpdatedDate = FormatDate(payload.CancelDate);
+
+                await _db.SaveChangesAsync();
+                await tx.CommitAsync();
+                return 1; // Success
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
+        }
+
         private static DateTime ParseDate(string? s)
         {
             if (DateTime.TryParse(s, out var dt)) return dt;
@@ -618,6 +831,97 @@ namespace HMIS.Application.ServiceLogics.IVF
 
         private static string FormatY14(DateTime dt) => dt.ToString("yyyyMMddHHmmss");
 
+        private static string FormatStatusForView(string? status, bool? isSigned)
+        {
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                return (isSigned ?? false) ? "Marked as Complete" : "New Order";
+            }
+
+            var trimmed = status.Trim();
+
+            // First try numeric codes (1-5) that map to LabOrderStatus enum values
+            if (int.TryParse(trimmed, out var code))
+            {
+                switch (code)
+                {
+                    case (int)LabOrderStatus.New:
+                        return "New Order";
+                    case (int)LabOrderStatus.InProgress:
+                        return "In Progress";
+                    case (int)LabOrderStatus.SampleCollected:
+                        return "Sample Collected";
+                    case (int)LabOrderStatus.Completed:
+                        return "Marked as Completed";
+                    case (int)LabOrderStatus.Cancel:
+                        return "Marked as Cancelled";
+                }
+            }
+
+            // Fallback for older textual status values stored in DB
+            var upper = trimmed.ToUpperInvariant();
+            switch (upper)
+            {
+                case "NEW":
+                case "NEW_ORDER":
+                    return "New Order";
+                case "INPROG":
+                case "IN_PROGRESS":
+                    return "In Progress";
+                case "COLLECT":
+                case "SAMPLE_COLLECTED":
+                    return "Sample Collected";
+                case "DONE":
+                case "COMPLETED":
+                    return "Completed";
+                case "CANCEL":
+                case "CANCELED":
+                    return "Cancelled";
+                default:
+                    return (isSigned ?? false) ? "Completed" : "New Order";
+            }
+        }
+
+        private static int GetStatusIdForView(string? status, bool? isSigned)
+        {
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                return (int)((isSigned ?? false) ? LabOrderStatus.Completed : LabOrderStatus.New);
+            }
+
+            var trimmed = status.Trim();
+
+            if (int.TryParse(trimmed, out var code))
+            {
+                if (code >= (int)LabOrderStatus.New && code <= (int)LabOrderStatus.Cancel)
+                {
+                    return code;
+                }
+            }
+
+            var upper = trimmed.ToUpperInvariant();
+            switch (upper)
+            {
+                case "NEW":
+                case "NEW_ORDER":
+                    return (int)LabOrderStatus.New;
+                case "INPROG":
+                case "IN_PROGRESS":
+                    return (int)LabOrderStatus.InProgress;
+                case "COLLECT":
+                case "SAMPLE_COLLECTED":
+                    return (int)LabOrderStatus.SampleCollected;
+                case "DONE":
+                case "COMPLETED":
+                    return (int)LabOrderStatus.Completed;
+                case "CANCEL":
+                case "CANCELED":
+                    return (int)LabOrderStatus.Cancel;
+                default:
+                    return (int)((isSigned ?? false) ? LabOrderStatus.Completed : LabOrderStatus.New);
+            }
+        }
+
         private static (string? status, bool? isSigned) ResolveStatus(LabOrderStatus? statusEnum, string? fallbackStatus, bool? fallbackIsSigned)
         {
             if (!statusEnum.HasValue)
@@ -628,15 +932,15 @@ namespace HMIS.Application.ServiceLogics.IVF
             switch (statusEnum.Value)
             {
                 case LabOrderStatus.New:
-                    return ("NEW", false);
+                    return ("1", false);
                 case LabOrderStatus.InProgress:
-                    return ("INPROG", false);
+                    return ("2", false);
                 case LabOrderStatus.SampleCollected:
-                    return ("COLLECT", false);
+                    return ("3", false);
                 case LabOrderStatus.Completed:
-                    return ("DONE", true);
+                    return ("4", true);
                 case LabOrderStatus.Cancel:
-                    return ("CANCEL", false);
+                    return ("5", false);
                 default:
                     return (fallbackStatus, fallbackIsSigned);
             }
