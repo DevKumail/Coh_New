@@ -37,7 +37,7 @@ export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges
     { id: 'social-history', label: 'Social History', icon: 'tablerNotes' },
     { id: 'family-history', label: 'Family History', icon: 'tablerNotes' },
     { id: 'vital-signs', label: 'Vital Signs', icon: 'tablerNotes' },
-    // { id: 'cycle', label: 'Cycle', icon: 'tablerActivity' },
+    { id: 'cycle', label: 'Cycle', icon: 'tablerActivity' },
   ];
 
   // Dynamic main items based on gender

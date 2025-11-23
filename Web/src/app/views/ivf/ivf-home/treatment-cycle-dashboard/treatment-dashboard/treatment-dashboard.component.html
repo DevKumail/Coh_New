@@ -1,0 +1,39 @@
+<div class="card">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='Overview'" (click)="setTab('Overview')">Overview</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='Aspiration'" (click)="setTab('Aspiration')">Aspiration</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='Culture'" (click)="setTab('Culture')">Culture</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='Transfer'" (click)="setTab('Transfer')">Transfer</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='Luteal phase'" (click)="setTab('Luteal phase')">Luteal phase</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='Pregnancy'" (click)="setTab('Pregnancy')">Pregnancy</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='Birth'" (click)="setTab('Birth')">Birth</button></li>
+    </ul>
+  </div>
+  <div class="card-body">
+
+    <ng-container *ngIf="activeTab==='Overview'">
+      <app-cycle-overview></app-cycle-overview>
+    </ng-container>
+
+    <ng-container *ngIf="activeTab==='Aspiration'">
+      <app-cycle-aspiration></app-cycle-aspiration>
+    </ng-container>
+    <ng-container *ngIf="activeTab==='Culture'">
+      <app-culture></app-culture>
+    </ng-container>
+    <ng-container *ngIf="activeTab==='Transfer'">
+      <app-transfer></app-transfer>
+    </ng-container>
+    <ng-container *ngIf="activeTab==='Luteal phase'">
+      <app-luteal-phase></app-luteal-phase>
+    </ng-container>
+    <ng-container *ngIf="activeTab==='Pregnancy'">
+      <app-pregnancy></app-pregnancy>
+    </ng-container>
+    <ng-container *ngIf="activeTab==='Birth'">
+      <app-birth></app-birth>
+    </ng-container>
+
+</div>
+</div>

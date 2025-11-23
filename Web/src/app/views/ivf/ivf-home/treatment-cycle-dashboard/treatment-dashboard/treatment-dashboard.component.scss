@@ -1,0 +1,165 @@
+.treatment-dashboard {
+  padding: 1rem;
+  background: #f8f9fa;
+}
+
+.dashboard-tabs {
+  .btn-sm {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+  }
+}
+
+// FullCalendar custom styling (v6+ has built-in styles)
+::ng-deep {
+  // Basic calendar container
+  full-calendar {
+    display: block;
+    width: 100%;
+  }
+
+  .fc {
+    font-size: 0.875rem;
+    font-family: inherit;
+  }
+
+  // Timeline events
+  .fc-timeline-event {
+    border-radius: 3px;
+    opacity: 0.85;
+    padding: 2px 4px;
+  }
+
+  // Resource area
+  .fc-resource-timeline {
+    .fc-datagrid-cell-main {
+      font-weight: 500;
+      padding: 4px 8px;
+    }
+  }
+
+  // Event icons (lab/radiology)
+  .event-icon {
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: inline-block;
+    
+    &:hover {
+      transform: scale(1.3);
+    }
+  }
+
+  // Toolbar styling
+  .fc-toolbar {
+    margin-bottom: 1rem;
+    
+    .fc-toolbar-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+  }
+
+  .fc-button {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    
+    &:hover {
+      background-color: #0b5ed7;
+      border-color: #0a58ca;
+    }
+    
+    &.fc-button-active {
+      background-color: #0a58ca;
+      border-color: #0a53be;
+    }
+  }
+
+  // Timeline slots
+  .fc-timeline-slot {
+    border-color: #dee2e6;
+  }
+
+  // Resource rows
+  .fc-timeline-lane {
+    border-color: #dee2e6;
+  }
+
+  // Event content
+  .fc-event-title {
+    font-weight: 500;
+  }
+}
+
+.timeline-container {
+  overflow-x: auto;
+  min-width: 100%;
+}
+
+.timeline-label {
+  min-width: 150px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.calendar-date {
+  min-width: 30px;
+  text-align: center;
+  padding: 0.25rem;
+  border-right: 1px solid #dee2e6;
+  font-size: 0.75rem;
+}
+
+.timeline-row {
+  height: 30px;
+  background: #fff8dc;
+  border-right: 1px solid #dee2e6;
+}
+
+.timeline-bar {
+  position: absolute;
+  height: 20px;
+  top: 5px;
+  border-radius: 3px;
+  opacity: 0.8;
+}
+
+.event-marker {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #0066cc;
+  border-radius: 50%;
+  top: 11px;
+}
+
+.card-header {
+  font-size: 0.9rem;
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+// Ultrasound table styling
+.table-sm {
+  font-size: 0.875rem;
+  
+  td, th {
+    padding: 0.25rem;
+    vertical-align: middle;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .timeline-label {
+    min-width: 120px;
+  }
+  
+  .calendar-date {
+    min-width: 25px;
+  }
+}

@@ -1,0 +1,173 @@
+<div class="treatment-dashboard">
+  <!-- Top Navigation Tabs -->
+  <!-- <div class="dashboard-tabs mb-3">
+    <div class="d-flex gap-2 flex-wrap">
+      <button class="btn btn-sm btn-success">Overview</button>
+      <button class="btn btn-sm btn-outline-secondary">Aspiration</button>
+      <button class="btn btn-sm btn-outline-secondary">Culture</button>
+      <button class="btn btn-sm btn-outline-secondary">Transfer</button>
+      <button class="btn btn-sm btn-outline-secondary">Luteal phase</button>
+      <button class="btn btn-sm btn-outline-secondary">Pregnancy</button>
+      <button class="btn btn-sm btn-outline-secondary">Birth</button>
+      <button class="btn btn-sm btn-outline-secondary ms-auto">Summaries</button>
+    </div>
+  </div> -->
+
+  <!-- Cycle Overview Section -->
+  <!-- <div class="card mb-3">
+    <div class="card-header bg-dark text-white py-1">
+      <strong>Cycle overview</strong>
+    </div>
+  </div> -->
+
+  <!-- FullCalendar Timeline -->
+  <div class="card">
+    <div class="card-body p-2">
+      <full-calendar [options]="calendarOptions"></full-calendar>
+    </div>
+  </div>
+
+  <!-- Add Event/Medication/Hormone Modal -->
+  <ng-template #addEventModal let-modal>
+    <div class="modal-header py-2">
+      <h6 class="modal-title" id="modal-basic-title">Add to Calendar</h6>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeAddModal()"></button>
+    </div>
+    <form class="p-3 pt-2" (ngSubmit)="submitAddForm()">
+      <!-- Category selector -->
+      <div class="mb-2">
+        <label class="form-label mb-1">Category</label>
+        <select class="form-select form-select-sm" [(ngModel)]="addForm.category" name="category" [disabled]="true">
+          <option value="events">Events</option>
+          <option value="medication">Medication</option>
+          <option value="hormone">Hormone</option>
+        </select>
+      </div>
+
+      <!-- Subtype by category -->
+      <div class="mb-2" *ngIf="addForm.category === 'events'">
+        <label class="form-label mb-1">Event type</label>
+        <select class="form-select form-select-sm" [(ngModel)]="addForm.subtype" name="subtype_events">
+          <option *ngFor="let s of eventSubtypes" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+      <div class="mb-2" *ngIf="addForm.category === 'medication'">
+        <label class="form-label mb-1">Medication</label>
+        <select class="form-select form-select-sm" [(ngModel)]="addForm.subtype" name="subtype_meds">
+          <option *ngFor="let s of medicationSubtypes" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+      <div class="mb-2" *ngIf="addForm.category === 'hormone'">
+        <label class="form-label mb-1">Hormone</label>
+        <select class="form-select form-select-sm" [(ngModel)]="addForm.subtype" name="subtype_hormone">
+          <option *ngFor="let s of hormoneSubtypes" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <!-- Title/Value -->
+      <div class="mb-2">
+        <label class="form-label mb-1">Title / Value</label>
+        <input class="form-control form-control-sm" [(ngModel)]="addForm.title" name="title" placeholder="e.g. LMP or 150 or 8.5" />
+      </div>
+
+      <!-- Dates -->
+      <div class="row g-2 mb-2">
+        <div class="col-6">
+          <label class="form-label mb-1">Start date</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="addForm.start" name="start" [disabled]="true" />
+        </div>
+        <div class="col-6">
+          <label class="form-label mb-1">End date</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="addForm.end" name="end" />
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="closeAddModal()">Cancel</button>
+        <button type="submit" class="btn btn-sm btn-primary">Add</button>
+      </div>
+    </form>
+  </ng-template>
+
+  <!-- Ultrasound Detail Modal -->
+  <ng-template #ultrasoundModal let-modal>
+    <div class="modal-header py-2">
+      <h6 class="modal-title" id="ultra-title">Ultrasound Report</h6>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeUltrasoundModal()"></button>
+    </div>
+    <div class="p-3 pt-2" *ngIf="ultrasoundDetail as u">
+      <div class="mb-2">
+        <strong>Report ID:</strong> #{{ u.reportId }}
+      </div>
+      <div class="mb-2">
+        <strong>Measurements</strong>
+        <div class="mt-1 small">
+          <div>Endometrium: {{ u.measurements?.endom }} mm</div>
+          <div>Total Follicles: {{ u.measurements?.total }}</div>
+          <div>Left Leading Follicle: {{ u.measurements?.leftFoll }} mm</div>
+          <div>Right Leading Follicle: {{ u.measurements?.rightFoll }} mm</div>
+        </div>
+      </div>
+      <div class="mb-2">
+        <strong>Images:</strong> {{ u.images?.length || 0 }} file(s)
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="closeUltrasoundModal()">Close</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Lab Order Modal -->
+  <ng-template #labOrderModal let-modal>
+    <div class="modal-header py-2">
+      <h6 class="modal-title" id="lab-title">Lab Order Details</h6>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeLabOrderModal()"></button>
+    </div>
+    <div class="p-3 pt-2" *ngIf="labOrderDetail as l">
+      <div class="mb-2"><strong>Order ID:</strong> #{{ l.orderId }}</div>
+      <div class="mb-2"><strong>Test Name:</strong> {{ l.testName }}</div>
+      <div class="mb-2"><strong>Status:</strong> {{ l.status }}</div>
+      <div class="mb-2"><strong>Images:</strong> {{ l.images?.length || 0 }} file(s)</div>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="closeLabOrderModal()">Close</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Medication Dose Modal -->
+  <ng-template #medicationModal let-modal>
+    <div class="modal-header py-2">
+      <h6 class="modal-title" id="med-title">Medication Details</h6>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeMedicationModal()"></button>
+    </div>
+    <div class="p-3 pt-2" *ngIf="medicationDetail as m">
+      <div class="mb-2"><strong>Medication:</strong> {{ m.medicationName }}</div>
+      <div class="mb-2"><strong>Dose:</strong> {{ m.dose }}</div>
+      <div class="mb-2"><strong>Date:</strong> {{ m.date }}</div>
+      <div class="mb-2" *ngIf="m.route"><strong>Route:</strong> {{ m.route }}</div>
+      <div class="mb-2" *ngIf="m.notes"><strong>Notes:</strong> {{ m.notes }}</div>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="closeMedicationModal()">Close</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Hormone Level Modal -->
+  <ng-template #hormoneModal let-modal>
+    <div class="modal-header py-2">
+      <h6 class="modal-title" id="hormone-title">Hormone Level Details</h6>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeHormoneModal()"></button>
+    </div>
+    <div class="p-3 pt-2" *ngIf="hormoneDetail as h">
+      <div class="mb-2"><strong>Hormone:</strong> {{ h.hormoneName }}</div>
+      <div class="mb-2"><strong>Value:</strong> {{ h.value }}</div>
+      <div class="mb-2"><strong>Date:</strong> {{ h.date }}</div>
+      <div class="mb-2" *ngIf="h.normalRange"><strong>Normal Range:</strong> {{ h.normalRange }}</div>
+      <div class="mb-2" *ngIf="h.status"><strong>Status:</strong> {{ h.status }}</div>
+      <div class="mb-2" *ngIf="h.notes"><strong>Notes:</strong> {{ h.notes }}</div>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="closeHormoneModal()">Close</button>
+      </div>
+    </div>
+  </ng-template>
+</div>
