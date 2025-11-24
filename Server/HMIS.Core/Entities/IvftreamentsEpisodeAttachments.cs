@@ -12,10 +12,22 @@ public partial class IvftreamentsEpisodeAttachments
     [Key]
     public int Id { get; set; }
 
-    [Column("IVFFemaleFHAdditionalMeasuresId")]
-    public int IvffemaleFhadditionalMeasuresId { get; set; }
+    [Column("IVFDashboardTreatmentEpisodeId")]
+    public int IvfdashboardTreatmentEpisodeId { get; set; }
 
-    [ForeignKey("IvffemaleFhadditionalMeasuresId")]
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    [ForeignKey("IvfdashboardTreatmentEpisodeId")]
     [InverseProperty("IvftreamentsEpisodeAttachments")]
-    public virtual IvfdashboardTreatmentEpisode IvffemaleFhadditionalMeasures { get; set; } = null!;
+    public virtual IvfdashboardTreatmentEpisode IvfdashboardTreatmentEpisode { get; set; } = null!;
 }

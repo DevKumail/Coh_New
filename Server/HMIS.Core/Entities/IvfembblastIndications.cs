@@ -6,16 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("IVFPlannedAdditionalMeasures")]
-public partial class IvfplannedAdditionalMeasures
+[Table("IVFEMBBlastIndications")]
+public partial class IvfembblastIndications
 {
     [Key]
-    public int AdditionalMeasuresId { get; set; }
+    [Column("PIDEMBBlastIndicationId")]
+    public int PidembblastIndicationId { get; set; }
 
     [Column("IVFAdditionalMeasuresId")]
     public int? IvfadditionalMeasuresId { get; set; }
 
-    public long? MeasuresCategoryId { get; set; }
+    [Column("PIDEMBBlastIndicationCategoryId")]
+    public long? PidembblastIndicationCategoryId { get; set; }
 
     public int? CreatedBy { get; set; }
 
@@ -30,10 +32,10 @@ public partial class IvfplannedAdditionalMeasures
     public bool IsDeleted { get; set; }
 
     [ForeignKey("IvfadditionalMeasuresId")]
-    [InverseProperty("IvfplannedAdditionalMeasures")]
+    [InverseProperty("IvfembblastIndications")]
     public virtual IvfdashboardAdditionalMeasures? IvfadditionalMeasures { get; set; }
 
-    [ForeignKey("MeasuresCategoryId")]
-    [InverseProperty("IvfplannedAdditionalMeasures")]
-    public virtual DropdownConfiguration? MeasuresCategory { get; set; }
+    [ForeignKey("PidembblastIndicationCategoryId")]
+    [InverseProperty("IvfembblastIndications")]
+    public virtual DropdownConfiguration? PidembblastIndicationCategory { get; set; }
 }

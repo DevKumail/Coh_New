@@ -6,16 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("IVFPlannedAdditionalMeasures")]
-public partial class IvfplannedAdditionalMeasures
+[Table("IVFPolarBodiesIndications")]
+public partial class IvfpolarBodiesIndications
 {
     [Key]
-    public int AdditionalMeasuresId { get; set; }
+    [Column("PIDPolarBodiesIndicationId")]
+    public int PidpolarBodiesIndicationId { get; set; }
 
     [Column("IVFAdditionalMeasuresId")]
     public int? IvfadditionalMeasuresId { get; set; }
 
-    public long? MeasuresCategoryId { get; set; }
+    [Column("PIDPolarBodiesIndicationCategoryId")]
+    public long? PidpolarBodiesIndicationCategoryId { get; set; }
 
     public int? CreatedBy { get; set; }
 
@@ -30,10 +32,10 @@ public partial class IvfplannedAdditionalMeasures
     public bool IsDeleted { get; set; }
 
     [ForeignKey("IvfadditionalMeasuresId")]
-    [InverseProperty("IvfplannedAdditionalMeasures")]
+    [InverseProperty("IvfpolarBodiesIndications")]
     public virtual IvfdashboardAdditionalMeasures? IvfadditionalMeasures { get; set; }
 
-    [ForeignKey("MeasuresCategoryId")]
-    [InverseProperty("IvfplannedAdditionalMeasures")]
-    public virtual DropdownConfiguration? MeasuresCategory { get; set; }
+    [ForeignKey("PidpolarBodiesIndicationCategoryId")]
+    [InverseProperty("IvfpolarBodiesIndications")]
+    public virtual DropdownConfiguration? PidpolarBodiesIndicationCategory { get; set; }
 }

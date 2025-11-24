@@ -218,7 +218,7 @@ public partial class TabDrugsName
     public DateTime? UppexpiryDate { get; set; }
 
     [InverseProperty("Drug")]
-    public virtual ICollection<Medication> Medication { get; set; } = new List<Medication>();
+    public virtual ICollection<Medications> Medications { get; set; } = new List<Medications>();
 
     [InverseProperty("Drug")]
     public virtual ICollection<Prescription> Prescription { get; set; } = new List<Prescription>();
