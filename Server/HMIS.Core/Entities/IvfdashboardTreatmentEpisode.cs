@@ -10,8 +10,8 @@ namespace HMIS.Core.Entities;
 public partial class IvfdashboardTreatmentEpisode
 {
     [Key]
-    [Column("IVFFemaleTreatmentEpisodeId")]
-    public int IvffemaleTreatmentEpisodeId { get; set; }
+    [Column("IVFDashboardTreatmentEpisodeId")]
+    public int IvfdashboardTreatmentEpisodeId { get; set; }
 
     [Column("IVFMainId")]
     public int? IvfmainId { get; set; }
@@ -45,21 +45,36 @@ public partial class IvfdashboardTreatmentEpisode
 
     public string? CycleNote { get; set; }
 
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
     [ForeignKey("CycleFromAmenorrheaCategoryId")]
     [InverseProperty("IvfdashboardTreatmentEpisodeCycleFromAmenorrheaCategory")]
     public virtual DropdownConfiguration? CycleFromAmenorrheaCategory { get; set; }
+
+    [InverseProperty("IvfdashboardTreatmentEpisode")]
+    public virtual ICollection<IvfdashboardAdditionalMeasures> IvfdashboardAdditionalMeasures { get; set; } = new List<IvfdashboardAdditionalMeasures>();
 
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual Ivfmain? Ivfmain { get; set; }
 
-    [InverseProperty("IvffemaleFhadditionalMeasures")]
+    [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual ICollection<IvftreamentsEpisodeAttachments> IvftreamentsEpisodeAttachments { get; set; } = new List<IvftreamentsEpisodeAttachments>();
 
-    [InverseProperty("IvffemaleTreatmentEpisode")]
+    [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual ICollection<IvftreatmentEpisodeOverviewStage> IvftreatmentEpisodeOverviewStage { get; set; } = new List<IvftreatmentEpisodeOverviewStage>();
 
-    [InverseProperty("IvffemaleTreatmentCycle")]
+    [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual ICollection<IvftreatmentTypes> IvftreatmentTypes { get; set; } = new List<IvftreatmentTypes>();
 
     [ForeignKey("MainIndicationCategoryId")]

@@ -1,0 +1,117 @@
+// FullCalendar custom styling for dose labels
+::ng-deep {
+  // Hide FullCalendar license message in this view
+  .fc-license-message {
+    display: none !important;
+  }
+  // Dose labels on medication/hormone bars - visible in each day box
+  .dose-label {
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    color: #000 !important;
+    text-align: center !important;
+    line-height: 1.3 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    width: 100% !important;
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+  }
+
+  // Event content styling
+  .fc-event-title {
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    color: #000 !important;
+  }
+
+  // Timeline event styling - ensure proper spacing
+  .fc-timeline-event {
+    min-height: 28px !important;
+    
+    .fc-event-main {
+      padding: 4px 6px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    
+    .fc-event-main-frame {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+
+  // Make sure text is visible on colored backgrounds
+  .fc-event {
+    .fc-event-title,
+    .fc-event-main-frame {
+      color: #000 !important;
+      font-weight: 700 !important;
+    }
+  }
+
+  // Timeline slots - ensure minimum width for visibility
+  .fc-timeline-slot {
+    min-width: 50px !important;
+  }
+
+  // Event background - ensure contrast
+  .fc-timeline-event-harness {
+    .fc-event {
+      border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    }
+  }
+
+  // Examination row label background (resource id 'orders') on the left resource column
+  // Apply background to all possible label parts to ensure visibility
+  .fc-datagrid .fc-scrollgrid-sync-table tr[data-resource-id="orders"] td,
+  tr[data-resource-id="orders"] .fc-datagrid-cell,
+  tr[data-resource-id="orders"] .fc-datagrid-cell-frame,
+  tr[data-resource-id="orders"] .fc-datagrid-cell-cushion,
+  tr[data-resource-id="orders"] .fc-datagrid-expander-space {
+    background-color: #D0D0D0 !important; // dark gray to match dividers
+  }
+
+  tr[data-resource-id="orders"] .fc-datagrid-cell-cushion {
+    font-weight: 600;
+    color: #333 !important;
+  }
+
+  // Divider rows label background (hormones + ultrasound sections) - dark gray
+  .fc-datagrid .fc-scrollgrid-sync-table tr[data-resource-id="divider-hormones"] td,
+  tr[data-resource-id="divider-hormones"] .fc-datagrid-cell,
+  tr[data-resource-id="divider-hormones"] .fc-datagrid-cell-frame,
+  tr[data-resource-id="divider-hormones"] .fc-datagrid-cell-cushion,
+  tr[data-resource-id="divider-hormones"] .fc-datagrid-expander-space,
+  .fc-datagrid .fc-scrollgrid-sync-table tr[data-resource-id="divider-ultrasound"] td,
+  tr[data-resource-id="divider-ultrasound"] .fc-datagrid-cell,
+  tr[data-resource-id="divider-ultrasound"] .fc-datagrid-cell-frame,
+  tr[data-resource-id="divider-ultrasound"] .fc-datagrid-cell-cushion,
+  tr[data-resource-id="divider-ultrasound"] .fc-datagrid-expander-space {
+    background-color: #D0D0D0 !important;
+  }
+
+  tr[data-resource-id="divider-hormones"] .fc-datagrid-cell-cushion,
+  tr[data-resource-id="divider-ultrasound"] .fc-datagrid-cell-cushion {
+    font-weight: 700;
+    color: #444 !important;
+  }
+
+  // Events row label background - dark gray to match
+  .fc-datagrid .fc-scrollgrid-sync-table tr[data-resource-id="events"] td,
+  tr[data-resource-id="events"] .fc-datagrid-cell,
+  tr[data-resource-id="events"] .fc-datagrid-cell-frame,
+  tr[data-resource-id="events"] .fc-datagrid-cell-cushion,
+  tr[data-resource-id="events"] .fc-datagrid-expander-space {
+    background-color: #D0D0D0 !important;
+  }
+  tr[data-resource-id="events"] .fc-datagrid-cell-cushion {
+    font-weight: 700;
+    color: #333 !important;
+  }
+}

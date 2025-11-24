@@ -21,6 +21,7 @@ import { log } from 'node:console';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { FemaleMedicalHistoryListComponent } from './female-section/female-medical-history-list/female-medical-history-list.component';
 import { VitalSignsComponent } from '../../clinical/vital-signs/vital-signs.component';
+import { TreatmentDashboardComponent } from '../ivf-home/treatment-cycle-dashboard/treatment-dashboard/treatment-dashboard.component';
 @Component({
   selector: 'app-ivf-patient-summary',
   standalone: true,
@@ -32,6 +33,7 @@ import { VitalSignsComponent } from '../../clinical/vital-signs/vital-signs.comp
     MedicalHistoryComponent,
     IvfPsPathologyResultsComponent,
     IvfPsLabOrdersComponent,
+    TreatmentDashboardComponent,
     SemenListComponent,
     VitalSignsComponent,
     IvfPsCycleComponent,

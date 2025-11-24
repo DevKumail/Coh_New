@@ -6,20 +6,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Keyless]
 [Table("IVFPerformedAdditionalMeasures")]
 public partial class IvfperformedAdditionalMeasures
 {
-    public int? PerformedAdditionalMeasures { get; set; }
+    [Key]
+    public int PerformedAdditionalMeasuresId { get; set; }
 
-    [Column("IVFFemaleFHAdditionalMeasuresId")]
-    public int? IvffemaleFhadditionalMeasuresId { get; set; }
+    [Column("IVFAdditionalMeasuresId")]
+    public int? IvfadditionalMeasuresId { get; set; }
 
     public long? PerformedAdditionalMeasuresCategoryId { get; set; }
 
-    [ForeignKey("IvffemaleFhadditionalMeasuresId")]
-    public virtual IvfdashboardAdditionalMeasures? IvffemaleFhadditionalMeasures { get; set; }
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    [ForeignKey("IvfadditionalMeasuresId")]
+    [InverseProperty("IvfperformedAdditionalMeasures")]
+    public virtual IvfdashboardAdditionalMeasures? IvfadditionalMeasures { get; set; }
 
     [ForeignKey("PerformedAdditionalMeasuresCategoryId")]
+    [InverseProperty("IvfperformedAdditionalMeasures")]
     public virtual DropdownConfiguration? PerformedAdditionalMeasuresCategory { get; set; }
 }

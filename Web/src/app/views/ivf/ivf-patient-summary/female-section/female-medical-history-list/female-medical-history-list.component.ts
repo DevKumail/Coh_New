@@ -145,11 +145,13 @@ export class FemaleMedicalHistoryListComponent implements AfterViewInit {
     }
 
     const formData = this.basicComponent.getFormData();
-    
+    var ivfMainId;
     // Get IVF Main ID from patient banner
     this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
-      const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
-      
+      ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
+          });
+
+
       if (!ivfMainId) {
         Swal.fire('Error', 'IVF Main ID not found', 'error');
         return;
@@ -208,7 +210,6 @@ export class FemaleMedicalHistoryListComponent implements AfterViewInit {
           Swal.fire('Error', error?.error?.message || 'Failed to save female fertility history', 'error');
         }
       });
-    });
   }
 
   onPageChanged(page: any){

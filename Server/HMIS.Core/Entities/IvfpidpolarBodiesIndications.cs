@@ -13,15 +13,15 @@ public partial class IvfpidpolarBodiesIndications
     [Column("PIDPolarBodiesIndicationId")]
     public int PidpolarBodiesIndicationId { get; set; }
 
-    [Column("IVFFemaleFHAdditionalMeasuresId")]
-    public int? IvffemaleFhadditionalMeasuresId { get; set; }
+    [Column("IVFAdditionalMeasuresId")]
+    public int? IvfadditionalMeasuresId { get; set; }
 
     [Column("PIDPolarBodiesIndicationCategoryId")]
     public long? PidpolarBodiesIndicationCategoryId { get; set; }
 
-    [ForeignKey("IvffemaleFhadditionalMeasuresId")]
+    [ForeignKey("IvfadditionalMeasuresId")]
     [InverseProperty("IvfpidpolarBodiesIndications")]
-    public virtual IvfdashboardAdditionalMeasures? IvffemaleFhadditionalMeasures { get; set; }
+    public virtual IvfdashboardAdditionalMeasures? IvfadditionalMeasures { get; set; }
 
     [ForeignKey("PidpolarBodiesIndicationCategoryId")]
     [InverseProperty("IvfpidpolarBodiesIndications")]

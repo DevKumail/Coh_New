@@ -13,6 +13,7 @@ import { NgIcon } from '@ng-icons/core';
 import { Router } from '@angular/router';
 import { distinctUntilChanged, filter, take } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CycleAddUpdateComponent } from './dashboard-cycle/cycle-add-update/cycle-add-update.component';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 import { Subscription } from 'rxjs';
  
@@ -254,4 +255,15 @@ export class IVFHomeComponent {
     this.SearchPatient();
   }
 
+  openAddCycle() {
+    this.modalRefInstance = this.modalService.open(CycleAddUpdateComponent, {
+      backdrop: 'static',
+      size: 'xl',
+      centered: true,
+      scrollable: true
+    });
+    this.modalRefInstance.result.then((result: any) => {
+      // handle post-save actions if needed
+    }).catch(() => {});
+  }
 }

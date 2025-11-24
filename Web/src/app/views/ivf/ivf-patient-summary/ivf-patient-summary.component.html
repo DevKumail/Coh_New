@@ -36,7 +36,7 @@
             <app-ivf-ps-pathology-results *ngIf="selectedId==='pathology-results'"></app-ivf-ps-pathology-results>
             <app-ivf-ps-lab-orders *ngIf="selectedId==='lab-orders'"></app-ivf-ps-lab-orders>
             <app-semen-list *ngIf="selectedId==='semen-analysis'"></app-semen-list>
-            <!-- <app-ivf-ps-cycle *ngIf="selectedId==='cycle'"></app-ivf-ps-cycle> -->
+            <app-treatment-dashboard *ngIf="selectedId==='cycle'"></app-treatment-dashboard>
           </ng-container>
           <ng-template #emptyState>
             <div class="d-flex align-items-center justify-content-center h-100 text-muted">
