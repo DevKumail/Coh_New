@@ -10,8 +10,8 @@ namespace HMIS.Core.Entities;
 public partial class IvfdashboardTreatmentEpisode
 {
     [Key]
-    [Column("IVFFemaleTreatmentEpisodeId")]
-    public int IvffemaleTreatmentEpisodeId { get; set; }
+    [Column("IVFDashboardTreatmentEpisodeId")]
+    public int IvfdashboardTreatmentEpisodeId { get; set; }
 
     [Column("IVFMainId")]
     public int? IvfmainId { get; set; }
@@ -53,13 +53,13 @@ public partial class IvfdashboardTreatmentEpisode
     [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual Ivfmain? Ivfmain { get; set; }
 
-    [InverseProperty("IvffemaleFhadditionalMeasures")]
+    [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual ICollection<IvftreamentsEpisodeAttachments> IvftreamentsEpisodeAttachments { get; set; } = new List<IvftreamentsEpisodeAttachments>();
 
     [InverseProperty("IvffemaleTreatmentEpisode")]
     public virtual ICollection<IvftreatmentEpisodeOverviewStage> IvftreatmentEpisodeOverviewStage { get; set; } = new List<IvftreatmentEpisodeOverviewStage>();
 
-    [InverseProperty("IvffemaleTreatmentCycle")]
+    [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual ICollection<IvftreatmentTypes> IvftreatmentTypes { get; set; } = new List<IvftreatmentTypes>();
 
     [ForeignKey("MainIndicationCategoryId")]

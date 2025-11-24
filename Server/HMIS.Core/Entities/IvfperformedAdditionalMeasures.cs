@@ -12,13 +12,13 @@ public partial class IvfperformedAdditionalMeasures
 {
     public int? PerformedAdditionalMeasures { get; set; }
 
-    [Column("IVFFemaleFHAdditionalMeasuresId")]
-    public int? IvffemaleFhadditionalMeasuresId { get; set; }
+    [Column("IVFAdditionalMeasuresId")]
+    public int? IvfadditionalMeasuresId { get; set; }
 
     public long? PerformedAdditionalMeasuresCategoryId { get; set; }
 
-    [ForeignKey("IvffemaleFhadditionalMeasuresId")]
-    public virtual IvfdashboardAdditionalMeasures? IvffemaleFhadditionalMeasures { get; set; }
+    [ForeignKey("IvfadditionalMeasuresId")]
+    public virtual IvfdashboardAdditionalMeasures? IvfadditionalMeasures { get; set; }
 
     [ForeignKey("PerformedAdditionalMeasuresCategoryId")]
     public virtual DropdownConfiguration? PerformedAdditionalMeasuresCategory { get; set; }

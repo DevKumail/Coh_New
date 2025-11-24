@@ -1,4 +1,5 @@
-﻿using HMIS.Core.Context;
+﻿using HMIS.Application.Enums;
+using HMIS.Core.Context;
 using HMIS.Core.DTOs;
 using HMIS.Core.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -197,54 +198,57 @@ namespace HMIS.Application.ServiceLogics.IVF
                 return preservations;
             }
 
-            public async Task<bool> CreateCryoPreservation(IVFMaleCryoPreservationCreateDto preservationDto)
+        public async Task<bool> CreateCryoPreservation(IVFMaleCryoPreservationCreateDto preservationDto)
+        {
+            try
             {
-                try
+                var preservation = new IvfmaleCryoPreservation
                 {
-                    var preservation = new IvfmaleCryoPreservation
-                    {
-                        SampleId = preservationDto.SampleId,
-                        PreservationCode = preservationDto.PreservationCode,
-                        FreezingDateTime = preservationDto.FreezingDateTime,
-                        CryopreservedById = preservationDto.CryopreservedById,
-                        OriginallyFromClinicId = preservationDto.OriginallyFromClinicId,
-                        StorageDateTime = preservationDto.StorageDateTime,
-                        StoredById = preservationDto.StoredById,
-                        MaterialTypeId = preservationDto.MaterialTypeId,
-                        StrawStartNumber = preservationDto.StrawStartNumber,
-                        StrawCount = preservationDto.StrawCount,
-                        StatusId = preservationDto.StatusId,
-                        CryoContractId = preservationDto.CryoContractId,
-                        PreserveUsingCryoStorage = preservationDto.PreserveUsingCryoStorage,
-                        StoragePlaceId = preservationDto.StoragePlaceId,
-                        Position = preservationDto.Position,
-                        ColorId = preservationDto.ColorId,
-                        ForResearch = preservationDto.ForResearch,
-                        ReasonForResearchId = preservationDto.ReasonForResearchId,
-                        Notes = preservationDto.Notes,
-                        CreatedBy = preservationDto.CreatedBy,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        IsDeleted = false
-                    };
+                    SampleId = preservationDto.SampleId,
+                    PreservationCode = preservationDto.PreservationCode,
+                    FreezingDateTime = preservationDto.FreezingDateTime,
+                    CryopreservedById = preservationDto.CryopreservedById,
+                    OriginallyFromClinicId = preservationDto.OriginallyFromClinicId,
+                    StorageDateTime = preservationDto.StorageDateTime,
+                    StoredById = preservationDto.StoredById,
+                    MaterialTypeId = preservationDto.MaterialTypeId,
+                    StrawStartNumber = preservationDto.StrawStartNumber,
+                    StrawCount = preservationDto.StrawCount,
+                    StatusId = preservationDto.StatusId,
+                    CryoContractId = preservationDto.CryoContractId,
+                    PreserveUsingCryoStorage = preservationDto.PreserveUsingCryoStorage,
+                    StoragePlaceId = preservationDto.StoragePlaceId,
+                    Position = preservationDto.Position,
+                    ColorId = preservationDto.ColorId,
+                    ForResearch = preservationDto.ForResearch,
+                    ReasonForResearchId = preservationDto.ReasonForResearchId,
+                    Notes = preservationDto.Notes,
+                    CreatedBy = preservationDto.CreatedBy,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                };
 
-                    _context.IvfmaleCryoPreservation.Add(preservation);
+                _context.IvfmaleCryoPreservation.Add(preservation);
 
-                    // Generate straws if count is specified
-                    if (preservationDto.StrawStartNumber.HasValue && preservationDto.StrawCount.HasValue)
-                    {
-                        await GenerateStraws(preservation.CryoPreservationId,
-                            preservationDto.StrawStartNumber.Value,
-                            preservationDto.StrawCount.Value,
-                            preservationDto.CreatedBy);
-                    }
 
-                // change cryolevelc table status
+                // Generate straws
+                if (preservationDto.StrawStartNumber.HasValue && preservationDto.StrawCount.HasValue)
+                {
+                    await GenerateStraws(
+                        preservation.CryoPreservationId,
+                        preservationDto.StrawStartNumber.Value,
+                        preservationDto.StrawCount.Value,
+                        preservationDto.CreatedBy
+                    );
+                }
 
+
+                // Change cryolevelC table status
                 if (preservationDto.StoragePlaceId > 0)
                 {
                     var levelC = await _context.IvfcryoLevelC
-                                     .FirstOrDefaultAsync(cp => cp.Id == preservationDto.StoragePlaceId);
+                        .FirstOrDefaultAsync(cp => cp.Id == preservationDto.StoragePlaceId);
 
                     if (levelC != null)
                     {
@@ -253,26 +257,42 @@ namespace HMIS.Application.ServiceLogics.IVF
                         levelC.UpdatedAt = DateTime.UtcNow;
                     }
 
-                        var semenSample = await _context.IvfmaleSemenSample
-                                             .FirstOrDefaultAsync(ss => ss.SampleId == preservationDto.SampleId);
+                    var semenSample = await _context.IvfmaleSemenSample
+                        .FirstOrDefaultAsync(ss => ss.SampleId == preservationDto.SampleId);
 
-                        if (semenSample != null)
-                        {
-                            semenSample.CryoStatusId = preservationDto.StatusId;
-                            semenSample.UpdatedAt = DateTime.UtcNow;
-                        }
+                    if (semenSample != null)
+                    {
+                        semenSample.CryoStatusId = preservationDto.StatusId;
+                        semenSample.UpdatedAt = DateTime.UtcNow;
+                    }
                 }
 
+                var cryoEvent = new IvfcryoEvents
+                {
+                    CryoPreservationId = preservation.CryoPreservationId,
+                    CryoStrawId = null,
+                    EventType = CryoEventType.Freeze.ToString(),    
+                    EventDateTime = DateTime.UtcNow,
+                    PerformedBy = preservationDto.StoredById,
+                    FromStorageLevelCid = null,
+                    ToStorageLevelCid = preservationDto.StoragePlaceId > 0 ? preservationDto.StoragePlaceId : null,
+                    Notes = "Cryopreservation created.",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    CreatedBy = preservationDto.CreatedBy,
+                    UpdatedBy = preservationDto.CreatedBy
+                };
+
+                _context.IvfcryoEvents.Add(cryoEvent);
 
                 await _context.SaveChangesAsync();
                 return true;
-                }
-                catch (Exception ex)
-                {
-                    // Log exception
-                    return false;
-                }
             }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
 
         public async Task<bool> UpdateCryoPreservation(IVFMaleCryoPreservationUpdateDto preservationDto)
         {
@@ -317,6 +337,28 @@ namespace HMIS.Application.ServiceLogics.IVF
                             newLevelC.UpdatedAt = DateTime.UtcNow;
                         }
                     }
+
+                    var moveEvent = new IvfcryoEvents
+                    {
+                        CryoPreservationId = preservation.CryoPreservationId,
+                        CryoStrawId = null,
+                        EventType = CryoEventType.Move.ToString(), 
+                        EventDateTime = DateTime.UtcNow,
+
+                        PerformedBy = preservationDto.StoredById,
+
+                        FromStorageLevelCid = originalStoragePlaceId,
+                        ToStorageLevelCid = preservationDto.StoragePlaceId,
+
+                        Notes = $"Moved from LevelC {originalStoragePlaceId} to {preservationDto.StoragePlaceId}",
+
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow,
+                        CreatedBy = preservationDto.UpdatedBy,
+                        UpdatedBy = preservationDto.UpdatedBy
+                    };
+
+                    _context.IvfcryoEvents.Add(moveEvent);
                 }
                 else if (preservationDto.StoragePlaceId == originalStoragePlaceId && preservationDto.StoragePlaceId > 0)
                 {

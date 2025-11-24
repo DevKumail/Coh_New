@@ -178,6 +178,8 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<IvfcryoContainers> IvfcryoContainers { get; set; }
 
+    public virtual DbSet<IvfcryoEvents> IvfcryoEvents { get; set; }
+
     public virtual DbSet<IvfcryoLevelA> IvfcryoLevelA { get; set; }
 
     public virtual DbSet<IvfcryoLevelB> IvfcryoLevelB { get; set; }
@@ -1115,6 +1117,18 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
         });
 
+        modelBuilder.Entity<IvfcryoEvents>(entity =>
+        {
+            entity.HasKey(e => e.CryoEventId).HasName("PK__IVFCryoE__EB95303D4DA769BC");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.FromStorageLevelC).WithMany(p => p.IvfcryoEventsFromStorageLevelC).HasConstraintName("FK_IVFCryoEvents_Cryolevelc");
+
+            entity.HasOne(d => d.ToStorageLevelC).WithMany(p => p.IvfcryoEventsToStorageLevelC).HasConstraintName("FK_IVFCryoEvents_Cryolevelcto");
+        });
+
         modelBuilder.Entity<IvfcryoLevelA>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Cryo_Lev__3214EC27FFA90B71");
@@ -1157,12 +1171,12 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfdashboardAdditionalMeasures>(entity =>
         {
-            entity.HasKey(e => e.IvffemaleFhadditionalMeasuresId).HasName("PK_IVFFemaleFHAdditionalMeasures");
+            entity.HasKey(e => e.IvfadditionalMeasuresId).HasName("PK_IVFFemaleFHAdditionalMeasures");
         });
 
         modelBuilder.Entity<IvfdashboardTreatmentEpisode>(entity =>
         {
-            entity.HasKey(e => e.IvffemaleTreatmentEpisodeId).HasName("PK_IVFFemaleTreatmentCycle");
+            entity.HasKey(e => e.IvfdashboardTreatmentEpisodeId).HasName("PK_IVFFemaleTreatmentCycle");
 
             entity.HasOne(d => d.CycleFromAmenorrheaCategory).WithMany(p => p.IvfdashboardTreatmentEpisodeCycleFromAmenorrheaCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration1");
 
@@ -1610,7 +1624,7 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfperformedAdditionalMeasures>(entity =>
         {
-            entity.HasOne(d => d.IvffemaleFhadditionalMeasures).WithMany().HasConstraintName("FK_IVFFemaleFHPerformedAdditionalMeasures_IVFFemaleFHAdditionalMeasures");
+            entity.HasOne(d => d.IvfadditionalMeasures).WithMany().HasConstraintName("FK_IVFFemaleFHPerformedAdditionalMeasures_IVFFemaleFHAdditionalMeasures");
 
             entity.HasOne(d => d.PerformedAdditionalMeasuresCategory).WithMany().HasConstraintName("FK_IVFFemaleFHPerformedAdditionalMeasures_DropdownConfiguration");
         });
@@ -1619,7 +1633,7 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.PidembblastIndicationId).HasName("PK_IVFFemaleFHPIDEMBBlastIndications");
 
-            entity.HasOne(d => d.IvffemaleFhadditionalMeasures).WithMany(p => p.IvfpidembblastIndications).HasConstraintName("FK_IVFFemaleFHPIDEMBBlastIndications_IVFFemaleFHAdditionalMeasures");
+            entity.HasOne(d => d.IvfadditionalMeasures).WithMany(p => p.IvfpidembblastIndications).HasConstraintName("FK_IVFFemaleFHPIDEMBBlastIndications_IVFFemaleFHAdditionalMeasures");
 
             entity.HasOne(d => d.PidembblastIndicationCategory).WithMany(p => p.IvfpidembblastIndications).HasConstraintName("FK_IVFFemaleFHPIDEMBBlastIndications_DropdownConfiguration");
         });
@@ -1630,7 +1644,7 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.PidpolarBodiesIndicationId).ValueGeneratedNever();
 
-            entity.HasOne(d => d.IvffemaleFhadditionalMeasures).WithMany(p => p.IvfpidpolarBodiesIndications).HasConstraintName("FK_IVFFemaleFHPIDPolarBodiesIndications_IVFFemaleFHAdditionalMeasures");
+            entity.HasOne(d => d.IvfadditionalMeasures).WithMany(p => p.IvfpidpolarBodiesIndications).HasConstraintName("FK_IVFFemaleFHPIDPolarBodiesIndications_IVFFemaleFHAdditionalMeasures");
 
             entity.HasOne(d => d.PidpolarBodiesIndicationCategory).WithMany(p => p.IvfpidpolarBodiesIndications).HasConstraintName("FK_IVFFemaleFHPIDPolarBodiesIndications_DropdownConfiguration");
         });
@@ -1639,7 +1653,7 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.AdditionalMeasuresId).HasName("PK_IVFFemaleFHAdditionalMeasuresValues");
 
-            entity.HasOne(d => d.IvffemaleFhadditionalMeasures).WithMany(p => p.IvfplannedAdditionalMeasures).HasConstraintName("FK_IVFFemaleFHAdditionalMeasuresValues_IVFFemaleFHAdditionalMeasures");
+            entity.HasOne(d => d.IvfadditionalMeasures).WithMany(p => p.IvfplannedAdditionalMeasures).HasConstraintName("FK_IVFFemaleFHAdditionalMeasuresValues_IVFFemaleFHAdditionalMeasures");
 
             entity.HasOne(d => d.MeasuresCategory).WithMany(p => p.IvfplannedAdditionalMeasures).HasConstraintName("FK_IVFFemaleFHAdditionalMeasuresValues_DropdownConfiguration");
         });
@@ -1658,7 +1672,7 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK_IVFFemaleFHTreamentsCycleAttachments");
 
-            entity.HasOne(d => d.IvffemaleFhadditionalMeasures).WithMany(p => p.IvftreamentsEpisodeAttachments)
+            entity.HasOne(d => d.IvfdashboardTreatmentEpisode).WithMany(p => p.IvftreamentsEpisodeAttachments)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFFemaleFHTreamentsCycleAttachments_IVFFemaleTreatmentCycle");
         });
@@ -1672,9 +1686,9 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvftreatmentTypes>(entity =>
         {
-            entity.HasKey(e => e.IvffemaleTreatmentTypeId).HasName("PK_IVFFemaleTreatmentTypes");
+            entity.HasKey(e => e.IvftreatmentTypeId).HasName("PK_IVFFemaleTreatmentTypes");
 
-            entity.HasOne(d => d.IvffemaleTreatmentCycle).WithMany(p => p.IvftreatmentTypes).HasConstraintName("FK_IVFFemaleTreatmentTypes_IVFFemaleTreatmentCycle");
+            entity.HasOne(d => d.IvfdashboardTreatmentEpisode).WithMany(p => p.IvftreatmentTypes).HasConstraintName("FK_IVFFemaleTreatmentTypes_IVFFemaleTreatmentCycle");
 
             entity.HasOne(d => d.TreatmentCategory).WithMany(p => p.IvftreatmentTypes).HasConstraintName("FK_IVFFemaleTreatmentTypes_DropdownConfiguration");
         });

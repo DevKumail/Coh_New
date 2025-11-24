@@ -34,6 +34,12 @@ public partial class IvfcryoLevelC
 
     public long? StatusId { get; set; }
 
+    [InverseProperty("FromStorageLevelC")]
+    public virtual ICollection<IvfcryoEvents> IvfcryoEventsFromStorageLevelC { get; set; } = new List<IvfcryoEvents>();
+
+    [InverseProperty("ToStorageLevelC")]
+    public virtual ICollection<IvfcryoEvents> IvfcryoEventsToStorageLevelC { get; set; } = new List<IvfcryoEvents>();
+
     [InverseProperty("StoragePlace")]
     public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservation { get; set; } = new List<IvfmaleCryoPreservation>();
 

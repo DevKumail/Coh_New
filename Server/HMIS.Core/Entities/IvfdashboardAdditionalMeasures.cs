@@ -10,18 +10,18 @@ namespace HMIS.Core.Entities;
 public partial class IvfdashboardAdditionalMeasures
 {
     [Key]
-    [Column("IVFFemaleFHAdditionalMeasuresId")]
-    public int IvffemaleFhadditionalMeasuresId { get; set; }
+    [Column("IVFAdditionalMeasuresId")]
+    public int IvfadditionalMeasuresId { get; set; }
 
     [StringLength(50)]
     public string? GeneralCondition { get; set; }
 
-    [InverseProperty("IvffemaleFhadditionalMeasures")]
+    [InverseProperty("IvfadditionalMeasures")]
     public virtual ICollection<IvfpidembblastIndications> IvfpidembblastIndications { get; set; } = new List<IvfpidembblastIndications>();
 
-    [InverseProperty("IvffemaleFhadditionalMeasures")]
+    [InverseProperty("IvfadditionalMeasures")]
     public virtual ICollection<IvfpidpolarBodiesIndications> IvfpidpolarBodiesIndications { get; set; } = new List<IvfpidpolarBodiesIndications>();
 
-    [InverseProperty("IvffemaleFhadditionalMeasures")]
+    [InverseProperty("IvfadditionalMeasures")]
     public virtual ICollection<IvfplannedAdditionalMeasures> IvfplannedAdditionalMeasures { get; set; } = new List<IvfplannedAdditionalMeasures>();
 }

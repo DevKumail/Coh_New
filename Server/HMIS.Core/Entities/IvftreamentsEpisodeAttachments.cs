@@ -12,10 +12,10 @@ public partial class IvftreamentsEpisodeAttachments
     [Key]
     public int Id { get; set; }
 
-    [Column("IVFFemaleFHAdditionalMeasuresId")]
-    public int IvffemaleFhadditionalMeasuresId { get; set; }
+    [Column("IVFDashboardTreatmentEpisodeId")]
+    public int IvfdashboardTreatmentEpisodeId { get; set; }
 
-    [ForeignKey("IvffemaleFhadditionalMeasuresId")]
+    [ForeignKey("IvfdashboardTreatmentEpisodeId")]
     [InverseProperty("IvftreamentsEpisodeAttachments")]
-    public virtual IvfdashboardTreatmentEpisode IvffemaleFhadditionalMeasures { get; set; } = null!;
+    public virtual IvfdashboardTreatmentEpisode IvfdashboardTreatmentEpisode { get; set; } = null!;
 }

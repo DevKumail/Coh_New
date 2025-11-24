@@ -10,17 +10,17 @@ namespace HMIS.Core.Entities;
 public partial class IvftreatmentTypes
 {
     [Key]
-    [Column("IVFFemaleTreatmentTypeId")]
-    public int IvffemaleTreatmentTypeId { get; set; }
+    [Column("IVFTreatmentTypeId")]
+    public int IvftreatmentTypeId { get; set; }
 
-    [Column("IVFFemaleTreatmentCycleId")]
-    public int? IvffemaleTreatmentCycleId { get; set; }
+    [Column("IVFDashboardTreatmentEpisodeId")]
+    public int? IvfdashboardTreatmentEpisodeId { get; set; }
 
     public long? TreatmentCategoryId { get; set; }
 
-    [ForeignKey("IvffemaleTreatmentCycleId")]
+    [ForeignKey("IvfdashboardTreatmentEpisodeId")]
     [InverseProperty("IvftreatmentTypes")]
-    public virtual IvfdashboardTreatmentEpisode? IvffemaleTreatmentCycle { get; set; }
+    public virtual IvfdashboardTreatmentEpisode? IvfdashboardTreatmentEpisode { get; set; }
 
     [ForeignKey("TreatmentCategoryId")]
     [InverseProperty("IvftreatmentTypes")]
