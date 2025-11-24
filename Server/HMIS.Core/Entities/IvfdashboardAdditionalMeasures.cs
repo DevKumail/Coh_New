@@ -13,15 +13,37 @@ public partial class IvfdashboardAdditionalMeasures
     [Column("IVFAdditionalMeasuresId")]
     public int IvfadditionalMeasuresId { get; set; }
 
+    [Column("IVFDashboardTreatmentEpisodeId")]
+    public int IvfdashboardTreatmentEpisodeId { get; set; }
+
     [StringLength(50)]
     public string? GeneralCondition { get; set; }
 
-    [InverseProperty("IvfadditionalMeasures")]
-    public virtual ICollection<IvfpidembblastIndications> IvfpidembblastIndications { get; set; } = new List<IvfpidembblastIndications>();
+    public int? CreatedBy { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    [ForeignKey("IvfdashboardTreatmentEpisodeId")]
+    [InverseProperty("IvfdashboardAdditionalMeasures")]
+    public virtual IvfdashboardTreatmentEpisode IvfdashboardTreatmentEpisode { get; set; } = null!;
 
     [InverseProperty("IvfadditionalMeasures")]
-    public virtual ICollection<IvfpidpolarBodiesIndications> IvfpidpolarBodiesIndications { get; set; } = new List<IvfpidpolarBodiesIndications>();
+    public virtual ICollection<IvfembblastIndications> IvfembblastIndications { get; set; } = new List<IvfembblastIndications>();
+
+    [InverseProperty("IvfadditionalMeasures")]
+    public virtual ICollection<IvfperformedAdditionalMeasures> IvfperformedAdditionalMeasures { get; set; } = new List<IvfperformedAdditionalMeasures>();
 
     [InverseProperty("IvfadditionalMeasures")]
     public virtual ICollection<IvfplannedAdditionalMeasures> IvfplannedAdditionalMeasures { get; set; } = new List<IvfplannedAdditionalMeasures>();
+
+    [InverseProperty("IvfadditionalMeasures")]
+    public virtual ICollection<IvfpolarBodiesIndications> IvfpolarBodiesIndications { get; set; } = new List<IvfpolarBodiesIndications>();
 }
