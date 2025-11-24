@@ -1,7 +1,7 @@
 <div class="card shadow">
   <div class="card-header d-flex justify-content-between align-items-center">
     <div>
-      <div class="fw-bold">Order completion</div>
+      <div class="fw-bold">Tests Observations</div>
       <div class="small text-muted">Order #: {{ order?.orderNumber || order?.orderSetId || '-' }}</div>
     </div>
     <div class="d-flex gap-2">
@@ -60,7 +60,7 @@
       <h6 class="mb-3">Test Details</h6>
       <div class="table-responsive">
         <table class="table table-sm table-bordered">
-          <thead class="table-light">
+          <thead>
             <tr>
               <th>Test Name</th>
               <th>Material</th>
@@ -86,7 +86,7 @@
       <h6 class="mb-3">Observations</h6>
       <div class="table-responsive">
         <table class="table table-sm table-bordered mb-2">
-          <thead class="table-light">
+          <thead>
             <tr>
               <th style="width: 60px;">Default Result</th>
               <th style="width: 400px;">Test</th>
@@ -111,13 +111,13 @@
                 <input class="form-check-input" type="checkbox" formControlName="weqayaScreening">
               </td>
               <td>
-                <select class="form-select form-select-sm" formControlName="selectedTest">
+                <select class="form-select form-select-sm" 
+                        formControlName="selectedTest"
+                        (change)="onTestSelectionChange(i, $any($event.target).value)">
                   <option [value]="''">Select Test</option>
                   <option *ngFor="let test of tests" 
-                          [value]="test.orderSetDetailId || test.id"
-                          [disabled]="isTestAlreadyUsed(test.orderSetDetailId || test.id, i)">
+                          [value]="test.orderSetDetailId || test.id">
                     {{ test.name || test.testName || test.cpt }}
-                    {{ isTestAlreadyUsed(test.orderSetDetailId || test.id, i) ? ' (Already used)' : '' }}
                   </option>
                 </select>
               </td>

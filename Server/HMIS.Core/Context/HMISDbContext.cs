@@ -874,14 +874,6 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.UploadedDate).HasDefaultValueSql("(getdate())");
         });
 
-        modelBuilder.Entity<DocumentUpload>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Document__3214EC07B46B22F3");
-
-            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
-            entity.Property(e => e.UploadedDate).HasDefaultValueSql("(getdate())");
-        });
-
         modelBuilder.Entity<DropdownCategory>(entity =>
         {
             entity.HasKey(e => e.CategoryId).HasName("PK__Dropdown__19093A0B926B72D2");
@@ -1687,26 +1679,6 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.TreatmentCategory).WithMany(p => p.IvftreatmentTypes).HasConstraintName("FK_IVFFemaleTreatmentTypes_DropdownConfiguration");
         });
 
-        modelBuilder.Entity<IvfmaleSemenSampleApprovalStatus>(entity =>
-        {
-            entity.HasKey(e => e.ApprovalStatusId).HasName("PK__IVFMaleS__08E527F8432A2EFA");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
-
-            entity.HasOne(d => d.Sample).WithMany(p => p.IvfmaleSemenSampleApprovalStatus).HasConstraintName("FK_Observation_Approval_Sample");
-        });
-
-        modelBuilder.Entity<IvfmaleSemenSampleDiagnosis>(entity =>
-        {
-            entity.HasKey(e => e.DiagnosisId).HasName("PK__IVFMaleS__0C54CC73DC667145");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
-
-            entity.HasOne(d => d.Sample).WithMany(p => p.IvfmaleSemenSampleDiagnosis).HasConstraintName("FK_Observation_Diagnosis_Sample");
-        });
-
         modelBuilder.Entity<LabOrderSet>(entity =>
         {
             entity.HasKey(e => e.LabOrderSetId).HasName("PK__LabOrder__322AE07AA8CA4595");
@@ -1735,16 +1707,6 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<LabSampleTypes>(entity =>
-        {
-            entity.HasKey(e => e.SampleTypeId).HasName("PK__LabSampl__4B9609E93B412B43");
-
-            entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.FastingRequired).HasDefaultValue(false);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
-        });
-
         modelBuilder.Entity<LabTests>(entity =>
         {
             entity.HasKey(e => e.LabTestId).HasName("PK_LabTestId");
@@ -1755,13 +1717,6 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.Laboratory).WithMany(p => p.LabTests).HasConstraintName("FK_LabTests_Laboratory");
 
             entity.HasOne(d => d.SampleType).WithMany(p => p.LabTests).HasConstraintName("FK_LabTests_SampleTypes");
-        });
-
-        modelBuilder.Entity<Laboratories>(entity =>
-        {
-            entity.HasKey(e => e.LaboratoryId).HasName("PK__Laborato__238050AD19EC2334");
-
-            entity.Property(e => e.Active).HasDefaultValue(true);
         });
 
         modelBuilder.Entity<Laboratories>(entity =>

@@ -125,6 +125,8 @@ namespace HMIS.Application.ServiceLogics.IVF
 
         private class LabRow
         {
+            public string SampleTypeName { get; set; } = null!;
+
             public long LabTestId { get; set; }
             public long? ParentId { get; set; }
             public string LabName { get; set; }
@@ -132,6 +134,9 @@ namespace HMIS.Application.ServiceLogics.IVF
             public bool? IsProfile { get; set; }
             public int? InvestigationTypeID { get; set; }
             public int? LaboratoryId { get; set; }
+
+            public int? SampleTypeId { get; set; }
+            
         }
     }
 }

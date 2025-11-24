@@ -108,6 +108,8 @@ export class SampleCollectionComponent implements OnInit {
       tests: this.tests || [],
       form: this.form
     };
+    console.log('Sample Collection Payload:', payload);
+    console.log('OrderSetDetailIds:', this.tests.map(t => t.orderSetDetailId));
     this.collected.emit(payload);
   }
 }

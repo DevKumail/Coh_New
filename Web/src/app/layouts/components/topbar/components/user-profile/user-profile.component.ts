@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 
 import { AuthService } from '@core/services/auth.service';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 
 @Component({
   selector: 'app-user-profile-topbar',
@@ -25,7 +26,8 @@ export class UserProfileComponent {
   menuItems = userDropdownItems;
 
   constructor(
-    public authService : AuthService
+    public authService: AuthService,
+    private patientBannerService: PatientBannerService
   ){}
 
   displayName: string = '';
@@ -61,19 +63,37 @@ export class UserProfileComponent {
         confirmButtonText: 'Yes, logout!',
         cancelButtonText: 'Cancel',
         allowOutsideClick: false
-    }).then((result) => {
+    }).then(async (result) => {
         if (result.isConfirmed) {
+          // Clear browser caches
           caches.keys().then(names => {
             return Promise.all(
               names.map(name => caches.delete(name))
             );
           });
-            this.executeLogout();
+          
+          // Clear IndexedDB
+          try {
+            await indexedDB.deleteDatabase('coherent');
+            console.log('✅ IndexedDB cleared');
+          } catch (error) {
+            console.error('⚠️ Failed to clear IndexedDB:', error);
+          }
+          
+          this.executeLogout();
         }
     });
 }
 
-private executeLogout() {
+private async executeLogout() {
+    // Clear patient banner data from RxDB
+    try {
+        await this.patientBannerService.clearAll();
+        console.log('✅ RxDB cleared on logout');
+    } catch (error) {
+        console.error('⚠️ Failed to clear RxDB:', error);
+    }
+
     const logout$ = this.authService.logout();
 
     Swal.fire({

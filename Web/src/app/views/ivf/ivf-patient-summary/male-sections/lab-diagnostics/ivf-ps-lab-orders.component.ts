@@ -31,12 +31,15 @@ import { LucideAngularModule, Edit, TestTube, Check, Trash2, XCircle } from 'luc
     .skeleton-loader { background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius:4px; }
     @keyframes loading { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
     .cursor-pointer { cursor: pointer; }
-    .child-row-bg { background-color: #f9fafb; }
+    .child-row-bg { background-color: transparent !important; border: none !important; }
     .child-container { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; }
     .child-row-bg.show .child-container { max-height: 500px; }
+    .child-container .table { background-color: transparent; color: var(--bs-body-color); border: none; }
+    .child-container .table thead th { background-color: transparent; color: var(--bs-body-color); border: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .child-container .table tbody td { background-color: transparent; color: var(--bs-body-color); border: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .btn-link { text-decoration: none; }
     .btn-link:hover { text-decoration: none; }
-    .btn-link:disabled { opacity: 0.4; }
+    .btn-link:disabled { opacity: 0.3; cursor: not-allowed; }
   `],
   template: `
     <!-- Toast Notifications -->
@@ -105,12 +108,6 @@ import { LucideAngularModule, Edit, TestTube, Check, Trash2, XCircle } from 'luc
                           <button class="btn btn-sm btn-link text-primary p-1" (click)="openEdit(o); $event.stopPropagation()" title="Edit" aria-label="Edit">
                             <i-lucide [img]="Edit" [size]="16"></i-lucide>
                           </button>
-                          <button class="btn btn-sm btn-link text-secondary p-1" (click)="openCollect(o); $event.stopPropagation()" [disabled]="isCollectDisabled(o)" title="Collect sample" aria-label="Collect sample">
-                            <i-lucide [img]="TestTube" [size]="16"></i-lucide>
-                          </button>
-                          <button class="btn btn-sm btn-link text-success p-1" (click)="markOrderComplete(o); $event.stopPropagation()" [disabled]="isMarkCompleteDisabled(o)" title="Mark as complete" aria-label="Mark as complete">
-                            <i-lucide [img]="Check" [size]="16"></i-lucide>
-                          </button>
                           <button class="btn btn-sm btn-link text-warning p-1" [disabled]="!o.orderSetId" (click)="cancelOrder(o); $event.stopPropagation()" title="Cancel" aria-label="Cancel">
                             <i-lucide [img]="XCircle" [size]="16"></i-lucide>
                           </button>
@@ -122,18 +119,19 @@ import { LucideAngularModule, Edit, TestTube, Check, Trash2, XCircle } from 'luc
                     </tr>
                     <!-- Child row: tests for this order -->
                     <tr class="child-row-bg" [class.show]="expandedRow === o">
-                      <td colspan="9" class="text-start">
+                      <td colspan="9" class="text-start p-0">
                         <div class="child-container">
                           <ng-container *ngIf="o.tests?.length; else noTests">
-                            <div class="fw-semibold mb-2">Tests in this order</div>
+                            <div class="fw-semibold mb-2 px-3 pt-3">Tests in this order</div>
                             <div class="table-responsive">
-                              <table class="table table-sm table-bordered mb-0">
-                                <thead class="table-light">
+                              <table class="table table-sm mb-0">
+                                <thead>
                                   <tr>
                                     <th style="width: 40px;">#</th>
                                     <th>Test</th>
                                     <th>Material</th>
-                                    <th>Status</th>
+                                    <th style="width: 200px;">Status</th>
+                                    <th style="width: 140px;">Actions</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -142,28 +140,41 @@ import { LucideAngularModule, Edit, TestTube, Check, Trash2, XCircle } from 'luc
                                     <td class="text-truncate">{{ t.name || t.cpt }}</td>
                                     <td class="text-truncate">{{ t.sampleTypeName || '-' }}</td>
                                     <td>{{ t.status || 'New' }}</td>
+                                    <td>
+                                      <div class="d-flex gap-1 justify-content-center">
+                                        <button
+                                          type="button"
+                                          class="btn btn-sm btn-link text-secondary p-1"
+                                          (click)="openCollectForTest(o, t); $event.stopPropagation()"
+                                          [disabled]="isTestCollected(t)"
+                                          title="Sample Collection">
+                                          <i-lucide [img]="TestTube" [size]="16"></i-lucide>
+                                        </button>
+                                        <button
+                                          type="button"
+                                          class="btn btn-sm btn-link text-success p-1"
+                                          (click)="markTestComplete(o, t); $event.stopPropagation()"
+                                          [disabled]="isTestCompleted(t)"
+                                          title="Mark as Complete">
+                                          <i-lucide [img]="Check" [size]="16"></i-lucide>
+                                        </button>
+                                        <button
+                                          type="button"
+                                          class="btn btn-sm btn-link text-primary p-1"
+                                          (click)="openCompleteForTest(o, t); $event.stopPropagation()"
+                                          title="Add Observation">
+                                          <i-lucide [img]="Edit" [size]="16"></i-lucide>
+                                        </button>
+                                      </div>
+                                    </td>
                                   </tr>
                                 </tbody>
                               </table>
                             </div>
-                            <div class="mt-2">
-                              <button
-                                type="button"
-                                class="btn btn-sm btn-outline-primary"
-                                (click)="openComplete(o); $event.stopPropagation()">
-                                Observations
-                              </button>
-                            </div>
                           </ng-container>
                           <ng-template #noTests>
-                            <span class="text-muted">No tests found for this order.</span>
-                            <div class="mt-2">
-                              <button
-                                type="button"
-                                class="btn btn-sm btn-outline-primary"
-                                (click)="openComplete(o); $event.stopPropagation()">
-                                Observations
-                              </button>
+                            <div class="px-3 py-3">
+                              <span class="text-muted">No tests found for this order.</span>
                             </div>
                           </ng-template>
                         </div>
@@ -347,10 +358,88 @@ export class IvfPsLabOrdersComponent implements OnInit {
   }
 
   private isCollectedStatus(status: any): boolean {
-    debugger
     const s = (status || '').toString().toUpperCase();
-    // Handle 'COLLECTED', 'SAMPLE COLLECTED', etc.
-    return s === '4' || s.includes('4') || s.includes('Sample Collected');
+    // Handle 'COLLECTED', 'SAMPLE COLLECTED', status id 3 or 4, etc.
+    return s === '3' || s === '4' || 
+           s.includes('COLLECT') || 
+           s.includes('SAMPLE COLLECTED') ||
+           s === 'SAMPLE COLLECTED';
+  }
+
+  // Per-test helper methods
+  isTestCollected(test: any): boolean {
+    // Disable collection if already collected OR completed
+    return this.isCollectedStatus(test?.status) || this.isTestCompleted(test);
+  }
+
+  isTestCompleted(test: any): boolean {
+    const status = (test?.status || '').toString().toUpperCase();
+    return status === 'COMPLETED' || status === 'MARKED AS COMPLETED' || status.includes('COMPLETED');
+  }
+
+  // Open sample collection for a single test
+  openCollectForTest(order: any, test: any) {
+    if (this.isTestCollected(test)) {
+      const message = this.isTestCompleted(test) 
+        ? 'This test is already completed' 
+        : 'Sample already collected for this test';
+      this.showNotification(message, 'warning');
+      return;
+    }
+    this.editingRow = order;
+    this.editingTests = [{ ...test, selected: true }];
+    
+    if (this.collectModalRef) {
+      this.collectModalRef.close();
+    }
+    this.collectModalRef = this.modalService.open(this.collectModalTpl, {
+      size: 'lg',
+      backdrop: 'static',
+      keyboard: false
+    });
+  }
+
+  // Mark a single test as complete
+  markTestComplete(order: any, test: any) {
+    const detailId = test?.orderSetDetailId;
+    if (!detailId) {
+      this.showNotification('Test detail ID is missing', 'warning');
+      return;
+    }
+
+    if (this.isTestCompleted(test)) {
+      this.showNotification('This test is already marked as completed', 'info');
+      return;
+    }
+
+    if (!this.isTestCollected(test)) {
+      this.showNotification('Sample must be collected before marking as complete', 'warning');
+      return;
+    }
+
+    this.isLoading = true;
+    const status = 4; // Completed
+    this.ivfApi.markLabOrderComplete(detailId, status).subscribe({
+      next: () => {
+        this.showNotification('Test marked as complete', 'success');
+      },
+      error: (error) => {
+        console.error('Error marking test complete:', error);
+        const errorMsg = error.error?.message || error.error || 'Unknown error';
+        this.showNotification('Failed to mark test complete: ' + errorMsg, 'danger');
+      },
+      complete: () => {
+        this.isLoading = false;
+        if (this.currentMrNo) this.loadOrders(this.currentMrNo);
+      }
+    });
+  }
+
+  // Open observation form for a single test
+  openCompleteForTest(order: any, test: any) {
+    this.editingRow = order;
+    this.editingTests = [{ ...test, done: false }];
+    this.showCompletePage = true;
   }
 
   loadOrders(mrno: string | number) {

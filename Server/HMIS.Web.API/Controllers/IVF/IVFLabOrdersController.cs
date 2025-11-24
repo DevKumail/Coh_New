@@ -98,11 +98,11 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(rows);
         }
 
-        // Sample collection
-        [HttpPost("{orderSetDetailId:long}/collect")]
-        public async Task<IActionResult> CollectSample(long orderSetDetailId, [FromBody] CollectSampleDTO payload)
+        // Sample collection - Collect samples for all tests in the order
+        [HttpPost("{OrderSetDetailId:long}/collect")]
+        public async Task<IActionResult> CollectSample(long OrderSetDetailId, [FromBody] CollectSampleDTO payload)
         {
-            var ok = await _service.CollectSampleAsync(orderSetDetailId, payload);
+            var ok = await _service.CollectSampleAsync(OrderSetDetailId, payload);
             return ok ? NoContent() : NotFound();
         }
 
@@ -113,18 +113,15 @@ namespace HMIS.Web.Controllers.IVF
             if (labResultId == 0) return NotFound();
             return Ok(new { labResultId });
         }
-        [HttpPost("{orderSetId:long}/mark-complete")]
-        public async Task<IActionResult> MarkComplete([FromRoute] long orderSetId,[FromBody] LabOrderStatus status)
+        [HttpPost("{orderSetDetailId:long}/mark-complete")]
+        public async Task<IActionResult> MarkComplete([FromRoute] long orderSetDetailId)
         {
-            var labResultId = await _service.MarkCompleteOrderAsync(orderSetId, status);
+            var success = await _service.MarkCompleteOrderAsync(orderSetDetailId);
 
-            if (labResultId == 0)
-                return NotFound("Order set not found or already completed.");
+            if (!success)
+                return NotFound("Order detail not found.");
 
-            if (labResultId == -1)
-                return BadRequest("Cannot mark as complete until all test samples are collected.");
-
-            return Ok(new { labResultId, orderSetId, status });
+            return NoContent();
         }
 
         [HttpPost("{orderSetId:long}/cancel")]

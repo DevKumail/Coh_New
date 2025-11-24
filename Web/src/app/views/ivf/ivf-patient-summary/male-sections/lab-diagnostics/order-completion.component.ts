@@ -4,6 +4,7 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators, ReactiveFor
 import { NgbDateStruct, NgbDatepicker, NgbDatepickerModule, NgbTimepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin, of, Observable } from 'rxjs';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
+import Swal from 'sweetalert2';
 
 export interface LabResultObservation {
   valueType: string;
@@ -37,19 +38,22 @@ export interface LabResultObservation {
     .form-label {
       font-weight: 500;
       margin-bottom: 0.25rem;
+      color: var(--bs-body-color);
     }
     .form-section {
-      background-color: #f8f9fa;
+      background-color: var(--bs-secondary-bg);
       border-radius: 4px;
       padding: 1rem;
       margin-bottom: 1rem;
+      color: var(--bs-body-color);
     }
     .observation-row {
-      background-color: #f8f9fa;
+      background-color: var(--bs-secondary-bg);
       border-radius: 4px;
       padding: 1rem;
       margin-bottom: 1rem;
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--bs-border-color);
+      color: var(--bs-body-color);
     }
     .btn-add-observation {
       margin-top: 1rem;
@@ -139,6 +143,27 @@ export class OrderCompletionComponent implements OnInit, OnChanges {
     return observations.some((obs: any, index: number) => 
       index !== currentObservationIndex && obs.selectedTest === testId
     );
+  }
+
+  onTestSelectionChange(index: number, selectedTestId: string) {
+    // Check if test is already used in another observation
+    if (selectedTestId && this.isTestAlreadyUsed(selectedTestId, index)) {
+      // Show SweetAlert
+      Swal.fire({
+        icon: 'warning',
+        title: 'Test Already Selected',
+        text: 'This test has already been selected in another observation. Please select a different test.',
+        showConfirmButton: true,
+        buttonsStyling: false,
+        customClass: {
+          confirmButton: 'btn btn-warning'
+        }
+      });
+      
+      // Clear the selection
+      const observationControl = this.observations.at(index) as FormGroup;
+      observationControl.patchValue({ selectedTest: '' });
+    }
   }
 
   createObservation(): FormGroup {

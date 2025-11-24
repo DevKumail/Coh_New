@@ -14,9 +14,12 @@ import { OrderCompletionComponent } from './order-completion.component';
     .skeleton-loader { background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius:4px; }
     @keyframes loading { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
     .cursor-pointer { cursor: pointer; }
-    .child-row-bg { background-color: #f9fafb; }
+    .child-row-bg { background-color: transparent !important; border: none !important; }
     .child-container { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; }
     .child-row-bg.show .child-container { max-height: 500px; }
+    .child-container .table { background-color: transparent; color: var(--bs-body-color); border: none; }
+    .child-container .table thead th { background-color: transparent; color: var(--bs-body-color); border: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .child-container .table tbody td { background-color: transparent; color: var(--bs-body-color); border: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .btn-link { text-decoration: none; }
     .btn-link:hover { text-decoration: none; }
   `],
@@ -78,8 +81,8 @@ import { OrderCompletionComponent } from './order-completion.component';
                           <ng-container *ngIf="r.observations?.length; else noObs">
                           <div class="fw-semibold mb-2">Observations for {{ r.testName }}</div>
                           <div class="table-responsive">
-                            <table class="table table-sm table-bordered mb-0">
-                              <thead class="table-light">
+                            <table class="table table-sm mb-0">
+                              <thead>
                                 <tr>
                                   <th style="width: 40px;">#</th>
                                   <th>Observation</th>

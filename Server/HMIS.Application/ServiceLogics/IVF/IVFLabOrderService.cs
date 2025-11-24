@@ -22,8 +22,8 @@ namespace HMIS.Application.ServiceLogics.IVF
         Task<IEnumerable<OptionDTO>> GetRefPhysiciansAsync(int? employeeTypeId);
         Task<IEnumerable<OptionDTO>> GetNotifyRolesAsync();
         Task<IEnumerable<OptionDTO>> GetReceiversByEmployeeTypeAsync(int? employeeTypeId);
-        Task<bool> CollectSampleAsync(long orderSetDetailId, CollectSampleDTO payload);
-        Task<long> MarkCompleteOrderAsync(long orderSetId, LabOrderStatus status);
+        Task<bool> CollectSampleAsync(long OrderSetDetailId, CollectSampleDTO payload);
+        Task<bool> MarkCompleteOrderAsync(long orderSetDetailId);
         Task<int> CompleteOrderAsync(long orderSetDetailId, CompleteLabOrderDTO payload);
         Task<IEnumerable<OrderCollectionDetailsDTO>> GetOrderCollectionDetailsAsync(long orderSetId);
         Task<IEnumerable<PathologyResultDTO>> GetPathologyResultsAsync(long mrno, string? search);
@@ -170,76 +170,108 @@ AND (
             public string? Clinician { get; set; }
         }
 
-        public async Task<bool> CollectSampleAsync(long orderSetDetailId, CollectSampleDTO payload)
+        public async Task<bool> CollectSampleAsync(long OrderSetDetailId, CollectSampleDTO payload)
         {
+            await using var tx = await _db.Database.BeginTransactionAsync();
             try
             {
-                var detail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetDetailId == orderSetDetailId);
+                // Get the detail record
+                var detail = await _db.LabOrderSetDetail
+                    .FirstOrDefaultAsync(d => d.OrderSetDetailId == OrderSetDetailId && !(d.IsDeleted ?? false));
+
                 if (detail == null) return false;
 
+                // Update CollectDate and Status for the test detail
                 detail.CollectDate = payload.CollectDate;
-                // Update header status to SAMPLE_COLLECTED via enum mapping
+                detail.Status = ((int)LabOrderStatus.SampleCollected).ToString(); // Store ID: "3"
+
+                // Check if all details in this order have samples collected
+                var allDetails = await _db.LabOrderSetDetail
+                    .Where(d => d.OrderSetId == detail.OrderSetId && !(d.IsDeleted ?? false))
+                    .ToListAsync();
+
+                bool allCollected = allDetails.All(d => d.CollectDate.HasValue || d.OrderSetDetailId == OrderSetDetailId);
+
+                // Update parent order status
                 var header = await _db.LabOrderSet.FirstOrDefaultAsync(h => h.LabOrderSetId == detail.OrderSetId);
                 if (header != null)
                 {
-                    var resolved = ResolveStatus(LabOrderStatus.SampleCollected, header.OrderStatus, header.IsSigned);
-                    header.OrderStatus = resolved.status;
-                    header.IsSigned = resolved.isSigned;
-                    // Reflect collected date/time on header for display compatibility
-                    header.OrderDate = FormatDate(payload.CollectDate);
+                    if (allCollected)
+                    {
+                        // All samples collected → Status = SampleCollected (3)
+                        header.OrderStatus = ((int)LabOrderStatus.SampleCollected).ToString();
+                    }
+                    else
+                    {
+                        // Some samples collected → Status = InProgress (2)
+                        header.OrderStatus = ((int)LabOrderStatus.InProgress).ToString();
+                    }
+                    
                     header.UpdatedBy = payload.UserId.ToString();
                     header.UpdatedDate = FormatDate(DateTime.UtcNow);
                 }
+
                 await _db.SaveChangesAsync();
+                await tx.CommitAsync();
                 return true;
             }
             catch(Exception ex)
             {
+                await tx.RollbackAsync();
                 throw ex;
             }
         }
 
-        public async Task<long> MarkCompleteOrderAsync(long orderSetId, LabOrderStatus status)
+        public async Task<bool> MarkCompleteOrderAsync(long orderSetDetailId)
         {
-            var orderSet = await _db.LabOrderSet.FirstOrDefaultAsync(o => o.LabOrderSetId == orderSetId);
-            if (orderSet == null)
+            await using var tx = await _db.Database.BeginTransactionAsync();
+            try
             {
-                return 0;
-            }
+                // Get the detail record
+                var detail = await _db.LabOrderSetDetail
+                    .FirstOrDefaultAsync(d => d.OrderSetDetailId == orderSetDetailId && !(d.IsDeleted ?? false));
 
-            // If trying to mark as Completed, ensure all tests for this order have their samples collected
-            if (status == LabOrderStatus.Completed)
-            {
-                var details = await _db.LabOrderSetDetail
-                    .Where(d => d.OrderSetId == orderSetId && !(d.IsDeleted ?? false))
+                if (detail == null) return false;
+
+                // Update Status for the test detail to Completed
+                detail.Status = ((int)LabOrderStatus.Completed).ToString(); // Store ID: "4"
+
+                // Check if all details in this order are completed
+                var allDetails = await _db.LabOrderSetDetail
+                    .Where(d => d.OrderSetId == detail.OrderSetId && !(d.IsDeleted ?? false))
                     .ToListAsync();
 
-                if (details.Count == 0)
+                bool allCompleted = allDetails.All(d => 
+                    d.Status == ((int)LabOrderStatus.Completed).ToString() || 
+                    d.OrderSetDetailId == orderSetDetailId);
+
+                // Update parent order status
+                var header = await _db.LabOrderSet.FirstOrDefaultAsync(h => h.LabOrderSetId == detail.OrderSetId);
+                if (header != null)
                 {
-                    return 0;
+                    if (allCompleted)
+                    {
+                        // All tests completed → Status = Completed (4)
+                        header.OrderStatus = ((int)LabOrderStatus.Completed).ToString();
+                    }
+                    else
+                    {
+                        // Some tests completed → Status = InProgress (2)
+                        header.OrderStatus = ((int)LabOrderStatus.InProgress).ToString();
+                    }
+                    
+                    header.UpdatedDate = FormatDate(DateTime.UtcNow);
                 }
 
-                if (details.Any(d => !d.CollectDate.HasValue))
-                {
-                    // Signal to caller that not all samples are collected yet
-                    return -1;
-                }
+                await _db.SaveChangesAsync();
+                await tx.CommitAsync();
+                return true;
             }
-
-            var resolved = ResolveStatus(status, orderSet.OrderStatus, orderSet.IsSigned);
-
-            // If already in the same resolved status/signature, treat as success without extra write
-            if (orderSet.OrderStatus == resolved.status && orderSet.IsSigned == resolved.isSigned)
+            catch(Exception ex)
             {
-                return orderSet.LabOrderSetId;
+                await tx.RollbackAsync();
+                throw ex;
             }
-
-            orderSet.OrderStatus = resolved.status;
-            orderSet.IsSigned = resolved.isSigned;
-            orderSet.UpdatedDate = FormatDate(DateTime.UtcNow);
-
-            await _db.SaveChangesAsync();
-            return orderSet.LabOrderSetId;
         }
 
         public async Task<int> CompleteOrderAsync(long orderSetDetailId, CompleteLabOrderDTO payload)
@@ -316,9 +348,8 @@ AND (
             detail.PerformDate = payload.PerformDate;
             if (header != null)
             {
-                var resolved = ResolveStatus(LabOrderStatus.Completed, header.OrderStatus, header.IsSigned);
-                header.OrderStatus = resolved.status;
-                header.IsSigned = resolved.isSigned;
+                var resolved = ResolveStatus(LabOrderStatus.Completed, header.OrderStatus);
+                header.OrderStatus = resolved;
                 header.UpdatedBy = payload.UserId.ToString();
                 header.UpdatedDate = FormatDate(DateTime.UtcNow);
             }
@@ -491,8 +522,8 @@ AND (
                             d.Pcomments,
                             TestName = t != null ? t.LabName : null,
                             SampleName = st != null ? st.SampleName : null,
-                            IsSigned = (h.IsSigned ?? false),
-                            OrderStatus = h.OrderStatus
+                            ParentStatus = h.OrderStatus, // Parent order status
+                            DetailStatus = d.Status // Child detail status
                         };
 
             var rows = await query.ToListAsync();
@@ -511,8 +542,8 @@ AND (
                     Clinician = g.First().Clinician,
                     Material = g.First().SampleName,
                     Laboratory = "Internal",
-                    Status = FormatStatusForView(g.First().OrderStatus, g.First().IsSigned),
-                    StatusId = GetStatusIdForView(g.First().OrderStatus, g.First().IsSigned),
+                    Status = FormatStatusForView(g.First().ParentStatus, null),
+                    StatusId = GetStatusIdForView(g.First().ParentStatus, null),
                     Comment = g.First().Pcomments,
                     Children = g.Select(x => new IVFOrderGridRowDTO
                     {
@@ -527,8 +558,8 @@ AND (
                         Name = x.TestName,
                         Material = x.SampleName,
                         Laboratory = "Internal",
-                        Status = FormatStatusForView(x.OrderStatus, x.IsSigned),
-                        StatusId = GetStatusIdForView(x.OrderStatus, x.IsSigned),
+                        Status = FormatStatusForView(x.DetailStatus, null),
+                        StatusId = GetStatusIdForView(x.DetailStatus, null),
                         Comment = x.Pcomments
                     }).ToList()
                 })
@@ -543,7 +574,7 @@ AND (
             try
             {
                 var h = payload.Header;
-                var resolvedCreate = ResolveStatus(h.OrderStatusEnum, h.OrderStatus, h.IsSigned);
+                var resolvedCreate = ResolveStatus(h.OrderStatusEnum, h.OrderStatus);
                 var details = payload.Details ?? new List<LabOrderSetDetailDTO>();
 
                 // Generate order number ONCE per order set
@@ -565,10 +596,9 @@ AND (
                     UpdatedBy = h.UpdatedBy?.ToString(),
                     UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null,
                     OrderControlCode = h.OrderControlCode,
-                    OrderStatus = resolvedCreate.status,
+                    OrderStatus = resolvedCreate,
                     IsHl7msgCreated = h.IsHL7MsgCreated,
                     IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips,
-                    IsSigned = resolvedCreate.isSigned,
                     OldMrno = h.oldMRNo,
                     Hl7messageId = (int?)h.HL7MessageId,
                     OrderNumber = orderNumber
@@ -611,7 +641,8 @@ AND (
                         OldOrderDetailId = d.OldOrderDetailId,
                         RescheduledTo = d.RescheduledTo,
                         BillOnOrder = d.BillOnOrder,
-                        IsDeleted = d.IsDeleted ?? false
+                        IsDeleted = d.IsDeleted ?? false,
+                        Status = ((int)LabOrderStatus.New).ToString() // Store ID: "1" for new orders
                     };
 
                     _db.LabOrderSetDetail.Add(ent);
@@ -641,7 +672,7 @@ AND (
                 if (hdr == null) return false;
 
                 var h = payload.Header;
-                var resolvedUpdate = ResolveStatus(h.OrderStatusEnum, h.OrderStatus, h.IsSigned);
+                var resolvedUpdate = ResolveStatus(h.OrderStatusEnum, h.OrderStatus);
                 hdr.Mrno = h.MRNo;
                 hdr.ProviderId = h.ProviderId;
                 hdr.OrderDate = FormatDate(h.OrderDate);
@@ -651,10 +682,9 @@ AND (
                 hdr.UpdatedBy = h.UpdatedBy?.ToString();
                 hdr.UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null;
                 hdr.OrderControlCode = h.OrderControlCode;
-                hdr.OrderStatus = resolvedUpdate.status;
+                hdr.OrderStatus = resolvedUpdate;
                 hdr.IsHl7msgCreated = h.IsHL7MsgCreated;
                 hdr.IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips;
-                hdr.IsSigned = resolvedUpdate.isSigned;
                 hdr.OldMrno = h.oldMRNo;
                 hdr.Hl7messageId = (int?)h.HL7MessageId;
                 if (h.OrderNumber.HasValue && h.OrderNumber.Value != 0)
@@ -705,7 +735,8 @@ AND (
                             OldOrderDetailId = d.OldOrderDetailId,
                             RescheduledTo = d.RescheduledTo,
                             BillOnOrder = d.BillOnOrder,
-                            IsDeleted = d.IsDeleted ?? false
+                            IsDeleted = d.IsDeleted ?? false,
+                            Status = ((int)LabOrderStatus.New).ToString() // Store ID: "1" for new orders
                         };
                         _db.LabOrderSetDetail.Add(ent);
                     }
@@ -764,7 +795,6 @@ AND (
                 {
                     foreach (var d in details) d.IsDeleted = true;
                     hdr.OrderStatus = "DELETED";
-                    hdr.IsSigned = false;
                 }
                 await _db.SaveChangesAsync();
                 await tx.CommitAsync();
@@ -786,15 +816,14 @@ AND (
                 if (header == null) return 0; // Order not found
 
                 // Check if order can be cancelled (not already completed)
-                if (header.IsSigned == true || header.OrderStatus == "4")
+                if (header.OrderStatus == "4") // Status 4 = Completed
                 {
                     return -1; // Cannot cancel completed orders
                 }
 
                 // Update header status to Cancel
-                var resolved = ResolveStatus(LabOrderStatus.Cancel, header.OrderStatus, header.IsSigned);
-                header.OrderStatus = resolved.status;
-                header.IsSigned = resolved.isSigned;
+                var resolved = ResolveStatus(LabOrderStatus.Cancel, header.OrderStatus);
+                header.OrderStatus = resolved;
                 header.UpdatedBy = payload.UserId.ToString();
                 header.UpdatedDate = FormatDate(payload.CancelDate);
 
@@ -858,7 +887,7 @@ AND (
                 }
             }
 
-            // Fallback for older textual status values stored in DB
+            // Fallback for textual status values stored in DB (enum names or old values)
             var upper = trimmed.ToUpperInvariant();
             switch (upper)
             {
@@ -867,9 +896,11 @@ AND (
                     return "New Order";
                 case "INPROG":
                 case "IN_PROGRESS":
+                case "INPROGRESS":
                     return "In Progress";
                 case "COLLECT":
                 case "SAMPLE_COLLECTED":
+                case "SAMPLECOLLECTED":
                     return "Sample Collected";
                 case "DONE":
                 case "COMPLETED":
@@ -907,9 +938,11 @@ AND (
                     return (int)LabOrderStatus.New;
                 case "INPROG":
                 case "IN_PROGRESS":
+                case "INPROGRESS":
                     return (int)LabOrderStatus.InProgress;
                 case "COLLECT":
                 case "SAMPLE_COLLECTED":
+                case "SAMPLECOLLECTED":
                     return (int)LabOrderStatus.SampleCollected;
                 case "DONE":
                 case "COMPLETED":
@@ -922,28 +955,15 @@ AND (
             }
         }
 
-        private static (string? status, bool? isSigned) ResolveStatus(LabOrderStatus? statusEnum, string? fallbackStatus, bool? fallbackIsSigned)
+        private static string? ResolveStatus(LabOrderStatus? statusEnum, string? fallbackStatus)
         {
             if (!statusEnum.HasValue)
             {
-                return (fallbackStatus, fallbackIsSigned);
+                return fallbackStatus;
             }
 
-            switch (statusEnum.Value)
-            {
-                case LabOrderStatus.New:
-                    return ("1", false);
-                case LabOrderStatus.InProgress:
-                    return ("2", false);
-                case LabOrderStatus.SampleCollected:
-                    return ("3", false);
-                case LabOrderStatus.Completed:
-                    return ("4", true);
-                case LabOrderStatus.Cancel:
-                    return ("5", false);
-                default:
-                    return (fallbackStatus, fallbackIsSigned);
-            }
+            // Simply return the enum ID as string
+            return ((int)statusEnum.Value).ToString();
         }
 
         private async Task<long> GetNextOrderNumberAsync()
