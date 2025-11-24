@@ -11,12 +11,38 @@ using Microsoft.Data.SqlClient;
 
 namespace HMIS.Application.ServiceLogics.IVF.Dashboard
 {
+    public class Result<T>
+    {
+        public bool IsSuccess { get; set; }
+        public T? Data { get; set; }
+        public string? ErrorMessage { get; set; }
+
+        public static Result<T> Success(T data)
+        {
+            return new Result<T>
+            {
+                IsSuccess = true,
+                Data = data
+            };
+        }
+
+        public static Result<T> Failure(string errorMessage)
+        {
+            return new Result<T>
+            {
+                IsSuccess = false,
+                ErrorMessage = errorMessage
+            };
+        }
+    }
+
     public interface IDashboardService
     {
         Task<(bool IsSuccess, DashboardReadDTO Data)> GetCoupleData(string MrNo);
         Task<(bool IsSuccess, IEnumerable<AllExceptSelfPatientsReadDTO> Data, int TotalRecords)> GetOppositeGenderPatients(string gender, PaginationInfo pagination, string? mrno = null, string? phone = null, string? emiratesId = null, string? name = null);
         Task<(bool IsSuccess, int IvfMainId, string Error)> GenerateIVFMain(InsertIvfRelationDTO dto);
         Task<(bool IsSuccess, int RelationId, string Error)> InsertPatientRelation(InsertPatientRelationDTO dto);
+        Task<Result<int>> CreateOrUpdateDashboardTreatmentEpisodeAsync(IVFDashboardTreatmentEpisodeDto dto);
     }
 
     internal class IVFDashboardService : IDashboardService
@@ -28,7 +54,6 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
             _dapper = dapper;
             _db = db;
         }
-
         public async Task<(bool IsSuccess, DashboardReadDTO Data)> GetCoupleData(string MrNo)
         {
             if (string.IsNullOrWhiteSpace(MrNo)) return (false, null);
@@ -195,6 +220,177 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
             catch (Exception ex)
             {
                 return (false, 0, ex.Message);
+            }
+        }
+
+        public async Task<Result<int>> CreateOrUpdateDashboardTreatmentEpisodeAsync(IVFDashboardTreatmentEpisodeDto dto)
+        {
+            if (dto == null) return Result<int>.Failure("DTO is required");
+
+            await using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                IvfdashboardTreatmentEpisode? episode;
+
+                if (dto.IVFDashboardTreatmentEpisodeId.HasValue && dto.IVFDashboardTreatmentEpisodeId.Value > 0)
+                {
+                    episode = await _db.IvfdashboardTreatmentEpisode
+                        .Include(e => e.IvftreatmentTypes)
+                        .Include(e => e.IvftreamentsEpisodeAttachments)
+                        .FirstOrDefaultAsync(e => e.IvfdashboardTreatmentEpisodeId == dto.IVFDashboardTreatmentEpisodeId.Value);
+
+                    if (episode == null)
+                    {
+                        episode = new IvfdashboardTreatmentEpisode();
+                        _db.IvfdashboardTreatmentEpisode.Add(episode);
+                    }
+                }
+                else
+                {
+                    episode = new IvfdashboardTreatmentEpisode();
+                    _db.IvfdashboardTreatmentEpisode.Add(episode);
+                }
+
+                if (dto.IVFMainId.HasValue) episode.IvfmainId = dto.IVFMainId.Value;
+                if (dto.TreatmentTypeCategoryId.HasValue) episode.TreatmentTypeCategoryId = dto.TreatmentTypeCategoryId.Value;
+                if (dto.OnlyInternalCycle.HasValue) episode.OnlyInternalCycle = dto.OnlyInternalCycle.Value;
+                if (dto.DateOfLMP.HasValue) episode.DateofLmp = dto.DateOfLMP.Value;
+                if (dto.TherapyStartDate.HasValue) episode.TherapyStartDate = dto.TherapyStartDate.Value;
+                if (dto.CycleFromAmenorrheaCategoryId.HasValue) episode.CycleFromAmenorrheaCategoryId = dto.CycleFromAmenorrheaCategoryId.Value;
+                if (dto.MainIndicationCategoryId.HasValue) episode.MainIndicationCategoryId = dto.MainIndicationCategoryId.Value;
+                if (dto.ProtocolCategoryId.HasValue) episode.ProtocolCategoryId = dto.ProtocolCategoryId.Value;
+                if (dto.StimulationPlannedCategoryId.HasValue) episode.StimulationPlannedCategoryId = dto.StimulationPlannedCategoryId.Value;
+                if (dto.StimulatedExternallyCategoryId.HasValue) episode.StimulatedExternallyCategoryId = dto.StimulatedExternallyCategoryId.Value;
+                if (dto.LongTermMedication != null) episode.LongTermMedication = dto.LongTermMedication;
+                if (dto.PlannedNo.HasValue) episode.PlannedNo = dto.PlannedNo.Value;
+                if (dto.PlannedSpermCollectionCategoryId.HasValue) episode.PlannedSpermCollectionCategoryId = dto.PlannedSpermCollectionCategoryId.Value;
+                if (dto.CycleNote != null) episode.CycleNote = dto.CycleNote;
+
+                await _db.SaveChangesAsync();
+
+                var episodeId = episode.IvfdashboardTreatmentEpisodeId;
+
+                if (dto.TreatmentCategoryIds != null)
+                {
+                    var existingTypes = await _db.IvftreatmentTypes.Where(t => t.IvfdashboardTreatmentEpisodeId == episodeId && !t.IsDeleted).ToListAsync();
+                    foreach (var t in existingTypes)
+                    {
+                        t.IsDeleted = true;
+                        t.DeletedBy = dto.UpdatedBy;
+                        t.UpdatedBy = dto.UpdatedBy;
+                        t.UpdatedAt = DateTime.UtcNow;
+                    }
+
+                    foreach (var catId in dto.TreatmentCategoryIds)
+                    {
+                        var item = new IvftreatmentTypes
+                        {
+                            IvfdashboardTreatmentEpisodeId = episodeId,
+                            TreatmentCategoryId = catId,
+                            CreatedBy = dto.CreatedBy,
+                            CreatedAt = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        _db.IvftreatmentTypes.Add(item);
+                    }
+                }
+
+                IvfdashboardAdditionalMeasures? additionalMeasures = null;
+                if (dto.IVFAdditionalMeasuresId.HasValue && dto.IVFAdditionalMeasuresId.Value > 0)
+                {
+                    additionalMeasures = await _db.IvfdashboardAdditionalMeasures
+                        .FirstOrDefaultAsync(a => a.IvfadditionalMeasuresId == dto.IVFAdditionalMeasuresId.Value);
+                }
+
+                if (additionalMeasures == null && (!string.IsNullOrWhiteSpace(dto.GeneralCondition)
+                    || (dto.PlannedAdditionalMeasuresCategoryIds != null && dto.PlannedAdditionalMeasuresCategoryIds.Any())
+                    || (dto.PerformedAdditionalMeasuresCategoryIds != null && dto.PerformedAdditionalMeasuresCategoryIds.Any())
+                    || (dto.PolarBodiesIndicationCategoryIds != null && dto.PolarBodiesIndicationCategoryIds.Any())
+                    || (dto.EMBBlastIndicationCategoryIds != null && dto.EMBBlastIndicationCategoryIds.Any())))
+                {
+                    additionalMeasures = new IvfdashboardAdditionalMeasures();
+                    _db.IvfdashboardAdditionalMeasures.Add(additionalMeasures);
+                }
+
+                if (additionalMeasures != null)
+                {
+                    if (dto.GeneralCondition != null) additionalMeasures.GeneralCondition = dto.GeneralCondition;
+
+                    await _db.SaveChangesAsync();
+
+                    var addId = additionalMeasures.IvfadditionalMeasuresId;
+
+                    if (dto.PlannedAdditionalMeasuresCategoryIds != null)
+                    {
+                        var existingPlanned = await _db.IvfplannedAdditionalMeasures.Where(p => p.IvfadditionalMeasuresId == addId).ToListAsync();
+                        if (existingPlanned.Any()) _db.IvfplannedAdditionalMeasures.RemoveRange(existingPlanned);
+
+                        foreach (var mId in dto.PlannedAdditionalMeasuresCategoryIds)
+                        {
+                            var planned = new IvfplannedAdditionalMeasures
+                            {
+                                IvfadditionalMeasuresId = addId,
+                                MeasuresCategoryId = mId
+                            };
+                            _db.IvfplannedAdditionalMeasures.Add(planned);
+                        }
+                    }
+
+                    if (dto.PerformedAdditionalMeasuresCategoryIds != null)
+                    {
+                        await _db.Database.ExecuteSqlRawAsync(
+                            "DELETE FROM IVFPerformedAdditionalMeasures WHERE IVFAdditionalMeasuresId = {0}", addId);
+
+                        foreach (var pId in dto.PerformedAdditionalMeasuresCategoryIds)
+                        {
+                            await _db.Database.ExecuteSqlRawAsync(
+                                "INSERT INTO IVFPerformedAdditionalMeasures (IVFAdditionalMeasuresId, PerformedAdditionalMeasuresCategoryId) VALUES ({0}, {1})",
+                                addId, pId);
+                        }
+                    }
+
+                    if (dto.PolarBodiesIndicationCategoryIds != null)
+                    {
+                        var existingPolar = await _db.IvfpolarBodiesIndications.Where(p => p.IvfadditionalMeasuresId == addId).ToListAsync();
+                        if (existingPolar.Any()) _db.IvfpolarBodiesIndications.RemoveRange(existingPolar);
+
+                        foreach (var cId in dto.PolarBodiesIndicationCategoryIds)
+                        {
+                            var polar = new IvfpolarBodiesIndications
+                            {
+                                IvfadditionalMeasuresId = addId,
+                                PidpolarBodiesIndicationCategoryId = cId
+                            };
+                            _db.IvfpolarBodiesIndications.Add(polar);
+                        }
+                    }
+
+                    if (dto.EMBBlastIndicationCategoryIds != null)
+                    {
+                        var existingEmb = await _db.IvfembblastIndications.Where(p => p.IvfadditionalMeasuresId == addId).ToListAsync();
+                        if (existingEmb.Any()) _db.IvfembblastIndications.RemoveRange(existingEmb);
+
+                        foreach (var eId in dto.EMBBlastIndicationCategoryIds)
+                        {
+                            var emb = new IvfembblastIndications
+                            {
+                                IvfadditionalMeasuresId = addId,
+                                PidembblastIndicationCategoryId = eId
+                            };
+                            _db.IvfembblastIndications.Add(emb);
+                        }
+                    }
+                }
+
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Result<int>.Success(episodeId);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return Result<int>.Failure(ex.Message);
             }
         }
     }
