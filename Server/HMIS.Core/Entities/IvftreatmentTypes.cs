@@ -32,7 +32,7 @@ public partial class IvftreatmentTypes
 
     [ForeignKey("IvfdashboardTreatmentEpisodeId")]
     [InverseProperty("IvftreatmentTypes")]
-    public virtual IvfdashboardTreatmentEpisode? IvfdashboardTreatmentEpisode { get; set; }
+    public virtual IvfdashboardTreatmentCycle? IvfdashboardTreatmentEpisode { get; set; }
 
     [ForeignKey("TreatmentCategoryId")]
     [InverseProperty("IvftreatmentTypes")]

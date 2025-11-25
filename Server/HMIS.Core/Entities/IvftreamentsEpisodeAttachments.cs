@@ -29,5 +29,5 @@ public partial class IvftreamentsEpisodeAttachments
 
     [ForeignKey("IvfdashboardTreatmentEpisodeId")]
     [InverseProperty("IvftreamentsEpisodeAttachments")]
-    public virtual IvfdashboardTreatmentEpisode IvfdashboardTreatmentEpisode { get; set; } = null!;
+    public virtual IvfdashboardTreatmentCycle IvfdashboardTreatmentEpisode { get; set; } = null!;
 }
