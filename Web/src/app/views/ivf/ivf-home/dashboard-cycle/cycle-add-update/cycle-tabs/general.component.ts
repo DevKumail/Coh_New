@@ -16,6 +16,8 @@ export class GeneralComponent {
   generalForm: FormGroup;
   @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
   @Input() hrEmployees: Array<{ providerId: number; name: string }> = [];
+  @Input() femaleHistoryOptions: Array<any> = [];
+  @Input() maleHistoryOptions: Array<any> = [];
 
   constructor(private fb: FormBuilder) {
     this.generalForm = this.fb.group({ 
@@ -53,6 +55,39 @@ export class GeneralComponent {
       maleHistory: [''],
       cycleNote: ['']
     });
+  }
+
+  // --- Medical history dynamic helpers ---
+  private formatPrevIllness(list: Array<{ illnessCode: string; descriptionFull: string }> | null | undefined) {
+    if (!list || !list.length) { return ''; }
+    return list.map(x => `${x.illnessCode} - ${x.descriptionFull}`).join('\n');
+  }
+
+  formatHistoryLabel(entry: any) {
+    const d = entry?.date ? new Date(entry.date).toLocaleDateString() : '-';
+    const prev = (entry?.prevIllnessList && entry.prevIllnessList.length)
+      ? entry.prevIllnessList.map((i: any) => i.descriptionFull).join(', ')
+      : 'Not specified';
+    const chrom = entry?.chromosomeAnalysis ?? 'Not performed';
+    return `M.hist.: ${d} | Prev. ill.: ${prev} | Chromos.: ${chrom}`;
+  }
+
+  onFemaleHistoryChange() {
+    const id = this.generalForm.get('femaleMedicalHistoryOf')?.value;
+    const sel = this.femaleHistoryOptions?.find(x => x.ivfFemaleFHId === id);
+    const text = this.formatPrevIllness(sel?.prevIllnessList);
+    const ctrl = this.generalForm.get('femaleHistory');
+    ctrl?.setValue(text);
+    if (id) { ctrl?.disable({ emitEvent: false }); } else { ctrl?.enable({ emitEvent: false }); }
+  }
+
+  onMaleHistoryChange() {
+    const id = this.generalForm.get('maleMedicalHistoryOf')?.value;
+    const sel = this.maleHistoryOptions?.find(x => x.ivfMaleFHId === id);
+    const text = this.formatPrevIllness(sel?.prevIllnessList);
+    const ctrl = this.generalForm.get('maleHistory');
+    ctrl?.setValue(text);
+    if (id) { ctrl?.disable({ emitEvent: false }); } else { ctrl?.enable({ emitEvent: false }); }
   }
 
   options(key: string) {

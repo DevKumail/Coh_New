@@ -29,6 +29,8 @@ export class CycleAddUpdateComponent implements OnDestroy {
   activeTab: 'general' | 'additional' | 'documents' | 'accounting' = 'general';
   private sub?: Subscription;
   private ivfMainId?: number;
+  FemalemedicalHistory: any[] = [];
+  MalemedicalHistory: any[] = [];
 
   @ViewChild(GeneralComponent) generalTab?: GeneralComponent;
   @ViewChild(AdditionalMeasuresComponent) additionalTab?: AdditionalMeasuresComponent;
@@ -65,12 +67,10 @@ export class CycleAddUpdateComponent implements OnDestroy {
   }
 
   getAllFh() {
-    var MainId
+    let MainId: any;
     this.sub = this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
-      if (data) {
-        if (data?.couple?.ivfMainId != null) {
-          MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
-        }
+      if (data?.couple?.ivfMainId != null) {
+        MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
       }
     });
 
@@ -81,10 +81,11 @@ export class CycleAddUpdateComponent implements OnDestroy {
 
     this.ivfMainId = Number(MainId) || 0;
     this.ivfService.GetFertilityHistoryForDashboard(MainId).subscribe((res: any) => {
-      this.AllDropdownValues = res;
-      this.getAllDropdown(res);
-      console.log(this.AllDropdownValues);
-    })
+      const male = res?.maleFertilityHistory ?? res?.fertilityHistory?.maleFertilityHistory ?? [];
+      const female = res?.femaleFertilityHistory ?? res?.fertilityHistory?.femaleFertilityHistory ?? [];
+      this.MalemedicalHistory = Array.isArray(male) ? male : [];
+      this.FemalemedicalHistory = Array.isArray(female) ? female : [];
+    });
   }
 
   FillCache() {

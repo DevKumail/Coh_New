@@ -43,11 +43,9 @@ export class IVFHomeComponent {
   modalService = new NgbModal();
   selectedTab: 'messages' | 'lab' | 'consents' | 'application' = 'messages';
   overview: Array<{
-    woman: string;
-    no: string | number;
+    id: number;
     start: string;
-    eggTreatment: string;
-    partner: string;
+    treatmentType: string;
     sperm: string;
     stimulation: string;
     stimProt: string;
@@ -185,21 +183,20 @@ export class IVFHomeComponent {
     return Number.isFinite(n) && n > 0 ? n : null;
   }
 
-  loadOverviewCycles(page: number = 1, rowsPerPage: number = 10) {
+  loadOverviewCycles() {
     const mainId = this.resolveIvfMainId();
     if (!mainId) {
       this.overview = [];
       return;
     }
-    this.ivfApi.GetAllIVFDashboardTreatmentCycle(mainId, page, rowsPerPage).subscribe({
+    this.ivfApi.GetAllIVFDashboardTreatmentCycle(mainId, this.CycleListPaginationInfo?.currentPage, this.CycleListPaginationInfo?.pageSize).subscribe({
       next: (res: any) => {
-        const data = res?.data || res || [];
+        this.CycleListTotalrecord = res?.dashboardTreatmentEpisodes?.totalRecords || 0;
+        const data = res?.dashboardTreatmentEpisodes?.data || res || [];
         this.overview = (Array.isArray(data) ? data : []).map((x: any) => ({
-          woman: x?.womanName ?? this.couple?.female?.name ?? '-',
-          no: x?.cycleNo ?? x?.no ?? '-',
-          start: x?.startDate ? new Date(x.startDate).toLocaleDateString() : (x?.start ?? '-'),
-          eggTreatment: x?.eggTreatment ?? '-',
-          partner: x?.partnerName ?? this.couple?.male?.name ?? '-',
+          id: x?.ivfDashboardTreatmentEpisodeId,
+          start: x?.dateOfLMP ? new Date(x.dateOfLMP).toLocaleDateString() : (x?.dateOfLMP ?? '-'),
+          treatmentType: x?.treatmentType ?? '-',
           sperm: x?.sperm ?? '-',
           stimulation: x?.stimulation ?? '-',
           stimProt: x?.stimProtocol ?? '-',
@@ -216,6 +213,15 @@ export class IVFHomeComponent {
     });
   }
 
+  CycleListPaginationInfo: any = {
+    pageSize: 10,
+    currentPage: 1,
+  }
+  CycleListTotalrecord: any = 0
+onCyclePageChanged(event: any){
+  this.CycleListPaginationInfo.currentPage = event;
+this.loadOverviewCycles()
+}
 
   async openLinkaPatient(modalRef: TemplateRef<any>) {
 

@@ -11,7 +11,12 @@
   <div class="card-body">
 
     <ng-container *ngIf="activeTab==='general'">
-      <app-general [dropdowns]="dropdowns" [hrEmployees]="hrEmployees"></app-general>
+      <app-general
+        [dropdowns]="dropdowns"
+        [hrEmployees]="hrEmployees"
+        [femaleHistoryOptions]="FemalemedicalHistory"
+        [maleHistoryOptions]="MalemedicalHistory"
+      ></app-general>
     </ng-container>
 
     <ng-container *ngIf="activeTab==='additional'">
