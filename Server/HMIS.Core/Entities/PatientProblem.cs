@@ -88,6 +88,10 @@ public partial class PatientProblem
 
     public long? PatientId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("PatientProblem")]
     public virtual SchAppointment? Appointment { get; set; }

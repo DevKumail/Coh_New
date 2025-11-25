@@ -31,6 +31,10 @@ public partial class Action
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [InverseProperty("Action")]
     public virtual ICollection<AuditLog> AuditLog { get; set; } = new List<AuditLog>();
 }

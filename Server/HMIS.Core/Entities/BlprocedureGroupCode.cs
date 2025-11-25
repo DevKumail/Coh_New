@@ -31,6 +31,16 @@ public partial class BlprocedureGroupCode
 
     public long? PayerId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("PayerId")]
     [InverseProperty("BlprocedureGroupCode")]
     public virtual Blpayer? Payer { get; set; }

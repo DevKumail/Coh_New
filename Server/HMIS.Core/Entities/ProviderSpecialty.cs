@@ -28,6 +28,16 @@ public partial class ProviderSpecialty
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [InverseProperty("Speciality")]
     public virtual ICollection<ProviderSchedule> ProviderSchedule { get; set; } = new List<ProviderSchedule>();
 }

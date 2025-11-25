@@ -6,9 +6,30 @@
     <div class="card  mt-2 d-flex flex-column">
     <form [formGroup]="clinicalForm" (ngSubmit)="submitVoice()">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-      <span>{{ 'CLINICAL_FREE_TEXT_NOTE_CREATE' | translate }}</span>
-    </h5>
+      <div class="d-flex align-items-center">
+    <label class="form-label mb-0 me-2" style="font-size: 0.875rem; font-weight: 600;">
+      Note Title
+    </label>
+    <input type="text"
+           class="form-control form-control-sm"
+           style="width: 300px; font-size: 0.875rem; background-color: #e9ecef; cursor: not-allowed;"
+           [value]="dataquestion?.node?.noteTitle || ('CLINICAL_FREE_TEXT_NOTE' | translate)"
+           readonly
+           disabled>
+  </div>
+
+  <!-- Description -->
+  <div class="d-flex align-items-center">
+    <label class="form-label mb-0 me-2" style="font-size: 0.875rem;">
+      Description
+    </label>
+    <textarea class="form-control"
+              style="width: 300px; height: 42px; font-size: 0.875rem;"
+              placeholder="Description"
+              formControlName="description">
+    </textarea>
+  </div>
+
 
          <div class="row">
           <div class="col-12 d-flex justify-content-end gap-2">
@@ -32,10 +53,7 @@
             </select>
           </div>
 
-          <div [class]="hideTemplateDropdown ? 'col-sm-4 col-md-3' : 'col-sm-3'">
-            <label class="form-label">Description</label>
-            <textarea class="form-control" style="height: 37px;" placeholder="Description" formControlName="description"></textarea>
-          </div>
+
 
         </div>
       </div>
@@ -56,13 +74,14 @@
 
     <!-- Free Text Editor when no template -->
     <div class="mt-3" *ngIf="!dataquestion?.node?.noteTitle">
-      <div class="card p-3">
-        <h5 class="mb-3">Clinical Note Editor</h5>
-        <div contenteditable="true"
-             class="form-control editable-content"
-             style="min-height: 400px; overflow-y: auto;"
-             placeholder="Start typing your clinical note here...">
-        </div>
+      <div class="card px-3 py-2">
+        <label class="fw-bold mb-2">Clinical Note Editor</label>
+        <quill-editor
+          formControlName="editorContent"
+          [modules]="quillModules"
+          format="html"
+          [style.height]="'300px'">
+        </quill-editor>
       </div>
     </div>
 
@@ -74,7 +93,7 @@
 </div>
 
 <style>
-  .editable-title, .editable-question, .editable-content {
+  .editable-title, .editable-question {
     outline: none;
     border: 1px dashed transparent;
     padding: 8px;
@@ -82,20 +101,14 @@
     transition: all 0.2s;
   }
 
-  .editable-title:hover, .editable-question:hover, .editable-content:hover {
+  .editable-title:hover, .editable-question:hover {
     border-color: #0d6efd;
     background-color: #f8f9fa;
   }
 
-  .editable-title:focus, .editable-question:focus, .editable-content:focus {
+  .editable-title:focus, .editable-question:focus {
     border-color: #0d6efd;
     background-color: #ffffff;
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
-  }
-
-  .editable-content[contenteditable]:empty:before {
-    content: attr(placeholder);
-    color: #6c757d;
-    font-style: italic;
   }
 </style>

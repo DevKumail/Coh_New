@@ -125,6 +125,13 @@ public partial class PatientBill
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("ProcedureId")]
     [InverseProperty("PatientBill")]
     public virtual BlsuperBillProcedure Procedure { get; set; } = null!;

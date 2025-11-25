@@ -12,4 +12,14 @@ public partial class RegRelationInverseMap
     public int RelationshipId { get; set; }
 
     public int InverseRelationshipId { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
 }

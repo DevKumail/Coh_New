@@ -67,6 +67,16 @@ public partial class Laboratories
     [StringLength(255)]
     public string? SiteApplicationId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [InverseProperty("Laboratory")]
     public virtual ICollection<LabTests> LabTests { get; set; } = new List<LabTests>();
 }

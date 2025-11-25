@@ -33,6 +33,16 @@ public partial class Emrroute
     [Unicode(false)]
     public string? MalaffiRoute { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [InverseProperty("Route")]
     public virtual ICollection<PatientImmunization> PatientImmunization { get; set; } = new List<PatientImmunization>();
 }

@@ -16,4 +16,14 @@ public partial class EmirateType
     public string? Name { get; set; }
 
     public bool? IsDeleted { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
 }

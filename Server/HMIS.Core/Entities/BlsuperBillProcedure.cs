@@ -193,6 +193,13 @@ public partial class BlsuperBillProcedure
 
     public long? AppointmentId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("BlsuperBillProcedure")]
     public virtual SchAppointment? Appointment { get; set; }

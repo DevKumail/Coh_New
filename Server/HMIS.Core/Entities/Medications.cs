@@ -174,6 +174,13 @@ public partial class Medications
     [Column(TypeName = "datetime")]
     public DateTime? CreateDate { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("Medications")]
     public virtual SchAppointment? Appointment { get; set; }
