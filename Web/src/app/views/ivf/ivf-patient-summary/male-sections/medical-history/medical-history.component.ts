@@ -310,21 +310,21 @@ export class MedicalHistoryComponent {
     this.loadFertilityHistory(event);
   }
 
-  // Store payload from service for dynamic labels/options
-  getAllDropdown(payload: { [key: string]: Array<{ valueId: number; name: string }> }) {
-    this.dropdowns = payload || {};
-  }
+    // Store payload from service for dynamic labels/options
+    getAllDropdown(payload: { [key: string]: Array<{ valueId: number; name: string }> }) {
+      this.dropdowns = payload || {};
+    }
 
 
 
-  getAlldropdown() {
-    this.sharedservice.getDropDownValuesByName(Page.IVFMaleFertilityHistory).subscribe((res: any) => {
-      this.AllDropdownValues = res;
-      this.getAllDropdown(res);
-      console.log(this.AllDropdownValues);
-    })
-    this.FillCache();
-  }
+    getAlldropdown() {
+      this.sharedservice.getDropDownValuesByName(Page.IVFMaleFertilityHistory).subscribe((res: any) => {
+        this.AllDropdownValues = res;
+        this.getAllDropdown(res);
+        console.log(this.AllDropdownValues);
+      })
+      this.FillCache();
+    }
 
   FillCache() {
     this.sharedservice.getCacheItem({ entities: this.cacheItems }).subscribe((response: any) => {

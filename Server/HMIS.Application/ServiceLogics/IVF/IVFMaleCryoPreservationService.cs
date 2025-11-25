@@ -311,7 +311,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                 if (preservationDto.StoragePlaceId != originalStoragePlaceId)
                 {
                     // Free up the OLD storage place (set to available - status ID 196)
-                    if (originalStoragePlaceId.HasValue && originalStoragePlaceId > 0)
+                    if (originalStoragePlaceId.HasValue && originalStoragePlaceId > 0)  
                     {
                         var oldLevelC = await _context.IvfcryoLevelC
                             .FirstOrDefaultAsync(cp => cp.Id == originalStoragePlaceId.Value);
