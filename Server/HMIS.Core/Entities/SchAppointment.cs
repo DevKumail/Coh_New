@@ -348,6 +348,9 @@ public partial class SchAppointment
     [InverseProperty("App")]
     public virtual ICollection<Ivfmain> Ivfmain { get; set; } = new List<Ivfmain>();
 
+    [InverseProperty("App")]
+    public virtual ICollection<LabOrderSet> LabOrderSet { get; set; } = new List<LabOrderSet>();
+
     [InverseProperty("Appointment")]
     public virtual ICollection<Medications> Medications { get; set; } = new List<Medications>();
 

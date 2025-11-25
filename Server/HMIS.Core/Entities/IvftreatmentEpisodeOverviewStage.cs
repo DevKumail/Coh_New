@@ -29,7 +29,7 @@ public partial class IvftreatmentEpisodeOverviewStage
 
     [ForeignKey("IvfdashboardTreatmentEpisodeId")]
     [InverseProperty("IvftreatmentEpisodeOverviewStage")]
-    public virtual IvfdashboardTreatmentEpisode? IvfdashboardTreatmentEpisode { get; set; }
+    public virtual IvfdashboardTreatmentCycle? IvfdashboardTreatmentEpisode { get; set; }
 
     [InverseProperty("Overview")]
     public virtual ICollection<IvfoverviewOhss> IvfoverviewOhss { get; set; } = new List<IvfoverviewOhss>();
