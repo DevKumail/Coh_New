@@ -10,18 +10,40 @@ namespace HMIS.Core.Entities;
 public partial class IvfdashboardAdditionalMeasures
 {
     [Key]
-    [Column("IVFFemaleFHAdditionalMeasuresId")]
-    public int IvffemaleFhadditionalMeasuresId { get; set; }
+    [Column("IVFAdditionalMeasuresId")]
+    public int IvfadditionalMeasuresId { get; set; }
+
+    [Column("IVFDashboardTreatmentEpisodeId")]
+    public int IvfdashboardTreatmentEpisodeId { get; set; }
 
     [StringLength(50)]
     public string? GeneralCondition { get; set; }
 
-    [InverseProperty("IvffemaleFhadditionalMeasures")]
-    public virtual ICollection<IvfpidembblastIndications> IvfpidembblastIndications { get; set; } = new List<IvfpidembblastIndications>();
+    public int? CreatedBy { get; set; }
 
-    [InverseProperty("IvffemaleFhadditionalMeasures")]
-    public virtual ICollection<IvfpidpolarBodiesIndications> IvfpidpolarBodiesIndications { get; set; } = new List<IvfpidpolarBodiesIndications>();
+    public DateTime? CreatedAt { get; set; }
 
-    [InverseProperty("IvffemaleFhadditionalMeasures")]
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    [ForeignKey("IvfdashboardTreatmentEpisodeId")]
+    [InverseProperty("IvfdashboardAdditionalMeasures")]
+    public virtual IvfdashboardTreatmentEpisode IvfdashboardTreatmentEpisode { get; set; } = null!;
+
+    [InverseProperty("IvfadditionalMeasures")]
+    public virtual ICollection<IvfembblastIndications> IvfembblastIndications { get; set; } = new List<IvfembblastIndications>();
+
+    [InverseProperty("IvfadditionalMeasures")]
+    public virtual ICollection<IvfperformedAdditionalMeasures> IvfperformedAdditionalMeasures { get; set; } = new List<IvfperformedAdditionalMeasures>();
+
+    [InverseProperty("IvfadditionalMeasures")]
     public virtual ICollection<IvfplannedAdditionalMeasures> IvfplannedAdditionalMeasures { get; set; } = new List<IvfplannedAdditionalMeasures>();
+
+    [InverseProperty("IvfadditionalMeasures")]
+    public virtual ICollection<IvfpolarBodiesIndications> IvfpolarBodiesIndications { get; set; } = new List<IvfpolarBodiesIndications>();
 }

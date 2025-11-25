@@ -48,6 +48,9 @@ public partial class DropdownConfiguration
     [InverseProperty("TreatmentTypeCategory")]
     public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisodeTreatmentTypeCategory { get; set; } = new List<IvfdashboardTreatmentEpisode>();
 
+    [InverseProperty("PidembblastIndicationCategory")]
+    public virtual ICollection<IvfembblastIndications> IvfembblastIndications { get; set; } = new List<IvfembblastIndications>();
+
     [InverseProperty("AdiposityCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryAdiposityCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
@@ -165,14 +168,20 @@ public partial class DropdownConfiguration
     [InverseProperty("Viscosity")]
     public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleViscosity { get; set; } = new List<IvfmaleSemenSample>();
 
-    [InverseProperty("PidembblastIndicationCategory")]
-    public virtual ICollection<IvfpidembblastIndications> IvfpidembblastIndications { get; set; } = new List<IvfpidembblastIndications>();
+    [InverseProperty("AdverseSideEffectsCategory")]
+    public virtual ICollection<IvfoverviewOhss> IvfoverviewOhssAdverseSideEffectsCategory { get; set; } = new List<IvfoverviewOhss>();
 
-    [InverseProperty("PidpolarBodiesIndicationCategory")]
-    public virtual ICollection<IvfpidpolarBodiesIndications> IvfpidpolarBodiesIndications { get; set; } = new List<IvfpidpolarBodiesIndications>();
+    [InverseProperty("OhssdiagnosisCategory")]
+    public virtual ICollection<IvfoverviewOhss> IvfoverviewOhssOhssdiagnosisCategory { get; set; } = new List<IvfoverviewOhss>();
+
+    [InverseProperty("PerformedAdditionalMeasuresCategory")]
+    public virtual ICollection<IvfperformedAdditionalMeasures> IvfperformedAdditionalMeasures { get; set; } = new List<IvfperformedAdditionalMeasures>();
 
     [InverseProperty("MeasuresCategory")]
     public virtual ICollection<IvfplannedAdditionalMeasures> IvfplannedAdditionalMeasures { get; set; } = new List<IvfplannedAdditionalMeasures>();
+
+    [InverseProperty("PidpolarBodiesIndicationCategory")]
+    public virtual ICollection<IvfpolarBodiesIndications> IvfpolarBodiesIndications { get; set; } = new List<IvfpolarBodiesIndications>();
 
     [InverseProperty("TreatmentCategory")]
     public virtual ICollection<IvftreatmentTypes> IvftreatmentTypes { get; set; } = new List<IvftreatmentTypes>();

@@ -348,6 +348,9 @@ public partial class SchAppointment
     [InverseProperty("App")]
     public virtual ICollection<Ivfmain> Ivfmain { get; set; } = new List<Ivfmain>();
 
+    [InverseProperty("Appointment")]
+    public virtual ICollection<Medications> Medications { get; set; } = new List<Medications>();
+
     [ForeignKey("PatientId")]
     [InverseProperty("SchAppointment")]
     public virtual RegPatient? Patient { get; set; }
@@ -385,9 +388,6 @@ public partial class SchAppointment
     [ForeignKey("PlanId")]
     [InverseProperty("SchAppointment")]
     public virtual BlpayerPlan? Plan { get; set; }
-
-    [InverseProperty("Appointment")]
-    public virtual ICollection<Prescription> Prescription { get; set; } = new List<Prescription>();
 
     [ForeignKey("PurposeOfVisitId")]
     [InverseProperty("SchAppointment")]

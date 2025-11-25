@@ -11,7 +11,7 @@ namespace HMIS.Application.DTOs.Clinical
 {
     public class PrescriptionModel
     {
-        public long MedicationId { get; set; }
+        public long PrescriptionId { get; set; }
         public long? ProviderId { get; set; }
 
         public string? Mrno { get; set; }
