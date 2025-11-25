@@ -38,6 +38,10 @@ public partial class SecModuleForm
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("ModuleId")]
     [InverseProperty("SecModuleForm")]
     public virtual SecModule Module { get; set; } = null!;

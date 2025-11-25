@@ -49,6 +49,10 @@ public partial class BlpayerPackage
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [InverseProperty("PayerPackage")]
     public virtual ICollection<Insured> Insured { get; set; } = new List<Insured>();
 

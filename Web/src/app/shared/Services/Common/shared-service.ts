@@ -6,14 +6,47 @@ import { Observable } from 'rxjs';
 export class SharedService {
   constructor(private api: ApiService) {}
 
-
   getDropDownValuesByName(name: string): Observable<any> {
     return this.api.get(`DropDownLookUp/GetDropDownValuesByName?page=${name}`);
   }
 
-    getCacheItem(object: any): Observable<any> {
+  getCacheItem(object: any): Observable<any> {
     return this.api.post('Cache/GetCache', object);
   }
 
+  // RsUpload APIs
+  uploadDocuments(files: File[], extraFields?: { [key: string]: string | number | boolean }): Observable<any> {
+    const form = new FormData();
+    files.forEach(f => form.append('files', f));
+    if (extraFields) {
+      Object.keys(extraFields).forEach(k => form.append(k, String(extraFields[k])));
+    }
+    // POST https://localhost:44320/api/RsUpload/upload-multiple
+    return this.api.post('RsUpload/upload-multiple', form);
+  }
 
-} 
+  // Exact shape matching the provided curl command
+  uploadDocumentsWithModule(moduleName: string, files: File[]): Observable<any> {
+    const form = new FormData();
+    form.append('moduleName', moduleName);
+    files.forEach(f => form.append('files', f));
+    // ApiService.post likely accepts only (url, body). Backend may return text/plain.
+    return this.api.post('RsUpload/upload-multiple', form);
+  }
+
+  deleteDocument(id: number): Observable<any> {
+    // DELETE https://localhost:44320/api/RsUpload/delete/{id}
+    return this.api.get(`RsUpload/delete/?fileId=${id}`);
+  }
+
+  downloadDocument(id: number): Observable<Blob> {
+    // GET https://localhost:44320/api/RsUpload/download/{id}
+    return this.api.get(`RsUpload/download/?fileId=${id}`, 
+      { responseType: 'blob' as any });
+  }
+
+  getDocumentInfo(id: number): Observable<any> {
+    // GET https://localhost:44320/api/RsUpload/info/{id}
+    return this.api.get(`RsUpload/info/?fileId=${id}`);
+  }
+}

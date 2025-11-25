@@ -35,6 +35,10 @@ public partial class SecPrivileges
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [InverseProperty("Privilege")]
     public virtual ICollection<SecPrivilegesAvailableForm> SecPrivilegesAvailableForm { get; set; } = new List<SecPrivilegesAvailableForm>();
 }

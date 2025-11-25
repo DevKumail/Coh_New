@@ -13,6 +13,7 @@ import { QuestionViewComponent } from '../question-view/question-view.component'
 import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { LoaderService } from '@core/services/loader.service';
+import { QuillModule } from 'ngx-quill';
 
 @Component({
     standalone: true,
@@ -22,7 +23,8 @@ import { LoaderService } from '@core/services/loader.service';
     TranslatePipe,
     FilledOnValueDirective,
     QuestionItemComponent,
-    QuestionViewComponent
+    QuestionViewComponent,
+    QuillModule
 ],
   selector: 'app-clinical-free-text-note-create',
   templateUrl: './clinical-free-text-note-create.component.html',
@@ -69,6 +71,18 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   private queryParamTemplate: any = null;
   hideTemplateDropdown: boolean = false;
 
+  quillModules = {
+    toolbar: [
+      [{ font: [] }],
+      [{ size: ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ color: [] }, { background: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ align: [] }],
+      ['clean']
+    ]
+  };
+
   constructor(
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService,
@@ -82,8 +96,8 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
-      note: [null, Validators.required],
-      description: ['']
+      description: [''],
+      editorContent: ['']
     });
   }
 
@@ -104,6 +118,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
     this.PatientData.selectedVisit$.subscribe((data: any) => {
       this.SelectedVisit = data;
+      this.appointmentID = data?.appointmentId || 0;
       console.log('Selected Visit medical-list', this.SelectedVisit);
     });
 
@@ -271,67 +286,39 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   // --- submit note (no voice) -------------------------------------------
   submitVoice() {
     if (this.clinicalForm.invalid) {
-      Swal.fire('Error', 'Please fill all required fields.', 'error');
-      this.clinicalForm.markAllAsTouched();
       return;
     }
 
-    const formValue = this.clinicalForm.value;
-    const providerCode = Number(formValue.provider) || this.selectedProviders;
-    const noteId = Number(formValue.note) || this.selectedNotes;
+    const htmlContent = this.clinicalForm.get('editorContent')?.value || '';
+    const textContent = this.stripHtml(htmlContent);
 
-    const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
-    this.createdBy = current_User.userName || '';
-    this.updatedBy = current_User.userName || '';
-    this.signedBy = false;
-
-    // find selected note using reactive form value
-    const selectedNoteId = noteId;
-    const selectedNote = this.clinicalNotes.find(note => note.pathId === selectedNoteId);
-    const noteName = selectedNote ? selectedNote.pathName : '';
-
-    const note = {
-      noteTitle: noteName,
-      createdBy: this.createdBy,
-      updatedBy: this.updatedBy,
-      description: formValue.description,
-      signedBy: this.signedBy,
-      createdOn: new Date(),
+    const payload = {
+      providerId: this.clinicalForm.get('provider')?.value,
+      appointmentId: this.appointmentID,
       mrNo: this.mrNo,
-      appointmentId: this.SelectedVisit.appointmentId,
-      pathId: selectedNoteId
+      description: this.clinicalForm.get('description')?.value,
+      htmlContent: htmlContent,
+      textContent: textContent
     };
 
-    if (navigator.onLine) {
-      const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out")), 300000)
-      );
-      this.loader.show();
-      Promise.race([ this.clinicalApiService.InsertSpeech(note), timeout ])
-        .then((response: any) => {
-          if (response != null && response != "") {
-            this.dataquestion = response;
-            this.nodeData = response.node;
-            this.viewNoteResponse = true;
-            this.clinicalForm.reset();
-            Swal.fire('Success', 'Note uploaded successfully.', 'success');
-            this.loader.hide();
-          } else {
-            this.loader.hide();
-            throw new Error('Upload failed');
-          }
-        })
-        .catch((error: any) => {
-          console.error('Upload failed:', error);
-          this.saveNoteOffline(note);
-          Swal.fire('Offline Save', 'Saved offline due to network/server error.', 'info');
-          this.loader.hide();
-        });
-    } else {
-      this.saveNoteOffline(note);
-      Swal.fire('Offline', 'Note saved offline and will be synced later.', 'info');
-      this.loader.hide();
+    if(this.appointmentID == null || this.appointmentID == undefined|| this.appointmentID == 0
+        && this.mrNo == null || this.mrNo == undefined|| this.mrNo == ''
+    ){
+        Swal.fire('Error', 'Appointment ID and MRNo are required to submit the note.', 'error');
+        return
     }
+
+
+
+    console.log('Payload:', payload);
+    // Call your service to save the data
+    // this.yourService.saveClinicalNote(payload).subscribe(...);
+  }
+
+  stripHtml(html: string): string {
+    const tmp = document.createElement('DIV');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
   }
 
   // --- additional submit used elsewhere in old code ---------------------

@@ -122,9 +122,15 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<EmrnoteQuestionRemoved> EmrnoteQuestionRemoved { get; set; }
 
+    public virtual DbSet<EmrnoteTemplate> EmrnoteTemplate { get; set; }
+
     public virtual DbSet<EmrnoteVoiceinText> EmrnoteVoiceinText { get; set; }
 
+    public virtual DbSet<EmrnotesAnswer> EmrnotesAnswer { get; set; }
+
     public virtual DbSet<EmrnotesEncounterPath> EmrnotesEncounterPath { get; set; }
+
+    public virtual DbSet<EmrnotesNote> EmrnotesNote { get; set; }
 
     public virtual DbSet<EmrnotesPathQuestion> EmrnotesPathQuestion { get; set; }
 
@@ -187,6 +193,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<IvfcryoLevelB> IvfcryoLevelB { get; set; }
 
     public virtual DbSet<IvfcryoLevelC> IvfcryoLevelC { get; set; }
+
+    public virtual DbSet<IvfcycleEpisodeOverviewUltraSound> IvfcycleEpisodeOverviewUltraSound { get; set; }
 
     public virtual DbSet<IvfdashboardAdditionalMeasures> IvfdashboardAdditionalMeasures { get; set; }
 
@@ -921,6 +929,17 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
+        modelBuilder.Entity<EmrnoteTemplate>(entity =>
+        {
+            entity.HasOne(d => d.Note).WithMany(p => p.EmrnoteTemplate)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EMRNoteTemplate_EMRNotesNote");
+
+            entity.HasOne(d => d.Template).WithMany(p => p.EmrnoteTemplate)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EMRNoteTemplate_EMRNotesEncounterPath");
+        });
+
         modelBuilder.Entity<EmrnoteVoiceinText>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Table_1");
@@ -929,6 +948,11 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<EmrnotesEncounterPath>(entity =>
         {
             entity.Property(e => e.PathId).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<EmrnotesNote>(entity =>
+        {
+            entity.Property(e => e.Active).HasDefaultValue(true);
         });
 
         modelBuilder.Entity<EmrnotesPathQuestion>(entity =>
@@ -1182,6 +1206,19 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.Sample).WithMany(p => p.IvfcryoLevelC).HasConstraintName("FK_IVFMaleCryoPreservation_Cryosamplelevelc");
 
             entity.HasOne(d => d.Status).WithMany(p => p.IvfcryoLevelC).HasConstraintName("FK_IVFMaleCryoPreservation_cryoelevelcstatus");
+        });
+
+        modelBuilder.Entity<IvfcycleEpisodeOverviewUltraSound>(entity =>
+        {
+            entity.Property(e => e.OverviewId).ValueGeneratedOnAdd();
+
+            entity.HasOne(d => d.App).WithMany()
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFCycleEpisodeOverviewUltraSound_SchAppointment");
+
+            entity.HasOne(d => d.Overview).WithMany()
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFCycleEpisodeOverviewUltraSound_IVFTreatmentEpisodeOverviewStage");
         });
 
         modelBuilder.Entity<IvfdashboardAdditionalMeasures>(entity =>
@@ -2099,7 +2136,7 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<RegCompany>(entity =>
         {
-            entity.HasOne(d => d.CreatedBy).WithMany(p => p.RegCompany).HasConstraintName("FK_RegCompany_HREmployee");
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.RegCompany).HasConstraintName("FK_RegCompany_HREmployee");
         });
 
         modelBuilder.Entity<RegCountries>(entity =>

@@ -58,4 +58,8 @@ public partial class Task
     public string? UpdatedBy { get; set; }
 
     public bool? IsDeleted { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 }

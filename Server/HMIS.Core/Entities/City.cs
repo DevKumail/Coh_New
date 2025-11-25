@@ -13,4 +13,14 @@ public partial class City
 
     [StringLength(100)]
     public string CityName { get; set; } = null!;
+
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
 }

@@ -81,4 +81,8 @@ public partial class LabResultsMain
     public int? SequenceNo { get; set; }
 
     public int? PerformAtLabId { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 }

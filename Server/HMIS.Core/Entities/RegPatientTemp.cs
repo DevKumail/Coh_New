@@ -143,6 +143,10 @@ public partial class RegPatientTemp
     [Unicode(false)]
     public string? DwellingNumber { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("NokcityId")]
     [InverseProperty("RegPatientTempNokcity")]
     public virtual RegCities? Nokcity { get; set; }

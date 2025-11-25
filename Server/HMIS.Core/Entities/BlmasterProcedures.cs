@@ -107,6 +107,10 @@ public partial class BlmasterProcedures
 
     public long? UpdatedBy { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [InverseProperty("ProcedureMaster")]
     public virtual ICollection<BlprocedureGroupCode> BlprocedureGroupCode { get; set; } = new List<BlprocedureGroupCode>();
 

@@ -50,6 +50,16 @@ public partial class RegAccount
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("PatientId")]
     [InverseProperty("RegAccount")]
     public virtual RegPatient? Patient { get; set; }

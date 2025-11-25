@@ -72,6 +72,10 @@ public partial class PatientAllergy
 
     public long? AppointmentId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("PatientAllergy")]
     public virtual SchAppointment? Appointment { get; set; }

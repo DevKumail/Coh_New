@@ -29,7 +29,6 @@ export interface IvfLabOrderDetailDto {
   billOnOrder: number;
 
   // Optional/extended
-  sampleTypeId?: number | null;
   orderSetDetailId?: number;
   orderSetId?: number;
   pComments?: string;

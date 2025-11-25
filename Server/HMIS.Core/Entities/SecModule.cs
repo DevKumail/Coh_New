@@ -33,6 +33,10 @@ public partial class SecModule
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [InverseProperty("Module")]
     public virtual ICollection<SecModuleForm> SecModuleForm { get; set; } = new List<SecModuleForm>();
 }
