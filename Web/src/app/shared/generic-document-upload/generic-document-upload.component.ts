@@ -1,19 +1,17 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GenericDocumentUploadComponent } from '@/app/shared/generic-document-upload/generic-document-upload.component';
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-documents',
-  standalone: true,
-  imports: [CommonModule, GenericDocumentUploadComponent],
-  templateUrl: './documents.component.html',
-  styleUrls: ['./documents.component.scss']
+  selector: 'app-generic-document-upload',
+  imports: [CommonModule],
+  templateUrl: './generic-document-upload.component.html',
+  styleUrls: ['./generic-document-upload.component.scss']
 })
-export class DocumentsComponent {
+export class GenericDocumentUploadComponent {
   selected: Array<{ id: number; name: string; size: number; ext: string }> = [];
   private idCounter = 1;
   isLoading: boolean = false;
-
+  
   onFilesChosen(evt: Event) {
     const input = evt.target as HTMLInputElement;
     const files = input.files;

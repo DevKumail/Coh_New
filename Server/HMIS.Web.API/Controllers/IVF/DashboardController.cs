@@ -59,7 +59,7 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(new { id });
         }
 
-        [HttpPost("CreateUpdateDashboardTreatmentEpisode")]
+        [HttpPost("CreateUpdateDashboardTreatmentCycle")]
         public async Task<IActionResult> CreateUpdateDashboardTreatmentEpisode([FromBody] IVFDashboardTreatmentEpisodeDto dto)
         {
             var result = await _service.CreateOrUpdateDashboardTreatmentEpisodeAsync(dto);
