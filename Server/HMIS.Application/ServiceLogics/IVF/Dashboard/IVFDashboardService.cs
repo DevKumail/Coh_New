@@ -340,14 +340,6 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
         {
             if (dto == null) return Result<int>.Failure("DTO is required");
 
-            if (dto.TreatmentTypes != null && dto.TreatmentTypes.Count > 0)
-            {
-                dto.TreatmentCategoryIds = dto.TreatmentTypes
-                    .Where(t => t.TreatmentCategoryId.HasValue)
-                    .Select(t => t.TreatmentCategoryId!.Value)
-                    .ToList();
-            }
-
             await using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
@@ -391,9 +383,12 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
 
                 var episodeId = episode.IvfdashboardTreatmentEpisodeId;
 
-                if (dto.TreatmentCategoryIds != null)
+                if (dto.TreatmentSubTypes != null && dto.TreatmentSubTypes.Any())
                 {
-                    var existingTypes = await _db.IvftreatmentTypes.Where(t => t.IvfdashboardTreatmentEpisodeId == episodeId && !t.IsDeleted).ToListAsync();
+                    var existingTypes = await _db.IvftreatmentTypes
+                        .Where(t => t.IvfdashboardTreatmentEpisodeId == episodeId && !t.IsDeleted)
+                        .ToListAsync();
+
                     foreach (var t in existingTypes)
                     {
                         t.IsDeleted = true;
@@ -402,12 +397,12 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                         t.UpdatedAt = DateTime.UtcNow;
                     }
 
-                    foreach (var catId in dto.TreatmentCategoryIds)
+                    foreach (var sub in dto.TreatmentSubTypes.Where(x => x.TreatmentCategoryId.HasValue))
                     {
                         var item = new IvftreatmentTypes
                         {
                             IvfdashboardTreatmentEpisodeId = episodeId,
-                            TreatmentCategoryId = catId,
+                            TreatmentCategoryId = sub.TreatmentCategoryId!.Value,
                             CreatedBy = dto.CreatedBy,
                             CreatedAt = DateTime.UtcNow,
                             IsDeleted = false
