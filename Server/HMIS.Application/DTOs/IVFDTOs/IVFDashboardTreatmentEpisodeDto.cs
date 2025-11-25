@@ -22,16 +22,32 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public long? PlannedSpermCollectionCategoryId { get; set; }
         public string? CycleNote { get; set; }
 
+        public List<long>? TreatmentCategoryIds { get; set; }
+
+        public List<long>? PlannedSpermCollectionCategoryIds { get; set; }
+
+        public List<IVFDashboardTreatmentTypeItemDto>? TreatmentTypes { get; set; }
+
+        public IVFDashboardAdditionalMeasureDto? AdditionalMeasure { get; set; }
+
+        public int? CreatedBy { get; set; }
+        public int? UpdatedBy { get; set; }
+    }
+
+    public class IVFDashboardTreatmentTypeItemDto
+    {
+        public int? IVFTreatmentTypeId { get; set; }
+        public long? TreatmentCategoryId { get; set; }
+    }
+
+    public class IVFDashboardAdditionalMeasureDto
+    {
         public int? IVFAdditionalMeasuresId { get; set; }
         public string? GeneralCondition { get; set; }
 
-        public List<long>? TreatmentCategoryIds { get; set; }
         public List<long>? PlannedAdditionalMeasuresCategoryIds { get; set; }
         public List<long>? PerformedAdditionalMeasuresCategoryIds { get; set; }
         public List<long>? PolarBodiesIndicationCategoryIds { get; set; }
         public List<long>? EMBBlastIndicationCategoryIds { get; set; }
-
-        public int? CreatedBy { get; set; }
-        public int? UpdatedBy { get; set; }
     }
 }
