@@ -280,16 +280,27 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
             using var conn = _dapper.CreateConnection();
             try
             {
-                using (var multi = await conn.QueryMultipleAsync(
+                var jsonResult = await conn.ExecuteScalarAsync<string>(
                     "IVF_GetAllIVFDashboardTreatmentCycle",
                     new { PageNumber = page, PageSize = rows, IVFMainId = ivfMainIdInt },
-                    commandType: CommandType.StoredProcedure))
-                {
-                    var data = (await multi.ReadAsync<IVFDashboardTreatmentEpisodeDto>()).ToList();
-                    var totalCount = await multi.ReadFirstAsync<int>();
+                    commandType: CommandType.StoredProcedure
+                );
 
-                    return (true, new { data, totalCount });
-                }
+                if (string.IsNullOrWhiteSpace(jsonResult))
+                    return (false, null);
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    PropertyNamingPolicy = null,
+                    NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
+                };
+
+                var dto = JsonSerializer.Deserialize<IVFDashboardTreatmentCycleListDto>(jsonResult, options);
+                if (dto == null)
+                    return (false, null);
+
+                return (true, dto);
             }
             catch
             {
