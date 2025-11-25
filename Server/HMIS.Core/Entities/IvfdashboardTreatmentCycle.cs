@@ -43,6 +43,20 @@ public partial class IvfdashboardTreatmentCycle
 
     public long? PlannedSpermCollectionCategoryId { get; set; }
 
+    public long? ProviderId { get; set; }
+
+    [StringLength(50)]
+    public string? RandomizationGroup { get; set; }
+
+    [StringLength(50)]
+    public string? Survey { get; set; }
+
+    [StringLength(100)]
+    public string? TakenOverFrom { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? TakeOverOn { get; set; }
+
     public string? CycleNote { get; set; }
 
     public int? CreatedBy { get; set; }
@@ -91,6 +105,10 @@ public partial class IvfdashboardTreatmentCycle
     [ForeignKey("ProtocolCategoryId")]
     [InverseProperty("IvfdashboardTreatmentCycleProtocolCategory")]
     public virtual DropdownConfiguration? ProtocolCategory { get; set; }
+
+    [ForeignKey("ProviderId")]
+    [InverseProperty("IvfdashboardTreatmentCycle")]
+    public virtual Hremployee? Provider { get; set; }
 
     [ForeignKey("StimulatedExternallyCategoryId")]
     [InverseProperty("IvfdashboardTreatmentCycleStimulatedExternallyCategory")]

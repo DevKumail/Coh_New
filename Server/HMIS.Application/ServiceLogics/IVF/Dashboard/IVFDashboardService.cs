@@ -388,6 +388,13 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                 if (dto.LongTermMedication != null) episode.LongTermMedication = dto.LongTermMedication;
                 if (dto.PlannedNo.HasValue) episode.PlannedNo = dto.PlannedNo.Value;
                 if (dto.PlannedSpermCollectionCategoryId.HasValue) episode.PlannedSpermCollectionCategoryId = dto.PlannedSpermCollectionCategoryId.Value;
+
+                if (dto.ProviderId.HasValue) episode.ProviderId = dto.ProviderId.Value;
+                if (dto.RandomizationGroup != null) episode.RandomizationGroup = dto.RandomizationGroup;
+                if (dto.Survey != null) episode.Survey = dto.Survey;
+                if (dto.TakenOverFrom != null) episode.TakenOverFrom = dto.TakenOverFrom;
+                if (dto.TakeOverOn.HasValue) episode.TakeOverOn = dto.TakeOverOn.Value;
+
                 if (dto.CycleNote != null) episode.CycleNote = dto.CycleNote;
 
                 await _db.SaveChangesAsync();

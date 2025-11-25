@@ -20,6 +20,13 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public string? LongTermMedication { get; set; }
         public int? PlannedNo { get; set; }
         public long? PlannedSpermCollectionCategoryId { get; set; }
+
+        public long? ProviderId { get; set; }
+        public string? RandomizationGroup { get; set; }
+        public string? Survey { get; set; }
+        public string? TakenOverFrom { get; set; }
+        public DateTime? TakeOverOn { get; set; }
+
         public string? CycleNote { get; set; }
 
         public List<long>? PlannedSpermCollectionCategoryIds { get; set; }

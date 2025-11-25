@@ -1250,6 +1250,8 @@ public partial class HMISDbContext : DbContext
 
             entity.HasOne(d => d.ProtocolCategory).WithMany(p => p.IvfdashboardTreatmentCycleProtocolCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration3");
 
+            entity.HasOne(d => d.Provider).WithMany(p => p.IvfdashboardTreatmentCycle).HasConstraintName("FK_IVFDashboardTreatmentCycle_HREmployee");
+
             entity.HasOne(d => d.StimulatedExternallyCategory).WithMany(p => p.IvfdashboardTreatmentCycleStimulatedExternallyCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration5");
 
             entity.HasOne(d => d.StimulationPlannedCategory).WithMany(p => p.IvfdashboardTreatmentCycleStimulationPlannedCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration4");
