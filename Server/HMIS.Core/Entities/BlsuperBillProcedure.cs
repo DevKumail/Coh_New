@@ -197,8 +197,7 @@ public partial class BlsuperBillProcedure
 
     public DateTime? UpdatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? UpdatedBy { get; set; }
+    public int? UpdatedBy { get; set; }
 
     [ForeignKey("AppointmentId")]
     [InverseProperty("BlsuperBillProcedure")]

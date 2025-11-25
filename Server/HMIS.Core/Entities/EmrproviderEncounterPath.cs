@@ -26,8 +26,7 @@ public partial class EmrproviderEncounterPath
 
     public DateTime? CreatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 }

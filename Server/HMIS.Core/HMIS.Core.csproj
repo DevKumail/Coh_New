@@ -7,8 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="HMISDbContext.Partial.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Context\HMISDbContext.Partial.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="8.1.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.15" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.15">
       <PrivateAssets>all</PrivateAssets>
@@ -26,8 +35,5 @@
 		<Using Include="HMIS.Core.Entities.Action" Alias="Action" />
 		<Using Include="HMIS.Core.Entities.Task" Alias="Task" />
 	</ItemGroup>
-  <ItemGroup>
-    <Folder Include="Context\" />
-  </ItemGroup>
 
 </Project>

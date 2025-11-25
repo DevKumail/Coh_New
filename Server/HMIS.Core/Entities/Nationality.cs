@@ -27,13 +27,11 @@ public partial class Nationality
 
     public DateTime? CreatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? UpdatedBy { get; set; }
+    public int? UpdatedBy { get; set; }
 
     [InverseProperty("PersonNationality")]
     public virtual ICollection<RegPatientTemp> RegPatientTemp { get; set; } = new List<RegPatientTemp>();
