@@ -11,6 +11,7 @@ import { QuestionViewComponent } from '../question-view/question-view.component'
 import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { LoaderService } from '@core/services/loader.service';
+import { UserDataService } from '@core/services/user-data.service';
 
 @Component({
   standalone: true,
@@ -56,7 +57,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     private loader: LoaderService,
     private router: Router,
     private route: ActivatedRoute,
-    private PatientData: PatientBannerService
+    private cdr: ChangeDetectorRef,
+    private PatientData: PatientBannerService,
+    private userDataService: UserDataService
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
@@ -185,7 +188,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     }
   }
 
-  submitVoice() {
+  async submitVoice() {
     if (this.clinicalForm.invalid) {
       Swal.fire('Error', 'Please fill all required fields.', 'error');
       this.clinicalForm.markAllAsTouched();
@@ -195,9 +198,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     const formValue = this.clinicalForm.value;
     const noteId = Number(formValue.note) || this.selectedNotes;
 
-    const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
-    const createdBy = current_User.userName || '';
-    const userId = current_User.userId || '';
+    // Get user data from RxDB instead of localStorage
+    const createdBy = await this.userDataService.getUserName();
+    const userId = await this.userDataService.getUserId();
 
     let noteName = this.dataquestion?.node?.noteTitle || '';
     if (!noteName) {

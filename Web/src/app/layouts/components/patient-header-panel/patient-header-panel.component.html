@@ -1,4 +1,17 @@
-<div *ngIf="visible" class="patient-banner position-relative bg-light border rounded shadow-sm p-1">
+<!-- Loading Skeleton -->
+<div *ngIf="isLoading && visible" class="patient-banner position-relative bg-light border rounded shadow-sm p-1">
+  <div class="d-flex align-items-center gap-2 p-2">
+    <div class="skeleton-circle" style="width: 50px; height: 50px;"></div>
+    <div class="flex-grow-1">
+      <div class="skeleton-line mb-2" style="width: 30%; height: 18px;"></div>
+      <div class="skeleton-line mb-1" style="width: 60%; height: 14px;"></div>
+      <div class="skeleton-line" style="width: 40%; height: 14px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Actual Banner -->
+<div *ngIf="visible && !isLoading" class="patient-banner position-relative bg-light border rounded shadow-sm p-1">
   <!-- Close -->
   <button
     class="btn-close position-absolute banner-close m-1" style="height: 2px; width: 8px;"
