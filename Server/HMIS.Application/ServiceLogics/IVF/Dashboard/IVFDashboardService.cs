@@ -230,25 +230,25 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
             await using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                IvfdashboardTreatmentEpisode? episode;
+                IvfdashboardTreatmentCycle? episode;
 
                 if (dto.IVFDashboardTreatmentEpisodeId.HasValue && dto.IVFDashboardTreatmentEpisodeId.Value > 0)
                 {
-                    episode = await _db.IvfdashboardTreatmentEpisode
+                    episode = await _db.IvfdashboardTreatmentCycle
                         .Include(e => e.IvftreatmentTypes)
                         .Include(e => e.IvftreamentsEpisodeAttachments)
                         .FirstOrDefaultAsync(e => e.IvfdashboardTreatmentEpisodeId == dto.IVFDashboardTreatmentEpisodeId.Value);
 
                     if (episode == null)
                     {
-                        episode = new IvfdashboardTreatmentEpisode();
-                        _db.IvfdashboardTreatmentEpisode.Add(episode);
+                        episode = new IvfdashboardTreatmentCycle();
+                        _db.IvfdashboardTreatmentCycle.Add(episode);
                     }
                 }
                 else
                 {
-                    episode = new IvfdashboardTreatmentEpisode();
-                    _db.IvfdashboardTreatmentEpisode.Add(episode);
+                    episode = new IvfdashboardTreatmentCycle();
+                    _db.IvfdashboardTreatmentCycle.Add(episode);
                 }
 
                 if (dto.IVFMainId.HasValue) episode.IvfmainId = dto.IVFMainId.Value;
