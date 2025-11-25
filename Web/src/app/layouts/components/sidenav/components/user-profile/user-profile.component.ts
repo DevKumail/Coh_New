@@ -5,6 +5,7 @@ import {NgIcon} from '@ng-icons/core';
 import { AuthService } from '../../../../../core/services/auth.service'; // Adjust path
 import { Router } from '@angular/router';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { UserDataService } from '@core/services/user-data.service';
 
 import {userDropdownItems} from '@layouts/components/data';
 
@@ -27,7 +28,8 @@ export class UserProfileComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private patientBannerService: PatientBannerService
+    private patientBannerService: PatientBannerService,
+    private userDataService: UserDataService
   ) {}
 
   async handleAction(action: string): Promise<void> {
@@ -35,9 +37,17 @@ export class UserProfileComponent {
       // Clear patient banner data from RxDB
       try {
         await this.patientBannerService.clearAll();
-        console.log('✅ RxDB cleared on logout');
+        console.log('✅ Patient banner cleared from RxDB');
       } catch (error) {
-        console.error('⚠️ Failed to clear RxDB:', error);
+        console.error('⚠️ Failed to clear patient banner:', error);
+      }
+
+      // Clear user data from RxDB
+      try {
+        await this.userDataService.clearCurrentUser();
+        console.log('✅ User data cleared from RxDB');
+      } catch (error) {
+        console.error('⚠️ Failed to clear user data:', error);
       }
       
       this.authService.logout();

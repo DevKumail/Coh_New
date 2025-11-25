@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { AuthService } from '@core/services/auth.service';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { UserDataService } from '@core/services/user-data.service';
 
 @Component({
   selector: 'app-user-profile-topbar',
@@ -27,7 +28,8 @@ export class UserProfileComponent {
 
   constructor(
     public authService: AuthService,
-    private patientBannerService: PatientBannerService
+    private patientBannerService: PatientBannerService,
+    private userDataService: UserDataService
   ){}
 
   displayName: string = '';
@@ -89,9 +91,17 @@ private async executeLogout() {
     // Clear patient banner data from RxDB
     try {
         await this.patientBannerService.clearAll();
-        console.log('✅ RxDB cleared on logout');
+        console.log('✅ Patient banner cleared from RxDB');
     } catch (error) {
-        console.error('⚠️ Failed to clear RxDB:', error);
+        console.error('⚠️ Failed to clear patient banner:', error);
+    }
+
+    // Clear user data from RxDB
+    try {
+        await this.userDataService.clearCurrentUser();
+        console.log('✅ User data cleared from RxDB');
+    } catch (error) {
+        console.error('⚠️ Failed to clear user data:', error);
     }
 
     const logout$ = this.authService.logout();

@@ -144,7 +144,7 @@ export class RxDBHelperService {
       const docs = await collection.find({
         selector: {
           [fieldPath]: mrNo
-        }
+        } as any
       }).exec();
       
       console.log(`📦 Found ${docs.length} documents with MR: ${mrNo}`);
@@ -191,7 +191,7 @@ export class RxDBHelperService {
   ): Promise<T[]> {
     try {
       const collection = await this.getCollection<T>(collectionName);
-      let query = collection.find({ selector });
+      let query = collection.find({ selector: selector as any });
 
       if (options?.sort) query = query.sort(options.sort);
       if (options?.limit) query = query.limit(options.limit);
@@ -214,7 +214,7 @@ export class RxDBHelperService {
   async findOne<T = any>(collectionName: string, selector: any): Promise<T | null> {
     try {
       const collection = await this.getCollection<T>(collectionName);
-      const doc = await collection.findOne({ selector }).exec();
+      const doc = await collection.findOne({ selector: selector as any }).exec();
       return doc ? (doc.toJSON() as T) : null;
     } catch (error) {
       console.error(`❌ Failed to find document in '${collectionName}':`, error);
@@ -230,10 +230,17 @@ export class RxDBHelperService {
   async count(collectionName: string, selector?: any): Promise<number> {
     try {
       const collection = await this.getCollection(collectionName);
-      const query = selector ? collection.find({ selector }) : collection.find();
-      const count = await query.count().exec();
-      console.log(`📊 Count in '${collectionName}':`, count);
-      return count;
+      if (selector) {
+        const docs = await collection.find({ selector: selector as any }).exec();
+        const count = docs.length;
+        console.log(`📊 Count in '${collectionName}':`, count);
+        return count;
+      } else {
+        const docs = await collection.find().exec();
+        const count = docs.length;
+        console.log(`📊 Count in '${collectionName}':`, count);
+        return count;
+      }
     } catch (error) {
       console.error(`❌ Failed to count documents in '${collectionName}':`, error);
       return 0;
@@ -284,7 +291,7 @@ export class RxDBHelperService {
   ): Promise<number> {
     try {
       const collection = await this.getCollection<T>(collectionName);
-      const docs = await collection.find({ selector }).exec();
+      const docs = await collection.find({ selector: selector as any }).exec();
 
       let updated = 0;
       for (const doc of docs) {
@@ -350,7 +357,7 @@ export class RxDBHelperService {
   async deleteMany(collectionName: string, selector: any): Promise<number> {
     try {
       const collection = await this.getCollection(collectionName);
-      const docs = await collection.find({ selector }).exec();
+      const docs = await collection.find({ selector: selector as any }).exec();
 
       let deleted = 0;
       for (const doc of docs) {
@@ -507,7 +514,7 @@ export class RxDBHelperService {
           [field]: {
             $regex: new RegExp(searchText, 'i')
           }
-        }
+        } as any
       }).exec();
 
       console.log(`🔍 Search found ${docs.length} results in '${collectionName}'`);

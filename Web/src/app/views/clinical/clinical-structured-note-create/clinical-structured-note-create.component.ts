@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { NotesComponent } from '../../patient-summary/components/notes/notes.component';
 import { LoaderService } from '@core/services/loader.service';
+import { UserDataService } from '@core/services/user-data.service';
 
 @Component({
     standalone: true,
@@ -81,7 +82,8 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    private PatientData: PatientBannerService
+    private PatientData: PatientBannerService,
+    private userDataService: UserDataService
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
@@ -246,7 +248,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   }
 
   // --- submit form without voice recording -------------------
-  submitVoice() {
+  async submitVoice() {
     if (this.clinicalForm.invalid) {
       Swal.fire('Error', 'Please fill all required fields.', 'error');
       this.clinicalForm.markAllAsTouched();
@@ -257,10 +259,13 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     const providerCode = Number(formValue.provider) || this.selectedProviders;
     const noteId = Number(formValue.note) || this.selectedNotes;
 
-    const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
-    this.createdBy = current_User.userName || '';
-    this.updatedBy = current_User.userName || '';
+    // Get user data from RxDB instead of localStorage
+    const auditInfo = await this.userDataService.getAuditInfo();
+    this.createdBy = auditInfo.createdBy;
+    this.updatedBy = auditInfo.updatedBy;
     this.signedBy = false;
+    
+    console.log('👤 User from RxDB:', auditInfo.createdBy);
 
     const selectedNoteId = noteId;
     // Use dataquestion.node.noteTitle if available, otherwise search in clinicalNotes
