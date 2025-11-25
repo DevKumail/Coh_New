@@ -221,7 +221,10 @@
   <div class="row g-3 mt-2" *ngIf="couple?.female || couple?.male">
     <div class="col-12">
       <div class="card">
-        <div class="card-header py-2"><div class="fw-semibold small">Overview</div></div>
+        <div class="card-header py-2 d-flex align-items-center justify-content-between">
+          <div class="fw-semibold small">Overview</div>
+          <button type="button" class="btn btn-sm btn-primary" (click)="openAddCycle()">Add Cycle</button>
+        </div>
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="table table-sm mb-0 align-middle">

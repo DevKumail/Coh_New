@@ -82,7 +82,7 @@ export class MedicalHistoryComponent {
     private sharedservice: SharedService,
     private loderService: LoaderService
 
-  ) {}
+  ) { }
 
 
   ngOnInit(): void {
@@ -171,14 +171,14 @@ export class MedicalHistoryComponent {
         ? fh.impairmentFactors.map((x: any) => x?.impairmentFactor).filter((v: any) => !!v)
         : [];
       this.basicTab?.fertilityFactors?.setValue?.(factorCodes);
-    } catch {}
+    } catch { }
 
     try {
       const illnessCodes = Array.isArray(fh?.prevIllnesses)
         ? fh.prevIllnesses.map((x: any) => x?.prevIllness).filter((v: any) => !!v)
         : [];
       this.basicTab?.previousIllnesses?.setValue?.(illnessCodes);
-    } catch {}
+    } catch { }
 
     // General tab
     const g = fh?.general || {};
@@ -272,12 +272,12 @@ export class MedicalHistoryComponent {
     }
   }
 
-  openAdd(){
+  openAdd() {
     this.isCreateUpdate = true;
     this.showAdd = true;
   }
 
-  onCancel(){
+  onCancel() {
     this.isCreateUpdate = false;
     this.showAdd = false;
   }
@@ -286,10 +286,10 @@ export class MedicalHistoryComponent {
     this.PaginationInfo.Page = page;
     this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
       const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
-      if(ivfMainId){
+      if (ivfMainId) {
         this.ivfservice.getMaleFertilityHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
           next: (res: any) => {
-            this.historyRows = res?.fertilityHistory?.data|| [];
+            this.historyRows = res?.fertilityHistory?.data || [];
             this.totalrecord = res?.fertilityHistory?.totalCount || 0;
             this.isLoadingHistory = false;
           },
@@ -315,7 +315,7 @@ export class MedicalHistoryComponent {
     this.dropdowns = payload || {};
   }
 
-  
+
 
   getAlldropdown() {
     this.sharedservice.getDropDownValuesByName(Page.IVFMaleFertilityHistory).subscribe((res: any) => {
@@ -373,14 +373,20 @@ export class MedicalHistoryComponent {
 
     const toNumOrNull = (v: any): number | null => (v === '' || v === undefined || v === null ? null : Number(v));
     const chromosomeAnalysisCategoryId = basic?.chromosomeAnalysis ?? null;
-  var MainId
+    var MainId
     this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
       if (data) {
         if (data?.couple?.ivfMainId != null) {
-           MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
-        } 
+          MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
+        }
       }
     });
+
+    if (!MainId) {
+      Swal.fire('Error', 'IVF Main ID not found', 'error');
+      return;
+    }
+
     // Build General section object
     const generalSection = {
       ivfMaleFHGeneralId: this.currentIds.generalId ?? 0,
@@ -454,14 +460,14 @@ export class MedicalHistoryComponent {
     pushIf('Surgical treatment', 3, (general as any)?.surgicalTreatment3);
     generalSection.performedTreatment.treatmentYears = treatmentYears;
 
-        // Genetics section from reactive form + editor
+    // Genetics section from reactive form + editor
     const geneticsRaw = this.geneticsTab?.geneticsForm?.getRawValue?.() || {};
     const geneticsSection = {
       ivfMaleFHGeneticsId: this.currentIds.geneticsId ?? null,
-      ivfMaleFHId:  this.currentFhId ?? 0,
+      ivfMaleFHId: this.currentFhId ?? 0,
       genetics: geneticsRaw?.genes || '',
       categoryIdInheritance: Number(geneticsRaw?.inheritance) || null,
-      medicalOpinion: geneticsRaw?.editorContent ||  ''
+      medicalOpinion: geneticsRaw?.editorContent || ''
     };
     const hasGeneticsData = (geneticsSection.medicalOpinion || '').trim().length > 0 || geneticsSection.categoryIdInheritance != null || (geneticsSection.genetics || '').trim().length > 0;
 
@@ -592,23 +598,29 @@ export class MedicalHistoryComponent {
       const factorCodes: string[] = (this.basicTab?.fertilityFactors?.value || []) as string[];
       payload.impairmentFactors = Array.isArray(factorCodes)
         ? factorCodes.filter(x => !!x).map(code => ({
-            ivfMaleFHImpairmentFactorId: 0,
-            ivfMaleFHId: this.currentFhId ?? 0,
-            impairmentFactor: String(code)
-          }))
+          ivfMaleFHImpairmentFactorId: 0,
+          ivfMaleFHId: this.currentFhId ?? 0,
+          impairmentFactor: String(code)
+        }))
         : [];
-    } catch {}
+    } catch { }
 
     try {
       const illnessCodes: string[] = (this.basicTab?.previousIllnesses?.value || []) as string[];
       payload.prevIllnesses = Array.isArray(illnessCodes)
         ? illnessCodes.filter(x => !!x).map(code => ({
-            ivfMaleFHPrevIllnessId: 0,
-            ivfMaleFHId: this.currentFhId ?? 0,
-            prevIllness: String(code)
-          }))
+          ivfMaleFHPrevIllnessId: 0,
+          ivfMaleFHId: this.currentFhId ?? 0,
+          prevIllness: String(code)
+        }))
         : [];
-    } catch {}
+    } catch { }
+
+
+    if (!MainId) {
+      Swal.fire('Error', 'IVF Main ID not found', 'error');
+      return;
+    }
 
     this.ivfservice.createOrUpdateMaleFertilityHistory(payload).subscribe({
       next: (res) => {
@@ -641,7 +653,7 @@ export class MedicalHistoryComponent {
   }
 
 
-  delete(id: any){
+  delete(id: any) {
     if (!id) return;
     Swal.fire({
       title: 'Delete this record?',

@@ -1,0 +1,10 @@
+:host {
+  display: block;
+  max-height: 80vh; /* keep within viewport */
+  overflow: auto;
+}
+
+.card-body {
+  max-height: calc(80vh - 56px); /* subtract header height */
+  overflow: auto;
+}

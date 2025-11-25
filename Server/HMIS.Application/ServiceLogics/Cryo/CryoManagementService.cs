@@ -111,10 +111,10 @@ namespace HMIS.Application.ServiceLogics.Cryo
                                     {
                                         var levelCEntity = new IvfcryoLevelC
                                         {
-                                            LevelBid = levelBEntity.Id, // Now LevelB ID is available
+                                            LevelBid = levelBEntity.Id, 
                                             StrawPosition = levelC.StrawPosition,
                                             SampleId = levelC.SampleID,
-                                            Status = levelC.Status,
+                                            StatusId = 196,
                                             CreatedBy = levelC.CreatedBy,
                                             CreatedAt = DateTime.Now
                                         };
@@ -323,7 +323,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                     {
                         levelCEntity.StrawPosition = levelCDto.StrawPosition;
                         levelCEntity.SampleId = levelCDto.SampleID;
-                        levelCEntity.Status = levelCDto.Status;
+                        levelCEntity.StatusId = 196;
                         levelCEntity.UpdatedBy = null;
                         levelCEntity.UpdatedAt = DateTime.Now;
                     }
@@ -336,7 +336,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                         LevelBid = levelB.Id, // Now LevelB ID is properly set
                         StrawPosition = levelCDto.StrawPosition,
                         SampleId = levelCDto.SampleID,
-                        Status = levelCDto.Status,
+                        StatusId = 196,
                         CreatedBy = null,
                         CreatedAt = DateTime.Now
                     };
@@ -513,7 +513,7 @@ namespace HMIS.Application.ServiceLogics.Cryo
                                         LevelBID = c.LevelBid,
                                         StrawPosition = c.StrawPosition,
                                         SampleID = c.SampleId,
-                                        Status = c.Status,
+                                        StatusId = c.StatusId,
                                         CreatedBy = c.CreatedBy,
                                         UpdatedBy = c.UpdatedBy,
                                         CreatedAt = c.CreatedAt,
@@ -646,60 +646,96 @@ namespace HMIS.Application.ServiceLogics.Cryo
 
         public async Task<List<CryoStorageListDto>> SearchCryoStorages(CryoSearchRequestDto searchRequest)
         {
-            var query = from levelC in _context.IvfcryoLevelC
-                        join levelB in _context.IvfcryoLevelB on levelC.LevelBid equals levelB.Id
-                        join levelA in _context.IvfcryoLevelA on levelB.LevelAid equals levelA.Id
-                        join container in _context.IvfcryoContainers on levelA.ContainerId equals container.Id
-                        where !levelC.IsDeleted && !levelB.IsDeleted && !levelA.IsDeleted && !container.IsDeleted
-                        select new { levelC, levelB, levelA, container };
+            // 1. Base LevelB join with LevelA + Container
+            var baseQuery = from levelB in _context.IvfcryoLevelB
+                            join levelA in _context.IvfcryoLevelA on levelB.LevelAid equals levelA.Id
+                            join container in _context.IvfcryoContainers on levelA.ContainerId equals container.Id
+                            where !levelB.IsDeleted && !levelA.IsDeleted && !container.IsDeleted
+                            select new
+                            {
+                                levelB,
+                                levelA,
+                                container
+                            };
 
-            // Apply filters
-            if (searchRequest.ContainerId.HasValue)
-                query = query.Where(x => x.container.Id == searchRequest.ContainerId.Value);
+            // Filters
+            if (searchRequest.ContainerId >0)
+                baseQuery = baseQuery.Where(x => x.container.Id == searchRequest.ContainerId.Value);
 
-            if (searchRequest.LevelAId.HasValue)
-                query = query.Where(x => x.levelA.Id == searchRequest.LevelAId.Value);
+            if (searchRequest.LevelAId>0)
+                baseQuery = baseQuery.Where(x => x.levelA.Id == searchRequest.LevelAId.Value);
 
-            if (searchRequest.LevelBId.HasValue)
-                query = query.Where(x => x.levelB.Id == searchRequest.LevelBId.Value);
+            if (searchRequest.LevelBId>0)
+                baseQuery = baseQuery.Where(x => x.levelB.Id == searchRequest.LevelBId.Value);
 
-            // Group by storage location to get aggregated data
-            var storageQuery = query.GroupBy(x => new
-            {
-                x.container.Description,
-                x.levelA.CanisterCode,
-                x.levelB.CaneCode
-            })
-            .Select(g => new
-            {
-                Description = g.Key.Description,
-                Canister = g.Key.CanisterCode,
-                Goblet = g.Key.CaneCode,
-                // Count distinct patients through IVFMain -> MalePatientId
-                PatientCount = g.Where(x => x.levelC.SampleId != null)
-                               .Select(x => x.levelC.Sample.Ivfmain.MalePatientId)
-                               .Distinct()
-                               .Count(),
-                SampleCount = g.Count(x => x.levelC.SampleId != null && x.levelC.Status != "Available"),
-                FreePlaces = g.Count(x => x.levelC.SampleId == null || x.levelC.Status == "Available"),
-                StrawIds = g.Where(x => x.levelC.SampleId != null)
-                           .Select(x => x.levelC.SampleId.ToString())
-            });
+            // 2. LEFT JOIN LevelC
+            var storageQuery =
+                from b in baseQuery
+                join c in _context.IvfcryoLevelC.Where(lc => !lc.IsDeleted)
+                      on b.levelB.Id equals c.LevelBid into levelCGroup
+                from lc in levelCGroup.DefaultIfEmpty()
+                select new
+                {
+                    b.container.Description,
+                    b.levelA.CanisterCode,
+                    b.levelB.CaneCode,
+                    LevelBId = b.levelB.Id,
+                    LevelC = lc
+                };
 
-            // Apply additional filters
-            if (searchRequest.MinFreePositions.HasValue)
-                storageQuery = storageQuery.Where(x => x.FreePlaces >= searchRequest.MinFreePositions.Value);
+            // 3. Group and calculate counts
+            var groupedQuery =
+                from x in storageQuery
+                group x by new { x.Description, x.CanisterCode, x.CaneCode, x.LevelBId } into g
+                select new
+                {
+                    g.Key.Description,
+                    Canister = g.Key.CanisterCode,
+                    Goblet = g.Key.CaneCode,
+                    // Distinct Patients
+                    PatientCount = g.Where(z => z.LevelC != null && z.LevelC.SampleId != null)
+                        .Select(z => z.LevelC.Sample.Ivfmain.MalePatientId)
+                        .Distinct()
+                        .Count(),
+                    // Sample count
+                    SampleCount = g.Count(z => z.LevelC != null &&
+                                               z.LevelC.SampleId != null &&
+                                               z.LevelC.StatusId != 196),
+                    // Free slots = total slots - occupied
+                    FreePlaces = (
+                        g.Count(z => z.LevelC == null ||        // no LevelC = free slot
+                                    z.LevelC.SampleId == null ||
+                                    z.LevelC.StatusId == 196)
+                    ),
+                    StrawIds = g.Where(z => z.LevelC != null && z.LevelC.SampleId != null)
+                                .Select(z => z.LevelC.SampleId.ToString()),
 
-            if (searchRequest.MaxPatients.HasValue)
-                storageQuery = storageQuery.Where(x => x.PatientCount <= searchRequest.MaxPatients.Value);
+                    FirstFreeLevelCId =
+            g.Where(z => z.LevelC.Id != null &&
+                         (z.LevelC.SampleId == null || z.LevelC.StatusId == 196))
+             .Select(z => z.LevelC.Id)
+             .FirstOrDefault(),
 
-            if (searchRequest.MaxSamples.HasValue)
-                storageQuery = storageQuery.Where(x => x.SampleCount <= searchRequest.MaxSamples.Value);
+                    NLevelCId = g.Where(z => z.LevelC != null && z.LevelC.SampleId != null)
+                                .Select(z => z.LevelC.Id).FirstOrDefault()
 
-            var result = await storageQuery.ToListAsync();
 
-            // Transform to final DTO
-            return result.Select(x => new CryoStorageListDto
+                };
+
+            // Filters
+            if (searchRequest.MinFreePositions>0)
+                groupedQuery = groupedQuery.Where(x => x.FreePlaces >= searchRequest.MinFreePositions.Value);
+
+            if (searchRequest.MaxPatients>0)
+                groupedQuery = groupedQuery.Where(x => x.PatientCount <= searchRequest.MaxPatients.Value);
+
+            if (searchRequest.MaxSamples>0)
+                groupedQuery = groupedQuery.Where(x => x.SampleCount <= searchRequest.MaxSamples.Value);
+
+            var data = await groupedQuery.ToListAsync();
+
+            // Final DTO mapping
+            return data.Select(x => new CryoStorageListDto
             {
                 Description = x.Description,
                 Canister = x.Canister,
@@ -707,10 +743,11 @@ namespace HMIS.Application.ServiceLogics.Cryo
                 PatientCount = x.PatientCount,
                 SampleCount = x.SampleCount,
                 FreePlaces = x.FreePlaces,
-                StrawId = x.StrawIds.Any() ? string.Join(", ", x.StrawIds) : null
+                StrawId = x.StrawIds.Any() ? string.Join(", ", x.StrawIds) : null,
+                LevelCId = x.FirstFreeLevelCId,
+                NLevelCId = x.NLevelCId
             }).ToList();
         }
-
         // Helper method to get patient count through SampleId
         private int GetPatientCount(IQueryable<IvfcryoLevelC> levelCQuery)
         {

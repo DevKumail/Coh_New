@@ -90,7 +90,7 @@ namespace HMIS.Application.ServiceLogics
         private bool Exist(long id)
         {
 
-            var prescription = _context?.Prescription?.FirstOrDefault(x=>x.MedicationId == id);
+            var prescription = _context?.Medications?.FirstOrDefault(x=>x.MedicationId == id);
             if(prescription == null)
             {
                 return false;
@@ -101,13 +101,13 @@ namespace HMIS.Application.ServiceLogics
         {
             try
             {
-                bool exist = Exist(prescriptionModel.MedicationId);
+                bool exist = Exist(prescriptionModel.PrescriptionId);
 
                 if (!exist)
                 {
-                    var newPrescription = new Prescription
+                    var newPrescription = new Medications
                     {
-                        MedicationId = prescriptionModel.MedicationId,
+                        MedicationId = prescriptionModel.PrescriptionId,
                         ProviderId = prescriptionModel.ProviderId == 0 ? null : prescriptionModel.ProviderId,
                         Mrno = prescriptionModel.Mrno,
                         AppointmentId = prescriptionModel.AppointmentId,
@@ -159,18 +159,18 @@ namespace HMIS.Application.ServiceLogics
                         IsDeleted = false
                     };
 
-                    _context.Prescription.Add(newPrescription);
+                    _context.Medications.Add(newPrescription);
                     await _context.SaveChangesAsync();
                     return true;
                 }
                 else
                 {
-                    var prescription = _context.Prescription.Find(prescriptionModel.MedicationId);
+                    var prescription = _context.Medications.Find(prescriptionModel.PrescriptionId);
 
                     if (prescription == null)
                         throw new Exception("Prescription not found for update.");
 
-                    prescription.MedicationId = prescriptionModel.MedicationId;
+                    prescription.MedicationId = prescriptionModel.PrescriptionId;
                     prescription.ProviderId = prescriptionModel.ProviderId == 0 ? null : prescriptionModel.ProviderId;
                     prescription.Mrno = prescriptionModel.Mrno;
                     prescription.AppointmentId = prescriptionModel.AppointmentId;
@@ -240,7 +240,7 @@ namespace HMIS.Application.ServiceLogics
 
             try
             {
-                var data = _context.Prescription.Where(x => x.MedicationId == Id).FirstOrDefault();
+                var data = _context.Medications.Where(x => x.MedicationId == Id).FirstOrDefault();
                 if (data != null)
                 {
                     data.IsDeleted = true;

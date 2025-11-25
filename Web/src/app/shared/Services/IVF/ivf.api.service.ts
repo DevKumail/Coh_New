@@ -19,6 +19,9 @@ export class IVFApiService {
     return this.api.post('IVFLabOrders', payload);
   }
 
+  GetStorageDetails(payload: any): Observable<any> {
+  return this.api.post('IVFMaleCryoPreservation/storage-details', payload);
+}
   getLabOrdersByMrNo(mrno: string | number, view: 'grid' | 'list' = 'grid'): Observable<any> {
     return this.api.get(`IVFLabOrders/by-mrno/${mrno}`, { view });
   }
@@ -116,5 +119,34 @@ export class IVFApiService {
 
   GetNextAvailableStorageSlot(): Observable<any> {
     return this.api.get('IVFMaleCryoPreservation/GetNextAvailableStorageSlot');
+  }
+
+  // Cryo Management dropdowns
+  GetCryoContainersDropdown(): Observable<any> {
+    return this.api.get('CryoManagement/containers/dropdown');
+  }
+
+  GetCryoLevelADropdown(containerId: number): Observable<any> {
+    return this.api.get(`CryoManagement/levela/dropdown/${containerId}`);
+  }
+
+  GetCryoLevelBDropdown(levelAId: number): Observable<any> {
+    return this.api.get(`CryoManagement/levelb/dropdown/${levelAId}`);
+  }
+
+  SearchCryoStorages(payload: any): Observable<any> {
+    return this.api.post('CryoManagement/search', payload);
+  }
+
+  CreateCryoPreservation(payload: any): Observable<any> {
+    return this.api.post('IVFMaleCryoPreservation/CreateCryoPreservation', payload);
+  }
+
+  GetCryoPreservationsBySampleId(sampleId: number): Observable<any> {
+    return this.api.get(`IVFMaleCryoPreservation/GetCryoPreservationsBySampleId/${sampleId}`);
+  }
+
+  UpdateCryoPreservation(payload: any): Observable<any> {
+    return this.api.put('IVFMaleCryoPreservation/UpdateCryoPreservation', payload);
   }
 }

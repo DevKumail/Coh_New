@@ -13,13 +13,13 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 @Component({
   selector: 'app-semen-add-edit',
   standalone: true,
-  imports: [CommonModule,FilledOnValueDirective, ReactiveFormsModule, SemenTabsComponent, SemenDiagnosisApprovalComponent],
+  imports: [CommonModule, FilledOnValueDirective, ReactiveFormsModule, SemenTabsComponent, SemenDiagnosisApprovalComponent],
   templateUrl: './semen-add-edit.component.html',
   styleUrls: ['./semen-add-edit.component.scss']
 })
 export class SemenAddEditComponent implements OnChanges {
   form: FormGroup;
-  AllDropdownValues:any = [];
+  AllDropdownValues: any = [];
   hrEmployees: any = [];
   @Input() model: any = null;
   @Output() back = new EventEmitter<void>();
@@ -131,7 +131,7 @@ export class SemenAddEditComponent implements OnChanges {
       if (!t) return null;
       const s = String(t);
       if (/^\d{2}:\d{2}$/.test(s)) return s;
-      if (/^\d{2}:\d{2}:\d{2}$/.test(s)) return s.substring(0,5);
+      if (/^\d{2}:\d{2}:\d{2}$/.test(s)) return s.substring(0, 5);
       return null;
     };
 
@@ -173,49 +173,49 @@ export class SemenAddEditComponent implements OnChanges {
       this.diag?.form.patchValue({ finding: diag?.finding ?? 'Normal', note: diag?.notes ?? '', approvalStatus });
       const dxCodes = Array.isArray(diag?.icdTypes) ? diag.icdTypes.map((x: any) => x?.icdCode).filter((x: any) => !!x) : [];
       this.diag?.setSelectedDiagnosisCodes?.(dxCodes);
-    } catch {}
+    } catch { }
 
     // Patch tabs (native, after-prep, preparation)
     const nativeObs = (m.observations || []).find((o: any) => o.observationType === 'Native');
     const afterObs = (m.observations || []).find((o: any) => o.observationType === 'AfterPreparation');
-    try { this.tabs?.patchFromModel(nativeObs, afterObs); } catch {}
+    try { this.tabs?.patchFromModel(nativeObs, afterObs); } catch { }
   }
 
-  getAlldropdown(){
-    this.sharedservice.getDropDownValuesByName(Page.IVFMaleSemanAnalysis).subscribe((res:any)=>{
-    this.AllDropdownValues = res;
-    this.getAllDropdown(res);
-    console.log(this.AllDropdownValues);
-  })
-  this.FillCache();
-}
-  
-    FillCache() {
-        this.sharedservice.getCacheItem({ entities: this.cacheItems }).subscribe((response: any) => {
-                if (response.cache != null) {
-                    this.FillDropDown(response);
-                }
-            })
-    }
-    FillDropDown(response: any) {
-        let jParse = JSON.parse(JSON.stringify(response)).cache;
-        let provider = JSON.parse(jParse).Provider;
+  getAlldropdown() {
+    this.sharedservice.getDropDownValuesByName(Page.IVFMaleSemanAnalysis).subscribe((res: any) => {
+      this.AllDropdownValues = res;
+      this.getAllDropdown(res);
+      console.log(this.AllDropdownValues);
+    })
+    this.FillCache();
+  }
 
-        if (provider) {
-            provider = provider.map(
-                (item: { EmployeeId: any; FullName: any; EmployeeType: any }) => {
-                    return {
-                        name: item.FullName,
-                        providerId: item.EmployeeId,
-                        employeeType: item.EmployeeType,
-                    };
-                },
-            );
-            this.hrEmployees = provider;
-            try {
-            } catch {}
-        }
+  FillCache() {
+    this.sharedservice.getCacheItem({ entities: this.cacheItems }).subscribe((response: any) => {
+      if (response.cache != null) {
+        this.FillDropDown(response);
+      }
+    })
+  }
+  FillDropDown(response: any) {
+    let jParse = JSON.parse(JSON.stringify(response)).cache;
+    let provider = JSON.parse(jParse).Provider;
+
+    if (provider) {
+      provider = provider.map(
+        (item: { EmployeeId: any; FullName: any; EmployeeType: any }) => {
+          return {
+            name: item.FullName,
+            providerId: item.EmployeeId,
+            employeeType: item.EmployeeType,
+          };
+        },
+      );
+      this.hrEmployees = provider;
+      try {
+      } catch { }
     }
+  }
 
 
   onSave() {
@@ -248,18 +248,23 @@ export class SemenAddEditComponent implements OnChanges {
 
     const d = this.diag?.getValue?.() || { diagnosis: null, finding: null, note: null, approvalStatus: 'Pending' };
     const approval = String(d.approvalStatus || 'Pending');
-  var MainId
+    var MainId
     this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
       if (data) {
         if (data?.couple?.ivfMainId != null) {
-           MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
-        } 
+          MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
+        }
       }
     });
+
+    if (!MainId) {
+      Swal.fire('Error', 'IVF Main ID not found', 'error');
+      return;
+    }
     const dxCodes: string[] = (this.diag?.getSelectedDiagnosisCodes?.() || []) as string[];
     const payload = {
       sampleId: this.model?.sampleId ?? 0,
-      ivfMainId: this.model?.ivfMainId  || MainId,
+      ivfMainId: this.model?.ivfMainId || MainId,
       sampleCode: h.sampleId || '',
       collectionDateTime,
       thawingDateTime,
@@ -301,12 +306,12 @@ export class SemenAddEditComponent implements OnChanges {
           updatedAt: nowIso,
           icdTypes: Array.isArray(dxCodes)
             ? dxCodes.map(code => ({
-                diagnosisICDId: 0,
-                diagnosisId: 0,
-                icdCode: String(code || ''),
-                createdAt: nowIso,
-                createdBy: '0',
-              }))
+              diagnosisICDId: 0,
+              diagnosisId: 0,
+              icdCode: String(code || ''),
+              createdAt: nowIso,
+              createdBy: '0',
+            }))
             : [],
         },
       ],
@@ -375,7 +380,7 @@ export class SemenAddEditComponent implements OnChanges {
           payload.approvalStatus.approvalStatusId = existing.approvalStatus.approvalStatusId || 0;
           payload.approvalStatus.sampleId = existing.sampleId || 0;
         }
-      } catch {}
+      } catch { }
     }
 
     this.ivfservice.InsertOrUpdateMaleSemenAnalysis(payload).subscribe({

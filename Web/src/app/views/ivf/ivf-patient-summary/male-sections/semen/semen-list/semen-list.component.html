@@ -18,7 +18,7 @@
     <ng-template #addElse>
       <ng-container *ngIf="showPreservation; else listView">
         <div class="p-2">
-          <app-preservation [preservationData]="preservationData"></app-preservation>
+          <app-preservation [preservationData]="preservationData" (saved)="onPreservationSaved()"></app-preservation>
         </div>
       </ng-container>
     </ng-template>

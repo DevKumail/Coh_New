@@ -24,6 +24,33 @@ public partial class DropdownConfiguration
     [InverseProperty("DropdownConfiguration")]
     public virtual DropdownCategory Category { get; set; } = null!;
 
+    [InverseProperty("Status")]
+    public virtual ICollection<IvfcryoLevelC> IvfcryoLevelC { get; set; } = new List<IvfcryoLevelC>();
+
+    [InverseProperty("CycleFromAmenorrheaCategory")]
+    public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisodeCycleFromAmenorrheaCategory { get; set; } = new List<IvfdashboardTreatmentEpisode>();
+
+    [InverseProperty("MainIndicationCategory")]
+    public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisodeMainIndicationCategory { get; set; } = new List<IvfdashboardTreatmentEpisode>();
+
+    [InverseProperty("PlannedSpermCollectionCategory")]
+    public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisodePlannedSpermCollectionCategory { get; set; } = new List<IvfdashboardTreatmentEpisode>();
+
+    [InverseProperty("ProtocolCategory")]
+    public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisodeProtocolCategory { get; set; } = new List<IvfdashboardTreatmentEpisode>();
+
+    [InverseProperty("StimulatedExternallyCategory")]
+    public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisodeStimulatedExternallyCategory { get; set; } = new List<IvfdashboardTreatmentEpisode>();
+
+    [InverseProperty("StimulationPlannedCategory")]
+    public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisodeStimulationPlannedCategory { get; set; } = new List<IvfdashboardTreatmentEpisode>();
+
+    [InverseProperty("TreatmentTypeCategory")]
+    public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisodeTreatmentTypeCategory { get; set; } = new List<IvfdashboardTreatmentEpisode>();
+
+    [InverseProperty("PidembblastIndicationCategory")]
+    public virtual ICollection<IvfembblastIndications> IvfembblastIndications { get; set; } = new List<IvfembblastIndications>();
+
     [InverseProperty("AdiposityCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryAdiposityCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
@@ -41,39 +68,6 @@ public partial class DropdownConfiguration
 
     [InverseProperty("PatencyRightCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryPatencyRightCategory { get; set; } = new List<IvffemaleFertilityHistory>();
-
-    [InverseProperty("PidembblastIndicationCategory")]
-    public virtual ICollection<IvffemaleFhpidembblastIndications> IvffemaleFhpidembblastIndications { get; set; } = new List<IvffemaleFhpidembblastIndications>();
-
-    [InverseProperty("PidpolarBodiesIndicationCategory")]
-    public virtual ICollection<IvffemaleFhpidpolarBodiesIndications> IvffemaleFhpidpolarBodiesIndications { get; set; } = new List<IvffemaleFhpidpolarBodiesIndications>();
-
-    [InverseProperty("MeasuresCategory")]
-    public virtual ICollection<IvffemaleFhplannedAdditionalMeasures> IvffemaleFhplannedAdditionalMeasures { get; set; } = new List<IvffemaleFhplannedAdditionalMeasures>();
-
-    [InverseProperty("CycleFromAmenorrheaCategory")]
-    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleCycleFromAmenorrheaCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
-
-    [InverseProperty("MainIndicationCategory")]
-    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleMainIndicationCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
-
-    [InverseProperty("PlannedSpermCollectionCategory")]
-    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCyclePlannedSpermCollectionCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
-
-    [InverseProperty("ProtocolCategory")]
-    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleProtocolCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
-
-    [InverseProperty("StimulatedExternallyCategory")]
-    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleStimulatedExternallyCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
-
-    [InverseProperty("StimulationPlannedCategory")]
-    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleStimulationPlannedCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
-
-    [InverseProperty("TreatmentTypeCategory")]
-    public virtual ICollection<IvffemaleTreatmentCycle> IvffemaleTreatmentCycleTreatmentTypeCategory { get; set; } = new List<IvffemaleTreatmentCycle>();
-
-    [InverseProperty("TreatmentCategory")]
-    public virtual ICollection<IvffemaleTreatmentTypes> IvffemaleTreatmentTypes { get; set; } = new List<IvffemaleTreatmentTypes>();
 
     [InverseProperty("MaterialType")]
     public virtual ICollection<IvfmaleCryoPreservation> IvfmaleCryoPreservationMaterialType { get; set; } = new List<IvfmaleCryoPreservation>();
@@ -159,12 +153,36 @@ public partial class DropdownConfiguration
     [InverseProperty("CollectionPlace")]
     public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleCollectionPlace { get; set; } = new List<IvfmaleSemenSample>();
 
+    [InverseProperty("CryoStatus")]
+    public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleCryoStatus { get; set; } = new List<IvfmaleSemenSample>();
+
     [InverseProperty("Purpose")]
     public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSamplePurpose { get; set; } = new List<IvfmaleSemenSample>();
 
     [InverseProperty("Smell")]
     public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleSmell { get; set; } = new List<IvfmaleSemenSample>();
 
+    [InverseProperty("Status")]
+    public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleStatus { get; set; } = new List<IvfmaleSemenSample>();
+
     [InverseProperty("Viscosity")]
     public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleViscosity { get; set; } = new List<IvfmaleSemenSample>();
+
+    [InverseProperty("AdverseSideEffectsCategory")]
+    public virtual ICollection<IvfoverviewOhss> IvfoverviewOhssAdverseSideEffectsCategory { get; set; } = new List<IvfoverviewOhss>();
+
+    [InverseProperty("OhssdiagnosisCategory")]
+    public virtual ICollection<IvfoverviewOhss> IvfoverviewOhssOhssdiagnosisCategory { get; set; } = new List<IvfoverviewOhss>();
+
+    [InverseProperty("PerformedAdditionalMeasuresCategory")]
+    public virtual ICollection<IvfperformedAdditionalMeasures> IvfperformedAdditionalMeasures { get; set; } = new List<IvfperformedAdditionalMeasures>();
+
+    [InverseProperty("MeasuresCategory")]
+    public virtual ICollection<IvfplannedAdditionalMeasures> IvfplannedAdditionalMeasures { get; set; } = new List<IvfplannedAdditionalMeasures>();
+
+    [InverseProperty("PidpolarBodiesIndicationCategory")]
+    public virtual ICollection<IvfpolarBodiesIndications> IvfpolarBodiesIndications { get; set; } = new List<IvfpolarBodiesIndications>();
+
+    [InverseProperty("TreatmentCategory")]
+    public virtual ICollection<IvftreatmentTypes> IvftreatmentTypes { get; set; } = new List<IvftreatmentTypes>();
 }

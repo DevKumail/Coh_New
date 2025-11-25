@@ -58,5 +58,13 @@ namespace HMIS.Web.Controllers.IVF
             if (!ok) return BadRequest(new { message = err });
             return Ok(new { id });
         }
+
+        [HttpPost("CreateUpdateDashboardTreatmentEpisode")]
+        public async Task<IActionResult> CreateUpdateDashboardTreatmentEpisode([FromBody] IVFDashboardTreatmentEpisodeDto dto)
+        {
+            var result = await _service.CreateOrUpdateDashboardTreatmentEpisodeAsync(dto);
+            if (!result.IsSuccess) return BadRequest(new { message = result.ErrorMessage });
+            return Ok(new { id = result.Data });
+        }
     }
 }
