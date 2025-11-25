@@ -146,6 +146,8 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<HiePatientDemographicsOutboundQueue> HiePatientDemographicsOutboundQueue { get; set; }
 
+    public virtual DbSet<HmisFiles> HmisFiles { get; set; }
+
     public virtual DbSet<HolidaySchedule> HolidaySchedule { get; set; }
 
     public virtual DbSet<Hremployee> Hremployee { get; set; }
@@ -188,9 +190,11 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<IvfdashboardAdditionalMeasures> IvfdashboardAdditionalMeasures { get; set; }
 
-    public virtual DbSet<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisode { get; set; }
+    public virtual DbSet<IvfdashboardTreatmentCycle> IvfdashboardTreatmentCycle { get; set; }
 
     public virtual DbSet<IvfembblastIndications> IvfembblastIndications { get; set; }
+
+    public virtual DbSet<IvfepisodeOverviewLabTestOrder> IvfepisodeOverviewLabTestOrder { get; set; }
 
     public virtual DbSet<IvffemaleFertilityHistory> IvffemaleFertilityHistory { get; set; }
 
@@ -265,6 +269,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<IvftreamentsEpisodeAttachments> IvftreamentsEpisodeAttachments { get; set; }
 
     public virtual DbSet<IvftreatmentEpisodeOverviewStage> IvftreatmentEpisodeOverviewStage { get; set; }
+
+    public virtual DbSet<IvftreatmentPlannedSpermCollection> IvftreatmentPlannedSpermCollection { get; set; }
 
     public virtual DbSet<IvftreatmentTypes> IvftreatmentTypes { get; set; }
 
@@ -970,6 +976,13 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
         });
 
+        modelBuilder.Entity<HmisFiles>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__HMIS_Fil__3214EC27C0D41F1F");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+        });
+
         modelBuilder.Entity<HolidaySchedule>(entity =>
         {
             entity.HasKey(e => e.HolidayScheduleId).HasName("PK_HolidayBlocked");
@@ -1183,28 +1196,28 @@ public partial class HMISDbContext : DbContext
                 .HasConstraintName("FK_IVFDashboardAdditionalMeasures_IVFDashboardTreatmentEpisode");
         });
 
-        modelBuilder.Entity<IvfdashboardTreatmentEpisode>(entity =>
+        modelBuilder.Entity<IvfdashboardTreatmentCycle>(entity =>
         {
             entity.HasKey(e => e.IvfdashboardTreatmentEpisodeId).HasName("PK_IVFFemaleTreatmentCycle");
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
-            entity.HasOne(d => d.CycleFromAmenorrheaCategory).WithMany(p => p.IvfdashboardTreatmentEpisodeCycleFromAmenorrheaCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration1");
+            entity.HasOne(d => d.CycleFromAmenorrheaCategory).WithMany(p => p.IvfdashboardTreatmentCycleCycleFromAmenorrheaCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration1");
 
-            entity.HasOne(d => d.Ivfmain).WithMany(p => p.IvfdashboardTreatmentEpisode).HasConstraintName("FK_IVFFemaleTreatmentCycle_IVFMain");
+            entity.HasOne(d => d.Ivfmain).WithMany(p => p.IvfdashboardTreatmentCycle).HasConstraintName("FK_IVFFemaleTreatmentCycle_IVFMain");
 
-            entity.HasOne(d => d.MainIndicationCategory).WithMany(p => p.IvfdashboardTreatmentEpisodeMainIndicationCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration2");
+            entity.HasOne(d => d.MainIndicationCategory).WithMany(p => p.IvfdashboardTreatmentCycleMainIndicationCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration2");
 
-            entity.HasOne(d => d.PlannedSpermCollectionCategory).WithMany(p => p.IvfdashboardTreatmentEpisodePlannedSpermCollectionCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration6");
+            entity.HasOne(d => d.PlannedSpermCollectionCategory).WithMany(p => p.IvfdashboardTreatmentCyclePlannedSpermCollectionCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration6");
 
-            entity.HasOne(d => d.ProtocolCategory).WithMany(p => p.IvfdashboardTreatmentEpisodeProtocolCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration3");
+            entity.HasOne(d => d.ProtocolCategory).WithMany(p => p.IvfdashboardTreatmentCycleProtocolCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration3");
 
-            entity.HasOne(d => d.StimulatedExternallyCategory).WithMany(p => p.IvfdashboardTreatmentEpisodeStimulatedExternallyCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration5");
+            entity.HasOne(d => d.StimulatedExternallyCategory).WithMany(p => p.IvfdashboardTreatmentCycleStimulatedExternallyCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration5");
 
-            entity.HasOne(d => d.StimulationPlannedCategory).WithMany(p => p.IvfdashboardTreatmentEpisodeStimulationPlannedCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration4");
+            entity.HasOne(d => d.StimulationPlannedCategory).WithMany(p => p.IvfdashboardTreatmentCycleStimulationPlannedCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration4");
 
-            entity.HasOne(d => d.TreatmentTypeCategory).WithMany(p => p.IvfdashboardTreatmentEpisodeTreatmentTypeCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration");
+            entity.HasOne(d => d.TreatmentTypeCategory).WithMany(p => p.IvfdashboardTreatmentCycleTreatmentTypeCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration");
         });
 
         modelBuilder.Entity<IvfembblastIndications>(entity =>
@@ -1217,6 +1230,13 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.IvfadditionalMeasures).WithMany(p => p.IvfembblastIndications).HasConstraintName("FK_IVFFemaleFHPIDEMBBlastIndications_IVFFemaleFHAdditionalMeasures");
 
             entity.HasOne(d => d.PidembblastIndicationCategory).WithMany(p => p.IvfembblastIndications).HasConstraintName("FK_IVFFemaleFHPIDEMBBlastIndications_DropdownConfiguration");
+        });
+
+        modelBuilder.Entity<IvfepisodeOverviewLabTestOrder>(entity =>
+        {
+            entity.HasOne(d => d.App).WithMany().HasConstraintName("FK_IVFEpisodeOverviewLabTestOrder_SchAppointment");
+
+            entity.HasOne(d => d.Overview).WithMany().HasConstraintName("FK_IVFEpisodeOverviewLabTestOrder_IVFTreatmentEpisodeOverviewStage");
         });
 
         modelBuilder.Entity<IvffemaleFertilityHistory>(entity =>
@@ -1725,6 +1745,16 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.IvfdashboardTreatmentEpisode).WithMany(p => p.IvftreatmentEpisodeOverviewStage).HasConstraintName("FK_IVFTreatmentEpisodeOverviewStage_IVFDashboardTreatmentEpisode");
         });
 
+        modelBuilder.Entity<IvftreatmentPlannedSpermCollection>(entity =>
+        {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.IvfdashboardTreatmentCycle).WithMany(p => p.IvftreatmentPlannedSpermCollection).HasConstraintName("FK_IVFTreatmentPlannedSpermCollection_IVFTreatmentPlannedSpermCollection");
+
+            entity.HasOne(d => d.PlannedSpermCollectionCategory).WithMany(p => p.IvftreatmentPlannedSpermCollection).HasConstraintName("FK_IVFTreatmentPlannedSpermCollection_DropdownConfiguration");
+        });
+
         modelBuilder.Entity<IvftreatmentTypes>(entity =>
         {
             entity.HasKey(e => e.IvftreatmentTypeId).HasName("PK_IVFFemaleTreatmentTypes");
@@ -1740,6 +1770,8 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<LabOrderSet>(entity =>
         {
             entity.HasKey(e => e.LabOrderSetId).HasName("PK__LabOrder__322AE07AA8CA4595");
+
+            entity.HasOne(d => d.App).WithMany(p => p.LabOrderSet).HasConstraintName("FK_LabOrderSet_SchAppointment");
         });
 
         modelBuilder.Entity<LabOrderSetDetail>(entity =>
