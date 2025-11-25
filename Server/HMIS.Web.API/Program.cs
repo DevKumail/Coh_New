@@ -132,6 +132,7 @@ builder.Services.AddSwaggerGen(config =>
 var cache = new CacheHelper();
 
 var app = builder.Build();
+app.MapControllers().RequireAuthorization();
 
 // Middleware pipeline
 if (app.Environment.IsDevelopment())

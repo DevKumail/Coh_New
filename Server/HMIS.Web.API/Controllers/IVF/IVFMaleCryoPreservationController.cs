@@ -7,7 +7,6 @@ namespace HMIS.Web.Controllers.IVF
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class IVFMaleCryoPreservationController : ControllerBase
     {
         private readonly IIVFStrawColorService _strawColorService;

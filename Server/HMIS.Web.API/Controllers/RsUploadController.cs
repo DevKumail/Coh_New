@@ -3,11 +3,13 @@ using HMIS.Core.FileSystem;
 using HMIS.Application.DTOs;
 using HMIS.Infrastructure.Helpers;
 using HMIS.Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HMIS.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+
     public class RsUploadController : BaseApiController
     {
         private readonly IFileRepository _fileRepository;
