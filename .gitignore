@@ -36,3 +36,4 @@
 /Server/HMIS.Web.API/bin/Release/net8.0
 /Server/HMIS.Web.API/Properties/PublishProfiles
 /Server/HMIS.Web.API/appsettings.json
+/Server/HMIS.Web.API/log.txt
