@@ -66,6 +66,5 @@ public partial class HolidaySchedule
 
     public DateTime? UpdatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? UpdatedBy { get; set; }
+    public int? UpdatedBy { get; set; }
 }

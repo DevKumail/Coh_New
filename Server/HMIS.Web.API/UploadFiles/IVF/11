@@ -1,0 +1,481 @@
+USE [HMISCOH]
+GO
+/****** Object:  Table [dbo].[Cryo_Containers]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Cryo_Containers](
+	[ID] [bigint] IDENTITY(1,1) NOT NULL,
+	[FacilityID] [bigint] NOT NULL,
+	[Description] [nvarchar](50) NOT NULL,
+	[LastAudit] [nvarchar](100) NULL,
+	[MaxStrawsInLastLevel] [int] NULL,
+	[CreatedBy] [bigint] NULL,
+	[UpdatedBy] [bigint] NULL,
+	[CreatedAt] [datetime] NOT NULL,
+	[UpdatedAt] [datetime] NOT NULL,
+	[IsDeleted] [bit] NOT NULL,
+	[IsSperm] [bit] NULL,
+	[IsOocyteOrEmbryo] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Cryo_LevelA]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Cryo_LevelA](
+	[ID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ContainerID] [bigint] NOT NULL,
+	[CanisterCode] [nvarchar](10) NOT NULL,
+	[CreatedBy] [bigint] NULL,
+	[UpdatedBy] [bigint] NULL,
+	[CreatedAt] [datetime] NOT NULL,
+	[UpdatedAt] [datetime] NOT NULL,
+	[IsDeleted] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Cryo_LevelB]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Cryo_LevelB](
+	[ID] [bigint] IDENTITY(1,1) NOT NULL,
+	[LevelAID] [bigint] NOT NULL,
+	[CaneCode] [nvarchar](10) NOT NULL,
+	[CreatedBy] [bigint] NULL,
+	[UpdatedBy] [bigint] NULL,
+	[CreatedAt] [datetime] NOT NULL,
+	[UpdatedAt] [datetime] NOT NULL,
+	[IsDeleted] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Cryo_LevelC]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Cryo_LevelC](
+	[ID] [bigint] IDENTITY(1,1) NOT NULL,
+	[LevelBID] [bigint] NOT NULL,
+	[StrawPosition] [int] NOT NULL,
+	[SampleID] [bigint] NULL,
+	[Status] [nvarchar](50) NOT NULL,
+	[CreatedBy] [bigint] NULL,
+	[UpdatedBy] [bigint] NULL,
+	[CreatedAt] [datetime] NOT NULL,
+	[UpdatedAt] [datetime] NOT NULL,
+	[IsDeleted] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[IVFMain]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[IVFMain](
+	[IVFMainId] [int] IDENTITY(1,1) NOT NULL,
+	[MalePatientId] [bigint] NOT NULL,
+	[FemalePatientId] [bigint] NOT NULL,
+	[AppId] [bigint] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[IVFMainId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[IVFMaleSemenMorphology]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[IVFMaleSemenMorphology](
+	[MorphologyId] [int] IDENTITY(1,1) NOT NULL,
+	[ObservationId] [int] NOT NULL,
+	[MorphologyNormalPercent] [decimal](5, 2) NULL,
+	[HeadDefectsPercent] [decimal](5, 2) NULL,
+	[NeckMidpieceDefectsPercent] [decimal](5, 2) NULL,
+	[TailDefectsPercent] [decimal](5, 2) NULL,
+	[ERCPercent] [decimal](5, 2) NULL,
+	[MultipleDefectsPercent] [decimal](5, 2) NULL,
+	[TeratozoospermiaIndex] [decimal](5, 2) NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[MorphologyId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[IVFMaleSemenMotility]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[IVFMaleSemenMotility](
+	[MotilityId] [int] IDENTITY(1,1) NOT NULL,
+	[ObservationId] [int] NOT NULL,
+	[WHO_AB_Percent] [decimal](5, 2) NULL,
+	[WHO_C_Percent] [decimal](5, 2) NULL,
+	[WHO_D_Percent] [decimal](5, 2) NULL,
+	[ProgressiveMotile] [int] NULL,
+	[OverallMotilityPercent] [decimal](5, 2) NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[MotilityId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[IVFMaleSemenObservation]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[IVFMaleSemenObservation](
+	[ObservationId] [int] IDENTITY(1,1) NOT NULL,
+	[SampleId] [int] NOT NULL,
+	[ObservationType] [nvarchar](50) NULL,
+	[VolumeML] [decimal](10, 2) NULL,
+	[PHValue] [decimal](4, 2) NULL,
+	[ConcentrationPerML] [decimal](18, 2) NULL,
+	[ConcLessThanPointOne] [bit] NULL,
+	[VitalityPercent] [decimal](5, 2) NULL,
+	[Leukocytesml] [decimal](18, 2) NULL,
+	[RoundCellsml] [decimal](18, 2) NULL,
+	[QuantificationPossibleId] [bigint] NULL,
+	[TotalSpermCount] [int] NULL,
+	[PeroxidasePositive] [decimal](18, 2) NULL,
+	[ImmunobeadAdherentPercent] [decimal](5, 2) NULL,
+	[MARTesPercent] [decimal](5, 2) NULL,
+	[MAR_IgG_Percent] [decimal](5, 2) NULL,
+	[MAR_IgA_Percent] [decimal](5, 2) NULL,
+	[CreatedBy] [int] NULL,
+	[UpdatedBy] [int] NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ObservationId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[IVFMaleSemenObservationPreparation]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[IVFMaleSemenObservationPreparation](
+	[PreparationId] [int] IDENTITY(1,1) NOT NULL,
+	[ObservationId] [int] NOT NULL,
+	[PreparationDate] [date] NOT NULL,
+	[PreparationTime] [time](7) NOT NULL,
+	[PreparedById] [int] NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[PreparationId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[IVFMaleSemenObservationPreparationMethod]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[IVFMaleSemenObservationPreparationMethod](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[PreparationId] [bigint] NOT NULL,
+	[PreparationMethodId] [bigint] NOT NULL,
+	[CreatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[IVFMaleSemenSample]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[IVFMaleSemenSample](
+	[SampleId] [int] IDENTITY(1,1) NOT NULL,
+	[IVFMainId] [int] NOT NULL,
+	[SampleCode] [nvarchar](64) NOT NULL,
+	[CollectionDateTime] [datetime2](7) NOT NULL,
+	[ThawingDateTime] [datetime2](7) NULL,
+	[PurposeId] [bigint] NULL,
+	[CollectionMethodId] [bigint] NULL,
+	[CollectionPlaceId] [bigint] NULL,
+	[CollectionDifficulties] [nvarchar](max) NULL,
+	[AbstinencePeriod] [nvarchar](100) NULL,
+	[AnalysisStartTime] [time](7) NULL,
+	[AnalyzedById] [bigint] NULL,
+	[AppearanceId] [bigint] NULL,
+	[SmellId] [bigint] NULL,
+	[ViscosityId] [bigint] NULL,
+	[LiquefactionMinutes] [int] NULL,
+	[Agglutination] [bit] NULL,
+	[TreatmentNotes] [nvarchar](max) NULL,
+	[Score] [nvarchar](100) NULL,
+	[DNAFragmentedPercent] [decimal](5, 2) NULL,
+	[TimeBetweenCollectionUsage] [time](7) NULL,
+	[InseminationMotileSperms] [decimal](12, 4) NULL,
+	[InseminatedAmountML] [decimal](6, 3) NULL,
+	[Motility24hPercent] [decimal](5, 2) NULL,
+	[CryoStatusId] [int] NULL,
+	[StatusId] [int] NULL,
+	[CreatedBy] [int] NULL,
+	[UpdatedBy] [int] NULL,
+	[CreatedAt] [datetime2](7) NULL,
+	[UpdatedAt] [datetime2](7) NULL,
+	[IsDeleted] [bit] NOT NULL,
+	[DeletedBy] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[SampleId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[IVFMaleSemenSampleApprovalStatus]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[IVFMaleSemenSampleApprovalStatus](
+	[ApprovalStatusId] [int] IDENTITY(1,1) NOT NULL,
+	[SampleId] [int] NOT NULL,
+	[IsApproved] [bit] NOT NULL,
+	[IsAttention] [bit] NOT NULL,
+	[AttentionForId] [bigint] NULL,
+	[Comment] [nvarchar](max) NULL,
+	[CreatedBy] [int] NULL,
+	[UpdatedBy] [int] NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ApprovalStatusId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[IVFMaleSemenSampleDiagnosis]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[IVFMaleSemenSampleDiagnosis](
+	[DiagnosisId] [int] IDENTITY(1,1) NOT NULL,
+	[SampleId] [int] NOT NULL,
+	[Finding] [nvarchar](50) NOT NULL,
+	[Notes] [nvarchar](max) NULL,
+	[CreatedBy] [int] NULL,
+	[UpdatedBy] [int] NULL,
+	[CreatedAt] [datetime2](7) NULL,
+	[UpdatedAt] [datetime2](7) NULL,
+	[DiagnosisICDId] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[DiagnosisId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[IVFMaleSemenSampleDiagnosisICDType]    Script Date: 11/19/2025 7:18:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[IVFMaleSemenSampleDiagnosisICDType](
+	[DiagnosisICDId] [int] IDENTITY(1,1) NOT NULL,
+	[DiagnosisId] [int] NOT NULL,
+	[ICDCode] [nvarchar](100) NULL,
+	[CreatedAt] [datetime] NULL,
+	[CreatedBy] [nvarchar](100) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[DiagnosisICDId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Cryo_Containers] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Cryo_Containers] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Cryo_Containers] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[Cryo_LevelA] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Cryo_LevelA] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Cryo_LevelA] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[Cryo_LevelB] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Cryo_LevelB] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Cryo_LevelB] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[Cryo_LevelC] ADD  DEFAULT ('Available') FOR [Status]
+GO
+ALTER TABLE [dbo].[Cryo_LevelC] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Cryo_LevelC] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Cryo_LevelC] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenMorphology] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenMorphology] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenMotility] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenMotility] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservation] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservation] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservationPreparation] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservationPreparation] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservationPreparationMethod] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] ADD  DEFAULT ((0)) FOR [Agglutination]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] ADD  DEFAULT (sysdatetime()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] ADD  DEFAULT (sysdatetime()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] ADD  CONSTRAINT [DF_IVFMaleSemenSample_IsDeleted]  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleApprovalStatus] ADD  DEFAULT ((0)) FOR [IsApproved]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleApprovalStatus] ADD  DEFAULT ((0)) FOR [IsAttention]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleApprovalStatus] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleApprovalStatus] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleDiagnosis] ADD  DEFAULT (sysdatetime()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleDiagnosis] ADD  DEFAULT (sysdatetime()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleDiagnosisICDType] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Cryo_LevelA]  WITH CHECK ADD FOREIGN KEY([ContainerID])
+REFERENCES [dbo].[Cryo_Containers] ([ID])
+GO
+ALTER TABLE [dbo].[Cryo_LevelB]  WITH CHECK ADD FOREIGN KEY([LevelAID])
+REFERENCES [dbo].[Cryo_LevelA] ([ID])
+GO
+ALTER TABLE [dbo].[Cryo_LevelC]  WITH CHECK ADD FOREIGN KEY([LevelBID])
+REFERENCES [dbo].[Cryo_LevelB] ([ID])
+GO
+ALTER TABLE [dbo].[IVFMain]  WITH CHECK ADD  CONSTRAINT [FK_IVFMain_FemalePatient] FOREIGN KEY([FemalePatientId])
+REFERENCES [dbo].[RegPatient] ([PatientId])
+GO
+ALTER TABLE [dbo].[IVFMain] CHECK CONSTRAINT [FK_IVFMain_FemalePatient]
+GO
+ALTER TABLE [dbo].[IVFMain]  WITH CHECK ADD  CONSTRAINT [FK_IVFMain_MalePatient] FOREIGN KEY([MalePatientId])
+REFERENCES [dbo].[RegPatient] ([PatientId])
+GO
+ALTER TABLE [dbo].[IVFMain] CHECK CONSTRAINT [FK_IVFMain_MalePatient]
+GO
+ALTER TABLE [dbo].[IVFMain]  WITH CHECK ADD  CONSTRAINT [FK_IVFMain_Visit] FOREIGN KEY([AppId])
+REFERENCES [dbo].[SchAppointment] ([AppId])
+GO
+ALTER TABLE [dbo].[IVFMain] CHECK CONSTRAINT [FK_IVFMain_Visit]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservation]  WITH CHECK ADD  CONSTRAINT [FK_Observation_QuantificationPossible] FOREIGN KEY([QuantificationPossibleId])
+REFERENCES [dbo].[DropdownConfiguration] ([ValueId])
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservation] CHECK CONSTRAINT [FK_Observation_QuantificationPossible]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservation]  WITH CHECK ADD  CONSTRAINT [FK_Observation_Sample] FOREIGN KEY([SampleId])
+REFERENCES [dbo].[IVFMaleSemenSample] ([SampleId])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservation] CHECK CONSTRAINT [FK_Observation_Sample]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservationPreparationMethod]  WITH CHECK ADD  CONSTRAINT [FK_IVFObsPrepMethod_DropdownMaster] FOREIGN KEY([PreparationMethodId])
+REFERENCES [dbo].[DropdownConfiguration] ([ValueId])
+GO
+ALTER TABLE [dbo].[IVFMaleSemenObservationPreparationMethod] CHECK CONSTRAINT [FK_IVFObsPrepMethod_DropdownMaster]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample]  WITH CHECK ADD  CONSTRAINT [FK_Sample_Appearance] FOREIGN KEY([AppearanceId])
+REFERENCES [dbo].[DropdownConfiguration] ([ValueId])
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] CHECK CONSTRAINT [FK_Sample_Appearance]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample]  WITH CHECK ADD  CONSTRAINT [FK_Sample_CollectionMethod] FOREIGN KEY([CollectionMethodId])
+REFERENCES [dbo].[DropdownConfiguration] ([ValueId])
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] CHECK CONSTRAINT [FK_Sample_CollectionMethod]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample]  WITH CHECK ADD  CONSTRAINT [FK_Sample_CollectionPlace] FOREIGN KEY([CollectionPlaceId])
+REFERENCES [dbo].[DropdownConfiguration] ([ValueId])
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] CHECK CONSTRAINT [FK_Sample_CollectionPlace]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample]  WITH CHECK ADD  CONSTRAINT [FK_Sample_Purpose] FOREIGN KEY([PurposeId])
+REFERENCES [dbo].[DropdownConfiguration] ([ValueId])
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] CHECK CONSTRAINT [FK_Sample_Purpose]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample]  WITH CHECK ADD  CONSTRAINT [FK_Sample_Smell] FOREIGN KEY([SmellId])
+REFERENCES [dbo].[DropdownConfiguration] ([ValueId])
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] CHECK CONSTRAINT [FK_Sample_Smell]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample]  WITH CHECK ADD  CONSTRAINT [FK_Sample_Viscosity] FOREIGN KEY([ViscosityId])
+REFERENCES [dbo].[DropdownConfiguration] ([ValueId])
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] CHECK CONSTRAINT [FK_Sample_Viscosity]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample]  WITH CHECK ADD  CONSTRAINT [FK_SemenSample_IVFMain] FOREIGN KEY([IVFMainId])
+REFERENCES [dbo].[IVFMain] ([IVFMainId])
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSample] CHECK CONSTRAINT [FK_SemenSample_IVFMain]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleApprovalStatus]  WITH CHECK ADD  CONSTRAINT [FK_Observation_Approval_Sample] FOREIGN KEY([SampleId])
+REFERENCES [dbo].[IVFMaleSemenSample] ([SampleId])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleApprovalStatus] CHECK CONSTRAINT [FK_Observation_Approval_Sample]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleDiagnosis]  WITH CHECK ADD  CONSTRAINT [FK_IVFMaleSemenSampleDiagnosis_ICDCodesMaster] FOREIGN KEY([DiagnosisICDId])
+REFERENCES [dbo].[IVFMaleSemenSampleDiagnosisICDType] ([DiagnosisICDId])
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleDiagnosis] CHECK CONSTRAINT [FK_IVFMaleSemenSampleDiagnosis_ICDCodesMaster]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleDiagnosis]  WITH CHECK ADD  CONSTRAINT [FK_Observation_Diagnosis_Sample] FOREIGN KEY([SampleId])
+REFERENCES [dbo].[IVFMaleSemenSample] ([SampleId])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleDiagnosis] CHECK CONSTRAINT [FK_Observation_Diagnosis_Sample]
+GO
+ALTER TABLE [dbo].[IVFMaleSemenSampleDiagnosisICDType]  WITH CHECK ADD FOREIGN KEY([DiagnosisId])
+REFERENCES [dbo].[IVFMaleSemenSampleDiagnosis] ([DiagnosisId])
+GO

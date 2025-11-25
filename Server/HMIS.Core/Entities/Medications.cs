@@ -168,8 +168,7 @@ public partial class Medications
 
     public bool? IsDeleted { get; set; }
 
-    [StringLength(100)]
-    public string? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreateDate { get; set; }
@@ -178,8 +177,7 @@ public partial class Medications
 
     public DateTime? UpdatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? UpdatedBy { get; set; }
+    public int? UpdatedBy { get; set; }
 
     [ForeignKey("AppointmentId")]
     [InverseProperty("Medications")]

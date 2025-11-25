@@ -1,0 +1,50 @@
+{
+  "response": {
+    "statusCode": 200,
+    "status": "Success",
+    "message": "Package with id 4"
+  },
+  "data": {
+    "package": {
+      "id": 4,
+      "code": "PKG00002",
+      "packageName": "Transportlogistics",
+      "description": "test",
+      "refundDays": 10,
+      "regionId": 1,
+      "packageTiers": [
+        {
+          "id": 4,
+          "packageId": 4,
+          "tierName": "standard",
+          "tierOrder": null,
+          "billingPlans": [
+            {
+              "id": 4,
+              "billingCycleTypeId": 1,
+              "billingCycleTypeName": "Quarterly",
+              "amount": 100
+            }
+          ]
+        }
+      ],
+      "tabPermissions": [
+        {
+          "id": 1,
+          "tabId": 1,
+          "tabActionId": 1
+        },
+        {
+          "id": 2,
+          "tabId": 1,
+          "tabActionId": 2
+        },
+        {
+          "id": 3,
+          "tabId": 2,
+          "tabActionId": 2
+        }
+      ]
+    }
+  }
+}

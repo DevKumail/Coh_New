@@ -32,13 +32,11 @@ public partial class RegStates
 
     public DateTime? CreatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? UpdatedBy { get; set; }
+    public int? UpdatedBy { get; set; }
 
     [InverseProperty("State")]
     public virtual ICollection<InsuredSubscriber> InsuredSubscriber { get; set; } = new List<InsuredSubscriber>();

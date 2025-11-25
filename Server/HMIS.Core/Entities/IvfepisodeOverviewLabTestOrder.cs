@@ -16,13 +16,11 @@ public partial class IvfepisodeOverviewLabTestOrder
 
     public DateTime? CreatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? UpdatedBy { get; set; }
+    public int? UpdatedBy { get; set; }
 
     [ForeignKey("AppId")]
     public virtual SchAppointment? App { get; set; }
