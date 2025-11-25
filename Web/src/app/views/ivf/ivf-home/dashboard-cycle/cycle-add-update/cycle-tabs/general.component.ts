@@ -89,6 +89,26 @@ export class GeneralComponent {
     return arr.join(', ');
   }
 
+  // Dynamically build the Treatment flags list from dropdown payload, mapped to existing controls
+  treatmentFlags() {
+    const mapping: Array<{ name: string; control: string }> = [
+      { name: 'Fertility preservation', control: 'fertilityPreservation' },
+      { name: 'Social egg freezing', control: 'socialEggFreezing' },
+      { name: 'Freeze all', control: 'freezeAll' },
+      { name: 'Oocyte thawing', control: 'oocyteThawing' },
+      { name: 'Embryo thawing', control: 'embryoThawing' },
+      { name: 'IVM', control: 'ivm' },
+      { name: 'IMSI', control: 'imsi' },
+      { name: 'PICSI', control: 'picsi' },
+    ];
+    const opts = this.options('TreatmentFlags');
+    if (opts && opts.length) {
+      const names = new Set(opts.map((o: any) => o.name));
+      return mapping.filter(m => names.has(m.name));
+    }
+    return mapping;
+  }
+
   quillModules = {
     toolbar: [
       [{ font: [] }],

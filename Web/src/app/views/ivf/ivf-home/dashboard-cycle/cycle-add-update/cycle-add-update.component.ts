@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GeneralComponent } from './cycle-tabs/general.component';
 import { AdditionalMeasuresComponent } from './cycle-tabs/additional-measures.component';
@@ -7,6 +7,10 @@ import { AccountingComponent } from './cycle-tabs/accounting.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import { Page } from '@/app/shared/enum/dropdown.enum';
+import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import Swal from 'sweetalert2';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-cycle-add-update',
   standalone: true,
@@ -14,7 +18,7 @@ import { Page } from '@/app/shared/enum/dropdown.enum';
   templateUrl: './cycle-add-update.component.html',
   styleUrls: ['./cycle-add-update.component.scss']
 })
-export class CycleAddUpdateComponent {
+export class CycleAddUpdateComponent implements OnDestroy {
   isSaving = false;
   dropdowns: any = [];
   AllDropdownValues: any = [];
@@ -23,14 +27,22 @@ export class CycleAddUpdateComponent {
 
 
   activeTab: 'general' | 'additional' | 'documents' | 'accounting' = 'general';
+  private sub?: Subscription;
 
   constructor(
     public activeModal: NgbActiveModal,
-    private sharedservice: SharedService) { }
+    private ivfService: IVFApiService,
+    private sharedservice: SharedService,
+    private patientBannerService: PatientBannerService) { }
 
   ngOnInit(): void {
     this.getAlldropdown();
     this.FillCache();
+    this.getAllFh();
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
   }
 
   // Store payload from service for dynamic labels/options
@@ -42,6 +54,28 @@ export class CycleAddUpdateComponent {
 
   getAlldropdown() {
     this.sharedservice.getDropDownValuesByName(Page.IVFTreatmentCycle).subscribe((res: any) => {
+      this.AllDropdownValues = res;
+      this.getAllDropdown(res);
+      console.log(this.AllDropdownValues);
+    })
+  }
+
+  getAllFh() {
+    var MainId
+    this.sub = this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+      if (data) {
+        if (data?.couple?.ivfMainId != null) {
+          MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;
+        }
+      }
+    });
+
+    if (!MainId) {
+      Swal.fire('Error', 'IVF Main ID not found', 'error');
+      return;
+    }
+
+    this.ivfService.GetFertilityHistoryForDashboard(MainId).subscribe((res: any) => {
       this.AllDropdownValues = res;
       this.getAllDropdown(res);
       console.log(this.AllDropdownValues);

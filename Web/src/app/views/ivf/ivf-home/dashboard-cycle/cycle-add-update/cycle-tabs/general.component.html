@@ -24,52 +24,10 @@
       <div class="card mt-2">
         <div class="card-body py-2">
           <div class="row g-1">
-            <div class="col-4">
+            <div class="col-4" *ngFor="let f of treatmentFlags()">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="fertilityPreservation" formControlName="fertilityPreservation">
-                <label class="form-check-label" for="fertilityPreservation">Fertility preservation</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="socialEggFreezing" formControlName="socialEggFreezing">
-                <label class="form-check-label" for="socialEggFreezing">Social egg freezing</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="freezeAll" formControlName="freezeAll">
-                <label class="form-check-label" for="freezeAll">Freeze all</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="oocyteThawing" formControlName="oocyteThawing">
-                <label class="form-check-label" for="oocyteThawing">Oocyte thawing</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="embryoThawing" formControlName="embryoThawing">
-                <label class="form-check-label" for="embryoThawing">Embryo thawing</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="ivm" formControlName="ivm">
-                <label class="form-check-label" for="ivm">IVM</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="imsi" formControlName="imsi">
-                <label class="form-check-label" for="imsi">IMSI</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="picsi" formControlName="picsi">
-                <label class="form-check-label" for="picsi">PICSI</label>
+                <input class="form-check-input" type="checkbox" [id]="f.control" [formControlName]="f.control">
+                <label class="form-check-label" [for]="f.control">{{ f.name }}</label>
               </div>
             </div>
           </div>

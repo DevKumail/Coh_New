@@ -34,14 +34,6 @@ export class IVFApiService {
     return this.api.get(`IVFLabOrders/${orderSetId}`);
   }
 
-  getPathologyResults(mrno: string | number, search?: string): Observable<any> {
-    const params: any = {};
-    if (search && search.trim()) {
-      params.search = search.trim();
-    }
-    return this.api.get(`IVFLabOrders/pathology-results/${mrno}`, params);
-  }
-
   getRefPhysicians(employeeTypeId: number = 1): Observable<any> {
     return this.api.get('IVFLabOrders/ref-physicians', { employeeTypeId });
   }
@@ -158,36 +150,8 @@ export class IVFApiService {
     return this.api.put('IVFMaleCryoPreservation/UpdateCryoPreservation', payload);
   }
 
-  // New: collect sample for an entire order set (order-level)
-  collectLabOrder(orderSetId: number | string, body: { collectDate: string; userId: number }): Observable<any> {
-    return this.api.post(`IVFLabOrders/${orderSetId}/collect`, body);
-  }
 
-  // New: collect sample for a specific order set detail
-  collectLabOrderDetail(orderSetDetailId: number | string, body: { CollectDate: string; UserId: number }): Observable<any> {
-    return this.api.post(`IVFLabOrders/${orderSetDetailId}/collect`, body);
-  }
-
-  // New: mark an order as complete (flag only, no results payload)
-  // Backend expects a raw numeric userId in the body (e.g. 4)
-  markLabOrderComplete(orderSetId: number | string, userId: number): Observable<any> {
-    return this.api.post(`IVFLabOrders/${orderSetId}/mark-complete`, userId);
-  }
-
-  // Add observations for a specific order set detail
-  addLabOrderObservations(orderSetDetailId: number | string, body: any): Observable<any> {
-    debugger
-    return this.api.post(`IVFLabOrders/${orderSetDetailId}/observations`, body);
-  }
-
-  // New: get full collection details for an order (per-test names, material)
-  // Proposed endpoint; adjust when your backend is ready
-  getOrderCollectionDetails(orderSetId: number | string): Observable<any> {
-    return this.api.get(`IVFLabOrders/${orderSetId}/collection-details`);
-  }
-
-  // Cancel a lab order
-  cancelLabOrder(orderSetId: number | string): Observable<any> {
-    return this.api.post(`IVFLabOrders/${orderSetId}/cancel`, {});
+    GetFertilityHistoryForDashboard(ivfmainid: string): Observable<any> {
+    return this.api.get(`IVFDashboard/GetFertilityHistoryForDashboard?ivfmainid=${ivfmainid}`);
   }
 }
