@@ -36,8 +36,9 @@ namespace HMIS.Web.Controllers.UserAuthentication
 
         #region Login
         [Route("Login")]
-        //[RequireHttps]
         [HttpPost]
+        [AllowAnonymous]
+
         public async Task<IActionResult> Login([FromBody] AuthernticateUserToken user)
             {
             var method = HttpContext.Request.Method;
