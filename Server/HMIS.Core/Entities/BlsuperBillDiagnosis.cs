@@ -64,6 +64,13 @@ public partial class BlsuperBillDiagnosis
 
     public long? AppointmentId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("BlsuperBillDiagnosis")]
     public virtual SchAppointment? Appointment { get; set; }

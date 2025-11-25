@@ -154,6 +154,16 @@ public partial class VitalSigns
 
     public long? AppointmentId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("VitalSigns")]
     public virtual SchAppointment? Appointment { get; set; }

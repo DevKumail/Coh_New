@@ -146,6 +146,16 @@ public partial class RegPatientDetails
     [StringLength(50)]
     public string? MotherEmail { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("CityId")]
     [InverseProperty("RegPatientDetails")]
     public virtual RegCities? City { get; set; }

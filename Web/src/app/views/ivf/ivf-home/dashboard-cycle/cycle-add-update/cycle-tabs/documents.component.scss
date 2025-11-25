@@ -1,1 +1,28 @@
 /* styling hook for documents */
+
+.list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+.list-item:hover { background: #f6f6f6; }
+
+.list-item .name {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-item .meta {
+  color: #6c757d;
+  font-size: 12px;
+}

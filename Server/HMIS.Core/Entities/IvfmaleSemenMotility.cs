@@ -33,4 +33,10 @@ public partial class IvfmaleSemenMotility
 
     [Column(TypeName = "datetime")]
     public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
 }

@@ -46,6 +46,16 @@ public partial class EligibilityLog
     [Unicode(false)]
     public string? ResponseDetails { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("FacilityId")]
     [InverseProperty("EligibilityLog")]
     public virtual RegFacility? Facility { get; set; }

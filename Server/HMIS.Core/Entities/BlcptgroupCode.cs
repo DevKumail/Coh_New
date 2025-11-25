@@ -35,6 +35,16 @@ public partial class BlcptgroupCode
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("GroupId")]
     [InverseProperty("BlcptgroupCode")]
     public virtual Blcptgroup Group { get; set; } = null!;

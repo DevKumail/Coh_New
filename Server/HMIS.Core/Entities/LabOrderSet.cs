@@ -70,6 +70,10 @@ public partial class LabOrderSet
 
     public long? OrderNumber { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("AppId")]
     [InverseProperty("LabOrderSet")]
     public virtual SchAppointment? App { get; set; }

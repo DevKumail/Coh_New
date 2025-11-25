@@ -52,6 +52,10 @@ public partial class TaskForwarding
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("ReceiverRoleId")]
     [InverseProperty("TaskForwarding")]
     public virtual SecRole ReceiverRole { get; set; } = null!;

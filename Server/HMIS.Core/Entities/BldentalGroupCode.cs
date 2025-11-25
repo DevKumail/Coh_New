@@ -35,6 +35,16 @@ public partial class BldentalGroupCode
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("DentalCode")]
     [InverseProperty("BldentalGroupCode")]
     public virtual BlmasterDentalCodes DentalCodeNavigation { get; set; } = null!;

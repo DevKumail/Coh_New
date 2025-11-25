@@ -17,6 +17,16 @@ public partial class DropdownCategory
     [StringLength(1000)]
     public string? Description { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [InverseProperty("Category")]
     public virtual ICollection<DropdownConfiguration> DropdownConfiguration { get; set; } = new List<DropdownConfiguration>();
 }

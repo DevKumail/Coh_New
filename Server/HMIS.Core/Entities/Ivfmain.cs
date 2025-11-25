@@ -19,6 +19,16 @@ public partial class Ivfmain
 
     public long? AppId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("AppId")]
     [InverseProperty("Ivfmain")]
     public virtual SchAppointment? App { get; set; }

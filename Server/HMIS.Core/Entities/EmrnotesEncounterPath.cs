@@ -48,4 +48,17 @@ public partial class EmrnotesEncounterPath
 
     [Column("isWeqayaTemplate")]
     public bool? IsWeqayaTemplate { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
+    [InverseProperty("Template")]
+    public virtual ICollection<EmrnoteTemplate> EmrnoteTemplate { get; set; } = new List<EmrnoteTemplate>();
 }
