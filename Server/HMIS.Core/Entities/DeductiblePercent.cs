@@ -21,6 +21,16 @@ public partial class DeductiblePercent
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("SubscriberId")]
     [InverseProperty("DeductiblePercent")]
     public virtual InsuredSubscriber Subscriber { get; set; } = null!;

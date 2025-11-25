@@ -6,23 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("BL_EClaimEncounterStartType")]
-public partial class BlEclaimEncounterStartType
+[Keyless]
+[Table("IVFCycleEpisodeOverviewUltraSound")]
+public partial class IvfcycleEpisodeOverviewUltraSound
 {
-    [Key]
-    public long Id { get; set; }
+    public long OverviewId { get; set; }
 
-    public int Code { get; set; }
-
-    [StringLength(500)]
-    [Unicode(false)]
-    public string Text { get; set; } = null!;
-
-    [Column("isActive")]
-    public bool IsActive { get; set; }
-
-    [Column("isDeleted")]
-    public bool IsDeleted { get; set; }
+    public long AppId { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
@@ -33,4 +23,10 @@ public partial class BlEclaimEncounterStartType
 
     [StringLength(100)]
     public string? UpdatedBy { get; set; }
+
+    [ForeignKey("AppId")]
+    public virtual SchAppointment App { get; set; } = null!;
+
+    [ForeignKey("OverviewId")]
+    public virtual IvftreatmentEpisodeOverviewStage Overview { get; set; } = null!;
 }

@@ -56,6 +56,10 @@ public partial class InsuranceEligibility
 
     public long? AppointmentId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("InsuranceEligibility")]
     public virtual SchAppointment? Appointment { get; set; }

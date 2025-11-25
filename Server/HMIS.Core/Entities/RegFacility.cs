@@ -95,6 +95,10 @@ public partial class RegFacility
 
     public long? CompanyId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("CompanyId")]
     [InverseProperty("RegFacility")]
     public virtual RegCompany? Company { get; set; }

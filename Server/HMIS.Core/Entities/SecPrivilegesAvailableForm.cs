@@ -35,6 +35,10 @@ public partial class SecPrivilegesAvailableForm
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("FormId")]
     [InverseProperty("SecPrivilegesAvailableForm")]
     public virtual SecModuleForm Form { get; set; } = null!;

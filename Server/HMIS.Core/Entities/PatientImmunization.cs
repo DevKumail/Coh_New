@@ -100,6 +100,10 @@ public partial class PatientImmunization
     [Column(TypeName = "datetime")]
     public DateTime? CreatedDate { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("PatientImmunization")]
     public virtual SchAppointment? Appointment { get; set; }

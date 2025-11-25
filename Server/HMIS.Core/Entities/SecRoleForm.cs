@@ -31,6 +31,10 @@ public partial class SecRoleForm
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("FormId")]
     [InverseProperty("SecRoleForm")]
     public virtual SecModuleForm Form { get; set; } = null!;

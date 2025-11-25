@@ -28,9 +28,19 @@ public partial class RegCompany
     [StringLength(50)]
     public string? Desination { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [ForeignKey("CreatedById")]
     [InverseProperty("RegCompany")]
-    public virtual Hremployee? CreatedBy { get; set; }
+    public virtual Hremployee? CreatedByNavigation { get; set; }
 
     [InverseProperty("Company")]
     public virtual ICollection<RegFacility> RegFacility { get; set; } = new List<RegFacility>();

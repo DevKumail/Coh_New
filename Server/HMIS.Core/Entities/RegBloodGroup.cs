@@ -17,6 +17,16 @@ public partial class RegBloodGroup
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
+
     [InverseProperty("PatientBloodGroup")]
     public virtual ICollection<RegPatient> RegPatient { get; set; } = new List<RegPatient>();
 }

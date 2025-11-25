@@ -108,6 +108,13 @@ public partial class RegPatientOld
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    [StringLength(100)]
+    public string? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("PatientId")]
     public virtual RegPatient? Patient { get; set; }
 

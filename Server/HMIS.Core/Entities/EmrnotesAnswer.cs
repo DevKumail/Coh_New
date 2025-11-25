@@ -6,28 +6,33 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-public partial class SchPatientCall
+[Table("EMRNotesAnswer")]
+public partial class EmrnotesAnswer
 {
     [Key]
-    [Column("CallID")]
-    public long CallId { get; set; }
+    public long AnswerId { get; set; }
 
-    public int CallNo { get; set; }
+    public long? NoteId { get; set; }
 
-    [Column("MRNo")]
+    public long QuestId { get; set; }
+
+    [Column(TypeName = "ntext")]
+    public string? Answer { get; set; }
+
+    public bool Inactive { get; set; }
+
     [StringLength(10)]
     [Unicode(false)]
-    public string Mrno { get; set; } = null!;
+    public string? Mrno { get; set; }
 
-    [Column(TypeName = "datetime")]
-    public DateTime CallDate { get; set; }
+    public long? VisitAcNo { get; set; }
+
+    public bool? IsHistory { get; set; }
 
     [Column("oldMRNo")]
     [StringLength(20)]
     [Unicode(false)]
     public string? OldMrno { get; set; }
-
-    public bool? IsDeleted { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

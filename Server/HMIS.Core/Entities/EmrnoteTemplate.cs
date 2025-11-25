@@ -6,17 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[PrimaryKey("ProviderId", "SpecialtyId")]
-public partial class ProviderSpecialtyAssign
+[PrimaryKey("NoteId", "TemplateId")]
+[Table("EMRNoteTemplate")]
+public partial class EmrnoteTemplate
 {
     [Key]
-    public long ProviderId { get; set; }
+    public long NoteId { get; set; }
 
     [Key]
-    [Column("SpecialtyID")]
-    public int SpecialtyId { get; set; }
-
-    public bool? IsDeleted { get; set; }
+    public int TemplateId { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
@@ -27,4 +25,12 @@ public partial class ProviderSpecialtyAssign
 
     [StringLength(100)]
     public string? UpdatedBy { get; set; }
+
+    [ForeignKey("NoteId")]
+    [InverseProperty("EmrnoteTemplate")]
+    public virtual EmrnotesNote Note { get; set; } = null!;
+
+    [ForeignKey("TemplateId")]
+    [InverseProperty("EmrnoteTemplate")]
+    public virtual EmrnotesEncounterPath Template { get; set; } = null!;
 }
