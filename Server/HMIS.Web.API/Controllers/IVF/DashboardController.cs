@@ -43,6 +43,19 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(new { data, total });
         }
 
+        [HttpGet("GetFertilityHistoryForDashboard")]
+        public async Task<IActionResult> GetFertilityHistoryForDashboard([FromQuery] string ivfmainid)
+        {
+            if (string.IsNullOrWhiteSpace(ivfmainid))
+                return BadRequest(new { message = "ivfmainid is required" });
+
+            var (ok, data) = await _service.GetFertilityHistoryForDashboard(ivfmainid);
+            if (!ok || data == null)
+                return BadRequest(new { message = "Unable to fetch fertility history for dashboard" });
+
+            return Ok(new { fertilityHistory = data });
+        }
+
         [HttpPost("GenerateIVFMain")]
         public async Task<IActionResult> GenerateIVFMain([FromBody] InsertIvfRelationDTO dto)
         {
@@ -59,7 +72,75 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(new { id });
         }
 
-        [HttpPost("CreateUpdateDashboardTreatmentEpisode")]
+        [HttpGet("GetIVFDashboardTreatmentCycle")]
+        public async Task<IActionResult> GetIVFDashboardTreatmentCycle([FromQuery] string ivfDashboardTreatmentEpisodeId)
+        {
+            if (string.IsNullOrWhiteSpace(ivfDashboardTreatmentEpisodeId))
+                return BadRequest(new { message = "ivfDashboardTreatmentEpisodeId is required" });
+
+            var (ok, data) = await _service.GetIVFDashboardTreatmentCycle(ivfDashboardTreatmentEpisodeId);
+            if (!ok || data == null)
+                return BadRequest(new { message = "Unable to fetch IVF dashboard treatment cycle" });
+
+            return Ok(new { dashboardTreatmentEpisode = data });
+        }
+
+        [HttpGet("GetAllIVFDashboardTreatmentCycle")]
+        public async Task<IActionResult> GetAllIVFDashboardTreatmentCycle([FromQuery] string ivfmainid, [FromQuery] int? page = 1, [FromQuery] int? rowsPerPage = 10)
+        {
+            if (string.IsNullOrWhiteSpace(ivfmainid))
+                return BadRequest(new { message = "ivfmainid is required" });
+            if (!int.TryParse(ivfmainid, out _))
+                return BadRequest(new { message = "ivfmainid must be an integer" });
+
+            var pg = page ?? 1;
+            var rp = rowsPerPage ?? 10;
+
+            var result = await _service.GetAllIVFDashboardTreatmentCycle(
+                ivfmainid,
+                new PaginationInfo { Page = pg, RowsPerPage = rp });
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = "Unable to fetch IVF dashboard treatment cycles" });
+
+            return Ok(new { dashboardTreatmentEpisodes = result.Data });
+        }
+
+        [HttpGet("GetIVFDashboardTreatmentCycle")]
+        public async Task<IActionResult> GetIVFDashboardTreatmentCycle([FromQuery] string ivfDashboardTreatmentEpisodeId)
+        {
+            if (string.IsNullOrWhiteSpace(ivfDashboardTreatmentEpisodeId))
+                return BadRequest(new { message = "ivfDashboardTreatmentEpisodeId is required" });
+
+            var (ok, data) = await _service.GetIVFDashboardTreatmentCycle(ivfDashboardTreatmentEpisodeId);
+            if (!ok || data == null)
+                return BadRequest(new { message = "Unable to fetch IVF dashboard treatment cycle" });
+
+            return Ok(new { dashboardTreatmentEpisode = data });
+        }
+
+        [HttpGet("GetAllIVFDashboardTreatmentCycle")]
+        public async Task<IActionResult> GetAllIVFDashboardTreatmentCycle([FromQuery] string ivfmainid, [FromQuery] int? page = 1, [FromQuery] int? rowsPerPage = 10)
+        {
+            if (string.IsNullOrWhiteSpace(ivfmainid))
+                return BadRequest(new { message = "ivfmainid is required" });
+            if (!int.TryParse(ivfmainid, out _))
+                return BadRequest(new { message = "ivfmainid must be an integer" });
+
+            var pg = page ?? 1;
+            var rp = rowsPerPage ?? 10;
+
+            var result = await _service.GetAllIVFDashboardTreatmentCycle(
+                ivfmainid,
+                new PaginationInfo { Page = pg, RowsPerPage = rp });
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = "Unable to fetch IVF dashboard treatment cycles" });
+
+            return Ok(new { dashboardTreatmentEpisodes = result.Data });
+        }
+
+        [HttpPost("CreateUpdateDashboardTreatmentCycle")]
         public async Task<IActionResult> CreateUpdateDashboardTreatmentEpisode([FromBody] IVFDashboardTreatmentEpisodeDto dto)
         {
             var result = await _service.CreateOrUpdateDashboardTreatmentEpisodeAsync(dto);
