@@ -128,18 +128,30 @@
     <div class="row g-2">
       <div class="col-12">
         <label class="form-label">Female medical history of</label>
-        <select class="form-select" formControlName="femaleMedicalHistoryOf" (change)="onFemaleHistoryChange()">
-          <option value="">Select</option>
-          <option *ngFor="let fh of femaleHistoryOptions" [ngValue]="fh.ivfFemaleFHId">{{ formatHistoryLabel(fh) }}</option>
-        </select>
+        <div ngbDropdown class="d-inline-block w-100">
+          <button class="select-like" ngbDropdownToggle>
+            {{ getSelectedFemaleLabel() }}
+          </button>
+          <div ngbDropdownMenu class="multi-menu p-2">
+            <div class="dropdown-item py-2" *ngFor="let fh of femaleHistoryOptions" (click)="selectFemaleHistory(fh)">
+              <div [innerHTML]="formatHistoryHtml(fh)"></div>
+            </div>
+          </div>
+        </div>
         <textarea rows="4" class="form-control mt-2" formControlName="femaleHistory"></textarea>
       </div>
       <div class="col-12">
         <label class="form-label">Male medical history of</label>
-        <select class="form-select" formControlName="maleMedicalHistoryOf" (change)="onMaleHistoryChange()">
-          <option value="">Select</option>
-          <option *ngFor="let mh of maleHistoryOptions" [ngValue]="mh.ivfMaleFHId">{{ formatHistoryLabel(mh) }}</option>
-        </select>
+        <div ngbDropdown class="d-inline-block w-100">
+          <button class="select-like" ngbDropdownToggle>
+            {{ getSelectedMaleLabel() }}
+          </button>
+          <div ngbDropdownMenu class="multi-menu p-2">
+            <div class="dropdown-item py-2" *ngFor="let mh of maleHistoryOptions" (click)="selectMaleHistory(mh)">
+              <div [innerHTML]="formatHistoryHtml(mh)"></div>
+            </div>
+          </div>
+        </div>
         <textarea rows="7" class="form-control mt-2" formControlName="maleHistory"></textarea>
       </div>
     </div>

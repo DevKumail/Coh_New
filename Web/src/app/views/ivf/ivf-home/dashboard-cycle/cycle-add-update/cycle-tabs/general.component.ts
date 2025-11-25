@@ -50,9 +50,9 @@ export class GeneralComponent {
       editorContent: [''],
 
       femaleMedicalHistoryOf: [''],
-      femaleHistory: [''],
+      femaleHistory: [{ value: '', disabled: true }],
       maleMedicalHistoryOf: [''],
-      maleHistory: [''],
+      maleHistory: [{ value: '', disabled: true }],
       cycleNote: ['']
     });
   }
@@ -63,31 +63,91 @@ export class GeneralComponent {
     return list.map(x => `${x.illnessCode} - ${x.descriptionFull}`).join('\n');
   }
 
+  private formatDate(val: any) {
+    try { return val ? new Date(val).toLocaleDateString() : '-'; } catch { return '-'; }
+  }
+
   formatHistoryLabel(entry: any) {
-    const d = entry?.date ? new Date(entry.date).toLocaleDateString() : '-';
+    // Single-line label fallback (used for button text)
+    const d = this.formatDate(entry?.date);
+    const chrom = entry?.chromosomeAnalysis ?? 'Not performed';
     const prev = (entry?.prevIllnessList && entry.prevIllnessList.length)
       ? entry.prevIllnessList.map((i: any) => i.descriptionFull).join(', ')
       : 'Not specified';
-    const chrom = entry?.chromosomeAnalysis ?? 'Not performed';
     return `M.hist.: ${d} | Prev. ill.: ${prev} | Chromos.: ${chrom}`;
+  }
+
+  formatHistoryHtml(entry: any) {
+    const d = this.formatDate(entry?.date);
+    const chrom = entry?.chromosomeAnalysis ?? 'Not performed';
+    const prev = (entry?.prevIllnessList && entry.prevIllnessList.length)
+      ? entry.prevIllnessList.map((i: any) => i.illnessCode).join(', ')
+      : 'Not specified';
+    return `
+      <div><strong>M.hist.:</strong> ${d}</div>
+      <div><strong>Prev. ill.:</strong> ${prev}</div>
+      <div><strong>Chromos.:</strong> ${chrom}</div>
+    `;
+  }
+
+  private buildTextareaHistory(entry: any) {
+    const d = this.formatDate(entry?.date);
+    const chrom = entry?.chromosomeAnalysis ?? 'Not performed';
+    const prevLines = this.formatPrevIllness(entry?.prevIllnessList);
+    const parts = [
+      `M.hist.: ${d}`,
+      `Chromos.: ${chrom}`,
+      prevLines ? `Prev. ill.:\n${prevLines}` : 'Prev. ill.: Not specified'
+    ];
+    return parts.join('\n');
   }
 
   onFemaleHistoryChange() {
     const id = this.generalForm.get('femaleMedicalHistoryOf')?.value;
     const sel = this.femaleHistoryOptions?.find(x => x.ivfFemaleFHId === id);
-    const text = this.formatPrevIllness(sel?.prevIllnessList);
+    const text = sel ? this.buildTextareaHistory(sel) : '';
     const ctrl = this.generalForm.get('femaleHistory');
     ctrl?.setValue(text);
-    if (id) { ctrl?.disable({ emitEvent: false }); } else { ctrl?.enable({ emitEvent: false }); }
+    ctrl?.disable({ emitEvent: false });
   }
 
   onMaleHistoryChange() {
     const id = this.generalForm.get('maleMedicalHistoryOf')?.value;
     const sel = this.maleHistoryOptions?.find(x => x.ivfMaleFHId === id);
-    const text = this.formatPrevIllness(sel?.prevIllnessList);
+    const text = sel ? this.buildTextareaHistory(sel) : '';
     const ctrl = this.generalForm.get('maleHistory');
     ctrl?.setValue(text);
-    if (id) { ctrl?.disable({ emitEvent: false }); } else { ctrl?.enable({ emitEvent: false }); }
+    ctrl?.disable({ emitEvent: false });
+  }
+
+  // Safe getters for button labels (avoid arrow functions in template)
+  getSelectedFemaleLabel() {
+    const id = this.generalForm?.value?.femaleMedicalHistoryOf;
+    const list = Array.isArray(this.femaleHistoryOptions) ? this.femaleHistoryOptions : [];
+    const entry = list.find((x: any) => x && x.ivfFemaleFHId === id);
+    return entry ? `M.hist.: ${this.formatDate(entry?.date)}` : 'Select female medical history';
+  }
+
+  getSelectedMaleLabel() {
+    const id = this.generalForm?.value?.maleMedicalHistoryOf;
+    const list = Array.isArray(this.maleHistoryOptions) ? this.maleHistoryOptions : [];
+    const entry = list.find((x: any) => x && x.ivfMaleFHId === id);
+    return entry ? `M.hist.: ${this.formatDate(entry?.date)}` : 'Select male medical history';
+  }
+
+  // Handlers for custom dropdown (multi-line options)
+  selectFemaleHistory(entry: any) {
+    this.generalForm.get('femaleMedicalHistoryOf')?.setValue(entry?.ivfFemaleFHId ?? null, { emitEvent: false });
+    const ctrl = this.generalForm.get('femaleHistory');
+    ctrl?.setValue(this.buildTextareaHistory(entry));
+    ctrl?.disable({ emitEvent: false });
+  }
+
+  selectMaleHistory(entry: any) {
+    this.generalForm.get('maleMedicalHistoryOf')?.setValue(entry?.ivfMaleFHId ?? null, { emitEvent: false });
+    const ctrl = this.generalForm.get('maleHistory');
+    ctrl?.setValue(this.buildTextareaHistory(entry));
+    ctrl?.disable({ emitEvent: false });
   }
 
   options(key: string) {
