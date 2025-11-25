@@ -16,15 +16,30 @@ export type PatientBannerCollection = RxCollection<PatientBannerDocType>;
 
 const schema: RxJsonSchema<PatientBannerDocType> = {
   title: 'patientbanner',
-  version: 2,
+  version: 3,
   primaryKey: 'id',
   type: 'object',
   properties: {
     id: { type: 'string', maxLength: 50 },
-    patientData: { type: 'object', properties: {}, additionalProperties: true },
-    patientIVFData: { type: 'object' },
+    patientData: { 
+      oneOf: [
+        { type: 'object', properties: {}, additionalProperties: true },
+        { type: 'null' }
+      ]
+    },
+    patientIVFData: { 
+      oneOf: [
+        { type: 'object', properties: {}, additionalProperties: true },
+        { type: 'null' }
+      ]
+    },
     visitAppointments: { type: 'array', items: { type: 'object', properties: {}, additionalProperties: true } },
-    selectedVisit: { type: 'object', properties: {}, additionalProperties: true },
+    selectedVisit: { 
+      oneOf: [
+        { type: 'object', properties: {}, additionalProperties: true },
+        { type: 'null' }
+      ]
+    },
     payerInfo: { type: 'array', items: { type: 'object', properties: {}, additionalProperties: true } },
     updatedAt: { type: 'number' }
   },
@@ -37,6 +52,15 @@ const migrationStrategies = {
       ...oldDoc,
       payerInfo: Array.isArray(oldDoc.payerInfo) ? oldDoc.payerInfo : []
     };
+  },
+  2: (oldDoc: any) => {
+    // Migration from v2 to v3: ensure null values are preserved
+    return {
+      ...oldDoc,
+      patientData: oldDoc.patientData ?? null,
+      patientIVFData: oldDoc.patientIVFData ?? null,
+      selectedVisit: oldDoc.selectedVisit ?? null
+    };
   }
 } as const;
 
@@ -47,43 +71,28 @@ export class PatientBannerStoreService {
 
   private async col(): Promise<PatientBannerCollection> {
     const db = await this.db();
-    // If already exists, return it (new name)
-    const existing = (db as any)?.collections?.patientbanner as PatientBannerCollection | undefined;
-    if (existing) return existing;
-    // Backward-compat: if old underscore name exists, use it
-    const legacy = (db as any)?.collections?.patient_banner as PatientBannerCollection | undefined;
-    if (legacy) return legacy;
-
-    // Try to create and return the created instance
-    try {
-      const created = await db.addCollections({ patientbanner: { schema, migrationStrategies: migrationStrategies as any } });
-      const direct = (created as any)?.patientbanner as PatientBannerCollection | undefined;
-      if (direct) return direct;
-      const afterCreate = (db as any)?.collections?.patientbanner as PatientBannerCollection | undefined;
-      if (afterCreate) return afterCreate;
-      const afterCreateLegacy = (db as any)?.collections?.patient_banner as PatientBannerCollection | undefined;
-      if (afterCreateLegacy) return afterCreateLegacy;
-    } catch (e) {
-      // ignore and fall back to db.collections
+    console.log('🔍 Looking for patientbanner collection...');
+    
+    // Check if collection already exists
+    if (!('patientbanner' in db.collections)) {
+      console.log('📝 Creating new patientbanner collection...');
+      try {
+        await db.addCollections({ 
+          patientbanner: { 
+            schema, 
+            migrationStrategies: migrationStrategies as any 
+          } 
+        });
+        console.log('✅ Created patientbanner collection successfully');
+      } catch (e) {
+        console.error('❌ Error creating patientbanner collection:', e);
+        throw e;
+      }
+    } else {
+      console.log('✅ Found existing patientbanner collection');
     }
-
-    // Retry once more in case of race
-    try {
-      const created2 = await db.addCollections({ patientbanner: { schema, migrationStrategies: migrationStrategies as any } });
-      const direct2 = (created2 as any)?.patientbanner as PatientBannerCollection | undefined;
-      if (direct2) return direct2;
-    } catch {}
-    // Try to create legacy-named collection as last resort
-    try {
-      const createdLegacy = await db.addCollections({ patient_banner: { schema, migrationStrategies: migrationStrategies as any } });
-      const directLegacy = (createdLegacy as any)?.patient_banner as PatientBannerCollection | undefined;
-      if (directLegacy) return directLegacy;
-    } catch {}
-    const col = (db as any)?.collections?.patientbanner as PatientBannerCollection | undefined;
-    if (col) return col;
-    const colLegacy = (db as any)?.collections?.patient_banner as PatientBannerCollection | undefined;
-    if (colLegacy) return colLegacy;
-    throw new Error('RxDB collection patientbanner is unavailable');
+    
+    return (db as any).collections.patientbanner as PatientBannerCollection;
   }
 
   private db(): Promise<RxDatabase> {
@@ -91,48 +100,49 @@ export class PatientBannerStoreService {
     return this.initPromise;
   }
 
-  private async colLegacy(): Promise<PatientBannerCollection | null> {
-    const db = await this.db();
-    const legacy = (db as any)?.collections?.patient_banner as PatientBannerCollection | undefined;
-    if (legacy) return legacy;
-    try {
-      const created = await db.addCollections({ patient_banner: { schema, migrationStrategies: migrationStrategies as any } });
-      const direct = (created as any)?.patient_banner as PatientBannerCollection | undefined;
-      return direct || ((db as any)?.collections?.patient_banner as PatientBannerCollection | undefined) || null;
-    } catch {
-      return (db as any)?.collections?.patient_banner || null;
-    }
-  }
 
   async get(): Promise<PatientBannerDocType | null> {
-    const col = await this.col();
-    const doc = await col.findOne('current').exec();
-    if (doc) return doc.toJSON() as PatientBannerDocType;
-
-    // Try legacy collection and migrate if found
-    const legacyCol = await this.colLegacy();
-    if (legacyCol) {
-      const legacyDoc = await legacyCol.findOne('current').exec();
-      if (legacyDoc) {
-        const legacyData = legacyDoc.toJSON() as PatientBannerDocType;
-        await col.upsert(legacyData);
-        try { await legacyDoc.remove(); } catch {}
-        return legacyData;
-      }
+    try {
+      const col = await this.col();
+      const doc = await col.findOne('current').exec();
+      return doc ? (doc.toJSON() as PatientBannerDocType) : null;
+    } catch (error) {
+      console.error('❌ Failed to get patient banner from RxDB:', error);
+      return null;
     }
-    return null;
   }
 
   async set(partial: Partial<Omit<PatientBannerDocType, 'id' | 'updatedAt'>>): Promise<void> {
-    const existing = (await this.get()) || { id: 'current', patientData: null, visitAppointments: [], selectedVisit: null, payerInfo: [], updatedAt: Date.now() };
-    const next = { ...existing, ...partial, updatedAt: Date.now() } as PatientBannerDocType;
-    const col = await this.col();
-    await col.upsert(next);
+    try {
+      const existing = (await this.get()) || { 
+        id: 'current', 
+        patientData: null, 
+        patientIVFData: null,
+        visitAppointments: [], 
+        selectedVisit: null, 
+        payerInfo: [], 
+        updatedAt: Date.now() 
+      };
+      const next = { ...existing, ...partial, updatedAt: Date.now() } as PatientBannerDocType;
+      const col = await this.col();
+      await col.upsert(next);
+      console.log('✅ Patient banner saved to RxDB successfully');
+    } catch (error) {
+      console.error('❌ Failed to save patient banner to RxDB:', error);
+      console.warn('⚠️ Data will not persist across page refreshes');
+      // Continue without throwing - app should work without persistence
+    }
   }
 
   async clear(): Promise<void> {
-    const col = await this.col();
-    const doc = await col.findOne('current').exec();
-    if (doc) await doc.remove();
+    try {
+      const col = await this.col();
+      const doc = await col.findOne('current').exec();
+      if (doc) await doc.remove();
+      console.log('✅ Patient banner cleared from RxDB');
+    } catch (error) {
+      console.error('❌ Failed to clear patient banner from RxDB:', error);
+      // Continue without throwing
+    }
   }
 }

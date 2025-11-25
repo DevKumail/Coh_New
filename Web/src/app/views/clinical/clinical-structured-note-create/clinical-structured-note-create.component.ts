@@ -11,6 +11,7 @@ import { QuestionViewComponent } from '../question-view/question-view.component'
 import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { LoaderService } from '@core/services/loader.service';
+import { UserDataService } from '@core/services/user-data.service';
 
 @Component({
   standalone: true,
@@ -56,7 +57,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     private loader: LoaderService,
     private router: Router,
     private route: ActivatedRoute,
-    private PatientData: PatientBannerService
+    private cdr: ChangeDetectorRef,
+    private PatientData: PatientBannerService,
+    private userDataService: UserDataService
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],

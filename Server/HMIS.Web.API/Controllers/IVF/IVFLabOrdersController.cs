@@ -39,6 +39,13 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(rows);
         }
 
+        [HttpGet("pathology-results/{mrno:long}")]
+        public async Task<IActionResult> GetPathologyResults(long mrno, [FromQuery] string? search)
+        {
+            var rows = await _service.GetPathologyResultsAsync(mrno, search);
+            return Ok(rows);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateUpdateLabOrderSetDTO payload)
         {
@@ -80,6 +87,55 @@ namespace HMIS.Web.Controllers.IVF
         {
             var items = await _service.GetReceiversByEmployeeTypeAsync(employeeTypeId);
             return Ok(items);
+        }
+
+        // Collection details
+        [HttpGet("{orderSetId:long}/collection-details")]
+        public async Task<IActionResult> GetCollectionDetails(long orderSetId)
+        {
+            var rows = await _service.GetOrderCollectionDetailsAsync(orderSetId);
+            if (rows == null) return NotFound();
+            return Ok(rows);
+        }
+
+        // Sample collection - Collect samples for all tests in the order
+        [HttpPost("{OrderSetDetailId:long}/collect")]
+        public async Task<IActionResult> CollectSample(long OrderSetDetailId, [FromBody] CollectSampleDTO payload)
+        {
+            var ok = await _service.CollectSampleAsync(OrderSetDetailId, payload);
+            return ok ? NoContent() : NotFound();
+        }
+
+        [HttpPost("{orderSetDetailId:long}/observations")]
+        public async Task<IActionResult> Complete(long orderSetDetailId, [FromBody] CompleteLabOrderDTO payload)
+        {
+            var labResultId = await _service.CompleteOrderAsync(orderSetDetailId, payload);
+            if (labResultId == 0) return NotFound();
+            return Ok(new { labResultId });
+        }
+        [HttpPost("{orderSetDetailId:long}/mark-complete")]
+        public async Task<IActionResult> MarkComplete([FromRoute] long orderSetDetailId)
+        {
+            var success = await _service.MarkCompleteOrderAsync(orderSetDetailId);
+
+            if (!success)
+                return NotFound("Order detail not found.");
+
+            return NoContent();
+        }
+
+        [HttpPost("{orderSetId:long}/cancel")]
+        public async Task<IActionResult> CancelOrder(long orderSetId, [FromBody] CancelOrderDTO payload)
+        {
+            var result = await _service.CancelOrderAsync(orderSetId, payload);
+            
+            if (result == 0)
+                return NotFound("Order not found.");
+            
+            if (result == -1)
+                return BadRequest("Marked complete order cannot be canceled.");
+            
+            return Ok(new { message = "Order cancelled successfully", orderSetId });
         }
     }
 }
