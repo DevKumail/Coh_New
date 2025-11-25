@@ -149,4 +149,9 @@ export class IVFApiService {
   UpdateCryoPreservation(payload: any): Observable<any> {
     return this.api.put('IVFMaleCryoPreservation/UpdateCryoPreservation', payload);
   }
+
+
+    GetFertilityHistoryForDashboard(ivfmainid: string): Observable<any> {
+    return this.api.get(`IVFDashboard/GetFertilityHistoryForDashboard?ivfmainid=${ivfmainid}`);
+  }
 }
