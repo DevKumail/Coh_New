@@ -146,6 +146,8 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<HiePatientDemographicsOutboundQueue> HiePatientDemographicsOutboundQueue { get; set; }
 
+    public virtual DbSet<HmisFiles> HmisFiles { get; set; }
+
     public virtual DbSet<HolidaySchedule> HolidaySchedule { get; set; }
 
     public virtual DbSet<Hremployee> Hremployee { get; set; }
@@ -191,6 +193,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisode { get; set; }
 
     public virtual DbSet<IvfembblastIndications> IvfembblastIndications { get; set; }
+
+    public virtual DbSet<IvfepisodeOverviewLabTestOrder> IvfepisodeOverviewLabTestOrder { get; set; }
 
     public virtual DbSet<IvffemaleFertilityHistory> IvffemaleFertilityHistory { get; set; }
 
@@ -970,6 +974,13 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
         });
 
+        modelBuilder.Entity<HmisFiles>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__HMIS_Fil__3214EC27C0D41F1F");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+        });
+
         modelBuilder.Entity<HolidaySchedule>(entity =>
         {
             entity.HasKey(e => e.HolidayScheduleId).HasName("PK_HolidayBlocked");
@@ -1217,6 +1228,13 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.IvfadditionalMeasures).WithMany(p => p.IvfembblastIndications).HasConstraintName("FK_IVFFemaleFHPIDEMBBlastIndications_IVFFemaleFHAdditionalMeasures");
 
             entity.HasOne(d => d.PidembblastIndicationCategory).WithMany(p => p.IvfembblastIndications).HasConstraintName("FK_IVFFemaleFHPIDEMBBlastIndications_DropdownConfiguration");
+        });
+
+        modelBuilder.Entity<IvfepisodeOverviewLabTestOrder>(entity =>
+        {
+            entity.HasOne(d => d.App).WithMany().HasConstraintName("FK_IVFEpisodeOverviewLabTestOrder_SchAppointment");
+
+            entity.HasOne(d => d.Overview).WithMany().HasConstraintName("FK_IVFEpisodeOverviewLabTestOrder_IVFTreatmentEpisodeOverviewStage");
         });
 
         modelBuilder.Entity<IvffemaleFertilityHistory>(entity =>
@@ -1740,6 +1758,8 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<LabOrderSet>(entity =>
         {
             entity.HasKey(e => e.LabOrderSetId).HasName("PK__LabOrder__322AE07AA8CA4595");
+
+            entity.HasOne(d => d.App).WithMany(p => p.LabOrderSet).HasConstraintName("FK_LabOrderSet_SchAppointment");
         });
 
         modelBuilder.Entity<LabOrderSetDetail>(entity =>

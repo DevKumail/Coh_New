@@ -12,6 +12,7 @@ using HMIS.Application.ModelMapping;
 using HMIS.Application;
 using HMIS.Core.Entities;
 using HMIS.Core.Context;
+using HMIS.Core.FileSystem;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,8 @@ builder.Host.UseSerilog((ctx, lc) => lc
 
 builder.Services.AddAutoMapper(typeof(GeneralProfile).Assembly);
 
+builder.Services.AddScoped<IFileRepository, FileRepository>();
+builder.Services.AddScoped<FileHelper>();
 
 // Add DB Context
 builder.Services.AddDbContext<HMISDbContext>(options =>

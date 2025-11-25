@@ -16,6 +16,8 @@ public partial class LabOrderSet
 
     public int? ProviderId { get; set; }
 
+    public long? AppId { get; set; }
+
     [StringLength(20)]
     [Unicode(false)]
     public string? OrderDate { get; set; }
@@ -67,4 +69,8 @@ public partial class LabOrderSet
     public int? Hl7messageId { get; set; }
 
     public long? OrderNumber { get; set; }
+
+    [ForeignKey("AppId")]
+    [InverseProperty("LabOrderSet")]
+    public virtual SchAppointment? App { get; set; }
 }
