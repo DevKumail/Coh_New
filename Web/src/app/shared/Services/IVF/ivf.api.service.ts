@@ -154,4 +154,12 @@ export class IVFApiService {
     GetFertilityHistoryForDashboard(ivfmainid: string): Observable<any> {
     return this.api.get(`IVFDashboard/GetFertilityHistoryForDashboard?ivfmainid=${ivfmainid}`);
   }
+
+  CreateUpdateDashboardTreatmentCycle(payload: any): Observable<any> {
+    return this.api.post('IVFDashboard/CreateUpdateDashboardTreatmentCycle', payload);
+  }
+
+  GetAllIVFDashboardTreatmentCycle(ivfmainid: number, page: number = 1, rowsPerPage: number = 10): Observable<any> {
+    return this.api.get('IVFDashboard/GetAllIVFDashboardTreatmentCycle', { ivfmainid, page, rowsPerPage });
+  }
 }

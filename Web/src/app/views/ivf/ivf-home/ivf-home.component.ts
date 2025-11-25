@@ -165,11 +165,55 @@ export class IVFHomeComponent {
         this.noCoupleAlertShown = false;
         this.patientBannerService.setIVFPatientData(null);
         this.patientBannerService.setIVFPatientData(res);
+        // Load overview cycles once we have couple/mainId
+        this.loadOverviewCycles();
       } else if(hasFemale && hasMale){
         this.patientBannerService.setIVFPatientData(null);
         this.patientBannerService.setIVFPatientData(res);
       }
     } catch {}
+  }
+
+  private resolveIvfMainId(): number | null {
+    const idFromCouple = (this.couple as any)?.couple?.ivfMainId?.IVFMainId
+      ?? (this.couple as any)?.ivfMainId?.IVFMainId
+      ?? (this.couple as any)?.ivfMainId
+      ?? (this.PrimaryPatientData as any)?.couple?.ivfMainId?.IVFMainId
+      ?? (this.PrimaryPatientData as any)?.ivfMainId?.IVFMainId
+      ?? (this.PrimaryPatientData as any)?.ivfMainId;
+    const n = Number(idFromCouple);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  }
+
+  loadOverviewCycles(page: number = 1, rowsPerPage: number = 10) {
+    const mainId = this.resolveIvfMainId();
+    if (!mainId) {
+      this.overview = [];
+      return;
+    }
+    this.ivfApi.GetAllIVFDashboardTreatmentCycle(mainId, page, rowsPerPage).subscribe({
+      next: (res: any) => {
+        const data = res?.data || res || [];
+        this.overview = (Array.isArray(data) ? data : []).map((x: any) => ({
+          woman: x?.womanName ?? this.couple?.female?.name ?? '-',
+          no: x?.cycleNo ?? x?.no ?? '-',
+          start: x?.startDate ? new Date(x.startDate).toLocaleDateString() : (x?.start ?? '-'),
+          eggTreatment: x?.eggTreatment ?? '-',
+          partner: x?.partnerName ?? this.couple?.male?.name ?? '-',
+          sperm: x?.sperm ?? '-',
+          stimulation: x?.stimulation ?? '-',
+          stimProt: x?.stimProtocol ?? '-',
+          stimMed: x?.stimMedication ?? '-',
+          triggering: x?.triggering ?? '-',
+          trigMed: x?.triggerMedication ?? '-',
+          cycle: x?.cycle ?? '-',
+        }));
+      },
+      error: (err: any) => {
+        console.error('Failed to fetch overview cycles', err);
+        this.overview = [];
+      }
+    });
   }
 
 
