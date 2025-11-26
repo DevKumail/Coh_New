@@ -114,5 +114,18 @@ namespace HMIS.Web.Controllers.IVF
             if (!result.IsSuccess) return BadRequest(new { message = result.ErrorMessage });
             return Ok(new { id = result.Data });
         }
+
+        [HttpDelete("DeleteIVFDashboardTreatmentCycle/{ivfDashboardTreatmentEpisodeId}")]
+        public async Task<IActionResult> DeleteIVFDashboardTreatmentCycle([FromRoute] string ivfDashboardTreatmentEpisodeId)
+        {
+            var (success, message) = await _service.DeleteDashboardTreatmentEpisodeAsync(ivfDashboardTreatmentEpisodeId);
+
+            if (success)
+            {
+                return Ok(new { message });
+            }
+
+            return BadRequest(new { message });
+        }
     }
 }

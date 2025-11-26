@@ -16,6 +16,12 @@ public partial class IvfdashboardTreatmentCycle
     [Column("IVFMainId")]
     public int? IvfmainId { get; set; }
 
+    [Column("IVFMaleFHId")]
+    public int? IvfmaleFhid { get; set; }
+
+    [Column("IVFFemaleFHId")]
+    public int? IvffemaleFhid { get; set; }
+
     public long? TreatmentTypeCategoryId { get; set; }
 
     public bool? OnlyInternalCycle { get; set; }
@@ -78,9 +84,17 @@ public partial class IvfdashboardTreatmentCycle
     [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual ICollection<IvfdashboardAdditionalMeasures> IvfdashboardAdditionalMeasures { get; set; } = new List<IvfdashboardAdditionalMeasures>();
 
+    [ForeignKey("IvffemaleFhid")]
+    [InverseProperty("IvfdashboardTreatmentCycle")]
+    public virtual IvffemaleFertilityHistory? IvffemaleFh { get; set; }
+
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfdashboardTreatmentCycle")]
     public virtual Ivfmain? Ivfmain { get; set; }
+
+    [ForeignKey("IvfmaleFhid")]
+    [InverseProperty("IvfdashboardTreatmentCycle")]
+    public virtual IvfmaleFertilityHistory? IvfmaleFh { get; set; }
 
     [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual ICollection<IvftreamentsEpisodeAttachments> IvftreamentsEpisodeAttachments { get; set; } = new List<IvftreamentsEpisodeAttachments>();

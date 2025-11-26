@@ -63,6 +63,9 @@ public partial class IvfmaleFertilityHistory
     [InverseProperty("IvfmaleFertilityHistoryGenerallyHealthyCategory")]
     public virtual DropdownConfiguration? GenerallyHealthyCategory { get; set; }
 
+    [InverseProperty("IvfmaleFh")]
+    public virtual ICollection<IvfdashboardTreatmentCycle> IvfdashboardTreatmentCycle { get; set; } = new List<IvfdashboardTreatmentCycle>();
+
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfmaleFertilityHistory")]
     public virtual Ivfmain Ivfmain { get; set; } = null!;

@@ -1242,7 +1242,11 @@ public partial class HMISDbContext : DbContext
 
             entity.HasOne(d => d.CycleFromAmenorrheaCategory).WithMany(p => p.IvfdashboardTreatmentCycleCycleFromAmenorrheaCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration1");
 
+            entity.HasOne(d => d.IvffemaleFh).WithMany(p => p.IvfdashboardTreatmentCycle).HasConstraintName("FK_IVFDashboardTreatmentCycle_IVFFemaleFertilityHistory");
+
             entity.HasOne(d => d.Ivfmain).WithMany(p => p.IvfdashboardTreatmentCycle).HasConstraintName("FK_IVFFemaleTreatmentCycle_IVFMain");
+
+            entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfdashboardTreatmentCycle).HasConstraintName("FK_IVFDashboardTreatmentCycle_IVFMaleFertilityHistory");
 
             entity.HasOne(d => d.MainIndicationCategory).WithMany(p => p.IvfdashboardTreatmentCycleMainIndicationCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration2");
 
@@ -1768,6 +1772,10 @@ public partial class HMISDbContext : DbContext
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.Hmisfile).WithMany(p => p.IvftreamentsEpisodeAttachments)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFTreamentsEpisodeAttachments_HMIS_Files");
 
             entity.HasOne(d => d.IvfdashboardTreatmentEpisode).WithMany(p => p.IvftreamentsEpisodeAttachments)
                 .OnDelete(DeleteBehavior.ClientSetNull)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace HMIS.Application.DTOs.IVFDTOs
 {
@@ -7,6 +8,9 @@ namespace HMIS.Application.DTOs.IVFDTOs
     {
         public int? IVFDashboardTreatmentEpisodeId { get; set; }
         public int? IVFMainId { get; set; }
+
+        public int? IVFMaleFHId { get; set; }
+        public int? IVFFemaleFHId { get; set; }
 
         public long? TreatmentTypeCategoryId { get; set; }
         public bool? OnlyInternalCycle { get; set; }
@@ -35,8 +39,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
 
         public IVFDashboardAdditionalMeasureDto? AdditionalMeasure { get; set; }
 
-        public int? CreatedBy { get; set; }
-        public int? UpdatedBy { get; set; }
+        public List<IVFDashboardTreatmentEpisodeAttachmentDto>? Attachments { get; set; }
     }
 
     public class IVFDashboardTreatmentSubTypeDto
@@ -53,5 +56,11 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public List<long>? PerformedAdditionalMeasuresCategoryIds { get; set; }
         public List<long>? PolarBodiesIndicationCategoryIds { get; set; }
         public List<long>? EMBBlastIndicationCategoryIds { get; set; }
+    }
+
+    public class IVFDashboardTreatmentEpisodeAttachmentDto
+    {
+        public int? Id { get; set; }
+        public long? HMISFileId { get; set; }
     }
 }
