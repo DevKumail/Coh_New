@@ -240,19 +240,20 @@
           </thead>
           <tbody class="table-group-divider">
             <tr *ngFor="let data of speechtotxt; let i = index">
-              <td class="text-center">{{ (data.noteTitle || '-').trim() }}</td>
+              <td class="text-center">{{ data.noteTitle || '-' }}</td>
               <td class="text-center">{{ data.visitAccDisplay || '-' }}</td>
               <td class="text-center">{{ data.visitDate || '-' }}</td>
               <td class="text-center">{{ data.createdBy || '-' }}</td>
-              <td class="text-center">{{ data.createdOn || '-' }} </td>
-              <td class="text-center">{{ data.signedBy || '-' }} </td>
-              <td style="font-size: 12px">
+              <td class="text-center">{{ data.createdOn || '-' }}</td>
+              <td class="text-center">{{ data.signedBy || '-' }}</td>
+              <td style="font-size: 12px" class="text-center">
                 <audio
                   *ngIf="data.voiceSafeUrl || data.notePath"
                   controls
                   style="width: 200px;"
                   [src]="data.voiceSafeUrl || data.notePath">
                 </audio>
+                <span *ngIf="!data.voiceSafeUrl && !data.notePath">-</span>
               </td>
             </tr>
             <tr *ngIf="clinicalnoteTotalItems === 0">

@@ -46,7 +46,8 @@
                         ],
                         "styles": [
                             "src/styles.scss",
-                            "quill/dist/quill.bubble.css"
+                            "quill/dist/quill.bubble.css",
+                            "node_modules/bootstrap-icons/font/bootstrap-icons.css"
                         ],
                         "allowedCommonJsDependencies": [
                             "dayjs",

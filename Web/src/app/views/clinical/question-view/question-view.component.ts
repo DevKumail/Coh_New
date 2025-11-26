@@ -11,7 +11,10 @@ import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 })
 export class QuestionViewComponent implements OnInit {
   @Input() question: any;
-  @Input() form?: FormGroup; // optional reactive FormGroup from parent
+  @Input() form!: FormGroup; // optional reactive FormGroup from parent
+
+  // Track collapse state for each section
+  isCollapsed: boolean = true;
 
   constructor() { }
 
@@ -24,28 +27,70 @@ export class QuestionViewComponent implements OnInit {
         this.form.addControl(key, new FormControl(initial));
       }
     }
+
+    // Sections with children start collapsed, others expanded
+    if (this.question?.type === 'Question Section' && this.question?.children?.length > 0) {
+      this.isCollapsed = true;
+    } else {
+      this.isCollapsed = false;
+    }
   }
 
+  /**
+   * Toggle collapse/expand state for sections
+   */
+  toggleSection(): void {
+    if (this.question?.type === 'Question Section') {
+      this.isCollapsed = !this.isCollapsed;
+    }
+  }
+
+  /**
+   * Handle mouse enter event for hover effect
+   */
+  onMouseEnter(event: Event): void {
+    const target = event.currentTarget as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = '#e9ecef';
+    }
+  }
+
+  /**
+   * Handle mouse leave event for hover effect
+   */
+  onMouseLeave(event: Event): void {
+    const target = event.currentTarget as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = '#f8f9fa';
+    }
+  }
+
+  /**
+   * Check if question has children
+   */
+  hasChildren(): boolean {
+    return this.question?.children && this.question.children.length > 0;
+  }
+
+  /**
+   * Check if checkbox is checked
+   */
   isChecked(answer: any): boolean {
-    return answer === 'Yes' || answer === true || answer === 'true';
+    return answer === true || answer === 'true' || answer === 1 || answer === '1';
   }
 
-  onCheckboxChange(event: any, question: any) {
-    const checked = event.target.checked;
-    question.answer = checked ? 'Yes' : 'No';
-    if (this.form && question?.quest_Id != null) {
-      const ctrl = this.form.get(question.quest_Id.toString());
-      if (ctrl) ctrl.setValue(checked);
-    }
+  /**
+   * Handle checkbox change
+   */
+  onCheckboxChange(event: any, question: any): void {
+    question.answer = event.target.checked;
   }
 
-  onAnswerChange(event: any, question: any) {
-    const value = event.target.value;
-    question.answer = value;
-    if (this.form && question?.quest_Id != null) {
-      const ctrl = this.form.get(question.quest_Id.toString());
-      if (ctrl) ctrl.setValue(value);
-    }
+  /**
+   * Handle text input change
+   */
+  onAnswerChange(event: any, question: any): void {
+    question.answer = event.target.value;
   }
 }
 

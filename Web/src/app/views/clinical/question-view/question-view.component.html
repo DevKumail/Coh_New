@@ -1,28 +1,51 @@
-<div class="question-section" style="margin-left: 20px; margin-top: 10px;">
-  <div>
-    <h4 *ngIf="question.type === 'Question Section'">{{ question.quest_Title }}</h4>
-    <label *ngIf="question.type === 'CheckBox'">
-      <input
-        type="checkbox"
-        [checked]="isChecked(question.answer)"
-        (change)="onCheckboxChange($event, question)"
-      />
-      {{ question.quest_Title }}
-    </label>
-  </div>
+<!-- Question Section with Collapse/Expand - Full Width -->
+<div *ngIf="question.type === 'Question Section'" class="question-section section-header" style="margin-left: 20px; margin-top: 10px;">
+  <h4
+    class="d-flex align-items-center gap-2"
+    style="cursor: pointer; user-select: none; padding: 10px 15px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #0d6efd; transition: all 0.2s ease;"
+    (click)="toggleSection()"
+    (mouseenter)="onMouseEnter($event)"
+    (mouseleave)="onMouseLeave($event)">
+    <!-- Main Collapse/Expand Icon (Left side) -->
+    <span style="font-size: 1.2rem; color: #0d6efd; font-weight: bold; min-width: 20px;">
+      {{ isCollapsed ? '▶' : '▼' }}
+    </span>
+    <span style="font-weight: 600;">{{ question.quest_Title }}</span>
+  </h4>
 
-  <div *ngIf="question.type === 'TextBox'">
-    <label>{{ question.quest_Title }}</label>
-    <input
-      type="text"
-      [value]="question.answer"
-      (input)="onAnswerChange($event, question)"
-      class="form-control"
-    />
+  <!-- Children (only shown when section is expanded) -->
+  <div
+    *ngIf="hasChildren() && !isCollapsed"
+    class="children-container"
+    style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-left: 15px; padding-left: 10px; border-left: 2px solid #e0e0e0; margin-top: 10px;">
+    <app-question-view
+      *ngFor="let child of question.children"
+      [question]="child"
+      [form]="form">
+    </app-question-view>
   </div>
+</div>
 
-  <div *ngFor="let child of question.children">
-    <app-question-view [question]="child" [form]="form"></app-question-view>
-  </div>
+<!-- CheckBox Type - Inline -->
+<label *ngIf="question.type === 'CheckBox'" class="d-flex align-items-center gap-2" style="margin-bottom: 10px;">
+  <input
+    type="checkbox"
+    [checked]="isChecked(question.answer)"
+    (change)="onCheckboxChange($event, question)"
+    style="cursor: pointer;"
+  />
+  <span>{{ question.quest_Title }}</span>
+</label>
+
+<!-- TextBox Type - Inline -->
+<div *ngIf="question.type === 'TextBox'" class="mb-3">
+  <label class="form-label fw-semibold" style="font-size: 0.9rem;">{{ question.quest_Title }}</label>
+  <input
+    type="text"
+    [value]="question.answer || ''"
+    (input)="onAnswerChange($event, question)"
+    class="form-control form-control-sm"
+    placeholder="Enter {{ question.quest_Title }}"
+  />
 </div>
 
