@@ -61,10 +61,8 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private PatientData: PatientBannerService,
-    private userDataService: UserDataService
-    private PatientData: PatientBannerService,
+    private userDataService: UserDataService,
     private cdr: ChangeDetectorRef,
-    private userDataService: UserDataService
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],

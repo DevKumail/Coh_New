@@ -227,7 +227,4 @@ public partial class TabDrugsName
 
     [InverseProperty("Drug")]
     public virtual ICollection<Medications> Medications { get; set; } = new List<Medications>();
-
-    [InverseProperty("Drug")]
-    public virtual ICollection<Prescription> Prescription { get; set; } = new List<Prescription>();
 }

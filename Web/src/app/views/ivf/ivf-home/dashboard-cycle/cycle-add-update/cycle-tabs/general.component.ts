@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
@@ -11,7 +11,7 @@ import { QuillModule, QuillEditorComponent } from 'ngx-quill';
   templateUrl: './general.component.html',
   styleUrls: ['./general.component.scss']
 })
-export class GeneralComponent {
+export class GeneralComponent implements OnChanges {
 
   generalForm: FormGroup;
   @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
@@ -55,6 +55,17 @@ export class GeneralComponent {
       maleHistory: [{ value: '', disabled: true }],
       cycleNote: ['']
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const femaleOptsChanged = !!changes['femaleHistoryOptions'];
+    const maleOptsChanged = !!changes['maleHistoryOptions'];
+    if (femaleOptsChanged && Array.isArray(this.femaleHistoryOptions) && this.femaleHistoryOptions.length) {
+      this.onFemaleHistoryChange();
+    }
+    if (maleOptsChanged && Array.isArray(this.maleHistoryOptions) && this.maleHistoryOptions.length) {
+      this.onMaleHistoryChange();
+    }
   }
 
   // --- Medical history dynamic helpers ---
@@ -103,8 +114,9 @@ export class GeneralComponent {
   }
 
   onFemaleHistoryChange() {
-    const id = this.generalForm.get('femaleMedicalHistoryOf')?.value;
-    const sel = this.femaleHistoryOptions?.find(x => x.ivfFemaleFHId === id);
+    const idRaw = this.generalForm.get('femaleMedicalHistoryOf')?.value;
+    const id = (idRaw === null || idRaw === undefined || idRaw === '') ? null : Number(idRaw);
+    const sel = id == null ? undefined : this.femaleHistoryOptions?.find(x => Number(x?.ivfFemaleFHId) === id);
     const text = sel ? this.buildTextareaHistory(sel) : '';
     const ctrl = this.generalForm.get('femaleHistory');
     ctrl?.setValue(text);
@@ -112,8 +124,9 @@ export class GeneralComponent {
   }
 
   onMaleHistoryChange() {
-    const id = this.generalForm.get('maleMedicalHistoryOf')?.value;
-    const sel = this.maleHistoryOptions?.find(x => x.ivfMaleFHId === id);
+    const idRaw = this.generalForm.get('maleMedicalHistoryOf')?.value;
+    const id = (idRaw === null || idRaw === undefined || idRaw === '') ? null : Number(idRaw);
+    const sel = id == null ? undefined : this.maleHistoryOptions?.find(x => Number(x?.ivfMaleFHId) === id);
     const text = sel ? this.buildTextareaHistory(sel) : '';
     const ctrl = this.generalForm.get('maleHistory');
     ctrl?.setValue(text);

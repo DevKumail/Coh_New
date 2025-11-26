@@ -85,13 +85,15 @@ public partial class LabOrderSetDetail
 
     public int? SampleTypeId { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
-
     public int? CreatedBy { get; set; }
 
-    public DateTime? UpdatedAt { get; set; }
-
     public int? UpdatedBy { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? CreatedAt { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? UpdatedAt { get; set; }
 
     [ForeignKey("SampleTypeId")]
     [InverseProperty("LabOrderSetDetail")]
