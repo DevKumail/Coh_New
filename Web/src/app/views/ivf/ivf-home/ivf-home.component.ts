@@ -8,6 +8,7 @@ import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { SecureStorageService } from '@core/services/secure-storage.service';
 import { IvfSearchService } from '@/app/shared/Services/IVF/ivf-search.service';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
+import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { NgIcon } from '@ng-icons/core';
 import { Router } from '@angular/router';
@@ -67,7 +68,8 @@ export class IVFHomeComponent {
     private fb: FormBuilder, 
     private router: Router,
     private patientBannerService : PatientBannerService,
-    private ivfApi: IVFApiService
+    private ivfApi: IVFApiService,
+    private shared: SharedService
   ) {
     this.SearchPatientForm = this.fb.group({
       mrNo: [''],
@@ -313,7 +315,50 @@ this.loadOverviewCycles()
       scrollable: true
     });
     this.modalRefInstance.result.then((result: any) => {
-      // handle post-save actions if needed
+      if (result) {
+        this.loadOverviewCycles();
+      }
     }).catch(() => {});
+  }
+
+  openEditCycle(row: { id: number }) {
+    if (!row?.id) return;
+    this.shared.getIVFDashboardTreatmentCycle(row.id).subscribe({
+      next: (res: any) => {
+        const modalRef = this.modalService.open(CycleAddUpdateComponent, {
+          backdrop: 'static', size: 'xl', centered: true, scrollable: true
+        });
+        const comp = modalRef.componentInstance as CycleAddUpdateComponent;
+        comp.initialCycle = res?.dashboardTreatmentEpisode ? res : { dashboardTreatmentEpisode: res };
+        modalRef.result.then((r: any) => {
+          if (r) { this.loadOverviewCycles(); }
+        }).catch(() => {});
+      },
+      error: (err: any) => {
+        Swal.fire('Error', (err?.error?.message || err?.message || 'Failed to load cycle'), 'error');
+      }
+    });
+  }
+
+  deleteCycle(row: { id: number }) {
+    if (!row?.id) return;
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This will delete the treatment cycle.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it'
+    }).then((res) => {
+      if (!res.isConfirmed) return;
+      this.shared.deleteIVFDashboardTreatmentCycle(row.id).subscribe({
+        next: () => {
+          Swal.fire('Deleted', 'Cycle deleted successfully', 'success');
+          this.loadOverviewCycles();
+        },
+        error: (err: any) => {
+          Swal.fire('Error', (err?.error?.message || err?.message || 'Failed to delete'), 'error');
+        }
+      });
+    });
   }
 }

@@ -162,4 +162,13 @@ export class IVFApiService {
   GetAllIVFDashboardTreatmentCycle(ivfmainid: number, page: number = 1, rowsPerPage: number = 10): Observable<any> {
     return this.api.get('IVFDashboard/GetAllIVFDashboardTreatmentCycle', { ivfmainid, page, rowsPerPage });
   }
+
+    getIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId: number): Observable<any> {
+      return this.api.get(`IVFDashboard/GetIVFDashboardTreatmentCycle?ivfDashboardTreatmentCycleId=${ivfDashboardTreatmentCycleId}`);
+    }
+  
+    deleteIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId: number): Observable<any> {
+      // Backend expects id via body or query; using POST for delete per given endpoint
+      return this.api.post('IVFDashboard/DeleteIVFDashboardTreatmentCycle', { ivfDashboardTreatmentCycleId });
+    }
 }

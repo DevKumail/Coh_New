@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+﻿import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
@@ -56,7 +56,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     private loader: LoaderService,
     private router: Router,
     private route: ActivatedRoute,
-    private PatientData: PatientBannerService
+    private PatientData: PatientBannerService,
+    private cdr: ChangeDetectorRef,
+    private userDataService: UserDataService
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
@@ -185,7 +187,10 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     }
   }
 
-  submitVoice() {
+  // submitVoice() {
+  // --- submit form without voice recording -------------------
+  async submitVoice() {
+  // submitVoice() {
     if (this.clinicalForm.invalid) {
       Swal.fire('Error', 'Please fill all required fields.', 'error');
       this.clinicalForm.markAllAsTouched();
@@ -198,6 +203,16 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
     const createdBy = current_User.userName || '';
     const userId = current_User.userId || '';
+    // Get user data from RxDB instead of localStorage
+    const auditInfo = await this.userDataService.getAuditInfo();
+    this.createdBy = auditInfo.createdBy;
+    this.updatedBy = auditInfo.updatedBy;
+    this.signedBy = false;
+    
+    console.log('👤 User from RxDB:', auditInfo.createdBy);
+
+    const selectedNoteId = noteId;
+
 
     let noteName = this.dataquestion?.node?.noteTitle || '';
     if (!noteName) {
@@ -254,6 +269,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       Swal.fire('Offline', 'You are offline. Please connect to the internet.', 'warning');
     }
   }
+// }
 
   collectFilledValues(): any {
     if (!this.dataquestion?.node) {
