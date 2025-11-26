@@ -2,16 +2,20 @@ import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
-
+import { LucideAngularModule, ChevronDown, ChevronRight, ChevronUp, X } from 'lucide-angular';
+  
 @Component({
   selector: 'app-add-lab-order',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   styles: [`
     .h-56 { max-height: 56vh; }
-    .tree-toggle { font-size: 18px; line-height: 1; color: #0d6efd; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; }
+    .tree-toggle { font-size: 18px; line-height: 1; color: #0d6efd; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+    .tree-toggle:hover { text-decoration: none; color: #0a58ca; }
     .tree-toggle:focus { box-shadow: none; }
     .move-btn { font-size: 16px; line-height: 1; }
+    .btn-link { text-decoration: none; }
+    .btn-link:hover { text-decoration: none; opacity: 0.8; }
   `],
   template: `
     <div class="card shadow">
@@ -50,8 +54,10 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
                 <ul class="list-unstyled mb-0">
                   <li *ngFor="let n of nodes" class="mb-1">
                     <div class="d-flex align-items-center gap-2">
-                      <button *ngIf="n.children?.length" class="btn btn-sm btn-link p-0 tree-toggle" (click)="toggleExpand(n.id)" [attr.aria-label]="isExpanded(n.id) ? 'Collapse' : 'Expand'">{{ isExpanded(n.id) ? '▾' : '▸' }}</button>
-                      <span *ngIf="!n.children?.length" style="width:16px"></span>
+                      <button *ngIf="n.children?.length" class="btn btn-sm btn-link p-0 tree-toggle" (click)="toggleExpand(n.id)" [attr.aria-label]="isExpanded(n.id) ? 'Collapse' : 'Expand'">
+                        <i-lucide [img]="isExpanded(n.id) ? ChevronDown : ChevronRight" [size]="16"></i-lucide>
+                      </button>
+                      <span *ngIf="!n.children?.length" style="width:22px"></span>
                       <input *ngIf="n.selectable" class="form-check-input" type="checkbox" [checked]="isSelected(n.id)" (change)="onLeafToggle(n, $event)">
                       <span class="text-truncate">{{ n.label }}<span *ngIf="n.cptCode"> ({{ n.cptCode }})</span></span>
                     </div>
@@ -72,10 +78,16 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
               <div class="d-flex flex-wrap gap-2">
                 <div class="badge bg-secondary d-inline-flex align-items-center gap-2 p-2" *ngFor="let s of selected; let i=index">
                   <span class="text-truncate" style="max-width:220px">{{ s.name }} ({{ s.cpt }})</span>
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-light py-0 move-btn" (click)="moveUp(i)" title="Move up">↑</button>
-                    <button class="btn btn-light py-0 move-btn" (click)="moveDown(i)" title="Move down">↓</button>
-                    <button class="btn btn-light py-0" (click)="removeById(s.id)" title="Remove">×</button>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-link text-white p-0 move-btn" (click)="moveUp(i)" title="Move up">
+                      <i-lucide [img]="ChevronUp" [size]="14"></i-lucide>
+                    </button>
+                    <button class="btn btn-link text-white p-0 move-btn" (click)="moveDown(i)" title="Move down">
+                      <i-lucide [img]="ChevronDown" [size]="14"></i-lucide>
+                    </button>
+                    <button class="btn btn-link text-white p-0" (click)="removeById(s.id)" title="Remove">
+                      <i-lucide [img]="X" [size]="14"></i-lucide>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -91,6 +103,8 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
               <thead class="table-light">
                 <tr>
                   <th style="width:18%">Test</th>
+                  <th style="width:14%">Material</th>
+                  <th style="width:10%">Status</th>
                   <th style="width:14%">Ref. Physician</th>
                   <th style="width:14%">Notify Role</th>
                   <th style="width:14%">Receiver</th>
@@ -102,6 +116,8 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
               <tbody>
                 <tr *ngFor="let s of selected">
                   <td class="text-truncate">{{ s.name }} ({{ s.cpt }})</td>
+                  <td class="text-truncate">{{ s.sampleTypeName || '-' }}</td>
+                  <td>{{ s.status || 'New' }}</td>
                   <td>
                     <select class="form-select form-select-sm" [(ngModel)]="details[s.id].refPhysicianId">
                       <option [ngValue]="null">Select...</option>
@@ -124,7 +140,7 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
                   <td><input class="form-control form-control-sm" [(ngModel)]="details[s.id].comments"></td>
                 </tr>
                 <tr *ngIf="selected.length===0">
-                  <td colspan="7" class="text-center text-muted">No test selected</td>
+                  <td colspan="9" class="text-center text-muted">No test selected</td>
                 </tr>
               </tbody>
             </table>
@@ -135,6 +151,12 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
   `
 })
 export class AddLabOrderComponent implements OnInit, OnChanges {
+  // Lucide icons
+  readonly ChevronDown = ChevronDown;
+  readonly ChevronRight = ChevronRight;
+  readonly ChevronUp = ChevronUp;
+  readonly X = X;
+
   @Input() mrNo: string | null = null;
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() orderId?: string | number;
@@ -153,7 +175,7 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
   isLoadingTree = false;
   expandedIds = new Set<number>();
 
-  selected: Array<{ id: number; name: string; cpt: string }> = [];
+  selected: Array<{ id: number; name: string; cpt: string; sampleTypeId?: number | null; sampleTypeName?: string; status?: string }> = [];
   details: Record<number, any> = {};
   search = '';
 
@@ -270,7 +292,14 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
     const checked = !!ev?.target?.checked;
     if (checked) {
       if (!this.selected.some(s => s.id === n.id)) {
-        const item = { id: n.id, name: n.label, cpt: n.cptCode || '' };
+        const item = {
+          id: n.id,
+          name: n.label,
+          cpt: n.cptCode || '',
+          sampleTypeId: n.sampleTypeId ?? null,
+          sampleTypeName: n.sampleTypeName || '',
+          status: 'New'
+        };
         this.selected = [...this.selected, item];
         if (!this.details[n.id]) this.details[n.id] = this.defaultDetails();
       }
@@ -286,7 +315,13 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
   clearAll() { this.selected = []; this.details = {}; }
 
   onSave() {
-    const perTests = this.selected.map(s => ({ ...s, details: this.details[s.id] || this.defaultDetails() }));
+    const perTests = this.selected.map(s => ({
+      ...s,
+      details: {
+        status: this.mapStatusToBackend(s.status || 'New'),
+        ...(this.details[s.id] || this.defaultDetails())
+      }
+    }));
     this.save.emit({ tests: perTests, details: this.form });
   }
 
@@ -317,7 +352,7 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
       const cpt = d.cptCode || '';
       const name = cpt || `Test ${id}`;
       if (!this.selected.some(s => s.id === id)) {
-        this.selected.push({ id, name, cpt });
+        this.selected.push({ id, name, cpt, status: this.mapStatusFromBackend(d.status) });
       }
       this.details[id] = {
         refPhysicianId: d.referralId ?? null,
@@ -328,6 +363,28 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
         comments: d.pComments ?? ''
       };
     });
+  }
+
+  private mapStatusToBackend(ui: string): string {
+    const s = (ui || '').toLowerCase();
+    if (s === 'new') return 'NEW';
+    if (s === 'open') return 'OPEN';
+    if (s === 'in progress') return 'IN_PROGRESS';
+    if (s === 'sample collected') return 'SAMPLE_COLLECTED';
+    if (s === 'completed') return 'COMPLETED';
+    if (s === 'cancel') return 'CANCEL';
+    return 'NEW';
+  }
+
+  private mapStatusFromBackend(api: string | null | undefined): string {
+    const s = (api || '').toUpperCase();
+    if (s === 'NEW') return 'New';
+    if (s === 'OPEN') return 'Open';
+    if (s === 'IN_PROGRESS') return 'In Progress';
+    if (s === 'SAMPLE_COLLECTED') return 'Sample Collected';
+    if (s === 'COMPLETED') return 'Completed';
+    if (s === 'CANCEL') return 'Cancel';
+    return 'New';
   }
 
 }

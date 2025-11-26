@@ -295,7 +295,7 @@ AND (
                 Cptcode = detail.Cptcode,
                 PerformDate = FormatY14(payload.PerformDate),
                 EntryDate = FormatY14(payload.EntryDate),
-                CreatedBy = payload.UserId.ToString(),
+                CreatedBy = Convert.ToInt32(payload.UserId),
                 CreatedDate = FormatY14(DateTime.UtcNow),
                 UpdatedBy = payload.UserId.ToString(),
                 UpdatedDate = FormatY14(DateTime.UtcNow),
