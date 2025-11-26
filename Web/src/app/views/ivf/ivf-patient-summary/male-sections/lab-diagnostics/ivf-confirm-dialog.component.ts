@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-@Component({
+@Component({  
   selector: 'app-ivf-confirm-dialog',
   standalone: true,
   imports: [CommonModule],

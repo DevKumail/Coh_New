@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-ivf-ps-lab-diagnostics',
-  standalone: true,
+  standalone: true,  
   imports: [CommonModule],
   template: `
     <div class="px-2 py-2">
