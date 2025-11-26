@@ -47,7 +47,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
         Task<(bool IsSuccess, IVFDashboardTreatmentEpisodeDto? Data)> GetIVFDashboardTreatmentCycle(string ivfDashboardTreatmentEpisodeId);
         Task<(bool IsSuccess, object? Data)> GetAllIVFDashboardTreatmentCycle(string ivfmainid, PaginationInfo pagination);
         Task<(bool IsSuccess, IVFDashboardFertilityHistoryDto? Data)> GetFertilityHistoryForDashboard(string ivfmainid);
-        Task<(bool IsSuccess, object? Data)> DeleteDashboardTreatmentEpisodeAsync(string ivfDashboardTreatmentEpisodeId, string deletedBy);
+        Task<(bool IsSuccess, object? Data)> DeleteDashboardTreatmentEpisodeAsync(string ivfDashboardTreatmentEpisodeId);
     }
 
     internal class IVFDashboardService : IDashboardService
