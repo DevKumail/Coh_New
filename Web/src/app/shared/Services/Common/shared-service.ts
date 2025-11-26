@@ -49,4 +49,14 @@ export class SharedService {
     // GET https://localhost:44320/api/RsUpload/info/{id}
     return this.api.get(`RsUpload/info/?fileId=${id}`);
   }
+
+  // IVF Dashboard Treatment Cycle endpoints
+  getIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId: number): Observable<any> {
+    return this.api.get(`IVFDashboard/GetIVFDashboardTreatmentCycle?ivfDashboardTreatmentCycleId=${ivfDashboardTreatmentCycleId}`);
+  }
+
+  deleteIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId: number): Observable<any> {
+    // Backend expects id via body or query; using POST for delete per given endpoint
+    return this.api.post('IVFDashboard/DeleteIVFDashboardTreatmentCycle', { ivfDashboardTreatmentCycleId });
+  }
 }

@@ -62,6 +62,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     private route: ActivatedRoute,
     private PatientData: PatientBannerService,
     private userDataService: UserDataService
+    private PatientData: PatientBannerService,
+    private cdr: ChangeDetectorRef,
+    private userDataService: UserDataService
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
@@ -289,6 +292,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       Swal.fire('Offline', 'You are offline. Please connect to the internet.', 'warning');
     }
   }
+// }
 
   collectFilledValues(): any {
     if (!this.dataquestion?.node) {

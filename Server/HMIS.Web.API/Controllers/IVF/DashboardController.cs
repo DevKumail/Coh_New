@@ -74,12 +74,12 @@ namespace HMIS.Web.Controllers.IVF
 
 
         [HttpGet("GetIVFDashboardTreatmentCycle")]
-        public async Task<IActionResult> GetIVFDashboardTreatmentCycle([FromQuery] string ivfDashboardTreatmentEpisodeId)
+        public async Task<IActionResult> GetIVFDashboardTreatmentCycle([FromQuery] string ivfDashboardTreatmentCycleId)
         {
-            if (string.IsNullOrWhiteSpace(ivfDashboardTreatmentEpisodeId))
-                return BadRequest(new { message = "ivfDashboardTreatmentEpisodeId is required" });
+            if (string.IsNullOrWhiteSpace(ivfDashboardTreatmentCycleId))
+                return BadRequest(new { message = "ivfDashboardTreatmentCycleId is required" });
 
-            var (ok, data) = await _service.GetIVFDashboardTreatmentCycle(ivfDashboardTreatmentEpisodeId);
+            var (ok, data) = await _service.GetIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId);
             if (!ok || data == null)
                 return BadRequest(new { message = "Unable to fetch IVF dashboard treatment cycle" });
 
@@ -115,10 +115,10 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(new { id = result.Data });
         }
 
-        [HttpDelete("DeleteIVFDashboardTreatmentCycle/{ivfDashboardTreatmentEpisodeId}")]
-        public async Task<IActionResult> DeleteIVFDashboardTreatmentCycle([FromRoute] string ivfDashboardTreatmentEpisodeId)
+        [HttpDelete("DeleteIVFDashboardTreatmentCycle/{ivfDashboardTreatmentCycleId}")]
+        public async Task<IActionResult> DeleteIVFDashboardTreatmentCycle([FromRoute] string ivfDashboardTreatmentCycleId)
         {
-            var (success, message) = await _service.DeleteDashboardTreatmentEpisodeAsync(ivfDashboardTreatmentEpisodeId);
+            var (success, message) = await _service.DeleteDashboardTreatmentEpisodeAsync(ivfDashboardTreatmentCycleId);
 
             if (success)
             {

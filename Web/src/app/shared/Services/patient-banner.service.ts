@@ -34,7 +34,7 @@ export class PatientBannerService {
   data = new Subject<boolean>() 
 
   constructor(
-    // private store: PatientBannerStoreService
+    private store: PatientBannerStoreService
   ) {
     console.log('🔄 PatientBannerService: Constructor started');
     // Rehydrate from RxDB on service initialization
@@ -105,6 +105,8 @@ export class PatientBannerService {
     //   else sessionStorage.setItem(this.STORAGE_KEYS.patientData, JSON.stringify(data));
     // } catch {}
   }
+  catch {}
+}
 
   getIVFPatientData(): any | null {
   return this.patientIVFData$ ?? null; 

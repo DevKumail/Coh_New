@@ -44,7 +44,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
         Task<(bool IsSuccess, int IvfMainId, string Error)> GenerateIVFMain(InsertIvfRelationDTO dto);
         Task<(bool IsSuccess, int RelationId, string Error)> InsertPatientRelation(InsertPatientRelationDTO dto);
         Task<Result<int>> CreateOrUpdateDashboardTreatmentEpisodeAsync(IVFDashboardTreatmentEpisodeDto dto);
-        Task<(bool IsSuccess, IVFDashboardTreatmentEpisodeDto? Data)> GetIVFDashboardTreatmentCycle(string ivfDashboardTreatmentEpisodeId);
+        Task<(bool IsSuccess, IVFDashboardTreatmentEpisodeDto? Data)> GetIVFDashboardTreatmentCycle(string ivfDashboardTreatmentCycleId);
         Task<(bool IsSuccess, object? Data)> GetAllIVFDashboardTreatmentCycle(string ivfmainid, PaginationInfo pagination);
         Task<(bool IsSuccess, IVFDashboardFertilityHistoryDto? Data)> GetFertilityHistoryForDashboard(string ivfmainid);
         Task<(bool IsSuccess, object? Data)> DeleteDashboardTreatmentEpisodeAsync(string ivfDashboardTreatmentEpisodeId);
@@ -397,12 +397,12 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
             }
         }
 
-        public async Task<(bool IsSuccess, IVFDashboardTreatmentEpisodeDto? Data)> GetIVFDashboardTreatmentCycle(string ivfDashboardTreatmentEpisodeId)
+        public async Task<(bool IsSuccess, IVFDashboardTreatmentEpisodeDto? Data)> GetIVFDashboardTreatmentCycle(string ivfDashboardTreatmentCycleId)
         {
-            if (string.IsNullOrWhiteSpace(ivfDashboardTreatmentEpisodeId))
+            if (string.IsNullOrWhiteSpace(ivfDashboardTreatmentCycleId))
                 return (false, null);
 
-            if (!int.TryParse(ivfDashboardTreatmentEpisodeId, out var episodeIdInt))
+            if (!int.TryParse(ivfDashboardTreatmentCycleId, out var treatmentCycleIdInt))
                 return (false, null);
 
             using var conn = _dapper.CreateConnection();
@@ -410,7 +410,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
             {
                 var jsonResult = await conn.ExecuteScalarAsync<string>(
                     "IVF_GetIVFDashboardTreatmentCycle",
-                    new { IVFDashboardTreatmentEpisodeId = episodeIdInt },
+                    new { IVFDashboardTreatmentCycleId = treatmentCycleIdInt },
                     commandType: CommandType.StoredProcedure
                 );
 
