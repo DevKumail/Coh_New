@@ -25,6 +25,14 @@ public partial class RegCountries
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("Country")]
     public virtual ICollection<InsuredSubscriber> InsuredSubscriber { get; set; } = new List<InsuredSubscriber>();
 

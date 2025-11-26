@@ -23,4 +23,12 @@ public partial class ClinicalUsage
     public bool? Active { get; set; }
 
     public bool? IsDeleted { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
 }

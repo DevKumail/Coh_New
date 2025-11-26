@@ -33,7 +33,7 @@ public partial class IvfdashboardAdditionalMeasures
 
     [ForeignKey("IvfdashboardTreatmentEpisodeId")]
     [InverseProperty("IvfdashboardAdditionalMeasures")]
-    public virtual IvfdashboardTreatmentEpisode IvfdashboardTreatmentEpisode { get; set; } = null!;
+    public virtual IvfdashboardTreatmentCycle IvfdashboardTreatmentEpisode { get; set; } = null!;
 
     [InverseProperty("IvfadditionalMeasures")]
     public virtual ICollection<IvfembblastIndications> IvfembblastIndications { get; set; } = new List<IvfembblastIndications>();

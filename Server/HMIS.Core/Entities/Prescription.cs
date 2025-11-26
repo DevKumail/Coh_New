@@ -47,6 +47,14 @@ public partial class Prescription
     [StringLength(200)]
     public string? Indications { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("DrugId")]
     [InverseProperty("Prescription")]
     public virtual TabDrugsName? Drug { get; set; }

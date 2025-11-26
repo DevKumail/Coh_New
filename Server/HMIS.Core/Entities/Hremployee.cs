@@ -316,6 +316,10 @@ public partial class Hremployee
     [Unicode(false)]
     public string? BusEnitity { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [InverseProperty("CreatedByNavigation")]
     public virtual ICollection<BlmasterProcedures> BlmasterProceduresCreatedByNavigation { get; set; } = new List<BlmasterProcedures>();
 
@@ -330,6 +334,9 @@ public partial class Hremployee
 
     [InverseProperty("Employee")]
     public virtual ICollection<HrlicenseInfo> HrlicenseInfo { get; set; } = new List<HrlicenseInfo>();
+
+    [InverseProperty("Provider")]
+    public virtual ICollection<IvfdashboardTreatmentCycle> IvfdashboardTreatmentCycle { get; set; } = new List<IvfdashboardTreatmentCycle>();
 
     [InverseProperty("Provider")]
     public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistory { get; set; } = new List<IvfmaleFertilityHistory>();
@@ -361,7 +368,7 @@ public partial class Hremployee
     [InverseProperty("UpdatedByNavigation")]
     public virtual ICollection<PatientProcedure> PatientProcedureUpdatedByNavigation { get; set; } = new List<PatientProcedure>();
 
-    [InverseProperty("CreatedBy")]
+    [InverseProperty("CreatedByNavigation")]
     public virtual ICollection<RegCompany> RegCompany { get; set; } = new List<RegCompany>();
 
     [InverseProperty("Provider")]

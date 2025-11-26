@@ -44,4 +44,8 @@ public partial class PatientChartSocialHistory
     public DateTime? EndDate { get; set; }
 
     public long? AppId { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 }

@@ -96,6 +96,10 @@ public partial class PatientProcedure
     [Unicode(false)]
     public string? ProviderName { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("PatientProcedure")]
     public virtual SchAppointment? Appointment { get; set; }

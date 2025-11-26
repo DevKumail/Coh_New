@@ -22,6 +22,14 @@ public partial class RegPatientRelation
     [Unicode(false)]
     public string CanonicalKey { get; set; } = null!;
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("PatientId")]
     [InverseProperty("RegPatientRelationPatient")]
     public virtual RegPatient Patient { get; set; } = null!;

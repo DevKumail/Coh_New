@@ -23,4 +23,10 @@ public partial class EmrproviderEncounterPath
     [StringLength(14)]
     [Unicode(false)]
     public string UpdatedDate { get; set; } = null!;
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 }

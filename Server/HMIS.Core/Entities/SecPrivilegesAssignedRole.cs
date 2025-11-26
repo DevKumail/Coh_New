@@ -31,6 +31,10 @@ public partial class SecPrivilegesAssignedRole
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("FormPrivilegeId")]
     [InverseProperty("SecPrivilegesAssignedRole")]
     public virtual SecPrivilegesAvailableForm FormPrivilege { get; set; } = null!;

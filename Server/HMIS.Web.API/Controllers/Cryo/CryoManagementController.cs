@@ -7,7 +7,6 @@ namespace HMIS.Web.Controllers.Cryo
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class CryoManagementController : ControllerBase
     {
         private readonly ICryoManagementService _cryoService;

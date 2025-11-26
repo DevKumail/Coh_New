@@ -308,6 +308,14 @@ public partial class SchAppointment
     [Unicode(false)]
     public string? PlanCopay { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("AppCriteriaId")]
     [InverseProperty("SchAppointment")]
     public virtual SchAppointmentCriteria? AppCriteria { get; set; }
@@ -347,6 +355,9 @@ public partial class SchAppointment
 
     [InverseProperty("App")]
     public virtual ICollection<Ivfmain> Ivfmain { get; set; } = new List<Ivfmain>();
+
+    [InverseProperty("App")]
+    public virtual ICollection<LabOrderSet> LabOrderSet { get; set; } = new List<LabOrderSet>();
 
     [InverseProperty("Appointment")]
     public virtual ICollection<Medications> Medications { get; set; } = new List<Medications>();

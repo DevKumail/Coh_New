@@ -92,6 +92,14 @@ public partial class RegLocationTypes
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("FacilityId")]
     [InverseProperty("RegLocationTypes")]
     public virtual RegFacility? Facility { get; set; }

@@ -68,6 +68,14 @@ public partial class LabTests
 
     public int? SampleTypeId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("LaboratoryId")]
     [InverseProperty("LabTests")]
     public virtual Laboratories? Laboratory { get; set; }

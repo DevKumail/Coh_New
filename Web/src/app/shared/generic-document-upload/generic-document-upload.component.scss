@@ -1,0 +1,10 @@
+/* Limit the selected list height and allow vertical scrolling */
+.table-responsive {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* Optional: keep header fixed-like appearance by preventing header from scrolling horizontally differently */
+.table-responsive table {
+  margin-bottom: 0;
+}

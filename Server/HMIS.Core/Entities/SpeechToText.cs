@@ -60,6 +60,10 @@ public partial class SpeechToText
     [Column(TypeName = "text")]
     public string? ApiResponse { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("SpeechToText")]
     public virtual SchAppointment? Appointment { get; set; }

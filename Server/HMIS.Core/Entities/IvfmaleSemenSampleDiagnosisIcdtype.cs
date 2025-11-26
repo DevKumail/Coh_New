@@ -22,8 +22,11 @@ public partial class IvfmaleSemenSampleDiagnosisIcdtype
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }
 
-    [StringLength(100)]
-    public string? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
 
     [ForeignKey("DiagnosisId")]
     [InverseProperty("IvfmaleSemenSampleDiagnosisIcdtype")]

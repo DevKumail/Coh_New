@@ -19,6 +19,14 @@ public partial class RegGender
     [StringLength(255)]
     public string? GenderCode { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("Gender")]
     public virtual ICollection<RegPatientDetails> RegPatientDetails { get; set; } = new List<RegPatientDetails>();
 }

@@ -219,4 +219,12 @@ public partial class TabDrugsNameBackup
     public DateTime? UppexpiryDate { get; set; }
 
     public long NewDrugId { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
 }

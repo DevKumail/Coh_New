@@ -14,4 +14,12 @@ public partial class EmrnoteQuestionRemoved
 
     [Column("Question_Id")]
     public long QuestionId { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
 }

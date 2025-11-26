@@ -19,6 +19,14 @@ public partial class CptsInCptbyAppType
     [StringLength(11)]
     public string Cptcode { get; set; } = null!;
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("GroupId")]
     [InverseProperty("CptsInCptbyAppType")]
     public virtual CptbyAppType Group { get; set; } = null!;

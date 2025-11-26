@@ -369,7 +369,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                     {
                         DiagnosisId = diagnosisId,
                         Icdcode = icdTypeDto.ICDCode,
-                        CreatedBy = icdTypeDto.CreatedBy,
+                        //CreatedBy = icdTypeDto.CreatedBy,
                         CreatedAt = DateTime.Now
                     };
                     _context.IvfmaleSemenSampleDiagnosisIcdtype.Add(icdType);

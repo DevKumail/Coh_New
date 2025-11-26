@@ -27,6 +27,14 @@ public partial class AlergyTypes
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("Type")]
     public virtual ICollection<PatientAllergy> PatientAllergy { get; set; } = new List<PatientAllergy>();
 }

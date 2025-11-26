@@ -19,6 +19,14 @@ public partial class Ivfmain
 
     public long? AppId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("AppId")]
     [InverseProperty("Ivfmain")]
     public virtual SchAppointment? App { get; set; }
@@ -28,7 +36,7 @@ public partial class Ivfmain
     public virtual RegPatient FemalePatient { get; set; } = null!;
 
     [InverseProperty("Ivfmain")]
-    public virtual ICollection<IvfdashboardTreatmentEpisode> IvfdashboardTreatmentEpisode { get; set; } = new List<IvfdashboardTreatmentEpisode>();
+    public virtual ICollection<IvfdashboardTreatmentCycle> IvfdashboardTreatmentCycle { get; set; } = new List<IvfdashboardTreatmentCycle>();
 
     [InverseProperty("Ivfmain")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistory { get; set; } = new List<IvffemaleFertilityHistory>();

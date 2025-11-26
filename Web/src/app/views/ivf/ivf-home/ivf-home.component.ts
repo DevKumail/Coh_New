@@ -43,11 +43,9 @@ export class IVFHomeComponent {
   modalService = new NgbModal();
   selectedTab: 'messages' | 'lab' | 'consents' | 'application' = 'messages';
   overview: Array<{
-    woman: string;
-    no: string | number;
+    id: number;
     start: string;
-    eggTreatment: string;
-    partner: string;
+    treatmentType: string;
     sperm: string;
     stimulation: string;
     stimProt: string;
@@ -165,6 +163,8 @@ export class IVFHomeComponent {
         this.noCoupleAlertShown = false;
         this.patientBannerService.setIVFPatientData(null);
         this.patientBannerService.setIVFPatientData(res);
+        // Load overview cycles once we have couple/mainId
+        this.loadOverviewCycles();
       } else if(hasFemale && hasMale){
         this.patientBannerService.setIVFPatientData(null);
         this.patientBannerService.setIVFPatientData(res);
@@ -172,6 +172,56 @@ export class IVFHomeComponent {
     } catch {}
   }
 
+  private resolveIvfMainId(): number | null {
+    const idFromCouple = (this.couple as any)?.couple?.ivfMainId?.IVFMainId
+      ?? (this.couple as any)?.ivfMainId?.IVFMainId
+      ?? (this.couple as any)?.ivfMainId
+      ?? (this.PrimaryPatientData as any)?.couple?.ivfMainId?.IVFMainId
+      ?? (this.PrimaryPatientData as any)?.ivfMainId?.IVFMainId
+      ?? (this.PrimaryPatientData as any)?.ivfMainId;
+    const n = Number(idFromCouple);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  }
+
+  loadOverviewCycles() {
+    const mainId = this.resolveIvfMainId();
+    if (!mainId) {
+      this.overview = [];
+      return;
+    }
+    this.ivfApi.GetAllIVFDashboardTreatmentCycle(mainId, this.CycleListPaginationInfo?.currentPage, this.CycleListPaginationInfo?.pageSize).subscribe({
+      next: (res: any) => {
+        this.CycleListTotalrecord = res?.dashboardTreatmentEpisodes?.totalRecords || 0;
+        const data = res?.dashboardTreatmentEpisodes?.data || res || [];
+        this.overview = (Array.isArray(data) ? data : []).map((x: any) => ({
+          id: x?.ivfDashboardTreatmentEpisodeId,
+          start: x?.dateOfLMP ? new Date(x.dateOfLMP).toLocaleDateString() : (x?.dateOfLMP ?? '-'),
+          treatmentType: x?.treatmentType ?? '-',
+          sperm: x?.sperm ?? '-',
+          stimulation: x?.stimulation ?? '-',
+          stimProt: x?.stimProtocol ?? '-',
+          stimMed: x?.stimMedication ?? '-',
+          triggering: x?.triggering ?? '-',
+          trigMed: x?.triggerMedication ?? '-',
+          cycle: x?.cycle ?? '-',
+        }));
+      },
+      error: (err: any) => {
+        console.error('Failed to fetch overview cycles', err);
+        this.overview = [];
+      }
+    });
+  }
+
+  CycleListPaginationInfo: any = {
+    pageSize: 10,
+    currentPage: 1,
+  }
+  CycleListTotalrecord: any = 0
+onCyclePageChanged(event: any){
+  this.CycleListPaginationInfo.currentPage = event;
+this.loadOverviewCycles()
+}
 
   async openLinkaPatient(modalRef: TemplateRef<any>) {
 

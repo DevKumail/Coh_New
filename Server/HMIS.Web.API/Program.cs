@@ -12,6 +12,7 @@ using HMIS.Application.ModelMapping;
 using HMIS.Application;
 using HMIS.Core.Entities;
 using HMIS.Core.Context;
+using HMIS.Core.FileSystem;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,11 +29,14 @@ builder.Host.UseSerilog((ctx, lc) => lc
 
 builder.Services.AddAutoMapper(typeof(GeneralProfile).Assembly);
 
+builder.Services.AddScoped<IFileRepository, FileRepository>();
+builder.Services.AddScoped<FileHelper>();
 
-// Add DB Context
-builder.Services.AddDbContext<HMISDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddDbContext<HMISDbContext>((sp, options) =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 // JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -129,6 +133,7 @@ builder.Services.AddSwaggerGen(config =>
 var cache = new CacheHelper();
 
 var app = builder.Build();
+app.MapControllers().RequireAuthorization();
 
 // Middleware pipeline
 if (app.Environment.IsDevelopment())

@@ -51,6 +51,10 @@ public partial class LoginUserHistory
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [InverseProperty("UserLoginHistory")]
     public virtual ICollection<AuditLog> AuditLog { get; set; } = new List<AuditLog>();
 }

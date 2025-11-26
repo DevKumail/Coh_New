@@ -61,6 +61,10 @@ public partial class LabSampleTypes
     [Column(TypeName = "datetime")]
     public DateTime? DeletedDate { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [InverseProperty("SampleType")]
     public virtual ICollection<LabOrderSetDetail> LabOrderSetDetail { get; set; } = new List<LabOrderSetDetail>();
 

@@ -54,6 +54,14 @@ public partial class BlmasterIcd9cm
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("Icd9codeNavigation")]
     public virtual ICollection<Blicd9cmgroupCode> Blicd9cmgroupCode { get; set; } = new List<Blicd9cmgroupCode>();
 

@@ -33,6 +33,10 @@ public partial class SecRole
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [InverseProperty("Role")]
     public virtual ICollection<SecEmployeeRole> SecEmployeeRole { get; set; } = new List<SecEmployeeRole>();
 

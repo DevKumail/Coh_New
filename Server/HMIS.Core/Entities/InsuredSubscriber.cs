@@ -154,6 +154,14 @@ public partial class InsuredSubscriber
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("Subscriber")]
     public virtual ICollection<BlpatientVisit> BlpatientVisit { get; set; } = new List<BlpatientVisit>();
 

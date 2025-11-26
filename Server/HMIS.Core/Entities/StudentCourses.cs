@@ -16,4 +16,12 @@ public partial class StudentCourses
     [StringLength(50)]
     [Unicode(false)]
     public string? Courses { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
 }

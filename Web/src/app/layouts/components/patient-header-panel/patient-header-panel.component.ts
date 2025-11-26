@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+﻿import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import {
   trigger,
@@ -50,7 +50,6 @@ import { SecureStorageService } from '@core/services/secure-storage.service';
 export class PatientHeaderPanelComponent implements OnInit {
   patientData: any;
   visible: boolean = false;
-  isLoading: boolean = true;
   patientInfo: any = [];
   insuranceInfo: any = [];
   AppoinmentData: any = [];
@@ -72,38 +71,25 @@ export class PatientHeaderPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-     console.log('🎬 PatientHeaderPanel: ngOnInit started');
-     
-     // Subscribe to loading state
-     this.patientBannerService.isLoading$.subscribe((loading: boolean) => {
-       this.isLoading = loading;
-       console.log('Banner Loading State:', loading);
-     });
-
      // Subscribe to live stream from RxDB-backed service
      this.patientBannerService.patientData$.subscribe((data: any) => {
-       console.log('📡 Patient Data Observable Fired:', data ? 'Has Data' : 'Null');
        this.patientData = data;
-       
        if (this.patientData) {
-         console.log('✅ Processing patient data, MR:', this.patientData?.table2?.[0]?.mrNo);
          this.visitAppointments = this.patientBannerService.getSelectedVisit();
          if (this.visitAppointments) {
            this.ActiveAppoinment = this.visitAppointments?.appointmentId;
          }
          this.patientInfo = this.patientData?.table2?.[0] || null;
          this.insuranceInfo = this.patientData?.table1?.[0] || [];
-         
-         if (this.patientInfo?.mrNo) {
+            if (this.patientInfo?.mrNo) {
            this.GetAllVisit();
          }
-          
+           
          if(this.router.url == '/ivf/dashboard' ){
-           this.visible = false;
-         } else {
-           this.visible = true;
-           console.log('✅ Banner set to visible');
-         }
+            this.visible = false;
+          } else {
+            this.visible = true;
+          }
        } else {
          // Only hide the banner if we're not loading (i.e., hydration is complete)
          // This prevents the banner from hiding during the initial data load

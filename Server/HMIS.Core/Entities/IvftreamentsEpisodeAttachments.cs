@@ -15,6 +15,9 @@ public partial class IvftreamentsEpisodeAttachments
     [Column("IVFDashboardTreatmentEpisodeId")]
     public int IvfdashboardTreatmentEpisodeId { get; set; }
 
+    [Column("HMISFileId")]
+    public long HmisfileId { get; set; }
+
     public int? CreatedBy { get; set; }
 
     public DateTime? CreatedAt { get; set; }
@@ -27,7 +30,11 @@ public partial class IvftreamentsEpisodeAttachments
 
     public bool IsDeleted { get; set; }
 
+    [ForeignKey("HmisfileId")]
+    [InverseProperty("IvftreamentsEpisodeAttachments")]
+    public virtual HmisFiles Hmisfile { get; set; } = null!;
+
     [ForeignKey("IvfdashboardTreatmentEpisodeId")]
     [InverseProperty("IvftreamentsEpisodeAttachments")]
-    public virtual IvfdashboardTreatmentEpisode IvfdashboardTreatmentEpisode { get; set; } = null!;
+    public virtual IvfdashboardTreatmentCycle IvfdashboardTreatmentEpisode { get; set; } = null!;
 }

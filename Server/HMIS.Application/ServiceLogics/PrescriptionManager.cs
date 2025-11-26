@@ -128,7 +128,7 @@ namespace HMIS.Application.ServiceLogics
                         Instructions = prescriptionModel.Instructions,
                         Indications = prescriptionModel.Indications,
                         Comments = prescriptionModel.Comments,
-                        CreatedBy = prescriptionModel.CreatedBy,
+                        //CreatedBy = prescriptionModel.CreatedBy,
                         CreateDate = prescriptionModel.CreateDate,
                         GcnSeqno = prescriptionModel.GcnSeqno,
                         IsActive = prescriptionModel.IsActive,

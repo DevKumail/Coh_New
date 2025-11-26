@@ -48,6 +48,14 @@ public partial class AuditLog
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("ActionId")]
     [InverseProperty("AuditLog")]
     public virtual Action? Action { get; set; }

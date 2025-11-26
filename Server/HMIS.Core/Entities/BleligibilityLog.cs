@@ -50,6 +50,12 @@ public partial class BleligibilityLog
 
     public long? AppointmentId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("BleligibilityLog")]
     public virtual SchAppointment? Appointment { get; set; }

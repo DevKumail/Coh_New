@@ -1,23 +1,17 @@
-﻿using HMIS.Application.DTOs;
+﻿using Deepgram;
+using Deepgram.Models.Listen.v1.REST;
 using HMIS.Application.DTOs.AppointmentDTOs;
 using HMIS.Application.DTOs.Clinical;
 using HMIS.Application.Implementations;
-using HMIS.Application.ServiceLogics;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
-
+using System.IO.Compression;
 //using static HMIS.Application.DTOs.AppointmentDTOs.SchAppointmentIWithFilter;
 using static HMIS.Application.DTOs.AppointmentDTOs.SpLocalModel.SchAppointmentIWithFilter;
-using System.IO.Compression;
-using Confluent.Kafka;
-using Deepgram;
-using Deepgram.Models.Listen.v1.REST;
 namespace HMIS.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class AppointmentController : BaseApiController
     {
         private readonly IAppointmentManager _appointmentManager;
@@ -174,33 +168,33 @@ namespace HMIS.Web.Controllers
 
 
 
-           // schApp.EnteredBy = User.Claims.Where(c => c.Type == "UserName").First().Value;
+            // schApp.EnteredBy = User.Claims.Where(c => c.Type == "UserName").First().Value;
 
             //DataSet result1 = await _appointmentManager.ValidateAppointmentDB(schApp);
             //if (result1.Tables[0].Rows.Count > 0)
             //{
-               // string res = result1.Tables[0].Rows[0]["ErrorMessage"].ToString();
-              //  if (res == "SUCCESS")
+            // string res = result1.Tables[0].Rows[0]["ErrorMessage"].ToString();
+            //  if (res == "SUCCESS")
             //    {
-                    var result = await _appointmentManager.InsertAppointmentDB(schApp);
+            var result = await _appointmentManager.InsertAppointmentDB(schApp);
 
 
-                    //FILE BASED
-                    //NLogHelper.WriteLog(new LogParameter() { Message = "Insert Appointment", ActionDetails = $"InsertAppointment", ActionId = 1, ActionTime = DateTime.Now, FormName = "SchAppointment table", ModuleName = "AppointmentController.cs", UserName = "System", TablesReadOrModified = 0, UserLoginHistoryId = 17 }, (short)NLog.LogLevel.Info.Ordinal, $"Insert Appointment > object  = {schApp.ToString()}");
+            //FILE BASED
+            //NLogHelper.WriteLog(new LogParameter() { Message = "Insert Appointment", ActionDetails = $"InsertAppointment", ActionId = 1, ActionTime = DateTime.Now, FormName = "SchAppointment table", ModuleName = "AppointmentController.cs", UserName = "System", TablesReadOrModified = 0, UserLoginHistoryId = 17 }, (short)NLog.LogLevel.Info.Ordinal, $"Insert Appointment > object  = {schApp.ToString()}");
 
 
-                    if (result != null)
-                    {
-                        return Ok(result);
-                    }
-                    return BadRequest(result);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
 
 
-              //  }
+            //  }
 
 
-           // }
-          //  return BadRequest(result1);
+            // }
+            //  return BadRequest(result1);
 
         }
 
@@ -393,7 +387,7 @@ namespace HMIS.Web.Controllers
         public async Task<IActionResult> SpeechtoText(int? MRNo, int? PageNumber, int? PageSize)
         {
 
-            DataSet result = await _appointmentManager.SpeechtoText(MRNo,PageNumber, PageSize);
+            DataSet result = await _appointmentManager.SpeechtoText(MRNo, PageNumber, PageSize);
 
             if (result != null)
             {
@@ -444,7 +438,7 @@ namespace HMIS.Web.Controllers
 
                     // Convert Base64 to byte[]
                     byte[] audioBytes = Convert.FromBase64String(note.VoiceFile);
-                
+
                     // Define file path
                     string fileName = $"{note.AppointmentId}_{Guid.NewGuid()}.webm";
                     string zipName = Path.ChangeExtension(fileName, ".zip");

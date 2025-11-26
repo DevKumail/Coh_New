@@ -20,6 +20,14 @@ public partial class BldentalGroup
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("Group")]
     public virtual ICollection<BldentalGroupCode> BldentalGroupCode { get; set; } = new List<BldentalGroupCode>();
 }

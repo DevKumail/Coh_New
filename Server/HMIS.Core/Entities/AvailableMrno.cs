@@ -24,4 +24,12 @@ public partial class AvailableMrno
     public string DeletedDate { get; set; } = null!;
 
     public bool? IsDeleted { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
 }

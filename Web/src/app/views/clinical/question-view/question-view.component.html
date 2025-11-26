@@ -1,38 +1,28 @@
 <div class="question-section" style="margin-left: 20px; margin-top: 10px;">
-  <div *ngIf="question.type === 'Question Section'" class="row">
-    <div class="col-md-12">
-      <h4 class="font-bold">{{ question.quest_Title }}</h4>
-    </div>
-    <ng-container *ngIf="question.children?.length">
-      <app-question-view
-        *ngFor="let child of question.children"
-        [question]="child"
-        [form]="form">
-      </app-question-view>
-    </ng-container>
-  </div>
-
-  <div *ngIf="question.type === 'CheckBox'" class="col-md-3">
-    <div class="checkbox">
-      <label>
-        <input
-          type="checkbox"
-          [checked]="isChecked(question.answer)"
-          (change)="onCheckboxChange($event, question)" />
-        {{ question.quest_Title }}
-      </label>
-    </div>
-  </div>
-
-  <div *ngIf="question.type === 'TextBox'" class="col-md-3">
-    <div class="form-group">
-      <label class="control-label">{{ question.quest_Title }}</label>
+  <div>
+    <h4 *ngIf="question.type === 'Question Section'">{{ question.quest_Title }}</h4>
+    <label *ngIf="question.type === 'CheckBox'">
       <input
-        type="text"
-        [value]="question.answer"
-        (input)="onAnswerChange($event, question)"
-        class="form-control" />
-    </div>
+        type="checkbox"
+        [checked]="isChecked(question.answer)"
+        (change)="onCheckboxChange($event, question)"
+      />
+      {{ question.quest_Title }}
+    </label>
+  </div>
+
+  <div *ngIf="question.type === 'TextBox'">
+    <label>{{ question.quest_Title }}</label>
+    <input
+      type="text"
+      [value]="question.answer"
+      (input)="onAnswerChange($event, question)"
+      class="form-control"
+    />
+  </div>
+
+  <div *ngFor="let child of question.children">
+    <app-question-view [question]="child" [form]="form"></app-question-view>
   </div>
 </div>
 
