@@ -61,8 +61,6 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private PatientData: PatientBannerService,
-    private userDataService: UserDataService
-    private PatientData: PatientBannerService,
     private cdr: ChangeDetectorRef,
     private userDataService: UserDataService
   ) {
