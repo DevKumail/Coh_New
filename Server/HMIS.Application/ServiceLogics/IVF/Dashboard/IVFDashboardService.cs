@@ -515,7 +515,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     }
                 }
 
-                if (dto.PlannedSpermCollectionCategoryIds != null)
+                if (dto.PlannedSpermCollectionCategoryIds != null || !dto.PlannedSpermCollectionCategoryIds.Any())
                 {
                     var existingPlannedSperm = await _db.IvftreatmentPlannedSpermCollection
                         .Where(p => p.IvfdashboardTreatmentCycleId == episodeId && !p.IsDeleted)
@@ -608,29 +608,47 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
 
                     if (addDto.PolarBodiesIndicationCategoryIds != null)
                     {
-                        // Use raw SQL here to avoid EF tracking conflicts on IvfpolarBodiesIndications
-                        await _db.Database.ExecuteSqlRawAsync(
-                            "DELETE FROM IVFPolarBodiesIndications WHERE IVFAdditionalMeasuresId = {0}", addId);
+                        var existingPolar = await _db.IvfpolarBodiesIndications
+                            .Where(p => p.IvfadditionalMeasuresId == addId)
+                            .ToListAsync();
+
+                        if (existingPolar.Any())
+                        {
+                            _db.IvfpolarBodiesIndications.RemoveRange(existingPolar);
+                        }
 
                         foreach (var cId in addDto.PolarBodiesIndicationCategoryIds)
                         {
-                            await _db.Database.ExecuteSqlRawAsync(
-                                "INSERT INTO IVFPolarBodiesIndications (IVFAdditionalMeasuresId, PIDPolarBodiesIndicationCategoryId) VALUES ({0}, {1})",
-                                addId, cId);
+                            var polar = new IvfpolarBodiesIndications
+                            {
+                                IvfadditionalMeasuresId = addId,
+                                PidpolarBodiesIndicationCategoryId = cId,
+                                IsDeleted = false
+                            };
+                            _db.IvfpolarBodiesIndications.Add(polar);
                         }
                     }
 
                     if (addDto.EMBBlastIndicationCategoryIds != null)
                     {
-                        // Use raw SQL here to avoid EF tracking conflicts on IvfembblastIndications
-                        await _db.Database.ExecuteSqlRawAsync(
-                            "DELETE FROM IVFEMBBlastIndications WHERE IVFAdditionalMeasuresId = {0}", addId);
+                        var existingEmb = await _db.IvfembblastIndications
+                            .Where(p => p.IvfadditionalMeasuresId == addId)
+                            .ToListAsync();
+
+                        if (existingEmb.Any())
+                        {
+                            _db.IvfembblastIndications.RemoveRange(existingEmb);
+                        }
 
                         foreach (var eId in addDto.EMBBlastIndicationCategoryIds)
                         {
-                            await _db.Database.ExecuteSqlRawAsync(
-                                "INSERT INTO IVFEMBBlastIndications (IVFAdditionalMeasuresId, PIDEMBBlastIndicationCategoryId) VALUES ({0}, {1})",
-                                addId, eId);
+                            var emb = new IvfembblastIndications
+                            {
+                                IvfadditionalMeasuresId = addId,
+                                PidembblastIndicationCategoryId = eId,
+                                IsDeleted = false
+                            };
+                            _db.IvfembblastIndications.Add(emb);
                         }
                     }
                 }
