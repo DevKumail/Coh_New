@@ -105,12 +105,18 @@ export class PatientHeaderPanelComponent implements OnInit {
            console.log('✅ Banner set to visible');
          }
        } else {
-         console.log('❌ No patient data, hiding banner');
-         this.visible = false;
-         this.patientInfo = null;
-         this.insuranceInfo = [];
-         this.visitAppointments = null;
-         this.ActiveAppoinment = null;
+         // Only hide the banner if we're not loading (i.e., hydration is complete)
+         // This prevents the banner from hiding during the initial data load
+         if (!this.isLoading) {
+           console.log('❌ No patient data, hiding banner');
+           this.visible = false;
+           this.patientInfo = null;
+           this.insuranceInfo = [];
+           this.visitAppointments = null;
+           this.ActiveAppoinment = null;
+         } else {
+           console.log('⏳ Still loading, keeping current banner state');
+         }
        }
      });
 

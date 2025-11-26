@@ -6,14 +6,6 @@ import { PatientBannerStoreService } from '@core/services/patient-banner-store.s
   providedIn: 'root',
 })
 export class PatientBannerService {
-  // Storage keys
-  private readonly STORAGE_KEYS = {
-    patientData: 'pb_patientData',
-    visitAppointments: 'pb_visitAppointments',
-    selectedVisit: 'pb_selectedVisit',
-    payerInfo: 'pb_payerInfo',
-  } as const;
-
   private isHydrated = false;
   private hydrationPromise!: Promise<void>;
 
@@ -46,13 +38,12 @@ export class PatientBannerService {
     private store: PatientBannerStoreService
   ) {
     console.log('🔄 PatientBannerService: Constructor started');
-    // Rehydrate from RxDB or localStorage on service initialization
+    // Rehydrate from RxDB on service initialization
     this.isLoadingSource.next(true);
     this.hydrationPromise = this.store.get().then((doc) => {
       console.log('📦 RxDB Data Retrieved:', doc ? 'Found' : 'Empty');
       if (!doc) {
-        console.log('⚠️ No existing data in RxDB, trying sessionStorage...');
-        this.loadFromSessionStorage();
+        console.log('⚠️ No existing data in RxDB');
         this.isHydrated = true;
         this.isLoadingSource.next(false);
         return;
@@ -71,44 +62,11 @@ export class PatientBannerService {
       console.log('✅ RxDB Hydration Complete');
     }).catch((error) => {
       console.error('❌ Failed to rehydrate patient banner from RxDB:', error);
-      console.warn('⚠️ Falling back to sessionStorage');
-      this.loadFromSessionStorage();
       this.isHydrated = true;
       this.isLoadingSource.next(false);
     });
   }
 
-  private loadFromSessionStorage(): void {
-    try {
-      const patientData = sessionStorage.getItem(this.STORAGE_KEYS.patientData);
-      const visitAppointments = sessionStorage.getItem(this.STORAGE_KEYS.visitAppointments);
-      const selectedVisit = sessionStorage.getItem(this.STORAGE_KEYS.selectedVisit);
-      const payerInfo = sessionStorage.getItem(this.STORAGE_KEYS.payerInfo);
-
-      if (patientData) {
-        const data = JSON.parse(patientData);
-        this.patientDataSource.next(data);
-        console.log('✅ Loaded patient data from sessionStorage:', data?.table2?.[0]?.mrNo);
-      }
-      if (visitAppointments) this.visitAppointmentsSource.next(JSON.parse(visitAppointments));
-      if (selectedVisit) this.selectedVisit.next(JSON.parse(selectedVisit));
-      if (payerInfo) this.payerInfo.next(JSON.parse(payerInfo));
-    } catch (error) {
-      console.error('❌ Failed to load from sessionStorage:', error);
-    }
-  }
-
-  private saveToSessionStorage(key: string, data: any): void {
-    try {
-      if (data === null || data === undefined) {
-        sessionStorage.removeItem(key);
-      } else {
-        sessionStorage.setItem(key, JSON.stringify(data));
-      }
-    } catch (error) {
-      console.error('❌ Failed to save to sessionStorage:', error);
-    }
-  }
 
   async setPatientData(data: any) {
     console.log('💾 setPatientData called with MR:', data?.table2?.[0]?.mrNo || 'null');
@@ -186,7 +144,7 @@ export class PatientBannerService {
     await this.hydrationPromise;
   }
 
-  // Getters: read directly from sessionStorage (safe JSON parsing)
+  // Getters: read directly from observables
   getPatientData(): any | null {
     return this.patientDataSource.value ?? null;
   }
