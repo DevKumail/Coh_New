@@ -11,8 +11,8 @@ import { CommonModule } from '@angular/common';
       background-size: 200% 100%;
       animation: loading 1.5s ease-in-out infinite;
       border-radius: 4px;
-    }
-    @keyframes loading {
+    }  
+    @keyframes loading { 
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
