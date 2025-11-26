@@ -146,6 +146,10 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
         this.generalTab.generalForm.get(f.control)?.setValue(true, { emitEvent: false });
       }
     }
+
+    // Ensure textareas get populated/disabled from selected history IDs
+    this.generalTab.onFemaleHistoryChange();
+    this.generalTab.onMaleHistoryChange();
   }
 
   FillCache() {
@@ -218,7 +222,11 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
       .filter(def => !!this.generalTab?.generalForm?.get(def.control)?.value)
       .map(def => def.name);
     // Try common possible groups: TreatmentSubTypes (preferred), fallback to TreatmentFlags
-    const treatmentSubtypeIds = mapIdsAny(['TreatmentSubTypes', 'Treatment Flags', 'TreatmentFlags', 'SubTypes', 'Subtypes'], selectedFlagNames);
+    debugger;
+    const treatmentSubtypeIds = mapIdsAny(
+      ['TreatmentSubTypes', 'Treatment Flags', 'TreatmentFlags', 'SubTypes', 'Subtypes'],
+      selectedFlagNames
+    );
 
     if (!this.ivfMainId || this.ivfMainId === 0 || this.ivfMainId === null || this.ivfMainId === undefined) {
       Swal.fire('Error', 'IVF Main ID not found', 'error');
@@ -236,7 +244,7 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
         const nullOrNumber = (v: any) => (v === null || v === undefined || v === '' ? null : Number(v));
 
         const payloadOut = {
-          ivfDashboardTreatmentEpisodeId: 0,
+          ivfDashboardTreatmentEpisodeId: this.initialCycle?.dashboardTreatmentEpisode?.id ?? 0,
           ivfMainId: this.ivfMainId ?? null,
           ivfMaleFHId: nullOrNumber(g.maleMedicalHistoryOf),
           ivfFemaleFHId: nullOrNumber(g.femaleMedicalHistoryOf),
@@ -280,6 +288,7 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
         this.ivfService.CreateUpdateDashboardTreatmentCycle(payloadOut).subscribe({
           next: (res) => {
             this.isSaving = false;
+            Swal.fire('Success', 'Cycle saved successfully', 'success');
             this.activeModal.close(res);
           },
           error: (err) => {

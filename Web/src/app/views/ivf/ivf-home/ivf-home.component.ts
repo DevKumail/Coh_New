@@ -323,7 +323,7 @@ this.loadOverviewCycles()
 
   openEditCycle(row: { id: number }) {
     if (!row?.id) return;
-    this.shared.getIVFDashboardTreatmentCycle(row.id).subscribe({
+    this.ivfApi.getIVFDashboardTreatmentCycle(row.id).subscribe({
       next: (res: any) => {
         const modalRef = this.modalService.open(CycleAddUpdateComponent, {
           backdrop: 'static', size: 'xl', centered: true, scrollable: true
@@ -350,7 +350,7 @@ this.loadOverviewCycles()
       confirmButtonText: 'Yes, delete it'
     }).then((res) => {
       if (!res.isConfirmed) return;
-      this.shared.deleteIVFDashboardTreatmentCycle(row.id).subscribe({
+      this.ivfApi.deleteIVFDashboardTreatmentCycle(row.id).subscribe({
         next: () => {
           Swal.fire('Deleted', 'Cycle deleted successfully', 'success');
           this.loadOverviewCycles();
