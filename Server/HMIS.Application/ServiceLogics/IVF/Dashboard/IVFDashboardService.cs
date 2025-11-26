@@ -285,7 +285,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     .Include(e => e.IvfdashboardAdditionalMeasures)
                         .ThenInclude(am => am.IvfembblastIndications)
                     .Include(e => e.IvftreatmentPlannedSpermCollection)
-                    .Include(e => e.IvftreamentsEpisodeAttachments)
+                    .Include(e => e.IvftreatmentEpisodesAttachments)
                     .Include(e => e.IvftreatmentTypes)
                     .Include(e => e.IvftreatmentEpisodeOverviewStage)
                     .FirstOrDefaultAsync(e => e.IvfdashboardTreatmentEpisodeId == id);
@@ -328,7 +328,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     planned.IsDeleted = true;
                 }
 
-                foreach (var att in episode.IvftreamentsEpisodeAttachments)
+                foreach (var att in episode.IvftreatmentEpisodesAttachments)
                 {
                     att.IsDeleted = true;
                 }
@@ -449,7 +449,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                 {
                     episode = await _db.IvfdashboardTreatmentCycle
                         .Include(e => e.IvftreatmentTypes)
-                        .Include(e => e.IvftreamentsEpisodeAttachments)
+                        .Include(e => e.IvftreatmentEpisodesAttachments)
                         .FirstOrDefaultAsync(e => e.IvfdashboardTreatmentEpisodeId == dto.IVFDashboardTreatmentEpisodeId.Value);
 
                     if (episode == null)
@@ -656,7 +656,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                 // Attachments (IVFTreamentsEpisodeAttachments) - replace semantics per save
                 if (dto.Attachments != null)
                 {
-                    var existingAttachments = await _db.IvftreamentsEpisodeAttachments
+                    var existingAttachments = await _db.IvftreatmentEpisodesAttachments
                         .Where(a => a.IvfdashboardTreatmentEpisodeId == episodeId && !a.IsDeleted)
                         .ToListAsync();
 
@@ -667,13 +667,13 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
 
                     foreach (var attDto in dto.Attachments.Where(x => x.HMISFileId.HasValue))
                     {
-                        var newAtt = new IvftreamentsEpisodeAttachments
+                        var newAtt = new IvftreatmentEpisodesAttachments
                         {
                             IvfdashboardTreatmentEpisodeId = episodeId,
                             HmisfileId = attDto.HMISFileId.Value,
                             IsDeleted = false
                         };
-                        _db.IvftreamentsEpisodeAttachments.Add(newAtt);
+                        _db.IvftreatmentEpisodesAttachments.Add(newAtt);
                     }
                 }
 

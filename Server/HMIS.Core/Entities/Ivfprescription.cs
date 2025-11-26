@@ -10,7 +10,7 @@ namespace HMIS.Core.Entities;
 [Table("IVFPrescription")]
 public partial class Ivfprescription
 {
-    public long? PrescriptionId { get; set; }
+    public long? MedicationId { get; set; }
 
     public long? OverviewId { get; set; }
 
@@ -22,9 +22,9 @@ public partial class Ivfprescription
 
     public int? UpdatedBy { get; set; }
 
+    [ForeignKey("MedicationId")]
+    public virtual Medications? Medication { get; set; }
+
     [ForeignKey("OverviewId")]
     public virtual IvftreatmentEpisodeOverviewStage? Overview { get; set; }
-
-    [ForeignKey("PrescriptionId")]
-    public virtual Prescription? Prescription { get; set; }
 }
