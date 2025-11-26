@@ -56,11 +56,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     private loader: LoaderService,
     private router: Router,
     private route: ActivatedRoute,
-    private PatientData: PatientBannerService
-    private cdr: ChangeDetectorRef,
     private PatientData: PatientBannerService,
+    private cdr: ChangeDetectorRef,
     private userDataService: UserDataService
-    private PatientData: PatientBannerService
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
@@ -189,10 +187,10 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     }
   }
 
-  submitVoice() {
+  // submitVoice() {
   // --- submit form without voice recording -------------------
   async submitVoice() {
-  submitVoice() {
+  // submitVoice() {
     if (this.clinicalForm.invalid) {
       Swal.fire('Error', 'Please fill all required fields.', 'error');
       this.clinicalForm.markAllAsTouched();
@@ -214,10 +212,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     console.log('👤 User from RxDB:', auditInfo.createdBy);
 
     const selectedNoteId = noteId;
-    // Use dataquestion.node.noteTitle if available, otherwise search in clinicalNotes
-    const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
-    const createdBy = current_User.userName || '';
-    const userId = current_User.userId || '';
+
 
     let noteName = this.dataquestion?.node?.noteTitle || '';
     if (!noteName) {
@@ -274,6 +269,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       Swal.fire('Offline', 'You are offline. Please connect to the internet.', 'warning');
     }
   }
+// }
 
   collectFilledValues(): any {
     if (!this.dataquestion?.node) {
