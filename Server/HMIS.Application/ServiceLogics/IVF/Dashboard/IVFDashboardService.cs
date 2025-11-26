@@ -285,7 +285,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     .Include(e => e.IvfdashboardAdditionalMeasures)
                         .ThenInclude(am => am.IvfembblastIndications)
                     .Include(e => e.IvftreatmentPlannedSpermCollection)
-                    .Include(e => e.IvftreamentsEpisodeAttachments)
+                    .Include(e => e.IvftreatmentEpisodesAttachments)
                     .Include(e => e.IvftreatmentTypes)
                     .Include(e => e.IvftreatmentEpisodeOverviewStage)
                     .FirstOrDefaultAsync(e => e.IvfdashboardTreatmentEpisodeId == id);
@@ -328,7 +328,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     planned.IsDeleted = true;
                 }
 
-                foreach (var att in episode.IvftreamentsEpisodeAttachments)
+                foreach (var att in episode.IvftreatmentEpisodesAttachments)
                 {
                     att.IsDeleted = true;
                 }
@@ -449,7 +449,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                 {
                     episode = await _db.IvfdashboardTreatmentCycle
                         .Include(e => e.IvftreatmentTypes)
-                        .Include(e => e.IvftreamentsEpisodeAttachments)
+                        .Include(e => e.IvftreatmentEpisodesAttachments)
                         .FirstOrDefaultAsync(e => e.IvfdashboardTreatmentEpisodeId == dto.IVFDashboardTreatmentEpisodeId.Value);
 
                     if (episode == null)
@@ -608,47 +608,29 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
 
                     if (addDto.PolarBodiesIndicationCategoryIds != null)
                     {
-                        var existingPolar = await _db.IvfpolarBodiesIndications
-                            .Where(p => p.IvfadditionalMeasuresId == addId && !p.IsDeleted)
-                            .ToListAsync();
-
-                        foreach (var polar in existingPolar)
-                        {
-                            polar.IsDeleted = true;
-                        }
+                        // Use raw SQL here to avoid EF tracking conflicts on IvfpolarBodiesIndications
+                        await _db.Database.ExecuteSqlRawAsync(
+                            "DELETE FROM IVFPolarBodiesIndications WHERE IVFAdditionalMeasuresId = {0}", addId);
 
                         foreach (var cId in addDto.PolarBodiesIndicationCategoryIds)
                         {
-                            var polar = new IvfpolarBodiesIndications
-                            {
-                                IvfadditionalMeasuresId = addId,
-                                PidpolarBodiesIndicationCategoryId = cId,
-                                IsDeleted = false
-                            };
-                            _db.IvfpolarBodiesIndications.Add(polar);
+                            await _db.Database.ExecuteSqlRawAsync(
+                                "INSERT INTO IVFPolarBodiesIndications (IVFAdditionalMeasuresId, PIDPolarBodiesIndicationCategoryId) VALUES ({0}, {1})",
+                                addId, cId);
                         }
                     }
 
                     if (addDto.EMBBlastIndicationCategoryIds != null)
                     {
-                        var existingEmb = await _db.IvfembblastIndications
-                            .Where(p => p.IvfadditionalMeasuresId == addId && !p.IsDeleted)
-                            .ToListAsync();
-
-                        foreach (var emb in existingEmb)
-                        {
-                            emb.IsDeleted = true;
-                        }
+                        // Use raw SQL here to avoid EF tracking conflicts on IvfembblastIndications
+                        await _db.Database.ExecuteSqlRawAsync(
+                            "DELETE FROM IVFEMBBlastIndications WHERE IVFAdditionalMeasuresId = {0}", addId);
 
                         foreach (var eId in addDto.EMBBlastIndicationCategoryIds)
                         {
-                            var emb = new IvfembblastIndications
-                            {
-                                IvfadditionalMeasuresId = addId,
-                                PidembblastIndicationCategoryId = eId,
-                                IsDeleted = false
-                            };
-                            _db.IvfembblastIndications.Add(emb);
+                            await _db.Database.ExecuteSqlRawAsync(
+                                "INSERT INTO IVFEMBBlastIndications (IVFAdditionalMeasuresId, PIDEMBBlastIndicationCategoryId) VALUES ({0}, {1})",
+                                addId, eId);
                         }
                     }
                 }
@@ -656,7 +638,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                 // Attachments (IVFTreamentsEpisodeAttachments) - replace semantics per save
                 if (dto.Attachments != null)
                 {
-                    var existingAttachments = await _db.IvftreamentsEpisodeAttachments
+                    var existingAttachments = await _db.IvftreatmentEpisodesAttachments
                         .Where(a => a.IvfdashboardTreatmentEpisodeId == episodeId && !a.IsDeleted)
                         .ToListAsync();
 
@@ -667,13 +649,13 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
 
                     foreach (var attDto in dto.Attachments.Where(x => x.HMISFileId.HasValue))
                     {
-                        var newAtt = new IvftreamentsEpisodeAttachments
+                        var newAtt = new IvftreatmentEpisodesAttachments
                         {
                             IvfdashboardTreatmentEpisodeId = episodeId,
                             HmisfileId = attDto.HMISFileId.Value,
                             IsDeleted = false
                         };
-                        _db.IvftreamentsEpisodeAttachments.Add(newAtt);
+                        _db.IvftreatmentEpisodesAttachments.Add(newAtt);
                     }
                 }
 

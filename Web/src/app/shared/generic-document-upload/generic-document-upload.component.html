@@ -14,6 +14,7 @@
           <table class="table table-bordered table-striped table-sm text-center">
             <thead>
               <tr>
+                <th>Thumb</th>
                 <th >Name</th>
                 <th >Size</th>
                 <th >Type</th>
@@ -23,20 +24,50 @@
             <tbody class="table-group-divider text-center ">
         <ng-container *ngIf="isLoading">
           <tr *ngFor="let i of [1,2,3]">
-            <td colspan="4" class="text-start">
+            <td colspan="5" class="text-start">
               <div class="placeholder-wave"><span class="placeholder col-12"></span></div>
             </td>
           </tr>
         </ng-container>
         <ng-container *ngIf="!isLoading">
               <tr *ngFor="let d of selected">
+                <td>
+                  <ng-container *ngIf="getPreview(d) as url; else fileIcon">
+                    <img [src]="url" alt="thumb" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" />
+                  </ng-container>
+                  <ng-template #fileIcon>
+                    <ng-container *ngIf="d.ext === 'pdf'; else docBadge">
+                      <span class="badge bg-danger" style="display:inline-block;min-width:40px;height:40px;line-height:40px;border-radius:4px;">PDF</span>
+                    </ng-container>
+                    <ng-template #docBadge>
+                      <ng-container *ngIf="d.ext === 'doc' || d.ext === 'docx'; else xlsBadge">
+                        <span class="badge bg-info" style="display:inline-block;min-width:40px;height:40px;line-height:40px;border-radius:4px;">DOCX</span>
+                      </ng-container>
+                    </ng-template>
+                    <ng-template #xlsBadge>
+                      <ng-container *ngIf="d.ext === 'xls' || d.ext === 'xlsx'; else pptBadge">
+                        <span class="badge bg-success" style="display:inline-block;min-width:40px;height:40px;line-height:40px;border-radius:4px;">XLSX</span>
+                      </ng-container>
+                    </ng-template>
+                    <ng-template #pptBadge>
+                      <ng-container *ngIf="d.ext === 'ppt' || d.ext === 'pptx'; else genericBadge">
+                        <span class="badge bg-warning text-dark" style="display:inline-block;min-width:40px;height:40px;line-height:40px;border-radius:4px;">PPTX</span>
+                      </ng-container>
+                    </ng-template>
+                    <ng-template #genericBadge>
+                      <span class="badge bg-secondary" style="display:inline-block;min-width:40px;height:40px;line-height:40px;border-radius:4px;">
+                        {{ (d.ext || '-') | uppercase }}
+                      </span>
+                    </ng-template>
+                  </ng-template>
+                </td>
                 <td><span [title]="d.name">{{ d.name }}</span></td>
                 <td>{{ d.size | number }} B</td>
                 <td>{{ d.ext || '-' }}</td>
                 <td><button type="button" class="btn btn-link text-danger btn-sm" (click)="removeOne(d.id)">Remove</button></td>
               </tr>
               <tr *ngIf="!selected.length">
-                <td colspan="4" class="text-center text-muted">No documents selected</td>
+                <td colspan="5" class="text-center text-muted">No documents selected</td>
               </tr>
         </ng-container>
             </tbody>

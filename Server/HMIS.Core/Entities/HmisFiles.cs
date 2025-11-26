@@ -47,5 +47,5 @@ public partial class HmisFiles
     public int? UpdatedBy { get; set; }
 
     [InverseProperty("Hmisfile")]
-    public virtual ICollection<IvftreamentsEpisodeAttachments> IvftreamentsEpisodeAttachments { get; set; } = new List<IvftreamentsEpisodeAttachments>();
+    public virtual ICollection<IvftreatmentEpisodesAttachments> IvftreatmentEpisodesAttachments { get; set; } = new List<IvftreatmentEpisodesAttachments>();
 }

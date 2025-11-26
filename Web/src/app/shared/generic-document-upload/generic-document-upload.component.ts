@@ -49,4 +49,16 @@ export class GenericDocumentUploadComponent {
   getFiles(): File[] {
     return this.files;
   }
+
+  // Thumbnail helpers
+  private isImageExt(ext: string | undefined) {
+    const e = (ext || '').toLowerCase();
+    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(e);
+  }
+
+  getPreview(meta: { name: string; size: number; ext: string }): string | null {
+    if (!this.isImageExt(meta?.ext)) return null;
+    const f = this.files.find(x => x.name === meta.name && x.size === meta.size);
+    return f ? URL.createObjectURL(f) : null;
+  }
 }
