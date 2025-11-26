@@ -1818,6 +1818,7 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<LabOrderSetDetail>(entity =>
         {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
             entity.Property(e => e.IsRadiologyTest).HasComment("2 = Pathalogy\r\n1 = Lab\r\n0 = Radiology");
 

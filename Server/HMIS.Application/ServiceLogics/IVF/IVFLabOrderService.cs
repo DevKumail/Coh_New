@@ -72,11 +72,6 @@ namespace HMIS.Application.ServiceLogics.IVF
                 ProviderId = hdrEntity.ProviderId ?? 0,
                 OrderDate = ParseDate(hdrEntity.OrderDate),
                 VisitAccountNo = TryParseLong(hdrEntity.VisitAccountNo),
-                // CreatedBy/UpdatedBy are strings in entity; keep defaults if not numeric
-                CreatedBy = TryParseLong(hdrEntity.CreatedBy),
-                CreatedDate = ParseDate(hdrEntity.CreatedDate),
-                UpdatedBy = TryParseLong(hdrEntity.UpdatedBy),
-                UpdatedDate = ParseDate(hdrEntity.UpdatedDate),
                 OrderControlCode = hdrEntity.OrderControlCode,
                 OrderStatus = hdrEntity.OrderStatus,
                 IsHL7MsgCreated = hdrEntity.IsHl7msgCreated,
@@ -133,8 +128,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                     ProviderId = h.ProviderId ?? 0,
                     OrderDate = ParseDate(h.OrderDate),
                     VisitAccountNo = TryParseLong(h.VisitAccountNo),
-                    CreatedBy = TryParseLong(h.CreatedBy),
-                    CreatedDate = ParseDate(h.CreatedDate),
+                    CreatedDate = (DateTime)h.CreatedAt,
                     UpdatedBy = TryParseLong(h.UpdatedBy),
                     UpdatedDate = ParseDate(h.UpdatedDate),
                     OrderControlCode = h.OrderControlCode,
@@ -190,17 +184,13 @@ namespace HMIS.Application.ServiceLogics.IVF
                     ProviderId = h.ProviderId,
                     OrderDate = FormatDate(h.OrderDate),
                     VisitAccountNo = h.VisitAccountNo?.ToString(),
-                    CreatedBy = h.CreatedBy.ToString(),
-                    CreatedDate = FormatDate(h.CreatedDate),
-                    UpdatedBy = h.UpdatedBy?.ToString(),
-                    UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null,
                     OrderControlCode = h.OrderControlCode,
                     OrderStatus = h.OrderStatus,
                     IsHl7msgCreated = h.IsHL7MsgCreated,
                     IsHl7messageGeneratedForPhilips = h.IsHL7MessageGeneratedForPhilips,
                     IsSigned = h.IsSigned,
                     OldMrno = h.oldMRNo,
-                    Hl7messageId = (int?)h.HL7MessageId
+                    Hl7messageId = h.HL7MessageId.HasValue ? (int?)h.HL7MessageId.Value : null
                 };
                 _db.LabOrderSet.Add(hdr);
                 await _db.SaveChangesAsync();
@@ -244,10 +234,10 @@ namespace HMIS.Application.ServiceLogics.IVF
                 await tx.CommitAsync();
                 return orderSetId;
             }
-            catch
+            catch (Exception ex)
             {
                 await tx.RollbackAsync();
-                throw;
+                throw ex;
             }
         }
 
@@ -264,10 +254,6 @@ namespace HMIS.Application.ServiceLogics.IVF
                 hdr.ProviderId = h.ProviderId;
                 hdr.OrderDate = FormatDate(h.OrderDate);
                 hdr.VisitAccountNo = h.VisitAccountNo?.ToString();
-                hdr.CreatedBy = h.CreatedBy.ToString();
-                hdr.CreatedDate = FormatDate(h.CreatedDate);
-                hdr.UpdatedBy = h.UpdatedBy?.ToString();
-                hdr.UpdatedDate = h.UpdatedDate.HasValue ? FormatDate(h.UpdatedDate.Value) : null;
                 hdr.OrderControlCode = h.OrderControlCode;
                 hdr.OrderStatus = h.OrderStatus;
                 hdr.IsHl7msgCreated = h.IsHL7MsgCreated;

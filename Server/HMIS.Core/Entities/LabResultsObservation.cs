@@ -54,9 +54,7 @@ public partial class LabResultsObservation
     [Unicode(false)]
     public string? AnalysisDateTime { get; set; }
 
-    [StringLength(25)]
-    [Unicode(false)]
-    public string CreatedBy { get; set; } = null!;
+    public int? CreatedBy { get; set; }
 
     [StringLength(14)]
     [Unicode(false)]
