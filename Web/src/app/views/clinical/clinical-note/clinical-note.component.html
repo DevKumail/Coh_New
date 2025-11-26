@@ -247,12 +247,27 @@
               <td class="text-center">{{ data.createdOn || '-' }}</td>
               <td class="text-center">{{ data.signedBy || '-' }}</td>
               <td style="font-size: 12px" class="text-center">
-                <audio
-                  *ngIf="data.voiceSafeUrl || data.notePath"
-                  controls
-                  style="width: 200px;"
-                  [src]="data.voiceSafeUrl || data.notePath">
-                </audio>
+                <div *ngIf="data.voiceSafeUrl || data.notePath"
+                     class="position-relative d-inline-block"
+                     style="cursor: pointer;">
+                  <audio
+                    #audioPlayer
+                    style="width: 200px;"
+                    [src]="data.voiceSafeUrl || data.notePath"
+                    (play)="onAudioPlay(i)"
+                    (pause)="onAudioPause(i)"
+                    (ended)="onAudioEnded(i)"
+                    (click)="playAudio(i)"
+                    controls>
+                  </audio>
+                  <!-- Play/Pause Overlay Icon -->
+                  <div
+                    class="position-absolute top-50 start-0 translate-middle-y ms-2"
+                    style="pointer-events: none; z-index: 10;"
+                    *ngIf="!data.isPlaying">
+                    <i class="bi bi-play-circle-fill text-success" style="font-size: 1.5rem;"></i>
+                  </div>
+                </div>
                 <span *ngIf="!data.voiceSafeUrl && !data.notePath">-</span>
               </td>
             </tr>

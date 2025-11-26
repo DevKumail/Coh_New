@@ -2,7 +2,7 @@ import { GenericPaginationComponent } from '@/app/shared/generic-pagination/gene
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { CommonModule } from '@angular/common';
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { distinctUntilChanged, filter, Subscription, Subject, takeUntil, debounceTime } from 'rxjs';
@@ -26,7 +26,7 @@ import { LoaderService } from '@core/services/loader.service';
   styleUrl: './clinical-note.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ClinicalNoteComponent {
+export class ClinicalNoteComponent implements OnInit {
     SearchPatientData: any;
     speechtotxt: any[] = [];
     pagegination: any = {
@@ -345,6 +345,75 @@ export class ClinicalNoteComponent {
 
   trackByPathId(index: number, item: any): any {
     return item.pathId || index;
+  }
+
+  @ViewChildren('audioPlayer') audioPlayers!: QueryList<ElementRef<HTMLAudioElement>>;
+
+  /**
+   * Play or pause audio at specific index
+   */
+  playAudio(index: number): void {
+    const audioElement = this.audioPlayers.toArray()[index]?.nativeElement;
+
+    if (audioElement) {
+      if (audioElement.paused) {
+        // Pause all other audio players first
+        this.pauseAllAudio();
+        audioElement.play().catch(err => {
+          console.error('Error playing audio:', err);
+        });
+      } else {
+        audioElement.pause();
+      }
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Pause all audio players
+   */
+  pauseAllAudio(): void {
+    this.audioPlayers.forEach((player) => {
+      if (!player.nativeElement.paused) {
+        player.nativeElement.pause();
+      }
+    });
+
+    this.speechtotxt.forEach((item) => {
+      item.isPlaying = false;
+    });
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle audio play event
+   */
+  onAudioPlay(index: number): void {
+    // Pause all other audios
+    this.speechtotxt.forEach((item, i) => {
+      if (i !== index) {
+        item.isPlaying = false;
+      }
+    });
+
+    this.speechtotxt[index].isPlaying = true;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle audio pause event
+   */
+  onAudioPause(index: number): void {
+    this.speechtotxt[index].isPlaying = false;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle audio ended event
+   */
+  onAudioEnded(index: number): void {
+    this.speechtotxt[index].isPlaying = false;
+    this.cdr.markForCheck();
   }
 
   ngOnDestroy(): void {
