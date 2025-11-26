@@ -127,7 +127,7 @@ export class TopbarComponent implements OnInit {
 
   mrNo: any;
 
-  onSearchClick() {
+  async onSearchClick() {
     if (this.mrNo && this.mrNo.length >= 3) {
       // If we are on an IVF route, treat the search as coming from the IVF dashboard
       const isIvfRoute = !!(this.router && this.router.url && this.router.url.indexOf('/ivf') !== -1);
@@ -143,8 +143,9 @@ export class TopbarComponent implements OnInit {
         this.searchAppointment(this.mrNo);
       }
     } else {
-      this.patientBannerService.setPatientData(null);
-      this.patientBannerService.setVisitAppointments(null);
+      // Clear data when search is empty
+      await this.patientBannerService.setPatientData(null);
+      await this.patientBannerService.setVisitAppointments(null);
     }
   }
 
@@ -154,7 +155,7 @@ export class TopbarComponent implements OnInit {
   //   this.onSearchClick();
   // }
 
-  searchPatient(mrNo: string, context?: string) {
+  async searchPatient(mrNo: string, context?: string) {
     if (context === 'patient-summary') {
       const sub = this.patientBannerService.patientData$.subscribe(data => {
         if (data) {
@@ -165,22 +166,22 @@ export class TopbarComponent implements OnInit {
     }
 
     this.demographicapi.getPatientByMrNo(mrNo).subscribe({
-      next: (res: any) => {
+      next: async (res: any) => {
         if (res?.table2?.length > 0) {
-          this.patientBannerService.setPatientData(res);
-          console.log('topbar Patient Data:', res);
+          // Await to ensure data is saved to RxDB before navigation
+          await this.patientBannerService.setPatientData(res);
+          console.log('topbar Patient Data saved to RxDB:', res?.table2?.[0]?.mrNo);
               if(this.router.url != '/ivf/dashboard' ){
               this.showPatientBanner = true;
               }
-    this.demographicapi
         } else {
-          this.patientBannerService.setPatientData(null);
+          await this.patientBannerService.setPatientData(null);
           this.showPatientBanner = false;
           Swal.fire('Error', 'No patient found with the provided MRNO.', 'error');
         }
       },
-      error: err => {
-        this.patientBannerService.setPatientData(null);
+      error: async (err) => {
+        await this.patientBannerService.setPatientData(null);
       }
     });
   }
@@ -193,18 +194,27 @@ export class TopbarComponent implements OnInit {
   async searchAppointment(mrNo: any){
     this.loader.show();
     if(mrNo){
-      await this.demographicapi.GetAppointmentByMRNO(mrNo,this.paginationInfo.currentPage,this.paginationInfo.pageSize).subscribe((Response: any)=>{
-      console.log("topbar Load Visit =>", Response);
-      if (Response?.table1?.length > 0){
-        this.patientBannerService.setVisitAppointments(Response?.table1);
-        this.patientBannerService.setSelectedVisit(Response?.table1[0]);
-        this.loader.hide();
-      } else{
-        this.patientBannerService.setVisitAppointments(null);
-        this.patientBannerService.setSelectedVisit(null);
-        this.loader.hide();
-      }
-    })
+      this.demographicapi.GetAppointmentByMRNO(mrNo,this.paginationInfo.currentPage,this.paginationInfo.pageSize).subscribe({
+        next: async (Response: any) => {
+          console.log("topbar Load Visit =>", Response);
+          if (Response?.table1?.length > 0){
+            await this.patientBannerService.setVisitAppointments(Response?.table1);
+            await this.patientBannerService.setSelectedVisit(Response?.table1[0]);
+            console.log('✅ Visit data saved to RxDB');
+            this.loader.hide();
+          } else{
+            await this.patientBannerService.setVisitAppointments(null);
+            await this.patientBannerService.setSelectedVisit(null);
+            this.loader.hide();
+          }
+        },
+        error: async (err) => {
+          console.error('Error loading appointments:', err);
+          await this.patientBannerService.setVisitAppointments(null);
+          await this.patientBannerService.setSelectedVisit(null);
+          this.loader.hide();
+        }
+      });
     }
   }
 

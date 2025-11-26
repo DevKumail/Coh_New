@@ -166,18 +166,19 @@ export class IvfPatientSummaryComponent implements OnInit {
     // Load patient data and visits same as topbar behavior
     this.loader.show();
     this.demographicapi.getPatientByMrNo(mrNo).subscribe({
-      next: (res: any) => {
+      next: async (res: any) => {
         if (res?.table2?.length > 0) {
-          this.patientBannerService.setPatientData(res);
+          await this.patientBannerService.setPatientData(res);
+          console.log('IVF Patient Data saved to RxDB:', res?.table2?.[0]?.mrNo);
           // After patient data, load appointments/visits
           this.loadAppointments(mrNo);
         } else {
-          this.patientBannerService.setPatientData(null);
+          await this.patientBannerService.setPatientData(null);
           this.loader.hide();
         }
       },
-      error: () => {
-        this.patientBannerService.setPatientData(null);
+      error: async () => {
+        await this.patientBannerService.setPatientData(null);
         this.loader.hide();
       }
     });
@@ -186,15 +187,24 @@ export class IvfPatientSummaryComponent implements OnInit {
   private loadAppointments(mrNo: string) {
     const paginationInfo: any = { currentPage: 1, pageSize: 10 };
     this.demographicapi.GetAppointmentByMRNO(mrNo, paginationInfo.currentPage, paginationInfo.pageSize)
-      .subscribe((Response: any) => {
-        if (Response?.table1?.length > 0) {
-          this.patientBannerService.setVisitAppointments(Response?.table1);
-          this.patientBannerService.setSelectedVisit(Response?.table1[0]);
-        } else {
-          this.patientBannerService.setVisitAppointments(null);
-          this.patientBannerService.setSelectedVisit(null);
+      .subscribe({
+        next: async (Response: any) => {
+          if (Response?.table1?.length > 0) {
+            await this.patientBannerService.setVisitAppointments(Response?.table1);
+            await this.patientBannerService.setSelectedVisit(Response?.table1[0]);
+            console.log('✅ IVF Visit data saved to RxDB');
+          } else {
+            await this.patientBannerService.setVisitAppointments(null);
+            await this.patientBannerService.setSelectedVisit(null);
+          }
+          this.loader.hide();
+        },
+        error: async (err) => {
+          console.error('Error loading IVF appointments:', err);
+          await this.patientBannerService.setVisitAppointments(null);
+          await this.patientBannerService.setSelectedVisit(null);
+          this.loader.hide();
         }
-        this.loader.hide();
       });
   }
 }
