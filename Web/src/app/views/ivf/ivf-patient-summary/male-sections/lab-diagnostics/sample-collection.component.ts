@@ -9,7 +9,7 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
   imports: [CommonModule, FormsModule],
   styles: [`
     .h-56 { max-height: 56vh; }
-  `],
+  `],  
   template: `
     <div class="card shadow">
       <div class="card-header d-flex justify-content-between align-items-center">

@@ -21,8 +21,8 @@ import { OrderCompletionComponent } from './order-completion.component';
     .child-container .table thead th { background-color: transparent; color: var(--bs-body-color); border: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .child-container .table tbody td { background-color: transparent; color: var(--bs-body-color); border: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .btn-link { text-decoration: none; }
-    .btn-link:hover { text-decoration: none; }
-  `],
+    .btn-link:hover { text-decoration: none; }   
+  `],    
   template: `
     <div class="px-2 py-2" *ngIf="!showCompletePage; else completePage">
       <div class="card shadow-sm">

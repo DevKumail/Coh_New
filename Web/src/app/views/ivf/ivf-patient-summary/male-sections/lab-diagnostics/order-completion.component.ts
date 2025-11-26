@@ -5,7 +5,7 @@ import { NgbDateStruct, NgbDatepicker, NgbDatepickerModule, NgbTimepickerModule,
 import { forkJoin, of, Observable } from 'rxjs';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import Swal from 'sweetalert2';
-
+  
 export interface LabResultObservation {
   valueType: string;
   observationIdentifierFullName: string;
