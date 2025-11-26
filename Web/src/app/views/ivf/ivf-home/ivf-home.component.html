@@ -240,6 +240,7 @@
                   <th>Triggering</th>
                   <th>Trig. med.</th>
                   <th>Cycle</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody class="table-group-divider text-center">
@@ -257,6 +258,10 @@
                   <td>{{row.triggering}}</td>
                   <td>{{row.trigMed}}</td>
                   <td>{{row.cycle}}</td>
+                  <th>
+                    <button type="button" class="btn btn-sm btn-primary" (click)="openEditCycle(row)">Edit</button>
+                    <button type="button" class="btn btn-sm btn-danger" (click)="deleteCycle(row)">Delete</button>
+                  </th>
                 </tr>
               </tbody>
             </table>

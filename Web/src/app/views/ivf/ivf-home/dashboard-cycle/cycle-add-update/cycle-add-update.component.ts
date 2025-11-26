@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GeneralComponent } from './cycle-tabs/general.component';
 import { AdditionalMeasuresComponent } from './cycle-tabs/additional-measures.component';
@@ -18,7 +18,7 @@ import { Subscription, of } from 'rxjs';
   templateUrl: './cycle-add-update.component.html',
   styleUrls: ['./cycle-add-update.component.scss']
 })
-export class CycleAddUpdateComponent implements OnDestroy {
+export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
   isSaving = false;
   dropdowns: any = [];
   AllDropdownValues: any = [];
@@ -35,6 +35,7 @@ export class CycleAddUpdateComponent implements OnDestroy {
   @ViewChild(GeneralComponent) generalTab?: GeneralComponent;
   @ViewChild(AdditionalMeasuresComponent) additionalTab?: AdditionalMeasuresComponent;
   @ViewChild(DocumentsComponent) documentsTab?: DocumentsComponent;
+  @Input() initialCycle?: any;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -46,6 +47,10 @@ export class CycleAddUpdateComponent implements OnDestroy {
     this.getAlldropdown();
     this.FillCache();
     this.getAllFh();
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.tryApplyInitial(), 0);
   }
 
   ngOnDestroy(): void {
@@ -64,6 +69,7 @@ export class CycleAddUpdateComponent implements OnDestroy {
       this.AllDropdownValues = res;
       this.getAllDropdown(res);
       console.log(this.AllDropdownValues);
+      this.tryApplyInitial();
     })
   }
 
@@ -86,7 +92,60 @@ export class CycleAddUpdateComponent implements OnDestroy {
       const female = res?.femaleFertilityHistory ?? res?.fertilityHistory?.femaleFertilityHistory ?? [];
       this.MalemedicalHistory = Array.isArray(male) ? male : [];
       this.FemalemedicalHistory = Array.isArray(female) ? female : [];
+      this.tryApplyInitial();
     });
+  }
+
+  private tryApplyInitial() {
+    if (!this.initialCycle || !this.generalTab) return;
+    const d = this.initialCycle?.dashboardTreatmentEpisode || this.initialCycle;
+    if (!d) return;
+
+    const findName = (key: string, id: number | null | undefined) => {
+      if (id === null || id === undefined) return '';
+      const arr = this.dropdowns?.[`IVFTreatmentCycle:${key}`] || [];
+      const f = arr.find((x: any) => x.valueId === id);
+      return f?.name || '';
+    };
+    const mapIdsToNames = (key: string, ids: number[] | null | undefined) => {
+      const arr = this.dropdowns?.[`IVFTreatmentCycle:${key}`] || [];
+      const set = new Set(ids || []);
+      return arr.filter((x: any) => set.has(x.valueId)).map((x: any) => x.name);
+    };
+
+    const g = this.generalTab.generalForm;
+    g.patchValue({
+      treatment: findName('Types', d.treatmentTypeCategoryId),
+      onlyInternalCycle: !!d.onlyInternalCycle,
+      dateOfLMP: d.dateOfLMP ? String(d.dateOfLMP).substring(0,10) : null,
+      cycleFromAmenorrhea: findName('FromAmenorrhea', d.cycleFromAmenorrheaCategoryId),
+      mainIndication: findName('MainIndication', d.mainIndicationCategoryId),
+      protocol: findName('Protocol', d.protocolCategoryId),
+      stimulationPlanned: findName('StimulationPlanned', d.stimulationPlannedCategoryId),
+      stimulatedExternally: findName('StimulatedExternally', d.stimulatedExternallyCategoryId),
+      longTermMedication: d.longTermMedication || '',
+      plannedNoOfEmbryos: d.plannedNo ?? null,
+      plannedSpermCollection: mapIdsToNames('PlannedSpermCollection', d.plannedSpermCollectionCategoryIds || (d.plannedSpermCollectionCategoryId ? [d.plannedSpermCollectionCategoryId] : [])),
+      attendingClinician: d.providerId ?? '',
+      surveyId: d.survey || '',
+      randomizationGroup: d.randomizationGroup || '',
+      takenOverFrom: d.takenOverFrom || '',
+      takenOverOn: d.takeOverOn ? String(d.takeOverOn).substring(0,10) : null,
+      editorContent: d.cycleNote || '',
+      femaleMedicalHistoryOf: d.ivfFemaleFHId ?? '',
+      maleMedicalHistoryOf: d.ivfMaleFHId ?? ''
+    }, { emitEvent: false });
+
+    // Treatment sub types
+    const subIds: number[] = Array.isArray(d.treatmentSubTypes) ? d.treatmentSubTypes.map((x: any) => x?.treatmentCategoryId).filter((n: any) => Number.isFinite(n)) : [];
+    const subNames = mapIdsToNames('TreatmentSubTypes', subIds).concat(mapIdsToNames('TreatmentFlags', subIds));
+    const flags = this.generalTab.treatmentFlags();
+    const set = new Set(subNames);
+    for (const f of flags) {
+      if (set.has(f.name)) {
+        this.generalTab.generalForm.get(f.control)?.setValue(true, { emitEvent: false });
+      }
+    }
   }
 
   FillCache() {
