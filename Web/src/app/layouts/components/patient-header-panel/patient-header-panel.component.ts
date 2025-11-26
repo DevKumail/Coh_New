@@ -50,6 +50,7 @@ import { SecureStorageService } from '@core/services/secure-storage.service';
 export class PatientHeaderPanelComponent implements OnInit {
   patientData: any;
   visible: boolean = false;
+  isLoading: boolean = false;
   patientInfo: any = [];
   insuranceInfo: any = [];
   AppoinmentData: any = [];

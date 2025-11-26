@@ -51,12 +51,16 @@ namespace HMIS.Core.Context
 				{
 					if (entry.Properties.Any(p => p.Metadata.Name == "CreatedAt"))
 						entry.Property("CreatedAt").CurrentValue = now;
+						entry.Property("CreatedAt").IsModified = true;
 
-					if (entry.Properties.Any(p => p.Metadata.Name == "CreatedBy"))
+
+                    if (entry.Properties.Any(p => p.Metadata.Name == "CreatedBy"))
 						entry.Property("CreatedBy").CurrentValue = userId;
-				}
+					    entry.Property("CreatedBy").IsModified = true;
 
-				if (entry.State == EntityState.Modified)
+                }
+
+                if (entry.State == EntityState.Modified)
 				{
 					if (entry.Properties.Any(p => p.Metadata.Name == "UpdatedAt"))
 						entry.Property("UpdatedAt").CurrentValue = now;

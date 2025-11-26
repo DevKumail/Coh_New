@@ -10,24 +10,24 @@
   </div>
   <div class="card-body">
 
-    <ng-container *ngIf="activeTab==='general'">
+    <div [hidden]="activeTab!=='general'">
       <app-general
         [dropdowns]="dropdowns"
         [hrEmployees]="hrEmployees"
         [femaleHistoryOptions]="FemalemedicalHistory"
         [maleHistoryOptions]="MalemedicalHistory"
       ></app-general>
-    </ng-container>
+    </div>
 
-    <ng-container *ngIf="activeTab==='additional'">
+    <div [hidden]="activeTab!=='additional'">
       <app-additional-measures [dropdowns]="dropdowns"></app-additional-measures>
-    </ng-container>
-    <ng-container *ngIf="activeTab==='documents'">
+    </div>
+    <div [hidden]="activeTab!=='documents'">
       <app-documents></app-documents>
-    </ng-container>
-    <ng-container *ngIf="activeTab==='accounting'">
+    </div>
+    <div [hidden]="activeTab!=='accounting'">
       <app-accounting></app-accounting>
-    </ng-container>
+    </div>
 
     <div class="card-footer d-flex justify-content-end mt-2">
     <button type="button" class="btn btn-light" (click)="onCancel()">Cancel</button>
