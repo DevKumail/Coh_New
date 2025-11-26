@@ -31,6 +31,10 @@ public partial class SecEmployeeRole
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("EmployeeId")]
     [InverseProperty("SecEmployeeRole")]
     public virtual Hremployee Employee { get; set; } = null!;

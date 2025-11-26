@@ -42,9 +42,7 @@ namespace HMIS.Core.FileSystem
                     FileName = fileName,
                     FilePath = modulePath,
                     DocumentType = mimeType,
-                    FileSize = data.Length,
-                    CreatedBy = null,
-                    CreatedAt = DateTime.Now
+                    FileSize = data.Length
                 };
 
                 _context.HmisFiles.Add(fileEntity);

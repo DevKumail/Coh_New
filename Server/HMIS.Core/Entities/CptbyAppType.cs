@@ -33,6 +33,10 @@ public partial class CptbyAppType
     [StringLength(50)]
     public string UpdatedBy { get; set; } = null!;
 
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [ForeignKey("AppTypeId")]
     [InverseProperty("CptbyAppType")]
     public virtual SchAppointmentType AppType { get; set; } = null!;

@@ -122,9 +122,15 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<EmrnoteQuestionRemoved> EmrnoteQuestionRemoved { get; set; }
 
+    public virtual DbSet<EmrnoteTemplate> EmrnoteTemplate { get; set; }
+
     public virtual DbSet<EmrnoteVoiceinText> EmrnoteVoiceinText { get; set; }
 
+    public virtual DbSet<EmrnotesAnswer> EmrnotesAnswer { get; set; }
+
     public virtual DbSet<EmrnotesEncounterPath> EmrnotesEncounterPath { get; set; }
+
+    public virtual DbSet<EmrnotesNote> EmrnotesNote { get; set; }
 
     public virtual DbSet<EmrnotesPathQuestion> EmrnotesPathQuestion { get; set; }
 
@@ -187,6 +193,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<IvfcryoLevelB> IvfcryoLevelB { get; set; }
 
     public virtual DbSet<IvfcryoLevelC> IvfcryoLevelC { get; set; }
+
+    public virtual DbSet<IvfcycleEpisodeOverviewUltraSound> IvfcycleEpisodeOverviewUltraSound { get; set; }
 
     public virtual DbSet<IvfdashboardAdditionalMeasures> IvfdashboardAdditionalMeasures { get; set; }
 
@@ -921,6 +929,17 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValue(false);
         });
 
+        modelBuilder.Entity<EmrnoteTemplate>(entity =>
+        {
+            entity.HasOne(d => d.Note).WithMany(p => p.EmrnoteTemplate)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EMRNoteTemplate_EMRNotesNote");
+
+            entity.HasOne(d => d.Template).WithMany(p => p.EmrnoteTemplate)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EMRNoteTemplate_EMRNotesEncounterPath");
+        });
+
         modelBuilder.Entity<EmrnoteVoiceinText>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Table_1");
@@ -929,6 +948,11 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<EmrnotesEncounterPath>(entity =>
         {
             entity.Property(e => e.PathId).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<EmrnotesNote>(entity =>
+        {
+            entity.Property(e => e.Active).HasDefaultValue(true);
         });
 
         modelBuilder.Entity<EmrnotesPathQuestion>(entity =>
@@ -1184,6 +1208,19 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.Status).WithMany(p => p.IvfcryoLevelC).HasConstraintName("FK_IVFMaleCryoPreservation_cryoelevelcstatus");
         });
 
+        modelBuilder.Entity<IvfcycleEpisodeOverviewUltraSound>(entity =>
+        {
+            entity.Property(e => e.OverviewId).ValueGeneratedOnAdd();
+
+            entity.HasOne(d => d.App).WithMany()
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFCycleEpisodeOverviewUltraSound_SchAppointment");
+
+            entity.HasOne(d => d.Overview).WithMany()
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFCycleEpisodeOverviewUltraSound_IVFTreatmentEpisodeOverviewStage");
+        });
+
         modelBuilder.Entity<IvfdashboardAdditionalMeasures>(entity =>
         {
             entity.HasKey(e => e.IvfadditionalMeasuresId).HasName("PK_IVFFemaleFHAdditionalMeasures");
@@ -1205,13 +1242,19 @@ public partial class HMISDbContext : DbContext
 
             entity.HasOne(d => d.CycleFromAmenorrheaCategory).WithMany(p => p.IvfdashboardTreatmentCycleCycleFromAmenorrheaCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration1");
 
+            entity.HasOne(d => d.IvffemaleFh).WithMany(p => p.IvfdashboardTreatmentCycle).HasConstraintName("FK_IVFDashboardTreatmentCycle_IVFFemaleFertilityHistory");
+
             entity.HasOne(d => d.Ivfmain).WithMany(p => p.IvfdashboardTreatmentCycle).HasConstraintName("FK_IVFFemaleTreatmentCycle_IVFMain");
+
+            entity.HasOne(d => d.IvfmaleFh).WithMany(p => p.IvfdashboardTreatmentCycle).HasConstraintName("FK_IVFDashboardTreatmentCycle_IVFMaleFertilityHistory");
 
             entity.HasOne(d => d.MainIndicationCategory).WithMany(p => p.IvfdashboardTreatmentCycleMainIndicationCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration2");
 
             entity.HasOne(d => d.PlannedSpermCollectionCategory).WithMany(p => p.IvfdashboardTreatmentCyclePlannedSpermCollectionCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration6");
 
             entity.HasOne(d => d.ProtocolCategory).WithMany(p => p.IvfdashboardTreatmentCycleProtocolCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration3");
+
+            entity.HasOne(d => d.Provider).WithMany(p => p.IvfdashboardTreatmentCycle).HasConstraintName("FK_IVFDashboardTreatmentCycle_HREmployee");
 
             entity.HasOne(d => d.StimulatedExternallyCategory).WithMany(p => p.IvfdashboardTreatmentCycleStimulatedExternallyCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration5");
 
@@ -1730,6 +1773,10 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
+            entity.HasOne(d => d.Hmisfile).WithMany(p => p.IvftreamentsEpisodeAttachments)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFTreamentsEpisodeAttachments_HMIS_Files");
+
             entity.HasOne(d => d.IvfdashboardTreatmentEpisode).WithMany(p => p.IvftreamentsEpisodeAttachments)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFFemaleFHTreamentsCycleAttachments_IVFFemaleTreatmentCycle");
@@ -2099,7 +2146,7 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<RegCompany>(entity =>
         {
-            entity.HasOne(d => d.CreatedBy).WithMany(p => p.RegCompany).HasConstraintName("FK_RegCompany_HREmployee");
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.RegCompany).HasConstraintName("FK_RegCompany_HREmployee");
         });
 
         modelBuilder.Entity<RegCountries>(entity =>

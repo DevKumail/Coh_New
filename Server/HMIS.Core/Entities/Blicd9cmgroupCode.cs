@@ -32,6 +32,14 @@ public partial class Blicd9cmgroupCode
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("GroupId")]
     [InverseProperty("Blicd9cmgroupCode")]
     public virtual Blicd9cmgroup Group { get; set; } = null!;

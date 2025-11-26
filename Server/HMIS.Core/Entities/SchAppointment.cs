@@ -308,6 +308,14 @@ public partial class SchAppointment
     [Unicode(false)]
     public string? PlanCopay { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("AppCriteriaId")]
     [InverseProperty("SchAppointment")]
     public virtual SchAppointmentCriteria? AppCriteria { get; set; }

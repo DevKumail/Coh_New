@@ -41,4 +41,11 @@ public partial class HmisFiles
     public int? DeletedBy { get; set; }
 
     public bool IsDeleted { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    [InverseProperty("Hmisfile")]
+    public virtual ICollection<IvftreamentsEpisodeAttachments> IvftreamentsEpisodeAttachments { get; set; } = new List<IvftreamentsEpisodeAttachments>();
 }

@@ -16,6 +16,14 @@ public partial class RegRelationShip
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("RelationShip")]
     public virtual ICollection<PatientChartFamilyHistory> PatientChartFamilyHistory { get; set; } = new List<PatientChartFamilyHistory>();
 

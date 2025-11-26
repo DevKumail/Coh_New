@@ -5,62 +5,75 @@
         <label class="form-label mb-0">Planned additional measures :</label>
       </div>
       <div class="col-12 col-md-7">
-        <select class="form-select" formControlName="plannedAdditionalMeasures">
-          <option value="" selected disabled>Select planned additional measures</option>
-          <option>PGT-A</option>
-          <option>PGT-M</option>
-          <option>PGT-SR</option>
-          <option>Embryo glue</option>
-        </select>
+        <div ngbDropdown class="d-inline-block w-100">
+          <button class="select-like" [title]="selectedTitle('plannedAdditionalMeasures')" [ngClass]="{'placeholder': !(form.value.plannedAdditionalMeasures?.length)}" ngbDropdownToggle>
+            {{ (form.value.plannedAdditionalMeasures?.length || 0) > 0 ? selectedSummary('plannedAdditionalMeasures', 3) : 'Select planned additional measures' }}
+          </button>
+          <div ngbDropdownMenu class="multi-menu p-2">
+            <div class="form-check" *ngFor="let o of options('PlannedAdditionalMeasures')">
+              <input class="form-check-input" type="checkbox" [checked]="isChecked('plannedAdditionalMeasures', o.name)" (change)="toggleSelection('plannedAdditionalMeasures', o.name)" id="pam_{{o.valueId}}">
+              <label class="form-check-label" [for]="'pam_'+o.valueId">{{ o.name }}</label>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="col-12 col-md-5 text-start">
         <label class="form-label mb-0">Performed additional measures :</label>
       </div>
       <div class="col-12 col-md-7">
-        <select class="form-select" formControlName="performedAdditionalMeasures">
-          <option value="" selected disabled>Select performed additional measures</option>
-          <option>PGT-A</option>
-          <option>PGT-M</option>
-          <option>PGT-SR</option>
-          <option>Embryo glue</option>
-        </select>
+        <div ngbDropdown class="d-inline-block w-100">
+          <button class="select-like" [title]="selectedTitle('performedAdditionalMeasures')" [ngClass]="{'placeholder': !(form.value.performedAdditionalMeasures?.length)}" ngbDropdownToggle>
+            {{ (form.value.performedAdditionalMeasures?.length || 0) > 0 ? selectedSummary('performedAdditionalMeasures', 3) : 'Select performed additional measures' }}
+          </button>
+          <div ngbDropdownMenu class="multi-menu p-2">
+            <div class="form-check" *ngFor="let o of options('PerformedAdditionalMeasures')">
+              <input class="form-check-input" type="checkbox" [checked]="isChecked('performedAdditionalMeasures', o.name)" (change)="toggleSelection('performedAdditionalMeasures', o.name)" id="per_{{o.valueId}}">
+              <label class="form-check-label" [for]="'per_'+o.valueId">{{ o.name }}</label>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="col-12 col-md-5 text-start">
         <label class="form-label mb-0">PID (Polar bodies) Indication :</label>
       </div>
       <div class="col-12 col-md-7">
-        <select class="form-select" formControlName="pidPolarBodiesIndication">
-          <option value="" selected disabled>Select indication</option>
-          <option>Not specified</option>
-          <option>Medical</option>
-          <option>Other</option>
-        </select>
+        <div ngbDropdown class="d-inline-block w-100">
+          <button class="select-like" [title]="selectedTitle('pidPolarBodiesIndication')" [ngClass]="{'placeholder': !(form.value.pidPolarBodiesIndication?.length)}" ngbDropdownToggle>
+            {{ (form.value.pidPolarBodiesIndication?.length || 0) > 0 ? selectedSummary('pidPolarBodiesIndication', 3) : 'Select indication' }}
+          </button>
+          <div ngbDropdownMenu class="multi-menu p-2">
+            <div class="form-check" *ngFor="let o of options('PolarBodiesIndication')">
+              <input class="form-check-input" type="checkbox" [checked]="isChecked('pidPolarBodiesIndication', o.name)" (change)="toggleSelection('pidPolarBodiesIndication', o.name)" id="pol_{{o.valueId}}">
+              <label class="form-check-label" [for]="'pol_'+o.valueId">{{ o.name }}</label>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="col-12 col-md-5 text-start">
         <label class="form-label mb-0">PID (EMB/Blast.) Indication :</label>
       </div>
       <div class="col-12 col-md-7">
-        <select class="form-select" formControlName="pidEmbBlastIndication">
-          <option value="" selected disabled>Select indication</option>
-          <option>Not specified</option>
-          <option>Medical</option>
-          <option>Other</option>
-        </select>
+        <div ngbDropdown class="d-inline-block w-100">
+          <button class="select-like" [title]="selectedTitle('pidEmbBlastIndication')" [ngClass]="{'placeholder': !(form.value.pidEmbBlastIndication?.length)}" ngbDropdownToggle>
+            {{ (form.value.pidEmbBlastIndication?.length || 0) > 0 ? selectedSummary('pidEmbBlastIndication', 3) : 'Select indication' }}
+          </button>
+          <div ngbDropdownMenu class="multi-menu p-2">
+            <div class="form-check" *ngFor="let o of options('EMBBlastIndication')">
+              <input class="form-check-input" type="checkbox" [checked]="isChecked('pidEmbBlastIndication', o.name)" (change)="toggleSelection('pidEmbBlastIndication', o.name)" id="emb_{{o.valueId}}">
+              <label class="form-check-label" [for]="'emb_'+o.valueId">{{ o.name }}</label>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="col-12 col-md-5 text-start">
         <label class="form-label mb-0">Genetic condition :</label>
       </div>
       <div class="col-12 col-md-7">
-        <select class="form-select" formControlName="geneticCondition">
-          <option value="" selected disabled>Select genetic condition</option>
-          <option>Not specified</option>
-          <option>Aneuploidy</option>
-          <option>Monogenic</option>
-        </select>
+        <input class="form-control" formControlName="geneticCondition" placeholder="Enter genetic condition" />
       </div>
     </div>
   </div>

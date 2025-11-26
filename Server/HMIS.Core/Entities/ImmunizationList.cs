@@ -21,6 +21,14 @@ public partial class ImmunizationList
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("DrugType")]
     public virtual ICollection<PatientImmunization> PatientImmunizationDrugType { get; set; } = new List<PatientImmunization>();
 

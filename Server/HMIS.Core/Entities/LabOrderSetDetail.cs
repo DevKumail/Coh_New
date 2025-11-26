@@ -85,6 +85,14 @@ public partial class LabOrderSetDetail
 
     public int? SampleTypeId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("SampleTypeId")]
     [InverseProperty("LabOrderSetDetail")]
     public virtual LabSampleTypes? SampleType { get; set; }

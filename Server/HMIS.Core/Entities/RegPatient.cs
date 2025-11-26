@@ -148,6 +148,12 @@ public partial class RegPatient
     [Unicode(false)]
     public string? PrimarycarephysicianPcp { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
     [InverseProperty("Patient")]
     public virtual ICollection<EligibilityLog> EligibilityLog { get; set; } = new List<EligibilityLog>();
 

@@ -23,6 +23,14 @@ public partial class ProviderScheduleByAppType
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("AppTypeId")]
     [InverseProperty("ProviderScheduleByAppType")]
     public virtual SchAppointmentType? AppType { get; set; }

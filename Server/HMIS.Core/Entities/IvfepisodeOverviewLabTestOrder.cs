@@ -14,6 +14,14 @@ public partial class IvfepisodeOverviewLabTestOrder
 
     public long? OverviewId { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("AppId")]
     public virtual SchAppointment? App { get; set; }
 

@@ -41,4 +41,12 @@ public partial class BlmasterIrdrg
     public decimal? Price { get; set; }
 
     public bool? IsDeleted { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
 }

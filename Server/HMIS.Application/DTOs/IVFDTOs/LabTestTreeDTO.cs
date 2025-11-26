@@ -11,8 +11,6 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public bool IsProfile { get; set; }
         public bool IsCategory { get; set; }
         public bool Selectable { get; set; }
-        public int? SampleTypeId { get; set; }
-        public string SampleTypeName { get; set; }
         public List<LabTestTreeNodeDTO> Children { get; set; } = new List<LabTestTreeNodeDTO>();
     }
 

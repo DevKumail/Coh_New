@@ -31,6 +31,14 @@ public partial class HrlicenseInfo
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [ForeignKey("EmployeeId")]
     [InverseProperty("HrlicenseInfo")]
     public virtual Hremployee Employee { get; set; } = null!;

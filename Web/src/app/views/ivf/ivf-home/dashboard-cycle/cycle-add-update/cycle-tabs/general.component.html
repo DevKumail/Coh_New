@@ -5,8 +5,7 @@
         <label class="form-label">Treatment</label>
         <select class="form-select" formControlName="treatment">
           <option value="" selected disabled>Select Treatment</option>
-          <option>IVF</option>
-          <option>ICSI</option>
+          <option *ngFor="let o of options('Types')" [value]="o.name">{{ o.name }}</option>
         </select>
       </div>
       <div class="col-md-4 d-flex align-items-start justify-content-between">
@@ -21,69 +20,26 @@
         <input type="date" class="form-control" formControlName="dateOfLMP" />
       </div>
 
-      <!-- all check box start -->
+      <!-- Treatment Sub Types Start  -->
       <div class="card mt-2">
         <div class="card-body py-2">
           <div class="row g-1">
-            <div class="col-4">
+            <div class="col-4" *ngFor="let f of treatmentFlags()">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="fertilityPreservation" formControlName="fertilityPreservation">
-                <label class="form-check-label" for="fertilityPreservation">Fertility preservation</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="socialEggFreezing" formControlName="socialEggFreezing">
-                <label class="form-check-label" for="socialEggFreezing">Social egg freezing</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="freezeAll" formControlName="freezeAll">
-                <label class="form-check-label" for="freezeAll">Freeze all</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="oocyteThawing" formControlName="oocyteThawing">
-                <label class="form-check-label" for="oocyteThawing">Oocyte thawing</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="embryoThawing" formControlName="embryoThawing">
-                <label class="form-check-label" for="embryoThawing">Embryo thawing</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="ivm" formControlName="ivm">
-                <label class="form-check-label" for="ivm">IVM</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="imsi" formControlName="imsi">
-                <label class="form-check-label" for="imsi">IMSI</label>
-              </div>
-            </div>
-            <div class="col-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="picsi" formControlName="picsi">
-                <label class="form-check-label" for="picsi">PICSI</label>
+                <input class="form-check-input" type="checkbox" [id]="f.control" [formControlName]="f.control">
+                <label class="form-check-label" [for]="f.control">{{ f.name }}</label>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- all check box end -->
+      <!-- Treatment Sub Types End -->
 
       <div class="col-md-4">
         <label class="form-label">Cycle from amenorrhea</label>
         <select class="form-select" formControlName="cycleFromAmenorrhea">
           <option value="" selected disabled>Select cycle from amenorrhea</option>
-          <option>No</option>
-          <option>Yes</option>
+          <option *ngFor="let o of options('FromAmenorrhea')" [value]="o.name">{{ o.name }}</option>
         </select>
       </div>
 
@@ -91,8 +47,7 @@
         <label class="form-label">Main indication</label>
         <select class="form-select" formControlName="mainIndication">
           <option value="" selected disabled>Select main indication</option>
-          <option>No</option>
-          <option>Yes</option>
+          <option *ngFor="let o of options('MainIndication')" [value]="o.name">{{ o.name }}</option>
         </select>
       </div>
 
@@ -100,8 +55,7 @@
         <label class="form-label">Protocol</label>
         <select class="form-select" formControlName="protocol">
           <option value="" selected disabled>Select protocol</option>
-          <option>No</option>
-          <option>Yes</option>
+          <option *ngFor="let o of options('Protocol')" [value]="o.name">{{ o.name }}</option>
         </select>
       </div>
 
@@ -109,18 +63,14 @@
         <label class="form-label">Stimulation planned</label>
         <select class="form-select" formControlName="stimulationPlanned">
           <option value="" selected disabled>Select stimulation planned</option>
-          <option>Not specified</option>
-          <option>Yes</option>
-          <option>No</option>
+          <option *ngFor="let o of options('StimulationPlanned')" [value]="o.name">{{ o.name }}</option>
         </select>
       </div>
       <div class="col-md-4">
         <label class="form-label">Stimulated externally</label>
         <select class="form-select" formControlName="stimulatedExternally">
           <option value="" selected disabled>Select stimulated externally</option>
-          <option>Not specified</option>
-          <option>Yes</option>
-          <option>No</option>
+          <option *ngFor="let o of options('StimulatedExternally')" [value]="o.name">{{ o.name }}</option>
         </select>
       </div>
 
@@ -135,21 +85,24 @@
 
       <div class="col-md-4">
         <label class="form-label">Planned sperm collection</label>
-        <select class="form-select" formControlName="plannedSpermCollection">
-          <option value="" selected disabled>Select Planned sperm collection</option>
-          <option>Not specified</option>
-          <option>Partner</option>
-          <option>Donor</option>
-        </select>
+        <div ngbDropdown class="d-inline-block w-100">
+          <button class="select-like" [title]="selectedTitle('plannedSpermCollection')" [ngClass]="{'placeholder': !(generalForm.value.plannedSpermCollection?.length)}" ngbDropdownToggle>
+            {{ (generalForm.value.plannedSpermCollection?.length || 0) > 0 ? selectedSummary('plannedSpermCollection', 1) : 'Select planned sperm collection' }}
+          </button>
+          <div ngbDropdownMenu class="multi-menu p-2">
+            <div class="form-check" *ngFor="let o of options('PlannedSpermCollection')">
+              <input class="form-check-input" type="checkbox" [checked]="isChecked('plannedSpermCollection', o.name)" (change)="toggleSelection('plannedSpermCollection', o.name)" id="psc_{{o.valueId}}">
+              <label class="form-check-label" [for]="'psc_'+o.valueId">{{ o.name }}</label>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="col-md-4">
         <label class="form-label">Attending clinician</label>
         <select class="form-select" formControlName="attendingClinician">
           <option value="" selected disabled>Select Attending clinician</option>
-          <option>None selected</option>
-          <option>Partner</option>
-          <option>Donor</option>
+          <option *ngFor="let p of hrEmployees" [value]="p.providerId">{{ p.name }}</option>
         </select>
       </div>
 
@@ -175,27 +128,36 @@
     <div class="row g-2">
       <div class="col-12">
         <label class="form-label">Female medical history of</label>
-        <select class="form-select" formControlName="femaleMedicalHistoryOf">
-          <option value="">Select</option>
-        </select>
+        <div ngbDropdown class="d-inline-block w-100">
+          <button class="select-like" ngbDropdownToggle>
+            {{ getSelectedFemaleLabel() }}
+          </button>
+          <div ngbDropdownMenu class="multi-menu p-2">
+            <div class="dropdown-item py-2" *ngFor="let fh of femaleHistoryOptions" (click)="selectFemaleHistory(fh)">
+              <div [innerHTML]="formatHistoryHtml(fh)"></div>
+            </div>
+          </div>
+        </div>
         <textarea rows="4" class="form-control mt-2" formControlName="femaleHistory"></textarea>
       </div>
       <div class="col-12">
         <label class="form-label">Male medical history of</label>
-        <select class="form-select" formControlName="maleMedicalHistoryOf">
-          <option value="">Select</option>
-        </select>
+        <div ngbDropdown class="d-inline-block w-100">
+          <button class="select-like" ngbDropdownToggle>
+            {{ getSelectedMaleLabel() }}
+          </button>
+          <div ngbDropdownMenu class="multi-menu p-2">
+            <div class="dropdown-item py-2" *ngFor="let mh of maleHistoryOptions" (click)="selectMaleHistory(mh)">
+              <div [innerHTML]="formatHistoryHtml(mh)"></div>
+            </div>
+          </div>
+        </div>
         <textarea rows="7" class="form-control mt-2" formControlName="maleHistory"></textarea>
       </div>
     </div>
         <div class="col-md-12 mt-2">
         <label class="form-label">Taken over on</label>
-        <select class="form-select" formControlName="takenOverOn">
-          <option value="" selected disabled>Select Taken over on</option>
-          <option>None selected</option>
-          <option>Partner</option>
-          <option>Donor</option>
-        </select>
+        <input type="date" class="form-control" formControlName="takenOverOn" />
       </div>
   </div>
 

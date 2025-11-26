@@ -129,7 +129,7 @@ export class SignInComponent implements OnInit {
   this.errorMessage = '';
 
   this.authService.login(username, password).subscribe({
-    next: () => {
+    next: async () => {
       // Cleanup again on successful login before navigation
       this.cleanSessionStorage();
       setTimeout(() => this.cleanSessionStorage(), 100);
@@ -142,7 +142,8 @@ export class SignInComponent implements OnInit {
         showConfirmButton: false
       });
 
-      this.patientBanner.setPatientData(null);
+      // Clear patient data before navigating to dashboard
+      await this.patientBanner.setPatientData(null);
 
       this.router.navigate(['/dashboards/dashboard']);
     },

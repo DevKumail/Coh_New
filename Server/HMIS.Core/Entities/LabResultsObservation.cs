@@ -78,4 +78,8 @@ public partial class LabResultsObservation
     public int? SequenceNo { get; set; }
 
     public int? LabResultId { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 }

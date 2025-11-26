@@ -55,4 +55,8 @@ public partial class Cases
     public string? OldMrno { get; set; }
 
     public bool? IsDeleted { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 }

@@ -16,6 +16,12 @@ public partial class IvfdashboardTreatmentCycle
     [Column("IVFMainId")]
     public int? IvfmainId { get; set; }
 
+    [Column("IVFMaleFHId")]
+    public int? IvfmaleFhid { get; set; }
+
+    [Column("IVFFemaleFHId")]
+    public int? IvffemaleFhid { get; set; }
+
     public long? TreatmentTypeCategoryId { get; set; }
 
     public bool? OnlyInternalCycle { get; set; }
@@ -43,6 +49,20 @@ public partial class IvfdashboardTreatmentCycle
 
     public long? PlannedSpermCollectionCategoryId { get; set; }
 
+    public long? ProviderId { get; set; }
+
+    [StringLength(50)]
+    public string? RandomizationGroup { get; set; }
+
+    [StringLength(50)]
+    public string? Survey { get; set; }
+
+    [StringLength(100)]
+    public string? TakenOverFrom { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? TakeOverOn { get; set; }
+
     public string? CycleNote { get; set; }
 
     public int? CreatedBy { get; set; }
@@ -64,9 +84,17 @@ public partial class IvfdashboardTreatmentCycle
     [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual ICollection<IvfdashboardAdditionalMeasures> IvfdashboardAdditionalMeasures { get; set; } = new List<IvfdashboardAdditionalMeasures>();
 
+    [ForeignKey("IvffemaleFhid")]
+    [InverseProperty("IvfdashboardTreatmentCycle")]
+    public virtual IvffemaleFertilityHistory? IvffemaleFh { get; set; }
+
     [ForeignKey("IvfmainId")]
     [InverseProperty("IvfdashboardTreatmentCycle")]
     public virtual Ivfmain? Ivfmain { get; set; }
+
+    [ForeignKey("IvfmaleFhid")]
+    [InverseProperty("IvfdashboardTreatmentCycle")]
+    public virtual IvfmaleFertilityHistory? IvfmaleFh { get; set; }
 
     [InverseProperty("IvfdashboardTreatmentEpisode")]
     public virtual ICollection<IvftreamentsEpisodeAttachments> IvftreamentsEpisodeAttachments { get; set; } = new List<IvftreamentsEpisodeAttachments>();
@@ -91,6 +119,10 @@ public partial class IvfdashboardTreatmentCycle
     [ForeignKey("ProtocolCategoryId")]
     [InverseProperty("IvfdashboardTreatmentCycleProtocolCategory")]
     public virtual DropdownConfiguration? ProtocolCategory { get; set; }
+
+    [ForeignKey("ProviderId")]
+    [InverseProperty("IvfdashboardTreatmentCycle")]
+    public virtual Hremployee? Provider { get; set; }
 
     [ForeignKey("StimulatedExternallyCategoryId")]
     [InverseProperty("IvfdashboardTreatmentCycleStimulatedExternallyCategory")]

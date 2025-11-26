@@ -17,4 +17,12 @@ public partial class MedicationComments
     [StringLength(50)]
     [Unicode(false)]
     public string Name { get; set; } = null!;
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
 }

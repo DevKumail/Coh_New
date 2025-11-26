@@ -1,4 +1,4 @@
-<form [formGroup]="form" class="container-fluid mw-100 w-100 mt-2">
+<form [formGroup]="form" class=" mw-100 w-100 mt-2">
   <div class="row g-3 align-items-stretch" *ngIf="couple?.female || couple?.male; else noCouple">
     <!-- Female start -->
     <div class="col-12 col-xl-6">
@@ -218,7 +218,7 @@
 
 
 
-  <div class="row g-3 mt-2" *ngIf="couple?.female || couple?.male">
+  <div class="row mt-1 " *ngIf="couple?.female || couple?.male">
     <div class="col-12">
       <div class="card">
         <div class="card-header py-2 d-flex align-items-center justify-content-between">
@@ -227,14 +227,12 @@
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-sm mb-0 align-middle">
-              <thead class="table-light">
+            <table class="table table-bordered table-striped table-sm">
+              <thead>
                 <tr>
-                  <th>Woman</th>
                   <th>No.</th>
                   <th>Start</th>
                   <th>Egg-treatment prt.</th>
-                  <th>Partner</th>
                   <th>Sperm</th>
                   <th>Stimulation</th>
                   <th>Stim. prot.</th>
@@ -244,16 +242,14 @@
                   <th>Cycle</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="table-group-divider text-center">
                 <tr *ngIf="overview.length===0">
                   <td colspan="12" class="text-center text-muted">No data to display</td>
                 </tr>
-                <tr *ngFor="let row of overview">
-                  <td>{{row.woman}}</td>
-                  <td>{{row.no}}</td>
+                <tr *ngFor="let row of overview; index as i">
+                  <td>{{i+1}}</td>
                   <td>{{row.start}}</td>
-                  <td>{{row.eggTreatment}}</td>
-                  <td>{{row.partner}}</td>
+                  <td>{{row.treatmentType}}</td>
                   <td>{{row.sperm}}</td>
                   <td>{{row.stimulation}}</td>
                   <td>{{row.stimProt}}</td>
@@ -264,6 +260,12 @@
                 </tr>
               </tbody>
             </table>
+                <app-generic-pagination 
+      [totalItems]="CycleListTotalrecord" 
+      [pageSize]="CycleListPaginationInfo?.pageSize"
+      [currentPage]="CycleListPaginationInfo?.currentPage" 
+      (pageChanged)="onCyclePageChanged($event)">
+      </app-generic-pagination>
           </div>
         </div>
       </div>

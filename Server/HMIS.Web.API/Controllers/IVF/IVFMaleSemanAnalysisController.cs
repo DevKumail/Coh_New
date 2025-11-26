@@ -9,7 +9,6 @@ namespace HMIS.Web.Controllers.IVF
 
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class IVFMaleSemanAnalysisController : ControllerBase
     {
         private readonly IIVFMaleSemenService _semenService;

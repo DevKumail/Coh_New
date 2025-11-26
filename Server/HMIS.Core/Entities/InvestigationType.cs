@@ -15,4 +15,12 @@ public partial class InvestigationType
     public string? Type { get; set; }
 
     public bool? IsRadiologyTest { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
 }

@@ -15,4 +15,12 @@ public partial class Assingment
     [Column("Assingment")]
     [StringLength(50)]
     public string? Assingment1 { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
 }

@@ -217,6 +217,14 @@ public partial class TabDrugsName
     [Column("UPPExpiryDate", TypeName = "datetime")]
     public DateTime? UppexpiryDate { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("Drug")]
     public virtual ICollection<Medications> Medications { get; set; } = new List<Medications>();
 

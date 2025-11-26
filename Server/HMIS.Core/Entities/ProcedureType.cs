@@ -15,6 +15,14 @@ public partial class ProcedureType
     [StringLength(250)]
     public string? Type { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("ProcedureType")]
     public virtual ICollection<BlProceduresGroup> BlProceduresGroup { get; set; } = new List<BlProceduresGroup>();
 

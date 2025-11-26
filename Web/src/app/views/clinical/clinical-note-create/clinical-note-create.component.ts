@@ -141,9 +141,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
         // Load template immediately
         this.GetNotesTemplate(templateId);
         // Load notes to get template name
-        if (this.preSelectedProvider) {
-          this.GetNotesEmployeeId(this.preSelectedProvider);
-        }
       }
     });
 
@@ -155,9 +152,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
         const code = Number(val) || 0;
         this.selectedProviders = code;
         // Only reload notes if template is not pre-selected
-        if (!this.isTemplatePreSelected) {
-          this.GetNotesEmployeeId(code);
-        }
       });
       this.subscriptions.push(sub);
     }
@@ -172,7 +166,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
         if (!this.isTemplatePreSelected) {
           const nid = Number(val) || 0;
           this.selectedNotes = nid;
-          this.GetNotesTemplate(nid);
         }
       });
       this.subscriptions.push(sub2);
@@ -227,35 +220,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
     }
   }
 
-  GetNotesEmployeeId(providerCode: any) {
-    if (providerCode == null || providerCode == undefined) providerCode = 0;
-    this.selectedProviders = Number(providerCode) || 0;
-    if (this.selectedProviders === 250) providerCode = 197;
-
-    // Don't clear note dropdown if template is pre-selected
-    if (!this.isTemplatePreSelected) {
-      this.clinicalNotes = [];
-      this.clinicalForm.patchValue({ note: null });
-    }
-
-    this.loader.show();
-    this.clinicalApiService.EMRNotesGetByEmpId(providerCode).then((res: any) => {
-      this.clinicalNotes = res.result || [];
-
-      // Set selected template name if pre-selected
-      if (this.isTemplatePreSelected && this.preSelectedTemplateId) {
-        const selectedNote = this.clinicalNotes.find(n => n.pathId === this.preSelectedTemplateId);
-        if (selectedNote) {
-          this.selectedTemplateName = selectedNote.pathName;
-          this.cdr.detectChanges();
-        }
-      }
-
-      this.loader.hide();
-    }).catch((e: any) =>
-      Swal.fire('Error', 'Error loading notes', 'error')
-    ).finally(() => this.loader.hide());
-  }
 
   // GetNotesTemplate unchanged except it now receives numeric noteId
   GetNotesTemplate(noteId: any) {
@@ -438,6 +402,57 @@ export class ClinicalNoteCreateComponent implements OnInit {
     req.onerror = (event: any) => console.error('Error saving note offline:', event);
   }
 
+  // collect filled answers from structured note tree
+  private collectFilledValues(): any {
+    if (!this.dataquestion?.node) return null;
+    const clone = JSON.parse(JSON.stringify(this.dataquestion));
+    if (clone.node?.questions) {
+      clone.node.questions = this.collectQuestionValues(clone.node.questions);
+    }
+    return clone;
+  }
+
+  private collectQuestionValues(questions: Question[]): Question[] {
+    return questions.map(q => ({
+      ...q,
+      answer: q.answer || '',
+      children: q.children && q.children.length ? this.collectQuestionValues(q.children) : []
+    }));
+  }
+
+  private generateHtmlFromStructuredNote(filledNote: any): string {
+    if (!filledNote?.node) return '';
+    let html = `<div class="clinical-note">`;
+    html += `<h2 style="font-weight:bold;text-decoration:underline;">${filledNote.node.noteTitle}</h2>`;
+    if (filledNote.node.questions) html += this.generateQuestionsHtml(filledNote.node.questions);
+    html += `</div>`;
+    return html;
+  }
+
+  private generateQuestionsHtml(questions: Question[]): string {
+    let html = '';
+    questions.forEach(q => {
+      if (q.type === 'Question Section') {
+        html += `<div style="margin-top:16px;"><h4 style="font-weight:bold;margin-left:10px;">${q.quest_Title}</h4>`;
+        if (q.children?.length) {
+          html += `<div style="display:flex;flex-wrap:wrap;margin-left:10px;">${this.generateQuestionsHtml(q.children)}</div>`;
+        }
+        html += `</div>`;
+      } else {
+        html += `<div style="display:inline-block;width:calc(25% - 16px);margin:4px 8px 12px 8px;vertical-align:top;">`;
+        html += `<div style="font-size:12px;font-weight:600;text-transform:uppercase;">${q.quest_Title}</div>`;
+        if (q.type === 'CheckBox') {
+          html += `<div><input type="checkbox" ${q.answer ? 'checked' : ''} disabled /> <span>${q.answer || ''}</span></div>`;
+        } else {
+          html += `<div style="white-space:pre-wrap;">${q.answer || 'N/A'}</div>`;
+        }
+        html += `</div>`;
+        if (q.children?.length) html += this.generateQuestionsHtml(q.children);
+      }
+    });
+    return html;
+  }
+
   // --- submit recorded voice (upload or offline save) -------------------
   submitVoice() {
     if (this.clinicalForm.invalid) {
@@ -445,78 +460,83 @@ export class ClinicalNoteCreateComponent implements OnInit {
       this.clinicalForm.markAllAsTouched();
       return;
     }
-
-    const formValue = this.clinicalForm.value;
-    // ensure numeric conversion
-    const providerCode = Number(formValue.provider) || this.selectedProviders;
-    const noteId = Number(formValue.note) || this.selectedNotes;
-
-
     if (!this.voiceBlob) {
-      alert('No voice recording available!');
+      Swal.fire('Warning', 'No voice recording available.', 'warning');
       return;
     }
+
+    const formValue = this.clinicalForm.value;
+    const providerId = Number(formValue.provider) || this.selectedProviders;
+    const noteId = Number(formValue.note) || this.selectedNotes;
     const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
-    this.createdBy = current_User.userName || '';
-    this.updatedBy = current_User.userName || '';
-    this.signedBy = false;
+    const createdBy = current_User.userName || '';
+    const userId = current_User.userId || '';
+
+    // derive note title
+    const selectedNote = this.clinicalNotes.find(n => n.pathId === noteId);
+    const noteName = selectedNote ? selectedNote.pathName : (this.dataquestion?.node?.noteTitle || '');
+
+    // collect structured filled values + html
+    const filledStructuredNote = this.collectFilledValues();
+    const htmlContent = this.generateHtmlFromStructuredNote(filledStructuredNote);
+
     const reader = new FileReader();
-
     reader.onloadend = () => {
-      const base64data = reader.result?.toString().split(',')[1] || '';
+      const voiceBase64 = reader.result?.toString().split(',')[1] || '';
 
-      // find selected note using reactive form value (not legacy property)
-      const selectedNoteId = noteId;
-      const selectedNote = this.clinicalNotes.find(note => note.pathId === selectedNoteId);
-      const noteName = selectedNote ? selectedNote.pathName : '';
-
-      const note = {
-        noteTitle: noteName,
-        createdBy: this.createdBy,
-        updatedBy: this.updatedBy,
-        description: formValue.description,
-        signedBy: this.signedBy,
-        voiceFile: base64data,
-        createdOn: new Date(),
+      const payload = {
+        appointmentId: this.SelectedVisit?.appointmentId,
+        providerId,
+        userId,
+        currentUser: createdBy,
         mrNo: this.mrNo,
-        appointmentId: this.SelectedVisit.appointmentId,
-        pathId: selectedNoteId
+        noteTitle: noteName,
+        description: formValue.description,
+        pathId: noteId,
+        structuredNote: filledStructuredNote,
+        htmlContent,
+        createdBy,
+        updatedBy: createdBy,
+        signedBy: false,
+        createdOn: new Date(),
+        voiceFile: voiceBase64,
+        voicetext: formValue.voicetext
       };
+
+      console.log('Payload:', payload);
 
       if (navigator.onLine) {
         const timeout = new Promise((_, reject) =>
           setTimeout(() => reject(new Error("Request timed out")), 300000)
         );
-this.loader.show();
-        Promise.race([ this.clinicalApiService.InsertSpeech(note), timeout ])
+        this.loader.show();
+        Promise.race([ this.clinicalApiService.InsertSpeech(payload), timeout ])
           .then((response: any) => {
             if (response != null && response != "") {
               this.dataquestion = response;
               this.nodeData = response.node;
               this.viewNoteResponse = true;
+              // keep provider/note selections
               this.audioUrl = null;
               this.voiceBlob = null;
-              this.clinicalForm.reset();
+              this.clinicalForm.patchValue({ description: '', voicetext: '' });
               Swal.fire('Success', 'Note uploaded successfully.', 'success');
-                this.loader.hide();
-            //   this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Note uploaded successfully.' });
+              this.loader.hide();
             } else {
-                this.loader.hide();
+              this.loader.hide();
               throw new Error('Upload failed');
             }
           })
           .catch((error: any) => {
             console.error('Upload failed:', error);
-            this.saveNoteOffline(note);
+            this.saveNoteOffline(payload);
             Swal.fire('Offline Save', 'Saved offline due to network/server error.', 'info');
             this.loader.hide();
-            // this.messageService.add({ severity: 'error', summary: 'Offline Save', detail: 'Saved offline due to network/server error.' });
           });
       } else {
-        this.saveNoteOffline(note);
+        this.saveNoteOffline(payload);
         Swal.fire('Offline', 'Note saved offline and will be synced later.', 'info');
         this.loader.hide();
-        // this.messageService.add({ severity: 'info', summary: 'Offline', detail: 'Note saved offline and will be synced later.' });
       }
     };
 

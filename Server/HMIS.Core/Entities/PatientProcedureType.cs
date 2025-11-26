@@ -15,6 +15,14 @@ public partial class PatientProcedureType
     [StringLength(100)]
     public string? Name { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("ProcedureTypeNavigation")]
     public virtual ICollection<PatientProcedure> PatientProcedure { get; set; } = new List<PatientProcedure>();
 }

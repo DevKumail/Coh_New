@@ -86,6 +86,9 @@ public partial class IvffemaleFertilityHistory
     public virtual DropdownConfiguration? GenerallyHealthyCategory { get; set; }
 
     [InverseProperty("IvffemaleFh")]
+    public virtual ICollection<IvfdashboardTreatmentCycle> IvfdashboardTreatmentCycle { get; set; } = new List<IvfdashboardTreatmentCycle>();
+
+    [InverseProperty("IvffemaleFh")]
     public virtual ICollection<IvffemaleFhimpairmentFactor> IvffemaleFhimpairmentFactor { get; set; } = new List<IvffemaleFhimpairmentFactor>();
 
     [InverseProperty("IvffemaleFh")]

@@ -1,0 +1,48 @@
+<div class="">
+  <div class="row mb-3">
+    <div class="col-12 col-md-6">
+      <label class="form-label">Select documents</label>
+      <input type="file" class="form-control" multiple (change)="onFilesChosen($event)" />
+      <div class="form-text">Choose one or more files. They will appear in the Selected table below.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <div>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped table-sm text-center">
+            <thead>
+              <tr>
+                <th >Name</th>
+                <th >Size</th>
+                <th >Type</th>
+                <th >Action</th>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider text-center ">
+        <ng-container *ngIf="isLoading">
+          <tr *ngFor="let i of [1,2,3]">
+            <td colspan="4" class="text-start">
+              <div class="placeholder-wave"><span class="placeholder col-12"></span></div>
+            </td>
+          </tr>
+        </ng-container>
+        <ng-container *ngIf="!isLoading">
+              <tr *ngFor="let d of selected">
+                <td><span [title]="d.name">{{ d.name }}</span></td>
+                <td>{{ d.size | number }} B</td>
+                <td>{{ d.ext || '-' }}</td>
+                <td><button type="button" class="btn btn-link text-danger btn-sm" (click)="removeOne(d.id)">Remove</button></td>
+              </tr>
+              <tr *ngIf="!selected.length">
+                <td colspan="4" class="text-center text-muted">No documents selected</td>
+              </tr>
+        </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -21,6 +21,14 @@ public partial class SchAppointmentType
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("AppType")]
     public virtual ICollection<CptbyAppType> CptbyAppType { get; set; } = new List<CptbyAppType>();
 

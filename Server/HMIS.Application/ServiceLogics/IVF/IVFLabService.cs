@@ -9,7 +9,7 @@ namespace HMIS.Application.ServiceLogics.IVF
 {
     public interface IIVFLabService
     {
-        Task<LabTestTreeResponseDTO> GetLabTestTree(int? investigationTypeId, int? laboratoryId);
+        Task<LabTestTreeResponseDTO> GetLabTestTree(int? investigationTypeId, Guid? laboratoryId);
     }
 
     public class IVFLabService : IIVFLabService
@@ -19,7 +19,7 @@ namespace HMIS.Application.ServiceLogics.IVF
         {
             _db = db;
         }
-        public async Task<LabTestTreeResponseDTO> GetLabTestTree(int? investigationTypeId, int? laboratoryId)
+        public async Task<LabTestTreeResponseDTO> GetLabTestTree(int? investigationTypeId, Guid? laboratoryId)
         {
             // Load all active/visible rows via EF; prune by filters in memory to preserve parent categories
             var list = _db.LabTests
@@ -32,9 +32,7 @@ namespace HMIS.Application.ServiceLogics.IVF
                     CPTCode = x.Cptcode,
                     IsProfile = x.IsProfile,
                     InvestigationTypeID = x.InvestigationTypeId,
-                    LaboratoryId = x.LaboratoryId,
-                    SampleTypeId = x.SampleTypeId,
-                    SampleTypeName = x.SampleType != null ? x.SampleType.SampleName : string.Empty
+                    LaboratoryId = x.LaboratoryId
                 })
                 .ToList();
             if (list.Count == 0)
@@ -53,8 +51,6 @@ namespace HMIS.Application.ServiceLogics.IVF
                     Label = r.LabName ?? string.Empty,
                     CptCode = r.CPTCode,
                     IsProfile = r.IsProfile ?? false,
-                    SampleTypeId = r.SampleTypeId,
-                    SampleTypeName = r.SampleTypeName ?? string.Empty,
                     Children = new List<LabTestTreeNodeDTO>()
                 };
             }
@@ -125,8 +121,6 @@ namespace HMIS.Application.ServiceLogics.IVF
 
         private class LabRow
         {
-            public string SampleTypeName { get; set; } = null!;
-
             public long LabTestId { get; set; }
             public long? ParentId { get; set; }
             public string LabName { get; set; }
@@ -134,9 +128,6 @@ namespace HMIS.Application.ServiceLogics.IVF
             public bool? IsProfile { get; set; }
             public int? InvestigationTypeID { get; set; }
             public int? LaboratoryId { get; set; }
-
-            public int? SampleTypeId { get; set; }
-            
         }
     }
 }

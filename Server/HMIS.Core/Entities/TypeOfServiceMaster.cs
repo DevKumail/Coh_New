@@ -19,6 +19,14 @@ public partial class TypeOfServiceMaster
 
     public bool? IsDeleted { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
     [InverseProperty("ServiceType")]
     public virtual ICollection<BlcptmasterRanges> BlcptmasterRanges { get; set; } = new List<BlcptmasterRanges>();
 }
