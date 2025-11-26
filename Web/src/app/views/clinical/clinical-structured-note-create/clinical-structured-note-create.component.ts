@@ -1,4 +1,5 @@
-﻿import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { UserDataService } from '@core/services/user-data.service';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
@@ -11,7 +12,6 @@ import { QuestionViewComponent } from '../question-view/question-view.component'
 import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { LoaderService } from '@core/services/loader.service';
-
 @Component({
   standalone: true,
   imports: [
@@ -50,12 +50,18 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   preSelectedTemplate: number = 0;
   SelectedVisit: any;
 
+  // User data from RxDB
+  private currentUserId: string = '';
+  private currentUserName: string = '';
+
   constructor(
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService,
     private loader: LoaderService,
     private router: Router,
     private route: ActivatedRoute,
+    private PatientData: PatientBannerService,
+    private userDataService: UserDataService
     private PatientData: PatientBannerService,
     private cdr: ChangeDetectorRef,
     private userDataService: UserDataService
@@ -68,6 +74,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Load user data first
+    this.loadCurrentUser();
+
     this.patientDataSubscription = this.PatientData.patientData$
       .pipe(
         filter((data: any) => !!data?.table2?.[0]?.mrNo),
@@ -113,6 +122,32 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
         this.GetNotesTemplate(nid);
       });
       this.subscriptions.push(sub2);
+    }
+  }
+
+  /**
+   * Load current user from RxDB
+   */
+  private async loadCurrentUser(): Promise<void> {
+    try {
+      const user = await this.userDataService.getCurrentUser();
+
+      if (user) {
+        this.currentUserName = user.userName || '';
+        this.currentUserId = user.userId || '';
+        console.log('✅ User loaded:', this.currentUserName);
+      } else {
+        console.warn('⚠️ No user found in RxDB');
+        // Fallback to localStorage if needed
+        const localUser = localStorage.getItem('currentUser');
+        if (localUser) {
+          const userData = JSON.parse(localUser);
+          this.currentUserName = userData.userName || '';
+          this.currentUserId = userData.userId || '';
+        }
+      }
+    } catch (error) {
+      console.error('❌ Failed to load user:', error);
     }
   }
 
@@ -187,10 +222,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     }
   }
 
-  // submitVoice() {
-  // --- submit form without voice recording -------------------
   async submitVoice() {
-  // submitVoice() {
     if (this.clinicalForm.invalid) {
       Swal.fire('Error', 'Please fill all required fields.', 'error');
       this.clinicalForm.markAllAsTouched();
@@ -200,19 +232,10 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     const formValue = this.clinicalForm.value;
     const noteId = Number(formValue.note) || this.selectedNotes;
 
-    const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
-    const createdBy = current_User.userName || '';
-    const userId = current_User.userId || '';
-    // Get user data from RxDB instead of localStorage
+    // Get user info from RxDB
     const auditInfo = await this.userDataService.getAuditInfo();
-    this.createdBy = auditInfo.createdBy;
-    this.updatedBy = auditInfo.updatedBy;
-    this.signedBy = false;
-    
-    console.log('👤 User from RxDB:', auditInfo.createdBy);
-
-    const selectedNoteId = noteId;
-
+    const createdBy = auditInfo.createdBy || this.currentUserName;
+    const userId = auditInfo.userId || this.currentUserId;
 
     let noteName = this.dataquestion?.node?.noteTitle || '';
     if (!noteName) {
