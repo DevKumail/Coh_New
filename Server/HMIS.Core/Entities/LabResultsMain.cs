@@ -40,9 +40,7 @@ public partial class LabResultsMain
     [Unicode(false)]
     public string EntryDate { get; set; } = null!;
 
-    [StringLength(25)]
-    [Unicode(false)]
-    public string? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
 
     [StringLength(14)]
     [Unicode(false)]
