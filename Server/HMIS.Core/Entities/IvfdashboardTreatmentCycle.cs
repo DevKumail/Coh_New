@@ -97,10 +97,10 @@ public partial class IvfdashboardTreatmentCycle
     public virtual IvfmaleFertilityHistory? IvfmaleFh { get; set; }
 
     [InverseProperty("IvfdashboardTreatmentEpisode")]
-    public virtual ICollection<IvftreamentsEpisodeAttachments> IvftreamentsEpisodeAttachments { get; set; } = new List<IvftreamentsEpisodeAttachments>();
+    public virtual ICollection<IvftreatmentEpisodeOverviewStage> IvftreatmentEpisodeOverviewStage { get; set; } = new List<IvftreatmentEpisodeOverviewStage>();
 
     [InverseProperty("IvfdashboardTreatmentEpisode")]
-    public virtual ICollection<IvftreatmentEpisodeOverviewStage> IvftreatmentEpisodeOverviewStage { get; set; } = new List<IvftreatmentEpisodeOverviewStage>();
+    public virtual ICollection<IvftreatmentEpisodesAttachments> IvftreatmentEpisodesAttachments { get; set; } = new List<IvftreatmentEpisodesAttachments>();
 
     [InverseProperty("IvfdashboardTreatmentCycle")]
     public virtual ICollection<IvftreatmentPlannedSpermCollection> IvftreatmentPlannedSpermCollection { get; set; } = new List<IvftreatmentPlannedSpermCollection>();
