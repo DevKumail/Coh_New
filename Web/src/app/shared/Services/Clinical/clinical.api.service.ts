@@ -351,6 +351,9 @@ export class ClinicalApiService {
     debugger
     return this.api.post(`EMRNotes/InsertSpeech`, note).toPromise();
   }
+  SaveEMRNote(note: any) {
+    return this.api.post(`EMRNotes/SaveEMRNote`, note).toPromise();
+  }
       SpeechtoText(MRNo:string, currentPage?: number, pageSize?: number) {
     return this.api.get(`Appointment/SpeechtoText?mrNo=${MRNo}&PageNumber=${currentPage}&PageSize=${pageSize}`).toPromise();
   }

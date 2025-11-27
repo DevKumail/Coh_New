@@ -2565,6 +2565,8 @@ public partial class HMISDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_SpeechToText_SchAppointment");
 
+            entity.HasOne(d => d.File).WithMany(p => p.SpeechToText).HasConstraintName("FK_SpeechToText_File_Id");
+
             entity.HasOne(d => d.Patient).WithMany(p => p.SpeechToText).HasConstraintName("FK_SpeechToText_RegPatient");
         });
 
