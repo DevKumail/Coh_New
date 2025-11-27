@@ -1,11 +1,13 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CryoStoragePlaceComponent } from '../cryo-storage-place/cryo-storage-place.component';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
+import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service'
+import { CryoStoragePlaceComponent } from '../cryo-storage-place/cryo-storage-place.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { Page } from '@/app/shared/enum/dropdown.enum';
-import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -15,7 +17,7 @@ import Swal from 'sweetalert2';
   templateUrl: './preservation.component.html',
   styleUrls: ['./preservation.component.scss']
 })
-export class PreservationComponent implements OnInit, OnChanges {
+export class PreservationComponent implements OnInit, OnChanges, OnDestroy {
   @Input() preservationData: any;
   @Output() saved = new EventEmitter<void>();
   form: FormGroup;
@@ -72,10 +74,10 @@ export class PreservationComponent implements OnInit, OnChanges {
     this.form.get('position')?.disable();
     
     // Subscribe to color changes to update background
-    this.form.get('colour1')?.valueChanges.subscribe(() => {
+    this.form.get('colour1')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       // Trigger change detection
     });
-    this.form.get('colour2')?.valueChanges.subscribe(() => {
+    this.form.get('colour2')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       // Trigger change detection
     });
   }
@@ -348,5 +350,12 @@ export class PreservationComponent implements OnInit, OnChanges {
       this.form.get('storagePlaceId')?.disable();
     }
     this.showStorage = false;
+  }
+
+  // teardown
+  private destroy$ = new Subject<void>();
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -18,7 +18,7 @@
        (click)="onSelect(item.id)"
        [attr.data-label]="item.label">
       <ng-icon [name]="item.icon" class="me-1"></ng-icon>
-      <span class="label" *ngIf="!collapsed">{{ item.label }}</span>
+      <span class="label mt-1" *ngIf="!collapsed">{{ item.label }}</span>
     </a>
   </ng-container>
 
@@ -31,7 +31,7 @@
        [class.active]="selected === item.id"
         (click)="onSelect(item.id)">
       <ng-icon [name]="item.icon" class="me-1"></ng-icon>
-      <span class="label" *ngIf="!collapsed">{{ item.label }}</span>
+      <span class="label mt-1" *ngIf="!collapsed">{{ item.label }}</span>
     </a>
   </ng-container>
 

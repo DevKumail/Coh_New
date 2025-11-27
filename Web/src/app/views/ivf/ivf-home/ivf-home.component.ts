@@ -17,6 +17,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CycleAddUpdateComponent } from './dashboard-cycle/cycle-add-update/cycle-add-update.component';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 import { Subscription } from 'rxjs';
+import { LoaderService } from '@core/services/loader.service';
  
 
 @Component({
@@ -40,7 +41,11 @@ export class IVFHomeComponent {
   PatientList: any = [];
   PrimaryPatientData: any = [];
   isLoading = false;
+  isPageLoading = false;
+  isOverviewLoading = false;
+  isCoupleLoading = false;
   modalRefInstance: any;
+  private isCycleModalOpen = false;
   modalService = new NgbModal();
   selectedTab: 'messages' | 'lab' | 'consents' | 'application' = 'messages';
   overview: Array<{
@@ -69,6 +74,7 @@ export class IVFHomeComponent {
     private router: Router,
     private patientBannerService : PatientBannerService,
     private ivfApi: IVFApiService,
+    private loader: LoaderService,
     private shared: SharedService
   ) {
     this.SearchPatientForm = this.fb.group({
@@ -82,12 +88,15 @@ export class IVFHomeComponent {
     });
   }
   ngOnInit() {      
+    this.isPageLoading = true;
+    this.isCoupleLoading = true;
       this.patientBannerService.setIsbanneropen(false);
     this.patientBannerService.patientData$.subscribe((data: any) => {
         this.PrimaryPatientData = data;
         this.getgetCoupleData();
         this.handleCoupleResponse(data);
       });
+      this.isPageLoading = false;
       // this.getgetCoupleData();
 
 
@@ -123,14 +132,19 @@ export class IVFHomeComponent {
   getgetCoupleData(){
     debugger
     const mrNo = this.PrimaryPatientData?.table2?.[0]?.mrNo;
-    if (!mrNo) return;
+    if (!mrNo) { this.isCoupleLoading = false; return; }
+    this.isCoupleLoading = true;
     this.ivfApi.getCoupleData(mrNo).subscribe({
         next: (res: any) => {
           console.log('IVF couple data (from ivf-home):', res);
           this.handleCoupleResponse(res);
+          this.isCoupleLoading = false;
+          this.isOverviewLoading = false;
         },
         error: (err: any) => {
           console.error('Failed to fetch IVF couple data', err);
+          this.isCoupleLoading = false;
+          this.isOverviewLoading = false;
         }
       });
   }
@@ -191,6 +205,7 @@ export class IVFHomeComponent {
       this.overview = [];
       return;
     }
+    this.isOverviewLoading = true;
     this.ivfApi.GetAllIVFDashboardTreatmentCycle(mainId, this.CycleListPaginationInfo?.currentPage, this.CycleListPaginationInfo?.pageSize).subscribe({
       next: (res: any) => {
         this.CycleListTotalrecord = res?.dashboardTreatmentEpisodes?.totalRecords || 0;
@@ -207,10 +222,12 @@ export class IVFHomeComponent {
           trigMed: x?.triggerMedication ?? '-',
           cycle: x?.cycle ?? '-',
         }));
+        this.isOverviewLoading = false;
       },
       error: (err: any) => {
         console.error('Failed to fetch overview cycles', err);
         this.overview = [];
+        this.isOverviewLoading = false;
       }
     });
   }
@@ -308,6 +325,8 @@ this.loadOverviewCycles()
   }
 
   openAddCycle() {
+    if (this.isCycleModalOpen) { return; }
+    this.isCycleModalOpen = true;
     this.modalRefInstance = this.modalService.open(CycleAddUpdateComponent, {
       backdrop: 'static',
       size: 'xl',
@@ -315,14 +334,18 @@ this.loadOverviewCycles()
       scrollable: true
     });
     this.modalRefInstance.result.then((result: any) => {
+      this.isCycleModalOpen = false;
       if (result) {
         this.loadOverviewCycles();
       }
-    }).catch(() => {});
+    }).catch(() => { this.isCycleModalOpen = false; });
   }
 
   openEditCycle(row: { id: number }) {
     if (!row?.id) return;
+    if (this.isCycleModalOpen) { return; }
+    this.isCycleModalOpen = true;
+    this.isOverviewLoading = true;
     this.ivfApi.getIVFDashboardTreatmentCycle(row.id).subscribe({
       next: (res: any) => {
         const modalRef = this.modalService.open(CycleAddUpdateComponent, {
@@ -330,17 +353,22 @@ this.loadOverviewCycles()
         });
         const comp = modalRef.componentInstance as CycleAddUpdateComponent;
         comp.initialCycle = res?.dashboardTreatmentEpisode ? res : { dashboardTreatmentEpisode: res };
+        this.isOverviewLoading = false;
         modalRef.result.then((r: any) => {
+          this.isCycleModalOpen = false;
           if (r) { this.loadOverviewCycles(); }
-        }).catch(() => {});
+        }).catch(() => { this.isCycleModalOpen = false; });
       },
       error: (err: any) => {
+        this.isCycleModalOpen = false;
+        this.isOverviewLoading = false;
         Swal.fire({ title: 'Error', text: (err?.error?.message || err?.message || 'Failed to load cycle'), icon: 'error', timer: 3000, showConfirmButton: false, timerProgressBar: true });
       }
     });
   }
 
   deleteCycle(row: { id: number }) {
+    // Only show skeleton once user confirms
     if (!row?.id) return;
     Swal.fire({
       title: 'Are you sure?',
@@ -350,12 +378,15 @@ this.loadOverviewCycles()
       confirmButtonText: 'Yes, delete it'
     }).then((res) => {
       if (!res.isConfirmed) return;
+      this.isOverviewLoading = true;
       this.ivfApi.deleteIVFDashboardTreatmentCycle(row.id).subscribe({
         next: () => {
+          this.isOverviewLoading = false;
           Swal.fire({ title: 'Deleted', text: 'Cycle deleted successfully', icon: 'success', timer: 3000, showConfirmButton: false, timerProgressBar: true });
           this.loadOverviewCycles();
         },
         error: (err: any) => {
+          this.isOverviewLoading = false;
           Swal.fire({ title: 'Error', text: (err?.error?.message || err?.message || 'Failed to delete'), icon: 'error', timer: 3000, showConfirmButton: false, timerProgressBar: true });
         }
       });

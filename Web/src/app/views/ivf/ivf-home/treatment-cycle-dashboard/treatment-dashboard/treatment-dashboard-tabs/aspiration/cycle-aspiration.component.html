@@ -1,1 +1,337 @@
-<p>cycle-aspiration works!</p>
+<form [formGroup]="form" class="py-2">
+    <div class="row g-3">
+        <div class="col-12">
+            <ul class="nav nav-tabs small">
+                <li class="nav-item">
+                    <button type="button" class="nav-link" [class.active]="activeTab==='oocyte'"
+                        (click)="activeTab='oocyte'">Oocyte retrieval</button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" [class.active]="activeTab==='further'"
+                        (click)="activeTab='further'">Further details</button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- tab oocyte retrieval start -->
+        <!-- Oocyte retrieval: Left column -->
+        <div class="col-12 col-lg-4" *ngIf="activeTab==='oocyte'">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="row g-2 mb-2 align-items-end">
+                        <div class="col-12">
+                            <label class="form-label mb-1">Date</label>
+                            <input type="date" class="form-control" formControlName="date">
+                        </div>
+                        <div class="row col-12 mt-2">
+                            <div class="col-6">
+                                <label class="form-label mb-1">Start Time</label>
+                                <input type="time" class="form-control" formControlName="startTime">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label mb-1">End Time</label>
+                                <input type="time" class="form-control" formControlName="endTime">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <hr> -->
+
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label mb-1">Σ Collected oocytes</label>
+                            <input type="number" min="0" class="form-control" formControlName="collectedOocytesCount">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label mb-1">Σ Empty cumuli</label>
+                            <input type="number" min="0" class="form-control" formControlName="emptyCumulusCount">
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label mb-1">If no eggs were collected, was it due to a poor response to
+                            drugs?</label>
+                        <select class="form-select" formControlName="poorDrugResponse">
+                            <option [ngValue]="null">Select</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+
+                    <!-- <hr> -->
+
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label mb-1">Retrieval technique</label>
+                            <select class="form-select" formControlName="retrievalTechnique">
+                                <option *ngFor="let t of retrievalTechniques" [value]="t.id">{{ t.name }}</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label mb-1">Anesthesia</label>
+                            <select class="form-select" formControlName="anesthesia">
+                                <option *ngFor="let a of anesthesiaOptions" [value]="a.id">{{ a.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Oocyte retrieval: Right column -->
+        <div class="col-12 col-lg-8" *ngIf="activeTab==='oocyte'">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label mb-1">Primary complication</label>
+                            <select class="form-select" formControlName="primaryComplication">
+                                <option *ngFor="let c of complicationOptions" [value]="c.id">{{ c.name }}</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label mb-1">Operating clinician</label>
+                            <select class="form-select" formControlName="operatingClinician">
+                                <option value="">Select</option>
+                                <option *ngFor="let p of operatingClinicians" [value]="p.id">{{ p.name }}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label mb-1">Further complications</label>
+                            <select class="form-select" formControlName="furtherComplications">
+                                <option [ngValue]="null">Select</option>
+                                <option *ngFor="let c of complicationOptions" [value]="c.id">{{ c.name }}</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label mb-1">Embryologist</label>
+                            <select class="form-select" formControlName="embryologist">
+                                <option value="">Select</option>
+                                <option *ngFor="let e of embryologists" [value]="e.id">{{ e.name }}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label mb-1">Primary measure</label>
+                            <select class="form-select" formControlName="primaryMeasure">
+                                <option [ngValue]="null">Select measure</option>
+                                <option *ngFor="let m of measuresOptions" [value]="m.id">{{ m.name }}</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label mb-1">Anesthetist</label>
+                            <select class="form-select" formControlName="anesthetist">
+                                <option value="">Select</option>
+                                <option *ngFor="let a of anesthetists" [value]="a.id">{{ a.name }}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label mb-1">Further measures</label>
+                            <select class="form-select" formControlName="furtherMeasures">
+                                <option [ngValue]="null">Select</option>
+                                <option *ngFor="let m of measuresOptions" [value]="m.id">{{ m.name }}</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label mb-1">Nurse</label>
+                            <select class="form-select" formControlName="nurse">
+                                <option value="">Select</option>
+                                <option *ngFor="let n of nurses" [value]="n.id">{{ n.name }}</option>
+                            </select>
+                        </div>
+
+                        <!-- <div class="card px-3 py-2"> -->
+                        <!-- <label class="fw-bold mb-0 mt-1">Aspiration note</label> -->
+                        <quill-editor formControlName="editorContent" [modules]="quillModules" format="html"
+                            placeholder="Enter Aspiration notes..." [styles]="{height: '100px'}">
+                        </quill-editor>
+                    </div>
+                    <!-- </div> -->
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-primary" (click)="submit()">Save</button>
+            </div>
+        </div>
+        <!-- tab oocyte retrieval end -->
+
+        <!-- tab further details start -->
+        <!-- Further details: Left column -->
+        <div class="col-12 col-lg-12" *ngIf="activeTab==='further'">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-12 col-md-4">
+                            <div class="border border-2 rounded p-2 h-100">
+
+                                <div class="mb-2">
+                                    <label class="form-label mb-1">Aspiration system</label>
+                                    <select class="form-select" formControlName="aspirationSystem">
+                                        <option *ngFor="let s of aspirationSystems" [value]="s.id">{{ s.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label mb-1">Size [mm] of leading follicle</label>
+                                    <input type="number" min="0" class="form-control" formControlName="leadingFollicleSizeMm">
+                                </div>
+                                <div>
+                                    <label class="form-label mb-1 d-flex align-items-center gap-2">
+                                        # washed follicles
+                                        <span class="form-check m-0 d-inline-flex align-items-center">
+                                            <input class="form-check-input me-1" type="checkbox" id="follicleWashed" formControlName="follicleWashed">
+                                            <span class="form-check-label">Follicle washed</span>
+                                        </span>
+                                    </label>
+                                    <input type="number" min="0" class="form-control" formControlName="washedFolliclesCount">
+                                </div>
+                            </div>
+                        </div>
+
+                          <div class="col-12 col-md-4">
+                                <div class="border border-2 rounded p-2 h-100">
+
+                                    <div class="fw-semibold text-primary text-center mb-2"># retrieved follicles</div>
+                                    <div class="row g-2 align-items-center">
+                                        <div class="col-2 pe-2">
+                                            <label class="col-form-label py-0 my-0">total:</label>
+                                        </div>
+                                        <div class="col-10">
+                                            <input type="number" min="0" placeholder="total" class="form-control"
+                                                formControlName="folliclesTotal">
+                                        </div>
+                                        <div class="col-2 pe-2">
+                                            <label class="col-form-label py-0 my-0">left:</label>
+                                        </div>
+                                        <div class="col-10">
+                                            <input type="number" min="0" placeholder="left" class="form-control"
+                                                formControlName="folliclesLeft">
+                                        </div>
+                                        <div class="col-2 pe-2">
+                                            <label class="col-form-label py-0 my-0">right:</label>
+                                        </div>
+                                        <div class="col-10">
+                                            <input type="number" min="0" placeholder="right" class="form-control"
+                                                formControlName="folliclesRight">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- # retrieved follicles End -->
+
+                            <!-- Total dose administered Start -->
+                            <div class="col-12 col-md-4">
+                                <div class="border border-2 rounded p-2 h-100">
+
+                                    <div class="fw-semibold text-primary text-center mb-2">Total dose administered</div>
+                                    <div class="row g-2 align-items-center">
+                                        <div class="col-12">
+                                            <input type="number" min="0" placeholder="LH" class="form-control"
+                                                formControlName="doseLH">
+                                        </div>
+                                        <div class="col-12">
+                                            <input type="number" min="0" placeholder="FSH" class="form-control"
+                                                formControlName="doseFSH">
+                                        </div>
+                                        <div class="col-12">
+                                            <input type="number" min="0" placeholder="HMG" class="form-control"
+                                                formControlName="doseHMG">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Total dose administered End -->
+
+                        <!-- Force next row under the top three fields -->
+                        <!-- <div class="row g-2 align-items-stretch"> -->
+                            <!-- # retrieved follicles Start -->
+                          
+                        <!-- </div> -->
+
+                        <div class="col-12">
+                            <div class="border border-2 rounded p-2">
+
+                                <div class="fw-semibold text-muted">Patient's condition</div>
+                                <div class="row g-2 mt-1">
+                                    <div class="col-6">
+                                        <label class="form-label mb-1">General condition</label>
+                                        <select class="form-select" formControlName="generalCondition">
+                                            <option *ngFor="let g of generalConditions" [value]="g.id">{{ g.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label mb-1">Mucous membrane</label>
+                                        <select class="form-select" formControlName="mucousMembrane">
+                                            <option *ngFor="let m of mucousMembranes" [value]="m.id">{{ m.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row g-2 align-items-stretch mt-2">
+                                    <!-- Measurement before oocyte retrieval Start -->
+                                    <div class="col-12 col-md-4">
+                                        <div class="border border-2 rounded p-2 h-100">
+                                            <div class="fw-semibold text-primary text-decoration-underline mt-2">Measurement before oocyte retrieval</div>
+                                            <div class="row g-1 mt-1 align-items-end">
+                                                <div class="col-4">
+                                                    <label class="form-label mb-1">Pulse</label>
+                                                    <input type="number" min="0" class="form-control" formControlName="preOpPulse">
+                                                </div>
+                                                <div class="col-8">
+                                                    <label class="form-label mb-1">Blood pressure</label>
+                                                    <div class="d-flex gap-2">
+                                                        <input type="number" min="0" class="form-control" formControlName="preOpBpSys" placeholder="SYS">
+                                                        <span style="font-size: 25px;">/</span>
+                                                        <input type="number" min="0" class="form-control" formControlName="preOpBpDia" placeholder="DIA">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Measurement before oocyte retrieval End -->
+
+                                    <!-- Measurement of the anaesthetist Start -->
+                                    <div class="col-12 col-md-4">
+                                        <div class="border border-2 rounded p-2 h-100">
+                                            <div class="fw-semibold text-primary text-decoration-underline mt-2">Measurement of the anaesthetist</div>
+                                            <div class="row g-1 mt-1 align-items-end">
+                                                <div class="col-4">
+                                                    <label class="form-label mb-1">Pulse</label>
+                                                    <input type="number" min="0" class="form-control" formControlName="anesPulse">
+                                                </div>
+                                                <div class="col-8">
+                                                    <label class="form-label mb-1">Blood pressure</label>
+                                                    <div class="d-flex gap-2">
+                                                        <input type="number" min="0" class="form-control" formControlName="anesBpSys" placeholder="SYS">
+                                                        <span style="font-size: 25px;">/</span>
+                                                        <input type="number" min="0" class="form-control" formControlName="anesBpDia" placeholder="DIA">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label mb-1">Temperature</label>
+                                        <input type="number" class="form-control" formControlName="preOpTemp">
+                                    </div>
+                                    <!-- Measurement of the anaesthetist End -->
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <quill-editor class="w-100" formControlName="anesNote" [modules]="quillModules"
+                                            format="html" placeholder="Enter anaesthetist notes..."
+                                            [styles]="{height: '120px', width: '100%'}">
+                                        </quill-editor>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- tab further details end -->
+    </div>
+</form>

@@ -16,28 +16,37 @@
               [selected]="selectedId"
               [collapsed]="leftCollapsed"
               [isMalesidebar]="isMalesidebar"
+              [maleMrNo]="SecondaryPatientData?.male?.mrNo || PrimaryPatientData?.mrNo"
+              [femaleMrNo]="SecondaryPatientData?.female?.mrNo || PrimaryPatientData?.mrNo"
               (genderChange)="setGender($event)"
               (select)="onSelect($event)"></app-ivf-side-menu>
           </div>
         </div>
 
-        <div [ngClass]="{ 'col-10': !leftCollapsed, 'col': leftCollapsed }" class="fixed-height" >
-          <ng-container *ngIf="(patientBannerService.patientData$ | async) as pdata; else emptyState">
-            <div *ngIf="isMalesidebar">
-              <app-medical-history *ngIf="selectedId==='medical-history'"></app-medical-history>
+        <div [ngClass]="{ 'col-10': !leftCollapsed, 'col': leftCollapsed }" class="fixed-height p-0" >
+          <ng-container *ngIf="isSwitchingGender; else contentArea">
+            <div class="p-3">
+              <div class="placeholder-glow">
+                <div class="placeholder col-6 mb-2"></div>
+                <div class="placeholder col-12 mb-2"></div>
+                <div class="placeholder col-10 mb-2"></div>
+                <div class="placeholder col-8 mb-2"></div>
+                <div class="placeholder col-12 mb-2"></div>
+              </div>
             </div>
-            <div *ngIf="!isMalesidebar">
-              <app-female-medical-history-list *ngIf="selectedId==='medical-history'"></app-female-medical-history-list>
-            </div>
-
-            <app-social-history *ngIf="selectedId==='social-history'"></app-social-history>
-            <app-family-history *ngIf="selectedId==='family-history'"></app-family-history>
-            <app-vital-signs *ngIf="selectedId==='vital-signs'"></app-vital-signs>
-            <app-ivf-ps-pathology-results *ngIf="selectedId==='pathology-results'"></app-ivf-ps-pathology-results>
-            <app-ivf-ps-lab-orders *ngIf="selectedId==='lab-orders'"></app-ivf-ps-lab-orders>
-            <app-semen-list *ngIf="selectedId==='semen-analysis'"></app-semen-list>
-            <app-ivf-ps-cycle *ngIf="selectedId==='cycle'"></app-ivf-ps-cycle>
           </ng-container>
+          <ng-template #contentArea>
+            <ng-container *ngIf="(patientBannerService.patientData$ | async) as pdata; else emptyState">
+              <div *ngIf="isMalesidebar">
+                <app-medical-history *ngIf="selectedId==='medical-history'"></app-medical-history>
+              </div>
+              <div *ngIf="!isMalesidebar">
+                <app-female-medical-history-list *ngIf="selectedId==='medical-history'"></app-female-medical-history-list>
+              </div>
+
+              <app-social-history *ngIf="selectedId==='social-history'"></app-social-history>
+            </ng-container>
+          </ng-template>
           <ng-template #emptyState>
             <div class="d-flex align-items-center justify-content-center h-100 text-muted">
               Select or search a patient to load summary

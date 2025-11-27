@@ -11,6 +11,7 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import Swal from 'sweetalert2';
 import { Subscription, of, forkJoin } from 'rxjs';
+import { LoaderService } from '@core/services/loader.service';
 @Component({
   selector: 'app-cycle-add-update',
   standalone: true,
@@ -22,6 +23,7 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
   isSaving = false;
   dropdowns: any = [];
   AllDropdownValues: any = [];
+  private dropdownIndex: { [group: string]: Map<string, number> } = {};
   hrEmployees: Array<{ providerId: number; name: string }> = [];
   cacheItems: string[] = ['Provider'];
 
@@ -41,12 +43,15 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
     public activeModal: NgbActiveModal,
     private ivfService: IVFApiService,
     private sharedservice: SharedService,
+    private loader: LoaderService,
     private patientBannerService: PatientBannerService) { }
 
   ngOnInit(): void {
+    this.loader.show();
     this.getAlldropdown();
     this.FillCache();
     this.getAllFh();
+    this.loader.hide();
   }
 
   ngAfterViewInit(): void {
@@ -57,9 +62,47 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
     this.sub?.unsubscribe();
   }
 
-  // Store payload from service for dynamic labels/options
+  // Helper: map names (from form flags) to IDs across multiple dropdown groups, case-insensitive with normalization
+  private mapNamesToIdsUnion(keys: string[], names: string[] | null | undefined): number[] {
+    const norm = (s: any) => String(s ?? '').toLowerCase().trim().replace(/\s+/g, ' ').replace(/[^a-z0-9 ]/g, '');
+    const wantedList = (names || []).map(norm).filter(Boolean);
+    const out = new Set<number>();
+    // First: exact matches via index for speed
+    for (const k of keys) {
+      const idx = this.dropdownIndex[`IVFTreatmentCycle:${k}`];
+      if (!idx) continue;
+      for (const w of wantedList) {
+        const id = idx.get(w);
+        if (typeof id === 'number') out.add(id);
+      }
+    }
+    // Second: fuzzy contains fallback to keep behavior identical
+    for (const k of keys) {
+      const arr = this.dropdowns?.[`IVFTreatmentCycle:${k}`] || [];
+      for (const it of arr) {
+        const optName = norm(it?.name);
+        const match = wantedList.some(w => w === optName || optName.includes(w) || w.includes(optName));
+        if (match && Number.isFinite(it?.valueId)) out.add(Number(it.valueId));
+      }
+    }
+    return Array.from(out);
+  }
+
+  // Store payload from service for dynamic labels/options and build fast lookup index
   getAllDropdown(payload: { [key: string]: Array<{ valueId: number; name: string }> }) {
+    const norm = (s: any) => String(s ?? '').toLowerCase().trim().replace(/\s+/g, ' ').replace(/[^a-z0-9 ]/g, '');
     this.dropdowns = payload || {};
+    this.dropdownIndex = {};
+    for (const key of Object.keys(this.dropdowns)) {
+      const arr = Array.isArray(this.dropdowns[key]) ? this.dropdowns[key] : [];
+      const map = new Map<string, number>();
+      for (const it of arr) {
+        const nm = norm(it?.name);
+        const id = Number(it?.valueId);
+        if (nm && Number.isFinite(id) && !map.has(nm)) map.set(nm, id);
+      }
+      this.dropdownIndex[key] = map;
+    }
   }
 
 
@@ -68,7 +111,6 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
     this.sharedservice.getDropDownValuesByName(Page.IVFTreatmentCycle).subscribe((res: any) => {
       this.AllDropdownValues = res;
       this.getAllDropdown(res);
-      console.log(this.AllDropdownValues);
       this.tryApplyInitial();
     })
   }
@@ -112,6 +154,20 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
       const set = new Set(ids || []);
       return arr.filter((x: any) => set.has(x.valueId)).map((x: any) => x.name);
     };
+    const mapNamesToIdsUnion = (keys: string[], names: string[] | null | undefined) => {
+      const wanted = new Set((names || []).map(s => String(s).trim().toLowerCase()).filter(Boolean));
+      const out = new Set<number>();
+      for (const k of keys) {
+        const arr = this.dropdowns?.[`IVFTreatmentCycle:${k}`] || [];
+        for (const it of arr) {
+          const nm = String(it?.name || '').trim().toLowerCase();
+          if (wanted.has(nm) && Number.isFinite(it?.valueId)) {
+            out.add(Number(it.valueId));
+          }
+        }
+      }
+      return Array.from(out);
+    };
 
     const g = this.generalTab.generalForm;
     g.patchValue({
@@ -138,7 +194,14 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
 
     // Treatment sub types
     const subIds: number[] = Array.isArray(d.treatmentSubTypes) ? d.treatmentSubTypes.map((x: any) => x?.treatmentCategoryId).filter((n: any) => Number.isFinite(n)) : [];
-    const subNames = mapIdsToNames('TreatmentSubTypes', subIds).concat(mapIdsToNames('TreatmentFlags', subIds));
+    const subNames = [
+      ...mapIdsToNames('TreatmentSubTypes', subIds),
+      ...mapIdsToNames('TreatmentSubtype', subIds),
+      ...mapIdsToNames('TreatmentFlags', subIds),
+      ...mapIdsToNames('Treatment Flags', subIds),
+      ...mapIdsToNames('SubTypes', subIds),
+      ...mapIdsToNames('Subtypes', subIds)
+    ];
     const flags = this.generalTab.treatmentFlags();
     const set = new Set(subNames);
     for (const f of flags) {
@@ -150,6 +213,22 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
     // Ensure textareas get populated/disabled from selected history IDs
     this.generalTab.onFemaleHistoryChange();
     this.generalTab.onMaleHistoryChange();
+
+    // Bind Additional Measures tab from payload (IDs -> names)
+    if (this.additionalTab && d.additionalMeasure) {
+      const am = d.additionalMeasure || {};
+      const planned = mapIdsToNames('PlannedAdditionalMeasures', am.plannedAdditionalMeasuresCategoryIds);
+      const performed = mapIdsToNames('PerformedAdditionalMeasures', am.performedAdditionalMeasuresCategoryIds);
+      const polar = mapIdsToNames('PolarBodiesIndication', am.polarBodiesIndicationCategoryIds);
+      const emb = mapIdsToNames('EMBBlastIndication', am.embBlastIndicationCategoryIds);
+      this.additionalTab.form.patchValue({
+        plannedAdditionalMeasures: planned || [],
+        performedAdditionalMeasures: performed || [],
+        pidPolarBodiesIndication: polar || [],
+        pidEmbBlastIndication: emb || [],
+        geneticCondition: am.generalCondition || ''
+      }, { emitEvent: false });
+    }
 
     // Bind existing attachments into Documents tab (if any)
     if (this.documentsTab && Array.isArray(d.attachments) && d.attachments.length) {
@@ -228,15 +307,8 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
 
     // More robust: try multiple groups for Treatment Sub Types ID resolution
     const mapIdsAny = (keys: string[], names: string[] | null | undefined) => {
-      const nameSet = new Set((names || []).filter(Boolean));
-      for (const k of keys) {
-        const arr = this.dropdowns?.[`IVFTreatmentCycle:${k}`] || [];
-        if (Array.isArray(arr) && arr.length) {
-          const ids = arr.filter((x: any) => nameSet.has(x.name)).map((x: any) => x.valueId);
-          if (ids.length) return ids;
-        }
-      }
-      return [] as number[];
+      // Return union across all provided keys (not just first hit)
+      return this.mapNamesToIdsUnion(keys, names);
     };
 
     // Build treatment subtypes from Treatment flags (checkboxes)
@@ -245,9 +317,8 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
       .filter(def => !!this.generalTab?.generalForm?.get(def.control)?.value)
       .map(def => def.name);
     // Try common possible groups: TreatmentSubTypes (preferred), fallback to TreatmentFlags
-    debugger;
     const treatmentSubtypeIds = mapIdsAny(
-      ['TreatmentSubTypes', 'Treatment Flags', 'TreatmentFlags', 'SubTypes', 'Subtypes'],
+      ['TreatmentSubTypes', 'TreatmentSubtype', 'Treatment Flags', 'TreatmentFlags', 'SubTypes', 'Subtypes'],
       selectedFlagNames
     );
 
@@ -302,7 +373,7 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
           takeOverOn: g.takenOverOn || null,
           cycleNote: g.editorContent || '',
           plannedSpermCollectionCategoryIds: Array.from(new Set(mapIds('PlannedSpermCollection', g.plannedSpermCollection))),
-          treatmentSubTypes: Array.from(new Set(treatmentSubtypeIds)).map((id: number) => ({ treatmentCategoryId: id })),
+          treatmentSubTypes: Array.from(new Set<number>(treatmentSubtypeIds)).map((id: number) => ({ treatmentCategoryId: id })),
           additionalMeasure: {
             ivfAdditionalMeasuresId: 0,
             generalCondition: a.geneticCondition || '',
