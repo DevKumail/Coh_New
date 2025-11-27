@@ -14,4 +14,12 @@ export class DocumentsComponent {
   getFiles(): File[] {
     return this.uploader?.getFiles() || [];
   }
+
+  setExisting(docs: Array<{ fileId: number; fileName: string; fileSize: number }>) {
+    this.uploader?.setExisting(docs);
+  }
+
+  getExistingIds(): number[] {
+    return this.uploader?.getExistingIds() || [];
+  }
 }

@@ -10,7 +10,7 @@ import { Page } from '@/app/shared/enum/dropdown.enum';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import Swal from 'sweetalert2';
-import { Subscription, of } from 'rxjs';
+import { Subscription, of, forkJoin } from 'rxjs';
 @Component({
   selector: 'app-cycle-add-update',
   standalone: true,
@@ -150,6 +150,29 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
     // Ensure textareas get populated/disabled from selected history IDs
     this.generalTab.onFemaleHistoryChange();
     this.generalTab.onMaleHistoryChange();
+
+    // Bind existing attachments into Documents tab (if any)
+    if (this.documentsTab && Array.isArray(d.attachments) && d.attachments.length) {
+      const ids: number[] = d.attachments
+        .map((a: any) => Number(a?.hmisFileId))
+        .filter((n: any) => Number.isFinite(n));
+      if (ids.length) {
+        const calls = ids.map(id => this.sharedservice.getDocumentInfo(id));
+        forkJoin(calls).subscribe({
+          next: (infos: any[]) => {
+            const mapped = (infos || []).map((info: any, idx: number) => {
+              // try common shapes
+              const fileId = ids[idx];
+              const name = info?.fileName || info?.name || `File_${fileId}`;
+              const size = info?.fileSize || info?.size || 0;
+              return { fileId, fileName: name, fileSize: size };
+            });
+            this.documentsTab?.setExisting(mapped);
+          },
+          error: () => {}
+        });
+      }
+    }
   }
 
   FillCache() {
@@ -229,7 +252,7 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
     );
 
     if (!this.ivfMainId || this.ivfMainId === 0 || this.ivfMainId === null || this.ivfMainId === undefined) {
-      Swal.fire('Error', 'IVF Main ID not found', 'error');
+      Swal.fire({ title: 'Error', text: 'IVF Main ID not found', icon: 'error', timer: 1000, showConfirmButton: false, timerProgressBar: true });
       return;
     }
 
@@ -239,12 +262,20 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
     upload$.subscribe({
       next: (uploadRes: any) => {
         const uploadedIds: number[] = Array.isArray(uploadRes) ? uploadRes.map((x: any) => Number(x?.fileId)).filter(Boolean) : [];
-        const attachments = uploadedIds.map(id => ({ id: 0, hmisFileId: id }));
+        const existingIds: number[] = this.documentsTab?.getExistingIds?.() ? this.documentsTab!.getExistingIds() : [];
+        const allIds = Array.from(new Set([...(existingIds || []), ...(uploadedIds || [])])).filter((n: any) => Number.isFinite(n));
+        const attachments = allIds.map(id => ({ id: 0, hmisFileId: id }));
 
         const nullOrNumber = (v: any) => (v === null || v === undefined || v === '' ? null : Number(v));
 
+        // Use existing episode id when editing; 0 indicates create
+        const existingEpisodeId = this.initialCycle?.ivfDashboardTreatmentEpisodeId
+          ?? this.initialCycle?.dashboardTreatmentEpisode?.ivfDashboardTreatmentEpisodeId
+          ?? this.initialCycle?.dashboardTreatmentEpisode?.id
+          ?? 0;
+
         const payloadOut = {
-          ivfDashboardTreatmentEpisodeId: this.initialCycle?.dashboardTreatmentEpisode?.id ?? 0,
+          ivfDashboardTreatmentEpisodeId: existingEpisodeId,
           ivfMainId: this.ivfMainId ?? null,
           ivfMaleFHId: nullOrNumber(g.maleMedicalHistoryOf),
           ivfFemaleFHId: nullOrNumber(g.femaleMedicalHistoryOf),
@@ -288,19 +319,19 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
         this.ivfService.CreateUpdateDashboardTreatmentCycle(payloadOut).subscribe({
           next: (res) => {
             this.isSaving = false;
-            Swal.fire('Success', 'Cycle saved successfully', 'success');
+            Swal.fire({ title: 'Success', text: 'Cycle saved successfully', icon: 'success', timer: 1000, showConfirmButton: false, timerProgressBar: true });
             this.activeModal.close(res);
           },
           error: (err) => {
             this.isSaving = false;
             const msg = this.extractApiMessage(err);
-            Swal.fire('Error', msg, 'error');
+            Swal.fire({ title: 'Error', text: msg, icon: 'error', timer: 1000, showConfirmButton: false, timerProgressBar: true });
           }
         });
       },
       error: (err) => {
         this.isSaving = false;
-        Swal.fire('Error', this.extractApiMessage(err), 'error');
+        Swal.fire({ title: 'Error', text: this.extractApiMessage(err), icon: 'error', timer: 1000, showConfirmButton: false, timerProgressBar: true });
       }
     });
   }

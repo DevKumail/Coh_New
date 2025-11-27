@@ -56,7 +56,7 @@ export class IVFHomeComponent {
     cycle: string;
   }> = [];
   pagination: any = {
-        pageSize: 10,
+        pageSize: 5,
         currentPage: 1,
       };
    PatientListPaginationInfo: any = {
@@ -216,7 +216,7 @@ export class IVFHomeComponent {
   }
 
   CycleListPaginationInfo: any = {
-    pageSize: 10,
+    pageSize: 5,
     currentPage: 1,
   }
   CycleListTotalrecord: any = 0
@@ -250,10 +250,10 @@ this.loadOverviewCycles()
     this.form.patchValue({ femaleId: SelactData?.name });
 
     if(!this.PrimaryPatientData?.table2?.[0]?.mrNo){
-      Swal.fire('Validation Error', 'Primary Patient MrNo is a required field. Please load a patient.', 'warning');
+      Swal.fire({ title: 'Validation Error', text: 'Primary Patient MrNo is a required field. Please load a patient.', icon: 'warning', timer: 3000, showConfirmButton: false, timerProgressBar: true });
       return;
     } else if(!SelactData?.mrNo){
-      Swal.fire('Validation Error', 'Secondary Patient MrNo is a required field. Please Link a patient.', 'warning');
+      Swal.fire({ title: 'Validation Error', text: 'Secondary Patient MrNo is a required field. Please Link a patient.', icon: 'warning', timer: 3000, showConfirmButton: false, timerProgressBar: true });
       return;
     }
     
@@ -264,7 +264,7 @@ this.loadOverviewCycles()
     
     this.ivfApi.InsertPatientRelation(body).subscribe({
       next: (res: any) => {
-        Swal.fire('Success', 'Patient Link Successfully', 'success');
+        Swal.fire({ title: 'Success', text: 'Patient Link Successfully', icon: 'success', timer: 3000, showConfirmButton: false, timerProgressBar: true });
         this.getgetCoupleData();
       try { 
        } catch {}
@@ -296,7 +296,7 @@ this.loadOverviewCycles()
         this.isLoading = false;
       },
       error: (err: any) => {
-        console.error('Failed to fetch IVF couple data', err);
+        Swal.fire({ title: 'Error', text: (err?.error?.message || err?.message || 'Failed to link patient'), icon: 'error', timer: 3000, showConfirmButton: false, timerProgressBar: true });
         this.isLoading = false;
       }
     })
@@ -335,7 +335,7 @@ this.loadOverviewCycles()
         }).catch(() => {});
       },
       error: (err: any) => {
-        Swal.fire('Error', (err?.error?.message || err?.message || 'Failed to load cycle'), 'error');
+        Swal.fire({ title: 'Error', text: (err?.error?.message || err?.message || 'Failed to load cycle'), icon: 'error', timer: 3000, showConfirmButton: false, timerProgressBar: true });
       }
     });
   }
@@ -352,13 +352,17 @@ this.loadOverviewCycles()
       if (!res.isConfirmed) return;
       this.ivfApi.deleteIVFDashboardTreatmentCycle(row.id).subscribe({
         next: () => {
-          Swal.fire('Deleted', 'Cycle deleted successfully', 'success');
+          Swal.fire({ title: 'Deleted', text: 'Cycle deleted successfully', icon: 'success', timer: 3000, showConfirmButton: false, timerProgressBar: true });
           this.loadOverviewCycles();
         },
         error: (err: any) => {
-          Swal.fire('Error', (err?.error?.message || err?.message || 'Failed to delete'), 'error');
+          Swal.fire({ title: 'Error', text: (err?.error?.message || err?.message || 'Failed to delete'), icon: 'error', timer: 3000, showConfirmButton: false, timerProgressBar: true });
         }
       });
     });
+  }
+
+  onEpisodeClick(data: any){
+    this.router.navigate(['ivf/episode']);
   }
 }
