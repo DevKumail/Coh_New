@@ -1,3 +1,17 @@
+/* Highlight selected date column */
+:host ::ng-deep .fc-selected-col {
+  background-color: rgba(0, 123, 255, 0.15) !important;
+}
+
+/* Ensure header cell also shows the highlight */
+:host ::ng-deep .fc-col-header-cell.fc-selected-col {
+  background-color: rgba(0, 123, 255, 0.25) !important;
+}
+
+/* Improve visibility in resource timeline slots */
+:host ::ng-deep .fc-timeline-slot.fc-selected-col {
+  background-color: rgba(0, 123, 255, 0.15) !important;
+}
 // FullCalendar custom styling for dose labels
 ::ng-deep {
   // Hide FullCalendar license message in this view
