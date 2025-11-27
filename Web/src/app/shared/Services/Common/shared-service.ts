@@ -36,7 +36,7 @@ export class SharedService {
 
   deleteDocument(id: number): Observable<any> {
     // DELETE https://localhost:44320/api/RsUpload/delete/{id}
-    return this.api.get(`RsUpload/delete/?fileId=${id}`);
+    return this.api.delete(`RsUpload/delete/${id}`);
   }
 
   downloadDocument(id: number): Observable<Blob> {
@@ -47,6 +47,6 @@ export class SharedService {
 
   getDocumentInfo(id: number): Observable<any> {
     // GET https://localhost:44320/api/RsUpload/info/{id}
-    return this.api.get(`RsUpload/info/?fileId=${id}`);
+    return this.api.get(`RsUpload/info/${id}`);
   }
 }

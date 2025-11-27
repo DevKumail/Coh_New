@@ -64,7 +64,14 @@
                 <td><span [title]="d.name">{{ d.name }}</span></td>
                 <td>{{ d.size | number }} B</td>
                 <td>{{ d.ext || '-' }}</td>
-                <td><button type="button" class="btn btn-link text-danger btn-sm" (click)="removeOne(d.id)">Remove</button></td>
+                <td>
+                  <ng-container *ngIf="d.isExisting; else removeBtn">
+                    <button type="button" class="btn btn-link text-danger btn-sm" title="Delete from server" (click)="removeOne(d.id)">Delete</button>
+                  </ng-container>
+                  <ng-template #removeBtn>
+                    <button type="button" class="btn btn-link text-danger btn-sm" title="Remove from selection" (click)="removeOne(d.id)">Remove</button>
+                  </ng-template>
+                </td>
               </tr>
               <tr *ngIf="!selected.length">
                 <td colspan="5" class="text-center text-muted">No documents selected</td>

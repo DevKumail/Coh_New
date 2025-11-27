@@ -35,6 +35,15 @@ export class CycleOverviewComponent {
     ivfAccounting: ''
   };
 
+  // Keep dynamic medications list (rendered as resources)
+  private medsResources: Array<{ id: string; title: string; eventColor: string; order: number }> = [
+    { id: 'gonad', title: 'Gonad F Pun [IVF]', eventColor: '#87CEEB', order: 5 },
+    { id: 'ovitrelle', title: 'Ovitrelle [ivg]', eventColor: '#FFA500', order: 6 },
+    { id: 'progesterone-mg', title: 'Progesterone [mg]', eventColor: '#90EE90', order: 7 },
+    { id: 'oestrogen', title: 'Oestrogen [mg]', eventColor: '#FF69B4', order: 8 },
+    { id: 'estradiol', title: 'Estradiol [mg]', eventColor: '#FFFF00', order: 9 },
+  ];
+
   // FullCalendar Options
   calendarOptions: any = {
     plugins: [resourceTimelinePlugin, interactionPlugin, dayGridPlugin],
@@ -52,42 +61,27 @@ export class CycleOverviewComponent {
     displayEventEnd: false, // Don't show end time
     // Force resource rows order using a numeric 'order' field on each resource
     resourceOrder: 'order',
-    resources: [
-      { id: 'events', title: 'Events', eventColor: '#0066cc', order: 1 },
-      // Divider after events for medications section
-      { id: 'divider-meds', title: 'Medication', eventColor: '#eee', order: 2 },
-      { id: 'gonad', title: 'Gonad F Pun [IVF]', eventColor: '#87CEEB', order: 5 },
-      { id: 'ovitrelle', title: 'Ovitrelle [ivg]', eventColor: '#FFA500', order: 6 },
-      { id: 'progesterone-mg', title: 'Progesterone [mg]', eventColor: '#90EE90', order: 7 },
-      { id: 'oestrogen', title: 'Oestrogen [mg]', eventColor: '#FF69B4', order: 8 },
-      { id: 'estradiol', title: 'Estradiol [mg]', eventColor: '#FFFF00', order: 9 },
-      // Divider before hormone rows
-      { id: 'divider-hormones', title: 'Hormones', eventColor: '#eee', order: 10 },
-      // Hormone rows
-      { id: 'fsh', title: 'FSH [mIU/ml]', eventColor: '#87CEEB', order: 11 },
-      { id: 'hcg-ng', title: 'hCG [ng/ml]', eventColor: '#FFD700', order: 12 },
-      { id: 'lh', title: 'LH [mIU/ml]', eventColor: '#FFA500', order: 13 },
-      { id: 'progesterone-ng', title: 'Progesterone [ng/ml]', eventColor: '#FFFF00', order: 14 },
-      // Examination row (orders)
-      { id: 'orders', title: 'Examination', eventColor: '#6c757d', order: 15 },
-      // Divider and rows for Ultrasound Data section
-      { id: 'divider-ultrasound', title: 'Follicle US', eventColor: '#eee', order: 16 },
-      { id: 'us-endom', title: 'Endom. [mm]', eventColor: '#e0e0e0', order: 17 },
-      { id: 'us-total', title: 'Total', eventColor: '#e0e0e0', order: 18 },
-      { id: 'us-left', title: 'Left lead. foll.', eventColor: '#e0e0e0', order: 19 },
-      { id: 'us-right', title: 'Right lead. foll.', eventColor: '#e0e0e0', order: 20 },
-      { id: 'us-re-above', title: 'R.E. above 22', eventColor: '#e0e0e0', order: 21 }
-    ],
+    resources: [],
     events: [],
     eventClick: this.handleEventClick.bind(this),
     eventContent: this.renderEventContent.bind(this),
     eventDidMount: this.handleEventDidMount.bind(this),
     resourceLabelDidMount: this.handleResourceLabelDidMount.bind(this),
-    dateClick: this.handleDateClick.bind(this)
+    dateClick: this.handleDateClick.bind(this),
+    dayHeaderDidMount: this.handleDayHeaderDidMount.bind(this),
+    dayCellDidMount: this.handleDayCellDidMount.bind(this),
+    viewDidMount: this.handleViewDidMount.bind(this),
+    datesSet: this.handleDatesSet.bind(this)
   };
 
   ngOnInit() {
     this.loadCalendarEvents();
+    this.rebuildResources();
+    this.medicationSubtypes = this.medsResources.map(r => r.title); 
+    // default select today
+    const today = new Date();
+    this.selectedDate = today.toISOString().slice(0, 10);
+    this.updateHighlightBg();
   }
 
   handleResourceLabelDidMount(arg: any) {
@@ -99,10 +93,80 @@ export class CycleOverviewComponent {
       el.style.fontWeight = '700';
       el.style.color = '#333';
     }
+    // Inject [+] button into Medication divider only
+    if (id === 'divider-meds') {
+      const el: HTMLElement = arg.el;
+      // ensure we can absolutely position the button
+      el.style.position = 'relative';
+      // avoid duplicates
+      if (!el.querySelector('.med-add-btn')) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-sm btn-link med-add-btn';
+        btn.title = 'Add medication row';
+        btn.style.position = 'absolute';
+        btn.style.right = '6px';
+        btn.style.top = '4px';
+        btn.style.padding = '0 6px';
+        btn.style.lineHeight = '1';
+        btn.textContent = '+';
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.openAddMedModal();
+        });
+        el.appendChild(btn);
+      }
+    }
   }
 
   // Keep a reusable array so we can append new items from the Add modal
   private calendarData: EventInput[] = [];
+  newMedName: string = '';
+  addMedName: string = '';
+  private selectedDate: string | null = null;
+  private bgEvents: EventInput[] = [];
+
+  private rebindEvents() {
+    this.calendarOptions = { ...this.calendarOptions, events: [...this.calendarData, ...this.bgEvents] };
+  }
+
+  private rebuildResources() {
+    const staticTop = [
+      { id: 'events', title: 'Events', eventColor: '#0066cc', order: 1 },
+      { id: 'divider-meds', title: 'Medication', eventColor: '#eee', order: 2 },
+    ];
+    // Normalize medication orders to consecutive values just after divider-meds
+    const medsSorted = [...this.medsResources]
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      .map((r, idx) => ({ id: r.id, title: r.title, eventColor: r.eventColor, order: 3 + idx }));
+
+    const staticBottom = [
+      { id: 'divider-hormones', title: 'Hormones', eventColor: '#eee', order: 3 + medsSorted.length },
+      { id: 'fsh', title: 'FSH [mIU/ml]', eventColor: '#87CEEB', order: 4 + medsSorted.length },
+      { id: 'hcg-ng', title: 'hCG [ng/ml]', eventColor: '#FFD700', order: 5 + medsSorted.length },
+      { id: 'lh', title: 'LH [mIU/ml]', eventColor: '#FFA500', order: 6 + medsSorted.length },
+      { id: 'progesterone-ng', title: 'Progesterone [ng/ml]', eventColor: '#FFFF00', order: 7 + medsSorted.length },
+      { id: 'orders', title: 'Examination', eventColor: '#6c757d', order: 20 + medsSorted.length },
+      { id: 'divider-ultrasound', title: 'Follicle US', eventColor: '#eee', order: 30 + medsSorted.length },
+      { id: 'us-endom', title: 'Endom. [mm]', eventColor: '#e0e0e0', order: 31 + medsSorted.length },
+      { id: 'us-total', title: 'Total', eventColor: '#e0e0e0', order: 32 + medsSorted.length },
+      { id: 'us-left', title: 'Left lead. foll.', eventColor: '#e0e0e0', order: 33 + medsSorted.length },
+      { id: 'us-right', title: 'Right lead. foll.', eventColor: '#e0e0e0', order: 34 + medsSorted.length },
+      { id: 'us-re-above', title: 'R.E. above 22', eventColor: '#e0e0e0', order: 35 + medsSorted.length }
+    ];
+    this.calendarOptions = { ...this.calendarOptions, resources: [...staticTop, ...medsSorted, ...staticBottom] };
+  }
+
+  addMedicationRow(name: string) {
+    const title = String(name || '').trim();
+    if (!title) return;
+    const slug = 'med-' + title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    if (this.medsResources.some(r => r.id === slug || r.title.toLowerCase() === title.toLowerCase())) return;
+    const nextOrder = (this.medsResources.length ? Math.max(...this.medsResources.map(r => r.order || 0)) + 1 : 3);
+    this.medsResources.push({ id: slug, title, eventColor: '#5bc0de', order: nextOrder });
+    this.medicationSubtypes = this.medsResources.map(r => r.title);
+    this.rebuildResources();
+  }
 
   loadCalendarEvents() {
     const events: EventInput[] = [
@@ -1586,7 +1650,7 @@ export class CycleOverviewComponent {
 
     // Save and bind
     this.calendarData = events;
-    this.calendarOptions.events = this.calendarData;
+    this.rebindEvents();
   }
 
   renderEventContent(arg: any) {
@@ -1719,11 +1783,13 @@ export class CycleOverviewComponent {
 
   // ---------------------- Add-from-calendar modal state & handlers ----------------------
   @ViewChild('addEventModal') addEventModal!: TemplateRef<any>;
+  @ViewChild('addMedModal') addMedModal!: TemplateRef<any>;
   @ViewChild('ultrasoundModal') ultrasoundModal!: TemplateRef<any>;
   @ViewChild('labOrderModal') labOrderModal!: TemplateRef<any>;
   @ViewChild('medicationModal') medicationModal!: TemplateRef<any>;
   @ViewChild('hormoneModal') hormoneModal!: TemplateRef<any>;
   addModalRef: any;
+  addMedModalRef: any;
   ultrasoundModalRef: any;
   ultrasoundDetail: any = null;
   labOrderModalRef: any;
@@ -1749,23 +1815,21 @@ export class CycleOverviewComponent {
   };
 
   eventSubtypes: string[] = ['LMP', 'OT', 'TRIG', 'OPU', 'FERT', 'ET', 'CS'];
-  medicationSubtypes: string[] = ['Gonad F Pun', 'Ovitrelle', 'Progesterone [mg]', 'Oestrogen [mg]', 'Estradiol [mg]'];
+  medicationSubtypes: string[] = ['Gonad F Pun [IVF]', 'Ovitrelle [ivg]', 'Progesterone [mg]', 'Oestrogen [mg]', 'Estradiol [mg]'];
   hormoneSubtypes: string[] = ['FSH [mIU/ml]', 'hCG [ng/ml]', 'LH [mIU/ml]', 'Progesterone [ng/ml]'];
 
   handleDateClick(arg: any) {
     const resId: string = arg?.resource?.id || '';
     const clickedDate: string = arg?.dateStr || '';
+    this.setSelectedDate(clickedDate);
 
     // Determine category by resource id
     let category: 'events' | 'medication' | 'hormone' = 'events';
-    if (['gonad', 'ovitrelle', 'progesterone-mg', 'oestrogen', 'estradiol'].includes(resId)) {
+    const medIds = new Set(this.medsResources.map(r => r.id));
+    if (medIds.has(resId)) {
       category = 'medication';
     } else if (['fsh', 'hcg-ng', 'lh', 'progesterone-ng'].includes(resId)) {
       category = 'hormone';
-    } else if (resId === 'events') {
-      category = 'events';
-    } else {
-      return; // ignore non-target rows
     }
 
     this.addForm = {
@@ -1774,10 +1838,97 @@ export class CycleOverviewComponent {
       title: '',
       start: clickedDate,
       end: clickedDate,
-      resourceId: resId || (category === 'events' ? 'events' : category === 'medication' ? 'gonad' : 'fsh')
+      resourceId: resId
     };
 
+    // Default subtype based on resource clicked
+    if (category === 'events') {
+      this.addForm.subtype = this.eventSubtypes[0] || '';
+    } else if (category === 'medication') {
+      const med = this.medsResources.find(r => r.id === resId);
+      this.addForm.subtype = med?.title || (this.medicationSubtypes[0] || '');
+    } else {
+      this.addForm.subtype = this.hormoneSubtypes[0] || '';
+    }
+
     this.openAddModal();
+  }
+
+  private setSelectedDate(dateStr: string) {
+    if (!dateStr) return;
+    const prev = this.selectedDate;
+    this.selectedDate = dateStr;
+    this.updateHighlightBg();
+  }
+
+  handleDayHeaderDidMount(arg: any) {
+    let dateStr = arg?.date?.toISOString?.().slice(0, 10) as string | undefined;
+    const el: HTMLElement = arg.el;
+    if (!dateStr) {
+      // fallback: many FullCalendar headers carry data-date
+      const attr = el.getAttribute('data-date');
+      if (attr) dateStr = attr;
+    }
+    if (!dateStr) return;
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', () => this.setSelectedDate(dateStr!));
+    // background event will paint the column; no direct class needed
+  }
+
+  handleDayCellDidMount(arg: any) {
+    // no-op; background event handles the highlight
+  }
+
+  handleViewDidMount() {
+    // Bind clicks on the timeline header slots (resourceTimeline header)
+    this.bindHeaderClicks();
+  }
+
+  handleDatesSet() {
+    // Rebind after navigation (prev/next/today)
+    this.bindHeaderClicks();
+  }
+
+  private bindHeaderClicks() {
+    // resourceTimeline header cells usually live under .fc-timeline-header .fc-timeline-slot
+    const headerSlots = document.querySelectorAll('.fc-timeline-header .fc-timeline-slot');
+    headerSlots.forEach((el: Element) => {
+      const h = el as HTMLElement;
+      const dateStr = h.getAttribute('data-date');
+      if (!dateStr) return;
+      h.style.cursor = 'pointer';
+      // avoid duplicate listeners
+      h.removeEventListener('click', (h as any).__fcClick || (()=>{}));
+      const handler = () => this.setSelectedDate(dateStr);
+      (h as any).__fcClick = handler;
+      h.addEventListener('click', handler);
+    });
+  }
+
+  private updateHighlightBg() {
+    // remove previous bg highlight event
+    this.bgEvents = this.bgEvents.filter(e => e.id !== '__col_highlight');
+    if (!this.selectedDate) {
+      this.calendarOptions = { ...this.calendarOptions, events: [...this.calendarData, ...this.bgEvents] };
+      return;
+    }
+    const start = this.selectedDate;
+    const end = this.addOneDayISO(start);
+    this.bgEvents.push({
+      id: '__col_highlight',
+      start,
+      end,
+      display: 'background',
+      backgroundColor: 'rgba(0,123,255,0.18)'
+    } as any);
+    // rebind events combining data + bg
+    this.rebindEvents();
+  }
+
+  private addOneDayISO(dateStr: string): string {
+    const d = new Date(dateStr + 'T00:00:00');
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10);
   }
 
   openAddModal() {
@@ -1796,30 +1947,26 @@ export class CycleOverviewComponent {
     let newEvent: EventInput | null = null;
 
     if (f.category === 'events') {
+      // Map event subtype to color
+      const colors: any = { LMP: '#FF6B6B', OT: '#90EE90', TRIG: '#ffc107', OPU: '#dc3545', FERT: '#fd7e14', ET: '#6f42c1', CS: '#0066cc' };
       newEvent = {
         resourceId: 'events',
-        title: f.subtype || f.title || 'Event',
+        title: f.subtype || 'Event',
         start: f.start,
-        end: f.end,
-        backgroundColor: '#90EE90',
-        extendedProps: { description: f.title || f.subtype }
+        end: f.end || undefined,
+        backgroundColor: colors[f.subtype] || '#0066cc',
+        extendedProps: { description: `${f.subtype || 'Event'} added` }
       };
     } else if (f.category === 'medication') {
-      const map: any = {
-        'Gonad F Pun': 'gonad',
-        'Ovitrelle': 'ovitrelle',
-        'Progesterone [mg]': 'progesterone-mg',
-        'Oestrogen [mg]': 'oestrogen',
-        'Estradiol [mg]': 'estradiol'
-      };
-      const rid = map[f.subtype] || f.resourceId || 'gonad';
+      // Use clicked resource for row; color from medsResources if found
+      const med = this.medsResources.find(r => r.id === f.resourceId);
       newEvent = {
-        resourceId: rid,
-        title: f.title || '1',
+        resourceId: f.resourceId,
+        title: f.title || '0',
         start: f.start,
-        end: f.end,
-        backgroundColor: '#4169E1',
-        extendedProps: { type: 'medication-dose', medicationName: f.subtype || 'Medication', dose: f.title || '1', date: f.start, notes: '' }
+        end: f.end || undefined,
+        backgroundColor: med?.eventColor || '#5bc0de',
+        extendedProps: { type: 'medication-dose', medicationName: f.subtype || (med?.title || 'Medication'), dose: f.title || '0', date: f.start }
       };
     } else if (f.category === 'hormone') {
       const map: any = {
@@ -1833,7 +1980,7 @@ export class CycleOverviewComponent {
         resourceId: rid,
         title: f.title || '0',
         start: f.start,
-        end: f.end,
+        end: f.end || undefined,
         backgroundColor: '#87CEEB',
         extendedProps: { type: 'hormone-level', hormoneName: f.subtype || 'Hormone', value: f.title || '0', date: f.start, status: 'Normal' }
       };
@@ -1841,9 +1988,29 @@ export class CycleOverviewComponent {
 
     if (newEvent) {
       this.calendarData.push(newEvent);
-      this.calendarOptions = { ...this.calendarOptions, events: [...this.calendarData] };
+      this.rebindEvents();
     }
 
     this.closeAddModal();
+  }
+
+  openAddMedModal() {
+    this.addMedName = '';
+    this.addMedModalRef = this.modalService.open(this.addMedModal, { size: 'md', centered: true });
+  }
+
+  closeAddMedModal() {
+    if (this.addMedModalRef) {
+      try { this.addMedModalRef.dismiss(); } catch {}
+      this.addMedModalRef = null;
+    }
+  }
+
+  confirmAddMed() {
+    const name = (this.addMedName || '').trim();
+    if (name) {
+      this.addMedicationRow(name);
+    }
+    this.closeAddMedModal();
   }
 }
