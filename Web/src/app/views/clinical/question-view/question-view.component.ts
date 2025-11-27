@@ -1,10 +1,29 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+import { ImmunizationsComponent } from '../immunizations/immunizations.component';
+import { MedicationComponent } from '../medication/medication.component';
+import { VitalSignsComponent } from '../vital-signs/vital-signs.component';
+import { AllergiesComponent } from '../allergies/allergies.component';
+import { FamilyHistoryComponent } from '../family-history/family-history.component';
+import { SocialHistoryComponent } from '../social-history/social-history.component';
+import { ProblemComponent } from '../problem/problem.component';
+import { MedicalHistoryComponent } from '../medical-history/medical-history.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ImmunizationsComponent,
+    MedicationComponent,
+    VitalSignsComponent,
+    AllergiesComponent,
+    FamilyHistoryComponent,
+    SocialHistoryComponent,
+    ProblemComponent,
+    MedicalHistoryComponent
+  ],
   selector: 'app-question-view',
   templateUrl: './question-view.component.html',
   styleUrls: ['./question-view.component.scss']
@@ -28,8 +47,8 @@ export class QuestionViewComponent implements OnInit {
       }
     }
 
-    // Sections with children start collapsed, others expanded
-    if (this.question?.type === 'Question Section' && this.question?.children?.length > 0) {
+    // All sections start collapsed by default
+    if (this.question?.type === 'Question Section') {
       this.isCollapsed = true;
     } else {
       this.isCollapsed = false;
@@ -91,6 +110,89 @@ export class QuestionViewComponent implements OnInit {
    */
   onAnswerChange(event: any, question: any): void {
     question.answer = event.target.value;
+  }
+
+  /**
+   * Get the component selector for this section
+   */
+  getComponentSelector(): string {
+    const sectionTitle = this.question?.quest_Title?.toLowerCase().trim();
+
+    // Remove trailing colons and extra spaces
+    const cleanTitle = sectionTitle?.replace(/:/g, '').trim();
+
+    const componentMap: { [key: string]: string } = {
+      'medical history': 'app-medical-history',
+      'medications history': 'app-medication',
+      'family history': 'app-family-history',
+      'social history': 'app-social-history',
+      'review of systems': 'app-review-of-systems',
+      'allergies': 'app-allergies',
+      'vital signs': 'app-vital-signs',
+      'immunizations': 'app-immunizations',
+      'problem': 'app-problem',
+      'problems': 'app-problem'
+    };
+
+    const selector = componentMap[cleanTitle || ''] || '';
+
+    // Debug logging
+    console.log('🔍 Section Title:', this.question?.quest_Title);
+    console.log('🔍 Clean Title:', cleanTitle);
+    console.log('🔍 Selector:', selector);
+    console.log('🔍 Has Custom Component:', this.hasCustomComponent());
+    console.log('🔍 Should Render:', this.shouldRenderCustomComponent());
+
+    return selector;
+  }
+
+  /**
+   * Check if section has a custom component
+   */
+  hasCustomComponent(): boolean {
+    if (this.question?.type !== 'Question Section') return false;
+
+    const sectionTitle = this.question?.quest_Title?.toLowerCase().trim();
+    const cleanTitle = sectionTitle?.replace(/:/g, '').trim();
+
+    const componentMap = [
+      'medical history',
+      'medications history',
+      'family history',
+      'social history',
+      'review of systems',
+      'allergies',
+      'vital signs',
+      'immunizations',
+      'problem',
+      'problems'
+    ];
+
+    const hasComponent = componentMap.includes(cleanTitle || '');
+
+    console.log(`✅ Section "${this.question?.quest_Title}" has custom component:`, hasComponent);
+
+    return hasComponent;
+  }
+
+  /**
+   * Check if this section should render a custom component
+   * Only render custom component if section has NO children
+   */
+  shouldRenderCustomComponent(): boolean {
+    const hasNoChildren = !this.hasChildren();
+    const isCustomSection = this.hasCustomComponent();
+    const isExpanded = !this.isCollapsed;
+
+    return hasNoChildren && isCustomSection && isExpanded;
+  }
+
+  /**
+   * Check if this section should render default children
+   * Render children if section HAS children (regardless of custom component)
+   */
+  shouldRenderDefaultChildren(): boolean {
+    return this.hasChildren() && !this.isCollapsed;
   }
 }
 
