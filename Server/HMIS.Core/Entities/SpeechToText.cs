@@ -64,9 +64,16 @@ public partial class SpeechToText
 
     public DateTime? UpdatedAt { get; set; }
 
+    [Column("File_Id")]
+    public long? FileId { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("SpeechToText")]
     public virtual SchAppointment? Appointment { get; set; }
+
+    [ForeignKey("FileId")]
+    [InverseProperty("SpeechToText")]
+    public virtual HmisFiles? File { get; set; }
 
     [ForeignKey("PatientId")]
     [InverseProperty("SpeechToText")]

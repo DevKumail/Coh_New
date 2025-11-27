@@ -207,8 +207,8 @@ AND (
                         header.OrderStatus = ((int)LabOrderStatus.InProgress).ToString();
                     }
                     
-                    header.UpdatedBy = payload.UserId.ToString();
-                    header.UpdatedDate = FormatDate(DateTime.UtcNow);
+                    //header.UpdatedBy = payload.UserId.ToString();
+                    //header.UpdatedDate = FormatDate(DateTime.UtcNow);
                 }
 
                 await _db.SaveChangesAsync();
@@ -260,7 +260,7 @@ AND (
                         header.OrderStatus = ((int)LabOrderStatus.InProgress).ToString();
                     }
                     
-                    header.UpdatedDate = FormatDate(DateTime.UtcNow);
+                    //header.UpdatedDate = FormatDate(DateTime.UtcNow);
                 }
 
                 await _db.SaveChangesAsync();
@@ -350,8 +350,8 @@ AND (
             {
                 var resolved = ResolveStatus(LabOrderStatus.Completed, header.OrderStatus);
                 header.OrderStatus = resolved;
-                header.UpdatedBy = payload.UserId.ToString();
-                header.UpdatedDate = FormatDate(DateTime.UtcNow);
+              //  header.UpdatedBy = payload.UserId.ToString();
+               // header.UpdatedDate = FormatDate(DateTime.UtcNow);
             }
             await _db.SaveChangesAsync();
             return labResultId;
@@ -458,8 +458,8 @@ AND (
                     OrderDate = ParseDate(h.OrderDate),
                     VisitAccountNo = TryParseLong(h.VisitAccountNo),
                     CreatedDate = (DateTime)h.CreatedAt,
-                    UpdatedBy = TryParseLong(h.UpdatedBy),
-                    UpdatedDate = ParseDate(h.UpdatedDate),
+                    //UpdatedBy = TryParseLong(h.UpdatedBy),
+                    //UpdatedDate = ParseDate(h.UpdatedDate),
                     OrderControlCode = h.OrderControlCode,
                     OrderStatus = h.OrderStatus,
                     OrderStatusEnum = ParseStatus(h.OrderStatus, h.IsSigned),
@@ -809,8 +809,8 @@ AND (
                 // Update header status to Cancel
                 var resolved = ResolveStatus(LabOrderStatus.Cancel, header.OrderStatus);
                 header.OrderStatus = resolved;
-                header.UpdatedBy = payload.UserId.ToString();
-                header.UpdatedDate = FormatDate(payload.CancelDate);
+                //header.UpdatedBy = payload.UserId.ToString();
+               // header.UpdatedDate = FormatDate(payload.CancelDate);
 
                 await _db.SaveChangesAsync();
                 await tx.CommitAsync();

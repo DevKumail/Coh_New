@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { NotesComponent } from '../../patient-summary/components/notes/notes.component';
 import { LoaderService } from '@core/services/loader.service';
+import { SharedService } from '@/app/shared/Services/Common/shared-service';
 
 @Component({
     standalone: true,
@@ -87,6 +88,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
     private clinicalApiService: ClinicalApiService,
     // private messageService: MessageService,
          private loader: LoaderService,
+    private sharedService: SharedService,
     private router: Router,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
@@ -483,8 +485,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
     const reader = new FileReader();
     reader.onloadend = () => {
       const voiceBase64 = reader.result?.toString().split(',')[1] || '';
-
-      const payload = {
+      const basePayload = {
         appointmentId: this.SelectedVisit?.appointmentId,
         providerId,
         userId,
@@ -499,42 +500,61 @@ export class ClinicalNoteCreateComponent implements OnInit {
         updatedBy: createdBy,
         signedBy: false,
         createdOn: new Date(),
-        voiceFile: voiceBase64,
         voicetext: formValue.voicetext
-      };
-
-      console.log('Payload:', payload);
+      } as any;
 
       if (navigator.onLine) {
-        const timeout = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Request timed out")), 300000)
-        );
         this.loader.show();
-        Promise.race([ this.clinicalApiService.InsertSpeech(payload), timeout ])
+
+        const audioFile = new File([
+          this.voiceBlob as Blob
+        ], 'clinical-note.webm', { type: (this.voiceBlob as Blob).type || 'audio/webm' });
+
+        this.sharedService.uploadDocumentsWithModule('ClinicalSpeech', [audioFile]).subscribe({
+          next: (uploadRes: any) => {
+            const first = Array.isArray(uploadRes) && uploadRes.length ? uploadRes[0] : null;
+            const fileId = first?.fileId || first?.id;
+
+            const payload = {
+              ...basePayload,
+              fileId
+            };
+
+            console.log('Payload:', payload);
+
+            const timeout = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Request timed out")), 300000)
+            );
+
+                  Promise.race([ this.clinicalApiService.InsertSpeech(payload), timeout ])
           .then((response: any) => {
-            if (response != null && response != "") {
-              this.dataquestion = response;
-              this.nodeData = response.node;
-              this.viewNoteResponse = true;
-              // keep provider/note selections
-              this.audioUrl = null;
-              this.voiceBlob = null;
-              this.clinicalForm.patchValue({ description: '', voicetext: '' });
-              Swal.fire('Success', 'Note uploaded successfully.', 'success');
-              this.loader.hide();
-            } else {
-              this.loader.hide();
-              throw new Error('Upload failed');
-            }
+            this.dataquestion = response;
+            this.nodeData = response?.node || response;
+            this.viewNoteResponse = true;
+
+            this.audioUrl = null;
+            this.voiceBlob = null;
+            this.clinicalForm.patchValue({ description: '', voicetext: '' });
+            Swal.fire('Success', 'Note uploaded successfully.', 'success');
+            this.loader.hide();
           })
           .catch((error: any) => {
             console.error('Upload failed:', error);
-            this.saveNoteOffline(payload);
             Swal.fire('Offline Save', 'Saved offline due to network/server error.', 'info');
             this.loader.hide();
           });
+          },
+          error: (err: any) => {
+            console.error('Voice file upload failed:', err);
+            this.loader.hide();
+            Swal.fire('Error', 'Failed to upload voice file.', 'error');
+          }
+        });
       } else {
-        this.saveNoteOffline(payload);
+        const offlinePayload = {
+          ...basePayload
+        };
+        this.saveNoteOffline(offlinePayload);
         Swal.fire('Offline', 'Note saved offline and will be synced later.', 'info');
         this.loader.hide();
       }

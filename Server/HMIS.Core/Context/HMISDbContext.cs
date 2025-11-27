@@ -1735,13 +1735,12 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.PidpolarBodiesIndicationId).HasName("PK_IVFFemaleFHPIDPolarBodiesIndications");
 
-            entity.Property(e => e.PidpolarBodiesIndicationId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
-            entity.HasOne(d => d.IvfadditionalMeasures).WithMany(p => p.IvfpolarBodiesIndications).HasConstraintName("FK_IVFFemaleFHPIDPolarBodiesIndications_IVFFemaleFHAdditionalMeasures");
+            entity.HasOne(d => d.IvfadditionalMeasures).WithMany(p => p.IvfpolarBodiesIndications).HasConstraintName("FK_IVFPolarBodiesIndications_IVFDashboardAdditionalMeasures");
 
-            entity.HasOne(d => d.PidpolarBodiesIndicationCategory).WithMany(p => p.IvfpolarBodiesIndications).HasConstraintName("FK_IVFFemaleFHPIDPolarBodiesIndications_DropdownConfiguration");
+            entity.HasOne(d => d.PidpolarBodiesIndicationCategory).WithMany(p => p.IvfpolarBodiesIndications).HasConstraintName("FK_IVFPolarBodiesIndications_DropdownConfiguration");
         });
 
         modelBuilder.Entity<Ivfprescription>(entity =>
@@ -2565,6 +2564,8 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.Appointment).WithMany(p => p.SpeechToText)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_SpeechToText_SchAppointment");
+
+            entity.HasOne(d => d.File).WithMany(p => p.SpeechToText).HasConstraintName("FK_SpeechToText_File_Id");
 
             entity.HasOne(d => d.Patient).WithMany(p => p.SpeechToText).HasConstraintName("FK_SpeechToText_RegPatient");
         });
