@@ -13,9 +13,27 @@
     <span style="font-weight: 600;">{{ question.quest_Title }}</span>
   </h4>
 
-  <!-- Children (only shown when section is expanded) -->
+  <!-- Custom Component (only for sections WITHOUT children) -->
+  <div *ngIf="shouldRenderCustomComponent()"
+       class="custom-component-container"
+       style="margin-left: 15px; padding-left: 10px; border-left: 2px solid #e0e0e0; margin-top: 10px;">
+
+    <!-- Dynamically render component based on section -->
+    <ng-container [ngSwitch]="getComponentSelector()">
+      <app-medical-history *ngSwitchCase="'app-medical-history'"></app-medical-history>
+      <app-medication *ngSwitchCase="'app-medication'"></app-medication>
+      <app-family-history *ngSwitchCase="'app-family-history'"></app-family-history>
+      <app-social-history *ngSwitchCase="'app-social-history'"></app-social-history>
+      <app-allergies *ngSwitchCase="'app-allergies'"></app-allergies>
+      <app-vital-signs *ngSwitchCase="'app-vital-signs'"></app-vital-signs>
+      <app-immunizations *ngSwitchCase="'app-immunizations'"></app-immunizations>
+      <app-problem *ngSwitchCase="'app-problem'"></app-problem>
+    </ng-container>
+  </div>
+
+  <!-- Default Children (for sections WITH children) -->
   <div
-    *ngIf="hasChildren() && !isCollapsed"
+    *ngIf="shouldRenderDefaultChildren()"
     class="children-container"
     style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-left: 15px; padding-left: 10px; border-left: 2px solid #e0e0e0; margin-top: 10px;">
     <app-question-view
