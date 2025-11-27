@@ -1,4 +1,6 @@
-﻿using HMIS.Application.DTOs.Clinical;
+﻿using AutoMapper;
+using HMIS.Application.DTOs.Clinical;
+using HMIS.Core.Entities;
 using HMIS.Service.Implementations;
 using HMIS.Web.Controllers;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +13,15 @@ namespace HMIS.API.Controllers.Clinical
     {
         private readonly IEMRNotesManager _eMRNotesManager;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
+
         TimerElapsed timerElapsed = new TimerElapsed();
 
-        public EMRNotesController(IEMRNotesManager eMRNotesManager, IConfiguration configuration)
+        public EMRNotesController(IEMRNotesManager eMRNotesManager, IConfiguration configuration, IMapper mapper)
         {
             _eMRNotesManager = eMRNotesManager;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         [HttpGet("GetNoteQuestionBYPathId")]
@@ -70,5 +75,28 @@ namespace HMIS.API.Controllers.Clinical
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
+
+
+        [HttpPost("SaveEMRNote")]
+        public async Task<IActionResult> SaveEMRNote([FromBody] ClinicalNoteSaveDto noteDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var noteEntity = _mapper.Map<EmrnotesNote>(noteDto);
+
+                var result = await _eMRNotesManager.SaveEMRNote(noteEntity);
+                return Ok(new { success = true, data = result, message = "EMR note saved successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = $"Internal Server Error: {ex.Message}" });
+            }
+        }
+
+
     }
 }

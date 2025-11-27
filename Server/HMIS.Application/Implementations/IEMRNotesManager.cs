@@ -1,4 +1,5 @@
 ﻿using HMIS.Application.DTOs.Clinical;
+using HMIS.Core.Entities;
 using HMIS.Service.DTOs;
 
 namespace HMIS.Service.Implementations
@@ -10,7 +11,7 @@ namespace HMIS.Service.Implementations
         Task<EMRNotesModel> GetNoteQuestionBYPathId(int pathId);
 
         Task<List<ProvierEMRNotesModel>> EMRNotesGetByEmpId(long EmpId);
-        //Task<nodeModel> InsertSpeech(ClinicalNoteObj note);
+        Task<ClinicalNoteResponseDto> SaveEMRNote(EmrnotesNote noteDto);
         Task<nodeModel> InsertSpeechWithTranscription(ClinicalNoteDto note);
     }
 

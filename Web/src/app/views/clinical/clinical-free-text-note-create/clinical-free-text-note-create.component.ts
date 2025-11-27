@@ -291,28 +291,78 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
     const htmlContent = this.clinicalForm.get('editorContent')?.value || '';
     const textContent = this.stripHtml(htmlContent);
+    const providerId = this.clinicalForm.get('provider')?.value;
+    const description = this.clinicalForm.get('description')?.value;
 
-    const payload = {
-      providerId: this.clinicalForm.get('provider')?.value,
-      appointmentId: this.appointmentID,
-      mrNo: this.mrNo,
-      description: this.clinicalForm.get('description')?.value,
-      htmlContent: htmlContent,
-      textContent: textContent
-    };
-
-    if(this.appointmentID == null || this.appointmentID == undefined|| this.appointmentID == 0
-        && this.mrNo == null || this.mrNo == undefined|| this.mrNo == ''
-    ){
-        Swal.fire('Error', 'Appointment ID and MRNo are required to submit the note.', 'error');
-        return
+    if (this.appointmentID == null || this.appointmentID == undefined || this.appointmentID == 0
+        && this.mrNo == null || this.mrNo == undefined || this.mrNo == ''
+    ) {
+      Swal.fire('Error', 'Appointment ID and MRNo are required to submit the note.', 'error');
+      return;
     }
 
+    const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
+    const createdByUserId = current_User.userId || 0;
 
+    const nowIso = new Date().toISOString();
 
-    console.log('Payload:', payload);
-    // Call your service to save the data
-    // this.yourService.saveClinicalNote(payload).subscribe(...);
+    const emrPayload = {
+      // use appointment ID as visit account number for EMR note
+      visitAcNo: this.appointmentID || 0,
+      notesTitle: this.dataquestion?.node?.noteTitle || 'Clinical Free Text Note',
+      noteText: textContent,
+      noteHtmltext: htmlContent,
+      description: description,
+      createdBy: createdByUserId,
+      createdOn: nowIso,
+      updatedBy: createdByUserId,
+      updatedDate: nowIso,
+      signed: false,
+      isEdit: false,
+      review: false,
+      noteType: 'FreeText',
+      active: true,
+      // provider who will sign the note
+      signedBy: providerId || 0,
+      signedDate: '',
+      cosignedBy: 0,
+      cosignedDate: '',
+      mrcosignedBy: 0,
+      mrcosignedDate: '',
+      noteCosignProvId: 0,
+      reviewedBy: 0,
+      reviewedDate: '',
+      noteStatus: 'Draft',
+      mrno: this.mrNo,
+      documents: '',
+      caseId: '00000000-0000-0000-0000-000000000000',
+      isNursingNote: false,
+      receiverRoleId: 0,
+      receiverEmpId: 0,
+      referredSiteId: '00000000-0000-0000-0000-000000000000',
+      labOrderSetDetailId: 0,
+      oldMrno: '',
+      isMbrcompleted: false,
+      oldNoteId: 0,
+      createdAt: nowIso,
+      updatedAt: nowIso
+    };
+
+    console.log('SaveEMRNote payload:', emrPayload);
+
+    this.loader.show();
+    this.clinicalApiService.SaveEMRNote(emrPayload)
+      .then(() => {
+        Swal.fire('Success', 'Note saved successfully.', 'success');
+        this.router.navigate(['/clinical/clinical-notes']);
+      })
+      .catch((error: any) => {
+        console.error('Error saving EMR note:', error);
+        Swal.fire('Error', 'Failed to save note.', 'error');
+      })
+      .finally(() => {
+        this.loader.hide();
+      });
   }
 
   stripHtml(html: string): string {

@@ -28,15 +28,15 @@ public partial class EmrnotesNote
     [Unicode(false)]
     public string? Description { get; set; }
 
-    public long? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
 
-    [StringLength(14)]
+    [StringLength(50)]
     [Unicode(false)]
-    public string CreatedOn { get; set; } = null!;
+    public string? CreatedOn { get; set; }
 
-    public long? UpdatedBy { get; set; }
+    public int? UpdatedBy { get; set; }
 
-    [StringLength(14)]
+    [StringLength(50)]
     [Unicode(false)]
     public string? UpdatedDate { get; set; }
 

@@ -274,6 +274,48 @@ namespace HMIS.Service.ServiceLogics
                 return null;
             }
         }
+
+        public async Task<ClinicalNoteResponseDto> SaveEMRNote(EmrnotesNote noteDto)
+        {
+            try
+            {
+                _logger.LogInformation("Starting to save EMR note for MRNo: {Mrno}", noteDto.Mrno);
+
+
+                noteDto.Active = true;
+                if (noteDto.SignedBy > 0)
+                {
+                    noteDto.Signed = true;
+                    noteDto.IsEdit = true;
+
+                }
+                else
+                {
+                    noteDto.Signed = false;
+                    noteDto.IsEdit = false;
+                }
+
+                _context.EmrnotesNote.Add(noteDto);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Successfully saved EMR note with ID: {NoteId}", noteDto.NoteId);
+
+                var responseDto = _mapper.Map<ClinicalNoteResponseDto>(noteDto);
+                return responseDto;
+            }
+            catch (DbUpdateException dbEx)
+            {
+                _logger.LogError(dbEx, "Database error while saving EMR note for MRNo: {Mrno}", noteDto.Mrno);
+                throw new Exception("Database error occurred while saving the note", dbEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving EMR note for MRNo: {Mrno}", noteDto.Mrno);
+                throw;
+            }
+        }
+
+
         private async Task<TranscriptionResult> TranscribeAudioFile(long? fileId)
         {
             try
@@ -406,6 +448,9 @@ namespace HMIS.Service.ServiceLogics
                     PrintQuestions(q.Children, level + 1);
             }
         }
+
+
     }
+
 
 }
