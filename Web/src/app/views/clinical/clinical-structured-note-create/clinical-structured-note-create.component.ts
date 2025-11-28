@@ -213,6 +213,8 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
         this.dataquestion = res;
         this.viewquestion = true;
         this.nodeData = res;
+        // show note preview immediately for real-time updates
+        this.viewNoteResponse = true;
         this.loader.hide();
       }).catch(() =>
         Swal.fire('Error', 'Error loading template', 'error')
@@ -384,6 +386,33 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   getProviderName(providerCode: string): string {
     const provider = this.providers?.find(p => p.code === providerCode);
     return provider ? provider.name : '';
+  }
+
+  // Update the model when a child emits an answer change (plain string)
+  onAnswerChange(value: string, question: any) {
+    if (question) {
+      question.answer = String(value ?? '');
+    }
+    // this.cdr.markForCheck();
+  }
+
+  // Helper for template to check if a section or any of its children has content (recursive)
+  isSectionFilled(section: any): boolean {
+    if (!section) return false;
+
+    // Check if the section itself has an answer
+    const hasSelf = typeof section.answer === 'string' && section.answer.trim().length > 0;
+
+    // Recursively check all children
+    const hasChild = Array.isArray(section.children) && section.children.some((c: any) => this.isSectionFilled(c));
+
+    return hasSelf || hasChild;
+  }
+
+  // Check if ANY question in the template has filled data
+  hasAnyFilledData(): boolean {
+    const questions = this.nodeData?.node?.questions || this.nodeData?.questions || [];
+    return questions.some((q: any) => this.isSectionFilled(q));
   }
 
   ngOnDestroy(): void {

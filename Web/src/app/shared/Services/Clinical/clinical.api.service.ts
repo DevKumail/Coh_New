@@ -354,7 +354,15 @@ export class ClinicalApiService {
   SaveEMRNote(note: any) {
     return this.api.post(`EMRNotes/SaveEMRNote`, note).toPromise();
   }
-      SpeechtoText(MRNo:string, currentPage?: number, pageSize?: number) {
+  GetEMRNoteByNoteId(noteId: number) {
+    return this.api.get(`EMRNotes/GetEMRNoteByNoteId/${noteId}`).toPromise();
+  }
+  SpeechtoText(MRNo:string, currentPage?: number, pageSize?: number) {
     return this.api.get(`Appointment/SpeechtoText?mrNo=${MRNo}&PageNumber=${currentPage}&PageSize=${pageSize}`).toPromise();
+  }
+  GetEMRNotesByMRNo(mrno: string, page: number, pageSize: number) {
+    return this.api
+      .get(`EMRNotes/GetEMRNotesByMRNo?mrno=${mrno}&page=${page}&pageSize=${pageSize}`)
+      .toPromise();
   }
 }

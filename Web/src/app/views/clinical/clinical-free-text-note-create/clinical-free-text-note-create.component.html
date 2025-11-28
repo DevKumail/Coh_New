@@ -52,6 +52,20 @@
               <option *ngFor="let p of providers" [value]="p.code">{{ p.name }}</option>
             </select>
           </div>
+          <div class="voice-controls">
+      <button
+        type="button"
+        class="btn"
+        [ngClass]="isRecording ? 'btn-danger' : 'btn-primary'"
+        (click)="toggleVoiceRecording()"
+        [disabled]="!clinicalForm.get('provider')?.value">
+        <i class="fas" [ngClass]="isRecording ? 'fa-stop' : 'fa-microphone'"></i>
+        {{ isRecording ? 'Stop Recording' : 'Start Voice Transcription' }}
+      </button>
+      <span *ngIf="isRecording" class="recording-indicator">
+        <i class="fas fa-circle text-danger blink"></i> Recording...
+      </span>
+    </div>
 
 
 
@@ -85,6 +99,9 @@
       </div>
     </div>
 
+    <!-- Add this button near your editor or toolbar -->
+
+
   </div> <!-- card-body -->
 </form>
 
@@ -102,13 +119,61 @@
   }
 
   .editable-title:hover, .editable-question:hover {
-    border-color: #0d6efd;
+    border-color: #0acf97;
     background-color: #f8f9fa;
   }
 
   .editable-title:focus, .editable-question:focus {
-    border-color: #0d6efd;
+    border-color: #0acf97;
     background-color: #ffffff;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+    box-shadow: 0 0 0 0.2rem rgba(10, 207, 151, 0.1);
+  }
+
+  /* Additional styles for the updated layout */
+  .voice-controls {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .voice-btn {
+    margin-right: 10px;
+  }
+
+  .recording-indicator {
+    display: flex;
+    align-items: center;
+  }
+
+  .recording-pulse {
+    animation: pulse-animation 1.5s infinite;
+  }
+
+  @keyframes pulse-animation {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .clinical-note-editor-wrapper {
+    margin-top: 10px;
+  }
+
+  .editor-header {
+    background-color: #f1f3f5;
+    padding: 10px;
+    border-radius: 4px 4px 0 0;
+  }
+
+  .editor-container {
+    border: 1px solid #ced4da;
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
   }
 </style>

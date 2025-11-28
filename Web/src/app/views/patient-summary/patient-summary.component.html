@@ -5,12 +5,12 @@
     <button type="button" class="toggle-btn left" (click)="toggleLeft()" [attr.aria-expanded]="!leftCollapsed">
       {{ leftCollapsed ? '›' : '‹' }}
     </button>
-    <button type="button" class="toggle-btn right" (click)="toggleRight()" [attr.aria-expanded]="!rightCollapsed">
+    <!-- <button type="button" class="toggle-btn right" (click)="toggleRight()" [attr.aria-expanded]="!rightCollapsed">
       {{ rightCollapsed ? '‹' : '›' }}
-    </button>
+    </button> -->
 
     <!-- Main Wrapper (expands when right sidebar collapsed) -->
-    <div [ngClass]="{ 'col-10': !rightCollapsed, 'col-12': rightCollapsed }">
+    <div [ngClass]="{  'col-12': rightCollapsed }">
       <div class="row g-0">
 
         <!-- Left Sidebar: keep visible, shrink on collapse -->
@@ -30,10 +30,10 @@
     </div>
 
     <!-- Right Sidebar -->
-    <div *ngIf="!rightCollapsed" class="col-2 bg-dark text-white rounded fixed-height">
+    <!-- <div *ngIf="!rightCollapsed" class="col-2 bg-dark text-white rounded fixed-height">
       <div>
         <app-notes></app-notes>
       </div>
-    </div>
+    </div> -->
   </div>
 </div>

@@ -130,12 +130,18 @@ export class ClinicalNoteComponent implements OnInit {
         return;
       }
       const MRN = this.SearchPatientData?.table2?.[0]?.mrNo;
-      this.apiservice.SpeechtoText(MRN, this.pagegination.currentPage, this.pagegination.pageSize).then((res: any) => {
-        console.log('Speech To Text RESULT: ', res);
-        this.speechtotxt = res.table1;
-        this.clinicalnoteTotalItems = res.table2[0]?.totalCount || 0;
-        this.cdr.markForCheck();
-      });
+      this.apiservice.GetEMRNotesByMRNo(MRN, this.pagegination.currentPage, this.pagegination.pageSize)
+        .then((res: any) => {
+          console.log('EMR Notes RESULT: ', res);
+          this.speechtotxt = res?.data || [];
+          this.clinicalnoteTotalItems = res?.pagination?.totalCount || this.speechtotxt.length || 0;
+          this.cdr.markForCheck();
+        })
+        .catch((error: any) => {
+          console.error('Error loading EMR notes: ', error);
+          Swal.fire('Error', 'Failed to load clinical notes', 'error');
+          this.cdr.markForCheck();
+        });
     }
 
   openNoteTypeModal(content: any) {
@@ -336,6 +342,17 @@ export class ClinicalNoteComponent implements OnInit {
   async onallergiePageChanged(page: number) {
     this.pagegination.currentPage = page;
     await this.speechtoText();
+  }
+
+  editNote(note: any) {
+    if (!note || !note.noteId) {
+      Swal.fire('Error', 'Note Id not found for editing', 'error');
+      return;
+    }
+
+    this.router.navigate(['/clinical/create-free-text-notes'], {
+      queryParams: { noteId: note.noteId }
+    });
   }
 
   // TrackBy functions for ngFor optimization

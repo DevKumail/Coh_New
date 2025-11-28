@@ -128,9 +128,6 @@ input[type="range"] {
   }
 }
 
-
-
-
 /* Json */
 
 .question-section {
@@ -157,5 +154,288 @@ h4 {
     overflow-x: hidden;
     overscroll-behavior: contain; // prevent scroll chaining to body/footer
     -webkit-overflow-scrolling: touch; // smooth on mobile
+}
+
+.voice-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-primary {
+    background-color: #0acf97;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #099f6b;
+    }
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+
+    &:hover {
+      background-color: #c82333;
+    }
+  }
+
+  .recording-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #dc3545;
+    font-weight: 500;
+
+    .blink {
+      animation: blink 1s infinite;
+    }
+  }
+}
+
+// Voice Controls Section
+.voice-controls-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+
+  .voice-btn {
+    padding: 0.65rem 1.5rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    i {
+      font-size: 18px;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    &:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .btn-primary {
+    background-color: #28a745;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #218838;
+    }
+
+    &:active:not(:disabled) {
+      background-color: #1e7e34;
+    }
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #c82333;
+    }
+
+    &:active:not(:disabled) {
+      background-color: #bd2130;
+    }
+  }
+
+  .recording-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #dc3545;
+    font-weight: 600;
+    font-size: 14px;
+
+    .recording-pulse {
+      animation: pulse 1.5s infinite;
+      font-size: 12px;
+    }
+
+    .recording-text {
+      animation: fadeInOut 1.5s infinite;
+    }
+  }
+}
+
+// Clinical Note Editor Wrapper
+.clinical-note-editor-wrapper {
+  margin: 1.5rem 0;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .editor-header {
+    background-color: #f8f9fa;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+
+    h5 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  .editor-container {
+    padding: 1rem;
+    background-color: #fff;
+
+    // Quill Editor Customization
+    ::ng-deep {
+      .quill-editor {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .ql-container {
+        flex: 1;
+        overflow-y: auto;
+        font-size: 15px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border: none !important;
+
+        .ql-editor {
+          min-height: 350px;
+          max-height: 500px;
+          padding: 1rem;
+          line-height: 1.6;
+
+          &.ql-blank::before {
+            color: #adb5bd;
+            font-style: italic;
+          }
+        }
+      }
+
+      .ql-toolbar {
+        border: none !important;
+        border-bottom: 1px solid #dee2e6 !important;
+        background-color: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+
+        .ql-stroke {
+          stroke: #495057;
+        }
+
+        .ql-fill {
+          fill: #495057;
+        }
+
+        .ql-picker-label {
+          color: #495057;
+        }
+
+        button:hover,
+        .ql-picker-label:hover {
+          .ql-stroke {
+            stroke: #0acf97;
+          }
+          .ql-fill {
+            fill: #0acf97;
+          }
+        }
+
+        button.ql-active,
+        .ql-picker-label.ql-active {
+          .ql-stroke {
+            stroke: #0acf97;
+          }
+          .ql-fill {
+            fill: #0acf97;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .voice-controls-section {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .voice-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .recording-indicator {
+      align-self: center;
+    }
+  }
+
+  .clinical-note-editor-wrapper {
+    .editor-container {
+      ::ng-deep .ql-container .ql-editor {
+        min-height: 250px;
+      }
+    }
+  }
 }
 
