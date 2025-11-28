@@ -169,7 +169,7 @@ export class IVFApiService {
   
     deleteIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId: number): Observable<any> {
       // Backend expects id via body or query; using POST for delete per given endpoint
-      return this.api.post('IVFDashboard/DeleteIVFDashboardTreatmentCycle', { ivfDashboardTreatmentCycleId });
+      return this.api.delete(`IVFDashboard/DeleteIVFDashboardTreatmentCycle/${ivfDashboardTreatmentCycleId}`);
     }
 
      // Add observations for a specific order set detail

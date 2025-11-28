@@ -1217,16 +1217,17 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
-            entity.HasOne(d => d.IvfdashboardTreatmentEpisode).WithMany(p => p.IvfdashboardAdditionalMeasures)
+            entity.HasOne(d => d.IvfdashboardTreatmentEpisode).WithOne(p => p.IvfdashboardAdditionalMeasures)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFDashboardAdditionalMeasures_IVFDashboardTreatmentEpisode");
         });
 
         modelBuilder.Entity<IvfdashboardTreatmentCycle>(entity =>
         {
-            entity.HasKey(e => e.IvfdashboardTreatmentEpisodeId).HasName("PK_IVFFemaleTreatmentCycle");
+            entity.HasKey(e => e.IvfdashboardTreatmentCycleId).HasName("PK_IVFFemaleTreatmentCycle");
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.CycleStatus).HasDefaultValue(true);
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
             entity.HasOne(d => d.CycleFromAmenorrheaCategory).WithMany(p => p.IvfdashboardTreatmentCycleCycleFromAmenorrheaCategory).HasConstraintName("FK_IVFFemaleTreatmentCycle_DropdownConfiguration1");
@@ -1808,7 +1809,7 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
-            entity.HasOne(d => d.IvfdashboardTreatmentEpisode).WithMany(p => p.IvftreatmentEpisodeOverviewStage).HasConstraintName("FK_IVFTreatmentEpisodeOverviewStage_IVFDashboardTreatmentEpisode");
+            entity.HasOne(d => d.IvfdashboardTreatmentCycle).WithMany(p => p.IvftreatmentEpisodeOverviewStage).HasConstraintName("FK_IVFTreatmentEpisodeOverviewStage_IVFDashboardTreatmentEpisode");
         });
 
         modelBuilder.Entity<IvftreatmentEpisodesAttachments>(entity =>

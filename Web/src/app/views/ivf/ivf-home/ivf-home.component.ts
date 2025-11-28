@@ -211,7 +211,7 @@ export class IVFHomeComponent {
         this.CycleListTotalrecord = res?.dashboardTreatmentEpisodes?.totalRecords || 0;
         const data = res?.dashboardTreatmentEpisodes?.data || res || [];
         this.overview = (Array.isArray(data) ? data : []).map((x: any) => ({
-          id: x?.ivfDashboardTreatmentEpisodeId,
+          id: x?.ivfDashboardTreatmentCycleId,
           start: x?.dateOfLMP ? new Date(x.dateOfLMP).toLocaleDateString() : (x?.dateOfLMP ?? '-'),
           treatmentType: x?.treatmentType ?? '-',
           sperm: x?.sperm ?? '-',
