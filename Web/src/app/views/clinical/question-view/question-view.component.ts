@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { ImmunizationsComponent } from '../immunizations/immunizations.component';
@@ -32,6 +32,7 @@ export class QuestionViewComponent implements OnInit {
   @Input() question: any;
   @Input() form!: FormGroup; // optional reactive FormGroup from parent
   @Input() hasParent: boolean = false; // Track if question has a parent
+  @Output() answerChange = new EventEmitter<string>();
 
   // Track collapse state for each section
   isCollapsed: boolean = true;
@@ -138,6 +139,17 @@ export class QuestionViewComponent implements OnInit {
    */
   onAnswerChange(event: any, question: any): void {
     question.answer = event.target.value;
+  }
+
+  /**
+   * Handle input change and emit answerChange event
+   */
+  onInputChange(event: any) {
+    const value = event?.target?.value || '';
+    if (this.question) {
+      this.question.answer = value;
+      this.answerChange.emit(value);
+    }
   }
 
   /**
