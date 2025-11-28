@@ -277,46 +277,89 @@ namespace HMIS.Service.ServiceLogics
             }
         }
 
-        public async Task<IActionResult> SaveEMRNote(EmrnotesNote noteDto)
+        public async Task<EmrnotesNote> SaveEMRNote(EmrnotesNote noteDto)
         {
             try
             {
-                _logger.LogInformation("Starting to save EMR note for MRNo: {Mrno}", noteDto.Mrno);
-
+                _logger.LogInformation("Starting to save EMR note for MRNo: {Mrno}, NoteId: {NoteId}", noteDto.Mrno, noteDto.NoteId);
 
                 noteDto.Active = true;
+
                 if (noteDto.SignedBy > 0)
                 {
                     noteDto.Signed = true;
-                    noteDto.IsEdit = true;
-
+                    noteDto.IsEdit = false;
                 }
                 else
                 {
                     noteDto.Signed = false;
-                    noteDto.IsEdit = false;
+                    noteDto.IsEdit = true;
                 }
 
-                _context.EmrnotesNote.Add(noteDto);
-                await _context.SaveChangesAsync();
+                // Handle create vs update
+                if (noteDto.NoteId > 0)
+                {
+                    // Update existing note
+                    var existingNote = await _context.EmrnotesNote
+                        .FirstOrDefaultAsync(n => n.NoteId == noteDto.NoteId);
 
-                _logger.LogInformation("Successfully saved EMR note with ID: {NoteId}", noteDto.NoteId);
+                    if (existingNote == null)
+                        throw new Exception($"Note with ID {noteDto.NoteId} not found");
 
-                return new StatusCodeResult(StatusCodes.Status200OK);
+                    // Update properties
+                    existingNote.NotesTitle = noteDto.NotesTitle;
+                    existingNote.NoteText = noteDto.NoteText;
+                    existingNote.NoteHtmltext = noteDto.NoteHtmltext;
+                    existingNote.Description = noteDto.Description;
+                    existingNote.UpdatedDate = noteDto.UpdatedDate;
+                    existingNote.UpdatedBy = noteDto.UpdatedBy;
+                    existingNote.UpdatedAt = DateTime.Now;
+                    existingNote.Signed = noteDto.Signed;
+                    existingNote.SignedBy = noteDto.SignedBy;
+                    existingNote.SignedDate = noteDto.SignedDate;
+                    existingNote.IsEdit = noteDto.IsEdit;
+                    existingNote.NoteType = noteDto.NoteType;
+                    existingNote.NoteStatus = noteDto.NoteStatus;
+                    existingNote.Review = noteDto.Review;
+                    existingNote.CosignedBy = noteDto.CosignedBy;
+                    existingNote.CosignedDate = noteDto.CosignedDate;
+                    existingNote.MrcosignedBy = noteDto.MrcosignedBy;
+                    existingNote.MrcosignedDate = noteDto.MrcosignedDate;
+                    existingNote.ReviewedBy = noteDto.ReviewedBy;
+                    existingNote.ReviewedDate = noteDto.ReviewedDate;
+                    existingNote.Documents = noteDto.Documents;
+                    existingNote.IsNursingNote = noteDto.IsNursingNote;
+                    existingNote.IsMbrcompleted = noteDto.IsMbrcompleted;
 
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("Successfully updated EMR note with ID: {NoteId}", existingNote.NoteId);
+
+                    return existingNote;
+                }
+                else
+                {
+                    // Create new note
+                    noteDto.CreatedAt = DateTime.Now;
+                    noteDto.UpdatedAt = DateTime.Now;
+
+                    _context.EmrnotesNote.Add(noteDto);
+                    await _context.SaveChangesAsync();
+
+                    _logger.LogInformation("Successfully created new EMR note with ID: {NoteId}", noteDto.NoteId);
+                    return noteDto;
+                }
             }
             catch (DbUpdateException dbEx)
             {
-                _logger.LogError(dbEx, "Database error while saving EMR note for MRNo: {Mrno}", noteDto.Mrno);
+                _logger.LogError(dbEx, "Database error while saving EMR note for MRNo: {Mrno}, NoteId: {NoteId}", noteDto.Mrno, noteDto.NoteId);
                 throw new Exception("Database error occurred while saving the note", dbEx);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving EMR note for MRNo: {Mrno}", noteDto.Mrno);
+                _logger.LogError(ex, "Error saving EMR note for MRNo: {Mrno}, NoteId: {NoteId}", noteDto.Mrno, noteDto.NoteId);
                 throw;
             }
         }
-
 
         private async Task<TranscriptionResult> TranscribeAudioFile(long? fileId)
         {
@@ -391,6 +434,29 @@ namespace HMIS.Service.ServiceLogics
             return (notes, totalCount);
         }
 
+        public async Task<EMRNoteDetailDto?> GetEMRNoteByNoteId(long noteId)
+        {
+            try
+            {
+                using var connection = new SqlConnection(_connectionString);
+
+                var parameters = new DynamicParameters();
+                parameters.Add("@NoteId", noteId);
+
+                var result = await connection.QueryFirstOrDefaultAsync<EMRNoteDetailDto>(
+                    "EMRNotes_GetByNoteId",
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetEMRNoteByNoteId for NoteId: {NoteId}", noteId);
+                return null;
+            }
+        }
         // Helper method to parse API response
         private EMRNotesModel ParseApiResponse(string apiResponse)
         {

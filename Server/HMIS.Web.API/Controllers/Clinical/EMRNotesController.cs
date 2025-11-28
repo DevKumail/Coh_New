@@ -96,8 +96,40 @@ namespace HMIS.API.Controllers.Clinical
                 return StatusCode(500, new { success = false, message = $"Internal Server Error: {ex.Message}" });
             }
         }
+        [HttpGet("GetEMRNoteByNoteId/{noteId}")]
+        public async Task<IActionResult> GetEMRNoteByNoteId(long noteId)
+        {
+            try
+            {
+                if (noteId <= 0)
+                {
+                    return BadRequest(new { success = false, message = "Valid NoteId is required" });
+                }
 
-        [HttpGet("GetEMRNotesByMRNo")]
+                var note = await _eMRNotesManager.GetEMRNoteByNoteId(noteId);
+
+                if (note == null)
+                {
+                    return NotFound(new { success = false, message = $"EMR note with ID {noteId} not found" });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    data = note,
+                    message = "EMR note retrieved successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"An error occurred while retrieving the EMR note: {ex.Message}"
+                });
+            }
+        }
+            [HttpGet("GetEMRNotesByMRNo")]
         public async Task<IActionResult> GetEMRNotesByMRNo(
     [FromQuery] string mrno,
     [FromQuery] int page = 1,

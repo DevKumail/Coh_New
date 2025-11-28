@@ -344,6 +344,17 @@ export class ClinicalNoteComponent implements OnInit {
     await this.speechtoText();
   }
 
+  editNote(note: any) {
+    if (!note || !note.noteId) {
+      Swal.fire('Error', 'Note Id not found for editing', 'error');
+      return;
+    }
+
+    this.router.navigate(['/clinical/create-free-text-notes'], {
+      queryParams: { noteId: note.noteId }
+    });
+  }
+
   // TrackBy functions for ngFor optimization
   trackByIndex(index: number): number {
     return index;
