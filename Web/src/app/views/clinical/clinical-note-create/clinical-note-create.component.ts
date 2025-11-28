@@ -56,6 +56,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
   mediaRecorder: any;
   audioChunks: any[] = [];
   voiceBlob: Blob | null = null;
+  mediaStream: MediaStream | null = null; // Add this to track the stream
   selectedProviders: any = 0;
   selectedNotes: any = 0;
   db: any;
@@ -302,43 +303,52 @@ export class ClinicalNoteCreateComponent implements OnInit {
 
 
   ganricfunction(){
-         navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-        this.mediaRecorder = new MediaRecorder(stream);
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      this.mediaStream = stream; // Store the stream reference
+      this.mediaRecorder = new MediaRecorder(stream);
 
-        this.audioChunks = [];
+      this.audioChunks = [];
 
-        this.mediaRecorder.ondataavailable = (event: any) => {
-          this.audioChunks.push(event.data);
-        };
+      this.mediaRecorder.ondataavailable = (event: any) => {
+        this.audioChunks.push(event.data);
+      };
 
-        this.mediaRecorder.onstop = () => {
-          // Revoke old URL to prevent memory leaks
-          if (this.audioUrl) {
-            const oldUrl = this.audioUrl.toString();
-            if (oldUrl.startsWith('blob:')) {
-              URL.revokeObjectURL(oldUrl);
-            }
+      this.mediaRecorder.onstop = () => {
+        // Stop all media stream tracks
+        if (this.mediaStream) {
+          this.mediaStream.getTracks().forEach(track => {
+            track.stop();
+            console.log('Track stopped:', track.kind);
+          });
+          this.mediaStream = null;
+        }
+
+        // Revoke old URL to prevent memory leaks
+        if (this.audioUrl) {
+          const oldUrl = this.audioUrl.toString();
+          if (oldUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(oldUrl);
           }
+        }
 
-          // Clear audio URL first
-          this.audioUrl = null;
-          this.cdr.detectChanges();
+        // Clear audio URL first
+        this.audioUrl = null;
+        this.cdr.detectChanges();
 
-          // Create new blob and URL
-          this.voiceBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-          const url = URL.createObjectURL(this.voiceBlob);
-          this.audioUrl = this.sanitizer.bypassSecurityTrustUrl(url);
+        // Create new blob and URL
+        this.voiceBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+        const url = URL.createObjectURL(this.voiceBlob);
+        this.audioUrl = this.sanitizer.bypassSecurityTrustUrl(url);
 
-          // Manually trigger change detection
-          this.cdr.detectChanges();
-        };
+        // Manually trigger change detection
+        this.cdr.detectChanges();
+      };
 
-        this.mediaRecorder.start();
-
-
-      }).catch((err) => {
-        console.error('Microphone access denied:', err);
-      });
+      this.mediaRecorder.start();
+    }).catch((err) => {
+      console.error('Microphone access denied:', err);
+      Swal.fire('Error', 'Microphone access denied. Please allow microphone access.', 'error');
+    });
   }
 
   pauseVoiceRecording() {
@@ -358,9 +368,18 @@ export class ClinicalNoteCreateComponent implements OnInit {
   stopVoiceRecording() {
     this.recording = false;
     this.isPaused = false;
+
     if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
       try {
         this.mediaRecorder.stop();
+        // Stop all tracks immediately
+        if (this.mediaStream) {
+          this.mediaStream.getTracks().forEach(track => {
+            track.stop();
+            console.log('Track stopped on button click:', track.kind);
+          });
+          this.mediaStream = null;
+        }
       } catch (e) {
         console.error('Error stopping recorder:', e);
       }
@@ -601,6 +620,15 @@ export class ClinicalNoteCreateComponent implements OnInit {
   ngOnDestroy(): void {
     // cleanup subscriptions
     this.subscriptions.forEach(s => s.unsubscribe());
+
+    // Stop media stream tracks
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(track => {
+        track.stop();
+        console.log('Track stopped on destroy:', track.kind);
+      });
+      this.mediaStream = null;
+    }
 
     // Cleanup audio URL
     if (this.audioUrl) {
