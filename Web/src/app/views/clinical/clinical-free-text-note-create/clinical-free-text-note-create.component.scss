@@ -179,11 +179,11 @@ h4 {
   }
 
   .btn-primary {
-    background-color: #007bff;
+    background-color: #0acf97;
     color: white;
 
     &:hover:not(:disabled) {
-      background-color: #0056b3;
+      background-color: #099f6b;
     }
   }
 
@@ -372,20 +372,20 @@ h4 {
         button:hover,
         .ql-picker-label:hover {
           .ql-stroke {
-            stroke: #007bff;
+            stroke: #0acf97;
           }
           .ql-fill {
-            fill: #007bff;
+            fill: #0acf97;
           }
         }
 
         button.ql-active,
         .ql-picker-label.ql-active {
           .ql-stroke {
-            stroke: #007bff;
+            stroke: #0acf97;
           }
           .ql-fill {
-            fill: #007bff;
+            fill: #0acf97;
           }
         }
       }
