@@ -6,16 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Keyless]
-[Table("IVFPrescription")]
-public partial class Ivfprescription
+[Table("IVFEpisodeOverviewEvents")]
+public partial class IvfepisodeOverviewEvents
 {
-    [Column("IVFPrescriptionMasterId")]
-    public long IvfprescriptionMasterId { get; set; }
-
-    public long DrugId { get; set; }
+    [Key]
+    public long EventId { get; set; }
 
     public long AppointmentId { get; set; }
+
+    public long OverviewId { get; set; }
+
+    public long EventTypeCategoryId { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? StartDate { get; set; }
@@ -36,11 +37,14 @@ public partial class Ivfprescription
     public bool IsDeleted { get; set; }
 
     [ForeignKey("AppointmentId")]
+    [InverseProperty("IvfepisodeOverviewEvents")]
     public virtual SchAppointment Appointment { get; set; } = null!;
 
-    [ForeignKey("DrugId")]
-    public virtual TabDrugsName Drug { get; set; } = null!;
+    [ForeignKey("EventTypeCategoryId")]
+    [InverseProperty("IvfepisodeOverviewEvents")]
+    public virtual DropdownConfiguration EventTypeCategory { get; set; } = null!;
 
-    [ForeignKey("IvfprescriptionMasterId")]
-    public virtual IvfprescriptionMaster IvfprescriptionMaster { get; set; } = null!;
+    [ForeignKey("OverviewId")]
+    [InverseProperty("IvfepisodeOverviewEvents")]
+    public virtual IvftreatmentEpisodeOverviewStage Overview { get; set; } = null!;
 }

@@ -15,6 +15,8 @@ public partial class IvftreatmentEpisodeOverviewStage
     [Column("IVFDashboardTreatmentEpisodeId")]
     public int? IvfdashboardTreatmentEpisodeId { get; set; }
 
+    public int? StatusId { get; set; }
+
     public int? CreatedBy { get; set; }
 
     public DateTime? CreatedAt { get; set; }
@@ -32,8 +34,14 @@ public partial class IvftreatmentEpisodeOverviewStage
     public virtual IvfdashboardTreatmentCycle? IvfdashboardTreatmentEpisode { get; set; }
 
     [InverseProperty("Overview")]
+    public virtual ICollection<IvfepisodeOverviewEvents> IvfepisodeOverviewEvents { get; set; } = new List<IvfepisodeOverviewEvents>();
+
+    [InverseProperty("Overview")]
     public virtual ICollection<IvfoverviewEpisodeAppointments> IvfoverviewEpisodeAppointments { get; set; } = new List<IvfoverviewEpisodeAppointments>();
 
     [InverseProperty("Overview")]
     public virtual ICollection<IvfoverviewOhss> IvfoverviewOhss { get; set; } = new List<IvfoverviewOhss>();
+
+    [InverseProperty("Overview")]
+    public virtual ICollection<IvfprescriptionMaster> IvfprescriptionMaster { get; set; } = new List<IvfprescriptionMaster>();
 }

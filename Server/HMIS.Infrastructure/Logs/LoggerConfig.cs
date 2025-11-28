@@ -18,14 +18,14 @@ namespace HMIS
         public static Logger CreateLogger(string requestMessage, string responseMessage, IConfiguration configuration)
         {
             var loggerConfiguration = new LoggerConfiguration()
-     .MinimumLevel.Verbose()
-     .WriteTo.Console(new RenderedCompactJsonFormatter())
-     .WriteTo.Seq(configuration["SeqUrl"]) // Read Seq URL from appsettings.json
-     .Enrich.WithMachineName()
-     .Enrich.WithProperty("Application", "HMIS.Web")
-     .Enrich.FromLogContext()
-     .Enrich.With(new RequestMessageEnricher(requestMessage))
-     .Enrich.With(new ResponseMessageEnricher(responseMessage));
+                                     .MinimumLevel.Verbose()
+                                     .WriteTo.Console(new RenderedCompactJsonFormatter())
+                                     .WriteTo.Seq(configuration["SeqUrl"]) // Read Seq URL from appsettings.json
+                                     .Enrich.WithMachineName()
+                                     .Enrich.WithProperty("Application", "HMIS.Web")
+                                     .Enrich.FromLogContext()
+                                     .Enrich.With(new RequestMessageEnricher(requestMessage))
+                                     .Enrich.With(new ResponseMessageEnricher(responseMessage));
 
             return loggerConfiguration.CreateLogger();
         }

@@ -59,6 +59,9 @@ public partial class DropdownConfiguration
     [InverseProperty("PidembblastIndicationCategory")]
     public virtual ICollection<IvfembblastIndications> IvfembblastIndications { get; set; } = new List<IvfembblastIndications>();
 
+    [InverseProperty("EventTypeCategory")]
+    public virtual ICollection<IvfepisodeOverviewEvents> IvfepisodeOverviewEvents { get; set; } = new List<IvfepisodeOverviewEvents>();
+
     [InverseProperty("AdiposityCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryAdiposityCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 
