@@ -355,9 +355,21 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
     this.loader.show();
     this.clinicalApiService.SaveEMRNote(emrPayload)
-      .then(() => {
-        Swal.fire('Success', 'Note saved successfully.', 'success');
-        this.router.navigate(['/clinical/clinical-notes']);
+      .then((res: any) => {
+        const message = res?.message || res?.Message || '';
+
+        if (message === 'Note saved successfully.' || message === 'Note saved successfully') {
+          Swal.fire('Success', message || 'Note saved successfully.', 'success');
+          this.router.navigate(['/clinical/clinical-notes']);
+        } else {
+          // If API did not return the expected success message, just show it and stay on page
+          if (message) {
+            Swal.fire('Info', message, 'info');
+          } else {
+            Swal.fire('Success', 'Note saved successfully.', 'success');
+            this.router.navigate(['/clinical/clinical-notes']);
+          }
+        }
       })
       .catch((error: any) => {
         console.error('Error saving EMR note:', error);
