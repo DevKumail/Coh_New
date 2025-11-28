@@ -8,6 +8,8 @@ using HMIS.Core.Entities;
 using HMIS.Core.FileSystem;
 using HMIS.Service.DTOs;
 using HMIS.Service.Implementations;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -275,7 +277,7 @@ namespace HMIS.Service.ServiceLogics
             }
         }
 
-        public async Task<ClinicalNoteResponseDto> SaveEMRNote(EmrnotesNote noteDto)
+        public async Task<IActionResult> SaveEMRNote(EmrnotesNote noteDto)
         {
             try
             {
@@ -300,8 +302,8 @@ namespace HMIS.Service.ServiceLogics
 
                 _logger.LogInformation("Successfully saved EMR note with ID: {NoteId}", noteDto.NoteId);
 
-                var responseDto = _mapper.Map<ClinicalNoteResponseDto>(noteDto);
-                return responseDto;
+                return new StatusCodeResult(StatusCodes.Status200OK);
+
             }
             catch (DbUpdateException dbEx)
             {
@@ -366,6 +368,27 @@ namespace HMIS.Service.ServiceLogics
                 _logger.LogError(ex, "Error transcribing audio file for FileId: {FileId}", fileId);
                 throw;
             }
+        }
+
+        public async Task<(IEnumerable<GetEMRNoteListDto> Data, int TotalCount)> GetEMRNotesByMRNo(string mrno, int page, int pageSize)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@MRNo", mrno);
+            parameters.Add("@Page", page);
+            parameters.Add("@PageSize", pageSize);
+            parameters.Add("@TotalCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var notes = await connection.QueryAsync<GetEMRNoteListDto>(
+                "EMRNotes_GetByMRNo",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            var totalCount = parameters.Get<int>("@TotalCount");
+
+            return (notes, totalCount);
         }
 
         // Helper method to parse API response
