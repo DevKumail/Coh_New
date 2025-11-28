@@ -1,7 +1,7 @@
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgIconComponent } from '@ng-icons/core';
@@ -14,6 +14,8 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { Page } from '@/app/shared/enum/dropdown.enum';
 import Swal from 'sweetalert2';
+import { Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-female-medical-history-list',
@@ -32,7 +34,7 @@ import Swal from 'sweetalert2';
   templateUrl: './female-medical-history-list.component.html',
   styleUrl: './female-medical-history-list.component.scss'
 })
-export class FemaleMedicalHistoryListComponent implements AfterViewInit {
+export class FemaleMedicalHistoryListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MedicalHistoryBasicComponent, { static: false }) basicComponent!: MedicalHistoryBasicComponent;
   
   dropdowns: any = [];
@@ -53,6 +55,7 @@ export class FemaleMedicalHistoryListComponent implements AfterViewInit {
   isEditMode: boolean = false;
   currentEditId: number = 0;
   pendingEditData: any = null;
+  private destroy$ = new Subject<void>();
 
     constructor(
     private fb: FormBuilder,
@@ -83,7 +86,7 @@ export class FemaleMedicalHistoryListComponent implements AfterViewInit {
       this.dropdowns = payload || {};
     }
     getAlldropdown() {
-      this.sharedservice.getDropDownValuesByName(Page.IVFFemaleFertilityHistory).subscribe((res: any) => {
+      this.sharedservice.getDropDownValuesByName(Page.IVFFemaleFertilityHistory).pipe(take(1)).subscribe((res: any) => {
         this.AllDropdownValues = res;
         this.getAllDropdown(res);
       })
@@ -91,7 +94,7 @@ export class FemaleMedicalHistoryListComponent implements AfterViewInit {
     }
   
     FillCache() {
-      this.sharedservice.getCacheItem({ entities: this.cacheItems }).subscribe((response: any) => {
+      this.sharedservice.getCacheItem({ entities: this.cacheItems }).pipe(take(1)).subscribe((response: any) => {
         if (response.cache != null) {
           this.FillDropDown(response);
         }
@@ -145,13 +148,9 @@ export class FemaleMedicalHistoryListComponent implements AfterViewInit {
     }
 
     const formData = this.basicComponent.getFormData();
-    var ivfMainId;
-    // Get IVF Main ID from patient banner
-    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
-      ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
-          });
-
-
+    // Get IVF Main ID from patient banner (one-time read)
+    this.patientBannerService.getIVFPatientData().pipe(take(1)).subscribe((data: any) => {
+      const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
       if (!ivfMainId) {
         Swal.fire('Error', 'IVF Main ID not found', 'error');
         return;
@@ -210,6 +209,7 @@ export class FemaleMedicalHistoryListComponent implements AfterViewInit {
           Swal.fire('Error', error?.error?.message || 'Failed to save female fertility history', 'error');
         }
       });
+    });
   }
 
   onPageChanged(page: any){
@@ -287,13 +287,17 @@ export class FemaleMedicalHistoryListComponent implements AfterViewInit {
       }
     });
   }
-
   GetAllFemaleMedicalHistory(){
     this.isLoadingHistory = true;
-    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
-      const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
-      this.currentIvfMainId = ivfMainId;
-      if(ivfMainId){
+    this.patientBannerService.getIVFPatientData().pipe(take(1)).subscribe({
+      next: (data: any) => {
+        const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
+        this.currentIvfMainId = ivfMainId;
+        if (!ivfMainId) {
+          this.isLoadingHistory = false;
+          Swal.fire('Error', 'IVF Main ID not found', 'error');
+          return;
+        }
         this.ivfservice.GetAllFemaleMedicalHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
           next: (res: any) => {
             this.isLoadingHistory = false;
@@ -302,11 +306,19 @@ export class FemaleMedicalHistoryListComponent implements AfterViewInit {
           },
           error: () => {
             this.isLoadingHistory = false;
+            Swal.fire('Error', 'Failed to load fertility history', 'error');
           }
         });
-      } else {
+      },
+      error: () => {
         this.isLoadingHistory = false;
+        Swal.fire('Error', 'Failed to read patient info', 'error');
       }
     });
+  }
+    
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

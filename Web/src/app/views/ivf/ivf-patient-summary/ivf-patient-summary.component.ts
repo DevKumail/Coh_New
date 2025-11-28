@@ -1,4 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { NgIcon } from '@ng-icons/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -43,13 +45,14 @@ import { VitalSignsComponent } from '../../clinical/vital-signs/vital-signs.comp
   templateUrl: './ivf-patient-summary.component.html',
   styleUrls: ['./ivf-patient-summary.component.scss']
 })
-export class IvfPatientSummaryComponent implements OnInit {
+export class IvfPatientSummaryComponent implements OnInit, OnDestroy {
   leftCollapsed = false;
   selectedId: string = 'medical-history';
   offset = 120; // px: used in CSS var --patient-summary-offset
   isCoupleLink: boolean = false;
   isivfstart: boolean = false;
   isMalesidebar: boolean = true;
+  isSwitchingGender: boolean = false;
   PrimaryPatientData: any = [];
   PrimaryPatientDataAppId: any;
   SecondaryPatientData: any;
@@ -59,30 +62,38 @@ export class IvfPatientSummaryComponent implements OnInit {
   demographicapi = inject(DemographicApiServices);
   loader = inject(LoaderService);
   ivfapi = inject(IVFApiService);
-
-  
+  private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
     // Auto-open Advanced Filter modal when no patient is loaded
 
-    this.patientBannerService.patientData$.subscribe(data => {
-      if (!data) {
-        // this.modalTrigger.openModal('advance-filter-modal', 'ivf-patient-summary');
+    this.patientBannerService.patientData$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        if (!data) {
+          // this.modalTrigger.openModal('advance-filter-modal', 'ivf-patient-summary');
           this.isCoupleLink = false;
           this.isivfstart = false;
-      } else {
-        this.PrimaryPatientData = data.table2[0] || [];
-        this.patientBannerService.selectedVisit$.subscribe((visit: any) => {
-          if (visit) {
-            this.PrimaryPatientDataAppId = visit.appointmentId;
-          }
-        });
+        } else {
+          this.PrimaryPatientData = data.table2[0] || [];
+          // Default active sidebar gender to the banner-loaded patient's gender
+          this.isMalesidebar = (this?.PrimaryPatientData?.gender === 'Male');
+          // Stop gender switching loader when data arrives
+          this.isSwitchingGender = false;
+          this.patientBannerService.selectedVisit$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((visit: any) => {
+              if (visit) {
+                this.PrimaryPatientDataAppId = visit.appointmentId;
+              }
+            });
+        }
+      });
 
 
-      }
-    });
-
-    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+    this.patientBannerService.getIVFPatientData()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data: any) => {
       console.log("IVF Patient Data", data)
       if (data) {
         this.SecondaryPatientData = data?.couple || [];
@@ -113,6 +124,7 @@ export class IvfPatientSummaryComponent implements OnInit {
 
   setGender(g: 'male' | 'female') {
     this.isMalesidebar = (g === 'male');
+    this.isSwitchingGender = true;
   }
 
 
@@ -204,5 +216,10 @@ export class IvfPatientSummaryComponent implements OnInit {
           this.loader.hide();
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

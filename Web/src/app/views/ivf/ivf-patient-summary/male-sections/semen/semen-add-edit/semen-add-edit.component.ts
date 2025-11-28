@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, SimpleChanges, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SemenTabsComponent } from './semen-tabs/semen-tabs.component';
@@ -9,6 +9,8 @@ import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
+import { Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-semen-add-edit',
@@ -17,7 +19,7 @@ import { PatientBannerService } from '@/app/shared/Services/patient-banner.servi
   templateUrl: './semen-add-edit.component.html',
   styleUrls: ['./semen-add-edit.component.scss']
 })
-export class SemenAddEditComponent implements OnChanges {
+export class SemenAddEditComponent implements OnInit, OnChanges, OnDestroy {
   form: FormGroup;
   AllDropdownValues: any = [];
   hrEmployees: any = [];
@@ -29,6 +31,7 @@ export class SemenAddEditComponent implements OnChanges {
   cacheItems: string[] = ['Provider'];
   @ViewChild(SemenTabsComponent) tabs?: SemenTabsComponent;
   @ViewChild(SemenDiagnosisApprovalComponent) diag?: SemenDiagnosisApprovalComponent;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -116,6 +119,11 @@ export class SemenAddEditComponent implements OnChanges {
       // Apply immediately if children are ready; otherwise defer slightly
       setTimeout(() => this.applyModel(changes['model'].currentValue), 0);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private applyModel(m: any) {
@@ -249,7 +257,7 @@ export class SemenAddEditComponent implements OnChanges {
     const d = this.diag?.getValue?.() || { diagnosis: null, finding: null, note: null, approvalStatus: 'Pending' };
     const approval = String(d.approvalStatus || 'Pending');
     var MainId
-    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+    this.patientBannerService.getIVFPatientData().pipe(take(1)).subscribe((data: any) => {
       if (data) {
         if (data?.couple?.ivfMainId != null) {
           MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;

@@ -1,4 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -37,7 +39,7 @@ import { LoaderService } from '@core/services/loader.service';
   templateUrl: './medical-history.component.html',
   styleUrls: ['./medical-history.component.scss']
 })
-export class MedicalHistoryComponent {
+export class MedicalHistoryComponent implements OnInit, OnDestroy {
   activeTabId: number = 1;
 
   AllDropdownValues: any = [];
@@ -57,6 +59,8 @@ export class MedicalHistoryComponent {
 
   // Toggle between list (default) and form
   showForm = false;
+
+  private destroy$ = new Subject<void>();
 
   // Track current record and section IDs when editing
   private currentFhId: number | null = null;
@@ -89,6 +93,11 @@ export class MedicalHistoryComponent {
     this.getAlldropdown();
     // Load list by default
     this.loadFertilityHistory();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   openEditById(ivfMaleFHId: number) {
@@ -284,8 +293,10 @@ export class MedicalHistoryComponent {
   loadFertilityHistory(page: number = this.PaginationInfo.Page) {
     this.isLoadingHistory = true;
     this.PaginationInfo.Page = page;
-    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
-      const ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
+    var ivfMainId;
+    this.patientBannerService.getIVFPatientData().pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
+      ivfMainId = data?.couple?.ivfMainId?.IVFMainId ?? null;
+      });
       if (ivfMainId) {
         this.ivfservice.getMaleFertilityHistory(ivfMainId, this.PaginationInfo.Page, this.PaginationInfo.RowsPerPage).subscribe({
           next: (res: any) => {
@@ -302,7 +313,6 @@ export class MedicalHistoryComponent {
         this.historyRows = [];
         this.isLoadingHistory = false;
       }
-    });
   }
 
   onPageChanged(event: any) {

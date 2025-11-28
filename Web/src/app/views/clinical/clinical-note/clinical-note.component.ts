@@ -289,6 +289,10 @@ export class ClinicalNoteComponent implements OnInit {
     if (noteValue) queryParams.template = noteValue;
     if (macroValue) queryParams.macro = macroValue;
 
+    if (this.selectedNoteType === 'freetext') {
+      queryParams.noteType = 'FreeText';
+    }
+
     switch(this.selectedNoteType) {
       case 'structured':
         this.router.navigate(['/clinical/create-structured-notes'], { queryParams });

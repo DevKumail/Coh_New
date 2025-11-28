@@ -28,13 +28,7 @@ public partial class LabOrderSet
 
     public int? CreatedBy { get; set; }
 
-    [StringLength(100)]
-    [Unicode(false)]
-    public string? UpdatedBy { get; set; }
-
-    [StringLength(20)]
-    [Unicode(false)]
-    public string? UpdatedDate { get; set; }
+    public int? UpdatedBy { get; set; }
 
     [StringLength(10)]
     [Unicode(false)]
@@ -66,6 +60,9 @@ public partial class LabOrderSet
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? UpdatedDate { get; set; }
 
     [ForeignKey("AppId")]
     [InverseProperty("LabOrderSet")]

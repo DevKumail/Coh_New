@@ -1,12 +1,13 @@
+using Deepgram;
+using Deepgram.Clients.Interfaces.v1;
 using HMIS.Application.Implementations;
 using HMIS.Application.ServiceLogics;
 using HMIS.Application.ServiceLogics.Cryo;
 using HMIS.Application.ServiceLogics.IVF;
 using HMIS.Application.ServiceLogics.IVF.Dashboard;
-using HMIS.Application.ServiceLogics.IVF.Male;
 using HMIS.Application.ServiceLogics.IVF.Female;
+using HMIS.Application.ServiceLogics.IVF.Male;
 using HMIS.ApplicationImplementations;
-using HMIS.Core.Entities;
 using HMIS.Service.Implementations;
 using HMIS.Service.ServiceLogics;
 using Microsoft.Extensions.Configuration;
@@ -36,17 +37,17 @@ namespace HMIS.Application
             services.AddScoped<IEncounterManager, EncounterManager>();
             services.AddScoped<ITempDemographicManager, TempDemographicManager>();
             services.AddScoped<IBillGeneratorManager, BillGeneratorManager>();
-            services.AddScoped<ISummarySheetManager,SummarySheetManager>();
+            services.AddScoped<ISummarySheetManager, SummarySheetManager>();
             services.AddScoped<IEligibilityManager, EligibilityManager>();
             services.AddScoped<IPatientProblem, PatientProblemManager>();
             services.AddScoped<IPatientImmunization, PatientImmunizationManager>();
             services.AddScoped<IPatientProcedure, PatientProcedureManager>();
-            services.AddScoped<IAlergyManager, AlergyManager >();
+            services.AddScoped<IAlergyManager, AlergyManager>();
             services.AddScoped<IEMRNotesManager, EMRNotesManager>();
             services.AddScoped<IPatientChartFamilyHistoryManager, PatientChartFamilyHistoryManager>();
             services.AddScoped<ILocalizationSpService, LocalizationSpService>();
             services.AddScoped<IPrescription, PrescriptionManager>();
-            services.AddScoped<IAlertManager, AlertManager >();
+            services.AddScoped<IAlertManager, AlertManager>();
             services.AddScoped<IDashboardService, IVFDashboardService>();
             services.AddScoped<ICryoManagementService, CryoManagementService>();
             services.AddScoped<IDropDownLookUpService, DropDownLookUpService>();
@@ -58,6 +59,12 @@ namespace HMIS.Application
             services.AddScoped<IIVFStrawColorService, IVFStrawColorService>();
             services.AddScoped<IIVFMaleCryoPreservationService, IVFMaleCryoPreservationService>();
 
+            services.AddSingleton<IListenRESTClient>(provider =>
+            {
+                var apiKey = _config["Deepgram:ApiKey"];
+                Library.Initialize();
+                return ClientFactory.CreateListenRESTClient(apiKey);
+            });
 
 
         }

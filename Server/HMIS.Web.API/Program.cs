@@ -28,6 +28,7 @@ builder.Host.UseSerilog((ctx, lc) => lc
 //}, typeof(Program));
 
 builder.Services.AddAutoMapper(typeof(GeneralProfile).Assembly);
+builder.Services.AddSharedInfrastructure(builder.Configuration);
 
 builder.Services.AddScoped<IFileRepository, FileRepository>();
 builder.Services.AddScoped<FileHelper>();

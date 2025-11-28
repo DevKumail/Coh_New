@@ -1,7 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-medical-history-general',
@@ -10,20 +12,21 @@ import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.
   templateUrl: './medical-history-general.component.html',
   styleUrls: ['./medical-history-general.component.scss']
 })
-export class MedicalHistoryGeneralComponent implements OnInit {
+export class MedicalHistoryGeneralComponent implements OnInit, OnDestroy {
   generalForm!: FormGroup;
   @Input() dropdowns: { [key: string]: Array<{ valueId: number; name: string }> } = {};
 
   constructor(private fb: FormBuilder) {}
+  private destroy$ = new Subject<void>();
 
   ngOnInit() {
     this.initializeForm();
-    this.generalForm.get('hepatitis')?.valueChanges.subscribe((checked: boolean) => {
+    this.generalForm.get('hepatitis')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((checked: boolean) => {
       if (!checked) {
         this.generalForm.get('hepatitisDetail')?.setValue('');
       }
     });
-    this.generalForm.get('existingAllergies')?.valueChanges.subscribe((checked: boolean) => {
+    this.generalForm.get('existingAllergies')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((checked: boolean) => {
       if (!checked) {
         this.generalForm.get('existingAllergiesDetail')?.setValue('');
       }
@@ -43,7 +46,7 @@ export class MedicalHistoryGeneralComponent implements OnInit {
       }
     };
     applyChildrenState(!!this.generalForm.get('hasChildren')?.value);
-    this.generalForm.get('hasChildren')?.valueChanges.subscribe((v: boolean) => applyChildrenState(!!v));
+    this.generalForm.get('hasChildren')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((v: boolean) => applyChildrenState(!!v));
 
     const applyAndroDiagState = (on: boolean) => {
       const dateCtrl = this.generalForm.get('andrologicalDiagnosisDate');
@@ -55,7 +58,7 @@ export class MedicalHistoryGeneralComponent implements OnInit {
       }
     };
     applyAndroDiagState(!!this.generalForm.get('andrologicalDiagnosisPerformed')?.value);
-    this.generalForm.get('andrologicalDiagnosisPerformed')?.valueChanges.subscribe((v: boolean) => applyAndroDiagState(!!v));
+    this.generalForm.get('andrologicalDiagnosisPerformed')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((v: boolean) => applyAndroDiagState(!!v));
 
     const illnessKeys = [
       'asthenozoospermia',
@@ -80,7 +83,7 @@ export class MedicalHistoryGeneralComponent implements OnInit {
       }
     };
     applyIdiopathicState(!!this.generalForm.get('idiopathic')?.value);
-    this.generalForm.get('idiopathic')?.valueChanges.subscribe((v: boolean) => applyIdiopathicState(!!v));
+    this.generalForm.get('idiopathic')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((v: boolean) => applyIdiopathicState(!!v));
   }
 
   isIdiopathicSelected(id: number): boolean {
@@ -180,5 +183,10 @@ export class MedicalHistoryGeneralComponent implements OnInit {
 
   opts(key: string) {
     return this.dropdowns?.[key] || [];
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

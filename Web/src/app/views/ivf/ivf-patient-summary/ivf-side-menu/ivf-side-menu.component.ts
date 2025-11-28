@@ -2,6 +2,9 @@ import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Ou
 import { CommonModule } from '@angular/common';
 import { NgIcon } from '@ng-icons/core';
 import Tooltip from 'bootstrap/js/dist/tooltip';
+import { DemographicApiServices } from '@/app/shared/Services/Demographic/demographic.api.serviec';
+import { take } from 'rxjs/operators';
+import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 
 @Component({
   selector: 'app-ivf-side-menu',
@@ -14,6 +17,8 @@ export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges
   @Input() selected: string = 'medical-history';
   @Input() collapsed: boolean = false;
   @Input() isMalesidebar: boolean = true;
+  @Input() maleMrNo: string | null = null;
+  @Input() femaleMrNo: string | null = null;
   @Output() select = new EventEmitter<string>();
   @Output() genderChange = new EventEmitter<'male' | 'female'>();
   @ViewChildren('menuLink') links!: QueryList<ElementRef<HTMLElement>>;
@@ -50,8 +55,21 @@ export class IvfSideMenuComponent implements AfterViewInit, OnDestroy, OnChanges
     this.select.emit(id);
   }
 
-  onGenderToggle(g: 'male' | 'female') {
+  constructor(private demoApi: DemographicApiServices, private patientBannerService: PatientBannerService) {}
+
+  async onGenderToggle(g: 'male' | 'female') {
     this.genderChange.emit(g);
+    const mr = g === 'male' ? (this.maleMrNo || '') : (this.femaleMrNo || '');
+    if (!mr) {
+      // No MR number provided; skip API call but keep existing behavior
+      console.warn(`[IvfSideMenu] Missing MR number for ${g} click; provide maleMrNo/femaleMrNo input to enable logging.`);
+      return;
+    }
+    await this.demoApi.getPatientByMrNo(mr).pipe(take(1)).subscribe({
+      next: (res) =>
+        this.patientBannerService.setPatientData(res),
+      error: (err) => console.error(`[IvfSideMenu] ${g} MRNo=${mr} error:`, err)
+    });
   }
 
   ngAfterViewInit(): void {

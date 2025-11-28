@@ -278,7 +278,10 @@ private question = 'assets/question.json';
   }
     InsertSpeech(note: any) {
     debugger
-    return this.api.post(`Appointment/InsertSpeech`, note).toPromise();
+    return this.api.post(`EMRNotes/InsertSpeech`, note).toPromise();
+  }
+  SaveEMRNote(note: any) {
+    return this.api.post(`EMRNotes/SaveEMRNote`, note).toPromise();
   }
   GetSocialHistory(){
     return this.api.get(`AllDropdowns/GetSocialHistory`).toPromise();

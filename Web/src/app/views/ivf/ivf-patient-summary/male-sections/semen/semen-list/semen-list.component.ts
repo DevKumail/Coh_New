@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { PreservationComponent } from '../cryo-preservation/preservation/preservation.component';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-semen-list',
@@ -46,7 +47,7 @@ export class SemenListComponent {
   load() {
     this.isLoading = true;
     var MainId: number = 0;
-    this.patientBannerService.getIVFPatientData().subscribe((data: any) => {
+    this.patientBannerService.getIVFPatientData().pipe(take(1)).subscribe((data: any) => {
       if (data) {
         if (data?.couple?.ivfMainId != null) {
           MainId = data?.couple?.ivfMainId?.IVFMainId ?? 0;

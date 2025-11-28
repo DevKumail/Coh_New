@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
-import { provideIcons } from '@ng-icons/core';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { tablerRotateClockwise } from '@ng-icons/tabler-icons';
-import { NgIconComponent } from '@ng-icons/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-cryo-storage-place',
@@ -14,7 +15,7 @@ import { NgIconComponent } from '@ng-icons/core';
   styleUrls: ['./cryo-storage-place.component.scss'],
   providers: [provideIcons({ tablerRotateClockwise })]
 })
-export class CryoStoragePlaceComponent {
+export class CryoStoragePlaceComponent implements OnDestroy {
   @Output() back = new EventEmitter<void>();
   @Output() selected = new EventEmitter<any>();
 
@@ -55,7 +56,7 @@ export class CryoStoragePlaceComponent {
     this.loadContainers();
 
     // On container change -> load level A, enable levelA, reset lower levels
-    this.form.get('description')?.valueChanges.subscribe((containerId: number) => {
+    this.form.get('description')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((containerId: number) => {
       this.levelAs = [];
       this.levelBs = [];
       this.form.get('levelA')?.reset();
@@ -73,7 +74,7 @@ export class CryoStoragePlaceComponent {
     });
 
     // On levelA change -> load level B, enable levelB
-    this.form.get('levelA')?.valueChanges.subscribe((levelAId: number) => {
+    this.form.get('levelA')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((levelAId: number) => {
       this.levelBs = [];
       this.form.get('levelB')?.reset();
       this.form.get('levelB')?.disable();
@@ -238,6 +239,13 @@ loadStorageDetails() {
     if (this.form.get('description')?.value !== id) {
       this.form.get('description')?.setValue(id);
     }
+  }
+
+  // teardown
+  private destroy$ = new Subject<void>();
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onLevelAChange(val: any) {
