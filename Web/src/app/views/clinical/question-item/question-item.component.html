@@ -9,14 +9,13 @@
 
   <div
     *ngIf="question.children?.length"
-    [style.display]="question.type === 'Question Section' ? 'flex' : 'inline-block'"
-    [style.flexWrap]="question.type === 'Question Section' ? 'wrap' : 'nowrap'"
-    [style.gap]="question.type === 'Question Section' ? '10px' : '0'">
+    [style.display]="question.type === 'Question Section' ? 'grid' : 'inline-flex'"
+    [style.gridTemplateColumns]="question.type === 'Question Section' ? 'repeat(3, 1fr)' : 'none'"
+    [style.flexWrap]="question.type === 'Question Section' ? 'nowrap' : 'wrap'"
+    [style.gap]="'10px'">
     <app-question-item
       *ngFor="let child of question.children"
-      [question]="child"
-      [style.flexBasis]="question.type === 'Question Section' ? 'calc(33.333% - 10px)' : 'auto'"
-      [style.maxWidth]="question.type === 'Question Section' ? 'calc(33.333% - 10px)' : 'none'"
-    ></app-question-item>
+      [question]="child">
+    </app-question-item>
   </div>
 </div>

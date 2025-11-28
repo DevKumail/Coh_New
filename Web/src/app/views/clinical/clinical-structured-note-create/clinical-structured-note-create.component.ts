@@ -361,10 +361,12 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
         html += `<div>${question.answer || 'N/A'}</div>`;
         html += `</div>`;
       } else if (question.type === 'CheckBox') {
-        html += `<div style="display: inline-block; margin-right: 20px; margin-bottom: 15px; width: calc(25% - 20px); vertical-align: top;">`;
-        html += `<div><input type="checkbox" ${question.answer ? 'checked' : ''} disabled> <strong>${question.quest_Title}</strong></div>`;
-        html += `<div>${question.answer || ''}</div>`;
-        html += `</div>`;
+        // Only show checkbox if it's checked (true)
+        if (question.answer === true || question.answer === 'true') {
+          html += `<div style="display: inline-block; margin-right: 20px; margin-bottom: 15px; width: calc(25% - 20px); vertical-align: top;">`;
+          html += `<div><strong>${question.quest_Title}:</strong> Yes</div>`;
+          html += `</div>`;
+        }
       }
 
       if (question.children && question.children.length > 0 && question.type !== 'Question Section') {
@@ -388,10 +390,10 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     return provider ? provider.name : '';
   }
 
-  // Update the model when a child emits an answer change (plain string)
-  onAnswerChange(value: string, question: any) {
+  // Update the model when a child emits an answer change (string or boolean for checkboxes)
+  onAnswerChange(value: string | boolean, question: any) {
     if (question) {
-      question.answer = String(value ?? '');
+      question.answer = value ?? '';
     }
     // this.cdr.markForCheck();
   }
@@ -400,8 +402,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   isSectionFilled(section: any): boolean {
     if (!section) return false;
 
-    // Check if the section itself has an answer
-    const hasSelf = typeof section.answer === 'string' && section.answer.trim().length > 0;
+    // Check if the section itself has an answer (string or boolean for checkboxes)
+    const hasSelf = (typeof section.answer === 'string' && section.answer.trim().length > 0) ||
+                    (typeof section.answer === 'boolean' && section.answer === true);
 
     // Recursively check all children
     const hasChild = Array.isArray(section.children) && section.children.some((c: any) => this.isSectionFilled(c));
@@ -428,6 +431,6 @@ export interface Question {
   quest_Title: string;
   type: string;
   parent_Id: number;
-  answer: string;
+  answer: string | boolean; // Support boolean for checkboxes
   children: Question[];
 }
