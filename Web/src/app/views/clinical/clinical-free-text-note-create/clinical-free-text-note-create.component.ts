@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
+import { DeepgramService } from '@/app/shared/Services/deepgram.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 import { distinctUntilChanged, filter, Subscription } from 'rxjs';
@@ -71,6 +72,10 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   private queryParamTemplate: any = null;
   hideTemplateDropdown: boolean = false;
 
+  isRecording: boolean = false;
+  transcriptionText: string = '';
+  private transcriptionSubscription: Subscription | null = null;
+
   quillModules = {
     toolbar: [
       [{ font: [] }],
@@ -86,13 +91,13 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService,
-    // private messageService: MessageService,
-         private loader: LoaderService,
+    private deepgramService: DeepgramService,
+    private loader: LoaderService,
     private router: Router,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-     private PatientData: PatientBannerService
+    private PatientData: PatientBannerService
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
@@ -165,6 +170,13 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
       });
       this.subscriptions.push(sub2);
     }
+
+    // Subscribe to transcription updates
+    this.transcriptionSubscription = this.deepgramService.getTranscript$().subscribe(
+      (transcript: string) => {
+        this.appendTranscriptionToEditor(transcript);
+      }
+    );
   }
 
   showDialog() { this.visible = true; }
@@ -213,16 +225,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     if (providerCode == null || providerCode == undefined) providerCode = 0;
     this.selectedProviders = Number(providerCode) || 0;
     if (this.selectedProviders === 250) providerCode = 197;
-    this.clinicalNotes = [];
-    this.clinicalForm.patchValue({ note: null });
-    this.loader.show();
-    this.clinicalApiService.EMRNotesGetByEmpId(providerCode).then((res: any) => {
-      this.clinicalNotes = res.result || [];
-        this.loader.hide();
-    }).catch((e: any) =>
-        Swal.fire('Error', 'Error loading notes', 'error')
-    //   this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading notes' })
-    ).finally(() => this.loader.hide());
+
   }
 
   // GetNotesTemplate unchanged except it now receives numeric noteId
@@ -402,9 +405,63 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   resetForm(){
     this.clinicalForm.reset();
   }
+  toggleVoiceRecording(): void {
+    if (this.isRecording) {
+      this.stopRecording();
+    } else {
+      this.startRecording();
+    }
+  }
+
+  async startRecording(): Promise<void> {
+    try {
+      this.loader.show();
+      await this.deepgramService.startTranscription();
+      this.isRecording = true;
+      Swal.fire({
+        icon: 'info',
+        title: 'Recording Started',
+        text: 'Speak into your microphone. Your speech will be transcribed in real-time.',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      Swal.fire('Error', 'Failed to start voice recording. Please check microphone permissions.', 'error');
+      this.isRecording = false;
+    } finally {
+      this.loader.hide();
+    }
+  }
+
+  stopRecording(): void {
+    this.deepgramService.stopTranscription();
+    this.isRecording = false;
+    Swal.fire({
+      icon: 'success',
+      title: 'Recording Stopped',
+      text: 'Transcription has been added to your note.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+  }
+
+  private appendTranscriptionToEditor(transcript: string): void {
+    const currentContent = this.clinicalForm.get('editorContent')?.value || '';
+    const newContent = currentContent + (currentContent ? ' ' : '') + transcript;
+    this.clinicalForm.patchValue({ editorContent: newContent });
+    this.cdr.detectChanges();
+  }
+
   ngOnDestroy(): void {
     if (this.patientDataSubscription) {
       this.patientDataSubscription.unsubscribe();
+    }
+    if (this.transcriptionSubscription) {
+      this.transcriptionSubscription.unsubscribe();
+    }
+    if (this.isRecording) {
+      this.deepgramService.stopTranscription();
     }
     this.subscriptions.forEach(s => s.unsubscribe());
   }
