@@ -12,9 +12,11 @@ namespace HMIS.Service.Implementations
         Task<EMRNotesModel> GetNoteQuestionBYPathId(int pathId);
 
         Task<List<ProvierEMRNotesModel>> EMRNotesGetByEmpId(long EmpId);
-        Task<IActionResult> SaveEMRNote(EmrnotesNote noteDto);
+        Task<EmrnotesNote> SaveEMRNote(EmrnotesNote noteDto);
         Task<nodeModel> InsertSpeechWithTranscription(ClinicalNoteDto note);
         Task<(IEnumerable<GetEMRNoteListDto> Data, int TotalCount)> GetEMRNotesByMRNo(string mrno, int page, int pageSize);
+        Task<EMRNoteDetailDto?> GetEMRNoteByNoteId(long noteId);
+
     }
 
 }

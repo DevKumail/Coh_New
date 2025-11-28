@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace HMIS.Application.DTOs.Clinical
-{// ClinicalNoteSaveDto.cs
+{
     public class ClinicalNoteSaveDto
     {
-        // Make sure ALL these are long? to match your entity
+        public long NoteId { get; set; }
         public long? VisitAcNo { get; set; }
         public long? CreatedBy { get; set; }
         public long? UpdatedBy { get; set; }
@@ -17,10 +17,8 @@ namespace HMIS.Application.DTOs.Clinical
         public long? LabOrderSetDetailId { get; set; }
         public long? OldNoteId { get; set; }
 
-        // Only ReceiverRoleId should be int? (based on your entity)
         public int? ReceiverRoleId { get; set; }
 
-        // Other properties remain the same
         [Required]
         [StringLength(50)]
         public string NotesTitle { get; set; } = null!;
@@ -74,5 +72,27 @@ namespace HMIS.Application.DTOs.Clinical
         public string? Mrno { get; set; }
         public string? NoteStatus { get; set; }
         public bool Signed { get; set; }
+    }
+
+    public class EMRNoteDetailDto
+    {
+        public long NoteId { get; set; }
+        public string NotesTitle { get; set; } = null!;
+        public string? NoteText { get; set; }
+        public string? NoteHtmltext { get; set; }
+        public string? Description { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+        public long? CreatedBy { get; set; }
+        public long? UpdatedBy { get; set; }
+        public bool Signed { get; set; }
+        public long? SignedBy { get; set; }
+        public DateTime? SignedDate { get; set; }
+        public bool IsEdit { get; set; }
+        public string? NoteType { get; set; }
+        public bool Active { get; set; }
+        public string? Mrno { get; set; }
+        public string? NoteStatus { get; set; }
+        public long? VisitAcNo { get; set; }
     }
 }

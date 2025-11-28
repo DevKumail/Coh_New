@@ -17,7 +17,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { QuillModule } from 'ngx-quill';
 
 @Component({
-    standalone: true,
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -26,7 +26,7 @@ import { QuillModule } from 'ngx-quill';
     QuestionItemComponent,
     QuestionViewComponent,
     QuillModule
-],
+  ],
   selector: 'app-clinical-free-text-note-create',
   templateUrl: './clinical-free-text-note-create.component.html',
   styleUrls: ['./clinical-free-text-note-create.component.scss']
@@ -70,6 +70,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
   private queryParamProvider: any = null;
   private queryParamTemplate: any = null;
+  private queryParamNoteId: number | null = null;
   hideTemplateDropdown: boolean = false;
 
   isRecording: boolean = false;
@@ -131,8 +132,9 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.queryParamProvider = params['provider'] ? Number(params['provider']) : null;
       this.queryParamTemplate = params['template'] ? Number(params['template']) : null;
+      this.queryParamNoteId = params['noteId'] ? Number(params['noteId']) : null;
 
-      console.log('Query params - Provider:', this.queryParamProvider, 'Template:', this.queryParamTemplate);
+      console.log('Query params - Provider:', this.queryParamProvider, 'Template:', this.queryParamTemplate, 'NoteId:', this.queryParamNoteId);
 
       // If template is provided, hide the template dropdown
       this.hideTemplateDropdown = !!this.queryParamTemplate;
@@ -140,6 +142,11 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
       // Set provider if provided
       if (this.queryParamProvider) {
         this.clinicalForm.patchValue({ provider: this.queryParamProvider });
+      }
+
+      // If noteId is provided, load existing note for editing
+      if (this.queryParamNoteId) {
+        this.loadExistingNote(this.queryParamNoteId);
       }
     });
 
@@ -188,7 +195,6 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     });
   }
 
-
   FillCache() {
     // ...existing code...
     this.clinicalApiService
@@ -200,8 +206,8 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
       })
       .catch((error: any) =>
         // this.messageService.add({ severity: 'error', summary: 'Error', detail: error?.message || 'Failed to load cache' })
-      Swal.fire('Error', error?.message || 'Failed to load cache', 'error'
-      ));
+        Swal.fire('Error', error?.message || 'Failed to load cache', 'error'
+        ));
   }
 
   FillDropDown(response: any) {
@@ -236,19 +242,56 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     this.dataquestion = [];
     this.viewquestion = false;
     this.nodeData = []
-    if(noteId != null && noteId != undefined && noteId != 0){
-    this.loader.show();
-    this.clinicalApiService.GetNotesTemplate(noteId).then((res: any) => {
-      this.dataquestion = res;
-      this.viewquestion = true;
-      this.nodeData = res;
-          this.loader.hide();
-    }).catch(() =>
-    //   this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading template' })
-    Swal.fire('Error', 'Error loading template', 'error')
-    ).finally(() => this.loader.hide());
+    if (noteId != null && noteId != undefined && noteId != 0) {
+      this.loader.show();
+      this.clinicalApiService.GetNotesTemplate(noteId).then((res: any) => {
+        this.dataquestion = res;
+        this.viewquestion = true;
+        this.nodeData = res;
+        this.loader.hide();
+      }).catch(() =>
+        //   this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading template' })
+        Swal.fire('Error', 'Error loading template', 'error')
+      ).finally(() => this.loader.hide());
     }
 
+  }
+
+  loadExistingNote(noteId: number) {
+    if (!noteId) {
+      return;
+    }
+
+    this.loader.show();
+    this.clinicalApiService.GetEMRNoteByNoteId(noteId)
+      .then((res: any) => {
+        const note = res?.data;
+        if (!note) {
+          Swal.fire('Error', 'Unable to load note details for editing.', 'error');
+          return;
+        }
+
+        // Update MRN and visit if available
+        this.mrNo = note.mrno || this.mrNo;
+        this.appointmentID = note.visitAcNo || this.appointmentID;
+
+        // Update title and form fields
+        this.noteTitle = note.notesTitle || this.noteTitle;
+        this.clinicalForm.patchValue({
+          provider: note.signedBy || null,
+          description: note.description || '',
+          editorContent: note.noteHtmltext || note.noteText || ''
+        });
+
+        this.cdr.markForCheck();
+      })
+      .catch((error: any) => {
+        console.error('Error loading EMR note by id:', error);
+        Swal.fire('Error', 'Failed to load note for editing.', 'error');
+      })
+      .finally(() => {
+        this.loader.hide();
+      });
   }
 
   // --- offline storage (IndexedDB) --------------------------------------
@@ -298,7 +341,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     const description = this.clinicalForm.get('description')?.value;
 
     if (this.appointmentID == null || this.appointmentID == undefined || this.appointmentID == 0
-        && this.mrNo == null || this.mrNo == undefined || this.mrNo == ''
+      && this.mrNo == null || this.mrNo == undefined || this.mrNo == ''
     ) {
       Swal.fire('Error', 'Appointment ID and MRNo are required to submit the note.', 'error');
       return;
@@ -353,6 +396,11 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
     console.log('SaveEMRNote payload:', emrPayload);
 
+    if (!this.appointmentID) {
+      Swal.fire('warning', 'Appointment ID is not found please load patient.', 'warning');
+      return;
+    }
+
     this.loader.show();
     this.clinicalApiService.SaveEMRNote(emrPayload)
       .then((res: any) => {
@@ -360,14 +408,15 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
         if (message === 'Note saved successfully.' || message === 'Note saved successfully') {
           Swal.fire('Success', message || 'Note saved successfully.', 'success');
-          this.router.navigate(['/clinical/clinical-notes']);
+          this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
         } else {
           // If API did not return the expected success message, just show it and stay on page
           if (message) {
-            Swal.fire('Info', message, 'info');
+            Swal.fire('success', message, 'success');
+            this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
           } else {
             Swal.fire('Success', 'Note saved successfully.', 'success');
-            this.router.navigate(['/clinical/clinical-notes']);
+            this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
           }
         }
       })
@@ -414,7 +463,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
   }
 
-  resetForm(){
+  resetForm() {
     this.clinicalForm.reset();
   }
   toggleVoiceRecording(): void {
