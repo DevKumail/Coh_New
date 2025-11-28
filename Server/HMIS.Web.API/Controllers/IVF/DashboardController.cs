@@ -28,6 +28,7 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(new { couple = couple.Data }); 
         }
 
+
         [HttpGet("GetOppositeGenderPatients")]
         public async Task<IActionResult> GetOppositeGenderPatients([FromQuery] string gender, [FromQuery] int? page = 1, [FromQuery] int? rowsPerPage = 10, [FromQuery] string? mrno = null, [FromQuery] string? phone = null, [FromQuery] string? emiratesId = null, [FromQuery] string? name = null)
         {
@@ -42,6 +43,7 @@ namespace HMIS.Web.Controllers.IVF
             if (!ok) return BadRequest("Invalid gender provided.");
             return Ok(new { data, total });
         }
+
 
         [HttpGet("GetFertilityHistoryForDashboard")]
         public async Task<IActionResult> GetFertilityHistoryForDashboard([FromQuery] string ivfmainid)

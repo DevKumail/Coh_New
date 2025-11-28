@@ -9,9 +9,14 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public object? IVFMainId { get; set; }     // null if absent
     }
 
-    public class FemaleDemographicDTO : BaseDemographicDTO { }
-    public class MaleDemographicDTO : BaseDemographicDTO { }
-
+    public class FemaleDemographicDTO : BaseDemographicDTO 
+    {
+    
+    }
+    public class MaleDemographicDTO : BaseDemographicDTO 
+    {
+    
+    }
     public class BaseDemographicDTO
     {
         public string Name { get; set; }
