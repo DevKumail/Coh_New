@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
 using HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview;
 using HMIS.Core.Context;
 using HMIS.Core.Entities;
@@ -16,6 +18,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
         Task<(bool isSuccess, string message)> CreatePrescription(CreateMasterPrescriptionDto dto);
         Task<(bool isSuccess, string message)> UpdatePrescription(CreateMasterPrescriptionDto dto);
         Task<(bool isSuccess, string message)> DeletePrescription(long prescriptionId);
+        Task<List<GetDrugDetailsDto>> GetAllDrugs(PaginationDto dto);
     }
     public class PrescriptionMasterService : IPrescriptionMasterService
     {
@@ -25,6 +28,23 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
         {
             _dapper = dapper;
             _context = context;
+        }
+
+        public async Task<List<GetDrugDetailsDto>> GetAllDrugs(PaginationDto dto)
+        {
+            using var connection = _dapper.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@PageNumber", dto.PageNumber, DbType.Int32);
+            parameters.Add("@PageSize", dto.PageSize, DbType.Int32);
+
+            var result = await connection.QueryAsync<GetDrugDetailsDto>(
+                "GetDrugsPaged",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return result.ToList();
         }
 
         public async Task<(bool isSuccess, string message)> CreatePrescription(CreateMasterPrescriptionDto dto) 

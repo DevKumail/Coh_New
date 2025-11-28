@@ -8,5 +8,10 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
 {
     public class GetDrugDetailsDto
     {
+        public int DrugId { get; set; }
+        public string DrugName { get; set; }
+        public string Dose { get; set; }
+        public string PackageSize { get; set; }
+        public string PackageName { get; set; }
     }
 }

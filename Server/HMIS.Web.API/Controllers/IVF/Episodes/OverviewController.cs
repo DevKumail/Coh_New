@@ -60,6 +60,14 @@ namespace HMIS.Web.Controllers.IVF.Episodes
 
         //----------------- Prescription Master start -----------------
 
+        [HttpPost("prescription-master-getalldrugs")]
+        public async Task<IActionResult> GetAllDrugsDetail([FromBody] PaginationDto dto)
+        {
+            var result = await _prescriptionMasterService.GetAllDrugs(dto);
+            return Ok(result);
+        }
+
+
         [HttpPost("prescription-master-create")]
         public async Task<IActionResult> CreateMasterPrescription([FromBody] CreateMasterPrescriptionDto dto)
         {
@@ -97,7 +105,7 @@ namespace HMIS.Web.Controllers.IVF.Episodes
 
         //----------------- Prescription Start -----------------
 
-        [HttpPost("create")]
+        [HttpPost("prescription-create")]
         public async Task<IActionResult> CreatePrescription([FromBody] CreatePrescriptiondto dto)
         {
             var result = await _prescriptionService.CreatePrescription(dto);
@@ -108,7 +116,7 @@ namespace HMIS.Web.Controllers.IVF.Episodes
             return Ok(result.message);
         }
 
-        [HttpPut("update")]
+        [HttpPut("prescription-update")]
         public async Task<IActionResult> UpdatePrescription([FromBody] CreatePrescriptiondto dto)
         {
             var result = await _prescriptionService.UpdatePrescription(dto);
@@ -120,7 +128,7 @@ namespace HMIS.Web.Controllers.IVF.Episodes
         }
 
 
-        [HttpDelete("delete/{prescriptionId}")]
+        [HttpDelete("prescription-delete/{prescriptionId}")]
         public async Task<IActionResult> DeletePrescription(long prescriptionId)
         {
             var result = await _prescriptionService.DeletePrescription(prescriptionId);
