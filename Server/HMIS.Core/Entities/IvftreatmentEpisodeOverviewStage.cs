@@ -12,8 +12,8 @@ public partial class IvftreatmentEpisodeOverviewStage
     [Key]
     public long OverviewId { get; set; }
 
-    [Column("IVFDashboardTreatmentEpisodeId")]
-    public int? IvfdashboardTreatmentEpisodeId { get; set; }
+    [Column("IVFDashboardTreatmentCycleId")]
+    public int? IvfdashboardTreatmentCycleId { get; set; }
 
     public int? StatusId { get; set; }
 
@@ -29,9 +29,9 @@ public partial class IvftreatmentEpisodeOverviewStage
 
     public bool IsDeleted { get; set; }
 
-    [ForeignKey("IvfdashboardTreatmentEpisodeId")]
+    [ForeignKey("IvfdashboardTreatmentCycleId")]
     [InverseProperty("IvftreatmentEpisodeOverviewStage")]
-    public virtual IvfdashboardTreatmentCycle? IvfdashboardTreatmentEpisode { get; set; }
+    public virtual IvfdashboardTreatmentCycle? IvfdashboardTreatmentCycle { get; set; }
 
     [InverseProperty("Overview")]
     public virtual ICollection<IvfepisodeOverviewEvents> IvfepisodeOverviewEvents { get; set; } = new List<IvfepisodeOverviewEvents>();

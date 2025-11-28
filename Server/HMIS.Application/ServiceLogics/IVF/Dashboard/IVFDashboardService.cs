@@ -43,11 +43,11 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
         Task<(bool IsSuccess, IEnumerable<AllExceptSelfPatientsReadDTO> Data, int TotalRecords)> GetOppositeGenderPatients(string gender, PaginationInfo pagination, string? mrno = null, string? phone = null, string? emiratesId = null, string? name = null);
         Task<(bool IsSuccess, int IvfMainId, string Error)> GenerateIVFMain(InsertIvfRelationDTO dto);
         Task<(bool IsSuccess, int RelationId, string Error)> InsertPatientRelation(InsertPatientRelationDTO dto);
-        Task<Result<int>> CreateOrUpdateDashboardTreatmentEpisodeAsync(IVFDashboardTreatmentEpisodeDto dto);
-        Task<(bool IsSuccess, IVFDashboardTreatmentEpisodeDto? Data)> GetIVFDashboardTreatmentCycle(string ivfDashboardTreatmentCycleId);
+        Task<Result<int>> CreateOrUpdateDashboardTreatmentCycleAsync(IVFDashboardTreatmentCycleDto dto);
+        Task<(bool IsSuccess, IVFDashboardTreatmentCycleDto? Data)> GetIVFDashboardTreatmentCycle(string ivfDashboardTreatmentCycleId);
         Task<(bool IsSuccess, object? Data)> GetAllIVFDashboardTreatmentCycle(string ivfmainid, PaginationInfo pagination);
         Task<(bool IsSuccess, IVFDashboardFertilityHistoryDto? Data)> GetFertilityHistoryForDashboard(string ivfmainid);
-        Task<(bool IsSuccess, object? Data)> DeleteDashboardTreatmentEpisodeAsync(string ivfDashboardTreatmentEpisodeId);
+        Task<(bool IsSuccess, object? Data)> DeleteDashboardTreatmentCycleAsync(string ivfDashboardTreatmentEpisodeId);
     }
 
     internal class IVFDashboardService : IDashboardService
@@ -267,15 +267,15 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
             }
         }
 
-        public async Task<(bool IsSuccess, object? Data)> DeleteDashboardTreatmentEpisodeAsync(string ivfDashboardTreatmentEpisodeId)
+        public async Task<(bool IsSuccess, object? Data)> DeleteDashboardTreatmentCycleAsync(string ivfDashboardTreatmentCycleId)
         {
-            if (!int.TryParse(ivfDashboardTreatmentEpisodeId, out var id))
-                return (false, "Invalid IVFDashboardTreatmentEpisodeId");
+            if (!int.TryParse(ivfDashboardTreatmentCycleId, out var id))
+                return (false, "Invalid IVFDashboardTreatmentCycleId");
 
             await using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                var episode = await _db.IvfdashboardTreatmentCycle
+                var cycle = await _db.IvfdashboardTreatmentCycle
                     .Include(e => e.IvfdashboardAdditionalMeasures)
                         .ThenInclude(am => am.IvfplannedAdditionalMeasures)
                     .Include(e => e.IvfdashboardAdditionalMeasures)
@@ -288,17 +288,18 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     .Include(e => e.IvftreatmentEpisodesAttachments)
                     .Include(e => e.IvftreatmentTypes)
                     .Include(e => e.IvftreatmentEpisodeOverviewStage)
-                    .FirstOrDefaultAsync(e => e.IvfdashboardTreatmentEpisodeId == id);
+                    .FirstOrDefaultAsync(e => e.IvfdashboardTreatmentCycleId == id);
 
-                if (episode == null || episode.IsDeleted)
+                if (cycle == null || cycle.IsDeleted)
                 {
                     await transaction.RollbackAsync();
                     return (false, "Record not found or already deleted");
                 }
 
-                episode.IsDeleted = true;
+                cycle.IsDeleted = true;
 
-                foreach (var add in episode.IvfdashboardAdditionalMeasures)
+                var add = cycle.IvfdashboardAdditionalMeasures;
+                if (add != null)
                 {
                     add.IsDeleted = true;
 
@@ -323,22 +324,22 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     }
                 }
 
-                foreach (var planned in episode.IvftreatmentPlannedSpermCollection)
+                foreach (var planned in cycle.IvftreatmentPlannedSpermCollection)
                 {
                     planned.IsDeleted = true;
                 }
 
-                foreach (var att in episode.IvftreatmentEpisodesAttachments)
+                foreach (var att in cycle.IvftreatmentEpisodesAttachments)
                 {
                     att.IsDeleted = true;
                 }
 
-                foreach (var tt in episode.IvftreatmentTypes)
+                foreach (var tt in cycle.IvftreatmentTypes)
                 {
                     tt.IsDeleted = true;
                 }
 
-                foreach (var ov in episode.IvftreatmentEpisodeOverviewStage)
+                foreach (var ov in cycle.IvftreatmentEpisodeOverviewStage)
                 {
                     ov.IsDeleted = true;
                 }
@@ -397,7 +398,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
             }
         }
 
-        public async Task<(bool IsSuccess, IVFDashboardTreatmentEpisodeDto? Data)> GetIVFDashboardTreatmentCycle(string ivfDashboardTreatmentCycleId)
+        public async Task<(bool IsSuccess, IVFDashboardTreatmentCycleDto? Data)> GetIVFDashboardTreatmentCycle(string ivfDashboardTreatmentCycleId)
         {
             if (string.IsNullOrWhiteSpace(ivfDashboardTreatmentCycleId))
                 return (false, null);
@@ -424,7 +425,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
                 };
 
-                var dto = JsonSerializer.Deserialize<IVFDashboardTreatmentEpisodeDto>(jsonResult, options);
+                var dto = JsonSerializer.Deserialize<IVFDashboardTreatmentCycleDto>(jsonResult, options);
                 if (dto == null)
                     return (false, null);
 
@@ -436,66 +437,66 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
             }
         }
 
-        public async Task<Result<int>> CreateOrUpdateDashboardTreatmentEpisodeAsync(IVFDashboardTreatmentEpisodeDto dto)
+        public async Task<Result<int>> CreateOrUpdateDashboardTreatmentCycleAsync(IVFDashboardTreatmentCycleDto dto)
         {
             if (dto == null) return Result<int>.Failure("DTO is required");
 
             await using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                IvfdashboardTreatmentCycle? episode;
+                IvfdashboardTreatmentCycle? cycle;
 
-                if (dto.IVFDashboardTreatmentEpisodeId.HasValue && dto.IVFDashboardTreatmentEpisodeId.Value > 0)
+                if (dto.IVFDashboardTreatmentCycleId.HasValue && dto.IVFDashboardTreatmentCycleId.Value > 0)
                 {
-                    episode = await _db.IvfdashboardTreatmentCycle
+                    cycle = await _db.IvfdashboardTreatmentCycle
                         .Include(e => e.IvftreatmentTypes)
                         .Include(e => e.IvftreatmentEpisodesAttachments)
-                        .FirstOrDefaultAsync(e => e.IvfdashboardTreatmentEpisodeId == dto.IVFDashboardTreatmentEpisodeId.Value);
+                        .FirstOrDefaultAsync(e => e.IvfdashboardTreatmentCycleId == dto.IVFDashboardTreatmentCycleId.Value);
 
-                    if (episode == null)
+                    if (cycle == null)
                     {
-                        episode = new IvfdashboardTreatmentCycle();
-                        _db.IvfdashboardTreatmentCycle.Add(episode);
+                        cycle = new IvfdashboardTreatmentCycle();
+                        _db.IvfdashboardTreatmentCycle.Add(cycle);
                     }
                 }
                 else
                 {
-                    episode = new IvfdashboardTreatmentCycle();
-                    _db.IvfdashboardTreatmentCycle.Add(episode);
+                    cycle = new IvfdashboardTreatmentCycle();
+                    _db.IvfdashboardTreatmentCycle.Add(cycle);
                 }
 
-                if (dto.IVFMainId.HasValue) episode.IvfmainId = dto.IVFMainId.Value;
-                if (dto.IVFMaleFHId.HasValue) episode.IvfmaleFhid = dto.IVFMaleFHId.Value;
-                if (dto.IVFFemaleFHId.HasValue) episode.IvffemaleFhid = dto.IVFFemaleFHId.Value;
-                if (dto.TreatmentTypeCategoryId.HasValue) episode.TreatmentTypeCategoryId = dto.TreatmentTypeCategoryId.Value;
-                if (dto.OnlyInternalCycle.HasValue) episode.OnlyInternalCycle = dto.OnlyInternalCycle.Value;
-                if (dto.DateOfLMP.HasValue) episode.DateofLmp = dto.DateOfLMP.Value;
-                if (dto.TherapyStartDate.HasValue) episode.TherapyStartDate = dto.TherapyStartDate.Value;
-                if (dto.CycleFromAmenorrheaCategoryId.HasValue) episode.CycleFromAmenorrheaCategoryId = dto.CycleFromAmenorrheaCategoryId.Value;
-                if (dto.MainIndicationCategoryId.HasValue) episode.MainIndicationCategoryId = dto.MainIndicationCategoryId.Value;
-                if (dto.ProtocolCategoryId.HasValue) episode.ProtocolCategoryId = dto.ProtocolCategoryId.Value;
-                if (dto.StimulationPlannedCategoryId.HasValue) episode.StimulationPlannedCategoryId = dto.StimulationPlannedCategoryId.Value;
-                if (dto.StimulatedExternallyCategoryId.HasValue) episode.StimulatedExternallyCategoryId = dto.StimulatedExternallyCategoryId.Value;
-                if (dto.LongTermMedication != null) episode.LongTermMedication = dto.LongTermMedication;
-                if (dto.PlannedNo.HasValue) episode.PlannedNo = dto.PlannedNo.Value;
-                if (dto.PlannedSpermCollectionCategoryId.HasValue) episode.PlannedSpermCollectionCategoryId = dto.PlannedSpermCollectionCategoryId.Value;
+                if (dto.IVFMainId.HasValue) cycle.IvfmainId = dto.IVFMainId.Value;
+                if (dto.IVFMaleFHId.HasValue) cycle.IvfmaleFhid = dto.IVFMaleFHId.Value;
+                if (dto.IVFFemaleFHId.HasValue) cycle.IvffemaleFhid = dto.IVFFemaleFHId.Value;
+                if (dto.TreatmentTypeCategoryId.HasValue) cycle.TreatmentTypeCategoryId = dto.TreatmentTypeCategoryId.Value;
+                if (dto.OnlyInternalCycle.HasValue) cycle.OnlyInternalCycle = dto.OnlyInternalCycle.Value;
+                if (dto.DateOfLMP.HasValue) cycle.DateofLmp = dto.DateOfLMP.Value;
+                if (dto.TherapyStartDate.HasValue) cycle.TherapyStartDate = dto.TherapyStartDate.Value;
+                if (dto.CycleFromAmenorrheaCategoryId.HasValue) cycle.CycleFromAmenorrheaCategoryId = dto.CycleFromAmenorrheaCategoryId.Value;
+                if (dto.MainIndicationCategoryId.HasValue) cycle.MainIndicationCategoryId = dto.MainIndicationCategoryId.Value;
+                if (dto.ProtocolCategoryId.HasValue) cycle.ProtocolCategoryId = dto.ProtocolCategoryId.Value;
+                if (dto.StimulationPlannedCategoryId.HasValue) cycle.StimulationPlannedCategoryId = dto.StimulationPlannedCategoryId.Value;
+                if (dto.StimulatedExternallyCategoryId.HasValue) cycle.StimulatedExternallyCategoryId = dto.StimulatedExternallyCategoryId.Value;
+                if (dto.LongTermMedication != null) cycle.LongTermMedication = dto.LongTermMedication;
+                if (dto.PlannedNo.HasValue) cycle.PlannedNo = dto.PlannedNo.Value;
+                if (dto.PlannedSpermCollectionCategoryId.HasValue) cycle.PlannedSpermCollectionCategoryId = dto.PlannedSpermCollectionCategoryId.Value;
 
-                if (dto.ProviderId.HasValue) episode.ProviderId = dto.ProviderId.Value;
-                if (dto.RandomizationGroup != null) episode.RandomizationGroup = dto.RandomizationGroup;
-                if (dto.Survey != null) episode.Survey = dto.Survey;
-                if (dto.TakenOverFrom != null) episode.TakenOverFrom = dto.TakenOverFrom;
-                if (dto.TakeOverOn.HasValue) episode.TakeOverOn = dto.TakeOverOn.Value;
+                if (dto.ProviderId.HasValue) cycle.ProviderId = dto.ProviderId.Value;
+                if (dto.RandomizationGroup != null) cycle.RandomizationGroup = dto.RandomizationGroup;
+                if (dto.Survey != null) cycle.Survey = dto.Survey;
+                if (dto.TakenOverFrom != null) cycle.TakenOverFrom = dto.TakenOverFrom;
+                if (dto.TakeOverOn.HasValue) cycle.TakeOverOn = dto.TakeOverOn.Value;
 
-                if (dto.CycleNote != null) episode.CycleNote = dto.CycleNote;
+                if (dto.CycleNote != null) cycle.CycleNote = dto.CycleNote;
 
                 await _db.SaveChangesAsync();
 
-                var episodeId = episode.IvfdashboardTreatmentEpisodeId;
+                var cycleId = cycle.IvfdashboardTreatmentCycleId;
 
                 if (dto.TreatmentSubTypes != null && dto.TreatmentSubTypes.Any())
                 {
                     var existingTypes = await _db.IvftreatmentTypes
-                        .Where(t => t.IvfdashboardTreatmentEpisodeId == episodeId && !t.IsDeleted)
+                        .Where(t => t.IvfdashboardTreatmentEpisodeId == cycleId && !t.IsDeleted)
                         .ToListAsync();
 
                     foreach (var t in existingTypes)
@@ -507,7 +508,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     {
                         var item = new IvftreatmentTypes
                         {
-                            IvfdashboardTreatmentEpisodeId = episodeId,
+                            IvfdashboardTreatmentEpisodeId = cycleId,
                             TreatmentCategoryId = sub.TreatmentCategoryId!.Value,
                             IsDeleted = false
                         };
@@ -518,7 +519,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                 if (dto.PlannedSpermCollectionCategoryIds != null || !dto.PlannedSpermCollectionCategoryIds.Any())
                 {
                     var existingPlannedSperm = await _db.IvftreatmentPlannedSpermCollection
-                        .Where(p => p.IvfdashboardTreatmentCycleId == episodeId && !p.IsDeleted)
+                        .Where(p => p.IvfdashboardTreatmentCycleId == cycleId && !p.IsDeleted)
                         .ToListAsync();
 
                     foreach (var p in existingPlannedSperm)
@@ -530,7 +531,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     {
                         var planned = new IvftreatmentPlannedSpermCollection
                         {
-                            IvfdashboardTreatmentCycleId = episodeId,
+                            IvfdashboardTreatmentCycleId = cycleId,
                             PlannedSpermCollectionCategoryId = catId,
                             IsDeleted = false
                         };
@@ -541,26 +542,30 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                 var addDto = dto.AdditionalMeasure;
                 IvfdashboardAdditionalMeasures? additionalMeasures = null;
 
-                if (addDto != null && addDto.IVFAdditionalMeasuresId.HasValue && addDto.IVFAdditionalMeasuresId.Value > 0)
+                if (addDto != null)
                 {
+                    // 1:1 relation: always resolve by treatment cycle, not by IVFAdditionalMeasuresId from DTO
                     additionalMeasures = await _db.IvfdashboardAdditionalMeasures
-                        .FirstOrDefaultAsync(a => a.IvfadditionalMeasuresId == addDto.IVFAdditionalMeasuresId.Value);
-                }
+                        .FirstOrDefaultAsync(a => a.IvfdashboardTreatmentEpisodeId == cycleId);
 
-                if (addDto != null && additionalMeasures == null &&
-                    (!string.IsNullOrWhiteSpace(addDto.GeneralCondition)
-                     || (addDto.PlannedAdditionalMeasuresCategoryIds != null && addDto.PlannedAdditionalMeasuresCategoryIds.Any())
-                     || (addDto.PerformedAdditionalMeasuresCategoryIds != null && addDto.PerformedAdditionalMeasuresCategoryIds.Any())
-                     || (addDto.PolarBodiesIndicationCategoryIds != null && addDto.PolarBodiesIndicationCategoryIds.Any())
-                     || (addDto.EMBBlastIndicationCategoryIds != null && addDto.EMBBlastIndicationCategoryIds.Any())))
-                {
-                    additionalMeasures = new IvfdashboardAdditionalMeasures();
-                    _db.IvfdashboardAdditionalMeasures.Add(additionalMeasures);
+                    if (additionalMeasures == null &&
+                        (!string.IsNullOrWhiteSpace(addDto.GeneralCondition)
+                         || (addDto.PlannedAdditionalMeasuresCategoryIds != null && addDto.PlannedAdditionalMeasuresCategoryIds.Any())
+                         || (addDto.PerformedAdditionalMeasuresCategoryIds != null && addDto.PerformedAdditionalMeasuresCategoryIds.Any())
+                         || (addDto.PolarBodiesIndicationCategoryIds != null && addDto.PolarBodiesIndicationCategoryIds.Any())
+                         || (addDto.EMBBlastIndicationCategoryIds != null && addDto.EMBBlastIndicationCategoryIds.Any())))
+                    {
+                        additionalMeasures = new IvfdashboardAdditionalMeasures
+                        {
+                            IvfdashboardTreatmentEpisodeId = cycleId
+                        };
+                        _db.IvfdashboardAdditionalMeasures.Add(additionalMeasures);
+                    }
                 }
 
                 if (additionalMeasures != null && addDto != null)
                 {
-                    additionalMeasures.IvfdashboardTreatmentEpisodeId = episodeId;
+                    additionalMeasures.IvfdashboardTreatmentEpisodeId = cycleId;
                     if (addDto.GeneralCondition != null) additionalMeasures.GeneralCondition = addDto.GeneralCondition;
 
                     await _db.SaveChangesAsync();
@@ -657,7 +662,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                 if (dto.Attachments != null)
                 {
                     var existingAttachments = await _db.IvftreatmentEpisodesAttachments
-                        .Where(a => a.IvfdashboardTreatmentEpisodeId == episodeId && !a.IsDeleted)
+                        .Where(a => a.IvfdashboardTreatmentEpisodeId == cycleId && !a.IsDeleted)
                         .ToListAsync();
 
                     foreach (var att in existingAttachments)
@@ -669,7 +674,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     {
                         var newAtt = new IvftreatmentEpisodesAttachments
                         {
-                            IvfdashboardTreatmentEpisodeId = episodeId,
+                            IvfdashboardTreatmentEpisodeId = cycleId,
                             HmisfileId = attDto.HMISFileId.Value,
                             IsDeleted = false
                         };
@@ -677,10 +682,25 @@ namespace HMIS.Application.ServiceLogics.IVF.Dashboard
                     }
                 }
 
+                // Ensure only this cycle is active for the given IVFMainId
+                if (cycle.IvfmainId.HasValue)
+                {
+                    var ivfMainId = cycle.IvfmainId.Value;
+
+                    var relatedCycles = await _db.IvfdashboardTreatmentCycle
+                        .Where(c => c.IvfmainId == ivfMainId && !c.IsDeleted)
+                        .ToListAsync();
+
+                    foreach (var cycles in relatedCycles)
+                    {
+                        cycles.CycleStatus = cycles.IvfdashboardTreatmentCycleId == cycleId;
+                    }
+                }
+
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return Result<int>.Success(episodeId);
+                return Result<int>.Success(cycleId);
             }
             catch (Exception ex)
             {

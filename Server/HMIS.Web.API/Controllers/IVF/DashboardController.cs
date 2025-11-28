@@ -110,9 +110,9 @@ namespace HMIS.Web.Controllers.IVF
         }
 
         [HttpPost("CreateUpdateDashboardTreatmentCycle")]
-        public async Task<IActionResult> CreateUpdateDashboardTreatmentEpisode([FromBody] IVFDashboardTreatmentEpisodeDto dto)
+        public async Task<IActionResult> CreateUpdateDashboardTreatmentEpisode([FromBody] IVFDashboardTreatmentCycleDto dto)
         {
-            var result = await _service.CreateOrUpdateDashboardTreatmentEpisodeAsync(dto);
+            var result = await _service.CreateOrUpdateDashboardTreatmentCycleAsync(dto);
             if (!result.IsSuccess) return BadRequest(new { message = result.ErrorMessage });
             return Ok(new { id = result.Data });
         }
@@ -120,7 +120,7 @@ namespace HMIS.Web.Controllers.IVF
         [HttpDelete("DeleteIVFDashboardTreatmentCycle/{ivfDashboardTreatmentCycleId}")]
         public async Task<IActionResult> DeleteIVFDashboardTreatmentCycle([FromRoute] string ivfDashboardTreatmentCycleId)
         {
-            var (success, message) = await _service.DeleteDashboardTreatmentEpisodeAsync(ivfDashboardTreatmentCycleId);
+            var (success, message) = await _service.DeleteDashboardTreatmentCycleAsync(ivfDashboardTreatmentCycleId);
 
             if (success)
             {

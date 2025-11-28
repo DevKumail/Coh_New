@@ -4,9 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace HMIS.Application.DTOs.IVFDTOs
 {
-    public class IVFDashboardTreatmentEpisodeDto
+    public class IVFDashboardTreatmentCycleDto
     {
-        public int? IVFDashboardTreatmentEpisodeId { get; set; }
+        public int? IVFDashboardTreatmentCycleId { get; set; }
         public int? IVFMainId { get; set; }
 
         public int? IVFMaleFHId { get; set; }

@@ -340,13 +340,13 @@ export class CycleAddUpdateComponent implements OnDestroy, AfterViewInit {
         const nullOrNumber = (v: any) => (v === null || v === undefined || v === '' ? null : Number(v));
 
         // Use existing episode id when editing; 0 indicates create
-        const existingEpisodeId = this.initialCycle?.ivfDashboardTreatmentEpisodeId
-          ?? this.initialCycle?.dashboardTreatmentEpisode?.ivfDashboardTreatmentEpisodeId
+        const existingCycleId = this.initialCycle?.ivfDashboardTreatmentCycleId
+          ?? this.initialCycle?.dashboardTreatmentEpisode?.ivfDashboardTreatmentCycleId
           ?? this.initialCycle?.dashboardTreatmentEpisode?.id
           ?? 0;
 
         const payloadOut = {
-          ivfDashboardTreatmentEpisodeId: existingEpisodeId,
+          ivfDashboardTreatmentCycleId: existingCycleId,
           ivfMainId: this.ivfMainId ?? null,
           ivfMaleFHId: nullOrNumber(g.maleMedicalHistoryOf),
           ivfFemaleFHId: nullOrNumber(g.femaleMedicalHistoryOf),
