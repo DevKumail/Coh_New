@@ -38,6 +38,8 @@ namespace HMIS.Application.DTOs.Clinical
         public bool SignedBy { get; set; }
         public string? VoiceFile { get; set; }
         public int pathId { get; set; }
+        public long? FileId { get; set; }
+
     }
 
     public class ClinicalNoteObj
@@ -59,6 +61,14 @@ namespace HMIS.Application.DTOs.Clinical
         public bool? IsDeleted { get; set; }
         public string UpdatedBy { get; set; }
         public int pathId { get; set; }
+        public long? File_Id { get; set; }
+
     }
+    public class TranscriptionResult
+    {
+        public string Transcript { get; set; }
+        public string FilePath { get; set; }
+    }
+
 
 }

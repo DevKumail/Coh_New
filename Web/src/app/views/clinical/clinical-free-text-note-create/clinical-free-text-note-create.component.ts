@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
+import { DeepgramService } from '@/app/shared/Services/deepgram.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 import { distinctUntilChanged, filter, Subscription } from 'rxjs';
@@ -16,7 +17,7 @@ import { LoaderService } from '@core/services/loader.service';
 import { QuillModule } from 'ngx-quill';
 
 @Component({
-    standalone: true,
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -25,7 +26,7 @@ import { QuillModule } from 'ngx-quill';
     QuestionItemComponent,
     QuestionViewComponent,
     QuillModule
-],
+  ],
   selector: 'app-clinical-free-text-note-create',
   templateUrl: './clinical-free-text-note-create.component.html',
   styleUrls: ['./clinical-free-text-note-create.component.scss']
@@ -69,7 +70,12 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
   private queryParamProvider: any = null;
   private queryParamTemplate: any = null;
+  private queryParamNoteId: number | null = null;
   hideTemplateDropdown: boolean = false;
+
+  isRecording: boolean = false;
+  transcriptionText: string = '';
+  private transcriptionSubscription: Subscription | null = null;
 
   quillModules = {
     toolbar: [
@@ -86,13 +92,13 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService,
-    // private messageService: MessageService,
-         private loader: LoaderService,
+    private deepgramService: DeepgramService,
+    private loader: LoaderService,
     private router: Router,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-     private PatientData: PatientBannerService
+    private PatientData: PatientBannerService
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
@@ -126,8 +132,9 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.queryParamProvider = params['provider'] ? Number(params['provider']) : null;
       this.queryParamTemplate = params['template'] ? Number(params['template']) : null;
+      this.queryParamNoteId = params['noteId'] ? Number(params['noteId']) : null;
 
-      console.log('Query params - Provider:', this.queryParamProvider, 'Template:', this.queryParamTemplate);
+      console.log('Query params - Provider:', this.queryParamProvider, 'Template:', this.queryParamTemplate, 'NoteId:', this.queryParamNoteId);
 
       // If template is provided, hide the template dropdown
       this.hideTemplateDropdown = !!this.queryParamTemplate;
@@ -135,6 +142,11 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
       // Set provider if provided
       if (this.queryParamProvider) {
         this.clinicalForm.patchValue({ provider: this.queryParamProvider });
+      }
+
+      // If noteId is provided, load existing note for editing
+      if (this.queryParamNoteId) {
+        this.loadExistingNote(this.queryParamNoteId);
       }
     });
 
@@ -165,6 +177,13 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
       });
       this.subscriptions.push(sub2);
     }
+
+    // Subscribe to transcription updates
+    this.transcriptionSubscription = this.deepgramService.getTranscript$().subscribe(
+      (transcript: string) => {
+        this.appendTranscriptionToEditor(transcript);
+      }
+    );
   }
 
   showDialog() { this.visible = true; }
@@ -175,7 +194,6 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
       console.log(" json Data Question", this.dataquestion);
     });
   }
-
 
   FillCache() {
     // ...existing code...
@@ -188,8 +206,8 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
       })
       .catch((error: any) =>
         // this.messageService.add({ severity: 'error', summary: 'Error', detail: error?.message || 'Failed to load cache' })
-      Swal.fire('Error', error?.message || 'Failed to load cache', 'error'
-      ));
+        Swal.fire('Error', error?.message || 'Failed to load cache', 'error'
+        ));
   }
 
   FillDropDown(response: any) {
@@ -213,16 +231,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     if (providerCode == null || providerCode == undefined) providerCode = 0;
     this.selectedProviders = Number(providerCode) || 0;
     if (this.selectedProviders === 250) providerCode = 197;
-    this.clinicalNotes = [];
-    this.clinicalForm.patchValue({ note: null });
-    this.loader.show();
-    this.clinicalApiService.EMRNotesGetByEmpId(providerCode).then((res: any) => {
-      this.clinicalNotes = res.result || [];
-        this.loader.hide();
-    }).catch((e: any) =>
-        Swal.fire('Error', 'Error loading notes', 'error')
-    //   this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading notes' })
-    ).finally(() => this.loader.hide());
+
   }
 
   // GetNotesTemplate unchanged except it now receives numeric noteId
@@ -233,19 +242,56 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     this.dataquestion = [];
     this.viewquestion = false;
     this.nodeData = []
-    if(noteId != null && noteId != undefined && noteId != 0){
-    this.loader.show();
-    this.clinicalApiService.GetNotesTemplate(noteId).then((res: any) => {
-      this.dataquestion = res;
-      this.viewquestion = true;
-      this.nodeData = res;
-          this.loader.hide();
-    }).catch(() =>
-    //   this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading template' })
-    Swal.fire('Error', 'Error loading template', 'error')
-    ).finally(() => this.loader.hide());
+    if (noteId != null && noteId != undefined && noteId != 0) {
+      this.loader.show();
+      this.clinicalApiService.GetNotesTemplate(noteId).then((res: any) => {
+        this.dataquestion = res;
+        this.viewquestion = true;
+        this.nodeData = res;
+        this.loader.hide();
+      }).catch(() =>
+        //   this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading template' })
+        Swal.fire('Error', 'Error loading template', 'error')
+      ).finally(() => this.loader.hide());
     }
 
+  }
+
+  loadExistingNote(noteId: number) {
+    if (!noteId) {
+      return;
+    }
+
+    this.loader.show();
+    this.clinicalApiService.GetEMRNoteByNoteId(noteId)
+      .then((res: any) => {
+        const note = res?.data;
+        if (!note) {
+          Swal.fire('Error', 'Unable to load note details for editing.', 'error');
+          return;
+        }
+
+        // Update MRN and visit if available
+        this.mrNo = note.mrno || this.mrNo;
+        this.appointmentID = note.visitAcNo || this.appointmentID;
+
+        // Update title and form fields
+        this.noteTitle = note.notesTitle || this.noteTitle;
+        this.clinicalForm.patchValue({
+          provider: note.signedBy || null,
+          description: note.description || '',
+          editorContent: note.noteHtmltext || note.noteText || ''
+        });
+
+        this.cdr.markForCheck();
+      })
+      .catch((error: any) => {
+        console.error('Error loading EMR note by id:', error);
+        Swal.fire('Error', 'Failed to load note for editing.', 'error');
+      })
+      .finally(() => {
+        this.loader.hide();
+      });
   }
 
   // --- offline storage (IndexedDB) --------------------------------------
@@ -291,28 +337,96 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
     const htmlContent = this.clinicalForm.get('editorContent')?.value || '';
     const textContent = this.stripHtml(htmlContent);
+    const providerId = this.clinicalForm.get('provider')?.value;
+    const description = this.clinicalForm.get('description')?.value;
 
-    const payload = {
-      providerId: this.clinicalForm.get('provider')?.value,
-      appointmentId: this.appointmentID,
-      mrNo: this.mrNo,
-      description: this.clinicalForm.get('description')?.value,
-      htmlContent: htmlContent,
-      textContent: textContent
-    };
-
-    if(this.appointmentID == null || this.appointmentID == undefined|| this.appointmentID == 0
-        && this.mrNo == null || this.mrNo == undefined|| this.mrNo == ''
-    ){
-        Swal.fire('Error', 'Appointment ID and MRNo are required to submit the note.', 'error');
-        return
+    if (this.appointmentID == null || this.appointmentID == undefined || this.appointmentID == 0
+      && this.mrNo == null || this.mrNo == undefined || this.mrNo == ''
+    ) {
+      Swal.fire('Error', 'Appointment ID and MRNo are required to submit the note.', 'error');
+      return;
     }
 
+    const current_User = JSON.parse(localStorage.getItem('currentUser') || 'null') || {};
+    const createdByUserId = current_User.userId || 0;
 
+    const nowIso = new Date().toISOString();
 
-    console.log('Payload:', payload);
-    // Call your service to save the data
-    // this.yourService.saveClinicalNote(payload).subscribe(...);
+    const emrPayload = {
+      // use appointment ID as visit account number for EMR note
+      visitAcNo: this.appointmentID || 0,
+      notesTitle: this.dataquestion?.node?.noteTitle || 'Clinical Free Text Note',
+      noteText: textContent,
+      noteHtmltext: htmlContent,
+      description: description,
+      createdBy: createdByUserId,
+      createdOn: nowIso,
+      updatedBy: createdByUserId,
+      updatedDate: nowIso,
+      signed: false,
+      isEdit: false,
+      review: false,
+      noteType: 'FreeText',
+      active: true,
+      // provider who will sign the note
+      signedBy: providerId || 0,
+      signedDate: '',
+      cosignedBy: 0,
+      cosignedDate: '',
+      mrcosignedBy: 0,
+      mrcosignedDate: '',
+      noteCosignProvId: 0,
+      reviewedBy: 0,
+      reviewedDate: '',
+      noteStatus: 'Draft',
+      mrno: this.mrNo,
+      documents: '',
+      caseId: '00000000-0000-0000-0000-000000000000',
+      isNursingNote: false,
+      receiverRoleId: 0,
+      receiverEmpId: 0,
+      referredSiteId: '00000000-0000-0000-0000-000000000000',
+      labOrderSetDetailId: 0,
+      oldMrno: '',
+      isMbrcompleted: false,
+      oldNoteId: 0,
+      createdAt: nowIso,
+      updatedAt: nowIso
+    };
+
+    console.log('SaveEMRNote payload:', emrPayload);
+
+    if (!this.appointmentID) {
+      Swal.fire('warning', 'Appointment ID is not found please load patient.', 'warning');
+      return;
+    }
+
+    this.loader.show();
+    this.clinicalApiService.SaveEMRNote(emrPayload)
+      .then((res: any) => {
+        const message = res?.message || res?.Message || '';
+
+        if (message === 'Note saved successfully.' || message === 'Note saved successfully') {
+          Swal.fire('Success', message || 'Note saved successfully.', 'success');
+          this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
+        } else {
+          // If API did not return the expected success message, just show it and stay on page
+          if (message) {
+            Swal.fire('success', message, 'success');
+            this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
+          } else {
+            Swal.fire('Success', 'Note saved successfully.', 'success');
+            this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
+          }
+        }
+      })
+      .catch((error: any) => {
+        console.error('Error saving EMR note:', error);
+        Swal.fire('Error', 'Failed to save note.', 'error');
+      })
+      .finally(() => {
+        this.loader.hide();
+      });
   }
 
   stripHtml(html: string): string {
@@ -349,12 +463,66 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
   }
 
-  resetForm(){
+  resetForm() {
     this.clinicalForm.reset();
   }
+  toggleVoiceRecording(): void {
+    if (this.isRecording) {
+      this.stopRecording();
+    } else {
+      this.startRecording();
+    }
+  }
+
+  async startRecording(): Promise<void> {
+    try {
+      this.loader.show();
+      await this.deepgramService.startTranscription();
+      this.isRecording = true;
+      Swal.fire({
+        icon: 'info',
+        title: 'Recording Started',
+        text: 'Speak into your microphone. Your speech will be transcribed in real-time.',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      Swal.fire('Error', 'Failed to start voice recording. Please check microphone permissions.', 'error');
+      this.isRecording = false;
+    } finally {
+      this.loader.hide();
+    }
+  }
+
+  stopRecording(): void {
+    this.deepgramService.stopTranscription();
+    this.isRecording = false;
+    Swal.fire({
+      icon: 'success',
+      title: 'Recording Stopped',
+      text: 'Transcription has been added to your note.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+  }
+
+  private appendTranscriptionToEditor(transcript: string): void {
+    const currentContent = this.clinicalForm.get('editorContent')?.value || '';
+    const newContent = currentContent + (currentContent ? ' ' : '') + transcript;
+    this.clinicalForm.patchValue({ editorContent: newContent });
+    this.cdr.detectChanges();
+  }
+
   ngOnDestroy(): void {
     if (this.patientDataSubscription) {
       this.patientDataSubscription.unsubscribe();
+    }
+    if (this.transcriptionSubscription) {
+      this.transcriptionSubscription.unsubscribe();
+    }
+    if (this.isRecording) {
+      this.deepgramService.stopTranscription();
     }
     this.subscriptions.forEach(s => s.unsubscribe());
   }

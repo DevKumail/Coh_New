@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { ImmunizationsComponent } from '../immunizations/immunizations.component';
@@ -31,6 +31,8 @@ import { MedicalHistoryComponent } from '../medical-history/medical-history.comp
 export class QuestionViewComponent implements OnInit {
   @Input() question: any;
   @Input() form!: FormGroup; // optional reactive FormGroup from parent
+  @Input() hasParent: boolean = false; // Track if question has a parent
+  @Output() answerChange = new EventEmitter<string>();
 
   // Track collapse state for each section
   isCollapsed: boolean = true;
@@ -47,19 +49,16 @@ export class QuestionViewComponent implements OnInit {
       }
     }
 
-    // All sections start collapsed by default
-    if (this.question?.type === 'Question Section') {
-      this.isCollapsed = true;
-    } else {
-      this.isCollapsed = false;
-    }
+    // All questions start collapsed by default
+    this.isCollapsed = true;
   }
 
   /**
-   * Toggle collapse/expand state for sections
+   * Toggle collapse/expand state for all questions
    */
   toggleSection(): void {
-    if (this.question?.type === 'Question Section') {
+    // Only toggle if this is a standalone question (no parent)
+    if (!this.hasParent || this.isSection()) {
       this.isCollapsed = !this.isCollapsed;
     }
   }
@@ -70,7 +69,7 @@ export class QuestionViewComponent implements OnInit {
   onMouseEnter(event: Event): void {
     const target = event.currentTarget as HTMLElement;
     if (target) {
-      target.style.backgroundColor = '#e9ecef';
+      target.style.backgroundColor = 'var(--bs-gray-200, #e9ecef)';
     }
   }
 
@@ -80,7 +79,7 @@ export class QuestionViewComponent implements OnInit {
   onMouseLeave(event: Event): void {
     const target = event.currentTarget as HTMLElement;
     if (target) {
-      target.style.backgroundColor = '#f8f9fa';
+      target.style.backgroundColor = 'var(--bs-light, #f8f9fa)';
     }
   }
 
@@ -89,6 +88,36 @@ export class QuestionViewComponent implements OnInit {
    */
   hasChildren(): boolean {
     return this.question?.children && this.question.children.length > 0;
+  }
+
+  /**
+   * Check if this is a section or single question
+   */
+  isSection(): boolean {
+    return this.question?.type === 'Question Section';
+  }
+
+  /**
+   * Check if this is a single question (has no children and is not a section)
+   */
+  isSingleQuestion(): boolean {
+    return !this.isSection() && !this.hasChildren();
+  }
+
+  /**
+   * Check if the question content should be visible
+   */
+  shouldShowContent(): boolean {
+    // For single questions without children, show content when expanded
+    if (this.isSingleQuestion()) {
+      return !this.isCollapsed;
+    }
+    // For sections with children, show children when expanded
+    if (this.hasChildren()) {
+      return !this.isCollapsed;
+    }
+    // For sections with custom components, show component when expanded
+    return !this.isCollapsed;
   }
 
   /**
@@ -110,6 +139,17 @@ export class QuestionViewComponent implements OnInit {
    */
   onAnswerChange(event: any, question: any): void {
     question.answer = event.target.value;
+  }
+
+  /**
+   * Handle input change and emit answerChange event
+   */
+  onInputChange(event: any) {
+    const value = event?.target?.value || '';
+    if (this.question) {
+      this.question.answer = value;
+      this.answerChange.emit(value);
+    }
   }
 
   /**
@@ -193,6 +233,31 @@ export class QuestionViewComponent implements OnInit {
    */
   shouldRenderDefaultChildren(): boolean {
     return this.hasChildren() && !this.isCollapsed;
+  }
+
+  /**
+   * Check if this question should be collapsable
+   * Sections are always collapsable
+   * TextBox/CheckBox are only collapsable if they have no parent
+   */
+  isCollapsable(): boolean {
+    if (this.isSection()) {
+      return true;
+    }
+    // Single questions (TextBox/CheckBox) are only collapsable if they have no parent
+    return !this.hasParent;
+  }
+
+  /**
+   * Check if input field should be shown for single questions
+   */
+  shouldShowInputField(): boolean {
+    // If question has parent, always show (not collapsable)
+    if (this.hasParent && !this.isSection()) {
+      return true;
+    }
+    // If standalone, show based on collapsed state
+    return this.isSingleQuestion() && !this.isCollapsed;
   }
 }
 

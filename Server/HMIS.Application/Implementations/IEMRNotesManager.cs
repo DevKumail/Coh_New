@@ -1,29 +1,22 @@
 ﻿using HMIS.Application.DTOs.Clinical;
+using HMIS.Core.Entities;
 using HMIS.Service.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace HMIS.Service.Implementations
 {
 
     public interface IEMRNotesManager
     {
-        nodeModel GetNoteQuestionBYNoteId(int pathId, string? voiceText);
+        Task<nodeModel> GetNoteQuestionBYNoteId(int pathId, string? voiceText);
+        Task<EMRNotesModel> GetNoteQuestionBYPathId(int pathId);
 
-        EMRNotesModel GetNoteQuestionBYPathId(int pathId);
+        Task<List<ProvierEMRNotesModel>> EMRNotesGetByEmpId(long EmpId);
+        Task<EmrnotesNote> SaveEMRNote(EmrnotesNote noteDto);
+        Task<nodeModel> InsertSpeechWithTranscription(ClinicalNoteDto note);
+        Task<(IEnumerable<GetEMRNoteListDto> Data, int TotalCount)> GetEMRNotesByMRNo(string mrno, int page, int pageSize);
+        Task<EMRNoteDetailDto?> GetEMRNoteByNoteId(long noteId);
 
-        List<ProvierEMRNotesModel> EMRNotesGetByEmpId(long EmpId);
-        Task<nodeModel> InsertSpeech(ClinicalNoteObj note);
     }
 
-    //public internal  IEMRNotesManager
-    //{
-    // Task<DataSet> GetUPPUplodingfileError(FilterUPPErrorList Req);
-    //    EMRNotesModel GetNoteQuestionBYPathId(int pathId);
-    //}
 }

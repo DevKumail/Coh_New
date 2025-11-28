@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 
@@ -12,10 +12,22 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 export class QuestionItemComponent implements OnInit {
   @Input() question: any;
   @Input() form?: FormGroup; // optional reactive FormGroup passed from parent
+  @Output() answerChange = new EventEmitter<string>();
 
   constructor() { }
 
   ngOnInit(): void {
-    // ...existing code...
+    // If a form/control is provided, emit its value as plain string on changes
+    const ctrlName = this.question?.controlName || this.question?.quest_Id;
+    if (this.form && ctrlName && this.form.get(String(ctrlName))) {
+      this.form.get(String(ctrlName))!.valueChanges.subscribe((v: any) => {
+        this.answerChange.emit(String(v ?? ''));
+      });
+    }
+  }
+
+  // Call this from template inputs to emit a plain string
+  onValueChange(value: string) {
+    this.answerChange.emit(value ?? '');
   }
 }
