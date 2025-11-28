@@ -357,4 +357,9 @@ export class ClinicalApiService {
       SpeechtoText(MRNo:string, currentPage?: number, pageSize?: number) {
     return this.api.get(`Appointment/SpeechtoText?mrNo=${MRNo}&PageNumber=${currentPage}&PageSize=${pageSize}`).toPromise();
   }
+  GetEMRNotesByMRNo(mrno: string, page: number, pageSize: number) {
+    return this.api
+      .get(`EMRNotes/GetEMRNotesByMRNo?mrno=${mrno}&page=${page}&pageSize=${pageSize}`)
+      .toPromise();
+  }
 }
