@@ -197,6 +197,11 @@ export class GeneralComponent implements OnChanges {
     return arr.join(', ');
   }
 
+  // trackBy for treatment flags to avoid control re-creation on list re-renders
+  trackFlag(index: number, item: { name: string; control: string }) {
+    return item?.control || index;
+  }
+
   // Dynamically build the Treatment flags list from dropdown payload, mapped to existing controls
   treatmentFlags() {
     const mapping: Array<{ name: string; control: string }> = [
