@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview;
+using HMIS.Application.DTOs.SpLocalModel;
 using HMIS.Core.Context;
 using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
@@ -15,10 +16,9 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
 {
     public interface IPrescriptionMasterService
     {
-        Task<(bool isSuccess, string message)> CreatePrescription(CreateMasterPrescriptionDto dto);
-        Task<(bool isSuccess, string message)> UpdatePrescription(CreateMasterPrescriptionDto dto);
+        Task<(bool isSuccess, string message)> SaveMasterPrescription(CreateMasterPrescriptionDto dto);
         Task<(bool isSuccess, string message)> DeletePrescription(long prescriptionId);
-        Task<List<GetDrugDetailsDto>> GetAllDrugs(PaginationDto dto);
+        Task<List<GetDrugDetailsDto>> GetAllDrugs(PaginationInfo dto);
     }
     public class PrescriptionMasterService : IPrescriptionMasterService
     {
@@ -30,16 +30,16 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
             _context = context;
         }
 
-        public async Task<List<GetDrugDetailsDto>> GetAllDrugs(PaginationDto dto)
+        public async Task<List<GetDrugDetailsDto>> GetAllDrugs(PaginationInfo dto)
         {
             using var connection = _dapper.CreateConnection();
 
             var parameters = new DynamicParameters();
-            parameters.Add("@PageNumber", dto.PageNumber, DbType.Int32);
-            parameters.Add("@PageSize", dto.PageSize, DbType.Int32);
+            parameters.Add("@Page", dto.Page, DbType.Int32);
+            parameters.Add("@RowsPerPage", dto.RowsPerPage, DbType.Int32);
 
             var result = await connection.QueryAsync<GetDrugDetailsDto>(
-                "GetDrugsPaged",
+                "GetAllDrugs",
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
@@ -47,7 +47,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
             return result.ToList();
         }
 
-        public async Task<(bool isSuccess, string message)> CreatePrescription(CreateMasterPrescriptionDto dto) 
+        public async Task<(bool isSuccess, string message)> SaveMasterPrescription(CreateMasterPrescriptionDto dto)
         {
             if (dto.OverviewId == 0 || dto.DrugId == 0)
                 return (false, "Invalid input. Required IDs are missing.");
@@ -60,48 +60,34 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                 if (!overviewExists)
                     return (false, "Overview does not exist.");
 
-                var entity = new IvfprescriptionMaster
+                IvfprescriptionMaster entity;
+
+                if (dto.IVFPrescriptionMasterId > 0)
                 {
-                    OverviewId = dto.OverviewId,
-                    DrugId = dto.DrugId,
-                };
+                    entity = await _context.IvfprescriptionMaster
+                        .FirstOrDefaultAsync(x => x.IvfprescriptionMasterId == dto.IVFPrescriptionMasterId);
 
-                await _context.IvfprescriptionMaster.AddAsync(entity);
-                await _context.SaveChangesAsync();
+                    if (entity == null)
+                        return (false, "Prescription not found.");
 
-                return (true, "Prescription created successfully.");
-            }
-            catch (Exception ex)
-            {
-                return (false, $"An error occurred: {ex.Message}");
-            }
-        }
+                    entity.OverviewId = dto.OverviewId;
+                    entity.DrugId = dto.DrugId;
 
-        public async Task<(bool isSuccess, string message)> UpdatePrescription(CreateMasterPrescriptionDto dto)
-        {
-            if (dto.IVFPrescriptionMasterId == 0 || dto.OverviewId == 0 || dto.DrugId == 0)
-                return (false, "Invalid input. Required IDs are missing.");
+                    await _context.SaveChangesAsync();
+                    return (true, "Prescription updated successfully.");
+                }
+                else
+                {
+                    entity = new IvfprescriptionMaster
+                    {
+                        OverviewId = dto.OverviewId,
+                        DrugId = dto.DrugId
+                    };
 
-            try
-            {
-                var entity = await _context.IvfprescriptionMaster
-                    .FirstOrDefaultAsync(x => x.IvfprescriptionMasterId == dto.IVFPrescriptionMasterId);
-
-                if (entity == null)
-                    return (false, "Prescription not found.");
-
-                var overviewExists = await _context.IvftreatmentEpisodeOverviewStage
-                    .AnyAsync(x => x.OverviewId == dto.OverviewId);
-
-                if (!overviewExists)
-                    return (false, "Overview does not exist.");
-
-                entity.OverviewId = dto.OverviewId;
-                entity.DrugId = dto.DrugId;
-
-                await _context.SaveChangesAsync();
-
-                return (true, "Prescription updated successfully.");
+                    await _context.IvfprescriptionMaster.AddAsync(entity);
+                    await _context.SaveChangesAsync();
+                    return (true, "Prescription created successfully.");
+                }
             }
             catch (Exception ex)
             {
