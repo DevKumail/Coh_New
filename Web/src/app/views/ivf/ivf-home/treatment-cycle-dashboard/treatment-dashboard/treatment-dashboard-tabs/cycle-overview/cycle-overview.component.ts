@@ -51,11 +51,11 @@ export class CycleOverviewComponent {
   dropdowns: any = [];
   // Keep dynamic medications list (rendered as resources)
   private medsResources: Array<{ id: string; title: string; eventColor: string; order: number }> = [
-    { id: 'gonad', title: 'Gonad F Pun [IVF]', eventColor: '#87CEEB', order: 5 },
-    { id: 'ovitrelle', title: 'Ovitrelle [ivg]', eventColor: '#FFA500', order: 6 },
-    { id: 'progesterone-mg', title: 'Progesterone [mg]', eventColor: '#90EE90', order: 7 },
-    { id: 'oestrogen', title: 'Oestrogen [mg]', eventColor: '#FF69B4', order: 8 },
-    { id: 'estradiol', title: 'Estradiol [mg]', eventColor: '#FFFF00', order: 9 },
+    // { id: 'gonad', title: 'Gonad F Pun [IVF]', eventColor: '#87CEEB', order: 5 },
+    // { id: 'ovitrelle', title: 'Ovitrelle [ivg]', eventColor: '#FFA500', order: 6 },
+    // { id: 'progesterone-mg', title: 'Progesterone [mg]', eventColor: '#90EE90', order: 7 },
+    // { id: 'oestrogen', title: 'Oestrogen [mg]', eventColor: '#FF69B4', order: 8 },
+    // { id: 'estradiol', title: 'Estradiol [mg]', eventColor: '#FFFF00', order: 9 },
   ];
 
   // FullCalendar Options
@@ -431,7 +431,13 @@ export class CycleOverviewComponent {
     }
     return [];
   }
-  medicationSubtypes: string[] = ['Gonad F Pun [IVF]', 'Ovitrelle [ivg]', 'Progesterone [mg]', 'Oestrogen [mg]', 'Estradiol [mg]'];
+  medicationSubtypes: string[] = [
+    // 'Gonad F Pun [IVF]', 
+    // 'Ovitrelle [ivg]', 
+    // 'Progesterone [mg]', 
+    // 'Oestrogen [mg]', 
+    // 'Estradiol [mg]'
+  ];
   hormoneSubtypes: string[] = ['FSH [mIU/ml]', 'hCG [ng/ml]', 'LH [mIU/ml]', 'Progesterone [ng/ml]'];
 
   handleDateClick(arg: any) {
