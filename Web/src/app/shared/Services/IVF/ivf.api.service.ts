@@ -227,6 +227,11 @@ export class IVFApiService {
     return this.api.post('IVFEpisodeAspiration/CreateUpdateEpisodeAspiration', body);
   }
 
+  // Get episode aspiration by cycle id
+  getEpisodeAspirationByCycleId(ivfDashboardTreatmentCycleId: number): Observable<any> {
+    return this.api.get(`IVFEpisodeAspiration/GetEpisodeAspirationByCycleId?ivfDashboardTreatmentCycleId=${ivfDashboardTreatmentCycleId}`);
+  }
+
   // New: collect sample for an entire order set (order-level)
   collectLabOrder(orderSetId: number | string, body: { collectDate: string; userId: number }): Observable<any> {
     return this.api.post(`IVFLabOrders/${orderSetId}/collect`, body);

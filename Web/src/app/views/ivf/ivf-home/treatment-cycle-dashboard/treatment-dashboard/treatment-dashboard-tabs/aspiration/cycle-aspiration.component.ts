@@ -34,7 +34,15 @@ export class CycleAspirationComponent {
     ]
   };
 
+  mucousMembranes = [
+    { id: 'intact', name: 'Intact' },
+    { id: 'inflamed', name: 'Inflamed' }
+  ];
+
   private cycleId: number = 0;
+  private aspirationId: number = 0;
+  private oocyteRetrievalId: number = 0;
+  private furtherDetailsId: number = 0;
 
   constructor(
     private sharedservice: SharedService,
@@ -93,12 +101,18 @@ export class CycleAspirationComponent {
       const idStr = qp.get('cycleId');
       const id = Number(idStr);
       this.cycleId = Number.isFinite(id) && id > 0 ? id : 0;
+      if (this.cycleId > 0) {
+        this.loadAspiration();
+      }
     });
   }
 
   ngOnInit(): void {
     this.getAlldropdown();
     this.FillCache();
+    if (this.cycleId > 0) {
+      this.loadAspiration();
+    }
   }
 
   FillCache() {
@@ -143,17 +157,79 @@ export class CycleAspirationComponent {
 
 
 
+  private loadAspiration() {
+    this.ivfApi.getEpisodeAspirationByCycleId(this.cycleId).subscribe({
+      next: (res: any) => {
+        const a = res?.aspiration;
+        if (!a) { return; }
+        this.aspirationId = Number(a.aspirationId) || 0;
+        const o = a.oocyteRetrieval || {};
+        const f = a.furtherDetails || {};
+        this.oocyteRetrievalId = Number(o.oocyteRetrievalId) || 0;
+        this.furtherDetailsId = Number(f.furtherDetailsId) || 0;
+
+        const dateStr = o.retrievalDate ? new Date(o.retrievalDate).toISOString().slice(0, 10) : null;
+        const poor = o.poorResponseToDrugs === true ? 'yes' : (o.poorResponseToDrugs === false ? 'no' : null);
+
+        this.form.patchValue({
+          date: dateStr,
+          startTime: o.startTime || null,
+          endTime: o.endTime || null,
+          collectedOocytesCount: o.collectedOocytes ?? null,
+          emptyCumulusCount: o.emptyCumuli ?? null,
+          poorDrugResponse: poor,
+
+          retrievalTechnique: o.retrievalTechniqueCategoryId || null,
+          anesthesia: o.anesthesiaCategoryId || null,
+          primaryComplication: o.primaryComplicationsCategoryId || null,
+          furtherComplications: o.furtherComplicationsCategoryId || null,
+          primaryMeasure: o.primaryMeasureCategoryId || null,
+          furtherMeasures: o.furtherMeasureCategoryId || null,
+
+          operatingClinician: o.operatingProviderId || null,
+          embryologist: o.embryologistId || null,
+          anesthetist: o.anesthetistId || null,
+          nurse: o.nurseId || null,
+
+          editorContent: o.note || '',
+
+          aspirationSystem: f.aspirationSystemCategoryId || null,
+          leadingFollicleSizeMm: f.leadingFollicleSize ?? null,
+          follicleWashed: !!f.folliclesWashed,
+          washedFolliclesCount: f.noOfWashedFollicles ?? null,
+          folliclesTotal: f.retrievedFolliclesTotal ?? null,
+          folliclesLeft: f.retrievedFolliclesLeft ?? null,
+          folliclesRight: f.retrievedFolliclesRight ?? null,
+          doseLH: f.totalDoseAdministeredLh ?? null,
+          doseFSH: f.totalDoseAdministeredFsh ?? null,
+          doseHMG: f.totalDoseAdministeredHmg ?? null,
+          generalCondition: f.generalConditionCategoryId || null,
+          mucousMembrane: f.mucousMembraneCategoryId || null,
+          preOpTemp: f.temperature ?? null,
+          preOpPulse: f.beforeOocyteRetrievalPulse ?? null,
+          preOpBpSys: f.beforeOocyteRetrievalBloodPressureSystolic ?? null,
+          preOpBpDia: f.beforeOocyteRetrievalBloodPressureDiastolic ?? null,
+          anesPulse: f.anaesthetistPulse ?? null,
+          anesBpSys: f.anaesthetistBloodPressureSystolic ?? null,
+          anesBpDia: f.anaesthetistBloodPressureDiastolic ?? null,
+          anesNote: f.note || ''
+        });
+      },
+      error: () => {}
+    });
+  }
+
   submit() {
     const v = this.form.value as any;
     const retrievalDateISO = v.date ? new Date(v.date).toISOString() : new Date().toISOString();
     const poorResponse = v.poorDrugResponse === 'yes' ? true : v.poorDrugResponse === 'no' ? false : false;
     const body: any = {
-      aspirationId: 0,
+      aspirationId: this.aspirationId || 0,
       ivfDashboardTreatmentCycleId: this.cycleId || 0,
       statusId: 0,
       oocyteRetrieval: {
-        oocyteRetrievalId: 0,
-        aspirationId: 0,
+        oocyteRetrievalId: this.oocyteRetrievalId || 0,
+        aspirationId: this.aspirationId || 0,
         retrievalDate: retrievalDateISO,
         startTime: v.startTime || '',
         endTime: v.endTime || '',
@@ -173,8 +249,8 @@ export class CycleAspirationComponent {
         note: v.editorContent || ''
       },
       furtherDetails: {
-        furtherDetailsId: 0,
-        aspirationId: 0,
+        furtherDetailsId: this.furtherDetailsId || 0,
+        aspirationId: this.aspirationId || 0,
         aspirationSystemCategoryId: Number(v.aspirationSystem) || 0,
         leadingFollicleSize: Number(v.leadingFollicleSizeMm) || 0,
         noOfWashedFollicles: Number(v.washedFolliclesCount) || 0,
@@ -201,10 +277,12 @@ export class CycleAspirationComponent {
     this.ivfApi.saveEpisodeAspiration(body).subscribe({
       next: () => {
         Swal.fire({ icon: 'success', title: 'Saved', text: 'Aspiration saved successfully.', timer: 3000, showConfirmButton: false, timerProgressBar: true });
+        this.loadAspiration();
       },
       error: (err: any) => {
         if (err && Number(err.status) === 200) {
           Swal.fire({ icon: 'success', title: 'Saved', text: 'Aspiration saved successfully.', timer: 3000, showConfirmButton: false, timerProgressBar: true });
+          this.loadAspiration();
           return;
         }
         Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save aspiration. Please try again.' });
