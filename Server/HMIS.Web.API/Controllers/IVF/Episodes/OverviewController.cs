@@ -107,8 +107,8 @@ namespace HMIS.Web.Controllers.IVF.Episodes
         //----------------- Overview start ---------------
 
 
-        [HttpPost("getalldrugs")]
-        public async Task<IActionResult> GetAllDrugsDetail([FromBody] PaginationInfo dto)
+        [HttpGet("getalldrugs")]
+        public async Task<IActionResult> GetAllDrugsDetail([FromQuery] PaginationInfo dto)
         {
             var result = await _prescriptionMasterService.GetAllDrugs(dto);
             return Ok(result);
@@ -117,7 +117,7 @@ namespace HMIS.Web.Controllers.IVF.Episodes
         [HttpGet("get-all-Overview/{treatmentCycleId}")]
         public async Task<IActionResult> GetAllOverviewDetail(long treatmentCycleId)
         {
-            var result = await _overviewService.getOverviewAsync(treatmentCycleId);
+            var result = await _overviewService.GetOverviewByTreatmentCycleAsync(treatmentCycleId);
             return Ok(result);
         }
 
