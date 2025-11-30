@@ -394,6 +394,7 @@ this.loadOverviewCycles()
   }
 
   onEpisodeClick(data: any){
-    this.router.navigate(['ivf/episode']);
+    const id = Number(data?.id);
+    this.router.navigate(['ivf/episode'], { queryParams: { cycleId: Number.isFinite(id) ? id : null } });
   }
 }

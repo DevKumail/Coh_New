@@ -3,5 +3,6 @@ export enum Page {
   IVFFemaleFertilityHistory = 'IVFFemaleFertilityHistory',
   IVFMaleFertilityHistory = 'IVFMaleFertilityHistory',
   IVFMaleCryoPreservation = 'IVFMaleCryoPreservation',
-  IVFTreatmentCycle = 'IVFTreatmentCycle'
+  IVFTreatmentCycle = 'IVFTreatmentCycle',
+  IVFEpisodeOverview = 'IVFEpisodeOverview'
 }

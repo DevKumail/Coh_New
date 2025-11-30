@@ -172,12 +172,28 @@ export class IVFApiService {
       return this.api.delete(`IVFDashboard/DeleteIVFDashboardTreatmentCycle/${ivfDashboardTreatmentCycleId}`);
     }
 
+    getOverviewByEpisodeId(episodeId: number): Observable<any> {
+      return this.api.get(`Overview/get-all-Overview/${episodeId}`);
+    }
+
+    saveOverviewEvent(payload: {
+      eventId: number;
+      appId: number;
+      categoryId: number;
+      overviewId: number;
+      startdate: string;
+      enddate: string;
+    }): Observable<any> {
+      return this.api.post('Overview/event-save', payload);
+    }
+
      // Add observations for a specific order set detail
   addLabOrderObservations(orderSetDetailId: number | string, body: any): Observable<any> {
     debugger
     return this.api.post(`IVFLabOrders/${orderSetDetailId}/observations`, body);
   }
-    getPathologyResults(mrno: string | number, search?: string): Observable<any> {
+
+  getPathologyResults(mrno: string | number, search?: string): Observable<any> {
     const params: any = {};
     if (search && search.trim()) {
       params.search = search.trim();
@@ -185,7 +201,26 @@ export class IVFApiService {
     return this.api.get(`IVFLabOrders/pathology-results/${mrno}`, params);
   }
 
- 
+  // Overview Drugs
+  getAllDrugs(page: number = 1, rowsPerPage: number = 10): Observable<any> {
+    return this.api.post('Overview/getalldrugs', { page, rowsPerPage });
+  }
+
+  // Save selected drug to prescription master
+  savePrescriptionMaster(body: { ivfPrescriptionMasterId: number; overviewId: number; drugId: number }): Observable<any> {
+    return this.api.post('Overview/prescription-master-save', body);
+  }
+
+  // Save prescription with dates and appointment
+  savePrescription(body: {
+    ivfPrescriptionMasterId: number;
+    drugId: number;
+    appointmentId: number;
+    startDate: string;
+    endDate: string;
+  }): Observable<any> {
+    return this.api.post('Overview/prescription-save', body);
+  }
 
   // New: collect sample for an entire order set (order-level)
   collectLabOrder(orderSetId: number | string, body: { collectDate: string; userId: number }): Observable<any> {
