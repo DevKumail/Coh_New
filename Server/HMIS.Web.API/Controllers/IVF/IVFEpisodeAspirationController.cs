@@ -19,8 +19,8 @@ namespace HMIS.Web.Controllers.IVF
             _service = service;
         }
 
-        [HttpPost("CreateUpdate")]
-        public async Task<IActionResult> CreateOrUpdate([FromBody] IVFEpisodeAspirationDto dto)
+        [HttpPost("CreateUpdateEpisodeAspiration")]
+        public async Task<IActionResult> CreateUpdateEpisodeAspiration([FromBody] IVFEpisodeAspirationDto dto)
         {
             var result = await _service.CreateOrUpdateEpisodeAspirationAsync(dto);
             if (!result.IsSuccess)
@@ -29,8 +29,8 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(new { id = result.Data });
         }
 
-        [HttpGet("GetById")] 
-        public async Task<IActionResult> GetById([FromQuery] long aspirationId)
+        [HttpGet("GetByIdAspirationById")] 
+        public async Task<IActionResult> GetByIdAspirationById([FromQuery] long aspirationId)
         {
             if (aspirationId <= 0)
                 return BadRequest(new { message = "aspirationId is required" });
@@ -42,8 +42,8 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(new { aspiration = data });
         }
 
-        [HttpGet("GetAll")] 
-        public async Task<IActionResult> GetAll([FromQuery] int ivfDashboardTreatmentCycleId, [FromQuery] int? page = 1, [FromQuery] int? rowsPerPage = 10)
+        [HttpGet("GetAllEpisodeAspiration")] 
+        public async Task<IActionResult> GetAllEpisodeAspiration([FromQuery] int ivfDashboardTreatmentCycleId, [FromQuery] int? page = 1, [FromQuery] int? rowsPerPage = 10)
         {
             if (ivfDashboardTreatmentCycleId <= 0)
                 return BadRequest(new { message = "ivfDashboardTreatmentCycleId is required" });
@@ -56,8 +56,8 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(new { data, totalRecords = total });
         }
 
-        [HttpDelete("Delete/{aspirationId}")]
-        public async Task<IActionResult> Delete([FromRoute] long aspirationId)
+        [HttpDelete("DeleteEpisodeAspiration/{aspirationId}")]
+        public async Task<IActionResult> DeleteEpisodeAspiration([FromRoute] long aspirationId)
         {
             var (success, message) = await _service.DeleteEpisodeAspirationAsync(aspirationId);
             if (success)
