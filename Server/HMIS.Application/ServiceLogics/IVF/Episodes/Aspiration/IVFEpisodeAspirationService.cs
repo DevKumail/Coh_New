@@ -44,7 +44,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Aspiration
     public interface IIVFEpisodeAspirationService
     {
         Task<Result<long>> CreateOrUpdateEpisodeAspirationAsync(IVFEpisodeAspirationDto dto);
-        Task<(bool IsSuccess, IVFEpisodeAspirationDto? Data)> GetEpisodeAspirationById(long aspirationId);
+        Task<(bool IsSuccess, IVFEpisodeAspirationDto? Data)> GetEpisodeAspirationByCycleId(int ivfDashboardTreatmentCycleId);
         Task<(bool IsSuccess, IEnumerable<IVFEpisodeAspirationListItemDto> Data, int TotalRecords)> GetAllEpisodeAspirationByCycleId(int ivfDashboardTreatmentCycleId, PaginationInfo pagination);
         Task<(bool IsSuccess, object? Data)> DeleteEpisodeAspirationAsync(long aspirationId);
     }
@@ -60,17 +60,17 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Aspiration
             _dapper = dapper;
         }
 
-        public async Task<(bool IsSuccess, IVFEpisodeAspirationDto? Data)> GetEpisodeAspirationById(long aspirationId)
+        public async Task<(bool IsSuccess, IVFEpisodeAspirationDto? Data)> GetEpisodeAspirationByCycleId(int ivfDashboardTreatmentCycleId)
         {
-            if (aspirationId <= 0)
+            if (ivfDashboardTreatmentCycleId <= 0)
                 return (false, null);
 
             using var conn = _dapper.CreateConnection();
             try
             {
                 var jsonResult = await conn.ExecuteScalarAsync<string>(
-                    "IVF_GetEpisodeAspiration",
-                    new { AspirationId = aspirationId },
+                    "IVF_GetEpisodeAspirationByCycle",
+                    new { IVFDashboardTreatmentCycleId = ivfDashboardTreatmentCycleId },
                     commandType: CommandType.StoredProcedure
                 );
 
