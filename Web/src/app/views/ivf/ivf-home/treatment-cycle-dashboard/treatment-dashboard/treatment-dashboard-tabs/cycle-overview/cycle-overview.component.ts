@@ -103,13 +103,17 @@ export class CycleOverviewComponent {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn btn-sm btn-link med-add-btn';
-        btn.title = 'Add medication row';
+        btn.title = 'Add medication';
         btn.style.position = 'absolute';
         btn.style.right = '6px';
-        btn.style.top = '4px';
+        btn.style.top = '8px';
         btn.style.padding = '0 6px';
         btn.style.lineHeight = '1';
         btn.textContent = '+';
+        btn.style.height = '20px';
+        btn.style.width = '20px';
+        btn.style.fontSize = 'xx-large';
+        btn.style.color = '#333';
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           this.openAddMedModal();
