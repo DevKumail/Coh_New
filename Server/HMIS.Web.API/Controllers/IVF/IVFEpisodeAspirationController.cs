@@ -29,13 +29,13 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(new { id = result.Data });
         }
 
-        [HttpGet("GetByIdAspirationById")] 
-        public async Task<IActionResult> GetByIdAspirationById([FromQuery] long aspirationId)
+        [HttpGet("GetEpisodeAspirationByCycleId")] 
+        public async Task<IActionResult> GetEpisodeAspirationByCycleId([FromQuery] int ivfDashboardTreatmentCycleId)
         {
-            if (aspirationId <= 0)
-                return BadRequest(new { message = "aspirationId is required" });
+            if (ivfDashboardTreatmentCycleId <= 0)
+                return BadRequest(new { message = "ivfDashboardTreatmentCycleId is required" });
 
-            var (ok, data) = await _service.GetEpisodeAspirationById(aspirationId);
+            var (ok, data) = await _service.GetEpisodeAspirationByCycleId(ivfDashboardTreatmentCycleId);
             if (!ok || data == null)
                 return BadRequest(new { message = "Unable to fetch aspiration" });
 
