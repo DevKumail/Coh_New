@@ -7,11 +7,17 @@ import Swal from 'sweetalert2';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import { Page } from '@/app/shared/enum/dropdown.enum';
+import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 
 @Component({
   selector: 'app-cycle-aspiration',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, QuillModule,],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    QuillModule,    
+    FilledOnValueDirective,
+  ],
   templateUrl: './cycle-aspiration.component.html',
   styleUrl: './cycle-aspiration.component.scss'
 })
@@ -168,7 +174,18 @@ export class CycleAspirationComponent {
         this.oocyteRetrievalId = Number(o.oocyteRetrievalId) || 0;
         this.furtherDetailsId = Number(f.furtherDetailsId) || 0;
 
-        const dateStr = o.retrievalDate ? new Date(o.retrievalDate).toISOString().slice(0, 10) : null;
+        let dateStr: string | null = null;
+        if (o.retrievalDate) {
+          if (typeof o.retrievalDate === 'string') {
+            dateStr = o.retrievalDate.split('T')[0];
+          } else {
+            const d = new Date(o.retrievalDate);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            dateStr = `${y}-${m}-${dd}`;
+          }
+        }
         const poor = o.poorResponseToDrugs === true ? 'yes' : (o.poorResponseToDrugs === false ? 'no' : null);
 
         this.form.patchValue({
