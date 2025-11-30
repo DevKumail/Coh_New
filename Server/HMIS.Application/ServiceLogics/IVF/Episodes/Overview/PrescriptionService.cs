@@ -35,7 +35,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
             {
                 Ivfprescription entity;
 
-                if (dto.IVFPrescriptionMasterId > 0)
+                if (dto.IvfprescriptionId > 0)
                 {
                     entity = await _context.Ivfprescription
                         .FirstOrDefaultAsync(x => x.IvfprescriptionMasterId == dto.IVFPrescriptionMasterId);
@@ -44,7 +44,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                         return (false, "Prescription not found.");
 
                     entity.AppointmentId = dto.AppointmentId;
-                    entity.DrugId = dto.DrugId;
+                    entity.IvfprescriptionMasterId = dto.IVFPrescriptionMasterId;
                     entity.StartDate = dto.StartDate;
                     entity.EndDate = dto.EndDate;
 
@@ -54,8 +54,8 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
 
                 entity = new Ivfprescription
                 {
+                    IvfprescriptionMasterId = dto.IVFPrescriptionMasterId,
                     AppointmentId = dto.AppointmentId,
-                    DrugId = dto.DrugId,
                     StartDate = dto.StartDate,
                     EndDate = dto.EndDate
                 };
