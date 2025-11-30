@@ -222,6 +222,11 @@ export class IVFApiService {
     return this.api.post('Overview/prescription-save', body);
   }
 
+  // Create or update episode aspiration
+  saveEpisodeAspiration(body: any): Observable<any> {
+    return this.api.post('IVFEpisodeAspiration/CreateUpdateEpisodeAspiration', body);
+  }
+
   // New: collect sample for an entire order set (order-level)
   collectLabOrder(orderSetId: number | string, body: { collectDate: string; userId: number }): Observable<any> {
     return this.api.post(`IVFLabOrders/${orderSetId}/collect`, body);
