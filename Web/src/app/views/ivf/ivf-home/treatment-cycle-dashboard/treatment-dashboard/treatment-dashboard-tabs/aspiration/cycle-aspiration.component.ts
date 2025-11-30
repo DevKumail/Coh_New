@@ -276,12 +276,12 @@ export class CycleAspirationComponent {
 
     this.ivfApi.saveEpisodeAspiration(body).subscribe({
       next: () => {
-        Swal.fire({ icon: 'success', title: 'Saved', text: 'Aspiration saved successfully.', timer: 3000, showConfirmButton: false, timerProgressBar: true });
+        Swal.fire({ icon: 'success', title: 'Saved', text: 'Aspiration saved successfully.', timer: 1000, showConfirmButton: false, timerProgressBar: true });
         this.loadAspiration();
       },
       error: (err: any) => {
         if (err && Number(err.status) === 200) {
-          Swal.fire({ icon: 'success', title: 'Saved', text: 'Aspiration saved successfully.', timer: 3000, showConfirmButton: false, timerProgressBar: true });
+          Swal.fire({ icon: 'success', title: 'Saved', text: 'Aspiration saved successfully.', timer: 1000, showConfirmButton: false, timerProgressBar: true });
           this.loadAspiration();
           return;
         }
