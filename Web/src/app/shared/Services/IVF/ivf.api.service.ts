@@ -203,7 +203,7 @@ export class IVFApiService {
 
   // Overview Drugs
   getAllDrugs(page: number = 1, rowsPerPage: number = 10): Observable<any> {
-    return this.api.post('Overview/getalldrugs', { page, rowsPerPage });
+    return this.api.get('Overview/getalldrugs', { Page: page, RowsPerPage: rowsPerPage });
   }
 
   // Save selected drug to prescription master

@@ -98,26 +98,30 @@
     <form class="p-3 pt-2" (ngSubmit)="confirmAddMed()">
       <div class="mb-2">
         <label class="form-label mb-1">Medication</label>
-        <div ngbDropdown class="d-block" autoClose="outside">
-          <button ngbDropdownToggle type="button" class="btn btn-sm btn-outline-secondary w-100 text-start" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-            <span *ngIf="!selectedDrugLabel">-- Select drug --</span>
-            <span *ngIf="selectedDrugLabel">{{ selectedDrugLabel }}</span>
-          </button>
-          <div ngbDropdownMenu class="w-100 p-0" style="max-height: 280px; overflow: auto;" (scroll)="onDrugsScroll($event)">
+        <div ngbDropdown class="d-block" autoClose="true">
+          <div ngbDropdownToggle tabindex="0" role="button"
+               class="form-control form-control-sm w-100"
+               style="white-space: normal; overflow-wrap: anywhere; min-height: 32px; display: block;"
+               [title]="selectedDrugLabel || ''">
+            <ng-container *ngIf="selectedDrugLabel; else medPlaceholder">
+              {{ selectedDrugLabel }}
+            </ng-container>
+            <ng-template #medPlaceholder>-- Select drug --</ng-template>
+          </div>
+          <div ngbDropdownMenu class="w-100 p-0" style="max-height: 300px; overflow: auto;" (scroll)="onDrugsScroll($event)">
             <button ngbDropdownItem type="button" class="py-2" (click)="selectedDrugId = null">
               -- Select drug --
             </button>
             <div class="dropdown-divider m-0"></div>
             <button ngbDropdownItem type="button" class="py-2" *ngFor="let d of drugs" (click)="selectedDrugId = d.drugId"
-                    style="white-space: normal; line-height: 1.2;">
-              <div class="fw-semibold">{{ d.drugName }}</div>
-              <div class="text-muted small" *ngIf="d.dose">{{ d.dose }}</div>
+                    [title]="d.drugName + (d.dose ? ' | ' + d.dose : '')">
+              <div class="d-flex flex-column text-start">
+                <div class="fw-semibold text-wrap">{{ d.drugName }}</div>
+                <small class="text-muted" *ngIf="d.dose">{{ d.dose }}</small>
+              </div>
             </button>
-            <div class="text-center small py-2" *ngIf="drugsLoading">Loading...</div>
-            <button type="button" class="dropdown-item text-center py-2" *ngIf="!drugsLoading && drugsHasMore" (click)="onLoadMoreClick($event)">
-              Load more…
-            </button>
-            <div class="text-center text-muted small py-2" *ngIf="!drugsLoading && !drugsHasMore">End of list</div>
+            <div class="dropdown-divider m-0"></div>
+            <button ngbDropdownItem type="button" class="py-2 text-center fw-semibold" (click)="onLoadMoreClick($event)">Load more…</button>
           </div>
         </div>
       </div>
