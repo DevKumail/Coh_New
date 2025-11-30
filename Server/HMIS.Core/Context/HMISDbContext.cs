@@ -1819,15 +1819,11 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<Ivfprescription>(entity =>
         {
-            entity.HasOne(d => d.Appointment).WithMany()
+            entity.HasOne(d => d.Appointment).WithMany(p => p.Ivfprescription)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFPrescription_SchAppointment");
 
-            entity.HasOne(d => d.Drug).WithMany()
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_IVFMedication_Medication");
-
-            entity.HasOne(d => d.IvfprescriptionMaster).WithMany()
+            entity.HasOne(d => d.IvfprescriptionMaster).WithMany(p => p.Ivfprescription)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFPrescription_IVFPrescriptionMaster");
         });
