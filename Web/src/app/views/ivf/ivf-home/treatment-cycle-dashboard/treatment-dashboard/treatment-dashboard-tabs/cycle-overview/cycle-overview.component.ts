@@ -32,21 +32,6 @@ export class CycleOverviewComponent {
     private route: ActivatedRoute) { }
 
   // Mock data for UI display
-  cycleInfo = {
-    treatment: 'IVF/ICSI',
-    ivfNo: '9',
-    embryos: '2',
-    dateOfLMP: '03/14/2008',
-    downRegulation: 'GnRH Agonist (Long) (Faviston)',
-    oocytes: '24',
-    mainIndication: 'Both',
-    protocol: '',
-    ivfSpermCollection: 'Autograft ejaculation (Autograft ejaculation)',
-    ivfAdditionalMeasures: 'Assisted hatching, Polar body biopsy',
-    pidIndication: '',
-    pidIndication2: '',
-    ivfAccounting: ''
-  };
   AllDropdownValues: any = [];
   dropdowns: any = [];
   // Keep dynamic medications list (rendered as resources)
