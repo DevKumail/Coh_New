@@ -13,5 +13,9 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public string Dose { get; set; }
         public string PackageSize { get; set; }
         public string PackageName { get; set; }
+        public string GreenRainCode { get; set; }
+        public string Color { get; set; }
+        public string Form { get;set;}
+        public string GenericName { get; set; }
     }
 }
