@@ -33,6 +33,9 @@ public partial class IvfprescriptionMaster
     [InverseProperty("IvfprescriptionMaster")]
     public virtual TabDrugsName Drug { get; set; } = null!;
 
+    [InverseProperty("IvfprescriptionMaster")]
+    public virtual ICollection<Ivfprescription> Ivfprescription { get; set; } = new List<Ivfprescription>();
+
     [ForeignKey("OverviewId")]
     [InverseProperty("IvfprescriptionMaster")]
     public virtual IvftreatmentEpisodeOverviewStage Overview { get; set; } = null!;

@@ -59,6 +59,33 @@ public partial class DropdownConfiguration
     [InverseProperty("PidembblastIndicationCategory")]
     public virtual ICollection<IvfembblastIndications> IvfembblastIndications { get; set; } = new List<IvfembblastIndications>();
 
+    [InverseProperty("AspirationSystemCategory")]
+    public virtual ICollection<IvfepisodeAspirationFurtherDetails> IvfepisodeAspirationFurtherDetailsAspirationSystemCategory { get; set; } = new List<IvfepisodeAspirationFurtherDetails>();
+
+    [InverseProperty("GeneralConditionCategory")]
+    public virtual ICollection<IvfepisodeAspirationFurtherDetails> IvfepisodeAspirationFurtherDetailsGeneralConditionCategory { get; set; } = new List<IvfepisodeAspirationFurtherDetails>();
+
+    [InverseProperty("MucousMembraneCategory")]
+    public virtual ICollection<IvfepisodeAspirationFurtherDetails> IvfepisodeAspirationFurtherDetailsMucousMembraneCategory { get; set; } = new List<IvfepisodeAspirationFurtherDetails>();
+
+    [InverseProperty("AnesthesiaCategory")]
+    public virtual ICollection<IvfepisodeAspirationOocyteRetrieval> IvfepisodeAspirationOocyteRetrievalAnesthesiaCategory { get; set; } = new List<IvfepisodeAspirationOocyteRetrieval>();
+
+    [InverseProperty("FurtherComplicationsCategory")]
+    public virtual ICollection<IvfepisodeAspirationOocyteRetrieval> IvfepisodeAspirationOocyteRetrievalFurtherComplicationsCategory { get; set; } = new List<IvfepisodeAspirationOocyteRetrieval>();
+
+    [InverseProperty("FurtherMeasureCategory")]
+    public virtual ICollection<IvfepisodeAspirationOocyteRetrieval> IvfepisodeAspirationOocyteRetrievalFurtherMeasureCategory { get; set; } = new List<IvfepisodeAspirationOocyteRetrieval>();
+
+    [InverseProperty("PrimaryComplicationsCategory")]
+    public virtual ICollection<IvfepisodeAspirationOocyteRetrieval> IvfepisodeAspirationOocyteRetrievalPrimaryComplicationsCategory { get; set; } = new List<IvfepisodeAspirationOocyteRetrieval>();
+
+    [InverseProperty("PrimaryMeasureCategory")]
+    public virtual ICollection<IvfepisodeAspirationOocyteRetrieval> IvfepisodeAspirationOocyteRetrievalPrimaryMeasureCategory { get; set; } = new List<IvfepisodeAspirationOocyteRetrieval>();
+
+    [InverseProperty("RetrievalTechniqueCategory")]
+    public virtual ICollection<IvfepisodeAspirationOocyteRetrieval> IvfepisodeAspirationOocyteRetrievalRetrievalTechniqueCategory { get; set; } = new List<IvfepisodeAspirationOocyteRetrieval>();
+
     [InverseProperty("EventTypeCategory")]
     public virtual ICollection<IvfepisodeOverviewEvents> IvfepisodeOverviewEvents { get; set; } = new List<IvfepisodeOverviewEvents>();
 

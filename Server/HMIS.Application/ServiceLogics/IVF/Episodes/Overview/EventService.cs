@@ -8,8 +8,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episode.Overview
 {
     public interface IEventService 
     {
-        Task<(bool isSuccess, string message)> CreateEvent(EventCreateDto dto);
-        Task<(bool isSuccess, string message)> UpdateEvent(int eventId, EventCreateDto dto);
+        Task<(bool isSuccess, string message)> SaveEvent(EventCreateDto dto);
         Task<(bool isSuccess, string message)> DeleteEvent(int eventId);
     }
 
@@ -22,10 +21,10 @@ namespace HMIS.Application.ServiceLogics.IVF.Episode.Overview
             _dapper = dapper;
             _context = context;
         }
-        public async Task<(bool isSuccess, string message)> CreateEvent(EventCreateDto dto)
+        public async Task<(bool isSuccess, string message)> SaveEvent(EventCreateDto dto)
         {
             if (dto.OverviewId == 0 || dto.CategoryId == 0 || dto.AppId == 0)
-                return (false, "Invalid input. Some required IDs are missing.");
+                return (false, "Invalid input. Required IDs are missing.");
 
             try
             {
@@ -35,7 +34,27 @@ namespace HMIS.Application.ServiceLogics.IVF.Episode.Overview
                 if (!overviewExists)
                     return (false, "Overview does not exist.");
 
-                var entity = new IvfepisodeOverviewEvents
+                IvfepisodeOverviewEvents entity;
+
+                if (dto.EventId > 0)
+                {
+                    entity = await _context.IvfepisodeOverviewEvents
+                        .FirstOrDefaultAsync(x => x.EventId == dto.EventId);
+
+                    if (entity == null)
+                        return (false, "Event not found.");
+
+                    entity.OverviewId = dto.OverviewId;
+                    entity.EventTypeCategoryId = dto.CategoryId;
+                    entity.AppointmentId = dto.AppId;
+                    entity.StartDate = dto.Startdate;
+                    entity.EndDate = dto.Enddate;
+
+                    await _context.SaveChangesAsync();
+                    return (true, "Event updated successfully.");
+                }
+
+                entity = new IvfepisodeOverviewEvents
                 {
                     OverviewId = dto.OverviewId,
                     EventTypeCategoryId = dto.CategoryId,
@@ -48,41 +67,6 @@ namespace HMIS.Application.ServiceLogics.IVF.Episode.Overview
                 await _context.SaveChangesAsync();
 
                 return (true, "Event created successfully.");
-            }
-            catch (Exception ex)
-            {
-                return (false, $"An error occurred: {ex.Message}");
-            }
-        }
-
-        public async Task<(bool isSuccess, string message)> UpdateEvent(int eventId, EventCreateDto dto)
-        {
-            if (dto.OverviewId == 0 || dto.CategoryId == 0 || dto.AppId == 0)
-                return (false, "Invalid input. Some required IDs are missing.");
-
-            try
-            {
-                var overviewExists = await _context.IvftreatmentEpisodeOverviewStage
-                    .AnyAsync(x => x.OverviewId == dto.OverviewId);
-
-                if (!overviewExists)
-                    return (false, "Overview does not exist.");
-
-                var entity = await _context.IvfepisodeOverviewEvents
-                    .FirstOrDefaultAsync(x => x.EventId == eventId);
-
-                if (entity == null)
-                    return (false, "Event not found.");
-
-                entity.OverviewId = dto.OverviewId;
-                entity.EventTypeCategoryId = dto.CategoryId;
-                entity.AppointmentId = dto.AppId;
-                entity.StartDate = dto.Startdate;
-                entity.EndDate = dto.Enddate;
-
-                await _context.SaveChangesAsync();
-
-                return (true, "Event updated successfully.");
             }
             catch (Exception ex)
             {

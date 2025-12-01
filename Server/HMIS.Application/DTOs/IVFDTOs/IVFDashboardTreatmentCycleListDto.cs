@@ -11,7 +11,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
 
     public class IVFDashboardTreatmentCycleListItemDto
     {
-        public int IVFDashboardTreatmentEpisodeId { get; set; }
+        public int IVFDashboardTreatmentCycleId { get; set; }
         public long? TreatmentTypeCategoryId { get; set; }
         public string? TreatmentType { get; set; }
         public DateTime? DateOfLMP { get; set; }

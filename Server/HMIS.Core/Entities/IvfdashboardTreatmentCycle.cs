@@ -10,8 +10,8 @@ namespace HMIS.Core.Entities;
 public partial class IvfdashboardTreatmentCycle
 {
     [Key]
-    [Column("IVFDashboardTreatmentEpisodeId")]
-    public int IvfdashboardTreatmentEpisodeId { get; set; }
+    [Column("IVFDashboardTreatmentCycleId")]
+    public int IvfdashboardTreatmentCycleId { get; set; }
 
     [Column("IVFMainId")]
     public int? IvfmainId { get; set; }
@@ -65,6 +65,8 @@ public partial class IvfdashboardTreatmentCycle
 
     public string? CycleNote { get; set; }
 
+    public bool CycleStatus { get; set; }
+
     public int? CreatedBy { get; set; }
 
     public DateTime? CreatedAt { get; set; }
@@ -82,7 +84,7 @@ public partial class IvfdashboardTreatmentCycle
     public virtual DropdownConfiguration? CycleFromAmenorrheaCategory { get; set; }
 
     [InverseProperty("IvfdashboardTreatmentEpisode")]
-    public virtual ICollection<IvfdashboardAdditionalMeasures> IvfdashboardAdditionalMeasures { get; set; } = new List<IvfdashboardAdditionalMeasures>();
+    public virtual IvfdashboardAdditionalMeasures? IvfdashboardAdditionalMeasures { get; set; }
 
     [ForeignKey("IvffemaleFhid")]
     [InverseProperty("IvfdashboardTreatmentCycle")]
@@ -96,7 +98,10 @@ public partial class IvfdashboardTreatmentCycle
     [InverseProperty("IvfdashboardTreatmentCycle")]
     public virtual IvfmaleFertilityHistory? IvfmaleFh { get; set; }
 
-    [InverseProperty("IvfdashboardTreatmentEpisode")]
+    [InverseProperty("IvfdashboardTreatmentCycle")]
+    public virtual IvftreatmentEpisodeAspirationStage? IvftreatmentEpisodeAspirationStage { get; set; }
+
+    [InverseProperty("IvfdashboardTreatmentCycle")]
     public virtual ICollection<IvftreatmentEpisodeOverviewStage> IvftreatmentEpisodeOverviewStage { get; set; } = new List<IvftreatmentEpisodeOverviewStage>();
 
     [InverseProperty("IvfdashboardTreatmentEpisode")]

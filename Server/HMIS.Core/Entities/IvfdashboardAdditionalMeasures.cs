@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Table("IVFDashboardAdditionalMeasures")]
+[Index("IvfdashboardTreatmentEpisodeId", Name = "IX_IVFDashboardAdditionalMeasures", IsUnique = true)]
 public partial class IvfdashboardAdditionalMeasures
 {
     [Key]

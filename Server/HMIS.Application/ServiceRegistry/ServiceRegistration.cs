@@ -7,6 +7,7 @@ using HMIS.Application.ServiceLogics.IVF;
 using HMIS.Application.ServiceLogics.IVF.Dashboard;
 using HMIS.Application.ServiceLogics.IVF.Episode.Overview;
 using HMIS.Application.ServiceLogics.IVF.Episodes.Overview;
+using HMIS.Application.ServiceLogics.IVF.Episodes.Aspiration;
 using HMIS.Application.ServiceLogics.IVF.Female;
 using HMIS.Application.ServiceLogics.IVF.Male;
 using HMIS.ApplicationImplementations;
@@ -51,6 +52,7 @@ namespace HMIS.Application
             services.AddScoped<IPrescription, PrescriptionManager>();
             services.AddScoped<IAlertManager, AlertManager>();
             services.AddScoped<IDashboardService, IVFDashboardService>();
+            services.AddScoped<IIVFEpisodeAspirationService, IVFEpisodeAspirationService>();
             services.AddScoped<ICryoManagementService, CryoManagementService>();
             services.AddScoped<IDropDownLookUpService, DropDownLookUpService>();
             services.AddScoped<IIVFLabService, IVFLabService>();
@@ -63,6 +65,7 @@ namespace HMIS.Application
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IPrescriptionMasterService, PrescriptionMasterService>();
             services.AddScoped<IPrescriptionService, PrescriptionService>();
+            services.AddScoped<IOverviewService, OverviewService>();
 
             services.AddSingleton<IListenRESTClient>(provider =>
             {

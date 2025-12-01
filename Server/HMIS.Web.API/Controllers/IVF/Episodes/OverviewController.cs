@@ -1,4 +1,5 @@
 ﻿using HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview;
+using HMIS.Application.DTOs.SpLocalModel;
 using HMIS.Application.ServiceLogics.IVF.Episode.Overview;
 using HMIS.Application.ServiceLogics.IVF.Episodes.Overview;
 using Microsoft.AspNetCore.Mvc;
@@ -12,21 +13,23 @@ namespace HMIS.Web.Controllers.IVF.Episodes
         private readonly IEventService _eventService;
         private readonly IPrescriptionMasterService _prescriptionMasterService;
         private readonly IPrescriptionService _prescriptionService;
+        private readonly IOverviewService _overviewService;
 
-        public OverviewController(IEventService eventService, IPrescriptionMasterService prescriptionService, IPrescriptionService service)
+        public OverviewController(IEventService eventService, IPrescriptionMasterService prescriptionService, IPrescriptionService service, IOverviewService overviewService)
         {
             _eventService = eventService;
             _prescriptionMasterService = prescriptionService;
             _prescriptionService = service;
+            _overviewService = overviewService;
         }
 
 
         //----------------- Events start -----------------
 
-        [HttpPost("event-create")]
-        public async Task<IActionResult> CreateEvent(EventCreateDto dto)
+        [HttpPost("event-save")]
+        public async Task<IActionResult> SaveEvent(EventCreateDto dto)
         {
-            var result = await _eventService.CreateEvent(dto);
+            var result = await _eventService.SaveEvent(dto);
 
             if (!result.isSuccess)
                 return BadRequest(result.message);
@@ -34,16 +37,6 @@ namespace HMIS.Web.Controllers.IVF.Episodes
             return Ok(result.message);
         }
 
-        [HttpPut("event-update/{eventId}")]
-        public async Task<IActionResult> UpdateEvent(int eventId, EventCreateDto dto)
-        {
-            var result = await _eventService.UpdateEvent(eventId, dto);
-
-            if (!result.isSuccess)
-                return BadRequest(result.message);
-
-            return Ok(result.message);
-        }
 
         [HttpDelete("event-delete/{eventId}")]
         public async Task<IActionResult> DeleteEvent(int eventId)
@@ -60,29 +53,10 @@ namespace HMIS.Web.Controllers.IVF.Episodes
 
         //----------------- Prescription Master start -----------------
 
-        [HttpPost("prescription-master-getalldrugs")]
-        public async Task<IActionResult> GetAllDrugsDetail([FromBody] PaginationDto dto)
+        [HttpPost("prescription-master-save")]
+        public async Task<IActionResult> SaveMasterPrescription([FromBody] CreateMasterPrescriptionDto dto)
         {
-            var result = await _prescriptionMasterService.GetAllDrugs(dto);
-            return Ok(result);
-        }
-
-
-        [HttpPost("prescription-master-create")]
-        public async Task<IActionResult> CreateMasterPrescription([FromBody] CreateMasterPrescriptionDto dto)
-        {
-            var result = await _prescriptionMasterService.CreatePrescription(dto);
-
-            if (!result.isSuccess)
-                return BadRequest(result.message);
-
-            return Ok(result.message);
-        }
-
-        [HttpPut("prescription-master-update")]
-        public async Task<IActionResult> UpdateMasterPrescription([FromBody] CreateMasterPrescriptionDto dto)
-        {
-            var result = await _prescriptionMasterService.UpdatePrescription(dto);
+            var result = await _prescriptionMasterService.SaveMasterPrescription(dto);
 
             if (!result.isSuccess)
                 return BadRequest(result.message);
@@ -105,21 +79,10 @@ namespace HMIS.Web.Controllers.IVF.Episodes
 
         //----------------- Prescription Start -----------------
 
-        [HttpPost("prescription-create")]
-        public async Task<IActionResult> CreatePrescription([FromBody] CreatePrescriptiondto dto)
+        [HttpPost("prescription-save")]
+        public async Task<IActionResult> SavePrescription([FromBody] CreatePrescriptiondto dto)
         {
-            var result = await _prescriptionService.CreatePrescription(dto);
-
-            if (!result.isSuccess)
-                return BadRequest(result.message);
-
-            return Ok(result.message);
-        }
-
-        [HttpPut("prescription-update")]
-        public async Task<IActionResult> UpdatePrescription([FromBody] CreatePrescriptiondto dto)
-        {
-            var result = await _prescriptionService.UpdatePrescription(dto);
+            var result = await _prescriptionService.SavePrescription(dto);
 
             if (!result.isSuccess)
                 return BadRequest(result.message);
@@ -140,5 +103,24 @@ namespace HMIS.Web.Controllers.IVF.Episodes
         }
 
         //----------------- Prescription end -----------------
+
+        //----------------- Overview start ---------------
+
+
+        [HttpGet("getalldrugs")]
+        public async Task<IActionResult> GetAllDrugsDetail([FromQuery] PaginationInfo dto)
+        {
+            var result = await _prescriptionMasterService.GetAllDrugs(dto);
+            return Ok(result);
+        }
+
+        [HttpGet("get-all-Overview/{treatmentCycleId}")]
+        public async Task<IActionResult> GetAllOverviewDetail(long treatmentCycleId)
+        {
+            var result = await _overviewService.GetOverviewByTreatmentCycleAsync(treatmentCycleId);
+            return Ok(result);
+        }
+
+        //----------------- Overview end -----------------
     }
 }

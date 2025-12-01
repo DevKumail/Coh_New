@@ -366,14 +366,14 @@
                     <td>{{row.cycle}}</td>
                     <th>
 
+                      <ng-icon name="tablerRecycle" title="Episodes" class="text-info me-1" style="cursor: pointer;"
+                        (click)="onEpisodeClick(row)">
+                      </ng-icon>
                       <ng-icon name="tablerEdit" title="Edit" class="me-1" style="cursor: pointer;"
                         (click)="openEditCycle(row)">
                       </ng-icon>
                       <ng-icon name="tablerTrash" title="Delete" class="text-danger me-1" style="cursor: pointer;"
                         (click)="deleteCycle(row)">
-                      </ng-icon>
-                      <ng-icon name="tablerRecycle" title="Episodes" class="text-info me-1" style="cursor: pointer;"
-                        (click)="onEpisodeClick(row)">
                       </ng-icon>
                     </th>
                   </tr>

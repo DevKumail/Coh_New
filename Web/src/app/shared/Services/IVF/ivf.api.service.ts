@@ -169,7 +169,22 @@ export class IVFApiService {
   
     deleteIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId: number): Observable<any> {
       // Backend expects id via body or query; using POST for delete per given endpoint
-      return this.api.post('IVFDashboard/DeleteIVFDashboardTreatmentCycle', { ivfDashboardTreatmentCycleId });
+      return this.api.delete(`IVFDashboard/DeleteIVFDashboardTreatmentCycle/${ivfDashboardTreatmentCycleId}`);
+    }
+
+    getOverviewByEpisodeId(episodeId: number): Observable<any> {
+      return this.api.get(`Overview/get-all-Overview/${episodeId}`);
+    }
+
+    saveOverviewEvent(payload: {
+      eventId: number;
+      appId: number;
+      categoryId: number;
+      overviewId: number;
+      startdate: string;
+      enddate: string;
+    }): Observable<any> {
+      return this.api.post('Overview/event-save', payload);
     }
 
      // Add observations for a specific order set detail
@@ -177,7 +192,8 @@ export class IVFApiService {
     debugger
     return this.api.post(`IVFLabOrders/${orderSetDetailId}/observations`, body);
   }
-    getPathologyResults(mrno: string | number, search?: string): Observable<any> {
+
+  getPathologyResults(mrno: string | number, search?: string): Observable<any> {
     const params: any = {};
     if (search && search.trim()) {
       params.search = search.trim();
@@ -185,7 +201,36 @@ export class IVFApiService {
     return this.api.get(`IVFLabOrders/pathology-results/${mrno}`, params);
   }
 
- 
+  // Overview Drugs
+  getAllDrugs(page: number = 1, rowsPerPage: number = 10): Observable<any> {
+    return this.api.get('Overview/getalldrugs', { Page: page, RowsPerPage: rowsPerPage });
+  }
+
+  // Save selected drug to prescription master
+  savePrescriptionMaster(body: { ivfPrescriptionMasterId: number; overviewId: number; drugId: number }): Observable<any> {
+    return this.api.post('Overview/prescription-master-save', body);
+  }
+
+  // Save prescription with dates and appointment
+  savePrescription(body: {
+    ivfPrescriptionMasterId: number;
+    drugId: number;
+    appointmentId: number;
+    startDate: string;
+    endDate: string;
+  }): Observable<any> {
+    return this.api.post('Overview/prescription-save', body);
+  }
+
+  // Create or update episode aspiration
+  saveEpisodeAspiration(body: any): Observable<any> {
+    return this.api.post('IVFEpisodeAspiration/CreateUpdateEpisodeAspiration', body);
+  }
+
+  // Get episode aspiration by cycle id
+  getEpisodeAspirationByCycleId(ivfDashboardTreatmentCycleId: number): Observable<any> {
+    return this.api.get(`IVFEpisodeAspiration/GetEpisodeAspirationByCycleId?ivfDashboardTreatmentCycleId=${ivfDashboardTreatmentCycleId}`);
+  }
 
   // New: collect sample for an entire order set (order-level)
   collectLabOrder(orderSetId: number | string, body: { collectDate: string; userId: number }): Observable<any> {
