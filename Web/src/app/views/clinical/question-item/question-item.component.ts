@@ -30,4 +30,15 @@ export class QuestionItemComponent implements OnInit {
   onValueChange(value: string) {
     this.answerChange.emit(value ?? '');
   }
+
+  hasData(question: any): boolean {
+    return question.answer || this.hasChildrenWithData(question);
+  }
+
+  hasChildrenWithData(question: any): boolean {
+    if (!question.children || question.children.length === 0) {
+      return false;
+    }
+    return question.children.some((child: any) => this.hasData(child));
+  }
 }
