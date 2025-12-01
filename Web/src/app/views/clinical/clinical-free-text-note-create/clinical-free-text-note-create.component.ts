@@ -49,6 +49,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   updatedBy: string = '';
   mrNo: string = '';
   appointmentID: number = 0;
+  id: number = 0;
   visible: boolean = false;
   SearchPatientData: any
   selectedProviders: any = 0;
@@ -301,7 +302,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
         // Update MRN and visit if available
         this.mrNo = note.mrno || this.mrNo;
         this.appointmentID = note.visitAcNo || this.appointmentID;
-
+        this.id = note.noteId;
         // Update title and form fields
         this.noteTitle = note.notesTitle || this.noteTitle;
         this.clinicalForm.patchValue({
@@ -381,6 +382,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
     const emrPayload = {
       // use appointment ID as visit account number for EMR note
+      Id : this.id || 0,
       visitAcNo: this.appointmentID || 0,
       notesTitle: this.dataquestion?.node?.noteTitle || 'Clinical Free Text Note',
       noteText: textContent,
@@ -429,7 +431,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     }
 
     this.loader.show();
-    this.clinicalApiService.SaveEMRNote(emrPayload)
+    this.clinicalApiService.InsertNote(emrPayload)
       .then((res: any) => {
         const message = res?.message || res?.Message || '';
 

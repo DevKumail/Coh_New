@@ -885,45 +885,45 @@ namespace HMIS.Application.ServiceLogics
 
         }
 
-        public async Task<bool> InsertSpeech(SpeechModel sp)
-        {
+        //public async Task<bool> InsertSpeech(ClinicalNoteDto sp)
+        //{
 
-            try
-            {
-                //regPatient.PatientId = (long)sp.PatientId;
-                var patid = await _context.RegPatient.Where(x => x.Mrno == sp.Mrno).Select(x => x.PatientId).FirstOrDefaultAsync();
-                RegPatient regPatient = new RegPatient();
-                regPatient.PatientId = patid; regPatient.Mrno = sp.Mrno;
-                Core.Entities.SpeechToText speech = new Core.Entities.SpeechToText()
-                {
-                     NoteTitle=sp.NoteTitle,
-                    NoteText = sp.NoteText,
-                    CreatedOn = DateTime.UtcNow,
-                    Description = sp.Description,
-                    CreatedBy = sp.CreatedBy,
-                    SignedBy = sp.SignedBy,
-                    Mrno=sp.Mrno,
-                    PatientId = regPatient.PatientId,
-                    UpdatedBy=sp.UpdatedBy,
-                    VisitDate=sp.VisitDate,
+        //    try
+        //    {
+        //        //regPatient.PatientId = (long)sp.PatientId;
+        //        var patid = await _context.RegPatient.Where(x => x.Mrno == sp.Mrno).Select(x => x.PatientId).FirstOrDefaultAsync();
+        //        RegPatient regPatient = new RegPatient();
+        //        regPatient.PatientId = patid; regPatient.Mrno = sp.Mrno;
+        //        Core.Entities.SpeechToText speech = new Core.Entities.SpeechToText()
+        //        {
+        //            NoteTitle = sp.NoteTitle,
+        //            NoteText = sp.NoteText,
+        //            CreatedOn = DateTime.UtcNow,
+        //            Description = sp.Description,
+        //            CreatedBy = sp.CreatedBy,
+        //            SignedBy = sp.SignedBy,
+        //            Mrno = sp.Mrno,
+        //            PatientId = regPatient.PatientId,
+        //            UpdatedBy = sp.UpdatedBy,
+        //            VisitDate = sp.VisitDate,
 
 
 
-                };
-                //Problem is here
-                await _context.SpeechToText.AddAsync(speech);
-                await _context.SaveChangesAsync();
-                return true;
+        //        };
+        //        //Problem is here
+        //        await _context.SpeechToText.AddAsync(speech);
+        //        await _context.SaveChangesAsync();
+        //        return true;
 
-            }
-            catch (Exception ex)
-            {
+        //    }
+        //    catch (Exception ex)
+        //    {
 
-                return false;
-            }
-            return false;
-        }
- public async Task<SchAppointment> GetAppoimentForEditById ( long appId)
+        //        return false;
+        //    }
+        //    return false;
+        //}
+        public async Task<SchAppointment> GetAppoimentForEditById ( long appId)
         {
             try
             {
