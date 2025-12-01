@@ -120,7 +120,6 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
         )
       )
       .subscribe((data: any) => {
-        console.log(' Subscription triggered with MRNO:', data?.table2?.[0]?.mrNo);
         this.SearchPatientData = data;
         this.mrNo = data?.table2?.[0]?.mrNo || '';
       });
@@ -128,7 +127,6 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     this.PatientData.selectedVisit$.subscribe((data: any) => {
       this.SelectedVisit = data;
       this.appointmentID = data?.appointmentId || 0;
-      console.log('Selected Visit medical-list', this.SelectedVisit);
     });
 
     // Read query parameters first
@@ -184,32 +182,11 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     // Subscribe to transcription updates
     this.transcriptionSubscription = this.deepgramService.getTranscript$().subscribe(
       (transcript: string) => {
-        console.log('═══════════════════════════════════════════════════');
-        console.log('[Deepgram] ✅ RAW DATA RECEIVED FROM DEEPGRAM');
-        console.log('═══════════════════════════════════════════════════');
-        console.log('[Deepgram] Full transcript data:', transcript);
-        console.log('[Deepgram] Data type:', typeof transcript);
-        console.log('[Deepgram] Data length:', transcript.length);
-        console.log('[Deepgram] Is empty?', transcript.length === 0);
-        console.log('[Deepgram] First 100 chars:', transcript.substring(0, 100));
-        console.log('[Deepgram] JSON stringify:', JSON.stringify(transcript));
-        console.log('═══════════════════════════════════════════════════');
-
         this.currentTranscript = transcript;
-        console.log('[Deepgram] Current Transcript stored:', this.currentTranscript);
         this.appendTranscriptionToEditor(transcript);
       },
       (error) => {
-        console.error('═══════════════════════════════════════════════════');
-        console.error('[Deepgram] ❌ ERROR RECEIVING DATA FROM DEEPGRAM');
-        console.error('═══════════════════════════════════════════════════');
-        console.error('[Deepgram] Error object:', error);
-        console.error('[Deepgram] Error message:', error?.message);
-        console.error('[Deepgram] Error stack:', error?.stack);
-        console.error('═══════════════════════════════════════════════════');
-      },
-      () => {
-        console.log('[Deepgram] 🏁 Transcription stream completed');
+        console.error('[Deepgram] Error receiving transcription:', error);
       }
     );
   }
@@ -506,12 +483,8 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   async startRecording(): Promise<void> {
     try {
       this.loader.show();
-      console.log('[Deepgram] 🎤 Starting transcription...');
-      console.log('[Deepgram] Requesting microphone access...');
       await this.deepgramService.startTranscription();
       this.isRecording = true;
-      console.log('[Deepgram] ✅ Transcription started successfully');
-      console.log('[Deepgram] 📡 Audio data SENDING to Deepgram...');
       Swal.fire({
         icon: 'info',
         title: 'Recording Started',
@@ -520,7 +493,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
         showConfirmButton: false
       });
     } catch (error) {
-      console.error('[Deepgram] ❌ Error starting recording:', error);
+      console.error('[Deepgram] Error starting recording:', error);
       Swal.fire('Error', 'Failed to start voice recording. Please check microphone permissions.', 'error');
       this.isRecording = false;
     } finally {
@@ -529,12 +502,9 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   }
 
   stopRecording(): void {
-    console.log('[Deepgram] 🛑 Stopping transcription...');
-    console.log('[Deepgram] 📡 Stopping audio data stream to Deepgram...');
     this.deepgramService.stopTranscription();
     this.isRecording = false;
     this.currentTranscript = '';
-    console.log('[Deepgram] ✅ Transcription stopped successfully');
     Swal.fire({
       icon: 'success',
       title: 'Recording Stopped',
@@ -545,26 +515,9 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   }
 
   private appendTranscriptionToEditor(transcript: string): void {
-    console.log('───────────────────────────────────────────────────');
-    console.log('[Deepgram] 📝 APPENDING DATA TO EDITOR');
-    console.log('───────────────────────────────────────────────────');
-
     const currentContent = this.clinicalForm.get('editorContent')?.value || '';
-    console.log('[Deepgram] Current editor content:', currentContent);
-    console.log('[Deepgram] Current content length:', currentContent.length);
-    console.log('[Deepgram] Transcript to append:', transcript);
-    console.log('[Deepgram] Transcript length:', transcript.length);
-
     const newContent = currentContent + (currentContent ? ' ' : '') + transcript;
-    console.log('[Deepgram] New combined content:', newContent);
-    console.log('[Deepgram] New content length:', newContent.length);
-    console.log('[Deepgram] Content increased by:', newContent.length - currentContent.length);
-
     this.clinicalForm.patchValue({ editorContent: newContent });
-    console.log('[Deepgram] ✅ Form control updated with new content');
-    console.log('[Deepgram] Form control value after update:', this.clinicalForm.get('editorContent')?.value);
-    console.log('───────────────────────────────────────────────────');
-
     this.cdr.detectChanges();
   }
 

@@ -202,8 +202,14 @@ export class IVFApiService {
   }
 
   // Overview Drugs
-  getAllDrugs(page: number = 1, rowsPerPage: number = 10): Observable<any> {
-    return this.api.get('Overview/getalldrugs', { Page: page, RowsPerPage: rowsPerPage });
+  getAllDrugs(page: number = 1, rowsPerPage: number = 10, keyword?: string): Observable<any> {
+    const kw = (keyword || '').trim();
+    const base = 'Overview/getalldrugs';
+    let url = `${base}?page=${encodeURIComponent(page)}&RowsPerPage=${encodeURIComponent(rowsPerPage)}`;
+    if (kw.length) {
+      url += `&keyword=${encodeURIComponent(kw)}`;
+    }
+    return this.api.get(url);
   }
 
   // Save selected drug to prescription master

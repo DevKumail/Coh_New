@@ -1,14 +1,14 @@
-<div [ngStyle]="{'display': question.type === 'Question Section' ? 'block' : 'inline-block', 'margin-right': question.type !== 'Question Section' ? '20px' : '0'}">
+<div *ngIf="hasData(question)" [ngStyle]="{'display': question.type === 'Question Section' ? 'block' : 'inline-block', 'margin-right': question.type !== 'Question Section' ? '20px' : '0'}">
   <div class="question" [style.marginLeft.px]="question.type === 'Question Section' ? 20 : 0" [style.display]="question.type === 'Question Section' ? 'block' : 'inline-flex'">
-    <h3 *ngIf="question.type === 'Question Section'" style="font-weight: bold;">{{ question.quest_Title }}</h3>
-    <h4 *ngIf="question.type == 'TextBox'" style="margin-left: 50px; font-weight: bold;">{{ question.quest_Title }}</h4>
-    <h4 *ngIf="question.type == 'CheckBox'" style="margin-left: 50px; font-weight: bold">{{ question.quest_Title }}</h4>
-    <label *ngIf="question.type != 'CheckBox'" style="margin-left: 10px; font-weight:normal "> {{ question.answer }} </label>
-    <label *ngIf="question.type == 'CheckBox'" style="margin-left: 10px; font-weight:normal "><b>:</b> {{ question.answer }} </label>
+    <h3 *ngIf="question.type === 'Question Section' && question.answer" style="font-weight: bold;">{{ question.quest_Title }}</h3>
+    <h3 *ngIf="question.type === 'Question Section' && !question.answer && hasChildrenWithData(question)" style="font-weight: bold;">{{ question.quest_Title }}</h3>
+    <h4 *ngIf="question.type == 'TextBox' && question.answer" style="margin-left: 50px; font-weight: bold;">{{ question.quest_Title }}:</h4>
+    <h4 *ngIf="question.type == 'CheckBox' && question.answer" style="margin-left: 50px; font-weight: bold">{{ question.quest_Title }}:</h4>
+    <label *ngIf="question.answer" style="margin-left: 10px; font-weight:normal "> {{ question.answer }} </label>
   </div>
 
   <div
-    *ngIf="question.children?.length"
+    *ngIf="question.children?.length && hasChildrenWithData(question)"
     [style.display]="question.type === 'Question Section' ? 'grid' : 'inline-flex'"
     [style.gridTemplateColumns]="question.type === 'Question Section' ? 'repeat(3, 1fr)' : 'none'"
     [style.flexWrap]="question.type === 'Question Section' ? 'nowrap' : 'wrap'"

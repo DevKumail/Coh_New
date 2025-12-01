@@ -108,9 +108,10 @@ namespace HMIS.Web.Controllers.IVF.Episodes
 
 
         [HttpGet("getalldrugs")]
-        public async Task<IActionResult> GetAllDrugsDetail([FromQuery] PaginationInfo dto)
+        public async Task<IActionResult> GetAllDrugsDetail([FromQuery] string? keyword,[FromQuery] int? page, [FromQuery] int? RowsPerPage)
         {
-            var result = await _prescriptionMasterService.GetAllDrugs(dto);
+            PaginationInfo dto = new PaginationInfo { Page = page, RowsPerPage = RowsPerPage };
+            var result = await _prescriptionMasterService.GetAllDrugs(keyword,dto);
             return Ok(result);
         }
 
