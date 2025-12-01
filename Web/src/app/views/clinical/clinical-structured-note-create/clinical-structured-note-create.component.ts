@@ -12,6 +12,7 @@ import { QuestionViewComponent } from '../question-view/question-view.component'
 import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { LoaderService } from '@core/services/loader.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 @Component({
   standalone: true,
   imports: [
@@ -63,6 +64,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     private userDataService: UserDataService,
     private PatientData: PatientBannerService,
     private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
@@ -184,22 +186,6 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       this.GetNotesTemplate(this.preSelectedTemplate);
     }
   }
-
-//   GetNotesEmployeeId(providerCode: any) {
-//     if (providerCode == null || providerCode == undefined) providerCode = 0;
-//     this.selectedProviders = Number(providerCode) || 0;
-//     if (this.selectedProviders === 250) providerCode = 197;
-//     this.clinicalNotes = [];
-//     this.clinicalForm.patchValue({ note: null });
-//     this.loader.show();
-//     this.clinicalApiService.EMRNotesGetByEmpId(providerCode).then((res: any) => {
-//       this.clinicalNotes = res.result || [];
-//       this.loader.hide();
-//     }).catch((e: any) =>
-//       Swal.fire('Error', 'Error loading notes', 'error')
-//     ).finally(() => this.loader.hide());
-//   }
-
   GetNotesTemplate(noteId: any) {
     if (noteId == null || noteId == undefined) noteId = 0;
 
@@ -375,6 +361,83 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     });
 
     return html;
+  }
+
+  getFormattedNoteHtml(): SafeHtml {
+    const questions = this.nodeData?.node?.questions || this.nodeData?.questions || [];
+    const title = this.nodeData?.node?.noteTitle || this.nodeData?.noteTitle || '';
+
+    let html = `<h2 style="margin-top: 10px; font-weight: bold; margin-left: 10px; text-decoration-line: underline;">${title}</h2>`;
+
+    questions.forEach((section: any) => {
+      if (this.hasQuestionData(section)) {
+        html += this.formatQuestion(section, 10);
+      }
+    });
+
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  private formatQuestion(question: any, marginLeft: number): string {
+    let html = '';
+
+    if (!this.hasQuestionData(question)) {
+      return html;
+    }
+
+    if (question.type === 'Question Section') {
+      html += `<h3 style="font-weight: bold; margin-top: 15px; margin-left: ${marginLeft}px;">${question.quest_Title}</h3>`;
+
+      if (question.answer) {
+        html += `<div style="margin-left: ${marginLeft + 20}px; margin-bottom: 10px;">${question.answer}</div>`;
+      }
+
+      if (question.children && question.children.length > 0) {
+        const filledChildren = question.children.filter((child: any) => this.hasQuestionData(child));
+
+        if (filledChildren.length > 0) {
+          html += `<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-left: ${marginLeft + 20}px;">`;
+
+          filledChildren.forEach((child: any) => {
+            html += '<div style="break-inside: avoid;">';
+            html += this.formatQuestion(child, 0);
+            html += '</div>';
+          });
+
+          html += '</div>';
+        }
+      }
+    } else if (question.type === 'TextBox' || question.type === 'CheckBox') {
+      if (question.answer) {
+        html += `<div style="margin-left: ${marginLeft}px; margin-bottom: 10px;">`;
+        html += `<strong>${question.quest_Title}:</strong> ${question.answer}`;
+        html += '</div>';
+
+        if (question.children && question.children.length > 0) {
+          question.children.forEach((child: any) => {
+            if (child.answer) {
+              html += `<div style="margin-left: ${marginLeft + 10}px; margin-top: 5px;">`;
+              html += `<strong>${child.quest_Title}:</strong> ${child.answer}`;
+              html += '</div>';
+            }
+          });
+        }
+      }
+    }
+
+    return html;
+  }
+
+  private hasQuestionData(question: any): boolean {
+    if (question.answer) {
+      return true;
+    }
+
+    if (question.children && question.children.length > 0) {
+      return question.children.some((child: any) => this.hasQuestionData(child));
+    }
+
+    return false;
   }
 
   cancel() {

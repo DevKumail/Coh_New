@@ -1,3 +1,4 @@
+import { log } from 'node:console';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -75,6 +76,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
   isRecording: boolean = false;
   transcriptionText: string = '';
+  currentTranscript: string = ''; // <-- Add this property
   private transcriptionSubscription: Subscription | null = null;
 
   quillModules = {
@@ -117,7 +119,6 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
         )
       )
       .subscribe((data: any) => {
-        console.log(' Subscription triggered with MRNO:', data?.table2?.[0]?.mrNo);
         this.SearchPatientData = data;
         this.mrNo = data?.table2?.[0]?.mrNo || '';
       });
@@ -125,7 +126,6 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     this.PatientData.selectedVisit$.subscribe((data: any) => {
       this.SelectedVisit = data;
       this.appointmentID = data?.appointmentId || 0;
-      console.log('Selected Visit medical-list', this.SelectedVisit);
     });
 
     // Read query parameters first
@@ -181,7 +181,11 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     // Subscribe to transcription updates
     this.transcriptionSubscription = this.deepgramService.getTranscript$().subscribe(
       (transcript: string) => {
+        this.currentTranscript = transcript;
         this.appendTranscriptionToEditor(transcript);
+      },
+      (error) => {
+        console.error('[Deepgram] Error receiving transcription:', error);
       }
     );
   }
@@ -487,7 +491,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
         showConfirmButton: false
       });
     } catch (error) {
-      console.error('Error starting recording:', error);
+      console.error('[Deepgram] Error starting recording:', error);
       Swal.fire('Error', 'Failed to start voice recording. Please check microphone permissions.', 'error');
       this.isRecording = false;
     } finally {
@@ -498,6 +502,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   stopRecording(): void {
     this.deepgramService.stopTranscription();
     this.isRecording = false;
+    this.currentTranscript = '';
     Swal.fire({
       icon: 'success',
       title: 'Recording Stopped',

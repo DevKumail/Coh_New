@@ -9,9 +9,13 @@ export class DeepgramService {
   private mediaRecorder: MediaRecorder | null = null;
   private transcriptSubject = new Subject<string>();
   private isRecording = false;
+  private audioContext: AudioContext | null = null;
+  private sourceNode: MediaStreamAudioSourceNode | null = null;
+  private processorNode: ScriptProcessorNode | null = null;
 
+  // Change URL to use correct encoding
   private readonly DEEPGRAM_API_KEY = '9fdf56b01c4d873bf1d2cbeaad4c0a48b1dc609c';
-  private readonly DEEPGRAM_URL = `wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=16000&channels=1&interim_results=true&punctuate=true`;
+  private readonly DEEPGRAM_URL = `wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=16000&channels=1&interim_results=true&punctuate=true&model=nova-2&language=en-US&smart_format=true`;
 
   constructor() {}
 
@@ -26,7 +30,6 @@ export class DeepgramService {
     }
 
     try {
-      // Get microphone access
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -35,32 +38,40 @@ export class DeepgramService {
         }
       });
 
-      // Connect to Deepgram WebSocket
       this.socket = new WebSocket(this.DEEPGRAM_URL, ['token', this.DEEPGRAM_API_KEY]);
 
       this.socket.onopen = () => {
-        console.log('Deepgram connection opened');
         this.isRecording = true;
         this.startMediaRecorder(stream);
       };
 
       this.socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.channel?.alternatives?.[0]?.transcript) {
-          const transcript = data.channel.alternatives[0].transcript;
-          if (transcript.trim()) {
+        try {
+          const data = JSON.parse(event.data);
+          let transcript = '';
+
+          if (data.channel?.alternatives?.[0]?.transcript) {
+            transcript = data.channel.alternatives[0].transcript;
+          } else if (data.results?.channels?.[0]?.alternatives?.[0]?.transcript) {
+            transcript = data.results.channels[0].alternatives[0].transcript;
+          } else if (data.transcript) {
+            transcript = data.transcript;
+          }
+
+          if (transcript && transcript.trim()) {
             this.transcriptSubject.next(transcript);
           }
+        } catch (error) {
+          console.error('[Deepgram Service] Error parsing message:', error);
         }
       };
 
       this.socket.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        console.error('[Deepgram Service] WebSocket error:', error);
         this.stopTranscription();
       };
 
       this.socket.onclose = () => {
-        console.log('Deepgram connection closed');
         this.isRecording = false;
       };
 
@@ -70,25 +81,45 @@ export class DeepgramService {
     }
   }
 
-  private startMediaRecorder(stream: MediaStream): void {
-    this.mediaRecorder = new MediaRecorder(stream, {
-      mimeType: 'audio/webm'
-    });
+  private async startMediaRecorder(stream: MediaStream): Promise<void> {
+    this.audioContext = new AudioContext({ sampleRate: 16000 });
+    this.sourceNode = this.audioContext.createMediaStreamSource(stream);
+    this.processorNode = this.audioContext.createScriptProcessor(4096, 1, 1);
 
-    this.mediaRecorder.addEventListener('dataavailable', (event) => {
-      if (event.data.size > 0 && this.socket?.readyState === WebSocket.OPEN) {
-        this.socket.send(event.data);
+    this.processorNode.onaudioprocess = (e) => {
+      if (this.socket?.readyState === WebSocket.OPEN) {
+        const inputData = e.inputBuffer.getChannelData(0);
+        const pcmData = new Int16Array(inputData.length);
+
+        for (let i = 0; i < inputData.length; i++) {
+          const s = Math.max(-1, Math.min(1, inputData[i]));
+          pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+
+        this.socket.send(pcmData.buffer);
       }
-    });
+    };
 
-    this.mediaRecorder.start(250); // Send data every 250ms
+    this.sourceNode.connect(this.processorNode);
+    this.processorNode.connect(this.audioContext.destination);
   }
 
   stopTranscription(): void {
-    if (this.mediaRecorder) {
-      this.mediaRecorder.stop();
-      this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
-      this.mediaRecorder = null;
+    if (this.processorNode) {
+      this.processorNode.disconnect();
+      this.processorNode = null;
+    }
+
+    if (this.sourceNode) {
+      this.sourceNode.disconnect();
+      const stream = this.sourceNode.mediaStream;
+      stream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+      this.sourceNode = null;
+    }
+
+    if (this.audioContext) {
+      this.audioContext.close();
+      this.audioContext = null;
     }
 
     if (this.socket) {
