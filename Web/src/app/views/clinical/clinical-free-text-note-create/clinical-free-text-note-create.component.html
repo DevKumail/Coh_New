@@ -90,6 +90,12 @@
     <div class="mt-3" *ngIf="!dataquestion?.node?.noteTitle">
       <div class="card px-3 py-2">
         <label class="fw-bold mb-2">Clinical Note Editor</label>
+
+        <!-- Debug: Show transcribed text -->
+        <div *ngIf="isRecording" class="alert alert-info mb-2">
+          <small><strong>Transcribing:</strong> {{ currentTranscript || 'Listening...' }}</small>
+        </div>
+
         <quill-editor
           formControlName="editorContent"
           [modules]="quillModules"
