@@ -18,7 +18,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
     {
         Task<(bool isSuccess, string message)> SaveMasterPrescription(CreateMasterPrescriptionDto dto);
         Task<(bool isSuccess, string message)> DeletePrescription(long prescriptionId);
-        Task<List<GetDrugDetailsDto>> GetAllDrugs(PaginationInfo dto);
+        Task<List<GetDrugDetailsDto>> GetAllDrugs(string? keyword, PaginationInfo dto);
     }
     public class PrescriptionMasterService : IPrescriptionMasterService
     {
@@ -30,13 +30,15 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
             _context = context;
         }
 
-        public async Task<List<GetDrugDetailsDto>> GetAllDrugs(PaginationInfo dto)
+        public async Task<List<GetDrugDetailsDto>> GetAllDrugs(string? keyword, PaginationInfo dto)
         {
             using var connection = _dapper.CreateConnection();
 
             var parameters = new DynamicParameters();
             parameters.Add("@Page", dto.Page, DbType.Int32);
             parameters.Add("@RowsPerPage", dto.RowsPerPage, DbType.Int32);
+            parameters.Add("@Keyword", keyword);
+            
 
             var result = await connection.QueryAsync<GetDrugDetailsDto>(
                 "GetAllDrugs",

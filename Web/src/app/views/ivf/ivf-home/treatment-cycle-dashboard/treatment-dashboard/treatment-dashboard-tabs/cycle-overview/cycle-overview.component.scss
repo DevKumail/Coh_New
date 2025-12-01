@@ -1,3 +1,7 @@
+// Hide caret arrow on any dropdown toggle inside this component
+:host ::ng-deep .dropdown-toggle::after {
+  display: none !important;
+}
 /* Highlight selected date column */
 :host ::ng-deep .fc-selected-col {
   background-color: rgba(0, 123, 255, 0.15) !important;
