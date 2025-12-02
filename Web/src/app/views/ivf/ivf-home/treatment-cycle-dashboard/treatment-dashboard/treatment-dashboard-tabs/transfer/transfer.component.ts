@@ -12,5 +12,8 @@ import { FurtherInformationComponent } from './forms/further-information/further
   styleUrl: './transfer.component.scss'
 })
 export class TransferComponent {
-
+  embryosList: EmbryoTransferComponent['embryos'] = [
+    { number: 3, id: 12673, title: 'Hatching blastocyst', morpho: 'ideal' as 'ideal', score: '5AA', image1: null, image2: null },
+    { number: 5, id: 12675, title: 'Hatching blastocyst', morpho: null, score: null, image1: null, image2: null }
+  ];
 }
