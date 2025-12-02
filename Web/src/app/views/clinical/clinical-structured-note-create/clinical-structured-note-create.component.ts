@@ -402,9 +402,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     }
 
     if (question.type === 'Question Section') {
-      html += `<h3 style="font-weight: bold; margin-top: 15px; margin-left: ${marginLeft}px;">${question.quest_Title}</h3>`;
+      html += `<h3 style="font-weight: bold; margin-top: 15px; margin-left: ${marginLeft}px; font-size: 1rem;">${question.quest_Title}</h3>`;
 
-      if (question.answer) {
+      if (question.answer && typeof question.answer === 'string' && question.answer.trim()) {
         html += `<div style="margin-left: ${marginLeft + 20}px; margin-bottom: 10px;">${question.answer}</div>`;
       }
 
@@ -412,29 +412,37 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
         const filledChildren = question.children.filter((child: any) => this.hasQuestionData(child));
 
         if (filledChildren.length > 0) {
-          html += `<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-left: ${marginLeft + 20}px;">`;
-
           filledChildren.forEach((child: any) => {
-            html += '<div style="break-inside: avoid;">';
-            html += this.formatQuestion(child, 0);
-            html += '</div>';
+            html += this.formatQuestion(child, marginLeft + 20);
           });
-
-          html += '</div>';
         }
       }
-    } else if (question.type === 'TextBox' || question.type === 'CheckBox') {
-      if (question.answer) {
+    } else if (question.type === 'TextBox') {
+      if (question.answer && typeof question.answer === 'string' && question.answer.trim()) {
         html += `<div style="margin-left: ${marginLeft}px; margin-bottom: 10px;">`;
-        html += `<strong>${question.quest_Title}:</strong> ${question.answer}`;
+        html += `<strong>${question.quest_Title}</strong> ${question.answer}`;
         html += '</div>';
 
         if (question.children && question.children.length > 0) {
           question.children.forEach((child: any) => {
-            if (child.answer) {
-              html += `<div style="margin-left: ${marginLeft + 10}px; margin-top: 5px;">`;
-              html += `<strong>${child.quest_Title}:</strong> ${child.answer}`;
-              html += '</div>';
+            if (this.hasQuestionData(child)) {
+              html += this.formatQuestion(child, marginLeft + 20);
+            }
+          });
+        }
+      }
+    } else if (question.type === 'CheckBox') {
+      // Only show if checkbox is checked (true)
+      if (question.answer === true || question.answer === 'true') {
+        html += `<div style="margin-left: ${marginLeft}px; margin-bottom: 10px;">`;
+        html += `<strong>${question.quest_Title}</strong>`;
+        html += '</div>';
+
+        // Show children if they have data
+        if (question.children && question.children.length > 0) {
+          question.children.forEach((child: any) => {
+            if (this.hasQuestionData(child)) {
+              html += this.formatQuestion(child, marginLeft + 20);
             }
           });
         }
@@ -445,7 +453,21 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   }
 
   private hasQuestionData(question: any): boolean {
-    if (question.answer) {
+    // For checkboxes, only return true if checked
+    if (question.type === 'CheckBox') {
+      const isChecked = question.answer === true || question.answer === 'true';
+      if (isChecked) {
+        return true;
+      }
+      // Check if any children have data
+      if (question.children && question.children.length > 0) {
+        return question.children.some((child: any) => this.hasQuestionData(child));
+      }
+      return false;
+    }
+
+    // For text fields, check if there's actual content
+    if (typeof question.answer === 'string' && question.answer.trim().length > 0) {
       return true;
     }
 
