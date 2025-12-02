@@ -249,15 +249,34 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     this.nodeData = []
     if (noteId != null && noteId != undefined && noteId != 0) {
       this.loader.show();
-      this.clinicalApiService.GetNotesTemplate(noteId).then((res: any) => {
-        this.dataquestion = res;
-        this.viewquestion = true;
-        this.nodeData = res;
-        this.loader.hide();
-      }).catch(() =>
-        //   this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading template' })
-        Swal.fire('Error', 'Error loading template', 'error')
-      ).finally(() => this.loader.hide());
+      this.clinicalApiService.EMRNotesGetByEmpId(this.selectedProviders)
+        .then((res: any) => {
+          debugger
+          // API can return either an array directly or wrapped in a property like result/data
+          const notes = Array.isArray(res)
+            ? res
+            : (res?.result || res?.data || []);
+
+          this.dataquestion = notes;
+          this.viewquestion = true;
+          this.nodeData = notes;
+
+          // Find note whose pathId matches the selected noteId (template)
+          const match = notes.find((n: any) =>
+            Number(n.pathId ?? n.pathid) === this.selectedNotes
+          );
+
+          const editorContent = match
+            ? (match.templateHTML || match.templateText || '')
+            : '';
+
+          this.clinicalForm.patchValue({ editorContent });
+          this.cdr.markForCheck();
+        })
+        .catch(() =>
+          Swal.fire('Error', 'Error loading template', 'error')
+        )
+        .finally(() => this.loader.hide());
     }
 
   }
