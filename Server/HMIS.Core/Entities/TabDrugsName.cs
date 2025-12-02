@@ -14,6 +14,10 @@ public partial class TabDrugsName
     [StringLength(255)]
     public string? TradeName { get; set; }
 
+    [StringLength(50)]
+    [Unicode(false)]
+    public string? Color { get; set; }
+
     [StringLength(255)]
     public string? Form { get; set; }
 

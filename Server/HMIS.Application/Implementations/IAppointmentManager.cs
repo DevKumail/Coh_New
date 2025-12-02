@@ -61,7 +61,7 @@ namespace HMIS.Application.Implementations
         Task<bool> UpdateRescheduleAppointmentDB(SchRescheduleAppointments schReschedule);
         Task<DataSet> SpeechtoText(int? MRNo, int? PageNumber, int? PageSize);
 
-        Task<bool> InsertSpeech(SpeechModel sp);  
+        //Task<bool> InsertSpeech(ClinicalNoteDto sp);  
         Task<SchAppointmentModel> GetAppoimentForEditById(long appId);
 
         Task<object> GetTimeSlotbySiteId(int SiteId);
@@ -78,7 +78,7 @@ namespace HMIS.Application.Implementations
         //Task<string> AddBLPatientVisit(BlPatientVisitModel req);
         Task<DataSet> SearchAppointmentDBWithPagination(SchAppointmentIWithFilterRequest req);
 
-        Task<bool> InsertSpeech(ClinicalNoteObj note);
+        //Task<bool> InsertSpeech(ClinicalNoteObj note);
 
     }
 }
