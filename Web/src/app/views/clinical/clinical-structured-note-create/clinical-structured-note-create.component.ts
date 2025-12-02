@@ -69,7 +69,8 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
       note: [null, Validators.required],
-      description: ['']
+      description: [''],
+      noteTitle: ['', Validators.required]
     });
   }
 
@@ -199,6 +200,10 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
         this.dataquestion = res;
         this.viewquestion = true;
         this.nodeData = res;
+        // Set the note title in the form
+        this.clinicalForm.patchValue({
+          noteTitle: res?.node?.noteTitle || ''
+        });
         // show note preview immediately for real-time updates
         this.viewNoteResponse = true;
         this.loader.hide();
@@ -223,7 +228,8 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     const createdBy = auditInfo.createdBy || this.currentUserName;
     const userId = auditInfo.userId || this.currentUserId;
 
-    let noteName = this.dataquestion?.node?.noteTitle || '';
+    // Use the editable note title from form
+    let noteName = formValue.noteTitle || this.dataquestion?.node?.noteTitle || '';
     if (!noteName) {
       const selectedNote = this.clinicalNotes.find(note => note.pathId === noteId);
       noteName = selectedNote ? selectedNote.pathName : '';
