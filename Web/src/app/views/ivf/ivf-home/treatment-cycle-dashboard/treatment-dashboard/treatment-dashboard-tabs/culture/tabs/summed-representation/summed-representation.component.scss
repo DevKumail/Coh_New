@@ -1,0 +1,81 @@
+// Mirror styles from table-representation for consistent look
+.rep-card {
+  height: 100%;
+  min-height: 280px;
+  border: 2px solid #5aa0e6;
+  box-shadow: none !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.rep-card .card-header {
+  background: #f3f8ff;
+  border-bottom: 1px dashed #cfe2ff;
+  font-size: 11px;
+  color: #476d9b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  flex-shrink: 0;
+}
+.rep-card .card-header small { font-size: 10px; }
+
+.rep-card .card-body {
+  font-size: 10px;
+  padding: 8px;
+  flex: 1;
+  overflow-y: auto;
+}
+.rep-card .card-body > div { margin-bottom: 4px; }
+.rep-card .card-body > div:last-child { margin-bottom: 0; }
+.rep-card .card-body span { font-size: 10px; }
+
+.rep-card .form-control {
+  height: 22px;
+  padding: 0 4px;
+  text-align: right;
+  font-size: 11px;
+  border: 1px solid #d0d5dd;
+}
+.rep-card .form-control:disabled {
+  background-color: #f5f5f5;
+  border-color: #e0e0e0;
+}
+.rep-card .form-control.bg-light {
+  background-color: #e8f0f8 !important;
+  border-color: #c5d9ed;
+}
+
+// Arrow between boxes (auto arrows on lg+)
+@media (min-width: 992px) {
+  .row.row-cols-lg-5 > .with-arrow {
+    position: relative;
+    margin-right: 16px;
+  }
+  .row.row-cols-lg-5 > .with-arrow::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -14px;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid #7b8a9e;
+    opacity: .85;
+    z-index: 10;
+  }
+  .row.row-cols-lg-5 > .with-arrow:last-child::after { display: none; }
+  .row.row-cols-lg-5 > .with-arrow:last-child { margin-right: 0; }
+}
+
+// Grid spacing identical to table representation
+.table-rep .row { margin-left: -4px; margin-right: -4px; }
+.table-rep .row > .col { padding-left: 4px; padding-right: 4px; }
+
+// Ensure 5 columns fit one row on large screens (equal widths)
+@media (min-width: 992px) {
+  .row.row-cols-lg-5 > .col { flex: 0 0 auto; width: calc(20% - 16px); }
+  .row.row-cols-lg-5 > .col:last-child { width: 20%; }
+}
