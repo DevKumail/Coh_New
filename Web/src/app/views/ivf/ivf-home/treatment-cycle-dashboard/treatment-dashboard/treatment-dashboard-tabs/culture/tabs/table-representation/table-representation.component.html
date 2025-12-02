@@ -1,1 +1,487 @@
-<p>table-representation works!</p>
+<div class="table-rep small" [formGroup]="cultureForm">
+    <div class="border rounded-1">
+        <div class="p-2">
+            <!-- Row 1: 5 columns with arrows on lg+ -->
+            <div class="row row-cols-1 row-cols-lg-5 g-2 align-items-stretch">
+                <div class="col with-arrow d-flex flex-column">
+                    <div class="mb-1 fw-bold text-center">Oocytes</div>
+                    <div class="card rep-card w-100">
+                        <div class="card-header py-1">
+                            <small class="text-muted">fol. aspiration</small>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>Total</span>
+                                <input type="number" class="form-control form-control-sm" 
+                                style="width: 50px; background-color: #f5f5f5;" formControlName="oocytesTotal" [disabled]="true" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>MII</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="oocytesMII" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>MI</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="oocytesMI" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>GV</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="oocytesGV" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>Total immature</span>
+                                <input type="number" class="form-control form-control-sm" 
+                                style="width: 50px; background-color: #f5f5f5" formControlName="oocytesTotalImmature" [disabled]="true" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Atr.</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="oocytesAtr" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col with-arrow d-flex flex-column">
+                    <div class="mb-1 fw-bold text-center">Treatment</div>
+                    <div class="card rep-card w-100">
+                        <div class="card-header py-1">
+                            <small class="text-muted">From fol. aspiration</small>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>IVF</span><input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="treatmentIVF" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>ICSI</span><input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="treatmentICSI" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>Cryo</span><input type="number" class="form-control form-control-sm bg-light"
+                                    style="width: 50px" formControlName="treatmentCryo" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>GIFT</span><input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="treatmentGIFT" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Discarded</span><input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="treatmentDiscarded" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col with-arrow d-flex flex-column">
+                    <div class="mb-1 fw-bold text-center">Pronucleus stages</div>
+                    <div class="card rep-card w-100">
+                        <div class="card-header py-1">
+                            <small class="text-muted">From IVF</small>
+                            <span class="subtle-link">PN thawing</span>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">2 PN</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 50px"
+                                    formControlName="pnIvfTwoPN" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 50px" formControlName="pnIvfThawTwoPN" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 50px"
+                                    [value]="getSum('pnIvfTwoPN', 'pnIvfThawTwoPN')" disabled />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">1 PN</span>
+                                <input type="number" class="form-control form-control-sm" style="width: 50px"
+                                    formControlName="pnIvfOnePN" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">>=3 PN</span>
+                                <input type="number" class="form-control form-control-sm" style="width: 50px"
+                                    formControlName="pnIvfGe3PN" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">0 PN</span>
+                                <input type="number" class="form-control form-control-sm" style="width: 50px"
+                                    formControlName="pnIvfZeroPN" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">Immature</span>
+                                <input type="number" class="form-control form-control-sm" style="width: 50px"
+                                    formControlName="pnIvfImmature" />
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2" style="min-width: 60px;">Atretic</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 50px"
+                                    formControlName="pnIvfAtretic" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 50px" formControlName="pnIvfThawAtretic" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 50px"
+                                    [value]="getSum('pnIvfAtretic', 'pnIvfThawAtretic')" disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col with-arrow d-flex flex-column">
+                    <div class="mb-1 fw-bold text-center">2 PN selection</div>
+                    <div class="card rep-card w-100">
+                        <div class="card-header py-1">
+                            <small class="text-muted">2 PN from IVF</small>
+                            <span class="subtle-link">From PN thawing</span>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">For cultivat.</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="pnSelIvfForCultivat" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="pnSelIvfThawForCultivat" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('pnSelIvfForCultivat', 'pnSelIvfThawForCultivat')" disabled />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">Cryo</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 44px" formControlName="pnSelIvfCryo" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">2 PN trans.</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="pnSelIvf2PNTrans" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="pnSelIvfThaw2PNTrans" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('pnSelIvf2PNTrans', 'pnSelIvfThaw2PNTrans')" disabled />
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2" style="min-width: 60px;">Discarded</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="pnSelIvfDiscarded" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="pnSelIvfThawDiscarded" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('pnSelIvfDiscarded', 'pnSelIvfThawDiscarded')" disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col d-flex flex-column">
+                    <div class="mb-1 fw-bold text-center">Embryos</div>
+                    <div class="card rep-card w-100">
+                        <div class="card-header py-1">
+                            <small class="text-muted">From IVF</small>
+                            <span class="subtle-link">Thawing</span>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 110px;">ET morph. ideal</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="embryoIvfETIdeal" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="embryoIvfThawETIdeal" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('embryoIvfETIdeal', 'embryoIvfThawETIdeal')" disabled />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 110px;">ET morph. n. ideal</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="embryoIvfETNIdeal" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="embryoIvfThawETNIdeal" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('embryoIvfETNIdeal', 'embryoIvfThawETNIdeal')" disabled />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 110px;">Cryo</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 44px" formControlName="embryoIvfCryo" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 110px;">2 PN arrest</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 44px" formControlName="embryoIvf2PNArrest" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 110px;">Embryo arrest</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 44px" formControlName="embryoIvfEmbryoArrest" />
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2" style="min-width: 110px;">Atr / discarded</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="embryoIvfAtrDiscarded" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="embryoIvfThawAtrDiscarded" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('embryoIvfAtrDiscarded', 'embryoIvfThawAtrDiscarded')" disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: 5 columns with arrows on lg+ -->
+            <div class="row row-cols-1 row-cols-lg-5 g-2 align-items-stretch mt-1">
+                <div class="col with-arrow d-flex">
+                    <div class="card rep-card w-100">
+                        <div class="card-header py-1">
+                            <small class="text-muted">Occ. thawing</small>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>Vital</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 50px; background-color: #f5f5f5;" formControlName="oocytesThawVital" [disabled]="true" />
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>MII</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="oocytesThawMII" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>MI</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="oocytesThawMI" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>GV</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="oocytesThawGV" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>Total immature</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 50px; background-color: #f5f5f5;" formControlName="oocytesThawTotalImmature" [disabled]="true" />
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Atr.</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 50px; background-color: #f5f5f5;" formControlName="oocytesThawAtr" [disabled]="true" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col with-arrow d-flex">
+                    <div class="card rep-card w-100">
+                        <div class="card-header py-1">From occ. thawing</div>
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>IVF</span><input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="fromOccThawIVF" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>ICSI</span><input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="fromOccThawICSI" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>GIFT</span><input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="fromOccThawGIFT" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>Lost</span><input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="fromOccThawLost" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Discarded</span><input type="number" class="form-control form-control-sm"
+                                    style="width: 50px" formControlName="fromOccThawDiscarded" />
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <span>on:</span>
+                                <select class="form-select form-select-sm" style="width: 80px" formControlName="fromOccThawDiscardedOn">
+                                    <option value="">--</option>
+                                    <option value="D1">D1</option>
+                                    <option value="D2">D2</option>
+                                    <option value="D3">D3</option>
+                                    <option value="D4">D4</option>
+                                    <option value="D5">D5</option>
+                                    <option value="D6">D6</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col with-arrow d-flex">
+                    <div class="card rep-card w-100">
+                        <div class="card-header py-1">
+                            From ICSI
+                            <span class="subtle-link">PN thawing</span>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">2 PN</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 50px"
+                                    formControlName="pnIcsiTwoPN" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 50px" formControlName="pnIcsiThawTwoPN" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm sum-box" style="width: 50px"
+                                    [value]="getSum('pnIcsiTwoPN', 'pnIcsiThawTwoPN')" disabled />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">1 PN</span>
+                                <input type="number" class="form-control form-control-sm" style="width: 50px"
+                                    formControlName="pnIcsiOnePN" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">>=3 PN</span>
+                                <input type="number" class="form-control form-control-sm" style="width: 50px"
+                                    formControlName="pnIcsiGe3PN" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">0 PN</span>
+                                <input type="number" class="form-control form-control-sm" style="width: 50px"
+                                    formControlName="pnIcsiZeroPN" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">Immature</span>
+                                <input type="number" class="form-control form-control-sm" style="width: 50px"
+                                    formControlName="pnIcsiImmature" />
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2" style="min-width: 60px;">Atretic</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 50px"
+                                    formControlName="pnIcsiAtretic" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 50px" formControlName="pnIcsiThawAtretic" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm sum-box" style="width: 50px"
+                                    [value]="getSum('pnIcsiAtretic', 'pnIcsiThawAtretic')" disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col with-arrow d-flex">
+                    <div class="card rep-card w-100">
+                        <div class="card-header py-1">
+                            <small class="text-muted">2 PN from ICSI</small>
+                            <span class="subtle-link">From PN thawing</span>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">For cultivat.</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="pnSelIcsiForCultivat" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="pnSelIcsiThawForCultivat" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('pnSelIcsiForCultivat', 'pnSelIcsiThawForCultivat')" disabled />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">Cryo</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 44px" formControlName="pnSelIcsiCryo" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 60px;">2 PN trans.</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="pnSelIcsi2PNTrans" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="pnSelIcsiThaw2PNTrans" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('pnSelIcsi2PNTrans', 'pnSelIcsiThaw2PNTrans')" disabled />
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2" style="min-width: 60px;">Discarded</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="pnSelIcsiDiscarded" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="pnSelIcsiThawDiscarded" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('pnSelIcsiDiscarded', 'pnSelIcsiThawDiscarded')" disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col d-flex">
+                    <div class="card rep-card w-100">
+                        <div class="card-header py-1">
+                            <small class="text-muted">From ICSI</small>
+                            <span class="subtle-link">Thawing</span>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 110px;">ET morph. ideal</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="embryoIcsiETIdeal" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="embryoIcsiThawETIdeal" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('embryoIcsiETIdeal', 'embryoIcsiThawETIdeal')" disabled />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 110px;">ET morph. n. ideal</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="embryoIcsiETNIdeal" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="embryoIcsiThawETNIdeal" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="getSum('embryoIcsiETNIdeal', 'embryoIcsiThawETNIdeal')" disabled />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 110px;">Cryo</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 44px" formControlName="embryoIcsiCryo" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 110px;">2 PN arrest</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 44px" formControlName="embryoIcsi2PNArrest" />
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="min-width: 110px;">Embryo arrest</span>
+                                <input type="number" class="form-control form-control-sm"
+                                    style="width: 44px" formControlName="embryoIcsiEmbryoArrest" />
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2" style="min-width: 110px;">Atr / discarded</span>
+                                <input type="number" class="form-control form-control-sm me-1" style="width: 44px"
+                                    formControlName="embryoIcsiAtrDiscarded" />
+                                <span class="px-1 text-muted">+</span>
+                                <input type="number" class="form-control form-control-sm me-1 bg-light"
+                                    style="width: 44px" formControlName="embryoIcsiThawAtrDiscarded" />
+                                <span class="px-1 text-muted">=</span>
+                                <input type="number" class="form-control form-control-sm text-muted" style="width: 48px"
+                                    [value]="
+                                        getSum(
+                                            'embryoIcsiAtrDiscarded',
+                                            'embryoIcsiThawAtrDiscarded'
+                                        )
+                                    " disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
