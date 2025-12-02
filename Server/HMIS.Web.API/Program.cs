@@ -69,6 +69,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<SieveProcessor>();
 builder.Services.AddMemoryCache();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+
 // Shared + Application layers
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddApplicationLayer();

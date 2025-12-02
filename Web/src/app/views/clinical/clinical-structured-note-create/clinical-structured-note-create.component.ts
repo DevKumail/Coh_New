@@ -69,7 +69,8 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
       note: [null, Validators.required],
-      description: ['']
+      description: [''],
+      noteTitle: ['', Validators.required]
     });
   }
 
@@ -199,6 +200,10 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
         this.dataquestion = res;
         this.viewquestion = true;
         this.nodeData = res;
+        // Set the note title in the form
+        this.clinicalForm.patchValue({
+          noteTitle: res?.node?.noteTitle || ''
+        });
         // show note preview immediately for real-time updates
         this.viewNoteResponse = true;
         this.loader.hide();
@@ -223,7 +228,8 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     const createdBy = auditInfo.createdBy || this.currentUserName;
     const userId = auditInfo.userId || this.currentUserId;
 
-    let noteName = this.dataquestion?.node?.noteTitle || '';
+    // Use the editable note title from form
+    let noteName = formValue.noteTitle || this.dataquestion?.node?.noteTitle || '';
     if (!noteName) {
       const selectedNote = this.clinicalNotes.find(note => note.pathId === noteId);
       noteName = selectedNote ? selectedNote.pathName : '';
@@ -234,6 +240,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
 
     // Generate HTML from structured note with filled values
     const htmlContent = this.generateHtmlFromStructuredNote(filledStructuredNote);
+
+    // Generate plain text note content from HTML for noteText
+    const noteText = this.stripHtml(htmlContent);
 
     const payload = {
       appointmentId: this.SelectedVisit.appointmentId,
@@ -246,9 +255,11 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       pathId: noteId,
       structuredNote: filledStructuredNote,
       htmlContent: htmlContent,
+      noteText: noteText,
       createdBy: createdBy,
       updatedBy: createdBy,
       signedBy: false,
+      noteType: 'Structured',
       createdOn: new Date()
     };
 
@@ -256,7 +267,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
 
     if (navigator.onLine) {
       this.loader.show();
-      this.clinicalApiService.InsertSpeech(payload)
+      this.clinicalApiService.InsertNote(payload)
         .then((response: any) => {
           if (response != null && response != "") {
             this.dataquestion = response;
@@ -327,10 +338,21 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     return html;
   }
 
+  private stripHtml(html: string): string {
+    const tmp = document.createElement('DIV');
+    tmp.innerHTML = html || '';
+    return tmp.textContent || tmp.innerText || '';
+  }
+
   generateQuestionsHtml(questions: Question[]): string {
     let html = '';
 
     questions.forEach(question => {
+      // Skip any question/section that has no filled data (matches Note tab behavior)
+      if (!this.isSectionFilled(question)) {
+        return;
+      }
+
       if (question.type === 'Question Section') {
         html += `<div style="margin-top: 20px;">`;
         html += `<h4 style="font-weight: bold; margin-left: 20px;">${question.quest_Title}</h4>`;
@@ -344,7 +366,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       } else if (question.type === 'TextBox') {
         html += `<div style="display: inline-block; margin-right: 20px; margin-bottom: 15px; width: calc(25% - 20px); vertical-align: top;">`;
         html += `<div style="margin-bottom: 5px;"><strong>${question.quest_Title}:</strong></div>`;
-        html += `<div>${question.answer || 'N/A'}</div>`;
+        html += `<div>${question.answer || ''}</div>`;
         html += `</div>`;
       } else if (question.type === 'CheckBox') {
         // Only show checkbox if it's checked (true)
@@ -386,9 +408,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     }
 
     if (question.type === 'Question Section') {
-      html += `<h3 style="font-weight: bold; margin-top: 15px; margin-left: ${marginLeft}px;">${question.quest_Title}</h3>`;
+      html += `<h3 style="font-weight: bold; margin-top: 15px; margin-left: ${marginLeft}px; font-size: 1rem;">${question.quest_Title}</h3>`;
 
-      if (question.answer) {
+      if (question.answer && typeof question.answer === 'string' && question.answer.trim()) {
         html += `<div style="margin-left: ${marginLeft + 20}px; margin-bottom: 10px;">${question.answer}</div>`;
       }
 
@@ -396,29 +418,37 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
         const filledChildren = question.children.filter((child: any) => this.hasQuestionData(child));
 
         if (filledChildren.length > 0) {
-          html += `<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-left: ${marginLeft + 20}px;">`;
-
           filledChildren.forEach((child: any) => {
-            html += '<div style="break-inside: avoid;">';
-            html += this.formatQuestion(child, 0);
-            html += '</div>';
+            html += this.formatQuestion(child, marginLeft + 20);
           });
-
-          html += '</div>';
         }
       }
-    } else if (question.type === 'TextBox' || question.type === 'CheckBox') {
-      if (question.answer) {
+    } else if (question.type === 'TextBox') {
+      if (question.answer && typeof question.answer === 'string' && question.answer.trim()) {
         html += `<div style="margin-left: ${marginLeft}px; margin-bottom: 10px;">`;
-        html += `<strong>${question.quest_Title}:</strong> ${question.answer}`;
+        html += `<strong>${question.quest_Title}</strong> ${question.answer}`;
         html += '</div>';
 
         if (question.children && question.children.length > 0) {
           question.children.forEach((child: any) => {
-            if (child.answer) {
-              html += `<div style="margin-left: ${marginLeft + 10}px; margin-top: 5px;">`;
-              html += `<strong>${child.quest_Title}:</strong> ${child.answer}`;
-              html += '</div>';
+            if (this.hasQuestionData(child)) {
+              html += this.formatQuestion(child, marginLeft + 20);
+            }
+          });
+        }
+      }
+    } else if (question.type === 'CheckBox') {
+      // Only show if checkbox is checked (true)
+      if (question.answer === true || question.answer === 'true') {
+        html += `<div style="margin-left: ${marginLeft}px; margin-bottom: 10px;">`;
+        html += `<strong>${question.quest_Title}</strong>`;
+        html += '</div>';
+
+        // Show children if they have data
+        if (question.children && question.children.length > 0) {
+          question.children.forEach((child: any) => {
+            if (this.hasQuestionData(child)) {
+              html += this.formatQuestion(child, marginLeft + 20);
             }
           });
         }
@@ -429,7 +459,21 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   }
 
   private hasQuestionData(question: any): boolean {
-    if (question.answer) {
+    // For checkboxes, only return true if checked
+    if (question.type === 'CheckBox') {
+      const isChecked = question.answer === true || question.answer === 'true';
+      if (isChecked) {
+        return true;
+      }
+      // Check if any children have data
+      if (question.children && question.children.length > 0) {
+        return question.children.some((child: any) => this.hasQuestionData(child));
+      }
+      return false;
+    }
+
+    // For text fields, check if there's actual content
+    if (typeof question.answer === 'string' && question.answer.trim().length > 0) {
       return true;
     }
 

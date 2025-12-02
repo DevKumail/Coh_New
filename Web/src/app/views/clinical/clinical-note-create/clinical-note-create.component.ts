@@ -3,16 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
-import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { distinctUntilChanged, filter, Subscription } from 'rxjs';
-
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 import { QuestionItemComponent } from '../question-item/question-item.component';
 import { QuestionViewComponent } from '../question-view/question-view.component';
 import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
-import { NotesComponent } from '../../patient-summary/components/notes/notes.component';
 import { LoaderService } from '@core/services/loader.service';
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
 
@@ -24,8 +22,7 @@ import { SharedService } from '@/app/shared/Services/Common/shared-service';
     TranslatePipe,
     FilledOnValueDirective,
     QuestionItemComponent,
-    QuestionViewComponent,
-    NotesComponent
+    QuestionViewComponent
   ],
   selector: 'app-clinical-note-create',
   templateUrl: './clinical-note-create.component.html',
@@ -97,6 +94,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
      private PatientData: PatientBannerService
   ) {
     this.clinicalForm = this.fb.group({
+      noteTitle: ['', Validators.required],
       provider: [null, Validators.required],
       note: [null, Validators.required],
       description: [''],
@@ -227,7 +225,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
   // GetNotesTemplate unchanged except it now receives numeric noteId
   GetNotesTemplate(noteId: any) {
     if (noteId == null || noteId == undefined) noteId = 0;
-
     this.selectedNotes = Number(noteId) || 0;
     this.dataquestion = [];
     this.viewquestion = false;
@@ -242,6 +239,8 @@ export class ClinicalNoteCreateComponent implements OnInit {
       // Set template name from response
       if (res?.node?.noteTitle) {
         this.selectedTemplateName = res.node.noteTitle;
+        // Patch the noteTitle form control with the template title
+        this.clinicalForm.patchValue({ noteTitle: res.node.noteTitle });
       }
 
       this.loader.hide();
@@ -307,14 +306,14 @@ export class ClinicalNoteCreateComponent implements OnInit {
       this.mediaStream = stream; // Store the stream reference
       this.mediaRecorder = new MediaRecorder(stream);
 
-      this.audioChunks = [];
+      this.audioChunks = []; // Clear chunks before starting
 
       this.mediaRecorder.ondataavailable = (event: any) => {
         this.audioChunks.push(event.data);
       };
 
       this.mediaRecorder.onstop = () => {
-        // Stop all media stream tracks
+        // Stop all media stream tracks ONLY here
         if (this.mediaStream) {
           this.mediaStream.getTracks().forEach(track => {
             track.stop();
@@ -372,14 +371,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
     if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
       try {
         this.mediaRecorder.stop();
-        // Stop all tracks immediately
-        if (this.mediaStream) {
-          this.mediaStream.getTracks().forEach(track => {
-            track.stop();
-            console.log('Track stopped on button click:', track.kind);
-          });
-          this.mediaStream = null;
-        }
       } catch (e) {
         console.error('Error stopping recorder:', e);
       }
@@ -513,6 +504,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
         noteTitle: noteName,
         description: formValue.description,
         pathId: noteId,
+        // Send filled template with voice
         structuredNote: filledStructuredNote,
         htmlContent,
         createdBy,
@@ -539,29 +531,30 @@ export class ClinicalNoteCreateComponent implements OnInit {
               fileId
             };
 
+            // Payload now contains both voice and filled template
             console.log('Payload:', payload);
 
             const timeout = new Promise((_, reject) =>
               setTimeout(() => reject(new Error("Request timed out")), 300000)
             );
 
-                  Promise.race([ this.clinicalApiService.InsertSpeech(payload), timeout ])
-          .then((response: any) => {
-            this.dataquestion = response;
-            this.nodeData = response?.node || response;
-            this.viewNoteResponse = true;
+            Promise.race([ this.clinicalApiService.InsertSpeech(payload), timeout ])
+              .then((response: any) => {
+                this.dataquestion = response;
+                this.nodeData = response?.node || response;
+                this.viewNoteResponse = true;
 
-            this.audioUrl = null;
-            this.voiceBlob = null;
-            this.clinicalForm.patchValue({ description: '', voicetext: '' });
-            Swal.fire('Success', 'Note uploaded successfully.', 'success');
-            this.loader.hide();
-          })
-          .catch((error: any) => {
-            console.error('Upload failed:', error);
-            Swal.fire('Offline Save', 'Saved offline due to network/server error.', 'info');
-            this.loader.hide();
-          });
+                this.audioUrl = null;
+                this.voiceBlob = null;
+                this.clinicalForm.patchValue({ description: '', voicetext: '' });
+                Swal.fire('Success', 'Note uploaded successfully.', 'success');
+                this.loader.hide();
+              })
+              .catch((error: any) => {
+                console.error('Upload failed:', error);
+                Swal.fire('Offline Save', 'Saved offline due to network/server error.', 'info');
+                this.loader.hide();
+              });
           },
           error: (err: any) => {
             console.error('Voice file upload failed:', err);
@@ -573,6 +566,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
         const offlinePayload = {
           ...basePayload
         };
+        // Offline save also includes filled template
         this.saveNoteOffline(offlinePayload);
         Swal.fire('Offline', 'Note saved offline and will be synced later.', 'info');
         this.loader.hide();

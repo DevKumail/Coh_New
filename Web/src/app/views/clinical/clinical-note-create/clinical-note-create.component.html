@@ -10,10 +10,9 @@
     </label>
     <input type="text"
            class="form-control form-control-sm"
-           style="width: 300px; font-size: 0.875rem; background-color: #e9ecef; cursor: not-allowed;"
-           [value]="dataquestion?.node?.noteTitle || ('CLINICAL_AI_POWERED_NOTE_CREATE' | translate)"
-           readonly
-           disabled>
+           style="width: 300px; font-size: 0.875rem;"
+           formControlName="noteTitle"
+           placeholder="Enter note title">
   </div>
 
   <!-- Description -->

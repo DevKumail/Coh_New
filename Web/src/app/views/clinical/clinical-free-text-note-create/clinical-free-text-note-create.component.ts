@@ -16,6 +16,7 @@ import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { LoaderService } from '@core/services/loader.service';
 import { QuillModule } from 'ngx-quill';
+import Quill from 'quill';
 
 @Component({
   standalone: true,
@@ -49,6 +50,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   updatedBy: string = '';
   mrNo: string = '';
   appointmentID: number = 0;
+  id: number = 0;
   visible: boolean = false;
   SearchPatientData: any
   selectedProviders: any = 0;
@@ -91,6 +93,10 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     ]
   };
 
+  private cursorPosition: number | null = null;
+  private lastFocusedElement: HTMLElement | null = null;
+  private quillEditor: any = null;
+
   constructor(
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService,
@@ -103,6 +109,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     private PatientData: PatientBannerService
   ) {
     this.clinicalForm = this.fb.group({
+      noteTitle: ['', Validators.required],
       provider: [null, Validators.required],
       description: [''],
       editorContent: ['']
@@ -112,7 +119,8 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
   SelectedVisit: any;
   ngOnInit(): void {
     this.patientDataSubscription = this.PatientData.patientData$
-      .pipe(
+
+    .pipe(
         filter((data: any) => !!data?.table2?.[0]?.mrNo),
         distinctUntilChanged((prev, curr) =>
           prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
@@ -178,11 +186,11 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
       this.subscriptions.push(sub2);
     }
 
-    // Subscribe to transcription updates
+    // Subscribe to transcription updates with cursor position support
     this.transcriptionSubscription = this.deepgramService.getTranscript$().subscribe(
       (transcript: string) => {
         this.currentTranscript = transcript;
-        this.appendTranscriptionToEditor(transcript);
+        this.insertTranscriptionAtCursor(transcript);
       },
       (error) => {
         console.error('[Deepgram] Error receiving transcription:', error);
@@ -248,15 +256,41 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     this.nodeData = []
     if (noteId != null && noteId != undefined && noteId != 0) {
       this.loader.show();
-      this.clinicalApiService.GetNotesTemplate(noteId).then((res: any) => {
-        this.dataquestion = res;
-        this.viewquestion = true;
-        this.nodeData = res;
-        this.loader.hide();
-      }).catch(() =>
-        //   this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading template' })
-        Swal.fire('Error', 'Error loading template', 'error')
-      ).finally(() => this.loader.hide());
+      this.clinicalApiService.EMRNotesGetByEmpId(this.selectedProviders)
+        .then((res: any) => {
+          debugger
+          // API can return either an array directly or wrapped in a property like result/data
+          const notes = Array.isArray(res)
+            ? res
+            : (res?.result || res?.data || []);
+
+          this.dataquestion = notes;
+          this.viewquestion = true;
+          this.nodeData = notes;
+
+          // Find note whose pathId matches the selected noteId (template)
+          const match = notes.find((n: any) =>
+            Number(n.pathId ?? n.pathid) === this.selectedNotes
+          );
+
+          const editorContent = match
+            ? (match.templateHTML || match.templateText || '')
+            : '';
+
+          const noteTitle = match
+            ? (match.pathName || match.noteTitle || 'Clinical Free Text Note')
+            : 'Clinical Free Text Note';
+
+          this.clinicalForm.patchValue({
+            editorContent,
+            noteTitle
+          });
+          this.cdr.markForCheck();
+        })
+        .catch(() =>
+          Swal.fire('Error', 'Error loading template', 'error')
+        )
+        .finally(() => this.loader.hide());
     }
 
   }
@@ -278,10 +312,11 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
         // Update MRN and visit if available
         this.mrNo = note.mrno || this.mrNo;
         this.appointmentID = note.visitAcNo || this.appointmentID;
-
+        this.id = note.noteId;
         // Update title and form fields
         this.noteTitle = note.notesTitle || this.noteTitle;
         this.clinicalForm.patchValue({
+          noteTitle: note.notesTitle || 'Clinical Free Text Note',
           provider: note.signedBy || null,
           description: note.description || '',
           editorContent: note.noteHtmltext || note.noteText || ''
@@ -343,6 +378,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     const textContent = this.stripHtml(htmlContent);
     const providerId = this.clinicalForm.get('provider')?.value;
     const description = this.clinicalForm.get('description')?.value;
+    const noteTitle = this.clinicalForm.get('noteTitle')?.value || 'Clinical Free Text Note';
 
     if (this.appointmentID == null || this.appointmentID == undefined || this.appointmentID == 0
       && this.mrNo == null || this.mrNo == undefined || this.mrNo == ''
@@ -358,8 +394,9 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
 
     const emrPayload = {
       // use appointment ID as visit account number for EMR note
+      Id : this.id || 0,
       visitAcNo: this.appointmentID || 0,
-      notesTitle: this.dataquestion?.node?.noteTitle || 'Clinical Free Text Note',
+      notesTitle: noteTitle,
       noteText: textContent,
       noteHtmltext: htmlContent,
       description: description,
@@ -406,7 +443,7 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
     }
 
     this.loader.show();
-    this.clinicalApiService.SaveEMRNote(emrPayload)
+    this.clinicalApiService.InsertNote(emrPayload)
       .then((res: any) => {
         const message = res?.message || res?.Message || '';
 
@@ -510,6 +547,77 @@ export class ClinicalFreeTextNoteCreateComponent implements OnInit {
       timer: 2000,
       showConfirmButton: false
     });
+  }
+
+  onQuillEditorCreated(quill: any): void {
+    this.quillEditor = quill;
+
+    // Track cursor position in Quill editor
+    quill.on('selection-change', (range: any) => {
+      if (range) {
+        this.cursorPosition = range.index;
+        this.lastFocusedElement = null; // Clear contenteditable focus
+      }
+    });
+  }
+
+  onContentEditableClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target.isContentEditable) {
+      this.lastFocusedElement = target;
+      this.cursorPosition = null; // Clear Quill position
+      this.saveCursorPosition(target);
+    }
+  }
+
+  private saveCursorPosition(element: HTMLElement): void {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      element.dataset['cursorOffset'] = String(range.startOffset);
+    }
+  }
+
+  private insertTranscriptionAtCursor(transcript: string): void {
+    // Insert in Quill editor if it was focused
+    if (this.quillEditor && this.cursorPosition !== null) {
+      const position = this.cursorPosition;
+      this.quillEditor.insertText(position, ' ' + transcript);
+      this.cursorPosition = position + transcript.length + 1;
+      this.quillEditor.setSelection(this.cursorPosition);
+      return;
+    }
+
+    // Insert in contenteditable element if it was focused
+    if (this.lastFocusedElement && this.lastFocusedElement.isContentEditable) {
+      this.insertIntoContentEditable(this.lastFocusedElement, transcript);
+      return;
+    }
+
+    // Fallback: append to Quill editor
+    this.appendTranscriptionToEditor(transcript);
+  }
+
+  private insertIntoContentEditable(element: HTMLElement, text: string): void {
+    element.focus();
+    const selection = window.getSelection();
+
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+
+      const textNode = document.createTextNode(' ' + text);
+      range.insertNode(textNode);
+
+      // Move cursor after inserted text
+      range.setStartAfter(textNode);
+      range.setEndAfter(textNode);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    } else {
+      // Fallback: append at end
+      element.textContent += ' ' + text;
+    }
   }
 
   private appendTranscriptionToEditor(transcript: string): void {

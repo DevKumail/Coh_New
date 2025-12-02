@@ -347,13 +347,15 @@ export class ClinicalApiService {
   getDataquestion(): Observable<any[]> {
     return this.http.get<any[]>(this.question);
   }
+    InsertNote(note: any) {
+    debugger
+    return this.api.post(`EMRNotes/SaveClinicalNote`, note).toPromise();
+  }
   InsertSpeech(note: any) {
     debugger
     return this.api.post(`EMRNotes/InsertSpeech`, note).toPromise();
   }
-  SaveEMRNote(note: any) {
-    return this.api.post(`EMRNotes/SaveEMRNote`, note).toPromise();
-  }
+ 
   GetEMRNoteByNoteId(noteId: number) {
     return this.api.get(`EMRNotes/GetEMRNoteByNoteId/${noteId}`).toPromise();
   }

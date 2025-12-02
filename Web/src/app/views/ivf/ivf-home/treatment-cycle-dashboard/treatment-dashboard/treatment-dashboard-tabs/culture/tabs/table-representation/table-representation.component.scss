@@ -1,0 +1,141 @@
+// Equal card sizing and classic look
+.rep-card {
+  height: 100%;
+  min-height: 280px;
+  border: 2px solid #5aa0e6; /* classic blue border */
+  box-shadow: none !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.rep-card .card-header {
+  background: #f3f8ff; /* pale blue */
+  border-bottom: 1px dashed #cfe2ff;
+  font-size: 11px;
+  color: #476d9b;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 8px;
+  flex-shrink: 0;
+}
+.rep-card .card-header small {
+  font-size: 10px;
+}
+.rep-card .card-header .subtle-link {
+  font-size: 10px;
+  color: #6aa5f5;
+  cursor: pointer;
+}
+.rep-card .card-body {
+  font-size: 10px;
+  padding: 8px;
+  flex: 1;
+  overflow-y: auto;
+}
+.rep-card .card-body > div {
+  margin-bottom: 4px;
+}
+.rep-card .card-body > div:last-child {
+  margin-bottom: 0;
+}
+.rep-card .card-body span {
+  font-size: 10px;
+}
+.rep-card .form-control {
+  height: 22px;
+  padding: 0 4px;
+  text-align: right;
+  font-size: 11px;
+  border: 1px solid #d0d5dd;
+}
+.rep-card .form-control:disabled {
+  background-color: #f5f5f5;
+  border-color: #e0e0e0;
+}
+.rep-card .form-control.bg-light {
+  background-color: #e8f0f8 !important;
+  border-color: #c5d9ed;
+}
+
+// Arrow between boxes
+.arrow-col {
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.arrow-right {
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 16px solid #9aa3b2;
+  filter: drop-shadow(0 0 1px rgba(0,0,0,.15));
+}
+
+// Auto arrows after each column in 5-col rows
+@media (min-width: 992px) { // lg+
+  .row.row-cols-lg-5 > .with-arrow {
+    position: relative;
+    margin-right: 16px;
+  }
+  .row.row-cols-lg-5 > .with-arrow::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -14px;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid #7b8a9e;
+    opacity: .85;
+    z-index: 10;
+  }
+  // Do not show arrow after the last column of the row
+  .row.row-cols-lg-5 > .with-arrow:last-child::after {
+    display: none;
+  }
+  .row.row-cols-lg-5 > .with-arrow:last-child {
+    margin-right: 0;
+  }
+}
+
+// Ensure proper grid spacing
+.table-rep .row {
+  margin-left: -4px;
+  margin-right: -4px;
+}
+.table-rep .row > .col {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+// Ensure 5 columns fit in one row on large screens
+@media (min-width: 992px) {
+  .row.row-cols-lg-5 > .col {
+    flex: 0 0 auto;
+    width: calc(20% - 16px); // 20% for 5 columns minus margin for arrows
+  }
+  .row.row-cols-lg-5 > .col:last-child {
+    width: 20%; // Last column doesn't need arrow margin
+  }
+  
+  // Make first two columns (Oocytes and Treatment) narrower
+  .row.row-cols-lg-5 > .col:nth-child(1),
+  .row.row-cols-lg-5 > .col:nth-child(2) {
+    width: calc(14% - 16px);
+  }
+  
+  // Make remaining columns wider to compensate
+  .row.row-cols-lg-5 > .col:nth-child(3),
+  .row.row-cols-lg-5 > .col:nth-child(4) {
+    width: calc(24% - 16px);
+  }
+  
+  .row.row-cols-lg-5 > .col:nth-child(5) {
+    width: 24%;
+  }
+}

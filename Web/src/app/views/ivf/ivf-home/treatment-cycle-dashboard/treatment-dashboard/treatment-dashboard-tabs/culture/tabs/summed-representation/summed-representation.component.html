@@ -1,1 +1,167 @@
-<p>summed-representation works!</p>
+<div class="table-rep small" [formGroup]="sumsForm">
+  <div class="border rounded-1">
+    <div class="p-2">
+      <div class="row row-cols-1 row-cols-lg-5 g-2 align-items-stretch">
+        <!-- Oocytes -->
+        <div class="col with-arrow d-flex flex-column">
+          <div class="mb-1 fw-bold text-center">Oocytes</div>
+          <div class="card rep-card w-100">
+            <div class="card-header py-1">
+              <small class="text-muted">Sum</small>
+            </div>
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>Ooc. total</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumOocTotal" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>MII</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumMII" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>MI</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumMI" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>GV</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumGV" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1 mt-2">
+                <span>Immature</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumImmature" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <span>Atr.</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumAtr" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Treatment -->
+        <div class="col with-arrow d-flex flex-column">
+          <div class="mb-1 fw-bold text-center">Treatment</div>
+          <div class="card rep-card w-100">
+            <div class="card-header py-1">
+              <small class="text-muted">Sum</small>
+            </div>
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>IVF</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumIVF" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>ICSI</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumICSI" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>Cryo</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumCryo" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>GIFT</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumGIFT" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <span>Discarded</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumDiscarded" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pronucleus stages -->
+        <div class="col with-arrow d-flex flex-column">
+          <div class="mb-1 fw-bold text-center">Pronucleus stages</div>
+          <div class="card rep-card w-100">
+            <div class="card-header py-1">
+              <small class="text-muted">Sum</small>
+            </div>
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>2 PN</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sum2PN" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>1 PN</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sum1PN" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>>=3 PN</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumGe3PN" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>0 PN</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sum0PN" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <span>Atretic</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumAtretic" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 PN selection -->
+        <div class="col with-arrow d-flex flex-column">
+          <div class="mb-1 fw-bold text-center">2 PN selection</div>
+          <div class="card rep-card w-100">
+            <div class="card-header py-1">
+              <small class="text-muted">Sum</small>
+            </div>
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>For EMB cultivation</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumForEMBCult" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>Cryo</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumSelCryo" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>2 PN trans.</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sum2PNTrans" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <span>Discarded</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumSelDiscarded" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Embryos -->
+        <div class="col d-flex flex-column">
+          <div class="mb-1 fw-bold text-center">Embryos</div>
+          <div class="card rep-card w-100">
+            <div class="card-header py-1">
+              <small class="text-muted">Sum</small>
+            </div>
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>Embryo transfer</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumEmbryoTransfer" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>∫ cryo</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumEmbCryo" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>∫ 2 PN-Arrest</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumEmb2PNArrest" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>∫ embryo arrest</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumEmbArrest" />
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <span>∫ atr / discarded</span>
+                <input type="number" class="form-control form-control-sm bg-light" style="width: 50px" formControlName="sumEmbAtrDiscarded" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

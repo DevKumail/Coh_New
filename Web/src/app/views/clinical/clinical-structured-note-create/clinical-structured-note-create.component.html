@@ -10,14 +10,13 @@
   <!-- Note Title -->
   <div class="d-flex align-items-center">
     <label class="form-label mb-0 me-2" style="font-size: 0.875rem; font-weight: 600;">
-      Note Title
+      Note Title <span class="text-danger">*</span>
     </label>
     <input type="text"
            class="form-control form-control-sm"
-           style="width: 300px; font-size: 0.875rem; background-color: #e9ecef; cursor: not-allowed;"
-           [value]="dataquestion?.node?.noteTitle || ('CLINICAL_STRUCTURED_NOTE_CREATE' | translate)"
-           readonly
-           disabled>
+           style="width: 300px; font-size: 0.875rem;"
+           placeholder="Enter note title"
+           formControlName="noteTitle">
   </div>
 
   <!-- Description -->

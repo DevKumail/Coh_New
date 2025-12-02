@@ -14,14 +14,16 @@ namespace HMIS.API.Controllers.Clinical
         private readonly IEMRNotesManager _eMRNotesManager;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly ILogger<EMRNotesController> _logger;
 
         TimerElapsed timerElapsed = new TimerElapsed();
 
-        public EMRNotesController(IEMRNotesManager eMRNotesManager, IConfiguration configuration, IMapper mapper)
+        public EMRNotesController(IEMRNotesManager eMRNotesManager, IConfiguration configuration, IMapper mapper, ILogger<EMRNotesController> logger)
         {
             _eMRNotesManager = eMRNotesManager;
             _configuration = configuration;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet("GetNoteQuestionBYPathId")]
@@ -62,37 +64,84 @@ namespace HMIS.API.Controllers.Clinical
             }
         }
 
-        [HttpPost("InsertSpeech")]
-        public async Task<IActionResult> InsertSpeech([FromBody] ClinicalNoteDto note)
+
+        //[HttpPost("InsertNote")]
+        //public async Task<IActionResult> InsertNote([FromBody] ClinicalNoteDto note)
+        //{
+        //    try
+        //    {
+        //        var result = await _eMRNotesManager.InsertStructureNotes(note);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal Server Error: {ex.Message}");
+        //    }
+        //}
+
+
+        //[HttpPost("InsertSpeech")]
+        //public async Task<IActionResult> InsertSpeech([FromBody] ClinicalNoteDto note)
+        //{
+        //    try
+        //    {
+        //        var result = await _eMRNotesManager.InsertSpeechWithTranscription(note);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal Server Error: {ex.Message}");
+        //    }
+        //}
+
+
+
+        //[HttpPost("SaveEMRNote")]
+        //public async Task<IActionResult> SaveEMRNote([FromBody] ClinicalNoteSaveDto noteDto)
+        //{
+        //    try
+        //    {
+        //        if (!ModelState.IsValid)
+        //            return BadRequest(ModelState);
+
+        //        var noteEntity = _mapper.Map<EmrnotesNote>(noteDto);
+
+        //        var result = await _eMRNotesManager.SaveEMRNote(noteEntity);
+        //        return Ok(new { success = true, data = result, message = "EMR note saved successfully" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { success = false, message = $"Internal Server Error: {ex.Message}" });
+        //    }
+        //}
+        [HttpPost("SaveClinicalNote")]
+        public async Task<IActionResult> SaveClinicalNote([FromBody] ClinicalNoteDto note)
         {
             try
             {
-                var result = await _eMRNotesManager.InsertSpeechWithTranscription(note);
-                return Ok(result);
+                _logger.LogInformation("Processing clinical note. NoteType: {NoteType}, AppointmentId: {AppointmentId}",
+                    note.NoteType, note.AppointmentId);
+
+                var result = await _eMRNotesManager.SaveClinicalNote(note);
+
+                if (result.Success)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        noteId = result.NoteId,
+                        message = result.Message,
+                        noteType = note.NoteType
+                    });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = result.Message });
+                }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
-
-
-
-        [HttpPost("SaveEMRNote")]
-        public async Task<IActionResult> SaveEMRNote([FromBody] ClinicalNoteSaveDto noteDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var noteEntity = _mapper.Map<EmrnotesNote>(noteDto);
-
-                var result = await _eMRNotesManager.SaveEMRNote(noteEntity);
-                return Ok(new { success = true, data = result, message = "EMR note saved successfully" });
-            }
-            catch (Exception ex)
-            {
+                _logger.LogError(ex, "Error saving clinical note");
                 return StatusCode(500, new { success = false, message = $"Internal Server Error: {ex.Message}" });
             }
         }
