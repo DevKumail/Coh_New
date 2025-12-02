@@ -12,14 +12,12 @@ namespace HMIS.Web.Controllers.IVF.Episodes
     {
         private readonly IEventService _eventService;
         private readonly IPrescriptionMasterService _prescriptionMasterService;
-        private readonly IPrescriptionService _prescriptionService;
         private readonly IOverviewService _overviewService;
 
-        public OverviewController(IEventService eventService, IPrescriptionMasterService prescriptionService, IPrescriptionService service, IOverviewService overviewService)
+        public OverviewController(IEventService eventService, IPrescriptionMasterService prescriptionService, IOverviewService overviewService)
         {
             _eventService = eventService;
             _prescriptionMasterService = prescriptionService;
-            _prescriptionService = service;
             _overviewService = overviewService;
         }
 
@@ -76,33 +74,6 @@ namespace HMIS.Web.Controllers.IVF.Episodes
         }
 
         //----------------- Prescription Master end -----------------
-
-        //----------------- Prescription Start -----------------
-
-        [HttpPost("prescription-save")]
-        public async Task<IActionResult> SavePrescription([FromBody] CreatePrescriptiondto dto)
-        {
-            var result = await _prescriptionService.SavePrescription(dto);
-
-            if (!result.isSuccess)
-                return BadRequest(result.message);
-
-            return Ok(result.message);
-        }
-
-
-        [HttpDelete("prescription-delete/{prescriptionId}")]
-        public async Task<IActionResult> DeletePrescription(long prescriptionId)
-        {
-            var result = await _prescriptionService.DeletePrescription(prescriptionId);
-
-            if (!result.isSuccess)
-                return BadRequest(result.message);
-
-            return Ok(result.message);
-        }
-
-        //----------------- Prescription end -----------------
 
         //----------------- Overview start ---------------
 

@@ -79,7 +79,6 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                                 existingMaster.Prescription.Add(prescription);
                         }
                     }
-
                     return overviewResult;
                 },
                 parameters,

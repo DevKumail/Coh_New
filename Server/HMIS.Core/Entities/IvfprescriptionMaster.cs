@@ -15,7 +15,7 @@ public partial class IvfprescriptionMaster
 
     public long OverviewId { get; set; }
 
-    public long DrugId { get; set; }
+    public long MedicationId { get; set; }
 
     public int? CreatedBy { get; set; }
 
@@ -29,12 +29,9 @@ public partial class IvfprescriptionMaster
 
     public bool IsDeleted { get; set; }
 
-    [ForeignKey("DrugId")]
+    [ForeignKey("MedicationId")]
     [InverseProperty("IvfprescriptionMaster")]
-    public virtual TabDrugsName Drug { get; set; } = null!;
-
-    [InverseProperty("IvfprescriptionMaster")]
-    public virtual ICollection<Ivfprescription> Ivfprescription { get; set; } = new List<Ivfprescription>();
+    public virtual Medications Medication { get; set; } = null!;
 
     [ForeignKey("OverviewId")]
     [InverseProperty("IvfprescriptionMaster")]

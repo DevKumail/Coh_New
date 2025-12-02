@@ -14,6 +14,10 @@ public partial class TabDrugsName
     [StringLength(255)]
     public string? TradeName { get; set; }
 
+    [StringLength(50)]
+    [Unicode(false)]
+    public string? Color { get; set; }
+
     [StringLength(255)]
     public string? Form { get; set; }
 
@@ -224,9 +228,6 @@ public partial class TabDrugsName
     public DateTime? UpdatedAt { get; set; }
 
     public int? UpdatedBy { get; set; }
-
-    [InverseProperty("Drug")]
-    public virtual ICollection<IvfprescriptionMaster> IvfprescriptionMaster { get; set; } = new List<IvfprescriptionMaster>();
 
     [InverseProperty("Drug")]
     public virtual ICollection<Medications> Medications { get; set; } = new List<Medications>();

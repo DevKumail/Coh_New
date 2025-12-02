@@ -206,6 +206,9 @@ public partial class DropdownConfiguration
     [InverseProperty("Viscosity")]
     public virtual ICollection<IvfmaleSemenSample> IvfmaleSemenSampleViscosity { get; set; } = new List<IvfmaleSemenSample>();
 
+    [InverseProperty("Category")]
+    public virtual ICollection<IvfoverviewMedicationApplicationDomain> IvfoverviewMedicationApplicationDomain { get; set; } = new List<IvfoverviewMedicationApplicationDomain>();
+
     [InverseProperty("AdverseSideEffectsCategory")]
     public virtual ICollection<IvfoverviewOhss> IvfoverviewOhssAdverseSideEffectsCategory { get; set; } = new List<IvfoverviewOhss>();
 

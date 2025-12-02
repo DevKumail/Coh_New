@@ -6,12 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Keyless]
-[Table("IVFPrescription")]
-public partial class Ivfprescription
+[Table("IVFMedicationPresentationForm")]
+public partial class IvfmedicationPresentationForm
 {
-    [Column("IVFPrescriptionMasterId")]
-    public long IvfprescriptionMasterId { get; set; }
+    [Key]
+    [Column("IVFMedicationPresentationFormId")]
+    public long IvfmedicationPresentationFormId { get; set; }
+
+    public long CategoryId { get; set; }
 
     public long MedicationId { get; set; }
 
@@ -27,9 +29,11 @@ public partial class Ivfprescription
 
     public bool IsDeleted { get; set; }
 
-    [ForeignKey("IvfprescriptionMasterId")]
-    public virtual IvfprescriptionMaster IvfprescriptionMaster { get; set; } = null!;
+    [ForeignKey("CategoryId")]
+    [InverseProperty("IvfmedicationPresentationForm")]
+    public virtual DropdownConfiguration Category { get; set; } = null!;
 
     [ForeignKey("MedicationId")]
+    [InverseProperty("IvfmedicationPresentationForm")]
     public virtual Medications Medication { get; set; } = null!;
 }

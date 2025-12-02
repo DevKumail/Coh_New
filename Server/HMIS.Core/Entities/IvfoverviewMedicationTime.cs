@@ -6,14 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Keyless]
-[Table("IVFPrescription")]
-public partial class Ivfprescription
+[Table("IVFOverviewMedicationTime")]
+public partial class IvfoverviewMedicationTime
 {
-    [Column("IVFPrescriptionMasterId")]
-    public long IvfprescriptionMasterId { get; set; }
+    [Key]
+    [Column("IVFOverviewMedicationTimeId")]
+    public long IvfoverviewMedicationTimeId { get; set; }
 
     public long MedicationId { get; set; }
+
+    [Precision(3)]
+    public TimeOnly? Time { get; set; }
 
     public int? CreatedBy { get; set; }
 
@@ -27,9 +30,7 @@ public partial class Ivfprescription
 
     public bool IsDeleted { get; set; }
 
-    [ForeignKey("IvfprescriptionMasterId")]
-    public virtual IvfprescriptionMaster IvfprescriptionMaster { get; set; } = null!;
-
     [ForeignKey("MedicationId")]
+    [InverseProperty("IvfoverviewMedicationTime")]
     public virtual Medications Medication { get; set; } = null!;
 }
