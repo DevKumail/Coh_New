@@ -1,36 +1,23 @@
-<div class="row g-3">
-  <div class="col-12 col-md-2">
-    <ul class="nav nav-pills flex-column small">
-      <li class="nav-item mb-1">
-        <button type="button" class="nav-link active w-100">Cryo thawing</button>
-      </li>
-      <li class="nav-item">
-        <button type="button" class="nav-link w-100">Cryopreservation</button>
-      </li>
-    </ul>
-  </div>
-
-  <div class="col-12 col-md-10">
-    <div class="text-muted small mb-1">Treatments and treatment semen analysis</div>
-    <div class="border border-2 rounded px-2 py-1">
-      <div class="d-flex align-items-center justify-content-between">
-        <div class="flex-grow-1">
-          <div class="d-flex align-items-center gap-3 flex-wrap">
-            <div class="fw-semibold">SPI</div>
-            <div>22/06/2025 2:17 PM - ICSI - partner</div>
-            <div class="text-muted">Performed by: Enumtasar, Ehtishar</div>
-            <div class="text-muted">Collection: 22/06/2025 (10:15 AM)</div>
-            <div class="text-muted">Sample ID:</div>
-            <div class="text-muted">if motile:</div>
-          </div>
-        </div>
-        <div class="ms-3" style="min-width: 260px;">
-          <select class="form-select form-select-sm">
-            <option>Embryo Freezing</option>
-            <option>Semen analysis (only if no treatment)</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="p-0">
+  <ul ngbNav #nav="ngbNav" class="nav nav-tabs small">
+    <li [ngbNavItem]="1">
+      <button ngbNavLink class="nav-link">Table representation</button>
+      <ng-template ngbNavContent>
+        <app-table-representation></app-table-representation>
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="2">
+      <button ngbNavLink class="nav-link">Graphical representation</button>
+      <ng-template ngbNavContent>
+        <div class="p-3 text-muted">Graphical representation (coming soon)</div>
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="3">
+      <button ngbNavLink class="nav-link">Summed representation</button>
+      <ng-template ngbNavContent>
+        <div class="p-3 text-muted">Summed representation (coming soon)</div>
+      </ng-template>
+    </li>
+  </ul>
+  <div [ngbNavOutlet]="nav" class="mt-2"></div>
 </div>
