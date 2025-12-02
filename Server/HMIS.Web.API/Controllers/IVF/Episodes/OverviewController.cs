@@ -79,16 +79,16 @@ namespace HMIS.Web.Controllers.IVF.Episodes
 
         //----------------- Prescription Start -----------------
 
-        [HttpPost("prescription-save")]
-        public async Task<IActionResult> SavePrescription([FromBody] CreatePrescriptiondto dto)
-        {
-            var result = await _prescriptionService.SavePrescription(dto);
+        //[HttpPost("prescription-save")]
+        //public async Task<IActionResult> SavePrescription([FromBody] CreatePrescriptiondto dto)
+        //{
+        //    var result = await _prescriptionService.SavePrescription(dto);
 
-            if (!result.isSuccess)
-                return BadRequest(result.message);
+        //    if (!result.isSuccess)
+        //        return BadRequest(result.message);
 
-            return Ok(result.message);
-        }
+        //    return Ok(result.message);
+        //}
 
 
         [HttpDelete("prescription-delete/{prescriptionId}")]

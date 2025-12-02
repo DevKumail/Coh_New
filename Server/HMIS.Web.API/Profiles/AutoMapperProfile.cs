@@ -62,6 +62,30 @@ namespace HMIS.API.Profiles
                     src.NoteId > 0 ? src.CreatedAt : (src.CreatedAt ?? DateTime.Now)))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src =>
                     src.UpdatedAt ?? DateTime.Now));
+
+
+            CreateMap<ClinicalNoteDto, EmrnotesNote>()
+           .ForMember(dest => dest.NotesTitle, opt => opt.MapFrom(src => src.NoteTitle))
+           .ForMember(dest => dest.NoteText, opt => opt.MapFrom(src => src.NoteText))
+           .ForMember(dest => dest.NoteHtmltext, opt => opt.MapFrom(src => src.HtmlContent))
+           .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+           .ForMember(dest => dest.Mrno, opt => opt.MapFrom(src => src.MrNo))
+           .ForMember(dest => dest.VisitAcNo, opt => opt.MapFrom(src => src.AppointmentId.ToString()))
+           .ForMember(dest => dest.Signed, opt => opt.MapFrom(src => src.SignedBy))
+           .ForMember(dest => dest.NoteType, opt => opt.MapFrom(src => "Structured"))
+           .ForMember(dest => dest.Active, opt => opt.MapFrom(src => true))
+           .ForMember(dest => dest.IsEdit, opt => opt.MapFrom(src => false))
+           .ForMember(dest => dest.Review, opt => opt.MapFrom(src => false))
+           .ForMember(dest => dest.IsNursingNote, opt => opt.MapFrom(src => false))
+           .ForMember(dest => dest.IsMbrcompleted, opt => opt.MapFrom(src => false));
+
+            CreateMap<AnswerItem, EmrnotesAnswer>()
+                .ForMember(dest => dest.QuestId, opt => opt.MapFrom(src => src.Quest_Id))
+                .ForMember(dest => dest.Answer, opt => opt.MapFrom(src => src.Answer))
+                .ForMember(dest => dest.Mrno, opt => opt.MapFrom(src => src.MrNo))
+                .ForMember(dest => dest.VisitAcNo, opt => opt.MapFrom(src => src.VisitAcNo))
+                .ForMember(dest => dest.Inactive, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.IsHistory, opt => opt.MapFrom(src => false));
         }
     }
 }

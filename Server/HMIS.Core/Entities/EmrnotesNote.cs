@@ -55,10 +55,6 @@ public partial class EmrnotesNote
 
     public long? SignedBy { get; set; }
 
-    [StringLength(14)]
-    [Unicode(false)]
-    public string? SignedDate { get; set; }
-
     public long? CosignedBy { get; set; }
 
     [StringLength(14)]
@@ -118,6 +114,9 @@ public partial class EmrnotesNote
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? SignedDate { get; set; }
 
     [InverseProperty("Note")]
     public virtual ICollection<EmrnoteTemplate> EmrnoteTemplate { get; set; } = new List<EmrnoteTemplate>();

@@ -12,9 +12,10 @@ using HMIS.Application.ServiceLogics.IVF.Female;
 using HMIS.Application.ServiceLogics.IVF.Male;
 using HMIS.ApplicationImplementations;
 using HMIS.Service.Implementations;
-using HMIS.Service.ServiceLogics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using HMIS.Service.ServiceLogics;
 
 namespace HMIS.Application
 {
@@ -73,7 +74,6 @@ namespace HMIS.Application
                 Library.Initialize();
                 return ClientFactory.CreateListenRESTClient(apiKey);
             });
-
 
         }
     }

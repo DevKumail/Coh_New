@@ -235,6 +235,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     // Generate HTML from structured note with filled values
     const htmlContent = this.generateHtmlFromStructuredNote(filledStructuredNote);
 
+    // Generate plain text note content from HTML for noteText
+    const noteText = this.stripHtml(htmlContent);
+
     const payload = {
       appointmentId: this.SelectedVisit.appointmentId,
       providerId: Number(formValue.provider) || this.selectedProviders,
@@ -246,9 +249,11 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       pathId: noteId,
       structuredNote: filledStructuredNote,
       htmlContent: htmlContent,
+      noteText: noteText,
       createdBy: createdBy,
       updatedBy: createdBy,
       signedBy: false,
+      noteType: 'Structured',
       createdOn: new Date()
     };
 
@@ -256,7 +261,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
 
     if (navigator.onLine) {
       this.loader.show();
-      this.clinicalApiService.InsertSpeech(payload)
+      this.clinicalApiService.InsertNote(payload)
         .then((response: any) => {
           if (response != null && response != "") {
             this.dataquestion = response;
@@ -327,10 +332,21 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     return html;
   }
 
+  private stripHtml(html: string): string {
+    const tmp = document.createElement('DIV');
+    tmp.innerHTML = html || '';
+    return tmp.textContent || tmp.innerText || '';
+  }
+
   generateQuestionsHtml(questions: Question[]): string {
     let html = '';
 
     questions.forEach(question => {
+      // Skip any question/section that has no filled data (matches Note tab behavior)
+      if (!this.isSectionFilled(question)) {
+        return;
+      }
+
       if (question.type === 'Question Section') {
         html += `<div style="margin-top: 20px;">`;
         html += `<h4 style="font-weight: bold; margin-left: 20px;">${question.quest_Title}</h4>`;
@@ -344,7 +360,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       } else if (question.type === 'TextBox') {
         html += `<div style="display: inline-block; margin-right: 20px; margin-bottom: 15px; width: calc(25% - 20px); vertical-align: top;">`;
         html += `<div style="margin-bottom: 5px;"><strong>${question.quest_Title}:</strong></div>`;
-        html += `<div>${question.answer || 'N/A'}</div>`;
+        html += `<div>${question.answer || ''}</div>`;
         html += `</div>`;
       } else if (question.type === 'CheckBox') {
         // Only show checkbox if it's checked (true)
