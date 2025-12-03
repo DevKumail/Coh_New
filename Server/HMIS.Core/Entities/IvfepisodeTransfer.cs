@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Table("IVFEpisodeTransfer")]
+[Index("TransferId", Name = "IX_IVFEpisodeTransfer", IsUnique = true)]
 public partial class IvfepisodeTransfer
 {
     [Key]
@@ -32,10 +33,10 @@ public partial class IvfepisodeTransfer
 
     public int? CultureDays { get; set; }
 
-    public long? CathererCategoryId { get; set; }
+    public long? CatheterCategoryId { get; set; }
 
     [StringLength(50)]
-    public string? CathererAddition { get; set; }
+    public string? CatheterAddition { get; set; }
 
     public long? MainCompilationCategoryId { get; set; }
 
@@ -47,7 +48,7 @@ public partial class IvfepisodeTransfer
 
     public bool? EmbryoGlue { get; set; }
 
-    public bool? DifficultCathererInsertion { get; set; }
+    public bool? DifficultCatheterInsertion { get; set; }
 
     public bool? CatheterChange { get; set; }
 
@@ -77,9 +78,9 @@ public partial class IvfepisodeTransfer
 
     public bool IsDeleted { get; set; }
 
-    [ForeignKey("CathererCategoryId")]
-    [InverseProperty("IvfepisodeTransferCathererCategory")]
-    public virtual DropdownConfiguration? CathererCategory { get; set; }
+    [ForeignKey("CatheterCategoryId")]
+    [InverseProperty("IvfepisodeTransferCatheterCategory")]
+    public virtual DropdownConfiguration? CatheterCategory { get; set; }
 
     [ForeignKey("EmbryologistId")]
     [InverseProperty("IvfepisodeTransferEmbryologist")]
