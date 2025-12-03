@@ -217,9 +217,9 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Transfer
 
                 stage.IsDeleted = true;
 
-                foreach (var t in stage.IvfepisodeTransfer)
+                if (stage.IvfepisodeTransfer != null)
                 {
-                    t.IsDeleted = true;
+                    stage.IvfepisodeTransfer.IsDeleted = true;
                 }
 
                 foreach (var e in stage.IvfepisodeTransferEmbryoInTransfer)
@@ -241,7 +241,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Transfer
 
         private async Task UpsertTransfer(IvftreatmentEpisodeTransferStage stage, IVFEpisodeTransferDto dto)
         {
-            var entity = stage.IvfepisodeTransfer.FirstOrDefault();
+            var entity = stage.IvfepisodeTransfer;
 
             if (entity == null)
             {
