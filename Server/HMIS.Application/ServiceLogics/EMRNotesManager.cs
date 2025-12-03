@@ -830,6 +830,7 @@ namespace HMIS.Service.ServiceLogics
             return (notes, totalCount);
         }
 
+
         public async Task<EMRNoteDetailDto?> GetEMRNoteByNoteId(long noteId)
         {
             try
@@ -845,12 +846,78 @@ namespace HMIS.Service.ServiceLogics
                     commandType: CommandType.StoredProcedure
                 );
 
+                if (result?.TemplateId > 0)
+                {
+                    var emrNotesModel = await GetNoteQuestionBYPathId(result.TemplateId ?? 0);
+
+                    // Convert EMRNotesModel to GetEMRNotesModel
+                    var getTemplate = new GetEMRNotesModel
+                    {
+                        NoteTitle = emrNotesModel.NoteTitle,
+                        Questions = ConvertNoteModelToGetNoteModel(emrNotesModel.Questions)
+                    };
+
+                    var flatQuestions = JsonConvert.DeserializeObject<List<FlatQuestionDto>>(result.AnswerJson)
+                                        ?? new List<FlatQuestionDto>();
+
+                    var answerLookup = flatQuestions
+                        .Where(q => !string.IsNullOrEmpty(q.Answer))
+                        .ToDictionary(q => q.Quest_Id, q => q.Answer);
+
+                    // Populate answers recursively
+                    PopulateAnswersRecursively(getTemplate.Questions, answerLookup);
+
+                    // Wrap in a List since AnsweredNotesTemplate expects List<GetEMRNotesModel>
+                    result.AnsweredNotesTemplate = new List<GetEMRNotesModel> { getTemplate };
+                }
+
                 return result;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetEMRNoteByNoteId for NoteId: {NoteId}", noteId);
                 return null;
+            }
+        }
+
+        // Helper method to convert List<NoteModel> to List<GetNoteModel>
+        private List<GetNoteModel> ConvertNoteModelToGetNoteModel(List<NoteModel> noteModels)
+        {
+            if (noteModels == null) return new List<GetNoteModel>();
+
+            var result = new List<GetNoteModel>();
+
+            foreach (var noteModel in noteModels)
+            {
+                result.Add(new GetNoteModel
+                {
+                    Quest_Id = noteModel.Quest_Id,
+                    Quest_Title = noteModel.Quest_Title,
+                    Type = noteModel.Type,
+                    Answer = noteModel.Answer,
+                    Children = ConvertNoteModelToGetNoteModel(noteModel.Children)
+                });
+            }
+
+            return result;
+        }
+
+        // Recursive method to populate answers
+        private void PopulateAnswersRecursively(List<GetNoteModel> questions, Dictionary<long, string> answerLookup)
+        {
+            if (questions == null) return;
+
+            foreach (var question in questions)
+            {
+                if (answerLookup.TryGetValue(question.Quest_Id, out var answer))
+                {
+                    question.Answer = answer;
+                }
+
+                if (question.Children != null && question.Children.Any())
+                {
+                    PopulateAnswersRecursively(question.Children, answerLookup);
+                }
             }
         }
         // Helper method to parse API response

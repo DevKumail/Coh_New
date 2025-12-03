@@ -72,7 +72,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   ) {
     this.clinicalForm = this.fb.group({
       provider: [null, Validators.required],
-      note: [null, Validators.required],
+      note: [null],
       description: [''],
       noteTitle: ['', Validators.required]
     });
@@ -208,7 +208,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     this.nodeData = [];
     if (noteId != null && noteId != undefined && noteId != 0) {
       this.loader.show();
+
       this.clinicalApiService.GetNotesTemplate(noteId).then((res: any) => {
+        debugger;
         this.dataquestion = res;
         this.viewquestion = true;
         this.nodeData = res;
@@ -229,6 +231,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     if (!noteId) {
       return;
     }
+    this.dataquestion = [];
+    this.viewquestion = false;
+    this.nodeData = [];
 
     this.loader.show();
     this.clinicalApiService.GetEMRNoteByNoteId(noteId)
@@ -238,7 +243,36 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
           Swal.fire('Error', 'Unable to load structured note for editing.', 'error');
           return;
         }
+        debugger;
 
+        // Normalize answeredNotesTemplate so it matches the same shape as GetNotesTemplate
+        let answeredTemplate: any = note.answeredNotesTemplate;
+
+        // If backend sends JSON string, parse it
+        if (typeof answeredTemplate === 'string') {
+          try {
+            answeredTemplate = JSON.parse(answeredTemplate);
+          } catch (e) {
+            console.error('Failed to parse answeredNotesTemplate JSON', e);
+          }
+        }
+
+        // If we only have questions without the { node: { ... } } wrapper, wrap it
+        if (answeredTemplate && !answeredTemplate.node && (answeredTemplate.questions || Array.isArray(answeredTemplate))) {
+          const questions = answeredTemplate[0].questions || answeredTemplate;
+          const titleFromTemplate = answeredTemplate[0].noteTitle || '';
+
+          answeredTemplate = {
+            node: {
+              noteTitle: titleFromTemplate || note.notesTitle || '',
+              questions: questions
+            }
+          };
+        }
+
+        this.dataquestion = answeredTemplate;
+        this.viewquestion = true;
+        this.nodeData = answeredTemplate;
         // Store id for update payload
         this.noteId = note.noteId || note.id || 0;
 
@@ -253,15 +287,24 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
         this.preSelectedProvider = providerCode || this.preSelectedProvider;
         this.selectedProviders = this.preSelectedProvider || 0;
 
+        // Set editable note title from loaded note
         this.clinicalForm.patchValue({
-          provider: this.preSelectedProvider || null,
-          note: null,
-          description: note.description || ''
-        }, { emitEvent: false });
+          noteTitle: note.notesTitle || note.noteTitle || '',
+          provider: providerCode,
+
+        });
+
+        // Optionally repopulate description/provider if desired
+        // this.clinicalForm.patchValue({
+        //   provider: this.preSelectedProvider || null,
+        //   note: null,
+        //   description: note.description || ''
+        // }, { emitEvent: false });
 
         // Capture existing HTML for Note tab
         this.existingNoteHtml = note.noteHtmltext || '';
         this.viewNoteResponse = !!this.existingNoteHtml;
+
 
         this.cdr.markForCheck();
       })
@@ -450,23 +493,28 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   }
 
   getFormattedNoteHtml(): SafeHtml {
-    // In edit mode, if backend provided full HTML, prefer that
+    // Prefer live structured template data when available (so edits reflect immediately)
+    const questions = this.nodeData?.node?.questions || this.nodeData?.questions;
+    const title = this.nodeData?.node?.noteTitle || this.nodeData?.noteTitle || '';
+
+    if (Array.isArray(questions) && questions.length > 0) {
+      let html = `<h2 style="margin-top: 10px; font-weight: bold; margin-left: 10px; text-decoration-line: underline;">${title}</h2>`;
+
+      questions.forEach((section: any) => {
+        if (this.hasQuestionData(section)) {
+          html += this.formatQuestion(section, 10);
+        }
+      });
+
+      return this.sanitizer.bypassSecurityTrustHtml(html);
+    }
+
+    // Fallback: use existing HTML from backend (e.g. when no structured template is available)
     if (this.noteId && this.existingNoteHtml) {
       return this.sanitizer.bypassSecurityTrustHtml(this.existingNoteHtml);
     }
 
-    const questions = this.nodeData?.node?.questions || this.nodeData?.questions || [];
-    const title = this.nodeData?.node?.noteTitle || this.nodeData?.noteTitle || '';
-
-    let html = `<h2 style="margin-top: 10px; font-weight: bold; margin-left: 10px; text-decoration-line: underline;">${title}</h2>`;
-
-    questions.forEach((section: any) => {
-      if (this.hasQuestionData(section)) {
-        html += this.formatQuestion(section, 10);
-      }
-    });
-
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    return this.sanitizer.bypassSecurityTrustHtml('');
   }
 
   private formatQuestion(question: any, marginLeft: number): string {
@@ -590,13 +638,17 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
 
   // Check if ANY question in the template has filled data
   hasAnyFilledData(): boolean {
-    // In edit mode, if we have existing HTML, treat as having data
+    const questions = this.nodeData?.node?.questions || this.nodeData?.questions;
+    if (Array.isArray(questions) && questions.length > 0) {
+      return questions.some((q: any) => this.isSectionFilled(q));
+    }
+
+    // Fallback: if we are in edit mode and only have existing HTML, treat as having data
     if (this.noteId && this.existingNoteHtml) {
       return true;
     }
 
-    const questions = this.nodeData?.node?.questions || this.nodeData?.questions || [];
-    return questions.some((q: any) => this.isSectionFilled(q));
+    return false;
   }
 
   ngOnDestroy(): void {

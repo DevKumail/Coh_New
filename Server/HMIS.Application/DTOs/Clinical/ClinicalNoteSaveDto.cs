@@ -94,5 +94,40 @@ namespace HMIS.Application.DTOs.Clinical
         public string? Mrno { get; set; }
         public string? NoteStatus { get; set; }
         public long? VisitAcNo { get; set; }
+        public int? TemplateId { get; set; }
+        public string? AnswerJson { get; set; }
+
+        public List<GetEMRNotesModel> AnsweredNotesTemplate { get; set; }
+
     }
+
+    public class FlatQuestionDto
+    {
+        public string NoteName { get; set; }
+        public long Quest_Id { get; set; }
+        public string Quest_Title { get; set; }
+        public string Quest_Type_Text { get; set; }
+        public int Quest_Type { get; set; }
+        public long? Parent_Id { get; set; }
+        public int QuestOrder_Template { get; set; }
+        public string Answer { get; set; }
+    }
+
+    public class GetEMRNotesModel
+    {
+        public string NoteTitle { get; set; }
+
+        public List<GetNoteModel> Questions { get; set; }
+    }
+
+    public class GetNoteModel
+    {
+        public long Quest_Id { get; set; }
+        public string Quest_Title { get; set; }
+        public string? Type { get; set; }
+        public string? Answer { get; set; }
+
+        public List<GetNoteModel> Children { get; set; } = new List<GetNoteModel>();
+    }
+
 }
