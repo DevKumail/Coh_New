@@ -30,6 +30,10 @@ public partial class IvftreatmentEpisodeAspirationStage
 
     public bool IsDeleted { get; set; }
 
+    [ForeignKey("AspirationId")]
+    [InverseProperty("IvftreatmentEpisodeAspirationStage")]
+    public virtual IvfepisodeAspirationOocyteRetrieval Aspiration { get; set; } = null!;
+
     [ForeignKey("IvfdashboardTreatmentCycleId")]
     [InverseProperty("IvftreatmentEpisodeAspirationStage")]
     public virtual IvfdashboardTreatmentCycle? IvfdashboardTreatmentCycle { get; set; }

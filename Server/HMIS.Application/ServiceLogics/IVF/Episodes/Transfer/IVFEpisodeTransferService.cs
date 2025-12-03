@@ -91,7 +91,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Transfer
                 {
                     stage = new IvftreatmentEpisodeTransferStage
                     {
-                        IvfdashboardTreatmentCycleId = dto.IVFDashboardTreatmentCycleId,
+                        IvfdashboardTreatmentCycleId = (int)dto.IVFDashboardTreatmentCycleId,
                         IsDeleted = false
                     };
                     _db.IvftreatmentEpisodeTransferStage.Add(stage);
