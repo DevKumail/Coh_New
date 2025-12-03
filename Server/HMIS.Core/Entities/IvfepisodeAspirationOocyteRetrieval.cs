@@ -69,10 +69,6 @@ public partial class IvfepisodeAspirationOocyteRetrieval
     [InverseProperty("IvfepisodeAspirationOocyteRetrievalAnesthetist")]
     public virtual Hremployee? Anesthetist { get; set; }
 
-    [ForeignKey("AspirationId")]
-    [InverseProperty("IvfepisodeAspirationOocyteRetrieval")]
-    public virtual IvftreatmentEpisodeAspirationStage Aspiration { get; set; } = null!;
-
     [ForeignKey("EmbryologistId")]
     [InverseProperty("IvfepisodeAspirationOocyteRetrievalEmbryologist")]
     public virtual Hremployee? Embryologist { get; set; }

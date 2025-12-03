@@ -36,7 +36,4 @@ public partial class IvftreatmentEpisodeAspirationStage
 
     [InverseProperty("Aspiration")]
     public virtual IvfepisodeAspirationFurtherDetails? IvfepisodeAspirationFurtherDetails { get; set; }
-
-    [InverseProperty("Aspiration")]
-    public virtual IvfepisodeAspirationOocyteRetrieval? IvfepisodeAspirationOocyteRetrieval { get; set; }
 }

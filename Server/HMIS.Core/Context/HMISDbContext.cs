@@ -1306,10 +1306,6 @@ public partial class HMISDbContext : DbContext
 
             entity.HasOne(d => d.Anesthetist).WithMany(p => p.IvfepisodeAspirationOocyteRetrievalAnesthetist).HasConstraintName("FK_IVFEpisodeApirationOocyteRetrieval_HREmployee2");
 
-            entity.HasOne(d => d.Aspiration).WithOne(p => p.IvfepisodeAspirationOocyteRetrieval)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_IVFEpisodeAspirationOocyteRetrieval_IVFTreatmentEpisodeAspirationStage");
-
             entity.HasOne(d => d.Embryologist).WithMany(p => p.IvfepisodeAspirationOocyteRetrievalEmbryologist).HasConstraintName("FK_IVFEpisodeApirationOocyteRetrieval_HREmployee1");
 
             entity.HasOne(d => d.FurtherComplicationsCategory).WithMany(p => p.IvfepisodeAspirationOocyteRetrievalFurtherComplicationsCategory).HasConstraintName("FK_IVFEpisodeApirationOocyteRetrieval_DropdownConfiguration3");
@@ -1351,7 +1347,6 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfepisodeTransfer>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
@@ -1374,7 +1369,6 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfepisodeTransferEmbryoInTransfer>(entity =>
         {
-            entity.Property(e => e.EmbryoInTransferId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
@@ -1914,7 +1908,6 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvftreatmentEpisodeAspirationStage>(entity =>
         {
-            entity.Property(e => e.AspirationId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
@@ -1933,11 +1926,12 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvftreatmentEpisodeTransferStage>(entity =>
         {
-            entity.Property(e => e.TransferId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
-            entity.HasOne(d => d.IvfdashboardTreatmentCycle).WithOne(p => p.IvftreatmentEpisodeTransferStage).HasConstraintName("FK_IVFTreatmentEpisodeTransferStage_IVFDashboardTreatmentCycle");
+            entity.HasOne(d => d.IvfdashboardTreatmentCycle).WithOne(p => p.IvftreatmentEpisodeTransferStage)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFTreatmentEpisodeTransferStage_IVFDashboardTreatmentCycle");
         });
 
         modelBuilder.Entity<IvftreatmentEpisodesAttachments>(entity =>
