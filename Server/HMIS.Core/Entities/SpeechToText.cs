@@ -36,10 +36,6 @@ public partial class SpeechToText
     [Unicode(false)]
     public string? Description { get; set; }
 
-    [StringLength(50)]
-    [Unicode(false)]
-    public string? CreatedBy { get; set; }
-
     public bool? SignedBy { get; set; }
 
     [Column(TypeName = "datetime")]
@@ -67,6 +63,10 @@ public partial class SpeechToText
     [Column("File_Id")]
     public long? FileId { get; set; }
 
+    public long? NoteId { get; set; }
+
+    public int? CreatedBy { get; set; }
+
     [ForeignKey("AppointmentId")]
     [InverseProperty("SpeechToText")]
     public virtual SchAppointment? Appointment { get; set; }
@@ -74,6 +74,10 @@ public partial class SpeechToText
     [ForeignKey("FileId")]
     [InverseProperty("SpeechToText")]
     public virtual HmisFiles? File { get; set; }
+
+    [ForeignKey("NoteId")]
+    [InverseProperty("SpeechToText")]
+    public virtual EmrnotesNote? Note { get; set; }
 
     [ForeignKey("PatientId")]
     [InverseProperty("SpeechToText")]

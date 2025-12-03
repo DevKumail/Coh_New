@@ -136,6 +136,26 @@ export class ClinicalNoteComponent implements OnInit {
           });
     }
 
+    private buildVoiceUrl(path: string): string {
+      if (!path) {
+        return '';
+      }
+
+      // Normalize backslashes to forward slashes
+      let normalized = path.replace(/\\/g, '/').replace(/\\/g, '/');
+
+      // Trim everything before the UploadFiles folder so we can use a relative URL
+      const lower = normalized.toLowerCase();
+      const marker = '/uploadfiles/';
+      const idx = lower.indexOf(marker);
+      if (idx >= 0) {
+        normalized = normalized.substring(idx);
+      }
+
+      // Return as relative URL (served from the same origin as the app/API)
+      return normalized;
+    }
+
     speechtoText() {
       if(!this.SearchPatientData?.table2?.[0]?.mrNo) {
         Swal.fire('Error', 'MRN not found for the Load patient', 'error');
@@ -145,7 +165,17 @@ export class ClinicalNoteComponent implements OnInit {
       this.apiservice.GetEMRNotesByMRNo(MRN, this.pagegination.currentPage, this.pagegination.pageSize)
         .then((res: any) => {
           console.log('EMR Notes RESULT: ', res);
-          this.speechtotxt = res?.data || [];
+
+          const rawData = res?.data || [];
+          this.speechtotxt = rawData.map((item: any) => {
+            const path = item.notePath || item.voicePath || item.filePath || '';
+            const voiceSafeUrl = this.buildVoiceUrl(path);
+            return {
+              ...item,
+              voiceSafeUrl
+            };
+          });
+
           this.clinicalnoteTotalItems = res?.pagination?.totalCount || this.speechtotxt.length || 0;
           this.cdr.markForCheck();
         })

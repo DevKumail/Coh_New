@@ -3,7 +3,7 @@
     public class ClinicalNoteDto
     {
         // Common fields
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string? NoteTitle { get; set; }
         public string? NoteText { get; set; }
         public string? NoteType { get; set; }
@@ -92,7 +92,7 @@
 
     public class ClinicalNoteObj
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         //public long? PatientId { get; set; }
         public string NoteHtmltext { get; set; }
         public string? NoteText { get; set; }
