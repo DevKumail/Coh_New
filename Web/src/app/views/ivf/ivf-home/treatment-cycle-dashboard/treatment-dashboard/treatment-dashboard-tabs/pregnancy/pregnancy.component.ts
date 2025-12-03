@@ -1,8 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { ProgressComponent } from './tabs/progress/progress.component';
 import { UltrasoundComponent } from './tabs/ultrasound/ultrasound.component';
+import { ProgressComponent } from './tabs/progress/progress.component';
+
 
 @Component({  
   selector: 'app-pregnancy',
