@@ -65,8 +65,8 @@ namespace HMIS.Application
             services.AddScoped<IIVFMaleCryoPreservationService, IVFMaleCryoPreservationService>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IPrescriptionMasterService, PrescriptionMasterService>();
-            services.AddScoped<IPrescriptionService, PrescriptionService>();
             services.AddScoped<IOverviewService, OverviewService>();
+            services.AddScoped<IIVFEpisodeTransferService, IVFEpisodeTransferService>();
 
             services.AddSingleton<IListenRESTClient>(provider =>
             {
