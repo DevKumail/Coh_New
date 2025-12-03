@@ -94,6 +94,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
      private PatientData: PatientBannerService
   ) {
     this.clinicalForm = this.fb.group({
+      noteTitle: ['', Validators.required],
       provider: [null, Validators.required],
       note: [null, Validators.required],
       description: [''],
@@ -236,9 +237,10 @@ export class ClinicalNoteCreateComponent implements OnInit {
       this.nodeData = res;
 
       // Set template name from response
-
       if (res?.node?.noteTitle) {
         this.selectedTemplateName = res.node.noteTitle;
+        // Patch the noteTitle form control with the template title
+        this.clinicalForm.patchValue({ noteTitle: res.node.noteTitle });
       }
 
       this.loader.hide();

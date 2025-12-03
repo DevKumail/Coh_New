@@ -73,7 +73,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                         return (false, "Prescription not found.");
 
                     entity.OverviewId = dto.OverviewId;
-                    entity.DrugId = dto.DrugId;
+                    //entity.DrugId = dto.DrugId;
 
                     await _context.SaveChangesAsync();
                     return (true, "Prescription updated successfully.");
@@ -83,7 +83,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     entity = new IvfprescriptionMaster
                     {
                         OverviewId = dto.OverviewId,
-                        DrugId = dto.DrugId
+                        //DrugId = dto.DrugId
                     };
 
                     await _context.IvfprescriptionMaster.AddAsync(entity);

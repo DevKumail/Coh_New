@@ -1,0 +1,49 @@
+<div class="row g-2">
+  <!-- Left info panel -->
+  <div class="col-md-3">
+    <div class="border rounded p-2 h-100">
+      <div class="mb-2 d-flex align-items-center justify-content-between">
+        <div>
+          <div class="small text-muted">Date:</div>
+          <div class="fw-semibold">07/10/2025</div>
+        </div>
+        <div class="small text-muted">PGW: <strong>10 [9+3]</strong></div>
+      </div>
+      <div class="mb-2">
+        <div class="small text-muted">Performed by:</div>
+        <div>Sayed, Walid Dr.</div>
+      </div>
+      <div>
+        <div class="small text-muted mb-1">Note:</div>
+        <div class="small">
+          <div><strong>Patient Name:</strong> Soheila Habib</div>
+          <div><strong>Medical MR No:</strong> 3168</div>
+          <div><strong>DOB:</strong> 07/04/1987</div>
+          <div><strong>Visit Date:</strong> 07/10/2025</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right images carousel -->
+  <div class="col-md-9">
+    <div class="ultra-strip border rounded p-2">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="fw-semibold">Images</div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary" type="button" (click)="strip.scrollBy({left: -300, behavior: 'smooth'})">‹</button>
+          <button class="btn btn-sm btn-outline-secondary" type="button" (click)="strip.scrollBy({left: 300, behavior: 'smooth'})">›</button>
+        </div>
+      </div>
+      <div class="thumbs" #strip>
+        <div class="thumb" *ngFor="let img of images">
+          <div class="thumb__img-wrap">
+            <img [src]="img.src" [alt]="img.alt" />
+          </div>
+          <div class="thumb__caption text-truncate" [title]="img.name">{{ img.name }}</div>
+          <button class="btn btn-link btn-sm p-0">Preview image</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

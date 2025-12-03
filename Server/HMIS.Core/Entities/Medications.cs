@@ -187,6 +187,15 @@ public partial class Medications
     [InverseProperty("Medications")]
     public virtual TabDrugsName? Drug { get; set; }
 
+    [InverseProperty("Medication")]
+    public virtual ICollection<IvfoverviewMedicationApplicationDomain> IvfoverviewMedicationApplicationDomain { get; set; } = new List<IvfoverviewMedicationApplicationDomain>();
+
+    [InverseProperty("Medication")]
+    public virtual ICollection<IvfoverviewMedicationTime> IvfoverviewMedicationTime { get; set; } = new List<IvfoverviewMedicationTime>();
+
+    [InverseProperty("Medication")]
+    public virtual ICollection<IvfprescriptionMaster> IvfprescriptionMaster { get; set; } = new List<IvfprescriptionMaster>();
+
     [ForeignKey("ProviderId")]
     [InverseProperty("Medications")]
     public virtual Hremployee? Provider { get; set; }

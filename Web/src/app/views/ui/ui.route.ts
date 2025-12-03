@@ -20,7 +20,6 @@ import {OffcanvasComponent} from '@/app/views/ui/offcanvas/offcanvas.component';
 import {PlaceholdersComponent} from '@/app/views/ui/placeholders/placeholders.component';
 import {PaginationComponent} from '@/app/views/ui/pagination/pagination.component';
 import {PopoversComponent} from '@/app/views/ui/popovers/popovers.component';
-import {ProgressComponent} from '@/app/views/ui/progress/progress.component';
 import {ScrollspyComponent} from '@/app/views/ui/scrollspy/scrollspy.component';
 import {SpinnersComponent} from '@/app/views/ui/spinners/spinners.component';
 import {TabsComponent} from '@/app/views/ui/tabs/tabs.component';
@@ -133,11 +132,6 @@ export const UI_ROUTES: Routes = [
         path: 'ui/popovers',
         component: PopoversComponent,
         data: {title: "Popovers"},
-    },
-    {
-        path: 'ui/progress',
-        component: ProgressComponent,
-        data: {title: "Progress"},
     },
     {
         path: 'ui/scrollspy',
