@@ -1,9 +1,10 @@
-<div class="d-flex flex-column">
+<div class="d-flex flex-column" [formGroup]="form">
   <div class="d-flex justify-content-end" style="margin-top:-18px;">
     <div class="fw-semibold small">Morphologically</div>
   </div>
   <hr>
-  <div *ngFor="let e of embryos; index as i; trackBy: trackById" [ngClass]="{'pt-2 mt-2 border-top': i>0}" class="px-1">
+  <div formArrayName="embryos">
+  <div *ngFor="let e of embryos; index as i; trackBy: trackById" [ngClass]="{'pt-2 mt-2 border-top': i>0}" class="px-1" [formGroupName]="i">
     <div class="row g-2 align-items-center">
       <!-- Left: number and ID -->
       <div class="col-2 col-md-2 text-center">
@@ -32,7 +33,7 @@
         <div class="row g-2 align-items-center">
           <div class="col-auto">
             <div class="form-check d-flex align-items-center gap-1">
-              <input class="form-check-input" type="radio" [name]="'morpho-'+e.id" [id]="'morphoIdeal-'+e.id" [(ngModel)]="e.morpho" value="ideal" />
+              <input class="form-check-input" type="radio" name="morpho" [id]="'morphoIdeal-'+e.id" formControlName="morpho" value="ideal" />
               <label class="form-check-label" [for]="'morphoIdeal-'+e.id">
                 <span class="badge rounded-circle me-1" style="background:#28a745;width:10px;height:10px;padding:0"></span>
                 Ideal
@@ -41,7 +42,7 @@
           </div>
           <div class="col-auto">
             <div class="form-check d-flex align-items-center gap-1">
-              <input class="form-check-input" type="radio" [name]="'morpho-'+e.id" [id]="'morphoNotIdeal-'+e.id" [(ngModel)]="e.morpho" value="not_ideal" />
+              <input class="form-check-input" type="radio" name="morpho" [id]="'morphoNotIdeal-'+e.id" formControlName="morpho" value="not_ideal" />
               <label class="form-check-label" [for]="'morphoNotIdeal-'+e.id">
                 <span class="badge rounded-circle me-1" style="background:#adb5bd;width:10px;height:10px;padding:0"></span>
                 Not ideal
@@ -50,7 +51,7 @@
           </div>
           <div class="col-auto d-flex align-items-center gap-2">
             <span class="fw-semibold">Score</span>
-            <select class="form-select form-select-sm" style="width:90px" [(ngModel)]="e.score">
+            <select class="form-select form-select-sm" style="width:90px" formControlName="score">
               <option [ngValue]="null">--</option>
               <option>5AA</option>
               <option>4AA</option>
@@ -60,5 +61,6 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 </div>

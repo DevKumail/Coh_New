@@ -163,31 +163,36 @@ export class IVFApiService {
     return this.api.get('IVFDashboard/GetAllIVFDashboardTreatmentCycle', { ivfmainid, page, rowsPerPage });
   }
 
-    getIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId: number): Observable<any> {
-      return this.api.get(`IVFDashboard/GetIVFDashboardTreatmentCycle?ivfDashboardTreatmentCycleId=${ivfDashboardTreatmentCycleId}`);
-    }
-  
-    deleteIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId: number): Observable<any> {
-      // Backend expects id via body or query; using POST for delete per given endpoint
-      return this.api.delete(`IVFDashboard/DeleteIVFDashboardTreatmentCycle/${ivfDashboardTreatmentCycleId}`);
-    }
+  getIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId: number): Observable<any> {
+    return this.api.get(`IVFDashboard/GetIVFDashboardTreatmentCycle?ivfDashboardTreatmentCycleId=${ivfDashboardTreatmentCycleId}`);
+  }
 
-    getOverviewByEpisodeId(episodeId: number): Observable<any> {
-      return this.api.get(`Overview/get-all-Overview/${episodeId}`);
-    }
+  deleteIVFDashboardTreatmentCycle(ivfDashboardTreatmentCycleId: number): Observable<any> {
+    // Backend expects id via body or query; using delete with id in route
+    return this.api.delete(`IVFDashboard/DeleteIVFDashboardTreatmentCycle/${ivfDashboardTreatmentCycleId}`);
+  }
 
-    saveOverviewEvent(payload: {
-      eventId: number;
-      appId: number;
-      categoryId: number;
-      overviewId: number;
-      startdate: string;
-      enddate: string;
-    }): Observable<any> {
-      return this.api.post('Overview/event-save', payload);
-    }
+  // Episode Transfer (Transfer tab)
+  saveEpisodeTransfer(payload: any): Observable<any> {
+    return this.api.post('IVFEpisodeTransfer/CreateUpdateEpisodeTransfer', payload);
+  }
 
-     // Add observations for a specific order set detail
+  getOverviewByEpisodeId(episodeId: number): Observable<any> {
+    return this.api.get(`Overview/get-all-Overview/${episodeId}`);
+  }
+
+  saveOverviewEvent(payload: {
+    eventId: number;
+    appId: number;
+    categoryId: number;
+    overviewId: number;
+    startdate: string;
+    enddate: string;
+  }): Observable<any> {
+    return this.api.post('Overview/event-save', payload);
+  }
+
+  // Add observations for a specific order set detail
   addLabOrderObservations(orderSetDetailId: number | string, body: any): Observable<any> {
     debugger
     return this.api.post(`IVFLabOrders/${orderSetDetailId}/observations`, body);

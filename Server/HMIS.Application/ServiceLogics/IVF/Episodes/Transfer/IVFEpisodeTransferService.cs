@@ -217,9 +217,9 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Transfer
 
                 stage.IsDeleted = true;
 
-                foreach (var t in stage.IvfepisodeTransfer)
+                if (stage.IvfepisodeTransfer != null)
                 {
-                    t.IsDeleted = true;
+                    stage.IvfepisodeTransfer.IsDeleted = true;
                 }
 
                 foreach (var e in stage.IvfepisodeTransferEmbryoInTransfer)
@@ -241,7 +241,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Transfer
 
         private async Task UpsertTransfer(IvftreatmentEpisodeTransferStage stage, IVFEpisodeTransferDto dto)
         {
-            var entity = stage.IvfepisodeTransfer.FirstOrDefault();
+            var entity = stage.IvfepisodeTransfer;
 
             if (entity == null)
             {
@@ -270,14 +270,14 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Transfer
             if (f != null)
             {
                 entity.CultureDays = f.CultureDays;
-                entity.CathererCategoryId = f.CathererCategoryId;
-                entity.CathererAddition = f.CathererAddition;
+                entity.CatheterCategoryId = f.CatheterCategoryId;
+                entity.CatheterAddition = f.CatheterAddition;
                 entity.MainCompilationCategoryId = f.MainCompilationCategoryId;
                 entity.FurtherComplicationCategoryId = f.FurtherComplicationCategoryId;
                 entity.SeveralAttempts = f.SeveralAttempts;
                 entity.NoOfAttempts = f.NoOfAttempts;
                 entity.EmbryoGlue = f.EmbryoGlue;
-                entity.DifficultCathererInsertion = f.DifficultCathererInsertion;
+                entity.DifficultCatheterInsertion = f.DifficultCatheterInsertion;
                 entity.CatheterChange = f.CatheterChange;
                 entity.MucusInCatheter = f.MucusInCatheter;
                 entity.BloodInCatheter = f.BloodInCatheter;

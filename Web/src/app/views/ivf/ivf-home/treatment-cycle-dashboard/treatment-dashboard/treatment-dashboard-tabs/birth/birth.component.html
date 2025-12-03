@@ -1,1 +1,24 @@
-<p>birth works!</p>
+<div class="card">
+  <div class="card-header py-2 bg-light"><strong>Birth</strong></div>
+  <div class="card-body py-2">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#birth-tab" type="button" role="tab">Birth</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#followup-tab" type="button" role="tab">Follow-up</button>
+      </li>
+    </ul>
+    <div class="tab-content border-start border-end border-bottom p-2">
+      <div class="tab-pane fade show active" id="birth-tab" role="tabpanel">
+       <app-birth-tab></app-birth-tab>
+      </div>
+      <div class="tab-pane fade" id="followup-tab" role="tabpanel">
+        <app-follow-up></app-follow-up>
+      </div>
+    </div>
+    <div class="text-end mt-2">
+      <button type="button" class="btn btn-sm btn-primary" (click)="onSave()">Save</button>
+    </div>
+  </div>
+</div>

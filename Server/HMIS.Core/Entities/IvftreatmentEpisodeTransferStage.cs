@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HMIS.Core.Entities;
 
 [Table("IVFTreatmentEpisodeTransferStage")]
+[Index("IvfdashboardTreatmentCycleId", Name = "IX_IVFTreatmentEpisodeTransferStage", IsUnique = true)]
 public partial class IvftreatmentEpisodeTransferStage
 {
     [Key]
@@ -34,7 +35,7 @@ public partial class IvftreatmentEpisodeTransferStage
     public virtual IvfdashboardTreatmentCycle? IvfdashboardTreatmentCycle { get; set; }
 
     [InverseProperty("Transfer")]
-    public virtual ICollection<IvfepisodeTransfer> IvfepisodeTransfer { get; set; } = new List<IvfepisodeTransfer>();
+    public virtual IvfepisodeTransfer? IvfepisodeTransfer { get; set; }
 
     [InverseProperty("Transfer")]
     public virtual ICollection<IvfepisodeTransferEmbryoInTransfer> IvfepisodeTransferEmbryoInTransfer { get; set; } = new List<IvfepisodeTransferEmbryoInTransfer>();

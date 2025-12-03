@@ -9,29 +9,52 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
     public class GetAllOverviewDetailDto
     {
         public long OverviewId { get; set; }
+        public List<GetCalenderDto> Calender { get; set; }
+        public List<GetResourcesDetailDto> Resources { get; set; }
+    }
+
+    public class GetResourcesDetailDto
+    {
+        public List<GetSidebarMedicationDto> AllMedications { get; set; }
+    }
+
+    public class GetSidebarMedicationDto
+    {
+        public long DrugId { get; set; }
+        public string DrugName { get; set; }
+    }
+
+    public class GetCalenderDto
+    {
         public List<GetEventDetailDto> Events { get; set; }
-        public List<GetMasterPrescriptionDetailDto> PrescriptionMaster { get; set; }
+        public List<GetMedicationDto> Medications { get; set; }
     }
 
     public class GetEventDetailDto
     {
         public long? EventId { get; set; }
-        public long? EventTypeCategoryId { get; set; }
+        public string? EventType { get; set; }
         public DateTime? EventStartDate { get; set; }
         public DateTime? EventEndDate { get; set; }
     }
 
-    public class GetMasterPrescriptionDetailDto 
+    public class GetMedicationDto
     {
-        public long? IVFPrescriptionMasterId { get; set; }
-        public long? DrugId { get; set; }
-        public List<GetPrescriptionDetailDto> Prescription { get; set; }
-    }
-
-    public class GetPrescriptionDetailDto
-    {
-        public long? IVFPrescriptionId { get; set; }
-        public DateTime? PrescriptionStartDate { get; set; }
-        public DateTime? PrescriptionEndDate { get; set; }
+        public long MedicationId { get; set; }
+        public long DrugId { get; set; }
+        public string DrugName { get; set; }
+        public List<string> ApplicationDomainName { get; set; } = new();
+        public DateTime? StartDate { get; set; }
+        public DateTime? StopDate { get; set; }
+        public List<TimeSpan> Time { get; set; } = new();
+        public string Frequency { get; set; }
+        public string Dose { get; set; }
+        public string RouteName { get; set; }
+        public string Quantity { get; set; }
+        public string AdditionalRefills { get; set; }
+        public string Samples { get; set; }
+        public string Substitution { get; set; }
+        public string Instructions { get; set; }
+        public string Indications { get; set; }
     }
 }
