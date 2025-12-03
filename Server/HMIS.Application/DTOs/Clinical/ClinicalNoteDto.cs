@@ -50,6 +50,8 @@
         public long? ProviderId { get; set; }
         public long? UserId { get; set; }
         public string? CurrentUser { get; set; }
+        public int? TemplateId { get; set; }
+
     }
 
     public class StructuredNote

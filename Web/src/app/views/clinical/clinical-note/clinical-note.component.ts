@@ -345,14 +345,23 @@ export class ClinicalNoteComponent implements OnInit {
   }
 
   editNote(note: any) {
+    debugger;
     if (!note || !note.noteId) {
       Swal.fire('Error', 'Note Id not found for editing', 'error');
       return;
     }
 
-    this.router.navigate(['/clinical/create-free-text-notes'], {
-      queryParams: { noteId: note.noteId }
-    });
+     if(note.noteType.toLowerCase() === 'freetext') {
+      this.router.navigate(['/clinical/create-free-text-notes'], {
+        queryParams: { noteId: note.noteId }
+      });
+    }
+    if(note.noteType.toLowerCase() === 'structured') {
+      this.router.navigate(['/clinical/create-structured-notes'], {
+        queryParams: { noteId: note.noteId }
+      });
+    }
+
   }
 
   // TrackBy functions for ngFor optimization
