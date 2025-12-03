@@ -1,37 +1,66 @@
-<div class="row g-3">
-  <div class="col-12 d-flex align-items-start gap-3">
-    <div class="text-center">
-      <div class="badge bg-secondary mb-2">1</div>
-      <div class="small text-muted">6631</div>
+<div class="d-flex flex-column" [formGroup]="form">
+  <div class="d-flex justify-content-end" style="margin-top:-18px;">
+    <div class="fw-semibold small">Morphologically</div>
+  </div>
+  <hr>
+  <div formArrayName="embryos">
+  <div *ngFor="let e of embryos; index as i; trackBy: trackById" [ngClass]="{'pt-2 mt-2 border-top': i>0}" class="px-1" [formGroupName]="i">
+    <div class="row g-2 align-items-center">
+      <!-- Left: number and ID -->
+      <div class="col-2 col-md-2 text-center">
+        <div class="fw-bold">{{ e.number }}</div>
+        <div class="small text-muted">{{ e.id }}</div>
+      </div>
+
+      <!-- Middle: title + images -->
+      <div class="col-4 col-md-5">
+        <div class="fw-semibold mb-1">{{ e.title }}</div>
+        <div class="d-flex align-items-center gap-2">
+          <img *ngIf="e.image1; else imgPh1" [src]="e.image1!" alt="" class="rounded border" style="width:56px;height:56px;object-fit:cover" />
+          <ng-template #imgPh1>
+            <div class="rounded border p-1" style="width:56px;height:56px;background:#f8f9fa"></div>
+          </ng-template>
+          <img *ngIf="e.image2; else imgPh2" [src]="e.image2!" alt="" class="rounded border" style="width:56px;height:56px;object-fit:cover" />
+          <ng-template #imgPh2>
+            <div class="rounded border p-1" style="width:56px;height:56px;background:#f8f9fa"></div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Right: Morphology + Score -->
+      <div class="col-6 col-md-5">
+        <div class="d-flex justify-content-between align-items-center mb-1"></div>
+        <div class="row g-2 align-items-center">
+          <div class="col-auto">
+            <div class="form-check d-flex align-items-center gap-1">
+              <input class="form-check-input" type="radio" name="morpho" [id]="'morphoIdeal-'+e.id" formControlName="morpho" value="ideal" />
+              <label class="form-check-label" [for]="'morphoIdeal-'+e.id">
+                <span class="badge rounded-circle me-1" style="background:#28a745;width:10px;height:10px;padding:0"></span>
+                Ideal
+              </label>
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-check d-flex align-items-center gap-1">
+              <input class="form-check-input" type="radio" name="morpho" [id]="'morphoNotIdeal-'+e.id" formControlName="morpho" value="not_ideal" />
+              <label class="form-check-label" [for]="'morphoNotIdeal-'+e.id">
+                <span class="badge rounded-circle me-1" style="background:#adb5bd;width:10px;height:10px;padding:0"></span>
+                Not ideal
+              </label>
+            </div>
+          </div>
+          <div class="col-auto d-flex align-items-center gap-2">
+            <span class="fw-semibold">Score</span>
+            <select class="form-select form-select-sm" style="width:90px" formControlName="score">
+              <option [ngValue]="null">--</option>
+              <option>5AA</option>
+              <option>4AA</option>
+              <option>3AA</option>
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div class="flex-grow-1">
-      <div class="d-flex align-items-center gap-3 mb-2">
-        <div class="rounded border p-1" style="width:64px;height:64px;background:#f8f9fa"></div>
-        <div class="rounded border p-1" style="width:64px;height:64px;background:#f8f9fa"></div>
-      </div>
-
-      <div class="mb-2">
-        <div class="fw-semibold">Hatching blastocyst</div>
-      </div>
-
-      <div class="row g-2 align-items-center">
-        <div class="col-auto">
-          <span class="fw-semibold">Morphologically</span>
-        </div>
-        <div class="col-auto form-check">
-          <input class="form-check-input" type="radio" name="morpho" id="morphoIdeal" />
-          <label class="form-check-label" for="morphoIdeal">Ideal</label>
-        </div>
-        <div class="col-auto form-check">
-          <input class="form-check-input" type="radio" name="morpho" id="morphoNotIdeal" />
-          <label class="form-check-label" for="morphoNotIdeal">Not ideal</label>
-        </div>
-        <div class="col-auto d-flex align-items-center">
-          <span class="ms-2 me-2 small text-muted">Score</span>
-          <input type="text" class="form-control form-control-sm" style="width:80px" placeholder="5AA" />
-        </div>
-      </div>
-    </div>
+  </div>
   </div>
 </div>

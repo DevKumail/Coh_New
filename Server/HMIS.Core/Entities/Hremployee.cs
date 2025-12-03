@@ -350,6 +350,15 @@ public partial class Hremployee
     [InverseProperty("OperatingProvider")]
     public virtual ICollection<IvfepisodeAspirationOocyteRetrieval> IvfepisodeAspirationOocyteRetrievalOperatingProvider { get; set; } = new List<IvfepisodeAspirationOocyteRetrieval>();
 
+    [InverseProperty("Embryologist")]
+    public virtual ICollection<IvfepisodeTransfer> IvfepisodeTransferEmbryologist { get; set; } = new List<IvfepisodeTransfer>();
+
+    [InverseProperty("Nurse")]
+    public virtual ICollection<IvfepisodeTransfer> IvfepisodeTransferNurse { get; set; } = new List<IvfepisodeTransfer>();
+
+    [InverseProperty("Provider")]
+    public virtual ICollection<IvfepisodeTransfer> IvfepisodeTransferProvider { get; set; } = new List<IvfepisodeTransfer>();
+
     [InverseProperty("Provider")]
     public virtual ICollection<IvfmaleFertilityHistory> IvfmaleFertilityHistory { get; set; } = new List<IvfmaleFertilityHistory>();
 

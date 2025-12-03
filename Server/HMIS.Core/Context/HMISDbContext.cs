@@ -208,6 +208,10 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<IvfepisodeOverviewLabTestOrder> IvfepisodeOverviewLabTestOrder { get; set; }
 
+    public virtual DbSet<IvfepisodeTransfer> IvfepisodeTransfer { get; set; }
+
+    public virtual DbSet<IvfepisodeTransferEmbryoInTransfer> IvfepisodeTransferEmbryoInTransfer { get; set; }
+
     public virtual DbSet<IvffemaleFertilityHistory> IvffemaleFertilityHistory { get; set; }
 
     public virtual DbSet<IvffemaleFhimpairmentFactor> IvffemaleFhimpairmentFactor { get; set; }
@@ -287,6 +291,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<IvftreatmentEpisodeAspirationStage> IvftreatmentEpisodeAspirationStage { get; set; }
 
     public virtual DbSet<IvftreatmentEpisodeOverviewStage> IvftreatmentEpisodeOverviewStage { get; set; }
+
+    public virtual DbSet<IvftreatmentEpisodeTransferStage> IvftreatmentEpisodeTransferStage { get; set; }
 
     public virtual DbSet<IvftreatmentEpisodesAttachments> IvftreatmentEpisodesAttachments { get; set; }
 
@@ -1343,6 +1349,42 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.Overview).WithMany().HasConstraintName("FK_IVFEpisodeOverviewLabTestOrder_IVFTreatmentEpisodeOverviewStage");
         });
 
+        modelBuilder.Entity<IvfepisodeTransfer>(entity =>
+        {
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.CathererCategory).WithMany(p => p.IvfepisodeTransferCathererCategory).HasConstraintName("FK_IVFEpisodeTransfer_DropdownConfiguration");
+
+            entity.HasOne(d => d.Embryologist).WithMany(p => p.IvfepisodeTransferEmbryologist).HasConstraintName("FK_IVFEpisodeTransfer_HREmployee2");
+
+            entity.HasOne(d => d.FurtherComplicationCategory).WithMany(p => p.IvfepisodeTransferFurtherComplicationCategory).HasConstraintName("FK_IVFEpisodeTransfer_DropdownConfiguration2");
+
+            entity.HasOne(d => d.MainCompilationCategory).WithMany(p => p.IvfepisodeTransferMainCompilationCategory).HasConstraintName("FK_IVFEpisodeTransfer_DropdownConfiguration1");
+
+            entity.HasOne(d => d.Nurse).WithMany(p => p.IvfepisodeTransferNurse).HasConstraintName("FK_IVFEpisodeTransfer_HREmployee1");
+
+            entity.HasOne(d => d.Provider).WithMany(p => p.IvfepisodeTransferProvider).HasConstraintName("FK_IVFEpisodeTransfer_HREmployee");
+
+            entity.HasOne(d => d.Transfer).WithMany(p => p.IvfepisodeTransfer)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFEpisodeTransfer_IVFTreatmentEpisodeTransferStage");
+        });
+
+        modelBuilder.Entity<IvfepisodeTransferEmbryoInTransfer>(entity =>
+        {
+            entity.Property(e => e.EmbryoInTransferId).ValueGeneratedNever();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.ScoreCategory).WithMany(p => p.IvfepisodeTransferEmbryoInTransfer).HasConstraintName("FK_IVFEpisodeTransferEmbryoInTransfer_DropdownConfiguration");
+
+            entity.HasOne(d => d.Transfer).WithMany(p => p.IvfepisodeTransferEmbryoInTransfer)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFEpisodeTransferEmbryoInTransfer_IVFTreatmentEpisodeTransferStage");
+        });
+
         modelBuilder.Entity<IvffemaleFertilityHistory>(entity =>
         {
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
@@ -1887,6 +1929,15 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
             entity.HasOne(d => d.IvfdashboardTreatmentCycle).WithMany(p => p.IvftreatmentEpisodeOverviewStage).HasConstraintName("FK_IVFTreatmentEpisodeOverviewStage_IVFDashboardTreatmentEpisode");
+        });
+
+        modelBuilder.Entity<IvftreatmentEpisodeTransferStage>(entity =>
+        {
+            entity.Property(e => e.TransferId).ValueGeneratedNever();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.IvfdashboardTreatmentCycle).WithMany(p => p.IvftreatmentEpisodeTransferStage).HasConstraintName("FK_IVFTreatmentEpisodeTransferStage_IVFDashboardTreatmentCycle");
         });
 
         modelBuilder.Entity<IvftreatmentEpisodesAttachments>(entity =>

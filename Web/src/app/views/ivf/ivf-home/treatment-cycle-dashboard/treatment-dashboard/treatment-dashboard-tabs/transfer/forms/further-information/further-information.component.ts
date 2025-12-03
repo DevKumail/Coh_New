@@ -31,7 +31,22 @@ export class FurtherInformationComponent {
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       editorContent: [''],
-      cultureDuration: [{ value: null, disabled: true }]
+      cultureDuration: [{ value: null, disabled: true }],
+      catheterUsed: [''],
+      catheterAddition: [''],
+      mainComplication: [''],
+      furtherComplications: [''],
+      severalAttempts: [false],
+      attempts: [{ value: null, disabled: true }],
+      embryoGlue: [false],
+      difficultCatheter: [false],
+      catheterChange: [false],
+      mucusInCatheter: [false],
+      bloodInCatheter: [false],
+      dilation: [false],
+      ultrasoundCheck: [false],
+      vulsellum: [false],
+      probe: [false],
     });
   }
 

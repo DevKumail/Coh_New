@@ -89,6 +89,18 @@ public partial class DropdownConfiguration
     [InverseProperty("EventTypeCategory")]
     public virtual ICollection<IvfepisodeOverviewEvents> IvfepisodeOverviewEvents { get; set; } = new List<IvfepisodeOverviewEvents>();
 
+    [InverseProperty("CathererCategory")]
+    public virtual ICollection<IvfepisodeTransfer> IvfepisodeTransferCathererCategory { get; set; } = new List<IvfepisodeTransfer>();
+
+    [InverseProperty("ScoreCategory")]
+    public virtual ICollection<IvfepisodeTransferEmbryoInTransfer> IvfepisodeTransferEmbryoInTransfer { get; set; } = new List<IvfepisodeTransferEmbryoInTransfer>();
+
+    [InverseProperty("FurtherComplicationCategory")]
+    public virtual ICollection<IvfepisodeTransfer> IvfepisodeTransferFurtherComplicationCategory { get; set; } = new List<IvfepisodeTransfer>();
+
+    [InverseProperty("MainCompilationCategory")]
+    public virtual ICollection<IvfepisodeTransfer> IvfepisodeTransferMainCompilationCategory { get; set; } = new List<IvfepisodeTransfer>();
+
     [InverseProperty("AdiposityCategory")]
     public virtual ICollection<IvffemaleFertilityHistory> IvffemaleFertilityHistoryAdiposityCategory { get; set; } = new List<IvffemaleFertilityHistory>();
 

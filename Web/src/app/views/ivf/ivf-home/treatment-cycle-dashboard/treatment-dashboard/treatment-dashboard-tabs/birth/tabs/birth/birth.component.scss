@@ -1,0 +1,23 @@
+.card-body {
+  .border.rounded {
+    .bg-light {
+      background-color: #f1f3f5 !important; /* light gray header bar */
+    }
+    .px-2.py-1 {
+      padding-top: 4px !important;
+      padding-bottom: 4px !important;
+    }
+    .p-2 {
+      padding: 8px !important;
+    }
+  }
+
+  input[disabled], select[disabled] {
+    background-color: #f1f3f5 !important; /* disabled look blocks */
+    opacity: 1; /* keep readable */
+  }
+
+  .form-label.small, .form-label.mb-0 {
+    font-size: 0.85rem;
+  }
+}
