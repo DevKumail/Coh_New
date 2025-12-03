@@ -75,13 +75,13 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
         {
             try
             {
-                var entity = await _context.Ivfprescription
-                    .FirstOrDefaultAsync(x => x.IvfprescriptionMasterId == prescriptionId);
+                //var entity = await _context.Ivfprescription
+                //    .FirstOrDefaultAsync(x => x.IvfprescriptionMasterId == prescriptionId);
 
-                if (entity == null)
-                    return (false, "Prescription not found.");
+                //if (entity == null)
+                //    return (false, "Prescription not found.");
 
-                entity.IsDeleted = true;
+                //entity.IsDeleted = true;
 
                 await _context.SaveChangesAsync();
 
