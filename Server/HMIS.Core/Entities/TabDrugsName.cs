@@ -230,8 +230,5 @@ public partial class TabDrugsName
     public int? UpdatedBy { get; set; }
 
     [InverseProperty("Drug")]
-    public virtual ICollection<IvfprescriptionMaster> IvfprescriptionMaster { get; set; } = new List<IvfprescriptionMaster>();
-
-    [InverseProperty("Drug")]
     public virtual ICollection<Medications> Medications { get; set; } = new List<Medications>();
 }
