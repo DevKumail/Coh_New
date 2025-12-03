@@ -14,6 +14,7 @@
         public bool Signed { get; set; }
         public bool IsEdit { get; set; }
         public string MRNo { get; set; }
+        public string NoteType { get; set; }
 
         public DateTime? AppDateTime { get; set; }
         public string VisitAccDisplay { get; set; }

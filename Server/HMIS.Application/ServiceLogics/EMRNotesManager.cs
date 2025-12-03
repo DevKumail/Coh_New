@@ -233,6 +233,13 @@ namespace HMIS.Service.ServiceLogics
                     _context.EmrnotesNote.Add(emrNote);
                     await _context.SaveChangesAsync();
 
+
+                    if (note.TemplateId > 0)
+                    {
+                        var noteId = emrNote.NoteId;
+
+                        await AddTemplateDetail(note,noteId);
+                    }
                     _logger.LogInformation("Successfully created new note ID: {NoteId}", emrNote.NoteId);
                 }
 
@@ -241,6 +248,7 @@ namespace HMIS.Service.ServiceLogics
                 {
                     await SaveStructuredQuestions(note, emrNote.NoteId);
                 }
+
 
                 return new ClinicalNoteResponse
                 {
@@ -348,6 +356,24 @@ namespace HMIS.Service.ServiceLogics
             if (updatedNote.IsMbrcompleted.HasValue)
                 existingNote.IsMbrcompleted = updatedNote.IsMbrcompleted.Value;
 
+        }
+
+        private async System.Threading.Tasks.Task AddTemplateDetail(ClinicalNoteDto note,long noteId)
+        {
+        
+            if (note.Id > 0)
+            {
+                //implement in future
+            }
+            else
+            {
+                var noteTemplate = new EmrnoteTemplate();
+                noteTemplate.TemplateId = note.TemplateId ?? 0;
+                noteTemplate.NoteId = noteId;
+                 _context.EmrnoteTemplate.Add(noteTemplate);
+                await _context.SaveChangesAsync();
+            }
+        
         }
 
         private async System.Threading.Tasks.Task SaveStructuredQuestions(ClinicalNoteDto note, long noteId)

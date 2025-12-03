@@ -51,6 +51,10 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   preSelectedTemplate: number = 0;
   SelectedVisit: any;
 
+  // Edit mode support
+  private noteId: number = 0;
+  private existingNoteHtml: string = '';
+
   // User data from RxDB
   private currentUserId: string = '';
   private currentUserName: string = '';
@@ -101,6 +105,14 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       if (params['template']) {
         this.preSelectedTemplate = Number(params['template']);
         this.isTemplatePreSelected = true;
+      }
+
+      // Edit existing structured note
+      if (params['noteId']) {
+        const id = Number(params['noteId']);
+        if (id) {
+          this.loadExistingNote(id);
+        }
       }
     });
 
@@ -213,6 +225,55 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     }
   }
 
+  private loadExistingNote(noteId: number) {
+    if (!noteId) {
+      return;
+    }
+
+    this.loader.show();
+    this.clinicalApiService.GetEMRNoteByNoteId(noteId)
+      .then((res: any) => {
+        const note = res?.data;
+        if (!note) {
+          Swal.fire('Error', 'Unable to load structured note for editing.', 'error');
+          return;
+        }
+
+        // Store id for update payload
+        this.noteId = note.noteId || note.id || 0;
+
+        // Update MRN and visit if available
+        this.mrNo = note.mrno || this.mrNo;
+        if (note.visitAcNo && (!this.SelectedVisit || !this.SelectedVisit.appointmentId)) {
+          this.SelectedVisit = { ...(this.SelectedVisit || {}), appointmentId: note.visitAcNo };
+        }
+
+        // Provider and description
+        const providerCode = note.signedBy || note.providerId || null;
+        this.preSelectedProvider = providerCode || this.preSelectedProvider;
+        this.selectedProviders = this.preSelectedProvider || 0;
+
+        this.clinicalForm.patchValue({
+          provider: this.preSelectedProvider || null,
+          note: null,
+          description: note.description || ''
+        }, { emitEvent: false });
+
+        // Capture existing HTML for Note tab
+        this.existingNoteHtml = note.noteHtmltext || '';
+        this.viewNoteResponse = !!this.existingNoteHtml;
+
+        this.cdr.markForCheck();
+      })
+      .catch((error: any) => {
+        console.error('Error loading structured EMR note by id:', error);
+        Swal.fire('Error', 'Failed to load structured note for editing.', 'error');
+      })
+      .finally(() => {
+        this.loader.hide();
+      });
+  }
+
   async submitVoice() {
     if (this.clinicalForm.invalid) {
       Swal.fire('Error', 'Please fill all required fields.', 'error');
@@ -258,9 +319,12 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       noteText: noteText,
       createdBy: createdBy,
       updatedBy: createdBy,
-      signedBy: false,
+      signedBy: this.selectedProviders || 0,
+      Id: this.noteId || 0,
+      isEdit: this.noteId > 0,
       noteType: 'Structured',
-      createdOn: new Date()
+      createdOn: new Date(),
+      templateId:this.preSelectedTemplate
     };
 
     console.log('Payload:', payload);
@@ -386,6 +450,11 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   }
 
   getFormattedNoteHtml(): SafeHtml {
+    // In edit mode, if backend provided full HTML, prefer that
+    if (this.noteId && this.existingNoteHtml) {
+      return this.sanitizer.bypassSecurityTrustHtml(this.existingNoteHtml);
+    }
+
     const questions = this.nodeData?.node?.questions || this.nodeData?.questions || [];
     const title = this.nodeData?.node?.noteTitle || this.nodeData?.noteTitle || '';
 
@@ -521,6 +590,11 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
 
   // Check if ANY question in the template has filled data
   hasAnyFilledData(): boolean {
+    // In edit mode, if we have existing HTML, treat as having data
+    if (this.noteId && this.existingNoteHtml) {
+      return true;
+    }
+
     const questions = this.nodeData?.node?.questions || this.nodeData?.questions || [];
     return questions.some((q: any) => this.isSectionFilled(q));
   }
