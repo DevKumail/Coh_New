@@ -1,1 +1,63 @@
-<p>pregnancy works!</p>
+<div class="" [formGroup]="form">
+  <div class="card">
+    <div class="card-header py-2 bg-light">
+      <strong>Pregnancy</strong>
+    </div>
+    <div class="card-body py-2">
+      <!-- Top status row -->
+      <div class="row g-1 align-items-end">
+        <div class="col-md-5 d-flex align-items-center gap-2 flex-wrap">
+          <div class="fw-semibold">Cycle outcome:</div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="outcomeUnknown" formControlName="outcomeUnknown">
+            <label class="form-check-label" for="outcomeUnknown">Unknown</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="outcomeClinical" formControlName="outcomeClinical">
+            <label class="form-check-label" for="outcomeClinical">Clinical PG</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="outcomeNoPreg" formControlName="outcomeNoPreg">
+            <label class="form-check-label" for="outcomeNoPreg">No pregnancy</label>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="d-flex align-items-center flex-nowrap gap-2">
+            <label class="form-label mb-0 small text-nowrap">Positive PG test</label>
+            <select class="form-select form-select-sm w-auto" formControlName="positivePgTest">
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="d-flex align-items-center flex-nowrap gap-2">
+            <label class="form-label mb-0 small text-nowrap">Last hCG</label>
+            <input type="date" class="form-control form-control-sm w-auto" formControlName="lastHcg" [disabled]="true" />
+          </div>
+        </div>
+      </div>
+      <hr>
+      <!-- Tabs -->
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#preg-progress" type="button" role="tab">Progress</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#preg-ultrasound" type="button" role="tab">Ultrasound</button>
+        </li>
+      </ul>
+      <div class="tab-content border-start border-end border-bottom p-2">
+        <div class="tab-pane fade show active" id="preg-progress" role="tabpanel">
+          <app-progress></app-progress>
+        </div>
+        <div class="tab-pane fade" id="preg-ultrasound" role="tabpanel">
+          <app-ultrasound></app-ultrasound>
+        </div>
+      </div>
+      <div class="text-end mt-2">
+        <button type="button" class="btn btn-sm btn-primary" (click)="onSave()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
