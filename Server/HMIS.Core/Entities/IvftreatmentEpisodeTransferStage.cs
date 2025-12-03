@@ -14,7 +14,7 @@ public partial class IvftreatmentEpisodeTransferStage
     public long TransferId { get; set; }
 
     [Column("IVFDashboardTreatmentCycleId")]
-    public int? IvfdashboardTreatmentCycleId { get; set; }
+    public int IvfdashboardTreatmentCycleId { get; set; }
 
     public int? StatusId { get; set; }
 
@@ -32,7 +32,7 @@ public partial class IvftreatmentEpisodeTransferStage
 
     [ForeignKey("IvfdashboardTreatmentCycleId")]
     [InverseProperty("IvftreatmentEpisodeTransferStage")]
-    public virtual IvfdashboardTreatmentCycle? IvfdashboardTreatmentCycle { get; set; }
+    public virtual IvfdashboardTreatmentCycle IvfdashboardTreatmentCycle { get; set; } = null!;
 
     [InverseProperty("Transfer")]
     public virtual IvfepisodeTransfer? IvfepisodeTransfer { get; set; }

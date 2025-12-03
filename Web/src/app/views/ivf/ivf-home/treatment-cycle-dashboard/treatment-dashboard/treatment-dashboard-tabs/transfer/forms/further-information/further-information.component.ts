@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { QuillModule, QuillEditorComponent } from 'ngx-quill';
@@ -11,6 +11,9 @@ import { QuillModule, QuillEditorComponent } from 'ngx-quill';
   styleUrl: './further-information.component.scss'
 })
 export class FurtherInformationComponent {
+  @Input() catheterOptions: Array<{ valueId: number; name: string }> = [];
+  @Input() mainOptions: Array<{ valueId: number; name: string }> = [];
+  @Input() furtherOptions: Array<{ valueId: number; name: string }> = [];
   severalAttempts = false;
   attempts: number | null = null;
 

@@ -13,7 +13,8 @@ public partial class IvfepisodeAspirationOocyteRetrieval
     [Key]
     public long OocyteRetrievalId { get; set; }
 
-    public long AspirationId { get; set; }
+    [Required]
+    public long? AspirationId { get; set; }
 
     public DateTime? RetrievalDate { get; set; }
 
@@ -69,10 +70,6 @@ public partial class IvfepisodeAspirationOocyteRetrieval
     [InverseProperty("IvfepisodeAspirationOocyteRetrievalAnesthetist")]
     public virtual Hremployee? Anesthetist { get; set; }
 
-    [ForeignKey("AspirationId")]
-    [InverseProperty("IvfepisodeAspirationOocyteRetrieval")]
-    public virtual IvftreatmentEpisodeAspirationStage Aspiration { get; set; } = null!;
-
     [ForeignKey("EmbryologistId")]
     [InverseProperty("IvfepisodeAspirationOocyteRetrievalEmbryologist")]
     public virtual Hremployee? Embryologist { get; set; }
@@ -84,6 +81,9 @@ public partial class IvfepisodeAspirationOocyteRetrieval
     [ForeignKey("FurtherMeasureCategoryId")]
     [InverseProperty("IvfepisodeAspirationOocyteRetrievalFurtherMeasureCategory")]
     public virtual DropdownConfiguration? FurtherMeasureCategory { get; set; }
+
+    [InverseProperty("Aspiration")]
+    public virtual IvftreatmentEpisodeAspirationStage? IvftreatmentEpisodeAspirationStage { get; set; }
 
     [ForeignKey("NurseId")]
     [InverseProperty("IvfepisodeAspirationOocyteRetrievalNurse")]

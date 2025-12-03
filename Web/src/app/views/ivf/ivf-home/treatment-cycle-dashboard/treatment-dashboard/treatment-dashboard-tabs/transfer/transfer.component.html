@@ -25,7 +25,7 @@
                             <label class="form-label mb-1">Operating clinician</label>
                             <select class="form-select form-select-sm" formControlName="operatingClinician">
                                 <option value="">Select</option>
-                                <option>Elbothy, Ahmed Dr.</option>
+                                <option *ngFor="let emp of hrEmployees" [value]="emp.providerId">{{ emp.name }}</option>
                             </select>
                         </div>
 
@@ -33,6 +33,7 @@
                             <label class="form-label mb-1">Nurse</label>
                             <select class="form-select form-select-sm" formControlName="nurse">
                                 <option value="">Select</option>
+                                <option *ngFor="let emp of hrEmployees" [value]="emp.providerId">{{ emp.name }}</option>
                             </select>
                         </div>
 
@@ -40,12 +41,12 @@
 
                         <div class="col-xl-3 col-lg-4 col-md-6">
                             <label class="form-label mb-1">Date of 2. transfer</label>
-                            <input type="date" class="form-control form-control-sm" />
+                            <input type="date" class="form-control form-control-sm" formControlName="dateOfSecTransfer" />
                         </div>
 
                         <div class="col-xl-3 col-lg-4 col-md-6 align-self-center">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="electiveSingleEmbryoTransfer">
+                                <input class="form-check-input" type="checkbox" id="electiveSingleEmbryoTransfer" formControlName="electiveSingleEmbryoTransfer">
                                 <label class="form-check-label" for="electiveSingleEmbryoTransfer">Elective single
                                     embryo transfer</label>
                             </div>
@@ -53,9 +54,9 @@
 
                         <div class="col-xl-3 col-lg-4 col-md-6">
                             <label class="form-label mb-1">Embryologist</label>
-                            <select class="form-select form-select-sm">
+                            <select class="form-select form-select-sm" formControlName="embryologistId">
                                 <option value="">Select</option>
-                                <option>Lteif, Lorene</option>
+                                <option *ngFor="let emp of hrEmployees" [value]="emp.providerId">{{ emp.name }}</option>
                             </select>
                         </div>
                     </div>
@@ -70,7 +71,7 @@
                     <strong>Embryo in transfer</strong>
                 </div>
                 <div class="card-body">
-                    <app-embryo-transfer [embryos]="embryosList"></app-embryo-transfer>
+                    <app-embryo-transfer [embryos]="embryosList" [scoreOptions]="options('Score')"></app-embryo-transfer>
                 </div>
             </div>
         </div>
@@ -81,7 +82,11 @@
                     <strong>Further information</strong>
                 </div>
                 <div class="card-body">
-                    <app-further-information></app-further-information>
+                    <app-further-information
+                      [catheterOptions]="options('Catheter')"
+                      [mainOptions]="options('MainCompilation')"
+                      [furtherOptions]="options('FurtherComplication')"
+                    ></app-further-information>
                 </div>
             </div>
         </div>
