@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, ViewChild, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -17,6 +17,7 @@ import { GenericPaginationComponent } from '@/app/shared/generic-pagination/gene
 import { AllergyDto} from '@/app/shared/Models/Clinical/allergy.model'
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
 import { ClinicalActivityService } from '@/app/shared/Services/clinical-activity.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 declare var flatpickr: any;
 
@@ -35,6 +36,8 @@ declare var flatpickr: any;
 })
 
 export class AllergiesComponent implements OnInit, AfterViewInit {
+  @Input() clinicalnote: boolean = false;
+  @ViewChild('allergyModal') allergyModal!: TemplateRef<any>;
   private focusFirstInvalidControl(): void {
     try {
       setTimeout(() => {
@@ -93,6 +96,16 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
         console.warn('resetForm failed', e);
       }
     }
+
+  openModal(): void {
+    this.resetForm();
+    this.modalService.open(this.allergyModal, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static'
+    });
+  }
+
   ngAfterViewInit(): void {
     // Initialize date pickers after view is ready
     this.initDatePickers();
@@ -237,7 +250,8 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
     private ClinicalApiService: ClinicalApiService,
     private loader: LoaderService,
     private PatientData: PatientBannerService,
-    private clinicalActivityService: ClinicalActivityService) { }
+    private clinicalActivityService: ClinicalActivityService,
+    private modalService: NgbModal) { }
   statusOptions = [{ id: 1, name: "Active" }, { id: 0, name: "InActive" }];
 
 
@@ -374,7 +388,7 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
       return;
     }
     // this.loader.show();
-     
+
     await this.ClinicalApiService.GetPatientAllergyData(mrno, this.pagegination.currentPage, this.pagegination.pageSize ).then((res: any) => {
       console.log('res', res);
       // this.loader.hide();
@@ -549,7 +563,7 @@ submit() {
     this.DropFilled();
     this.GetPatientAllergyData();
     this.isSubmitting = false;
-    
+
     // Emit clinical activity
     const providerName = this.hrEmployees.find(p => p.providerId === formValue.providerId)?.name || 'Unknown Provider';
     const allergyTypeName = this.GetAlergy?.find((a: any) => a.alergyTypeId === formValue.allergyType)?.alergyName || formValue.allergyType;
@@ -564,7 +578,10 @@ submit() {
       details: payload,
       summary: `${allergyTypeName} - ${formValue.allergen} (${formValue.reaction || 'No reaction noted'}) - Severity: ${severityName || 'Not specified'}`
     });
-    
+
+    // Close modal after successful submission
+    this.modalService.dismissAll();
+
     Swal.fire('Success', 'Allergies Successfully Created', 'success');
   }).catch((error: any) => {
     this.isSubmitting = false;
@@ -692,7 +709,7 @@ submit() {
 
 
 editAllergy(allergy: any) {
-   
+
   console.log('Editing Allergy:', allergy);
   this.buttonText = 'Update';
   this.id = allergy.allergyId;
@@ -705,6 +722,13 @@ editAllergy(allergy: any) {
     startDate: this.formatDateYMDForInput(allergy.startDate),
     endDate: this.formatDateYMDForInput(allergy.endDate),
     status: allergy.status === 'Active' ? 1 : 0
+  });
+
+  // Open modal for editing
+  this.modalService.open(this.allergyModal, {
+    size: 'xl',
+    centered: true,
+    backdrop: 'static'
   });
 }
 

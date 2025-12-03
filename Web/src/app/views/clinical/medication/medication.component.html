@@ -1,240 +1,18 @@
-<form *ngIf="MedicationForm" [formGroup]="MedicationForm">
-    <div class="card shadow-lg rounded-3 border-0">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
+<form *ngIf="MedicationForm  " [formGroup]="MedicationForm">
+    <div  class="card shadow-lg rounded-3 border-0">
+        <div class="card-header d-flex justify-content-between align-items-center py-2">
+            <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2 text-center w-100">
                 <!-- <lucide-angular [img]="headingIcon" class="fs-5"></lucide-angular> -->
                 <span>{{ 'MEDICATION' | translate }}</span>
             </h5>
-            <i class="bi bi-heart-pulse fs-4"></i>
+            <button type="button" class="btn btn-primary btn-sm position-absolute end-0 me-3" (click)="openMedicationModal()">
+                <i class="bi bi-plus-lg me-1"></i>{{ 'ADD' | translate }}
+            </button>
         </div>
 
-        <div class="row p-2">
-            <div class="row">
-                <div class="col-12 mt-1 mb-2">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" formControlName="isProviderCheck"
-                            id="isProviderCheck" style="height: 20px; width: 20px;" />
-                        <label class="form-check-label me-2 ms-2 mt-1" for="isProviderCheck">
-                            {{ 'PROVIDER_OUTSIDE_CLINIC' | translate }}
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3">
-                <div class="mb-1" *ngIf="MedicationForm.get('isProviderCheck')?.value == true">
-                    <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }} <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" formControlName="providerDescription"
-                        placeholder="{{ 'ENTER_PROVIDER' | translate }}" />
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('providerDescription')?.touched || submitted) && MedicationForm.get('providerDescription')?.invalid">
-                        {{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
-                </div>
-
-
-                <div class="mb-1" *ngIf="MedicationForm.get('isProviderCheck')?.value == false">
-                    <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }} <span class="text-danger">*</span></label>
-                    <select class="form-select" formControlName="providerId">
-                        <option [ngValue]="null" disabled>{{'SELECT_PROVIDER' | translate}}</option>
-                        <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}
-                        </option>
-                    </select>
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('providerId')?.touched || submitted) && MedicationForm.get('providerId')?.invalid">
-                        {{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{'RX' | translate}} <span class="text-danger">*</span></label>
-
-                    <div class="input-group">
-                        <input type="text" class="form-control" formControlName="rx"
-                            placeholder="{{ 'ENTER_RX' | translate }}" />
-                        <button class="btn btn-success" type="button" (click)="ClickRx(standardModal)">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </div>
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('rx')?.touched || submitted) && MedicationForm.get('rx')?.invalid">
-                        {{ 'RX_IS_REQUIRED' | translate }}</div>
-
-                </div>
-            </div>
-
-
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'DOSE' | translate }} <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" formControlName="dose"
-                        placeholder="{{ 'ENTER_DOSE' | translate }}" />
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('dose')?.touched || submitted) && MedicationForm.get('dose')?.invalid">
-                        {{ 'DOSE_IS_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'ROUTE' | translate }} <span class="text-danger">*</span></label>
-                    <select class="form-select" formControlName="route">
-                        <option [ngValue]="null" disabled>{{'SELECT_ROUTE' | translate}}</option>
-                        <option *ngFor="let route of GetRoute" [value]="route.routeId">{{ route.name }}
-                        </option>
-                    </select>
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('route')?.touched || submitted) && MedicationForm.get('route')?.invalid">
-                        {{ 'ROUTE_IS_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'START_DATE' | translate }} <span class="text-danger">*</span></label>
-                    <input type="date" class="form-control" formControlName="startDate" [attr.min]="todayStr" />
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('startDate')?.touched || submitted) && MedicationForm.get('startDate')?.invalid">
-                        {{ 'START_DATE_IS_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'STOP_DATE' | translate }} <span class="text-danger">*</span></label>
-                    <input type="date" class="form-control" formControlName="stopDate"
-                        [attr.min]="MedicationForm.get('startDate')?.value || null"
-                        [disabled]="MedicationForm.get('status')?.value !== 'Inactive'" />
-                    <div class="text-danger small"
-                        *ngIf="MedicationForm.get('stopDate')?.touched && MedicationForm.get('stopDate')?.invalid">{{
-                        'STOP_DATE_REQUIRED' | translate }}</div>
-                    <div class="text-danger small"
-                        *ngIf="MedicationForm.get('stopDate')?.touched && MedicationForm.get('startDate')?.value && MedicationForm.get('stopDate')?.value && (MedicationForm.get('stopDate')?.value < MedicationForm.get('startDate')?.value)">
-                        {{ 'STOP_DATE_NOT_LESS_THAN_START' | translate }}
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'DURATION_DAYS' | translate }} <span class="text-danger">*</span></label>
-                    <input type="number" class="form-control" formControlName="durationDays"
-                        placeholder="{{ 'ENTER_DURATION_DAYS' | translate }}" />
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('durationDays')?.touched || submitted) && MedicationForm.get('durationDays')?.invalid">
-                        {{ 'DURATION_DAYS_IS_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'FREQUENCY' | translate }} <span class="text-danger">*</span></label>
-                    <select class="form-select" formControlName="frequency">
-                        <option [ngValue]="null" disabled>{{'SELECT_FREQUENCY' | translate}}</option>
-                        <option *ngFor="let frequency of getfrequency" [value]="frequency.frequencyId">{{
-                            frequency.name }}
-                        </option>
-                    </select>
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('frequency')?.touched || submitted) && MedicationForm.get('frequency')?.invalid">
-                        {{ 'FREQUENCY_IS_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-            <!-- <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'WEIGHT' | translate }} <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" formControlName="weight"
-                        placeholder="{{ 'ENTER_WEIGHT' | translate }}" />
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('weight')?.touched || submitted) && MedicationForm.get('weight')?.invalid">
-                        {{ 'WEIGHT_IS_REQUIRED' | translate }}</div>
-                </div>
-            </div> -->
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'GIVEN_BY' | translate }} <span class="text-danger">*</span></label>
-                    <select class="form-select" formControlName="givenBy">
-                        <option [ngValue]="null" disabled>{{'SELECT_GIVEN_BY' | translate}}</option>
-                        <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}
-                        </option>
-                    </select>
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('givenBy')?.touched || submitted) && MedicationForm.get('givenBy')?.invalid">
-                        {{ 'GIVEN_BY_IS_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'GIVEN_DATE' | translate }} <span class="text-danger">*</span></label>
-                    <input type="date" class="form-control" formControlName="givenDate" [attr.min]="todayStr" />
-                    <div class="text-danger small"
-                        *ngIf="MedicationForm.get('givenDate')?.touched && MedicationForm.get('givenDate')?.invalid">{{
-                        'GIVEN_DATE_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'CHECKED_BY' | translate }} <span class="text-danger">*</span></label>
-                    <select class="form-select" formControlName="checkedBy">
-                        <option [ngValue]="null" disabled>{{'SELECT_CHECKED_BY' | translate}}</option>
-                        <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}
-                        </option>
-                    </select>
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('checkedBy')?.touched || submitted) && MedicationForm.get('checkedBy')?.invalid">
-                        {{ 'CHECKED_BY_IS_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'CHECKED_DATE' | translate }} <span class="text-danger">*</span></label>
-                    <input type="date" class="form-control" formControlName="checkedDate" [attr.min]="todayStr" />
-                    <div class="text-danger small"
-                        *ngIf="MedicationForm.get('checkedDate')?.touched && MedicationForm.get('checkedDate')?.invalid">
-                        {{
-                        'CHECKED_DATE_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-            <div class="col-lg-3">
-                <div class="mb-1">
-                    <label class="form-label fw-semibold">{{ 'COMMENT' | translate }}</label>
-                    <select class="form-select" formControlName="comments">
-                        <option [ngValue]="null" disabled>{{'SELECT_COMMENTS' | translate}}</option>
-                        <option *ngFor="let comment of getComments" [value]="comment.id">{{ comment.name
-                            }}
-                        </option>
-                    </select>
-                    <div class="text-danger small"
-                        *ngIf="(MedicationForm.get('comments')?.touched || submitted) && MedicationForm.get('comments')?.invalid">
-                        {{ 'COMMENT_IS_REQUIRED' | translate }}</div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 ms-auto mt-3">
-                <div class="d-flex justify-content-end gap-2 mt-2">
-                    <button type="button" class="btn btn-secondary" (click)="onClear()">{{ 'CLEAR' | translate
-                        }}</button>
-                    <button type="submit" class="btn btn-success" (click)="onSubmit()" [disabled]="isSubmitting">
-                        <span *ngIf="isSubmitting">
-                            <span class="spinner-border spinner-border-sm me-1 ms-1" role="status" aria-hidden="true"></span>
-                            {{ 'SUBMITTING' | translate }}
-                        </span>
-                        <span *ngIf="!isSubmitting">{{ 'SAVE' | translate }}</span>
-                    </button>
-                </div>
-            </div>
-
-
-        </div>
     </div>
+
+    <!-- Modal Template -->
 
     <div class="card mt-3">
         <div class="card-body">
@@ -262,7 +40,7 @@
                                 </thead>
                                 <tbody class="table-group-divider text-center">
                                     <tr *ngFor="let record of currentMedicationData">
-                                        @if(record.providerName){ 
+                                        @if(record.providerName){
                                         <td>{{ record.providerName || '-' }}</td>
                                         }
                                         @else{
@@ -306,7 +84,7 @@
                             <table class="table table-bordered table-striped table-sm">
                                 <thead>
                                     <tr class="text-center">
-                                        
+
                                         <th>{{ 'PROVIDER' | translate }}</th>
                                         <th style="width: 250px; min-width: 250px; max-width: 250px;">{{ 'RX' | translate }}</th>
                                         <th>{{ 'DOSE' | translate }}</th>
@@ -323,7 +101,7 @@
                                 </thead>
                                 <tbody class="table-group-divider text-center">
                                     <tr *ngFor="let record of PastMedicationData">
-                                        @if(record.providerName){ 
+                                        @if(record.providerName){
                                         <td>{{ record.providerName || '-' }}</td>
                                         }
                                         @else{
@@ -354,9 +132,9 @@
                                 </tbody>
                             </table>
                         </div>
-                        <app-generic-pagination 
+                        <app-generic-pagination
                             [totalItems]="PastMedicationTotalItems"
-                            [pageSize]="PastMedicationPaginationInfo?.RowsPerPage" 
+                            [pageSize]="PastMedicationPaginationInfo?.RowsPerPage"
                             [currentPage]="PastMedicationPaginationInfo?.Page"
                             (pageChanged)="onPastMedicationPageChanged($event)">
                         </app-generic-pagination>
@@ -436,4 +214,218 @@
         </div>
 
     </form>
+</ng-template>
+
+<!-- Medication Modal Template -->
+<ng-template #medicationModal let-modal>
+    <div class="modal-header py-2">
+        <h5 class="modal-title w-100 text-center">{{ 'MEDICATION' | translate }}</h5>
+        <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body py-3">
+        <div class="row">
+            <div class="row">
+                <div class="col-12 mt-1 mb-2">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" formControlName="isProviderCheck"
+                            id="isProviderCheck" style="height: 20px; width: 20px;" />
+                        <label class="form-check-label me-2 ms-2 mt-1" for="isProviderCheck">
+                            {{ 'PROVIDER_OUTSIDE_CLINIC' | translate }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1" *ngIf="MedicationForm.get('isProviderCheck')?.value == true">
+                    <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }} <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" formControlName="providerDescription"
+                        placeholder="{{ 'ENTER_PROVIDER' | translate }}" />
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('providerDescription')?.touched || submitted) && MedicationForm.get('providerDescription')?.invalid">
+                        {{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
+                </div>
+
+                <div class="mb-1" *ngIf="MedicationForm.get('isProviderCheck')?.value == false">
+                    <label class="form-label fw-semibold">{{ 'PROVIDER' | translate }} <span class="text-danger">*</span></label>
+                    <select class="form-select" formControlName="providerId">
+                        <option [ngValue]="null" disabled>{{'SELECT_PROVIDER' | translate}}</option>
+                        <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('providerId')?.touched || submitted) && MedicationForm.get('providerId')?.invalid">
+                        {{ 'PROVIDER_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{'RX' | translate}} <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" formControlName="rx"
+                            placeholder="{{ 'ENTER_RX' | translate }}" />
+                        <button class="btn btn-success" type="button" (click)="ClickRx(standardModal)">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('rx')?.touched || submitted) && MedicationForm.get('rx')?.invalid">
+                        {{ 'RX_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'DOSE' | translate }} <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" formControlName="dose"
+                        placeholder="{{ 'ENTER_DOSE' | translate }}" />
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('dose')?.touched || submitted) && MedicationForm.get('dose')?.invalid">
+                        {{ 'DOSE_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'ROUTE' | translate }} <span class="text-danger">*</span></label>
+                    <select class="form-select" formControlName="route">
+                        <option [ngValue]="null" disabled>{{'SELECT_ROUTE' | translate}}</option>
+                        <option *ngFor="let route of GetRoute" [value]="route.routeId">{{ route.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('route')?.touched || submitted) && MedicationForm.get('route')?.invalid">
+                        {{ 'ROUTE_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'START_DATE' | translate }} <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" formControlName="startDate" [attr.min]="todayStr" />
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('startDate')?.touched || submitted) && MedicationForm.get('startDate')?.invalid">
+                        {{ 'START_DATE_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'STOP_DATE' | translate }} <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" formControlName="stopDate"
+                        [attr.min]="MedicationForm.get('startDate')?.value || null"
+                        [disabled]="MedicationForm.get('status')?.value !== 'Inactive'" />
+                    <div class="text-danger small"
+                        *ngIf="MedicationForm.get('stopDate')?.touched && MedicationForm.get('stopDate')?.invalid">{{
+                        'STOP_DATE_REQUIRED' | translate }}</div>
+                    <div class="text-danger small"
+                        *ngIf="MedicationForm.get('stopDate')?.touched && MedicationForm.get('startDate')?.value && MedicationForm.get('stopDate')?.value && (MedicationForm.get('stopDate')?.value < MedicationForm.get('startDate')?.value)">
+                        {{ 'STOP_DATE_NOT_LESS_THAN_START' | translate }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'DURATION_DAYS' | translate }} <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" formControlName="durationDays"
+                        placeholder="{{ 'ENTER_DURATION_DAYS' | translate }}" />
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('durationDays')?.touched || submitted) && MedicationForm.get('durationDays')?.invalid">
+                        {{ 'DURATION_DAYS_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'FREQUENCY' | translate }} <span class="text-danger">*</span></label>
+                    <select class="form-select" formControlName="frequency">
+                        <option [ngValue]="null" disabled>{{'SELECT_FREQUENCY' | translate}}</option>
+                        <option *ngFor="let frequency of getfrequency" [value]="frequency.frequencyId">{{
+                            frequency.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('frequency')?.touched || submitted) && MedicationForm.get('frequency')?.invalid">
+                        {{ 'FREQUENCY_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'GIVEN_BY' | translate }} <span class="text-danger">*</span></label>
+                    <select class="form-select" formControlName="givenBy">
+                        <option [ngValue]="null" disabled>{{'SELECT_GIVEN_BY' | translate}}</option>
+                        <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('givenBy')?.touched || submitted) && MedicationForm.get('givenBy')?.invalid">
+                        {{ 'GIVEN_BY_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'GIVEN_DATE' | translate }} <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" formControlName="givenDate" [attr.min]="todayStr" />
+                    <div class="text-danger small"
+                        *ngIf="MedicationForm.get('givenDate')?.touched && MedicationForm.get('givenDate')?.invalid">{{
+                        'GIVEN_DATE_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'CHECKED_BY' | translate }} <span class="text-danger">*</span></label>
+                    <select class="form-select" formControlName="checkedBy">
+                        <option [ngValue]="null" disabled>{{'SELECT_CHECKED_BY' | translate}}</option>
+                        <option *ngFor="let provider of hrEmployees" [value]="provider.providerId">{{ provider.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('checkedBy')?.touched || submitted) && MedicationForm.get('checkedBy')?.invalid">
+                        {{ 'CHECKED_BY_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'CHECKED_DATE' | translate }} <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" formControlName="checkedDate" [attr.min]="todayStr" />
+                    <div class="text-danger small"
+                        *ngIf="MedicationForm.get('checkedDate')?.touched && MedicationForm.get('checkedDate')?.invalid">
+                        {{ 'CHECKED_DATE_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">{{ 'COMMENT' | translate }}</label>
+                    <select class="form-select" formControlName="comments">
+                        <option [ngValue]="null" disabled>{{'SELECT_COMMENTS' | translate}}</option>
+                        <option *ngFor="let comment of getComments" [value]="comment.id">{{ comment.name }}
+                        </option>
+                    </select>
+                    <div class="text-danger small"
+                        *ngIf="(MedicationForm.get('comments')?.touched || submitted) && MedicationForm.get('comments')?.invalid">
+                        {{ 'COMMENT_IS_REQUIRED' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="col-12 mt-3">
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" (click)="onClear()">{{ 'CLEAR' | translate }}</button>
+                    <button type="submit" class="btn btn-success" (click)="onSubmit()" [disabled]="isSubmitting">
+                        <span *ngIf="isSubmitting">
+                            <span class="spinner-border spinner-border-sm me-1 ms-1" role="status" aria-hidden="true"></span>
+                            {{ 'SUBMITTING' | translate }}
+                        </span>
+                        <span *ngIf="!isSubmitting">{{ Id ? 'UPDATE' : 'SAVE' }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </ng-template>

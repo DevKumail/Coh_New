@@ -1,12 +1,26 @@
 <form [formGroup]="ImmunizationForm">
-  <div class="card shadow-lg rounded-3 border-0">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-        <!-- <lucide-angular [img]="headingIcon" class="fs-5"></lucide-angular> -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div style="width: 150px;"></div>
+    <h5 class="modal-title d-inline-flex align-items-center gap-2 m-0">
+      <i class="bi bi-heart-pulse"></i>
+      <span>{{ 'IMMUNIZATION' | translate }}</span>
+    </h5>
+    <button type="button" class="btn btn-primary" (click)="openModal()">
+      <i class="bi bi-plus-circle"></i> {{ 'ADD_IMMUNIZATION' | translate }}
+    </button>
+  </div>
+
+  <!-- Modal -->
+  <ng-template #immunizationModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title d-inline-flex align-items-center gap-2">
+        <i class="bi bi-heart-pulse"></i>
         <span>{{ 'IMMUNIZATION' | translate }}</span>
       </h5>
-      <i class="bi bi-heart-pulse fs-4"></i>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
     </div>
+
+    <div class="modal-body">
     <div class="row p-3 g-2">
       <div class="col-12 d-flex align-items-center">
         <input type="checkbox" class="form-check-input" id="providerOutside" formControlName="isProviderCheck"
@@ -14,7 +28,7 @@
         <label class="form-check-label ms-2" for="providerOutside">Provider Outside Clinic</label>
       </div>
 
-      
+
           <!-- [class.is-invalid]="ImmunizationForm.get('providerId')?.invalid && ImmunizationForm.get('providerId')?.touched" -->
       <div class="col-md-3 col-sm-4 col-12">
         <label class="form-label">Provider <span class="text-danger">*</span></label>
@@ -23,21 +37,21 @@
           <option [ngValue]="null">Provider</option>
           <option *ngFor="let p of hrEmployees" [ngValue]="p.providerId">{{ p.name }}</option>
         </select>
-        <div *ngIf="!ImmunizationForm.get('isProviderCheck')?.value && ImmunizationForm.get('providerId')?.invalid && ImmunizationForm.get('providerId')?.touched" 
+        <div *ngIf="!ImmunizationForm.get('isProviderCheck')?.value && ImmunizationForm.get('providerId')?.invalid && ImmunizationForm.get('providerId')?.touched"
              class="invalid-feedback d-block">
           Provider is required
         </div>
-        
+
           <!-- [class.is-invalid]="ImmunizationForm.get('providerDescription')?.invalid && ImmunizationForm.get('providerDescription')?.touched"  -->
         <input *ngIf="ImmunizationForm.get('isProviderCheck')?.value" class="form-control" type="text"
           placeholder="Enter Provider / Nurse Name" formControlName="providerDescription"/>
-        <div *ngIf="ImmunizationForm.get('isProviderCheck')?.value && ImmunizationForm.get('providerDescription')?.invalid && ImmunizationForm.get('providerDescription')?.touched" 
+        <div *ngIf="ImmunizationForm.get('isProviderCheck')?.value && ImmunizationForm.get('providerDescription')?.invalid && ImmunizationForm.get('providerDescription')?.touched"
              class="invalid-feedback d-block">
           Provider name is required
         </div>
       </div>
 
-      
+
                 <!-- [class.is-invalid]="ImmunizationForm.get('immTypeId')?.invalid && ImmunizationForm.get('immTypeId')?.touched" -->
       <div class="col-md-3 col-sm-4 col-12">
           <label class="form-label">Type <span class="text-danger">*</span></label>
@@ -45,7 +59,7 @@
           <option [ngValue]="null" disabled>Type</option>
           <option *ngFor="let t of getImmunization" [ngValue]="t.immTypeId">{{ t.immTypeName }}</option>
         </select>
-        <div *ngIf="ImmunizationForm.get('immTypeId')?.invalid && ImmunizationForm.get('immTypeId')?.touched" 
+        <div *ngIf="ImmunizationForm.get('immTypeId')?.invalid && ImmunizationForm.get('immTypeId')?.touched"
              class="invalid-feedback d-block">
           Type is required
         </div>
@@ -107,7 +121,7 @@
         </select>
       </div>
 
- 
+
 
       <div class="col-md-3 col-sm-4 col-12">
         <label class="form-label">Comments</label>
@@ -136,7 +150,9 @@
         </div>
       </div>
     </div>
-  </div>
+    </div>
+  </ng-template>
+
   <div class="card p-2" [formGroup]="ImmunizationForm">
     <div class="row align-items-end">
       <div class="col-lg-4 col-md-4 col-sm-6">
@@ -165,7 +181,7 @@
         </thead>
         <tbody class="table-group-divider text-center">
           <tr *ngFor="let data of ImmunizationData">
-            @if(data.fullName){ 
+            @if(data.fullName){
               <td>{{ data.fullName || '-' }}</td>
             }
             @else{
@@ -194,7 +210,7 @@
         </tbody>
       </table>
 
-      <app-generic-pagination 
+      <app-generic-pagination
             [totalItems]="totalimmunizationCount"
             [pageSize]="paginationInfo?.PageSize"
             [currentPage]="paginationInfo?.PageNumber"

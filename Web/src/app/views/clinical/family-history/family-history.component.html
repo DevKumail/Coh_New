@@ -1,15 +1,25 @@
 <form *ngIf="FamilyForm" [formGroup]="FamilyForm">
-  <div class="card shadow-lg rounded-3 border-0">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-        <span>{{ 'FAMILY_HISTORY' | translate }}</span>
-      </h5>
+  <!-- Add button visible ly when clinicalnote is true -->
+  <div class="d-flex justify-content-center align-items-center mb-2 position-relative">
+    <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
       <i class="bi bi-heart-pulse fs-4"></i>
+      <span>{{ 'FAMILY_HISTORY' | translate }}</span>
+    </h5>
+    <button type="button" class="btn btn-primary position-absolute end-0" (click)="openAddModal(addFamilyHistoryModal)">
+      <i class="bi bi-plus-lg"></i> {{ 'ADD' | translate }}
+    </button>
+  </div>
+
+  <!-- Modal template that reuses the existing form UI -->
+  <ng-template #addFamilyHistoryModal let-modal>
+    <div class="modal-header py-2">
+      <h5 class="modal-title">{{ 'FAMILY_HISTORY' | translate }}</h5>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('cross')"></button>
     </div>
-    <div class="card-body">
+    <div class="modal-body py-3">
       <div class="row g-2">
 
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-6">
           <label class="form-label fw-semibold">{{ 'RELATIONSHIP' | translate }} <span class="text-danger">*</span></label>
           <select class="form-select" formControlName="Relationship">
             <option [ngValue]="null" disabled>{{ 'SELECT_RELATIONSHIP' | translate }}</option>
@@ -20,7 +30,7 @@
             {{ 'RELATIONSHIP_IS_REQUIRED' | translate }}</div>
         </div>
 
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-6">
           <label class="form-label fw-semibold">{{ 'PROBLEM' | translate }} <span class="text-danger">*</span></label>
           <select class="form-select" formControlName="Problem">
             <option [ngValue]="null" disabled>{{ 'SELECT_PROBLEM' | translate }}</option>
@@ -31,28 +41,23 @@
             {{ 'PROBLEM_IS_REQUIRED' | translate }}</div>
         </div>
 
+        <div class="col-12">
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" (click)="resetForm()">
+              <i class="bi bi-arrow-counterclockwise"></i> {{ 'CLEAR' | translate }}
+            </button>
 
+            <button type="button" class="btn btn-success" [disabled]="isSubmitting" (click)="submit(); modal.close('save')">
+              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              {{ isSubmitting ? ('SUBMITTING' | translate) : ('SAVE' | translate) }}
+            </button>
+          </div>
+        </div>
 
-       <div class="col-md-6 col-lg-3 mt-3">
-        
-        <div class="d-flex justify-content-end mt-3 ">
-      <button type="button" class="btn btn-secondary" (click)="resetForm()">
-        <i class="bi bi-arrow-counterclockwise"></i> {{ 'CLEAR' | translate }}
-      </button>
-
-      <button type="button" class="btn btn-success ms-2" [disabled]="isSubmitting" (click)="submit()">
-        <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        {{ isSubmitting ? ('SUBMITTING' | translate) : ('SAVE' | translate) }}
-      </button>
-       </div>
-
-    </div>
       </div>
     </div>
+  </ng-template>
 
-    <!-- Buttons -->
-
-  </div>
 
   <div class="card mt-3">
     <div class="card-body">
@@ -89,10 +94,10 @@
         </table>
       </div>
 
-      <app-generic-pagination 
-      [totalItems]="FamilyHistoryTotalItems" 
+      <app-generic-pagination
+      [totalItems]="FamilyHistoryTotalItems"
       [pageSize]="pagegination.pageSize"
-      [currentPage]="pagegination.currentPage" 
+      [currentPage]="pagegination.currentPage"
       (pageChanged)="onFamilyHistoryPageChanged($event)">
       </app-generic-pagination>
     </div>

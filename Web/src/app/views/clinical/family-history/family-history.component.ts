@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
@@ -21,12 +22,14 @@ import { tablerArrowWaveLeftDown } from '@ng-icons/tabler-icons';
     TranslatePipe,
     NgIcon,
     FilledOnValueDirective,
-    GenericPaginationComponent
+    GenericPaginationComponent,
+    NgbModalModule
   ],
   templateUrl: './family-history.component.html',
   styleUrls: ['./family-history.component.scss']
 })
 export class FamilyHistoryComponent {
+  @Input() clinicalnote: boolean = false;
   FamilyForm!: FormGroup;
   pagegination: any = {
     currentPage: 1,
@@ -48,6 +51,7 @@ export class FamilyHistoryComponent {
     private fb: FormBuilder,
     private ClinicalApiService: ClinicalApiService,
     private PatientData: PatientBannerService,
+    private modalService: NgbModal,
   ) { }
 
   // Custom validator: only null is invalid (0 is allowed)
@@ -106,7 +110,7 @@ export class FamilyHistoryComponent {
   FillDropDown(response: any) {
     let jParse = JSON.parse(JSON.stringify(response)).cache;
     let relationships = JSON.parse(jParse).RegRelationShip;
-  
+
     if (relationships) {
       relationships = relationships.map(
         (item: { RelationshipId: any; Relationship: any }) => {
@@ -217,6 +221,10 @@ export class FamilyHistoryComponent {
   }
 })
 }
+
+  openAddModal(content: any) {
+    this.modalService.open(content, { centered: true, size: 'md' });
+  }
 
   editFamilyHistory(data: any){
     this.id = data.fhid;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
@@ -8,6 +8,7 @@ import { distinctUntilChanged, filter, Subscription } from 'rxjs';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { NgIconComponent } from '@ng-icons/core';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -25,6 +26,8 @@ import Swal from 'sweetalert2';
   styleUrls: ['./immunizations.component.scss']
 })
 export class ImmunizationsComponent implements OnInit {
+  @Input() clinicalnote: boolean = false;
+  @ViewChild('immunizationModal') immunizationModal!: TemplateRef<any>;
   buttonText = 'Save';
   ImmunizationForm!: FormGroup;
   providers: any[] = [];
@@ -54,14 +57,15 @@ export class ImmunizationsComponent implements OnInit {
   constructor(
     private clinical: ClinicalApiService,
     private fb: FormBuilder,
-    private PatientData: PatientBannerService
+    private PatientData: PatientBannerService,
+    private modalService: NgbModal
   ) { }
 
   ngOnInit(): void {
     // Get current date in yyyy-MM-dd format
     const today = new Date();
-    const currentDate = today.getFullYear() + '-' + 
-                        String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+    const currentDate = today.getFullYear() + '-' +
+                        String(today.getMonth() + 1).padStart(2, '0') + '-' +
                         String(today.getDate()).padStart(2, '0');
 
     // Build Reactive Form mirroring Medication style
@@ -97,7 +101,7 @@ export class ImmunizationsComponent implements OnInit {
         // Set MRNO from banner
         this.Mrno = this.SearchPatientData?.table2?.[0]?.mrNo || '';
         this.PatientId = this.SearchPatientData?.table2?.[0]?.patientId || '';
-        // After assigning, 
+        // After assigning,
         this.GetPatientImmunizationData();
       });
 
@@ -160,7 +164,16 @@ export class ImmunizationsComponent implements OnInit {
   }
 
 
-   private setProviderFromSelectedVisit(): void {
+   openModal(): void {
+    this.DropFilled();
+    this.modalService.open(this.immunizationModal, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static'
+    });
+  }
+
+  private setProviderFromSelectedVisit(): void {
     try {
       if (!this.ImmunizationForm) { return; }
       const empId = this.SelectedVisit?.employeeId;
@@ -303,14 +316,14 @@ onEdit(data: any) {
   DropFilled() {
     // Get current date in yyyy-MM-dd format
     const today = new Date();
-    const currentDate = today.getFullYear() + '-' + 
-                        String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+    const currentDate = today.getFullYear() + '-' +
+                        String(today.getMonth() + 1).padStart(2, '0') + '-' +
                         String(today.getDate()).padStart(2, '0');
 
     this.ImmunizationForm.reset();
-    this.ImmunizationForm.patchValue({ 
-      status: 1, 
-      ActiveStatus: 1, 
+    this.ImmunizationForm.patchValue({
+      status: 1,
+      ActiveStatus: 1,
       isProviderCheck: false,
       startDate: currentDate // Reset to current date
     });
@@ -377,6 +390,7 @@ onEdit(data: any) {
       .InsertOrUpdatePatientImmunization(payload)
       .then(() => {
         this.DropFilled();
+        this.modalService.dismissAll();
         Swal.fire({
           icon: 'success',
           title: 'Success',

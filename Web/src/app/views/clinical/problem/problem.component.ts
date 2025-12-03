@@ -1,6 +1,5 @@
-
 import { ClinicalApiService } from './../clinical.api.service';
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild, Input } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -33,7 +32,8 @@ import { distinctUntilChanged, filter, Subscription } from 'rxjs';
   templateUrl: './problem.component.html',
   styleUrl: './problem.component.scss'
 })
-export class ProblemComponent {
+export class ProblemComponent implements OnInit {
+    @Input() clinicalnote: boolean = false;
     private patientDataSubscription!: Subscription;
   datePipe = new DatePipe('en-US');
   favoritesForm!: FormGroup;
@@ -50,6 +50,7 @@ export class ProblemComponent {
   modalService = new NgbModal();
   ModalFilterForm!: FormGroup;
   // @ViewChild('problemModal') problemModal: any;
+  @ViewChild('problemListModal') problemListModal!: TemplateRef<any>;
   id: any;
   // DescriptionFilter: any;
   providerList: any[] = [];
@@ -146,7 +147,7 @@ MHPaginationInfo: any = {
     private fb: FormBuilder,
     private clinicalApiService: ClinicalApiService,
      private loader: LoaderService,
-        private PatientData: PatientBannerService, 
+        private PatientData: PatientBannerService,
   ) { }
 
 
@@ -183,7 +184,7 @@ MHPaginationInfo: any = {
     this.patientDataSubscription = this.PatientData.patientData$
           .pipe(
             filter((data: any) => !!data?.table2?.[0]?.mrNo),
-            distinctUntilChanged((prev, curr) => 
+            distinctUntilChanged((prev, curr) =>
               prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
             )
           )
@@ -194,8 +195,8 @@ MHPaginationInfo: any = {
             // After assigning, load problems
             this.GetPatientProblemData();
             const mrno = this.Mrno;
-    
-    
+
+
           });
 
         this.PatientData.selectedVisit$.subscribe((data: any) => {
@@ -210,13 +211,13 @@ MHPaginationInfo: any = {
       providerId: [null, Validators.required],
       problem: ['', Validators.required],
       comments: [''],
-      status: ['Active', Validators.required],  
+      status: ['Active', Validators.required],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
-      providerName: [''], 
+      providerName: [''],
       providerDescription:[''],
       isConfidentential: [false],
-      isProviderCheck: [false] 
+      isProviderCheck: [false]
     });
 
     // Ensure provider defaults from SelectedVisit right after form init
@@ -291,9 +292,9 @@ MHPaginationInfo: any = {
       description: ['']
     });
     this.Problems.ActiveStatus = 1
- 
+
     this.FillCache();
-    this.GetPatientProblemData();    
+    this.GetPatientProblemData();
 
     // Enforce endDate rules based on status and startDate (UI + Reactive validation)
 const endDateCtrl = this.medicalForm.get('endDate');
@@ -340,7 +341,7 @@ minDateValidator(otherControlName: string) {
   };
 }
 
-// // // // PROBLEM WORK START // // // // 
+// // // // PROBLEM WORK START // // // //
   async GetPatientProblemData() {
   // this.loader.show();
   this.medicalHistoryData = [];
@@ -379,7 +380,7 @@ editproblem(record: any) {
     icD9Code :  record?.icD9,
     descriptionFull : record?.icD9Description,
     icdVersionId : record?.icdVersionID,
-  }    
+  }
     this.medicalForm.patchValue(
       {
         providerId: record?.providerId,
@@ -395,6 +396,11 @@ editproblem(record: any) {
     }else{
       this.medicalForm.get('status')?.setValue('Inactive');
     }
+    this.modalService.open(this.problemListModal, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static'
+    });
 }
 
 onPROBSubmit() {
@@ -418,7 +424,7 @@ onPROBSubmit() {
       // });
       return;
     }
-     
+
 
     const formData = this.medicalForm.value;
     console.log('medicalForm =>',this.medicalForm.value);
@@ -443,7 +449,7 @@ onPROBSubmit() {
       status: status || 0,
       createdBy: this.currentUser || 0,
       updatedBy: this.currentUser || 0,
-      mrno:  this.SearchPatientData?.table2?.[0]?.mrNo || 0,                           
+      mrno:  this.SearchPatientData?.table2?.[0]?.mrNo || 0,
       patientId: this.SearchPatientData?.table2?.[0]?.patientId || 0,
       activeStatus: 1,
       active: true,
@@ -477,6 +483,7 @@ onPROBSubmit() {
       this.id = 0;
       this.GetPatientProblemData();
       this.onPROBClear();
+      this.modalService.dismissAll();
     }).catch((error: any) => {
       Swal.fire({
         icon: 'error',
@@ -486,6 +493,15 @@ onPROBSubmit() {
       console.error('Submission error:', error);
     }).finally(() => {
       this.isSubmitting = false;
+    });
+  }
+
+  openProblemListModal(): void {
+    this.onPROBClear();
+    this.modalService.open(this.problemListModal, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static'
     });
   }
 
@@ -503,9 +519,9 @@ onPROBClear(){
     status: '',
     startDate: this.todayStr,
     endDate: '',
-    providerName: '', 
+    providerName: '',
     isConfidentential: false,
-    isProviderCheck: false 
+    isProviderCheck: false
   })
   this.medicalForm.markAsPristine();
   this.medicalForm.markAsUntouched();
@@ -528,11 +544,11 @@ onPROBClear(){
     Swal.fire({
       icon: 'success',
       title: 'Deleted Successfully',
-    })  
+    })
     this.loader.hide();
       console.log(this.DiagnosisCode, 'this.DiagnosisCode');
 
-    })      
+    })
   } else if (result.dismiss === Swal.DismissReason.cancel) {
         Swal.fire(
           'Cancelled',
@@ -544,12 +560,12 @@ onPROBClear(){
 
     this.loader.hide();
   }
-// // // // PROBLEM WORK END // // // // 
+// // // // PROBLEM WORK END // // // //
 
 
 
-// // // // DROPDOWN WORK // // // // 
-  async FillCache() { 
+// // // // DROPDOWN WORK // // // //
+  async FillCache() {
     await this.clinicalApiService.getCacheItems({ entities: this.cacheItems }).then((response: any) => {
       if (response.cache != null) {
         this.FillDropDown(response);
@@ -565,7 +581,7 @@ onPROBClear(){
       })
   }
   FillDropDown(response: any) {
-     
+
     let jParse = JSON.parse(JSON.stringify(response)).cache;
     let provider = JSON.parse(jParse).Provider;
     let iCDVersion = JSON.parse(jParse).BLICDVersion;
@@ -590,7 +606,7 @@ onPROBClear(){
             code: item.ICDVersionId,
           };
         });
-       
+
       const item = {
         name: 'ALL',
         code: 0,
@@ -601,7 +617,7 @@ onPROBClear(){
       console.log(this.ICDVersions);
     }
   }
-// // // // DROPDOWN WORK END // // // // 
+// // // // DROPDOWN WORK END // // // //
 
 
 // // // // MODAL WORK START // // // //
@@ -650,8 +666,8 @@ ModalSearchDiagnosis() {
     this.ModalFilterForm.value.icdVersionId || 0,
     this.ModalPaginationInfo.Page,
     this.ModalPaginationInfo.RowsPerPage,
-    this.ModalFilterForm.value.startingCode, 
-    this.ModalFilterForm.value.diagnosisEndCode, 
+    this.ModalFilterForm.value.startingCode,
+    this.ModalFilterForm.value.diagnosisEndCode,
     this.ModalFilterForm.value.descriptionFilter,
   ).then((response: any) => {
     this.DiagnosisCode = response?.table1 || [];
@@ -679,7 +695,7 @@ ClickFilter(modalRef: TemplateRef<any>) {
 onRowSelect(diagnosis: any, modal: any) {
   this.medicalForm.patchValue({ problem: diagnosis?.descriptionFull });
   this.selectedDiagnosis = diagnosis;
-  modal.close(diagnosis); 
+  modal.close(diagnosis);
 }
 onModalDiagnosisPageChanged(page: number){
   this.ModalPaginationInfo.Page = page;
@@ -688,14 +704,14 @@ onModalDiagnosisPageChanged(page: number){
 // // // // MODAL WORK END // // // //
 
 
-// // // // FAV WORK START // // // // 
+// // // // FAV WORK START // // // //
 async onFAVSearch() {
   this.loader.show();
   const ICDVersionId = this.favoritesForm.value.icdVersionId || 0;
   const DiagnosisStartCode = this.favoritesForm.value.startingCode || '';
   const DiagnosisEndCode = this.favoritesForm.value.endingCode || '';
   const DescriptionFilter = this.favoritesForm.value.description || '';
-  const PageNumber = this.PaginationInfo.Page || 1; 
+  const PageNumber = this.PaginationInfo.Page || 1;
   const PageSize = this.PaginationInfo.RowsPerPage || 5;
 
   await this.clinicalApiService.DiagnosisCodebyProvider(ICDVersionId, PageNumber, PageSize, DiagnosisStartCode, DiagnosisEndCode, DescriptionFilter).then((response: any) => {
@@ -722,5 +738,5 @@ async onFAVClear(){
   this.PaginationInfo.RowsPerPage = 5;
   await this.onFAVSearch();
 }
-// // // // FAV WORK END // // // // 
+// // // // FAV WORK END // // // //
 }

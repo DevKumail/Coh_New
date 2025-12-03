@@ -1,347 +1,17 @@
 <form *ngIf="procedureForm" [formGroup]="procedureForm">
     <div class="card shadow-lg rounded-3 border-0">
-        <div
-            class="card-header d-flex justify-content-between align-items-center"
-        >
-            <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
+        <div class="card-header d-flex justify-content-between align-items-center py-2">
+            <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2 text-center w-100">
                 <!-- <lucide-angular [img]="headingIcon" class="fs-5"></lucide-angular> -->
                 <span>{{ "PROCEDURE" | translate }}</span>
             </h5>
-            <i class="bi bi-heart-pulse fs-4"></i>
-        </div>
-
-        <div class="card-body">
-            <!-- FORM SECTION -->
-            <!-- <div class="row">
-      <div class="col-12" style="margin-top: -20px;">
-        <div class="form-check">
-          <input type="checkbox" class="form-check-input" formControlName="isProviderCheck" id="isProviderCheck"
-            (change)="onCheckboxChange()" style="height: 20px; width: 20px;" />
-          <label class="form-check-label" for="isProviderCheck" style="margin-bottom: -22px;">
-            Provider Outside Clinic
-          </label>
-        </div>
-      </div>
-    </div> -->
-
-            <div class="row">
-                <div class="row">
-                    <div class="col-12 mt-1 mb-1">
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                class="form-check-input"
-                                formControlName="isProviderCheck"
-                                id="isProviderCheck"
-                                style="height: 20px; width: 20px"
-                            />
-                            <label
-                                class="form-check-label me-2 ms-2 mt-1"
-                                for="isProviderCheck"
-                            >
-                                {{ "PROVIDER_OUTSIDE_CLINIC" | translate }}
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3">
-                    <div
-                        class="mb-3"
-                        *ngIf="
-                            procedureForm.get('isProviderCheck')?.value == true
-                        "
-                    >
-                        <label class="form-label fw-semibold">{{
-                            "PROVIDER" | translate
-                        }}</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            formControlName="providerName"
-                            placeholder="{{ 'ENTER_PROVIDER' | translate }}"
-                        />
-                        <div
-                            class="text-danger small"
-                            *ngIf="
-                                (procedureForm.get('providerName')?.touched ||
-                                    submitted) &&
-                                procedureForm.get('providerName')?.invalid
-                            "
-                        >
-                            {{ "PROVIDER_IS_REQUIRED" | translate }}
-                        </div>
-                    </div>
-
-                    <div
-                        class="mb-3"
-                        *ngIf="
-                            procedureForm.get('isProviderCheck')?.value == false
-                        "
-                    >
-                        <label class="form-label fw-semibold"
-                            >{{ "PROVIDER" | translate }}
-                            <span class="text-danger">*</span>
-                        </label>
-                        <select
-                            class="form-select"
-                            formControlName="providerId"
-                        >
-                            <option [ngValue]="null" disabled>
-                                {{ "SELECT_PROVIDER" | translate }}
-                            </option>
-                            <option
-                                *ngFor="let provider of hrEmployees"
-                                [value]="provider.providerId"
-                            >
-                                {{ provider.name }}
-                            </option>
-                        </select>
-                        <div
-                            class="text-danger small"
-                            *ngIf="
-                                (procedureForm.get('providerId')?.touched ||
-                                    submitted) &&
-                                procedureForm.get('providerId')?.invalid
-                            "
-                        >
-                            {{ "PROVIDER_IS_REQUIRED" | translate }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3">
-                    <div class="mb-3">
-                        <label class="form-label"
-                            >{{ "PROCEDURE" | translate }}
-                            <span class="text-danger">*</span></label
-                        >
-
-                        <div class="input-group">
-                            <input
-                                type="text"
-                                class="form-control"
-                                formControlName="procedure"
-                                placeholder="{{
-                                    'ENTER_PROCEDURE' | translate
-                                }}"
-                            />
-                            <button
-                                class="btn btn-success"
-                                type="button"
-                                (click)="ClickFilter(standardModal)"
-                            >
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </div>
-                        <div
-                            class="text-danger small"
-                            *ngIf="
-                                (procedureForm.get('procedure')?.touched ||
-                                    submitted) &&
-                                procedureForm.get('procedure')?.invalid
-                            "
-                        >
-                            {{ "PROCEDURE_IS_REQUIRED" | translate }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3">
-                    <div class="mb-3">
-                        <label class="form-label">{{
-                            "COMMENT" | translate
-                        }}</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            formControlName="comments"
-                            placeholder="{{ 'ENTER_COMMENT' | translate }}"
-                        />
-                        <!-- <div class="text-danger small" *ngIf="(procedureForm.get('comments')?.touched || submitted) && procedureForm.get('comments')?.invalid">{{ 'COMMENT_IS_REQUIRED' | translate }}</div> -->
-                    </div>
-                </div>
-
-                <div class="col-lg-3">
-                    <!-- <div class="form-check mt-2">
-                        <input
-                            type="checkbox"
-                            class="form-check-input"
-                            formControlName="isConfidentential"
-                            id="confidential"
-                            style="height: 20px; width: 20px"
-                        />
-                        <label
-                            class="form-check-label me-2 ms-2"
-                            for="confidential"
-                        >
-                            {{ "CONFIDENTIAL" | translate }}
-                        </label>
-                    </div> -->
-
-                    <div class="form-check mt-4">
-                        <input
-                            type="checkbox"
-                            class="form-check-input"
-                            formControlName="isPerformedOnFacility"
-                            id="PerformedOnFacility"
-                            style="height: 20px; width: 20px"
-                        />
-                        <label
-                            class="form-check-label me-2 ms-2"
-                            for="PerformedOnFacility"
-                        >
-                            {{ "PERFORMED_ON_FACILITY" | translate }}
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-
-            <div class="col-lg-3">
-                    <div class="mb-3">
-                        <label class="form-label"
-                            >{{ "PROCEDURE_TYPE" | translate }}
-                            <span class="text-danger">*</span></label>
-                        <select class="form-select" formControlName="procedureType">
-                            <option value="" disabled selected>
-                                {{ "SELECT_TYPE" | translate }}
-                            </option>
-                              <option
-                                *ngFor="let t of type"
-                                [value]="t.id">
-                                {{ t.name }}
-                            </option>
-                        </select>
-                        <div
-                            class="text-danger small"
-                            *ngIf="
-                                (procedureForm.get('procedureType')?.touched ||
-                                    submitted) &&
-                                procedureForm.get('procedureType')?.invalid">
-                            {{ "PROCEDURE_TYPE_IS_REQUIRED" | translate }}
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="col-lg-3">
-                    <div class="mb-3">
-                        <label class="form-label"
-                            >{{ "STATUS" | translate }}
-                            <span class="text-danger">*</span></label
-                        >
-                        <select class="form-select" formControlName="status">
-                            <option value="" disabled selected>
-                                {{ "SELECT_STATUS" | translate }}
-                            </option>
-                            <option value="Active">{{ "Active" }}</option>
-                            <option value="Inactive">{{ "InActive" }}</option>
-                        </select>
-                        <div
-                            class="text-danger small"
-                            *ngIf="
-                                (procedureForm.get('status')?.touched ||
-                                    submitted) &&
-                                procedureForm.get('status')?.invalid
-                            "
-                        >
-                            {{ "STATUS_IS_REQUIRED" | translate }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3">
-                    <div class="mb-3">
-                        <label class="form-label"
-                            >{{ "START_DATE" | translate }}
-                            <span class="text-danger">*</span></label
-                        >
-                        <input
-                            type="date"
-                            class="form-control"
-                            formControlName="startDate"
-                            [attr.min]="todayStr"
-                        />
-                        <div
-                            class="text-danger small"
-                            *ngIf="
-                                (procedureForm.get('startDate')?.touched ||
-                                    submitted) &&
-                                procedureForm.get('startDate')?.invalid
-                            "
-                        >
-                            {{ "START_DATE_IS_REQUIRED" | translate }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3">
-                    <div class="mb-3">
-                        <label class="form-label">{{
-                            "END_DATE" | translate
-                        }}</label>
-                        <input
-                            type="date"
-                            class="form-control"
-                            formControlName="endDate"
-                            [attr.min]="
-                                procedureForm.get('startDate')?.value || null
-                            "
-                            [disabled]="
-                                procedureForm.get('status')?.value !==
-                                'Inactive'
-                            "
-                        />
-                        <div
-                            class="text-danger small"
-                            *ngIf="
-                                procedureForm.get('endDate')?.touched &&
-                                procedureForm.get('endDate')?.invalid
-                            "
-                        >
-                            {{ "END_DATE_REQUIRED" | translate }}
-                        </div>
-                        <div
-                            class="text-danger small"
-                            *ngIf="
-                                procedureForm.get('endDate')?.touched &&
-                                procedureForm.get('startDate')?.value &&
-                                procedureForm.get('endDate')?.value &&
-                                procedureForm.get('endDate')?.value <
-                                    procedureForm.get('startDate')?.value
-                            "
-                        >
-                            {{ "END_DATE_NOT_LESS_THAN_START" | translate }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 ms-auto mt-2">
-                    <div class="d-flex justify-content-end gap-2 mt-3">
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            (click)="onClear()"
-                        >
-                            {{ "CLEAR" | translate }}
-                        </button>
-                        <button
-                            type="submit"
-                            class="btn btn-success"
-                            (click)="onSubmit()"
-                            [disabled]="isSubmitting"
-                        >
-                            <span *ngIf="isSubmitting">
-                                <span class="spinner-border spinner-border-sm me-1 ms-1" role="status" aria-hidden="true"></span>
-                                {{ 'SUBMITTING' | translate }}
-                            </span>
-                            <span *ngIf="!isSubmitting">{{ 'SAVE' | translate }}</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <button
+                type="button"
+                class="btn btn-primary btn-sm position-absolute end-0 me-3"
+                (click)="openProcedureModal()"
+            >
+                <i class="bi bi-plus-lg me-1"></i>{{ 'ADD' | translate }}
+            </button>
         </div>
     </div>
 </form>
@@ -389,7 +59,7 @@
                                 @if (record.provider) {
                                     <td>{{ record.provider || "-" }}</td>
                                 } @else {
-                                    <td>{{ record.providerName || "-" }} 
+                                    <td>{{ record.providerName || "-" }}
                                     <br> (Out Side Clinic)
                                     </td>
                                 }
@@ -723,4 +393,311 @@
             </div>
         </div>
     </form>
+</ng-template>
+
+<!-- Procedure Modal Template -->
+<ng-template #procedureModal let-modal>
+    <div class="modal-header py-2">
+        <h5 class="modal-title w-100 text-center">{{ "PROCEDURE" | translate }}</h5>
+        <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body py-3">
+        <div class="row">
+            <div class="row">
+                <div class="col-12 mt-1 mb-1">
+                    <div class="form-check">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            formControlName="isProviderCheck"
+                            id="isProviderCheck"
+                            style="height: 20px; width: 20px"
+                        />
+                        <label
+                            class="form-check-label me-2 ms-2 mt-1"
+                            for="isProviderCheck"
+                        >
+                            {{ "PROVIDER_OUTSIDE_CLINIC" | translate }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div
+                    class="mb-3"
+                    *ngIf="
+                        procedureForm.get('isProviderCheck')?.value == true
+                    "
+                >
+                    <label class="form-label fw-semibold">{{
+                        "PROVIDER" | translate
+                    }}</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="providerName"
+                        placeholder="{{ 'ENTER_PROVIDER' | translate }}"
+                    />
+                    <div
+                        class="text-danger small"
+                        *ngIf="
+                            (procedureForm.get('providerName')?.touched ||
+                                submitted) &&
+                            procedureForm.get('providerName')?.invalid
+                        "
+                    >
+                        {{ "PROVIDER_IS_REQUIRED" | translate }}
+                    </div>
+                </div>
+
+                <div
+                    class="mb-3"
+                    *ngIf="
+                        procedureForm.get('isProviderCheck')?.value == false
+                    "
+                >
+                    <label class="form-label fw-semibold"
+                        >{{ "PROVIDER" | translate }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <select
+                        class="form-select"
+                        formControlName="providerId"
+                    >
+                        <option [ngValue]="null" disabled>
+                            {{ "SELECT_PROVIDER" | translate }}
+                        </option>
+                        <option
+                            *ngFor="let provider of hrEmployees"
+                            [value]="provider.providerId"
+                        >
+                            {{ provider.name }}
+                        </option>
+                    </select>
+                    <div
+                        class="text-danger small"
+                        *ngIf="
+                            (procedureForm.get('providerId')?.touched ||
+                                submitted) &&
+                            procedureForm.get('providerId')?.invalid
+                        "
+                    >
+                        {{ "PROVIDER_IS_REQUIRED" | translate }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-3">
+                    <label class="form-label"
+                        >{{ "PROCEDURE" | translate }}
+                        <span class="text-danger">*</span></label
+                    >
+
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            class="form-control"
+                            formControlName="procedure"
+                            placeholder="{{
+                                'ENTER_PROCEDURE' | translate
+                            }}"
+                        />
+                        <button
+                            class="btn btn-success"
+                            type="button"
+                            (click)="ClickFilter(standardModal)"
+                        >
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <div
+                        class="text-danger small"
+                        *ngIf="
+                            (procedureForm.get('procedure')?.touched ||
+                                submitted) &&
+                            procedureForm.get('procedure')?.invalid
+                        "
+                    >
+                        {{ "PROCEDURE_IS_REQUIRED" | translate }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-3">
+                    <label class="form-label">{{
+                        "COMMENT" | translate
+                    }}</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        formControlName="comments"
+                        placeholder="{{ 'ENTER_COMMENT' | translate }}"
+                    />
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="form-check mt-4">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        formControlName="isPerformedOnFacility"
+                        id="PerformedOnFacility"
+                        style="height: 20px; width: 20px"
+                    />
+                    <label
+                        class="form-check-label me-2 ms-2"
+                        for="PerformedOnFacility"
+                    >
+                        {{ "PERFORMED_ON_FACILITY" | translate }}
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-3">
+                    <label class="form-label"
+                        >{{ "PROCEDURE_TYPE" | translate }}
+                        <span class="text-danger">*</span></label>
+                    <select class="form-select" formControlName="procedureType">
+                        <option value="" disabled selected>
+                            {{ "SELECT_TYPE" | translate }}
+                        </option>
+                        <option
+                            *ngFor="let t of type"
+                            [value]="t.id">
+                            {{ t.name }}
+                        </option>
+                    </select>
+                    <div
+                        class="text-danger small"
+                        *ngIf="
+                            (procedureForm.get('procedureType')?.touched ||
+                                submitted) &&
+                            procedureForm.get('procedureType')?.invalid">
+                        {{ "PROCEDURE_TYPE_IS_REQUIRED" | translate }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-3">
+                    <label class="form-label"
+                        >{{ "STATUS" | translate }}
+                        <span class="text-danger">*</span></label
+                    >
+                    <select class="form-select" formControlName="status">
+                        <option value="" disabled selected>
+                            {{ "SELECT_STATUS" | translate }}
+                        </option>
+                        <option value="Active">{{ "Active" }}</option>
+                        <option value="Inactive">{{ "InActive" }}</option>
+                    </select>
+                    <div
+                        class="text-danger small"
+                        *ngIf="
+                            (procedureForm.get('status')?.touched ||
+                                submitted) &&
+                            procedureForm.get('status')?.invalid
+                        "
+                    >
+                        {{ "STATUS_IS_REQUIRED" | translate }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-3">
+                    <label class="form-label"
+                        >{{ "START_DATE" | translate }}
+                        <span class="text-danger">*</span></label
+                    >
+                    <input
+                        type="date"
+                        class="form-control"
+                        formControlName="startDate"
+                        [attr.min]="todayStr"
+                    />
+                    <div
+                        class="text-danger small"
+                        *ngIf="
+                            (procedureForm.get('startDate')?.touched ||
+                                submitted) &&
+                            procedureForm.get('startDate')?.invalid
+                        "
+                    >
+                        {{ "START_DATE_IS_REQUIRED" | translate }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="mb-3">
+                    <label class="form-label">{{
+                        "END_DATE" | translate
+                    }}</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        formControlName="endDate"
+                        [attr.min]="
+                            procedureForm.get('startDate')?.value || null
+                        "
+                        [disabled]="
+                            procedureForm.get('status')?.value !==
+                            'Inactive'
+                        "
+                    />
+                    <div
+                        class="text-danger small"
+                        *ngIf="
+                            procedureForm.get('endDate')?.touched &&
+                            procedureForm.get('endDate')?.invalid
+                        "
+                    >
+                        {{ "END_DATE_REQUIRED" | translate }}
+                    </div>
+                    <div
+                        class="text-danger small"
+                        *ngIf="
+                            procedureForm.get('endDate')?.touched &&
+                            procedureForm.get('startDate')?.value &&
+                            procedureForm.get('endDate')?.value &&
+                            procedureForm.get('endDate')?.value <
+                                procedureForm.get('startDate')?.value
+                        "
+                    >
+                        {{ "END_DATE_NOT_LESS_THAN_START" | translate }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mt-3">
+                <div class="d-flex justify-content-end gap-2">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        (click)="onClear()"
+                    >
+                        {{ "CLEAR" | translate }}
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                        (click)="onSubmit()"
+                        [disabled]="isSubmitting"
+                    >
+                        <span *ngIf="isSubmitting">
+                            <span class="spinner-border spinner-border-sm me-1 ms-1" role="status" aria-hidden="true"></span>
+                            {{ 'SUBMITTING' | translate }}
+                        </span>
+                        <span *ngIf="!isSubmitting">{{ id ? 'UPDATE' : 'SAVE' }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </ng-template>

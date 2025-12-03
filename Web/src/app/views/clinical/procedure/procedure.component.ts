@@ -7,6 +7,7 @@ import {
     TemplateRef,
     Input,
     OnDestroy,
+    ViewChild,
 } from '@angular/core';
 import {
     FormBuilder,
@@ -48,6 +49,7 @@ import { ClinicalActivityService } from '@/app/shared/Services/clinical-activity
     styleUrl: './procedure.component.scss',
 })
 export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
+    @ViewChild('procedureModal') procedureModal!: TemplateRef<any>;
     datePipe = new DatePipe('en-US');
     procedureForm!: FormGroup;
     submitted: boolean = false;
@@ -462,8 +464,17 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
             isProviderCheck: false,
         });
         this.submitted = false;
+        this.id = null;
     }
 
+    openProcedureModal() {
+        this.onClear();
+        this.modalService.open(this.procedureModal, {
+            size: 'xl',
+            centered: true,
+            backdrop: 'static'
+        });
+    }
     onSubmit() {
         if (this.procedureForm.invalid) {
             Swal.fire({
@@ -527,10 +538,10 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
             .SubmitPatientProcedure(problemPayload)
             .then((res: any) => {
                 console.log('my payload', res);
-                
+
                 // Emit clinical activity
-                const providerName = isOutside 
-                    ? formData.providerName 
+                const providerName = isOutside
+                    ? formData.providerName
                     : (this.hrEmployees.find((p: any) => p.providerId === formData.providerId)?.name || 'Unknown Provider');
                 const procedureTypeName = this.type.find(t => t.id === formData.procedureType)?.name || 'Unknown Type';
                 this.clinicalActivityService.addActivity({
@@ -543,7 +554,7 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
                     details: problemPayload,
                     summary: `${procedureTypeName} - ${formData.procedure} (Start: ${formData.startDate}${formData.endDate ? ', End: ' + formData.endDate : ''})`
                 });
-                
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Submitted Successfully',
@@ -552,6 +563,7 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
                 this.id = 0;
                 this.GetPatientProcedureData();
                 this.onClear();
+                this.modalService.dismissAll();
             })
             .catch((error: any) => {
                 Swal.fire({
@@ -849,6 +861,12 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
         } else {
             this.procedureForm.get('status')?.setValue('Inactive');
         }
+
+        this.modalService.open(this.procedureModal, {
+            size: 'xl',
+            centered: true,
+            backdrop: 'static'
+        });
     }
 
     onDelete(id: any) {
