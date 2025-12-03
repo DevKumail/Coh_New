@@ -1,12 +1,17 @@
 <form *ngIf="SocialForm" [formGroup]="SocialForm">
-  <div class="card shadow-lg rounded-3 border-0">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-        <span>{{ 'SOCIAL_HISTORY' | translate }}</span>
-      </h5>
-      <i class="bi bi-heart-pulse fs-4"></i>
+    <div class="card-header d-flex justify-content-center align-items-center position-relative py-1">
+      <h5 class="mb-0 fw-bold">{{ 'SOCIAL_HISTORY' | translate }}</h5>
+      <button type="button" class="btn btn-primary position-absolute end-0 me-3" (click)="openSocialHistoryModal()">
+        <i class="bi bi-plus-lg"></i> {{ 'ADD' | translate }}
+      </button>
     </div>
-    <div class="card-body">
+    <div class="card-body py-1">
+      <ng-template #socialHistoryModal let-modal>
+        <div class="modal-header py-2">
+          <h5 class="modal-title">{{ 'SOCIAL_HISTORY' | translate }}</h5>
+          <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+        </div>
+        <div class="modal-body py-3">
       <div class="row g-2">
 
         <div class="col-md-6 col-lg-3">
@@ -26,7 +31,7 @@
           <div class="mb-3">
             <label class="form-label fw-semibold">{{ 'START_DATE' | translate }} <span
                 class="text-danger">*</span></label>
-            <input type="date" class="form-control" formControlName="startDate" 
+            <input type="date" class="form-control" formControlName="startDate"
              />
              <!-- [attr.min]="todayStr" -->
             <div class="text-danger small"
@@ -34,9 +39,9 @@
                   'START_DATE_REQUIRED' | translate }}</div>
           </div>
         </div>
-        
+
         <!-- End Date -->
-        
+
         <div class="col-md-6 col-lg-3">
           <div class="mb-3">
             <label class="form-label">{{ 'END_DATE' | translate }}<span
@@ -53,7 +58,7 @@
           </div>
         </div>
        <div class="col-md-6 col-lg-3 mt-3">
-        
+
         <div class="d-flex justify-content-end mt-3 ">
       <button type="button" class="btn btn-secondary" (click)="resetForm()">
         <i class="bi bi-arrow-counterclockwise"></i> {{ 'CLEAR' | translate }}
@@ -61,17 +66,16 @@
 
       <button type="button" class="btn btn-success ms-2" [disabled]="isSubmitting" (click)="submit()">
         <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        {{ isSubmitting ? ('SUBMITTING' | translate) : ('SAVE' | translate) }}
+        {{ isSubmitting ? ('SUBMITTING' | translate) : (id ? ('UPDATE' | translate) : ('SAVE' | translate)) }}
       </button>
        </div>
 
     </div>
       </div>
+        </div>
+      </ng-template>
     </div>
 
-    <!-- Buttons -->
-
-  </div>
 
   <div class="card mt-3">
     <div class="card-body">
@@ -91,7 +95,7 @@
             <tr *ngFor="let data of SocialHistoryList; let i = index">
               <td>{{ data.shName || '-' }} </td>
             <td>{{ data.startDate ? (data.startDate | date:'dd/MM/yyyy') : '-' }}</td>
-            <td>{{ data.endDate ? (data.endDate | date:'dd/MM/yyyy') : '-' }}</td>  
+            <td>{{ data.endDate ? (data.endDate | date:'dd/MM/yyyy') : '-' }}</td>
             <td>{{ data.active  ? 'Active' : 'Inactive' }}</td>
               <td class="text-center" style="text-align: center;">
 
@@ -110,10 +114,10 @@
         </table>
       </div>
 
-      <app-generic-pagination 
-      [totalItems]="SocialHistoryTotalItems" 
+      <app-generic-pagination
+      [totalItems]="SocialHistoryTotalItems"
       [pageSize]="pagegination.pageSize"
-      [currentPage]="pagegination.currentPage" 
+      [currentPage]="pagegination.currentPage"
       (pageChanged)="onSocialHistoryPageChanged($event)">
       </app-generic-pagination>
     </div>

@@ -34,8 +34,8 @@ namespace HMIS.Application.DTOs.IVFDTOs
     public class IVFEpisodeTransferFurtherInformationDto
     {
         public int? CultureDays { get; set; }
-        public long? CathererCategoryId { get; set; }
-        public string? CathererAddition { get; set; }
+        public long? CatheterCategoryId { get; set; }
+        public string? CatheterAddition { get; set; }
 
         public long? MainCompilationCategoryId { get; set; }
         public long? FurtherComplicationCategoryId { get; set; }
@@ -43,7 +43,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public bool? SeveralAttempts { get; set; }
         public int? NoOfAttempts { get; set; }
         public bool? EmbryoGlue { get; set; }
-        public bool? DifficultCathererInsertion { get; set; }
+        public bool? DifficultCatheterInsertion { get; set; }
         public bool? CatheterChange { get; set; }
         public bool? MucusInCatheter { get; set; }
         public bool? BloodInCatheter { get; set; }

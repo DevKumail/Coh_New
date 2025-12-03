@@ -20,6 +20,8 @@ export class EmbryoTransferComponent implements OnChanges {
     score?: string | null;
   }> = [];
 
+  @Input() scoreOptions: Array<{ valueId: number; name: string }> = [];
+
   trackById = (_: number, e: { id: number | string }) => e.id;
 
   form: FormGroup;

@@ -51,11 +51,9 @@
           </div>
           <div class="col-auto d-flex align-items-center gap-2">
             <span class="fw-semibold">Score</span>
-            <select class="form-select form-select-sm" style="width:90px" formControlName="score">
+            <select class="form-select form-select-sm" style="width:120px" formControlName="score">
               <option [ngValue]="null">--</option>
-              <option>5AA</option>
-              <option>4AA</option>
-              <option>3AA</option>
+              <option *ngFor="let s of scoreOptions" [value]="s.valueId">{{ s.name }}</option>
             </select>
           </div>
         </div>

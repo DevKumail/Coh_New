@@ -12,9 +12,7 @@
       <label class="form-label mb-0">Catheter used</label>
       <select class="form-select form-select-sm" formControlName="catheterUsed">
         <option value="">Select</option>
-        <option>Cook</option>
-        <option>Wallace</option>
-        <option>Tomcat</option>
+        <option *ngFor="let opt of catheterOptions" [value]="opt.valueId">{{ opt.name }}</option>
       </select>
     </div>
 
@@ -27,9 +25,7 @@
       <label class="form-label mb-0">Main complication</label>
       <select class="form-select form-select-sm" formControlName="mainComplication">
         <option value="">Select</option>
-        <option>Cook</option>
-        <option>Wallace</option>
-        <option>Tomcat</option>
+        <option *ngFor="let opt of mainOptions" [value]="opt.valueId">{{ opt.name }}</option>
       </select>
     </div>
 
@@ -37,9 +33,7 @@
       <label class="form-label mb-0">Further complications</label>
       <select class="form-select form-select-sm" formControlName="furtherComplications">
         <option value="">Select</option>
-        <option>Cook</option>
-        <option>Wallace</option>
-        <option>Tomcat</option>
+        <option *ngFor="let opt of furtherOptions" [value]="opt.valueId">{{ opt.name }}</option>
       </select>
     </div>
 

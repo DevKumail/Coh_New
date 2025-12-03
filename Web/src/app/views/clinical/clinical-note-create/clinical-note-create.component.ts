@@ -4,10 +4,9 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl, SafeHtml } from '@angular/platform-browser';
 import { distinctUntilChanged, filter, Subscription } from 'rxjs';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
-import { QuestionItemComponent } from '../question-item/question-item.component';
 import { QuestionViewComponent } from '../question-view/question-view.component';
 import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
@@ -21,7 +20,6 @@ import { SharedService } from '@/app/shared/Services/Common/shared-service';
     ReactiveFormsModule,
     TranslatePipe,
     FilledOnValueDirective,
-    QuestionItemComponent,
     QuestionViewComponent
   ],
   selector: 'app-clinical-note-create',
@@ -415,7 +413,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
   }
 
   // collect filled answers from structured note tree
-  private collectFilledValues(): any {
+  public collectFilledValues(): any {
     if (!this.dataquestion?.node) return null;
     const clone = JSON.parse(JSON.stringify(this.dataquestion));
     if (clone.node?.questions) {
@@ -424,7 +422,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
     return clone;
   }
 
-  private collectQuestionValues(questions: Question[]): Question[] {
+  public collectQuestionValues(questions: Question[]): Question[] {
     return questions.map(q => ({
       ...q,
       answer: q.answer || '',
@@ -432,7 +430,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
     }));
   }
 
-  private generateHtmlFromStructuredNote(filledNote: any): string {
+  public generateHtmlFromStructuredNote(filledNote: any): string {
     if (!filledNote?.node) return '';
     let html = `<div class="clinical-note">`;
     html += `<h2 style="font-weight:bold;text-decoration:underline;">${filledNote.node.noteTitle}</h2>`;
@@ -441,34 +439,174 @@ export class ClinicalNoteCreateComponent implements OnInit {
     return html;
   }
 
-  private generateQuestionsHtml(questions: Question[]): string {
+  public generateQuestionsHtml(questions: Question[]): string {
     let html = '';
-    questions.forEach(q => {
-      if (q.type === 'Question Section') {
-        html += `<div style="margin-top:16px;"><h4 style="font-weight:bold;margin-left:10px;">${q.quest_Title}</h4>`;
-        if (q.children?.length) {
-          html += `<div style="display:flex;flex-wrap:wrap;margin-left:10px;">${this.generateQuestionsHtml(q.children)}</div>`;
+
+    questions.forEach(question => {
+      // Skip any question/section that has no filled data
+      if (!this.isSectionFilled(question)) {
+        return;
+      }
+
+      if (question.type === 'Question Section') {
+        html += `<div style="margin-top: 20px;">`;
+        html += `<h4 style="font-weight: bold; margin-left: 20px;">${question.quest_Title}</h4>`;
+
+        if (question.children && question.children.length > 0) {
+          html += `<div style="display: flex; flex-wrap: wrap; margin-left: 20px;">`;
+          html += this.generateQuestionsHtml(question.children);
+          html += `</div>`;
         }
         html += `</div>`;
-      } else {
-        html += `<div style="display:inline-block;width:calc(25% - 16px);margin:4px 8px 12px 8px;vertical-align:top;">`;
-        html += `<div style="font-size:12px;font-weight:600;text-transform:uppercase;">${q.quest_Title}</div>`;
-        if (q.type === 'CheckBox') {
-          html += `<div><input type="checkbox" ${q.answer ? 'checked' : ''} disabled /> <span>${q.answer || ''}</span></div>`;
-        } else {
-          html += `<div style="white-space:pre-wrap;">${q.answer || 'N/A'}</div>`;
-        }
+      } else if (question.type === 'TextBox') {
+        html += `<div style="display: inline-block; margin-right: 20px; margin-bottom: 15px; width: calc(25% - 20px); vertical-align: top;">`;
+        html += `<div style="margin-bottom: 5px;"><strong>${question.quest_Title}:</strong></div>`;
+        html += `<div>${question.answer || ''}</div>`;
         html += `</div>`;
-        if (q.children?.length) html += this.generateQuestionsHtml(q.children);
+      } else if (question.type === 'CheckBox') {
+        // Only show checkbox if it's checked (true)
+        if (question.answer === 'true' || question.answer === true) {
+          html += `<div style="display: inline-block; margin-right: 20px; margin-bottom: 15px; width: calc(25% - 20px); vertical-align: top;">`;
+          html += `<div><strong>${question.quest_Title}:</strong> Yes</div>`;
+          html += `</div>`;
+        }
+      }
+
+      if (question.children && question.children.length > 0 && question.type !== 'Question Section') {
+        html += this.generateQuestionsHtml(question.children);
       }
     });
+
     return html;
+  }
+
+  getFormattedNoteHtml(): SafeHtml {
+    const questions = this.dataquestion?.node?.questions || this.dataquestion?.questions || [];
+    const title = this.dataquestion?.node?.noteTitle || this.dataquestion?.noteTitle || '';
+
+    let html = `<h2 style="margin-top: 10px; font-weight: bold; margin-left: 10px; text-decoration-line: underline;">${title}</h2>`;
+
+    questions.forEach((section: any) => {
+      if (this.hasQuestionData(section)) {
+        html += this.formatQuestion(section, 10);
+      }
+    });
+
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  private formatQuestion(question: any, marginLeft: number): string {
+    let html = '';
+
+    if (!this.hasQuestionData(question)) {
+      return html;
+    }
+
+    if (question.type === 'Question Section') {
+      html += `<h3 style="font-weight: bold; margin-top: 15px; margin-left: ${marginLeft}px; font-size: 1rem;">${question.quest_Title}</h3>`;
+
+      if (question.answer && typeof question.answer === 'string' && question.answer.trim()) {
+        html += `<div style="margin-left: ${marginLeft + 20}px; margin-bottom: 10px;">${question.answer}</div>`;
+      }
+
+      if (question.children && question.children.length > 0) {
+        const filledChildren = question.children.filter((child: any) => this.hasQuestionData(child));
+
+        if (filledChildren.length > 0) {
+          filledChildren.forEach((child: any) => {
+            html += this.formatQuestion(child, marginLeft + 20);
+          });
+        }
+      }
+    } else if (question.type === 'TextBox') {
+      if (question.answer && typeof question.answer === 'string' && question.answer.trim()) {
+        html += `<div style="margin-left: ${marginLeft}px; margin-bottom: 10px;">`;
+        html += `<strong>${question.quest_Title}:</strong> ${question.answer}`;
+        html += '</div>';
+
+        if (question.children && question.children.length > 0) {
+          question.children.forEach((child: any) => {
+            if (this.hasQuestionData(child)) {
+              html += this.formatQuestion(child, marginLeft + 20);
+            }
+          });
+        }
+      }
+    } else if (question.type === 'CheckBox') {
+      // Only show if checkbox is checked (true)
+      if (question.answer === 'true' || question.answer === true) {
+        html += `<div style="margin-left: ${marginLeft}px; margin-bottom: 10px;">`;
+        html += `<strong>${question.quest_Title}:</strong> Yes`;
+        html += '</div>';
+
+        // Show children if they have data
+        if (question.children && question.children.length > 0) {
+          question.children.forEach((child: any) => {
+            if (this.hasQuestionData(child)) {
+              html += this.formatQuestion(child, marginLeft + 20);
+            }
+          });
+        }
+      }
+    }
+
+    return html;
+  }
+
+  private hasQuestionData(question: any): boolean {
+    // For checkboxes, only return true if checked
+    if (question.type === 'CheckBox') {
+      const isChecked = question.answer === 'true' || question.answer === true;
+      if (isChecked) {
+        return true;
+      }
+      // Check if any children have data
+      if (question.children && question.children.length > 0) {
+        return question.children.some((child: any) => this.hasQuestionData(child));
+      }
+      return false;
+    }
+
+    // For text fields, check if there's actual content
+    if (typeof question.answer === 'string' && question.answer.trim().length > 0) {
+      return true;
+    }
+
+    if (question.children && question.children.length > 0) {
+      return question.children.some((child: any) => this.hasQuestionData(child));
+    }
+
+    return false;
+  }
+
+  private isSectionFilled(question: Question): boolean {
+    // Check if the question itself has an answer
+    if (question.answer && question.answer.toString().trim() !== '') {
+      return true;
+    }
+
+    // For checkboxes, only consider filled if checked
+    if (question.type === 'CheckBox' && (question.answer === 'true' || question.answer === true)) {
+      return true;
+    }
+
+    // Check if any children have data
+    if (question.children && question.children.length > 0) {
+      return question.children.some(child => this.isSectionFilled(child));
+    }
+
+    return false;
+  }
+
+  hasAnyFilledData(): boolean {
+    const questions = this.nodeData?.node?.questions || this.nodeData?.questions || [];
+    return questions.some((q: any) => this.hasQuestionData(q));
   }
 
   // --- submit recorded voice (upload or offline save) -------------------
   submitVoice() {
     if (this.clinicalForm.invalid) {
-        Swal.fire('Error', 'Please fill all required fields.', 'error');
+      Swal.fire('Error', 'Please fill all required fields.', 'error');
       this.clinicalForm.markAllAsTouched();
       return;
     }
@@ -566,7 +704,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
         const offlinePayload = {
           ...basePayload
         };
-        // Offline save also includes filled template
         this.saveNoteOffline(offlinePayload);
         Swal.fire('Offline', 'Note saved offline and will be synced later.', 'info');
         this.loader.hide();
@@ -655,6 +792,6 @@ export interface Question {
   quest_Title: string;
   type: string;
   parent_Id: number;
-  answer: string;
+  answer: string | boolean;  // Updated to allow both string and boolean
   children: Question[];
 }

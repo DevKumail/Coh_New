@@ -1,6 +1,6 @@
 import { routes } from './../../../app.routes';
 import { EmailItemType } from '@/app/views/apps/email/types';
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, Input, ViewChild, TemplateRef } from '@angular/core';
 import {
     FormBuilder,
     FormGroup,
@@ -22,7 +22,6 @@ import { OnInit } from '@angular/core';
 import { Observable, ReplaySubject, Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
 import { NgxDaterangepickerBootstrapModule } from 'ngx-daterangepicker-bootstrap';
-import { ViewChild } from '@angular/core';
 import { NgxDaterangepickerBootstrapDirective } from 'ngx-daterangepicker-bootstrap';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { CounterDirective } from '@core/directive/counter.directive';
@@ -36,6 +35,7 @@ import { filter,distinctUntilChanged  } from 'rxjs/operators';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 
@@ -43,6 +43,7 @@ declare var flatpickr: any;
 
 @Component({
     selector: 'app-vital-signs',
+    standalone: true,
     imports: [
         CommonModule,
         ReactiveFormsModule,
@@ -61,6 +62,7 @@ declare var flatpickr: any;
 })
 
 export class VitalSignsComponent implements OnInit {
+  @Input() clinicalnote: boolean = false;
   vitalSignsForm!: FormGroup;
   SearchPatientData: any;
   patientDataSubscription!: Subscription;
@@ -99,12 +101,15 @@ bpSystolic = 0;
     } catch {}
   }
 
+  @ViewChild('vitalSignsModal') vitalSignsModal!: TemplateRef<any>;
+
   constructor(
     private fb: FormBuilder,
     private ClinicalApiService: ClinicalApiService,
     public Loader: LoaderService,
     private PatientData: PatientBannerService,
-    private router: Router
+    private router: Router,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -207,6 +212,15 @@ bpSystolic = 0;
   }
 
 
+openVitalSignsModal(): void {
+  this.clearForm();
+  this.modalService.open(this.vitalSignsModal, {
+    size: 'xl',
+    centered: true,
+    backdrop: 'static'
+  });
+}
+
 onSubmit() {
   this.isSubmitting = true;
   const form = this.vitalSignsForm;
@@ -289,6 +303,7 @@ onSubmit() {
       }).then(() => {
         this.clearForm();
         this.vitalSign();
+        this.modalService.dismissAll();
       });
     })
     .catch((err: any) => {
@@ -349,7 +364,7 @@ PageInfo: any = {
   Id: any;
 
   editVital(vital: any) {
- 
+
     this.Id = vital?.id;
     // Extract local date (YYYY-MM-DD) and time (HH:mm) from stored datetime
     const rawDateTime: any = vital?.entryDate ?? vital?.EntryDate ?? null;
@@ -389,6 +404,11 @@ PageInfo: any = {
         comment: vital?.comment,
         heartRate: vital?.heartrate,
         glucose: vital?.glucose,
+    });
+    this.modalService.open(this.vitalSignsModal, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static'
     });
 }
 

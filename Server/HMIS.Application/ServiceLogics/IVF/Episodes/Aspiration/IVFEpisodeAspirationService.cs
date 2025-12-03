@@ -138,7 +138,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Aspiration
             try
             {
                 var stage = await _db.IvftreatmentEpisodeAspirationStage
-                    .Include(a => a.IvfepisodeAspirationOocyteRetrieval)
+                    .Include(a => a.Aspiration)
                     .Include(a => a.IvfepisodeAspirationFurtherDetails)
                     .FirstOrDefaultAsync(a => a.AspirationId == aspirationId);
 
@@ -150,9 +150,9 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Aspiration
 
                 stage.IsDeleted = true;
 
-                if (stage.IvfepisodeAspirationOocyteRetrieval != null)
+                if (stage.Aspiration != null)
                 {
-                    stage.IvfepisodeAspirationOocyteRetrieval.IsDeleted = true;
+                    stage.Aspiration.IsDeleted = true;
                 }
 
                 if (stage.IvfepisodeAspirationFurtherDetails != null)
@@ -188,7 +188,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Aspiration
                 if (dto.AspirationId.HasValue && dto.AspirationId.Value > 0)
                 {
                     stage = await _db.IvftreatmentEpisodeAspirationStage
-                        .Include(a => a.IvfepisodeAspirationOocyteRetrieval)
+                        .Include(a => a.Aspiration)
                         .Include(a => a.IvfepisodeAspirationFurtherDetails)
                         .FirstOrDefaultAsync(a => a.AspirationId == dto.AspirationId.Value);
                 }
@@ -196,7 +196,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Aspiration
                 if (stage == null)
                 {
                     stage = await _db.IvftreatmentEpisodeAspirationStage
-                        .Include(a => a.IvfepisodeAspirationOocyteRetrieval)
+                        .Include(a => a.Aspiration)
                         .Include(a => a.IvfepisodeAspirationFurtherDetails)
                         .FirstOrDefaultAsync(a => a.IvfdashboardTreatmentCycleId == dto.IVFDashboardTreatmentCycleId.Value);
                 }
@@ -320,9 +320,9 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Aspiration
                 StatusId = stage.StatusId
             };
 
-            if (stage.IvfepisodeAspirationOocyteRetrieval != null)
+            if (stage.Aspiration != null)
             {
-                var o = stage.IvfepisodeAspirationOocyteRetrieval;
+                var o = stage.Aspiration;
                 dto.OocyteRetrieval = new IVFEpisodeAspirationOocyteRetrievalDto
                 {
                     OocyteRetrievalId = o.OocyteRetrievalId,

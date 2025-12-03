@@ -28,6 +28,7 @@ import { LoaderService } from '@core/services/loader.service';
 })
 export class ClinicalNoteComponent implements OnInit {
     SearchPatientData: any;
+    SelectedVisit: any;
     speechtotxt: any[] = [];
     pagegination: any = {
         pageSize: 10,
@@ -35,6 +36,7 @@ export class ClinicalNoteComponent implements OnInit {
       };
     clinicalnoteTotalItems: any= 0;
     private patientDataSubscription: Subscription | undefined;
+    private selectedVisitSubscription: Subscription | undefined;
     private destroy$ = new Subject<void>();
     private providersCache: any[] | null = null;
     private notesCache = new Map<number, any[]>();
@@ -78,6 +80,16 @@ export class ClinicalNoteComponent implements OnInit {
           console.log(' Subscription triggered with MRNO:', data?.table2?.[0]?.mrNo);
           this.SearchPatientData = data;
           this.speechtoText();
+        });
+
+        // Subscribe to selected visit to get provider info
+        this.selectedVisitSubscription = this.PatientData.selectedVisit$
+        .pipe(
+          takeUntil(this.destroy$)
+        )
+        .subscribe((visit: any) => {
+          this.SelectedVisit = visit;
+          console.log('Selected visit updated:', visit);
         });
 
         // Debounce provider changes to avoid excessive API calls
@@ -147,12 +159,15 @@ export class ClinicalNoteComponent implements OnInit {
   openNoteTypeModal(content: any) {
     this.modalForm.reset();
     this.clinicalNotes = [];
+    this.macroList = [];
     this.selectedNoteType = '';
     this.isProviderSelected = false;
 
     // Load providers from cache if available
     if (this.providersCache) {
       this.providers = this.providersCache;
+      // Auto-select provider from selected visit
+      this.setProviderFromSelectedVisit();
       this.cdr.markForCheck();
       this.modalService.open(content, {
         centered: true,
@@ -162,12 +177,35 @@ export class ClinicalNoteComponent implements OnInit {
       });
     } else {
       this.FillCache();
+      // Auto-select provider after cache loads
+      setTimeout(() => this.setProviderFromSelectedVisit(), 100);
       this.modalService.open(content, {
         centered: true,
         size: 'lg',
         scrollable: false,
         backdrop: 'static'
       });
+    }
+  }
+
+  private setProviderFromSelectedVisit(): void {
+    try {
+      if (!this.modalForm) { return; }
+      const empId = this.SelectedVisit?.employeeId;
+      if (!empId) { return; }
+      const exists = Array.isArray(this.providers)
+        ? this.providers.some((p: any) => String(p?.code) === String(empId))
+        : false;
+      const ctrl = this.modalForm.get('provider');
+      if (!ctrl || !exists) { return; }
+      // Set provider value which will trigger template fetch via valueChanges subscription
+      ctrl.setValue(empId, { emitEvent: true });
+      ctrl.markAsDirty();
+      ctrl.markAsTouched();
+      ctrl.updateValueAndValidity({ onlySelf: true });
+      console.log('Auto-selected provider from visit:', empId);
+    } catch (error) {
+      console.error('Error setting provider from visit:', error);
     }
   }
 
@@ -199,6 +237,15 @@ export class ClinicalNoteComponent implements OnInit {
     providerCtrl?.updateValueAndValidity();
     noteCtrl?.updateValueAndValidity();
     macroCtrl?.updateValueAndValidity();
+
+    // If provider is already selected, fetch templates for the new note type
+    const providerValue = providerCtrl?.value;
+    if (providerValue) {
+      const code = Number(providerValue) || 0;
+      console.log('Note type changed, refetching templates for provider:', code);
+      this.GetNotesEmployeeId(code);
+    }
+
     this.cdr.markForCheck();
   }
 
@@ -332,10 +379,13 @@ export class ClinicalNoteComponent implements OnInit {
 
   goBackToStep1() {
     this.selectedNoteType = '';
-    this.modalForm.reset();
-    this.clinicalNotes = [];
-    this.macroList = [];
-    this.isProviderSelected = false;
+    // Don't reset the form completely, keep provider and templates
+    // Just clear the note and macro selections
+    this.modalForm.patchValue({
+      note: null,
+      macro: null
+    }, { emitEvent: false });
+    // Keep clinicalNotes and macroList so they're available when user selects a note type again
     this.cdr.markForCheck();
   }
 
@@ -452,6 +502,10 @@ export class ClinicalNoteComponent implements OnInit {
 
     if (this.patientDataSubscription) {
       this.patientDataSubscription.unsubscribe();
+    }
+
+    if (this.selectedVisitSubscription) {
+      this.selectedVisitSubscription.unsubscribe();
     }
   }
 }

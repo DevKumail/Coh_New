@@ -8,7 +8,7 @@ import { AllergiesComponent } from '../allergies/allergies.component';
 import { FamilyHistoryComponent } from '../family-history/family-history.component';
 import { SocialHistoryComponent } from '../social-history/social-history.component';
 import { ProblemComponent } from '../problem/problem.component';
-import { MedicalHistoryComponent } from '../medical-history/medical-history.component';
+import { ProblemListComponent } from '../problem-list/problem-list.component';
 
 @Component({
   standalone: true,
@@ -22,7 +22,7 @@ import { MedicalHistoryComponent } from '../medical-history/medical-history.comp
     FamilyHistoryComponent,
     SocialHistoryComponent,
     ProblemComponent,
-    MedicalHistoryComponent
+    ProblemListComponent
   ],
   selector: 'app-question-view',
   templateUrl: './question-view.component.html',
@@ -36,6 +36,9 @@ export class QuestionViewComponent implements OnInit {
 
   // Track collapse state for each section
   isCollapsed: boolean = true;
+
+  // Hardcoded clinical flag to pass to all components
+  readonly clinicalnote: boolean = true;
 
   constructor() { }
 
@@ -175,14 +178,13 @@ export class QuestionViewComponent implements OnInit {
     };
 
     const selector = componentMap[cleanTitle || ''] || '';
-
-    // Debug logging
-    console.log('🔍 Section Title:', this.question?.quest_Title);
-    console.log('🔍 Clean Title:', cleanTitle);
-    console.log('🔍 Selector:', selector);
-    console.log('🔍 Has Custom Component:', this.hasCustomComponent());
-    console.log('🔍 Should Render:', this.shouldRenderCustomComponent());
-
+    console.log('🔍 Component Selector Debug:', {
+      sectionTitle,
+      cleanTitle,
+      selector,
+      isExpanded: !this.isCollapsed,
+      hasChildren: this.hasChildren()
+    });
     return selector;
   }
 
@@ -209,9 +211,6 @@ export class QuestionViewComponent implements OnInit {
     ];
 
     const hasComponent = componentMap.includes(cleanTitle || '');
-
-    console.log(`✅ Section "${this.question?.quest_Title}" has custom component:`, hasComponent);
-
     return hasComponent;
   }
 
@@ -246,6 +245,13 @@ export class QuestionViewComponent implements OnInit {
     }
     // Single questions (TextBox/CheckBox) are only collapsable if they have no parent
     return !this.hasParent;
+  }
+
+  /**
+   * Get the clinical flag (always true for clinical context)
+   */
+  getClinicalFlag(): boolean {
+    return this.clinicalnote;
   }
 
   /**

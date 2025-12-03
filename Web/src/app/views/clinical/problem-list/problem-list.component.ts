@@ -1,4 +1,3 @@
- 
 import { Patient } from './../../Scheduling/appointment-dashboard/appointment-dashboard.component';
 import { ClinicalApiService } from './../clinical.api.service';
 // import Swal from 'sweetalert2';
@@ -30,7 +29,7 @@ import { LucideAlertTriangle } from 'lucide-angular';
 
   imports: [CommonModule,
     ReactiveFormsModule,
-    
+
     FormsModule,
     NgbNavModule,
     NgIconComponent,
@@ -44,6 +43,7 @@ import { LucideAlertTriangle } from 'lucide-angular';
   styleUrl: './problem-list.component.scss'
 })
 export class ProblemListComponent implements OnInit, OnChanges, OnDestroy {
+  @Input() clinicalnote: boolean = false;
   datePipe = new DatePipe('en-US');
   medicalForm!: FormGroup;
   submitted: boolean = false;
@@ -60,7 +60,9 @@ export class ProblemListComponent implements OnInit, OnChanges, OnDestroy {
   modalService = new NgbModal();
   FilterForm!: FormGroup;
   @ViewChild('problemModal') problemModal: any;
+  @ViewChild('medicalHistoryModal') medicalHistoryModal!: TemplateRef<any>;
   @Input() editData: any;
+  @Input() clinical: boolean = false;
   private pendingEditRecord: any;
   private providerToggleSub?: Subscription;
   protected readonly headingIcon = LucideAlertTriangle;
@@ -189,12 +191,17 @@ SelectedVisit: any;
 
   constructor(
     private fb: FormBuilder,
-    private clinicalApiService: ClinicalApiService, 
+    private clinicalApiService: ClinicalApiService,
     private loader: LoaderService,
     private PatientData: PatientBannerService,
   ) { }
 
   async ngOnInit() {
+    // Log clinicalnote value at initialization
+    console.log('=== ProblemListComponent Initialized ===');
+    console.log('clinicalnote input value:', this.clinicalnote);
+    console.log('clinical input value:', this.clinical);
+
     // Build today's date string (YYYY-MM-DD) for min attribute on startDate
     try {
       const now = new Date();
@@ -203,12 +210,13 @@ SelectedVisit: any;
       const d = String(now.getDate()).padStart(2, '0');
       this.todayStr = `${y}-${m}-${d}`;
     } catch {}
-     
+
     // Wait for patient banner to provide MRNO before loading data
+    console.log('clinicalnote', this.clinicalnote);
      this.patientDataSubscription = this.PatientData.patientData$
       .pipe(
         filter((data: any) => !!data?.table2?.[0]?.mrNo),
-        distinctUntilChanged((prev, curr) => 
+        distinctUntilChanged((prev, curr) =>
           prev?.table2?.[0]?.mrNo === curr?.table2?.[0]?.mrNo
         )
       )
@@ -230,8 +238,8 @@ SelectedVisit: any;
         }
       });
 
-   
-    
+
+
     // var app =JSON.parse(localStorage.getItem('LoadvisitDetail') || '');
     // this.appId=app.appointmentId
     this.FillDropDown
@@ -240,13 +248,13 @@ SelectedVisit: any;
       providerId: [null, Validators.required],
       problem: ['', Validators.required],
       comments: [''],
-      status: ['Active', Validators.required],  
+      status: ['Active', Validators.required],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
-      providerName: [''], 
+      providerName: [''],
       providerDescription:[''],
       isConfidentential: [false],
-      isProviderCheck: [false] 
+      isProviderCheck: [false]
     });
 
     // Toggle validators based on provider outside clinic checkbox
@@ -324,7 +332,7 @@ SelectedVisit: any;
     this.userid = Number.isFinite(parsedUserId) ? parsedUserId : 0;
     this.Problems.ActiveStatus = 1
     // this.loadData();
-   
+
     await this.GetPatientProblemData();
     await this.FillCache();
 
@@ -339,7 +347,7 @@ SelectedVisit: any;
     const endDateCtrl = this.medicalForm.get('endDate');
     const startDateCtrl = this.medicalForm.get('startDate');
     const statusCtrl = this.medicalForm.get('status');
-    
+
     const applyStatusRules = (val: string) => {
       if (val === 'Inactive') {
         endDateCtrl?.enable({ emitEvent: false });
@@ -354,14 +362,14 @@ SelectedVisit: any;
       }
       endDateCtrl?.updateValueAndValidity({ onlySelf: true });
     };
-    
+
     // Initialize and subscribe
     applyStatusRules(statusCtrl?.value);
     statusCtrl?.valueChanges.subscribe((val: string) => applyStatusRules(val));
     startDateCtrl?.valueChanges.subscribe(() => {
       endDateCtrl?.updateValueAndValidity({ onlySelf: true });
     });
-    
+
     startDateCtrl?.valueChanges.subscribe(() => {
       // Clear end date whenever start date changes, then revalidate
       endDateCtrl?.setValue('', { emitEvent: false });
@@ -383,6 +391,14 @@ minDateValidator(otherControlName: string) {
 }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // Track clinicalnote input changes
+    if (changes['clinicalnote']) {
+      console.log('=== clinicalnote Input Changed ===');
+      console.log('Previous Value:', changes['clinicalnote'].previousValue);
+      console.log('Current Value:', changes['clinicalnote'].currentValue);
+      console.log('First Change:', changes['clinicalnote'].firstChange);
+    }
+
     if (changes['editData'] && changes['editData'].currentValue) {
       const record = changes['editData'].currentValue;
       if (this.medicalForm) {
@@ -462,6 +478,15 @@ minDateValidator(otherControlName: string) {
 
 
   // ✅ Clear form
+  openMedicalHistoryModal(): void {
+    this.onClear();
+    this.modalService.open(this.medicalHistoryModal, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static'
+    });
+  }
+
   onClear(): void {
   //this.medicalForm.reset();
   const empId = this.SelectedVisit?.employeeId;
@@ -475,9 +500,9 @@ minDateValidator(otherControlName: string) {
     status: 'Active',
     startDate: this.todayStr,
     endDate: '',
-    providerName: '', 
+    providerName: '',
     isConfidentential: false,
-    isProviderCheck: false 
+    isProviderCheck: false
   })
   this.submitted = false;
   }
@@ -498,7 +523,7 @@ minDateValidator(otherControlName: string) {
   }
 
   onSubmit() {
-  
+
   if (this.medicalForm.invalid) {
     Swal.fire({
       icon: 'warning',
@@ -519,7 +544,7 @@ minDateValidator(otherControlName: string) {
     // });
     return;
   }
-   
+
 
   const formData = this.medicalForm.value;
   console.log('medicalForm =>',this.medicalForm.value);
@@ -544,9 +569,9 @@ minDateValidator(otherControlName: string) {
     createdBy: this.userid || 0,
     updatedBy: this.userid || 0,
     appointmentId: this.SelectedVisit?.appointmentId,
-    // mrno: '1006', 
-    
-    mrno:  this.SearchPatientData?.table2?.[0]?.mrNo || 0,                           
+    // mrno: '1006',
+
+    mrno:  this.SearchPatientData?.table2?.[0]?.mrNo || 0,
     patientId: this.SearchPatientData?.table2?.[0]?.patientId || 0,
     activeStatus: 1,
     active: true,
@@ -573,6 +598,7 @@ minDateValidator(otherControlName: string) {
   this.isSubmitting = true;
   this.clinicalApiService.SubmitPatientProblem(problemPayload).then((res: any) => {
     console.log("my payload", res);
+    this.modalService.dismissAll();
     Swal.fire({
       icon: 'success',
       title: 'Submitted Successfully',
@@ -630,12 +656,12 @@ minDateValidator(otherControlName: string) {
   ];
 
   onRowSelect(diagnosis: any, modal: any) {
-     
+
     this.medicalForm.patchValue({ problem: diagnosis?.descriptionFull });
     this.selectedDiagnosis = diagnosis;
-    modal.close(diagnosis); 
+    modal.close(diagnosis);
     console.log("diagnosis waleed",diagnosis)
- 
+
   }
   async FillCache() {
 
@@ -654,7 +680,7 @@ minDateValidator(otherControlName: string) {
       })
   }
   FillDropDown(response: any) {
-     
+
     let jParse = JSON.parse(JSON.stringify(response)).cache;
     let provider = JSON.parse(jParse).Provider;
     let iCDVersion = JSON.parse(jParse).BLICDVersion;
@@ -697,7 +723,7 @@ minDateValidator(otherControlName: string) {
             code: item.ICDVersionId,
           };
         });
-       
+
       const item = {
         name: 'ALL',
         code: 0,
@@ -751,17 +777,17 @@ minDateValidator(otherControlName: string) {
     this.DiagnosisStartCode = start || '';
     this.DiagnosisEndCode = end || '';
     this.DescriptionFilter = desc || '';
-    
-    const PageNumber = this.PaginationInfo.Page; 
+
+    const PageNumber = this.PaginationInfo.Page;
     const PageSize = this.PaginationInfo.RowsPerPage;
-    
+
 
     this.clinicalApiService.DiagnosisCodebyProvider(
-      this.ICDVersionId, 
+      this.ICDVersionId,
       PageNumber,
       PageSize,
-      this.DiagnosisStartCode, 
-      this.DiagnosisEndCode, 
+      this.DiagnosisStartCode,
+      this.DiagnosisEndCode,
       this.DescriptionFilter,
     ).then((response: any) => {
       this.DiagnosisCode = response?.table1;
@@ -816,18 +842,18 @@ minDateValidator(otherControlName: string) {
     this.DiagnosisStartCode = start || '';
     this.DiagnosisEndCode = end || '';
     this.DescriptionFilter = desc || '';
-    
-    const PageNumber = this.PaginationInfo.Page; 
+
+    const PageNumber = this.PaginationInfo.Page;
     const PageSize = this.PaginationInfo.RowsPerPage;
         this.isLoading = true;
 
 
     this.clinicalApiService.DiagnosisCodebyProvider(
-      this.ICDVersionId, 
+      this.ICDVersionId,
       PageNumber,
       PageSize,
-      this.DiagnosisStartCode, 
-      this.DiagnosisEndCode, 
+      this.DiagnosisStartCode,
+      this.DiagnosisEndCode,
       this.DescriptionFilter,
     ).then((response: any) => {
       this.DiagnosisCode = response?.table1;
@@ -856,7 +882,7 @@ minDateValidator(otherControlName: string) {
     }
 
 
-    
+
 
     async onProblemPageChanged(page: number) {
       this.MHPaginationInfo.Page = page;
@@ -866,15 +892,15 @@ minDateValidator(otherControlName: string) {
 
 
       onEdit(record: any) {
-         
+
       this.id = record?.id,
       this.selectedDiagnosis = {
         icD9Code :  record?.icD9,
         descriptionFull : record?.icD9Description,
         icdVersionId : record?.icdVersionID,
-      }    
-      
-      
+      }
+
+
         this.medicalForm.patchValue(
           {
             providerId: record?.providerId,
@@ -909,11 +935,11 @@ minDateValidator(otherControlName: string) {
     Swal.fire({
       icon: 'success',
       title: 'Deleted Successfully',
-    })  
+    })
     this.loader.hide();
       console.log(this.DiagnosisCode, 'this.DiagnosisCode');
 
-    })      
+    })
   } else if (result.dismiss === Swal.DismissReason.cancel) {
         Swal.fire(
           'Cancelled',
