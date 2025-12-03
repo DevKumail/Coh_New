@@ -1,8 +1,9 @@
-﻿using System.Data;
-using Dapper;
+﻿using Dapper;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview;
 using HMIS.Core.Context;
 using HMIS.Infrastructure.ORM;
+using System.Data;
 
 namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
 {
@@ -18,22 +19,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
         {
             _dapper = dapper;
             _context = context;
-        }
-
-        //public async Task<GetAllOverviewDetailDto> getOverviewAsync(long treatmentCycleId)
-        //{
-        //    using var connection = _dapper.CreateConnection();
-
-        //    var parameters = new DynamicParameters();
-        //    parameters.Add("@IVFDashboardTreatmentCycleId", treatmentCycleId, DbType.Int64);
-
-        //    var result = await connection.QueryFirstOrDefaultAsync<GetAllOverviewDetailDto>(
-        //                 "IVF_GetOverviewByTreatmentCycle",
-        //                 parameters,
-        //                 commandType: CommandType.StoredProcedure);
-
-        //    return result;
-        //}
+        } 
 
         public async Task<GetAllOverviewDetailDto> GetOverviewByTreatmentCycleAsync(long treatmentCycleId)
         {
@@ -42,51 +28,74 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
             var parameters = new DynamicParameters();
             parameters.Add("@IVFDashboardTreatmentCycleId", treatmentCycleId, DbType.Int64);
 
-            GetAllOverviewDetailDto overviewResult = null;
+            var lookup = new Dictionary<long, GetAllOverviewDetailDto>();
 
-            var result = await connection.QueryAsync<GetAllOverviewDetailDto, GetEventDetailDto, GetMasterPrescriptionDetailDto, GetPrescriptionDetailDto, GetAllOverviewDetailDto>(
+            var result = await connection.QueryAsync<GetAllOverviewDetailDto, GetEventDetailDto, GetMedicationDto, GetAllOverviewDetailDto>(
                 "IVF_GetOverviewByTreatmentCycle",
-                (overview, eventDetail, masterPrescription, prescription) =>
+                (overview, ev, med) =>
                 {
-                    if (overviewResult == null)
+                    if (!lookup.TryGetValue(overview.OverviewId, out var ov))
                     {
-                        overviewResult = overview;
-                        overviewResult.Events = new List<GetEventDetailDto>();
-                        overviewResult.PrescriptionMaster = new List<GetMasterPrescriptionDetailDto>();
-                    }
-
-                    if (eventDetail != null && eventDetail.EventId.HasValue)
-                    {
-                        if (!overviewResult.Events.Any(e => e.EventId == eventDetail.EventId))
-                            overviewResult.Events.Add(eventDetail);
-                    }
-
-                    if (masterPrescription != null && masterPrescription.IVFPrescriptionMasterId.HasValue)
-                    {
-                        var existingMaster = overviewResult.PrescriptionMaster
-                            .FirstOrDefault(pm => pm.IVFPrescriptionMasterId == masterPrescription.IVFPrescriptionMasterId);
-
-                        if (existingMaster == null)
+                        ov = overview;
+                        ov.Calender = new List<GetCalenderDto>
+                                    {
+                                       new GetCalenderDto
+                                       {
+                                           Events = new List<GetEventDetailDto>(),
+                                           Medications = new List<GetMedicationDto>()
+                                       }
+                                    };
+                        ov.Resources = new List<GetResourcesDetailDto>
                         {
-                            masterPrescription.Prescription = new List<GetPrescriptionDetailDto>();
-                            overviewResult.PrescriptionMaster.Add(masterPrescription);
-                            existingMaster = masterPrescription;
+                            new GetResourcesDetailDto
+                            {
+                                AllMedications = new List<GetSidebarMedicationDto>()
+                            }
+                        };
+                        lookup.Add(ov.OverviewId, ov);
+                    }
+
+                    var cal = ov.Calender.First();
+
+                    if (ev?.EventId != null)
+                    {
+                        if (!cal.Events.Any(x => x.EventId == ev.EventId))
+                            cal.Events.Add(ev);
+                    }
+
+                    if (med?.MedicationId > 0)
+                    {
+                        var existingMed = cal.Medications.FirstOrDefault(x => x.DrugId == med.DrugId);
+                        if (existingMed == null)
+                        {
+                            cal.Medications.Add(med);
+
+                            var res = ov.Resources.First();
+                            if (!res.AllMedications.Any(x => x.DrugId == med.DrugId))
+                                res.AllMedications.Add(new GetSidebarMedicationDto
+                                {
+                                    DrugId = med.DrugId,
+                                    DrugName = med.DrugName
+                                });
+
+                            existingMed = med;
                         }
 
-                        if (prescription != null && prescription.IVFPrescriptionId.HasValue)
-                        {
-                            if (!existingMaster.Prescription.Any(p => p.IVFPrescriptionId == prescription.IVFPrescriptionId))
-                                existingMaster.Prescription.Add(prescription);
-                        }
+                        if (!string.IsNullOrEmpty(med.ApplicationDomainName?.FirstOrDefault()))
+                            existingMed.ApplicationDomainName.AddRange(med.ApplicationDomainName);
+
+                        if (med.Time?.Any() == true)
+                            existingMed.Time.AddRange(med.Time);
                     }
-                    return overviewResult;
+
+                    return ov;
                 },
-                parameters,
-                splitOn: "EventId,IVFPrescriptionMasterId,IVFPrescriptionId",
+                new { IVFDashboardTreatmentCycleId = treatmentCycleId },
+                splitOn: "EventId,MedicationId",
                 commandType: CommandType.StoredProcedure
             );
 
-            return overviewResult;
+            return lookup.Values.FirstOrDefault();
         }
 
     }

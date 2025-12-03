@@ -12,6 +12,7 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public long IVFPrescriptionMasterId { get; set; }
         public long OverviewId { get; set; }
         public long DrugId { get; set; }
+        public long AppId { get; set; }
         public List<long> ApplicationDomainCategoryId { get; set; }    
         public DateTime StartDate { get; set; }
         public int XDays { get; set; }
@@ -19,7 +20,7 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public string DosageFrequency { get; set; }
         public string DailyDosage { get; set; }
         public string RouteCategoryId { get; set; }
-        public int Quantity { get; set; }
+        public string Quantity { get; set; }
         public string AdditionalRefills { get; set; }
         public string Samples { get; set; }
         public string Instructions { get; set; }
