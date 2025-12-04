@@ -61,7 +61,7 @@
           </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="note-tab" data-bs-toggle="tab" data-bs-target="#note" type="button" role="tab">
+          <button class="nav-link" id="note-tab" data-bs-toggle="tab" data-bs-target="#note" type="button" role="tab" (click)="refreshAdditionalSections()">
             Note
           </button>
         </li>
@@ -78,7 +78,7 @@
         </div>
 
         <div class="tab-pane fade" id="note" role="tabpanel" aria-labelledby="note-tab">
-          <div *ngIf="viewNoteResponse" class="card p-3">
+          <div class="card p-3">
             <ng-container *ngIf="hasAnyFilledData(); else noData">
               <div class="formatted-note" [innerHTML]="getFormattedNoteHtml()"></div>
             </ng-container>

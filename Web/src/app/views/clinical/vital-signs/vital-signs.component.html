@@ -557,6 +557,14 @@
         <table class="table table-bordered table-striped table-sm text-center">
             <thead>
                 <tr>
+                    <th *ngIf="clinicalnote">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            [(ngModel)]="selectAll"
+                            [ngModelOptions]="{standalone: true}"
+                            (change)="toggleSelectAll()" />
+                    </th>
                     <th>{{ "DATE" | translate }}</th>
                     <!-- <th>Time</th> -->
                     <th>{{ "TEMPERATURE" | translate }} (°F)</th>
@@ -574,6 +582,14 @@
             </thead>
             <tbody class="table-group-divider text-center align-middle">
                 <tr *ngFor="let vital of vitalSignsPagedData; let i = index">
+                    <td *ngIf="clinicalnote">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            [(ngModel)]="vital.selected"
+                            [ngModelOptions]="{standalone: true}"
+                            (change)="onCheckboxChange()" />
+                    </td>
                     <td>
                         {{ vital.entryDate | date : "dd/MM/yyyy HH:mm:ss" }}
                     </td>

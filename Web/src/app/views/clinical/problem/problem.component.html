@@ -282,6 +282,14 @@
       <table class="table table-bordered table-striped table-sm">
         <thead>
           <tr class="text-center">
+            <th *ngIf="clinicalnote">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [(ngModel)]="selectAll"
+                [ngModelOptions]="{standalone: true}"
+                (change)="toggleSelectAll()" />
+            </th>
             <th>{{'PROVIDER' | translate}}</th>
             <th>{{'PROBLEM' | translate}}</th>
             <th>{{'COMMENT' | translate}}</th>
@@ -294,6 +302,14 @@
         </thead>
         <tbody class="table-group-divider text-center">
           <tr *ngFor="let record of medicalHistoryData">
+            <td *ngIf="clinicalnote">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [(ngModel)]="record.selected"
+                [ngModelOptions]="{standalone: true}"
+                (change)="onCheckboxChange()" />
+            </td>
             <td>{{ record.providerName || '-' }}</td>
             <td>{{ record.icD9Description || '-' }}</td>
             <td>{{ record.comments || '-' }}</td>

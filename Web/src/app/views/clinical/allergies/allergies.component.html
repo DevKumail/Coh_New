@@ -323,7 +323,7 @@
                 class="btn btn-primary position-absolute end-0"
                 (click)="openModal()"
             >
-                <i class="bi bi-plus-circle"></i>
+                <i ></i>
                 {{ "ADD" | translate }}
             </button>
         </div>
@@ -331,6 +331,13 @@
             <table class="table table-bordered table-striped table-sm">
                 <thead class="align-middle thead-sm">
                     <tr>
+                        <th class="text-center" *ngIf="clinicalnote">
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                [(ngModel)]="selectAll"
+                                (change)="toggleSelectAll()" />
+                        </th>
                         <th class="text-center">
                             {{ "PROVIDER" | translate }}
                         </th>
@@ -358,6 +365,13 @@
                 </thead>
                 <tbody class="table-group-divider">
                     <tr *ngFor="let allergy of MyAllergiesData; let i = index">
+                        <td class="text-center" *ngIf="clinicalnote">
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                [(ngModel)]="allergy.selected"
+                                (change)="onCheckboxChange()" />
+                        </td>
                         <td class="text-center">
                             {{
                                 allergy.providerName ||
@@ -411,7 +425,7 @@
                         </td>
                     </tr>
                     <tr *ngIf="allergieTotalItems === 0">
-                        <td colspan="9" class="text-center">
+                        <td [attr.colspan]="clinicalnote ? 10 : 9" class="text-center">
                             {{ "NO_DATA_FOUND" | translate }}
                         </td>
                     </tr>

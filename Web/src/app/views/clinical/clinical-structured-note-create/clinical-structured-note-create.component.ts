@@ -1,5 +1,5 @@
 import { UserDataService } from '@core/services/user-data.service';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
@@ -7,8 +7,8 @@ import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.
 import { Router, ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, filter, Subscription } from 'rxjs';
 import { FilledOnValueDirective } from '@/app/shared/directives/filled-on-value.directive';
-import { QuestionItemComponent } from '../question-item/question-item.component';
 import { QuestionViewComponent } from '../question-view/question-view.component';
+import { SocialHistoryComponent } from '../social-history/social-history.component';
 import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { LoaderService } from '@core/services/loader.service';
@@ -20,14 +20,16 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     ReactiveFormsModule,
     TranslatePipe,
     FilledOnValueDirective,
-    QuestionItemComponent,
-    QuestionViewComponent
+    QuestionViewComponent,
+    SocialHistoryComponent
   ],
   selector: 'app-clinical-structured-note-create',
   templateUrl: './clinical-structured-note-create.component.html',
   styleUrls: ['./clinical-structured-note-create.component.scss']
 })
-export class ClinicalStructuredNoteCreateComponent implements OnInit {
+export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewInit {
+  @ViewChild('socialHistory', { static: false }) socialHistoryComponent!: SocialHistoryComponent;
+
   clinicalForm: FormGroup;
   mrNo: string = '';
   SearchPatientData: any;
@@ -42,6 +44,8 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   viewquestion: boolean = false;
   viewNoteResponse: boolean = false;
   nodeData: any;
+  additionalSections: any[] = [];
+  selectedSocialHistoryItems: any[] = [];
 
   cacheItems: string[] = ['Provider'];
   private subscriptions: Subscription[] = [];
@@ -342,7 +346,18 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     // Collect filled values from the structured note
     const filledStructuredNote = this.collectFilledValues();
 
-    // Generate HTML from structured note with filled values
+    // Build additional sections from selected social history items
+    this.additionalSections = [];
+    if (this.selectedSocialHistoryItems && this.selectedSocialHistoryItems.length > 0) {
+      this.additionalSections.push({
+        sectionTitle: 'Social History',
+        type: 'SocialHistory',
+        data: this.selectedSocialHistoryItems
+      });
+      console.log('✅ Added social history to additionalSections:', this.additionalSections);
+    }
+
+    // Generate HTML from structured note with filled values and additional sections
     const htmlContent = this.generateHtmlFromStructuredNote(filledStructuredNote);
 
     // Generate plain text note content from HTML for noteText
@@ -367,7 +382,8 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       isEdit: this.noteId > 0,
       noteType: 'Structured',
       createdOn: new Date(),
-      templateId:this.preSelectedTemplate
+      templateId: this.preSelectedTemplate,
+      additionalSections: this.additionalSections
     };
 
     console.log('Payload:', payload);
@@ -441,6 +457,11 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
       html += this.generateQuestionsHtml(filledNote.node.questions);
     }
 
+    // Add additional sections like social history
+    if (this.additionalSections && this.additionalSections.length > 0) {
+      html += this.generateAdditionalSectionsHtml();
+    }
+
     html += `</div>`;
     return html;
   }
@@ -449,6 +470,47 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     const tmp = document.createElement('DIV');
     tmp.innerHTML = html || '';
     return tmp.textContent || tmp.innerText || '';
+  }
+
+  generateAdditionalSectionsHtml(): string {
+    let html = '';
+    debugger;
+
+    this.additionalSections.forEach(section => {
+      if (section.type === 'SocialHistory') {
+        html += `<div style="margin-top: 20px;">`;
+        html += `<h3 style="font-weight: bold; text-decoration: underline;">${section.sectionTitle}</h3>`;
+        html += `<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">`;
+        html += `<thead>`;
+        html += `<tr style="background-color: #f8f9fa;">`;
+        html += `<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">Social History</th>`;
+        html += `<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">Start Date</th>`;
+        html += `<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">End Date</th>`;
+        html += `<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">Status</th>`;
+        html += `</tr>`;
+        html += `</thead>`;
+        html += `<tbody>`;
+
+        section.data.forEach((item: any) => {
+          const startDate = item.startDate ? new Date(item.startDate).toLocaleDateString('en-GB') : '-';
+          const endDate = item.endDate ? new Date(item.endDate).toLocaleDateString('en-GB') : '-';
+          const status = item.active ? 'Active' : 'Inactive';
+
+          html += `<tr>`;
+          html += `<td style="border: 1px solid #dee2e6; padding: 8px;">${item.socialHistory || '-'}</td>`;
+          html += `<td style="border: 1px solid #dee2e6; padding: 8px;">${startDate}</td>`;
+          html += `<td style="border: 1px solid #dee2e6; padding: 8px;">${endDate}</td>`;
+          html += `<td style="border: 1px solid #dee2e6; padding: 8px;">${status}</td>`;
+          html += `</tr>`;
+        });
+
+        html += `</tbody>`;
+        html += `</table>`;
+        html += `</div>`;
+      }
+    });
+
+    return html;
   }
 
   generateQuestionsHtml(questions: Question[]): string {
@@ -469,6 +531,11 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
           html += this.generateQuestionsHtml(question.children);
           html += `</div>`;
         }
+        html += `</div>`;
+      } else if (question.type === 'SocialHistoryItem') {
+        // Handle social history items specifically
+        html += `<div style="margin-left: 40px; margin-top: 8px;">`;
+        html += `<strong>• ${question.answer}</strong>`;
         html += `</div>`;
       } else if (question.type === 'TextBox') {
         html += `<div style="display: inline-block; margin-right: 20px; margin-bottom: 15px; width: calc(25% - 20px); vertical-align: top;">`;
@@ -492,7 +559,29 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     return html;
   }
 
+  refreshAdditionalSections(): void {
+    this.additionalSections = [];
+    console.log('🔍 socialHistoryComponent exists?', !!this.socialHistoryComponent);
+
+    if (!this.socialHistoryComponent) {
+      console.log('❌ socialHistoryComponent is null or undefined');
+      return;
+    }
+
+    const socialHistoryData = this.socialHistoryComponent.getSelectedSocialHistoriesForNote();
+    console.log('🔍 Social History Data:', socialHistoryData);
+    console.log('🔍 Selected items count:', this.socialHistoryComponent.selectedSocialHistories?.size || 0);
+
+    if (socialHistoryData && socialHistoryData.data && socialHistoryData.data.length > 0) {
+      this.additionalSections.push(socialHistoryData);
+      console.log('✅ Added to additionalSections:', this.additionalSections);
+    } else {
+      console.log('❌ No social history data to add');
+    }
+  }
+
   getFormattedNoteHtml(): SafeHtml {
+    debugger
     // Prefer live structured template data when available (so edits reflect immediately)
     const questions = this.nodeData?.node?.questions || this.nodeData?.questions;
     const title = this.nodeData?.node?.noteTitle || this.nodeData?.noteTitle || '';
@@ -505,6 +594,12 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
           html += this.formatQuestion(section, 10);
         }
       });
+
+      // Add additional sections to preview
+      this.refreshAdditionalSections();
+      if (this.additionalSections && this.additionalSections.length > 0) {
+        html += this.generateAdditionalSectionsHtml();
+      }
 
       return this.sanitizer.bypassSecurityTrustHtml(html);
     }
@@ -576,6 +671,11 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   }
 
   private hasQuestionData(question: any): boolean {
+    // For social history items, always show if they exist
+    if (question.type === 'SocialHistoryItem') {
+      return true;
+    }
+
     // For checkboxes, only return true if checked
     if (question.type === 'CheckBox') {
       const isChecked = question.answer === true || question.answer === 'true';
@@ -614,12 +714,83 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     return provider ? provider.name : '';
   }
 
+  getSelectedSocialHistoryIds(): number[] {
+    return this.selectedSocialHistoryItems.map(item => item.shid);
+  }
+
   // Update the model when a child emits an answer change (string or boolean for checkboxes)
   onAnswerChange(value: string | boolean, question: any) {
     if (question) {
       question.answer = value ?? '';
     }
     // this.cdr.markForCheck();
+  }
+
+  // Handle social history selection changes
+  onSocialHistorySelectionChanged(selectedItems: any[]): void {
+    console.log('📥 [ClinicalNote] Received social history selections:', selectedItems);
+
+    // Store selected items to prevent loss during re-renders
+    this.selectedSocialHistoryItems = selectedItems;
+
+    // Find the Social history section in the template
+    const questions = this.dataquestion?.node?.questions || [];
+    const socialHistorySection = questions.find((q: any) =>
+      q.quest_Title?.toLowerCase().includes('social history')
+    );
+
+    if (socialHistorySection) {
+      console.log('✅ Found Social history section:', socialHistorySection);
+
+      // Clear existing children
+      socialHistorySection.children = [];
+
+      // Add selected social history items as children
+      selectedItems.forEach((item, index) => {
+        socialHistorySection.children.push({
+          quest_Id: item.shid,
+          quest_Title: item.socialHistory,
+          type: 'SocialHistoryItem',
+          parent_Id: socialHistorySection.quest_Id,
+          answer: `${item.socialHistory} (${this.formatDate(item.startDate)} - ${this.formatDate(item.endDate)})`,
+          children: [],
+          metadata: {
+            shid: item.shid,
+            startDate: item.startDate,
+            endDate: item.endDate,
+            active: item.active
+          }
+        });
+      });
+
+      console.log('✅ Updated Social history section with children:', socialHistorySection.children);
+
+      // Update nodeData as well for the Note tab
+      if (this.nodeData?.node?.questions) {
+        const nodeDataSection = this.nodeData.node.questions.find((q: any) =>
+          q.quest_Title?.toLowerCase().includes('social history')
+        );
+        if (nodeDataSection) {
+          nodeDataSection.children = [...socialHistorySection.children];
+        }
+      }
+
+      console.log('✅ Updated nodeData with social history children');
+      this.cdr.detectChanges();
+    } else {
+      console.warn('⚠️ Social history section not found in template');
+    }
+  }
+
+  private formatDate(dateValue: any): string {
+    if (!dateValue) return 'N/A';
+    try {
+      const d = new Date(dateValue);
+      if (!isFinite(d.getTime())) return 'N/A';
+      return d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } catch {
+      return 'N/A';
+    }
   }
 
   // Helper for template to check if a section or any of its children has content (recursive)
@@ -640,7 +811,13 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
   hasAnyFilledData(): boolean {
     const questions = this.nodeData?.node?.questions || this.nodeData?.questions;
     if (Array.isArray(questions) && questions.length > 0) {
-      return questions.some((q: any) => this.isSectionFilled(q));
+      const hasQuestionData = questions.some((q: any) => this.isSectionFilled(q));
+      if (hasQuestionData) return true;
+    }
+
+    // Check if social history items are selected
+    if (this.selectedSocialHistoryItems && this.selectedSocialHistoryItems.length > 0) {
+      return true;
     }
 
     // Fallback: if we are in edit mode and only have existing HTML, treat as having data
@@ -649,6 +826,13 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit {
     }
 
     return false;
+  }
+
+  ngAfterViewInit(): void {
+    console.log('🔍 ViewChild socialHistoryComponent:', this.socialHistoryComponent);
+    setTimeout(() => {
+      console.log('🔍 ViewChild after timeout:', this.socialHistoryComponent);
+    }, 1000);
   }
 
   ngOnDestroy(): void {
