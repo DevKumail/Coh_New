@@ -1,11 +1,4 @@
 <form *ngIf="SocialForm" [formGroup]="SocialForm">
-    <div class="card-header d-flex justify-content-center align-items-center position-relative py-1">
-      <h5 class="mb-0 fw-bold">{{ 'SOCIAL_HISTORY' | translate }}</h5>
-      <button type="button" class="btn btn-primary position-absolute end-0 me-3" (click)="openSocialHistoryModal()">
-        <i class="bi bi-plus-lg"></i> {{ 'ADD' | translate }}
-      </button>
-    </div>
-    <div class="card-body py-1">
       <ng-template #socialHistoryModal let-modal>
         <div class="modal-header py-2">
           <h5 class="modal-title">{{ 'SOCIAL_HISTORY' | translate }}</h5>
@@ -74,11 +67,14 @@
       </div>
         </div>
       </ng-template>
-    </div>
-
-
   <div class="card mt-3">
     <div class="card-body">
+        <div class="card-header d-flex justify-content-left align-items-left position-relative py-1">
+            <h5 class="mb-0 fw-bold">{{ 'SOCIAL_HISTORY' | translate }}</h5>
+            <button type="button" class="btn btn-primary position-absolute end-0 me-3" (click)="openSocialHistoryModal()">
+                <i ></i> {{ 'ADD' | translate }}
+            </button>
+    </div>
       <div class="table-responsive">
         <table class="table table-bordered table-striped table-sm">
 
