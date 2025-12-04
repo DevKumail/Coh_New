@@ -198,13 +198,128 @@ export class CycleOverviewComponent {
         this.overviewData = res;
         const oid = Number((res as any)?.overviewId);
         this.overviewId = Number.isFinite(oid) ? oid : null;
-        // TODO: Map API data into calendar or details UI as needed
-        // console.log('Overview API data', res);
+        // Bind into calendar/resources if response carries calendar-like payload
+        this.bindFromPayload(res as any);
       },
       error: (err) => {
         // console.error('Failed to load Overview data', err);
       }
     });
+  }
+
+  // Reset all dynamic calendar data/resources
+  private resetCalendarBinding() {
+    this.calendarData = [];
+    this.medsResources = [];
+    this.medResourceDrugMap = {} as any;
+    this.rebuildResources();
+    this.rebindEvents();
+  }
+
+  // Public entry to bind the UI from given payload structure
+  bindFromPayload(payload: any) {
+    try {
+      if (!payload) return;
+      const cal = Array.isArray(payload?.calender) ? payload.calender : [];
+      // Clear existing before binding
+      this.resetCalendarBinding();
+      const eventsToAdd: EventInput[] = [];
+
+      // Helper: add event row entries
+      const pushEventMarker = (title: string, startISO: string, endISO?: string) => {
+        if (!title || !startISO) return;
+        eventsToAdd.push({
+          resourceId: 'events',
+          title,
+          start: startISO,
+          end: endISO || undefined,
+          backgroundColor: '#0066cc',
+          extendedProps: { description: `${title} added` }
+        } as any);
+      };
+
+      // Helper: ensure medication resource row exists and return its id
+      const ensureMedResource = (name: string, drugId?: number): string | null => {
+        const title = String(name || '').trim();
+        if (!title) return null;
+        const slug = 'med-' + title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        if (!this.medsResources.some(r => r.id === slug)) {
+          const nextOrder = (this.medsResources.length ? Math.max(...this.medsResources.map(r => r.order || 0)) + 1 : 3);
+          this.medsResources.push({ id: slug, title, eventColor: '#5bc0de', order: nextOrder });
+          if (Number.isFinite(Number(drugId)) && Number(drugId) > 0) this.medResourceDrugMap[slug] = Number(drugId);
+          this.medicationSubtypes = this.medsResources.map(r => r.title);
+        }
+        return slug;
+      };
+
+      // Helper: iterate dates inclusive
+      const eachDate = (start: string, end: string): string[] => {
+        try {
+          const s = new Date(start);
+          const e = new Date(end || start);
+          if (isNaN(s.getTime()) || isNaN(e.getTime())) return [];
+          const out: string[] = [];
+          const d = new Date(s);
+          while (d <= e) {
+            out.push(d.toISOString().slice(0, 10));
+            d.setDate(d.getDate() + 1);
+          }
+          return out;
+        } catch { return []; }
+      };
+
+      for (const block of cal) {
+        // Events row
+        const evs = Array.isArray(block?.events) ? block.events : [];
+        for (const ev of evs) {
+          const title = String(ev?.eventType || '').trim();
+          const s = ev?.eventStartDate ? new Date(ev.eventStartDate).toISOString() : '';
+          const e = ev?.eventEndDate ? new Date(ev.eventEndDate).toISOString() : undefined;
+          if (title && s) pushEventMarker(title, s, e);
+        }
+
+        // Medications
+        const meds = Array.isArray(block?.medications) ? block.medications : [];
+        for (const m of meds) {
+          const medName = String(m?.drugName || '').trim();
+          const rid = ensureMedResource(medName, Number(m?.drugId || 0) || undefined);
+          if (!rid) continue;
+          const doseTitle = String(m?.dose || '0').trim() || '0';
+          const start = m?.startDate ? String(m.startDate) : '';
+          const stop = m?.stopDate ? String(m.stopDate) : start;
+          const times: string[] = Array.isArray(m?.time) ? m.time.filter((t: any) => !!t) : [];
+          const dates = start ? eachDate(start, stop) : [];
+          for (const d of dates) {
+            if (times.length === 0) {
+              // Add as all-day label if no specific times
+              eventsToAdd.push({
+                resourceId: rid,
+                title: doseTitle,
+                start: d,
+                backgroundColor: '#5bc0de',
+                extendedProps: { type: 'medication-dose', medicationName: medName, dose: doseTitle, date: d }
+              } as any);
+            } else {
+              for (const t of times) {
+                const dt = `${d}T${String(t).slice(0,8)}`; // ensure HH:mm:ss
+                eventsToAdd.push({
+                  resourceId: rid,
+                  title: doseTitle,
+                  start: dt,
+                  backgroundColor: '#5bc0de',
+                  extendedProps: { type: 'medication-dose', medicationName: medName, dose: doseTitle, date: d }
+                } as any);
+              }
+            }
+          }
+        }
+      }
+
+      // Apply to calendar/resources
+      this.rebuildResources();
+      this.calendarData = eventsToAdd;
+      this.rebindEvents();
+    } catch { }
   }
 
   handleResourceLabelDidMount(arg: any) {
