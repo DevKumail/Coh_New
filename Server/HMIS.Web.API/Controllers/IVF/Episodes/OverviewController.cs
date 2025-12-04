@@ -79,7 +79,7 @@ namespace HMIS.Web.Controllers.IVF.Episodes
             var result = await _prescriptionMasterService.DeleteMasterPrescription(dto);
 
             if (!result.isSuccess)
-                return BadRequest(result.message);
+                return NotFound(result.message);
 
             return Ok(result.message);
         }
