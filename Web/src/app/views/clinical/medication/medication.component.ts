@@ -1,4 +1,4 @@
-import { Component, TemplateRef } from '@angular/core';
+import { Component, TemplateRef, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
@@ -28,6 +28,8 @@ import { distinctUntilChanged, filter, Subscription } from 'rxjs';
     styleUrl: './medication.component.scss'
 })
 export class MedicationComponent {
+    @Input() clinicalnote: boolean = false;
+    @ViewChild('medicationModal') medicationModal!: TemplateRef<any>;
     MedicationForm!: FormGroup;
     DrugFilterForm!: FormGroup;
     submitted = false;
@@ -231,7 +233,7 @@ export class MedicationComponent {
         this.PastMedicationPaginationInfo.Page = event;
         this.GetAllPastPrescriptions();
     }
-    
+
     onSubmit() {
         this.submitted = true;
         if (this.MedicationForm.invalid) {
@@ -294,11 +296,12 @@ export class MedicationComponent {
         this.isSubmitting = true;
         this.clinicalApiService.SubmitPrescription(payload)
             .then(() => {
-                Swal.fire('Success', 'Medication successfully created', 'success');
+                Swal.fire('Success', 'Medication successfully saved', 'success');
                 this.GetAllCurrentPrescriptions();
                 this.GetAllPastPrescriptions();
                 this.onClear();
                 this.submitted = false;
+                this.modalService.dismissAll();
             })
             .catch((error: any) => {
                 Swal.fire('Error', error?.message || 'Failed to submit medication', 'error');
@@ -312,9 +315,19 @@ export class MedicationComponent {
     onClear() {
         this.MedicationForm.reset();
         this.submitted = false;
+        this.Id = null;
         this.MedicationForm.get('isProviderCheck')?.setValue(false);
         // Re-apply default start date after clearing
         this.MedicationForm.get('startDate')?.setValue(this.todayStr);
+    }
+
+    openMedicationModal() {
+        this.onClear();
+        this.modalService.open(this.medicationModal, {
+            size: 'xl',
+            centered: true,
+            backdrop: 'static'
+        });
     }
 
     SearchDrug() {
@@ -390,6 +403,12 @@ export class MedicationComponent {
 
             // Comments
             comments: record?.commentId ?? null,
+        });
+
+        this.modalService.open(this.medicationModal, {
+            size: 'xl',
+            centered: true,
+            backdrop: 'static'
         });
     }
     onDrugPageChanged(event: any) {

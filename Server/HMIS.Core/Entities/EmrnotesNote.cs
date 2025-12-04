@@ -120,4 +120,7 @@ public partial class EmrnotesNote
 
     [InverseProperty("Note")]
     public virtual ICollection<EmrnoteTemplate> EmrnoteTemplate { get; set; } = new List<EmrnoteTemplate>();
+
+    [InverseProperty("Note")]
+    public virtual ICollection<SpeechToText> SpeechToText { get; set; } = new List<SpeechToText>();
 }

@@ -411,7 +411,6 @@ export class ClinicalNoteCreateComponent implements OnInit {
     req.onsuccess = () => console.log('Note saved offline');
     req.onerror = (event: any) => console.error('Error saving note offline:', event);
   }
-
   // collect filled answers from structured note tree
   public collectFilledValues(): any {
     if (!this.dataquestion?.node) return null;
@@ -437,6 +436,12 @@ export class ClinicalNoteCreateComponent implements OnInit {
     if (filledNote.node.questions) html += this.generateQuestionsHtml(filledNote.node.questions);
     html += `</div>`;
     return html;
+  }
+
+  private stripHtml(html: string): string {
+    const tmp = document.createElement('DIV');
+    tmp.innerHTML = html || '';
+    return tmp.textContent || tmp.innerText || '';
   }
 
   public generateQuestionsHtml(questions: Question[]): string {
@@ -629,6 +634,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
     // collect structured filled values + html
     const filledStructuredNote = this.collectFilledValues();
     const htmlContent = this.generateHtmlFromStructuredNote(filledStructuredNote);
+    const noteText = this.stripHtml(htmlContent);
 
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -642,13 +648,17 @@ export class ClinicalNoteCreateComponent implements OnInit {
         noteTitle: noteName,
         description: formValue.description,
         pathId: noteId,
-        // Send filled template with voice
         structuredNote: filledStructuredNote,
         htmlContent,
+        noteText,
         createdBy,
         updatedBy: createdBy,
-        signedBy: false,
+        signedBy: providerId || 0,
+        Id: 0,
+        isEdit: false,
+        noteType: 'Structured',
         createdOn: new Date(),
+        templateId: noteId,
         voicetext: formValue.voicetext
       } as any;
 
@@ -676,7 +686,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
               setTimeout(() => reject(new Error("Request timed out")), 300000)
             );
 
-            Promise.race([ this.clinicalApiService.InsertSpeech(payload), timeout ])
+            Promise.race([ this.clinicalApiService.InsertNote(payload), timeout ])
               .then((response: any) => {
                 this.dataquestion = response;
                 this.nodeData = response?.node || response;

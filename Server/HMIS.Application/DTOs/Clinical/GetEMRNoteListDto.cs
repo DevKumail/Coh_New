@@ -21,6 +21,8 @@
 
         public string CreatedByName { get; set; }
         public string SignedByName { get; set; }
+        public string? FilePath { get; set; }
+
     }
 
     public class EMRNotePaginatedResponse

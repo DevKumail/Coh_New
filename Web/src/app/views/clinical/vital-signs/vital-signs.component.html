@@ -16,16 +16,21 @@
     </ol>
 </nav> -->
 
-    <form *ngIf="vitalSignsForm" [formGroup]="vitalSignsForm" (ngSubmit)="onSubmit()">
+    <form *ngIf="vitalSignsForm " [formGroup]="vitalSignsForm" (ngSubmit)="onSubmit()">
           <div class="card shadow-lg rounded-3 border-0">
-          <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-        <!-- <lucide-angular [img]="headingIcon" class="fs-5"></lucide-angular> -->
-  <span>{{ 'VITAL_SIGNS' | translate }}</span>
-      </h5>
-      <i class="bi bi-heart-pulse fs-4"></i>
+          <div class="card-header d-flex justify-content-center align-items-center position-relative py-2">
+      <h5 class="mb-0 fw-bold">{{ 'VITAL_SIGNS' | translate }}</h5>
+      <button type="button" class="btn btn-primary position-absolute end-0 me-3" (click)="openVitalSignsModal()">
+        <i class="bi bi-plus-lg"></i> {{ 'ADD' | translate }}
+      </button>
     </div>
-        <div class="card-body">
+        <div class="card-body py-3">
+          <ng-template #vitalSignsModal let-modal>
+            <div class="modal-header py-2">
+              <h5 class="modal-title">{{ 'VITAL_SIGNS' | translate }}</h5>
+              <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+            </div>
+            <div class="modal-body py-3">
         <div class="row">
             <div class="col-sm-3 mb-2">
                 <label>{{ 'ENTERED_DATE' | translate }} <span class="text-danger">*</span></label>
@@ -232,7 +237,7 @@
 
             <!-- SPO2 -->
             <div class="col-sm-3 mb-2">
-                <label>{{ 'SPO2' | translate }} (%)</label>  
+                <label>{{ 'SPO2' | translate }} (%)</label>
                 <div class="mt-2">
                     <input
                         type="number"
@@ -301,10 +306,10 @@
                       ></span>
                       {{ 'SUBMITTING' | translate }}
                   </span>
-                  <span *ngIf="!isSubmitting">{{ 'SAVE' | translate }}</span>
+                  <span *ngIf="!isSubmitting">{{ Id ? ('UPDATE' | translate) : ('SAVE' | translate) }}</span>
               </button>
 
-              
+
             </div>
             <!-- <div class="col-12 mt-2" *ngIf="vitalSignsForm.hasError('noMeasurement') && (vitalSignsForm.touched || vitalSignsForm.dirty)">
                 <div class="text-danger small">
@@ -313,13 +318,15 @@
             </div> -->
         </div>
         <!-- buttons on their own row -->
+            </div>
+          </ng-template>
         </div>
         </div>
     </form>
 <!-- 👇 Grid/Card Starts -->
 
 
- 
+
 <div class="card p-3 mt-4 shadow-sm">
     <!-- <div class="card-body"> -->
         <div class="table-responsive">

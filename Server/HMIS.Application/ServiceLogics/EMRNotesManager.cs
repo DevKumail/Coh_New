@@ -240,10 +240,14 @@ namespace HMIS.Service.ServiceLogics
 
                         await AddTemplateDetail(note,noteId);
                     }
+                    if(note.FileId > 0)
+                    {
+                        note.Id = emrNote.NoteId; 
+                        await InsertSpeechWithTranscription(note);
+                    }
                     _logger.LogInformation("Successfully created new note ID: {NoteId}", emrNote.NoteId);
                 }
 
-                // Handle structured note questions if applicable
                 if (noteType == "structured" && note.StructuredNote?.Node?.Questions != null)
                 {
                     await SaveStructuredQuestions(note, emrNote.NoteId);
@@ -455,359 +459,154 @@ namespace HMIS.Service.ServiceLogics
         }
 
 
-        //public async Task<nodeModel> InsertSpeech(ClinicalNoteObj note)
-        //{
-        //    try
-        //    {
-        //        // Get patient ID
-        //        var patientId = await _context.RegPatient
-        //            .Where(x => x.Mrno == note.Mrno)
-        //            .Select(x => x.PatientId)
-        //            .FirstOrDefaultAsync();
+        public async Task<nodeModel> InsertSpeech(ClinicalNoteObj note)
+        {
+            try
+            {
+                // Get patient ID
+                var patientId = await _context.RegPatient
+                    .Where(x => x.Mrno == note.Mrno)
+                    .Select(x => x.PatientId)
+                    .FirstOrDefaultAsync();
 
-        //        var speechToText = new SpeechToText
-        //        {
-        //            PatientId = patientId,
-        //            NoteHtmltext = note.NoteHtmltext,
-        //            NoteText = note.NoteText,
-        //            CreatedOn = note.CreatedOn ?? DateTime.Now,
-        //            Mrno = note.Mrno,
-        //            NoteTitle = note.NoteTitle,
-        //            Description = note.Description,
-        //            CreatedBy = note.CreatedBy,
-        //            SignedBy = note.SignedBy,
-        //            VisitDate = note.VisitDate ?? DateTime.Now,
-        //            IsDeleted = note.IsDeleted ?? false,
-        //            UpdatedBy = note.UpdatedBy,
-        //            NotePath = note.NotePath,
-        //            AppointmentId = note.AppointmentId,
-        //            NotePathId = note.pathId,
-        //            FileId = note.File_Id
-        //        };
+                var speechToText = new SpeechToText
+                {
+                    PatientId = patientId,
+                    NoteHtmltext = note.NoteHtmltext,
+                    NoteText = note.NoteText,
+                    Mrno = note.Mrno,
+                    NoteTitle = note.NoteTitle,
+                    Description = note.Description,
+                    SignedBy = note.SignedBy,
+                    VisitDate = note.VisitDate ?? DateTime.Now,
+                    IsDeleted = note.IsDeleted ?? false,
+                    NotePath = note.NotePath,
+                    AppointmentId = note.AppointmentId,
+                    NotePathId = note.pathId,
+                    FileId = note.File_Id,
+                    NoteId = note.Id
+                };
 
-        //        _context.SpeechToText.Add(speechToText);
-        //        await _context.SaveChangesAsync();
+                _context.SpeechToText.Add(speechToText);
+                await _context.SaveChangesAsync();
 
-        //        _logger.LogInformation("SpeechToText record inserted with ID: {InsertedId}", speechToText.Id);
+                _logger.LogInformation("SpeechToText record inserted with ID: {InsertedId}", speechToText.Id);
 
-        //        string notetext = note.NoteText;
-        //        var node = await GetNoteQuestionBYNoteId(note.pathId, notetext);
+                string notetext = note.NoteText;
+                var node = await GetNoteQuestionBYNoteId(note.pathId, notetext);
 
-        //        // Get API response using EF instead of Dapper
-        //        var getpurposeofvisit2 = await _context.SpeechToText
-        //            .Where(x => x.Id == 567)
-        //            .Select(x => new SpeechToTextResponse { ApiResponse = x.ApiResponse })
-        //            .FirstOrDefaultAsync();
+                // Get API response using EF instead of Dapper
+                var getpurposeofvisit2 = await _context.SpeechToText
+                    .Where(x => x.Id == 567)
+                    .Select(x => new SpeechToTextResponse { ApiResponse = x.ApiResponse })
+                    .FirstOrDefaultAsync();
 
-        //        if (!string.IsNullOrEmpty(getpurposeofvisit2?.ApiResponse))
-        //        {
-        //            var model = ParseApiResponse(getpurposeofvisit2.ApiResponse);
-        //            if (model != null)
-        //            {
-        //                node = new nodeModel { node = model };
-        //            }
-        //        }
+                if (!string.IsNullOrEmpty(getpurposeofvisit2?.ApiResponse))
+                {
+                    var model = ParseApiResponse(getpurposeofvisit2.ApiResponse);
+                    if (model != null)
+                    {
+                        node = new nodeModel { node = model };
+                    }
+                }
 
-        //        return node;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error in InsertSpeech for MRNo: {Mrno}", note.Mrno);
-        //        return null;
-        //    }
-        //}
+                return node;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in InsertSpeech for MRNo: {Mrno}", note.Mrno);
+                return null;
+            }
+        }
 
+        public async Task<nodeModel> InsertSpeechWithTranscription(ClinicalNoteDto note)
+        {
+            try
+            {
+                string transcript = "";
+                string filePath = "";
 
+                if (note.FileId > 0)
+                {
+                    var result = await TranscribeAudioFile(note.FileId);
+                    transcript = result.Transcript;
+                    filePath = result.FilePath;
+                }
 
+                var NoteData = new ClinicalNoteObj()
+                {
+                    Id = note.Id,
+                    Description = note.Description,
+                    NoteTitle = note.NoteTitle,
+                    // SignedBy = note.SignedBy,
+                    NoteText = transcript,
+                    NotePath = filePath,
+                    Mrno = note.MrNo,
+                    AppointmentId = note.AppointmentId,
+                    pathId = note.PathId,
+                    File_Id = note.FileId
+                };
 
+                return await InsertSpeech(NoteData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in InsertSpeechWithTranscription for MRNo: {Mrno}", note.MrNo);
+                return null;
+            }
+        }
 
+        private async Task<TranscriptionResult> TranscribeAudioFile(long? fileId)
+        {
+            try
+            {
+                if (!fileId.HasValue)
+                    throw new ArgumentException("FileId is required");
 
-        //public async Task<ClinicalNoteResponse> InsertStructureNotes(ClinicalNoteDto note)
-        //{
-        //    await using var transaction = await _context.Database.BeginTransactionAsync();
+                // Use FileRepository to get file path
+                var filePath = await _fileRepository.GetFilePathAsync(fileId.Value);
 
-        //    try
-        //    {
-        //        var emrNote = new EmrnotesNote
-        //        {
-        //            NotesTitle = ExtractNoteTitle(note),
-        //            NoteText = note.NoteText,
-        //            NoteHtmltext = note.HtmlContent,
-        //            Description = note.Description,
-        //            Mrno = note.MrNo,
-        //            VisitAcNo = note.AppointmentId,
-        //           // Signed = note.SignedBy,
-        //            SignedBy = note.SignedBy ,
-        //            //SignedDate = DateTime.UtcNow ,
-        //            NoteType = "Structure",
-        //            Active = true,
-        //            //NoteStatus = note.SignedBy ? "Signed" : "Draft",
-        //            IsEdit = false,
-        //            Review = false,
-        //            IsNursingNote = false,
-        //            IsMbrcompleted = false
-        //        };
+                if (string.IsNullOrEmpty(filePath))
+                    throw new FileNotFoundException($"File not found for FileId: {fileId}");
 
-        //        await _context.EmrnotesNote.AddAsync(emrNote);
-        //        await _context.SaveChangesAsync();
+                if (!System.IO.File.Exists(filePath))
+                    throw new FileNotFoundException($"Audio file not found at: {filePath}");
 
-        //        // 2. Use AutoMapper for answers (simpler mapping)
-        //        if (note.StructuredNote?.Node?.Questions != null && note.StructuredNote.Node.Questions.Any())
-        //        {
-        //            var answers = FlattenQuestions(
-        //                note.StructuredNote.Node.Questions,
-        //                emrNote.NoteId,
-        //                note.MrNo,
-        //                note.AppointmentId);
+                // Read audio file
+                byte[] audioBytes = await System.IO.File.ReadAllBytesAsync(filePath);
 
-        //            if (answers.Any())
-        //            {
-        //                var answerEntities = _mapper.Map<List<EmrnotesAnswer>>(answers);
-        //                await _context.EmrnotesAnswer.AddRangeAsync(answerEntities);
-        //                await _context.SaveChangesAsync();
-        //            }
-        //        }
+                // Deepgram call
+                var response = await _deepgram.TranscribeFile(
+                    audioBytes,
+                    new PreRecordedSchema
+                    {
+                        Model = "nova-3"
+                    });
 
-        //        await transaction.CommitAsync();
+                string transcript = response?
+                    .Results?
+                    .Channels?[0]?
+                    .Alternatives?[0]?
+                    .Transcript ?? "";
 
-        //        return new ClinicalNoteResponse
-        //        {
-        //            Success = true,
-        //            NoteId = emrNote.NoteId,
-        //            Message = "Speech note saved successfully"
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        await transaction.RollbackAsync();
-        //        _logger.LogError(ex, "Error in InsertSpeechWithTranscriptionManual");
-        //        throw;
-        //    }
-        //}
+                _logger.LogInformation(
+                    "Deepgram transcription complete. FileId: {FileId}, Transcript Length: {Length}",
+                    fileId,
+                    transcript.Length
+                );
 
-        //private List<AnswerItem> FlattenQuestions(
-        //List<Question> questions,
-        //long noteId,
-        //string mrNo,
-        //long visitAcNo)
-        //{
-        //    var answers = new List<AnswerItem>();
-
-        //    foreach (var question in questions)
-        //    {
-        //        if (!string.IsNullOrWhiteSpace(question.Answer))
-        //        {
-        //            answers.Add(new AnswerItem
-        //            {
-        //                NoteId = noteId,
-        //                Quest_Id = question.Quest_Id,
-        //                Answer = question.Answer,
-        //                MrNo = mrNo,
-        //                VisitAcNo = visitAcNo
-        //            });
-        //        }
-
-        //        if (question.Children != null && question.Children.Any())
-        //        {
-        //            answers.AddRange(FlattenQuestions(
-        //                question.Children,
-        //                noteId,
-        //                mrNo,
-        //                visitAcNo));
-        //        }
-        //    }
-
-        //    return answers;
-        //}
-        //private string ExtractNoteTitle(ClinicalNoteDto note)
-        //{
-        //    if (!string.IsNullOrEmpty(note.NoteTitle))
-        //        return note.NoteTitle;
-
-        //    if (note.StructuredNote != null &&
-        //        note.StructuredNote.Node != null &&
-        //        !string.IsNullOrEmpty(note.StructuredNote.Node.NoteTitle))
-        //    {
-        //        return note.StructuredNote.Node.NoteTitle;
-        //    }
-
-        //    return "Speech Note";
-        //}
-
-        //public async Task<nodeModel> InsertSpeechWithTranscription(ClinicalNoteDto note)
-        //{
-        //    try
-        //    {
-        //        string transcript = "";
-        //        string filePath = "";
-
-        //        if (note.FileId > 0)
-        //        {
-        //            var result = await TranscribeAudioFile(note.FileId);
-        //            transcript = result.Transcript;
-        //            filePath = result.FilePath;
-        //        }
-
-        //        var NoteData = new ClinicalNoteObj()
-        //        {
-        //            Id = note.Id,
-        //            CreatedBy = note.CreatedBy,
-        //            Description = note.Description,
-        //            NoteTitle = note.NoteTitle,
-        //           // SignedBy = note.SignedBy,
-        //            UpdatedBy = note.UpdatedBy,
-        //            NoteText = transcript,
-        //            NotePath = filePath,
-        //            Mrno = note.MrNo,
-        //            AppointmentId = note.AppointmentId,
-        //            pathId = note.PathId,
-        //            File_Id = note.FileId
-        //        };
-
-        //        return await InsertSpeech(NoteData);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error in InsertSpeechWithTranscription for MRNo: {Mrno}", note.MrNo);
-        //        return null;
-        //    }
-        //}
-
-        //public async Task<EmrnotesNote> SaveEMRNote(EmrnotesNote noteDto)
-        //{
-        //    try
-        //    {
-        //        _logger.LogInformation("Starting to save EMR note for MRNo: {Mrno}, NoteId: {NoteId}", noteDto.Mrno, noteDto.NoteId);
-
-        //        noteDto.Active = true;
-
-        //        if (noteDto.SignedBy > 0)
-        //        {
-        //            noteDto.Signed = true;
-        //            noteDto.IsEdit = false;
-        //        }
-        //        else
-        //        {
-        //            noteDto.Signed = false;
-        //            noteDto.IsEdit = true;
-        //        }
-
-        //        // Handle create vs update
-        //        if (noteDto.NoteId > 0)
-        //        {
-        //            // Update existing note
-        //            var existingNote = await _context.EmrnotesNote
-        //                .FirstOrDefaultAsync(n => n.NoteId == noteDto.NoteId);
-
-        //            if (existingNote == null)
-        //                throw new Exception($"Note with ID {noteDto.NoteId} not found");
-
-        //            // Update properties
-        //            existingNote.NotesTitle = noteDto.NotesTitle;
-        //            existingNote.NoteText = noteDto.NoteText;
-        //            existingNote.NoteHtmltext = noteDto.NoteHtmltext;
-        //            existingNote.Description = noteDto.Description;
-        //            existingNote.UpdatedDate = noteDto.UpdatedDate;
-        //            existingNote.UpdatedBy = noteDto.UpdatedBy;
-        //            existingNote.UpdatedAt = DateTime.Now;
-        //            existingNote.Signed = noteDto.Signed;
-        //            existingNote.SignedBy = noteDto.SignedBy;
-        //            existingNote.SignedDate = noteDto.SignedDate;
-        //            existingNote.IsEdit = noteDto.IsEdit;
-        //            existingNote.NoteType = noteDto.NoteType;
-        //            existingNote.NoteStatus = noteDto.NoteStatus;
-        //            existingNote.Review = noteDto.Review;
-        //            existingNote.CosignedBy = noteDto.CosignedBy;
-        //            existingNote.CosignedDate = noteDto.CosignedDate;
-        //            existingNote.MrcosignedBy = noteDto.MrcosignedBy;
-        //            existingNote.MrcosignedDate = noteDto.MrcosignedDate;
-        //            existingNote.ReviewedBy = noteDto.ReviewedBy;
-        //            existingNote.ReviewedDate = noteDto.ReviewedDate;
-        //            existingNote.Documents = noteDto.Documents;
-        //            existingNote.IsNursingNote = noteDto.IsNursingNote;
-        //            existingNote.IsMbrcompleted = noteDto.IsMbrcompleted;
-
-        //            await _context.SaveChangesAsync();
-        //            _logger.LogInformation("Successfully updated EMR note with ID: {NoteId}", existingNote.NoteId);
-
-        //            return existingNote;
-        //        }
-        //        else
-        //        {
-        //            // Create new note
-        //            noteDto.CreatedAt = DateTime.Now;
-        //            noteDto.UpdatedAt = DateTime.Now;
-
-        //            _context.EmrnotesNote.Add(noteDto);
-        //            await _context.SaveChangesAsync();
-
-        //            _logger.LogInformation("Successfully created new EMR note with ID: {NoteId}", noteDto.NoteId);
-        //            return noteDto;
-        //        }
-        //    }
-        //    catch (DbUpdateException dbEx)
-        //    {
-        //        _logger.LogError(dbEx, "Database error while saving EMR note for MRNo: {Mrno}, NoteId: {NoteId}", noteDto.Mrno, noteDto.NoteId);
-        //        throw new Exception("Database error occurred while saving the note", dbEx);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error saving EMR note for MRNo: {Mrno}, NoteId: {NoteId}", noteDto.Mrno, noteDto.NoteId);
-        //        throw;
-        //    }
-        //}
-
-        //private async Task<TranscriptionResult> TranscribeAudioFile(long? fileId)
-        //{
-        //    try
-        //    {
-        //        if (!fileId.HasValue)
-        //            throw new ArgumentException("FileId is required");
-
-        //        // Use FileRepository to get file path
-        //        var filePath = await _fileRepository.GetFilePathAsync(fileId.Value);
-
-        //        if (string.IsNullOrEmpty(filePath))
-        //            throw new FileNotFoundException($"File not found for FileId: {fileId}");
-
-        //        if (!System.IO.File.Exists(filePath))
-        //            throw new FileNotFoundException($"Audio file not found at: {filePath}");
-
-        //        // Read audio file
-        //        byte[] audioBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-
-        //        // Deepgram call
-        //        var response = await _deepgram.TranscribeFile(
-        //            audioBytes,
-        //            new PreRecordedSchema
-        //            {
-        //                Model = "nova-3"
-        //            });
-
-        //        string transcript = response?
-        //            .Results?
-        //            .Channels?[0]?
-        //            .Alternatives?[0]?
-        //            .Transcript ?? "";
-
-        //        _logger.LogInformation(
-        //            "Deepgram transcription complete. FileId: {FileId}, Transcript Length: {Length}",
-        //            fileId,
-        //            transcript.Length
-        //        );
-
-        //        return new TranscriptionResult
-        //        {
-        //            Transcript = transcript,
-        //            FilePath = filePath
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error transcribing audio file for FileId: {FileId}", fileId);
-        //        throw;
-        //    }
-        //}
+                return new TranscriptionResult
+                {
+                    Transcript = transcript,
+                    FilePath = filePath
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error transcribing audio file for FileId: {FileId}", fileId);
+                throw;
+            }
+        }
 
         public async Task<(IEnumerable<GetEMRNoteListDto> Data, int TotalCount)> GetEMRNotesByMRNo(string mrno, int page, int pageSize)
         {
@@ -830,6 +629,7 @@ namespace HMIS.Service.ServiceLogics
             return (notes, totalCount);
         }
 
+
         public async Task<EMRNoteDetailDto?> GetEMRNoteByNoteId(long noteId)
         {
             try
@@ -845,12 +645,78 @@ namespace HMIS.Service.ServiceLogics
                     commandType: CommandType.StoredProcedure
                 );
 
+                if (result?.TemplateId > 0)
+                {
+                    var emrNotesModel = await GetNoteQuestionBYPathId(result.TemplateId ?? 0);
+
+                    // Convert EMRNotesModel to GetEMRNotesModel
+                    var getTemplate = new GetEMRNotesModel
+                    {
+                        NoteTitle = emrNotesModel.NoteTitle,
+                        Questions = ConvertNoteModelToGetNoteModel(emrNotesModel.Questions)
+                    };
+
+                    var flatQuestions = JsonConvert.DeserializeObject<List<FlatQuestionDto>>(result.AnswerJson)
+                                        ?? new List<FlatQuestionDto>();
+
+                    var answerLookup = flatQuestions
+                        .Where(q => !string.IsNullOrEmpty(q.Answer))
+                        .ToDictionary(q => q.Quest_Id, q => q.Answer);
+
+                    // Populate answers recursively
+                    PopulateAnswersRecursively(getTemplate.Questions, answerLookup);
+
+                    // Wrap in a List since AnsweredNotesTemplate expects List<GetEMRNotesModel>
+                    result.AnsweredNotesTemplate = new List<GetEMRNotesModel> { getTemplate };
+                }
+
                 return result;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetEMRNoteByNoteId for NoteId: {NoteId}", noteId);
                 return null;
+            }
+        }
+
+        // Helper method to convert List<NoteModel> to List<GetNoteModel>
+        private List<GetNoteModel> ConvertNoteModelToGetNoteModel(List<NoteModel> noteModels)
+        {
+            if (noteModels == null) return new List<GetNoteModel>();
+
+            var result = new List<GetNoteModel>();
+
+            foreach (var noteModel in noteModels)
+            {
+                result.Add(new GetNoteModel
+                {
+                    Quest_Id = noteModel.Quest_Id,
+                    Quest_Title = noteModel.Quest_Title,
+                    Type = noteModel.Type,
+                    Answer = noteModel.Answer,
+                    Children = ConvertNoteModelToGetNoteModel(noteModel.Children)
+                });
+            }
+
+            return result;
+        }
+
+        // Recursive method to populate answers
+        private void PopulateAnswersRecursively(List<GetNoteModel> questions, Dictionary<long, string> answerLookup)
+        {
+            if (questions == null) return;
+
+            foreach (var question in questions)
+            {
+                if (answerLookup.TryGetValue(question.Quest_Id, out var answer))
+                {
+                    question.Answer = answer;
+                }
+
+                if (question.Children != null && question.Children.Any())
+                {
+                    PopulateAnswersRecursively(question.Children, answerLookup);
+                }
             }
         }
         // Helper method to parse API response

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
 import { Subscription } from 'rxjs';
 import { filter, distinctUntilChanged } from 'rxjs/operators';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'app-social-history',
@@ -20,13 +21,16 @@ import { filter, distinctUntilChanged } from 'rxjs/operators';
         FormsModule,
         TranslatePipe,
         NgIcon,
-        FilledOnValueDirective,
         GenericPaginationComponent
     ],
     templateUrl: './social-history.component.html',
     styleUrls: ['./social-history.component.scss']
 })
 export class SocialHistoryComponent {
+
+    @ViewChild('socialHistoryModal') socialHistoryModal!: TemplateRef<any>;
+
+    @Input() clinicalnote: boolean = false;
 
     SocialForm!: FormGroup;
     todayStr: string = '';
@@ -46,6 +50,7 @@ export class SocialHistoryComponent {
         private fb: FormBuilder,
         private ClinicalApiService: ClinicalApiService,
         private PatientData: PatientBannerService,
+        private modalService: NgbModal
     ) { }
 
     ngOnInit(): void {
@@ -100,6 +105,15 @@ export class SocialHistoryComponent {
         this.getSocialHistoryData();
     }
 
+    openSocialHistoryModal(): void {
+        this.resetForm();
+        this.modalService.open(this.socialHistoryModal, {
+            size: 'lg',
+            centered: true,
+            backdrop: 'static'
+        });
+    }
+
     submit() {
         this.isSubmitting = true;
         const uid = sessionStorage.getItem('userId');
@@ -143,6 +157,7 @@ export class SocialHistoryComponent {
             this.SocialForm.reset();
             this.getSocialHistoryData();
             this.isSubmitting = false;
+            this.modalService.dismissAll();
             return
         }).catch((error: any) => Swal.fire({
             title: 'Error',
@@ -182,6 +197,11 @@ export class SocialHistoryComponent {
             startDate: this.formatDateYMDForInput(data.startDate),
             endDate: this.formatDateYMDForInput(data.endDate),
         })
+        this.modalService.open(this.socialHistoryModal, {
+            size: 'lg',
+            centered: true,
+            backdrop: 'static'
+        });
     }
 
     deleteSocialHistory(id: any) {
