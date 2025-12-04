@@ -821,7 +821,7 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
 
     MHPaginationInfo: any = {
         Page: 1,
-        RowsPerPage: 3,
+        RowsPerPage: 10,
     };
 
     async onDiagnosisPageChanged(page: number) {

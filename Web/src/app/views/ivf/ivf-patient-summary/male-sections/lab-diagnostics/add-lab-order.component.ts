@@ -161,6 +161,7 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() orderId?: string | number;
   @Input() initialOrder?: any;
+  @Input() investigationTypeId: number = 23;
 
   @Output() cancel = new EventEmitter<void>();
   @Output() save = new EventEmitter<{ tests: any[]; details: any; header?: any }>();
@@ -211,10 +212,11 @@ export class AddLabOrderComponent implements OnInit, OnChanges {
 
   loadTree() {
     this.isLoadingTree = true;
-    this.ivfApi.getLabTestsTree(23).subscribe({
+    this.ivfApi.getLabTestsTree(this.investigationTypeId).subscribe({
       next: (res: any) => {
         this.tree = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
-        (this.tree || []).forEach((n: any) => this.expandedIds.add(n.id));
+        // Start with everything collapsed
+        this.expandedIds.clear();
       },
       error: () => {},
       complete: () => { this.isLoadingTree = false; }

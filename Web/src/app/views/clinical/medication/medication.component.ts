@@ -42,7 +42,7 @@ export class MedicationComponent {
     Mrno: any;
     PastMedicationPaginationInfo: any = {
         Page: 1,
-        RowsPerPage: 3,
+        RowsPerPage: 10,
     };
     PastMedicationTotalItems: number = 0;
     currentMedicationData: any = [];
@@ -54,7 +54,7 @@ export class MedicationComponent {
     DrugTotalItems: number = 0;
     currentMedicationPaginationInfo: any = {
         Page: 1,
-        RowsPerPage: 3,
+        RowsPerPage: 10,
     };
     Id: any;
     SelectedVisit: any;

@@ -33,7 +33,7 @@ export class FamilyHistoryComponent {
   FamilyForm!: FormGroup;
   pagegination: any = {
     currentPage: 1,
-    pageSize: 5,
+    pageSize: 10,
   }
   FamilyHistoryTotalItems: number = 0;
   isSubmitting: boolean = false;

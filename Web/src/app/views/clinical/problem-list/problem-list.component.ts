@@ -873,7 +873,7 @@ minDateValidator(otherControlName: string) {
 
     MHPaginationInfo: any = {
       Page: 1,
-      RowsPerPage: 5
+      RowsPerPage: 10
     };
 
   async onDiagnosisPageChanged(page: number) {

@@ -1,221 +1,421 @@
 <form [formGroup]="ImmunizationForm">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div style="width: 150px;"></div>
-    <h5 class="modal-title d-inline-flex align-items-center gap-2 m-0">
-      <i class="bi bi-heart-pulse"></i>
-      <span>{{ 'IMMUNIZATION' | translate }}</span>
-    </h5>
-    <button type="button" class="btn btn-primary" (click)="openModal()">
-      <i class="bi bi-plus-circle"></i> {{ 'ADD_IMMUNIZATION' | translate }}
-    </button>
-  </div>
-
-  <!-- Modal -->
-  <ng-template #immunizationModal let-modal>
-    <div class="modal-header">
-      <h5 class="modal-title d-inline-flex align-items-center gap-2">
-        <i class="bi bi-heart-pulse"></i>
-        <span>{{ 'IMMUNIZATION' | translate }}</span>
-      </h5>
-      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-    </div>
-
-    <div class="modal-body">
-    <div class="row p-3 g-2">
-      <div class="col-12 d-flex align-items-center">
-        <input type="checkbox" class="form-check-input" id="providerOutside" formControlName="isProviderCheck"
-          (change)="onCheckboxChange2()" />
-        <label class="form-check-label ms-2" for="providerOutside">Provider Outside Clinic</label>
-      </div>
-
-
-          <!-- [class.is-invalid]="ImmunizationForm.get('providerId')?.invalid && ImmunizationForm.get('providerId')?.touched" -->
-      <div class="col-md-3 col-sm-4 col-12">
-        <label class="form-label">Provider <span class="text-danger">*</span></label>
-        <select class="form-select" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value" formControlName="providerId"
-          (change)="onProviderChange($event)">
-          <option [ngValue]="null">Provider</option>
-          <option *ngFor="let p of hrEmployees" [ngValue]="p.providerId">{{ p.name }}</option>
-        </select>
-        <div *ngIf="!ImmunizationForm.get('isProviderCheck')?.value && ImmunizationForm.get('providerId')?.invalid && ImmunizationForm.get('providerId')?.touched"
-             class="invalid-feedback d-block">
-          Provider is required
+    <!-- Modal -->
+    <ng-template #immunizationModal let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title d-inline-flex align-items-center gap-2">
+                <i class="bi bi-heart-pulse"></i>
+                <span>{{ "IMMUNIZATION" | translate }}</span>
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                aria-label="Close"
+                (click)="modal.dismiss()"
+            ></button>
         </div>
 
-          <!-- [class.is-invalid]="ImmunizationForm.get('providerDescription')?.invalid && ImmunizationForm.get('providerDescription')?.touched"  -->
-        <input *ngIf="ImmunizationForm.get('isProviderCheck')?.value" class="form-control" type="text"
-          placeholder="Enter Provider / Nurse Name" formControlName="providerDescription"/>
-        <div *ngIf="ImmunizationForm.get('isProviderCheck')?.value && ImmunizationForm.get('providerDescription')?.invalid && ImmunizationForm.get('providerDescription')?.touched"
-             class="invalid-feedback d-block">
-          Provider name is required
-        </div>
-      </div>
+        <div class="modal-body">
+            <div class="row p-3 g-2">
+                <div class="col-12 d-flex align-items-center">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="providerOutside"
+                        formControlName="isProviderCheck"
+                        (change)="onCheckboxChange2()"
+                    />
+                    <label class="form-check-label ms-2" for="providerOutside"
+                        >Provider Outside Clinic</label
+                    >
+                </div>
 
+                <!-- [class.is-invalid]="ImmunizationForm.get('providerId')?.invalid && ImmunizationForm.get('providerId')?.touched" -->
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label class="form-label"
+                        >Provider <span class="text-danger">*</span></label
+                    >
+                    <select
+                        class="form-select"
+                        *ngIf="!ImmunizationForm.get('isProviderCheck')?.value"
+                        formControlName="providerId"
+                        (change)="onProviderChange($event)"
+                    >
+                        <option [ngValue]="null">Provider</option>
+                        <option
+                            *ngFor="let p of hrEmployees"
+                            [ngValue]="p.providerId"
+                        >
+                            {{ p.name }}
+                        </option>
+                    </select>
+                    <div
+                        *ngIf="
+                            !ImmunizationForm.get('isProviderCheck')?.value &&
+                            ImmunizationForm.get('providerId')?.invalid &&
+                            ImmunizationForm.get('providerId')?.touched
+                        "
+                        class="invalid-feedback d-block"
+                    >
+                        Provider is required
+                    </div>
+
+                    <!-- [class.is-invalid]="ImmunizationForm.get('providerDescription')?.invalid && ImmunizationForm.get('providerDescription')?.touched"  -->
+                    <input
+                        *ngIf="ImmunizationForm.get('isProviderCheck')?.value"
+                        class="form-control"
+                        type="text"
+                        placeholder="Enter Provider / Nurse Name"
+                        formControlName="providerDescription"
+                    />
+                    <div
+                        *ngIf="
+                            ImmunizationForm.get('isProviderCheck')?.value &&
+                            ImmunizationForm.get('providerDescription')
+                                ?.invalid &&
+                            ImmunizationForm.get('providerDescription')?.touched
+                        "
+                        class="invalid-feedback d-block"
+                    >
+                        Provider name is required
+                    </div>
+                </div>
 
                 <!-- [class.is-invalid]="ImmunizationForm.get('immTypeId')?.invalid && ImmunizationForm.get('immTypeId')?.touched" -->
-      <div class="col-md-3 col-sm-4 col-12">
-          <label class="form-label">Type <span class="text-danger">*</span></label>
-        <select class="form-select" formControlName="immTypeId">
-          <option [ngValue]="null" disabled>Type</option>
-          <option *ngFor="let t of getImmunization" [ngValue]="t.immTypeId">{{ t.immTypeName }}</option>
-        </select>
-        <div *ngIf="ImmunizationForm.get('immTypeId')?.invalid && ImmunizationForm.get('immTypeId')?.touched"
-             class="invalid-feedback d-block">
-          Type is required
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label class="form-label"
+                        >Type <span class="text-danger">*</span></label
+                    >
+                    <select class="form-select" formControlName="immTypeId">
+                        <option [ngValue]="null" disabled>Type</option>
+                        <option
+                            *ngFor="let t of getImmunization"
+                            [ngValue]="t.immTypeId"
+                        >
+                            {{ t.immTypeName }}
+                        </option>
+                    </select>
+                    <div
+                        *ngIf="
+                            ImmunizationForm.get('immTypeId')?.invalid &&
+                            ImmunizationForm.get('immTypeId')?.touched
+                        "
+                        class="invalid-feedback d-block"
+                    >
+                        Type is required
+                    </div>
+                </div>
+
+                <div
+                    class="col-md-3 col-sm-4 col-12"
+                    *ngIf="!ImmunizationForm.get('isProviderCheck')?.value"
+                >
+                    <label class="form-label">Dose</label>
+                    <input
+                        class="form-control"
+                        type="text"
+                        placeholder="Dose"
+                        formControlName="dose"
+                    />
+                </div>
+
+                <div
+                    class="col-md-3 col-sm-4 col-12"
+                    *ngIf="!ImmunizationForm.get('isProviderCheck')?.value"
+                >
+                    <label class="form-label">Route</label>
+                    <select class="form-select" formControlName="routeId">
+                        <option [ngValue]="null">Route</option>
+                        <option
+                            *ngFor="let r of RouteOptions"
+                            [ngValue]="r.routeId"
+                        >
+                            {{ r.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div
+                    class="col-md-3 col-sm-4 col-12"
+                    *ngIf="!ImmunizationForm.get('isProviderCheck')?.value"
+                >
+                    <label class="form-label">Immunization Start Date</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        formControlName="startDate"
+                    />
+                </div>
+
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label class="form-label">Description</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Description"
+                        formControlName="description"
+                    />
+                </div>
+
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label class="form-label">Manufacturer Name</label>
+                    <input
+                        class="form-control"
+                        type="text"
+                        placeholder="Manufacturer Name"
+                        formControlName="manufacturerName"
+                    />
+                </div>
+
+                <div
+                    class="col-md-3 col-sm-4 col-12"
+                    *ngIf="!ImmunizationForm.get('isProviderCheck')?.value"
+                >
+                    <label class="form-label">Lot No. of Medication</label>
+                    <input
+                        class="form-control"
+                        type="text"
+                        placeholder="No. of Medication"
+                        formControlName="lotNumber"
+                    />
+                </div>
+
+                <div
+                    class="col-md-3 col-sm-4 col-12"
+                    *ngIf="!ImmunizationForm.get('isProviderCheck')?.value"
+                >
+                    <label class="form-label">Immunization Date</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        formControlName="startDate"
+                    />
+                </div>
+
+                <div
+                    class="col-md-3 col-sm-4 col-12"
+                    *ngIf="!ImmunizationForm.get('isProviderCheck')?.value"
+                >
+                    <label class="form-label">Expiry Date</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        formControlName="expiryDate"
+                    />
+                </div>
+
+                <div
+                    class="col-md-3 col-sm-4 col-12"
+                    *ngIf="!ImmunizationForm.get('isProviderCheck')?.value"
+                >
+                    <label class="form-label">Next Immunization Date</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        formControlName="nextInjectionDate"
+                    />
+                </div>
+
+                <div
+                    class="col-md-3 col-sm-4 col-12"
+                    *ngIf="!ImmunizationForm.get('isProviderCheck')?.value"
+                >
+                    <label class="form-label" for="site"
+                        >Site Immunization</label
+                    >
+                    <select class="form-select" formControlName="SiteInjection">
+                        <option [ngValue]="null">Select Site</option>
+                        <option
+                            *ngFor="let s of siteOptions"
+                            [ngValue]="s.siteId"
+                        >
+                            {{ s.siteName }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label class="form-label">Comments</label>
+                    <input
+                        class="form-control"
+                        type="text"
+                        placeholder="Comments"
+                        formControlName="comments"
+                    />
+                </div>
+
+                <div class="col-md-3 col-sm-4 col-12">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" formControlName="status">
+                        <option [ngValue]="null">Status</option>
+                        <option *ngFor="let st of Active" [ngValue]="st.id">
+                            {{ st.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 col-sm-4 col-12 ms-auto mt-4">
+                    <div class="d-flex justify-content-end gap-2 mt-2">
+                        <button
+                            class="btn btn-secondary ms-2 me-2"
+                            type="button"
+                            (click)="DropFilled()"
+                        >
+                            {{ "CLEAR" | translate }}
+                        </button>
+                        <button
+                            class="btn btn-success"
+                            type="button"
+                            (click)="submit()"
+                            [disabled]="isSubmitting"
+                        >
+                            <span *ngIf="isSubmitting">
+                                <span
+                                    class="spinner-border spinner-border-sm me-1 ms-1"
+                                    role="status"
+                                    aria-hidden="true"
+                                ></span>
+                                {{ "SUBMITTING" | translate }}
+                            </span>
+                            <span *ngIf="!isSubmitting">{{
+                                "SAVE" | translate
+                            }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+    </ng-template>
 
-      <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
-        <label class="form-label">Dose</label>
-        <input class="form-control" type="text" placeholder="Dose" formControlName="dose" />
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
-        <label class="form-label">Route</label>
-        <select class="form-select" formControlName="routeId">
-          <option [ngValue]="null">Route</option>
-          <option *ngFor="let r of RouteOptions" [ngValue]="r.routeId">{{ r.name }}</option>
-        </select>
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
-        <label class="form-label">Immunization Start Date</label>
-        <input type="date" class="form-control" formControlName="startDate" />
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12">
-        <label class="form-label">Description</label>
-        <input type="text" class="form-control" placeholder="Description" formControlName="description" />
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12">
-        <label class="form-label">Manufacturer Name</label>
-        <input class="form-control" type="text" placeholder="Manufacturer Name" formControlName="manufacturerName" />
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
-        <label class="form-label">Lot No. of Medication</label>
-        <input class="form-control" type="text" placeholder="No. of Medication" formControlName="lotNumber" />
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
-        <label class="form-label">Immunization Date</label>
-        <input type="date" class="form-control" formControlName="startDate" />
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
-        <label class="form-label">Expiry Date</label>
-        <input type="date" class="form-control" formControlName="expiryDate" />
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
-        <label class="form-label">Next Immunization Date</label>
-        <input type="date" class="form-control" formControlName="nextInjectionDate" />
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12" *ngIf="!ImmunizationForm.get('isProviderCheck')?.value">
-        <label class="form-label" for="site">Site Immunization</label>
-        <select class="form-select" formControlName="SiteInjection">
-          <option [ngValue]="null">Select Site</option>
-          <option *ngFor="let s of siteOptions" [ngValue]="s.siteId">{{ s.siteName }}</option>
-        </select>
-      </div>
-
-
-
-      <div class="col-md-3 col-sm-4 col-12">
-        <label class="form-label">Comments</label>
-        <input class="form-control" type="text" placeholder="Comments" formControlName="comments" />
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12">
-        <label class="form-label">Status</label>
-        <select class="form-select" formControlName="status">
-          <option [ngValue]="null">Status</option>
-          <option *ngFor="let st of Active" [ngValue]="st.id">{{ st.name }}</option>
-        </select>
-      </div>
-
-      <div class="col-md-3 col-sm-4 col-12 ms-auto mt-4">
-        <div class="d-flex justify-content-end gap-2 mt-2">
-          <button class="btn btn-secondary ms-2 me-2" type="button" (click)="DropFilled()">{{ 'CLEAR' | translate
-            }}</button>
-          <button class="btn btn-success" type="button" (click)="submit()" [disabled]="isSubmitting">
-            <span *ngIf="isSubmitting">
-              <span class="spinner-border spinner-border-sm me-1 ms-1" role="status" aria-hidden="true"></span>
-              {{ 'SUBMITTING' | translate }}
-            </span>
-            <span *ngIf="!isSubmitting">{{ 'SAVE' | translate }}</span>
-          </button>
+    <div class="card p-2" [formGroup]="ImmunizationForm">
+        <div
+            class="d-flex justify-content-between align-items-center mb-3"
+        >
+            <h5
+                class="d-inline-flex align-items-center gap-2 m-0"
+            >
+                <i ></i>
+                <span>{{ "IMMUNIZATION" | translate }}</span>
+            </h5>
+            <button
+                type="button"
+                class="btn btn-primary"
+                (click)="openModal()"
+            >
+                <i></i>
+                {{ "ADD" | translate }}
+            </button>
         </div>
-      </div>
-    </div>
-    </div>
-  </ng-template>
+        <div class="row align-items-end">
+            <div class="col-lg-4 col-md-4 col-sm-6">
+                <!-- <label class="form-label" for="statusFilter">Status</label> -->
+                <select
+                    id="statusFilter"
+                    class="form-select"
+                    formControlName="ActiveStatus"
+                    (change)="onStatusChange()"
+                >
+                    <option value="-1" selected>ALL</option>
+                    <option *ngFor="let st of ActiveStatus" [ngValue]="st.id">
+                        {{ st.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
 
-  <div class="card p-2" [formGroup]="ImmunizationForm">
-    <div class="row align-items-end">
-      <div class="col-lg-4 col-md-4 col-sm-6">
-        <!-- <label class="form-label" for="statusFilter">Status</label> -->
-        <select id="statusFilter" class="form-select" formControlName="ActiveStatus" (change)="onStatusChange()">
-          <option value="-1" selected>ALL</option>
-          <option *ngFor="let st of ActiveStatus" [ngValue]="st.id">{{ st.name }}</option>
-        </select>
-      </div>
-    </div>
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered table-striped table-sm">
+                <thead>
+                    <tr class="text-center">
+                        <th>Provider Name</th>
+                        <th>Type</th>
+                        <th>Dose</th>
+                        <th>Route</th>
+                        <th>Immunization Date</th>
+                        <th>Next Immunization</th>
+                        <th>Site Immunization</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider text-center">
+                    <tr *ngFor="let data of ImmunizationData">
+                        @if(data.fullName){
+                        <td>{{ data.fullName || "-" }}</td>
+                        } @else{
+                        <td>
+                            {{ data.providerName || "-" }} <br />
+                            (Out Side Clinic)
+                        </td>
+                        }
+                        <td>{{ data.immTypeName || "-" }}</td>
+                        <td>{{ data.dose || "-" }}</td>
+                        <td>{{ data.routeName || "-" }}</td>
+                        <td>
+                            {{
+                                data.startDate
+                                    ? (data.startDate | date : "dd/MM/yyyy")
+                                    : "-"
+                            }}
+                        </td>
+                        <td>
+                            {{
+                                data.nextInjectionDate
+                                    ? (data.nextInjectionDate
+                                      | date : "dd/MM/yyyy")
+                                    : "-"
+                            }}
+                        </td>
+                        <td>{{ data.siteName || "-" }}</td>
+                        <td>
+                            {{
+                                data.status === 1
+                                    ? "Active"
+                                    : data.status === 0
+                                    ? "Inactive"
+                                    : "-"
+                            }}
+                        </td>
+                        <td class="text-end">
+                            <div
+                                ngbDropdownMenu
+                                class="dropdown-menu-end d-flex gap-2 px-2 py-1"
+                            >
+                                <ng-icon
+                                    name="tablerEdit"
+                                    style="cursor: pointer"
+                                    class="me-1"
+                                    (click)="onEdit(data)"
+                                >
+                                </ng-icon>
+                                <ng-icon
+                                    name="tablerTrash"
+                                    style="cursor: pointer"
+                                    class="text-danger me-1"
+                                    (click)="delete(data?.id)"
+                                >
+                                </ng-icon>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngIf="
+                            !ImmunizationData || ImmunizationData.length === 0
+                        "
+                    >
+                        <td colspan="9" class="text-center">
+                            {{ "NO_DATA_FOUND" | translate }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-    <div class="table-responsive mt-3">
-      <table class="table table-bordered table-striped table-sm">
-        <thead>
-          <tr class="text-center">
-            <th>Provider Name</th>
-            <th>Type</th>
-            <th>Dose</th>
-            <th>Route</th>
-            <th>Immunization Date</th>
-            <th>Next Immunization</th>
-            <th>Site Immunization</th>
-            <th>Status</th>
-            <th class="text-end">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="table-group-divider text-center">
-          <tr *ngFor="let data of ImmunizationData">
-            @if(data.fullName){
-              <td>{{ data.fullName || '-' }}</td>
-            }
-            @else{
-              <td>{{ data.providerName || '-' }} <br> (Out Side Clinic)</td>
-            }
-            <td>{{ data.immTypeName || '-' }}</td>
-            <td>{{ data.dose || '-' }}</td>
-            <td>{{ data.routeName || '-' }}</td>
-            <td>{{ data.startDate ? (data.startDate | date:'dd/MM/yyyy') : '-' }}</td>
-            <td>{{ (data.nextInjectionDate ? (data.nextInjectionDate | date:'dd/MM/yyyy') : '-') }}</td>
-            <td>{{ data.siteName || '-' }}</td>
-            <td>{{ data.status === 1 ? 'Active' : data.status === 0 ? 'Inactive' : '-' }}</td>
-            <td class="text-end">
-              <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
-                <ng-icon name="tablerEdit" style="cursor: pointer;" class="me-1" (click)="onEdit(data)">
-                </ng-icon>
-                <ng-icon name="tablerTrash" style="cursor: pointer;" class="text-danger me-1"
-                  (click)="delete(data?.id)">
-                </ng-icon>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="!ImmunizationData || ImmunizationData.length === 0">
-            <td colspan="9" class="text-center">{{ 'NO_DATA_FOUND' | translate }}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <app-generic-pagination
-            [totalItems]="totalimmunizationCount"
-            [pageSize]="paginationInfo?.PageSize"
-            [currentPage]="paginationInfo?.PageNumber"
-            (pageChanged)="onImmunizationPageChanged($event)">
-        </app-generic-pagination>
+            <app-generic-pagination
+                [totalItems]="totalimmunizationCount"
+                [pageSize]="paginationInfo?.PageSize"
+                [currentPage]="paginationInfo?.PageNumber"
+                (pageChanged)="onImmunizationPageChanged($event)"
+            >
+            </app-generic-pagination>
+        </div>
     </div>
-  </div>
 </form>

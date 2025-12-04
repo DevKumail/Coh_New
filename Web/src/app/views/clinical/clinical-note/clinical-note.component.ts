@@ -303,6 +303,33 @@ export class ClinicalNoteComponent implements OnInit {
     }
   }
 
+  private filterNotesByType(notes: any[]): any[] {
+    if (!Array.isArray(notes) || notes.length === 0) {
+      return [];
+    }
+
+    const type = (this.selectedNoteType || '').toLowerCase();
+debugger;
+    // For freetext selection, only show FreeText templates
+    if (type === 'freetext') {
+      return notes.filter((n: any) => {
+        const t = (n.noteType || n.templateType || '').toString().toLowerCase();
+        return t === 'free text';
+      });
+    }
+
+    // For structured and AI, show only structured templates (default when no type)
+    const desired = 'structured';
+    return notes.filter((n: any) => {
+      const t = (n.noteType || n.templateType || '').toString().toLowerCase();
+      if (!t) {
+        // If backend didn't set a type, treat as structured to avoid hiding everything
+        return true;
+      }
+      return t === desired;
+    });
+  }
+
   GetNotesEmployeeId(providerCode: any) {
     if (providerCode == null || providerCode == undefined) providerCode = 0;
     const selectedProvider = Number(providerCode) || 0;
@@ -310,8 +337,10 @@ export class ClinicalNoteComponent implements OnInit {
 
     // Check cache first
     if (this.notesCache.has(providerCode)) {
-      this.clinicalNotes = this.notesCache.get(providerCode) || [];
-      this.macroList = this.macrosCache.get(providerCode) || [];
+      const allNotes = this.notesCache.get(providerCode) || [];
+      const filtered = this.filterNotesByType(allNotes);
+      this.clinicalNotes = filtered;
+      this.macroList = filtered;
       this.modalForm.patchValue({ note: null, macro: null });
       this.cdr.markForCheck();
       return;
@@ -324,12 +353,15 @@ export class ClinicalNoteComponent implements OnInit {
 
     this.apiservice.EMRNotesGetByEmpId(providerCode).then((res: any) => {
       const notes = res.result || [];
-      this.clinicalNotes = notes;
-      this.macroList = notes;
 
-      // Cache the results
+      // Cache the full list per provider
       this.notesCache.set(providerCode, notes);
       this.macrosCache.set(providerCode, notes);
+
+      // Apply filtering based on selected note type
+      const filtered = this.filterNotesByType(notes);
+      this.clinicalNotes = filtered;
+      this.macroList = filtered;
 
       this.loader.hide();
       this.cdr.markForCheck();
@@ -341,6 +373,7 @@ export class ClinicalNoteComponent implements OnInit {
   }
 
   createNote(modal: any) {
+    debugger
     // Validation for structured notes - must select either template or macro
     if (this.selectedNoteType === 'structured') {
       const noteValue = this.modalForm.get('note')?.value;
@@ -436,8 +469,13 @@ export class ClinicalNoteComponent implements OnInit {
         queryParams: { noteId: note.noteId }
       });
     }
-    if(note.noteType.toLowerCase() === 'structured') {
+    if(note.noteType.toLowerCase() === 'structured' && (note.filepath == null ||note.filepath == "")) {
       this.router.navigate(['/clinical/create-structured-notes'], {
+        queryParams: { noteId: note.noteId }
+      });
+    }
+ if(note.noteType.toLowerCase() === 'structured' && (note.filepath != null ||note.filepath != "")) {
+      this.router.navigate(['/clinical/create-notes'], {
         queryParams: { noteId: note.noteId }
       });
     }
