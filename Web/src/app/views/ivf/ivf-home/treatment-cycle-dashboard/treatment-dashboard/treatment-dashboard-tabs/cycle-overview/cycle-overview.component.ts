@@ -34,6 +34,9 @@ export class CycleOverviewComponent {
     private clinicalApiService: ClinicalApiService,
     private route: ActivatedRoute) { }
 
+  // Patient context
+  mrNo: string | null = null;
+
   // Mock data for UI display
   AllDropdownValues: any = [];
   dropdowns: any = [];
@@ -94,6 +97,14 @@ export class CycleOverviewComponent {
         this.fetchOverviewData(id);
       }
     });
+
+    // Load MRN from patient banner (table2[0].mrNo pattern used elsewhere)
+    try {
+      const pdata = this.patientBanner.getPatientData();
+      this.mrNo = pdata?.table2?.[0]?.mrNo || null;
+    } catch {
+      this.mrNo = null;
+    }
   }
 
   // Store payload from service for dynamic labels/options
@@ -686,8 +697,67 @@ export class CycleOverviewComponent {
   }
 
   onLabOrderCreateSave(evt: { tests: any[]; details: any; header?: any }) {
-    // TODO: integrate with backend to persist IVF lab order
-    this.closeLabOrderCreateModal();
+    if (!evt || !Array.isArray(evt.tests) || evt.tests.length === 0) {
+      Swal.fire({ icon: 'warning', title: 'No tests selected', text: 'Please select at least one test.', timer: 1200, showConfirmButton: false });
+      return;
+    }
+
+    const mrNoNum = Number(this.mrNo || 0);
+    if (!mrNoNum) {
+      Swal.fire({ icon: 'error', title: 'MRN not found', text: 'Patient MRN is missing. Please load patient in banner.', timer: 1500, showConfirmButton: false });
+      return;
+    }
+
+    const visitId = this.getAppId();
+    if (!visitId) {
+      Swal.fire({ icon: 'error', title: 'Visit not found', text: 'Appointment/visit is not loaded.', timer: 1500, showConfirmButton: false });
+      return;
+    }
+
+    const now = new Date().toISOString();
+
+    // Derive provider from per-test refPhysicianId (same pattern as other IVF forms)
+    const providerFromPhysician = Number(
+      (evt.tests || [])
+        .find(t => (t?.details?.refPhysicianId ?? null) !== null && (t?.details?.refPhysicianId ?? undefined) !== undefined)
+        ?.details?.refPhysicianId ?? 0
+    );
+    const providerId = Number.isFinite(providerFromPhysician) && providerFromPhysician > 0
+      ? providerFromPhysician
+      : 0;
+
+    const header = {
+      mrNo: mrNoNum,
+      providerId,
+      orderDate: now,
+      visitAccountNo: Number(visitId),
+      createdBy: providerId || 0,
+      createdDate: now,
+      orderControlCode: 'NW',
+      orderStatus: 'NEW',
+      isHL7MsgCreated: false,
+      isHL7MessageGeneratedForPhilips: false,
+      isSigned: false
+    } as any;
+
+    const details = evt.tests.map((t: any) => ({
+      labTestId: Number(t.id),
+      cptCode: t.cpt || '',
+      orderQuantity: 1,
+      investigationTypeId: 5,
+      billOnOrder: 1,
+      pComments: (evt.details && evt.details.comments) || ''
+    }));
+
+    this.api.createLabOrder({ header, details } as any).subscribe({
+      next: () => {
+        Swal.fire({ icon: 'success', title: 'Lab order saved', text: 'Lab order has been created.', timer: 1200, showConfirmButton: false });
+        this.closeLabOrderCreateModal();
+      },
+      error: () => {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create lab order.', timer: 1500, showConfirmButton: false });
+      }
+    });
   }
 
   openAddModal() {
