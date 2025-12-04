@@ -16,6 +16,8 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
         Task<(bool isSuccess, string message)> DeletePrescription(long prescriptionId);
         Task<List<GetDrugDetailsDto>> GetAllDrugs(string? keyword, PaginationInfo dto);
         Task<(bool isSuccess, string message)> DeleteMasterPrescription(DeleteMasterPrescriptionDto dto);
+        Task<List<HREmployeeTypeDto>> GetHREmployeeType();
+        Task<List<HREmployeeDto>> GetHREmployeeByIdAsync(long employeeId);
     }
     public class PrescriptionMasterService : IPrescriptionMasterService
     {
@@ -35,7 +37,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
             parameters.Add("@Page", dto.Page, DbType.Int32);
             parameters.Add("@RowsPerPage", dto.RowsPerPage, DbType.Int32);
             parameters.Add("@Keyword", keyword);
-            
+
 
             var result = await connection.QueryAsync<GetDrugDetailsDto>(
                 "GetAllDrugs",
@@ -140,7 +142,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     Comments = dto.Substitution,
                     Indications = dto.Indications,
                     Instructions = dto.Instructions,
-                    IsInternal = dto.InternalOrder ,
+                    IsInternal = dto.InternalOrder,
                     AppointmentId = dto.AppId
                 };
 
@@ -220,7 +222,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
 
             foreach (var pm in masterPrescriptions)
             {
-                if (pm.Medication.DrugId == dto.DrugId) 
+                if (pm.Medication.DrugId == dto.DrugId)
                 {
                     pm.IsDeleted = true;
                     pm.Medication.IsDeleted = true;
@@ -231,5 +233,27 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
             return (true, "Master prescription deleted successfully.");
         }
 
+        public async Task<List<HREmployeeTypeDto>> GetHREmployeeType()
+        {
+            using var connection = _dapper.CreateConnection();
+            var result = await connection.QueryAsync<HREmployeeTypeDto>(
+                "select TypeID, TypeDescription from HREmployeeType",
+                commandType: CommandType.Text
+            );
+            return result.ToList();
+        }
+
+        public async Task<List<HREmployeeDto>> GetHREmployeeByIdAsync(long employeeId) 
+        {
+           using var connection = _dapper.CreateConnection();
+            var parameters = new DynamicParameters();
+            parameters.Add("@EmployeeID", employeeId, DbType.Int64);
+            var result = await connection.QueryAsync<HREmployeeDto>(
+                "select EmployeeId, FullName from HREmployee where EmployeeType = @EmployeeID",
+                parameters,
+                commandType: CommandType.Text
+            );
+            return result.ToList();
+        }
     }
 }
