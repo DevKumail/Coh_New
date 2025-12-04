@@ -45,10 +45,10 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public string DrugName { get; set; }
         public string Code { get; set; }
         public string Color { get; set; }
-        public List<string> ApplicationDomainName { get; set; } = new();
+        public List<GetApplicationDomainDto> ApplicationDomainName { get; set; } = new();
         public DateTime? StartDate { get; set; }
         public DateTime? StopDate { get; set; }
-        public List<TimeSpan> Time { get; set; } = new();
+        public List<GetTimeDetailsDto> TimeDetails { get; set; } = new();
         public string Frequency { get; set; }
         public string Dose { get; set; }
         public string RouteName { get; set; }
@@ -58,5 +58,17 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public string Substitution { get; set; }
         public string Instructions { get; set; }
         public string Indications { get; set; }
+    }
+
+    public class GetTimeDetailsDto
+    {
+        public long TimeId { get; set; }
+        public TimeSpan Time { get; set; }
+    }
+
+    public class GetApplicationDomainDto
+    {
+        public long ApplicationDomainId { get; set; }
+        public string ApplicationDomainName { get; set; }
     }
 }

@@ -6,7 +6,6 @@ using HMIS.Core.Context;
 using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
 {
@@ -62,16 +61,11 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                 if (!overviewExists)
                     return (false, "Overview not found.");
 
-                if (dto.IVFPrescriptionMasterId > 0)
+                if (dto.MedicationId > 0)
                 {
-                    var master = await _context.IvfprescriptionMaster
-                        .FirstOrDefaultAsync(x => x.IvfprescriptionMasterId == dto.IVFPrescriptionMasterId);
-
-                    if (master == null)
-                        return (false, "Prescription not found.");
-
-                    var medication = await _context.Medications
-                        .FirstOrDefaultAsync(x => x.MedicationId == master.MedicationId);
+                    var medication = await _context.IvfprescriptionMaster
+                        .Select(x=>x.Medication)
+                        .FirstOrDefaultAsync(x => x.MedicationId == dto.MedicationId);
 
                     if (medication == null)
                         return (false, "Medication record missing.");

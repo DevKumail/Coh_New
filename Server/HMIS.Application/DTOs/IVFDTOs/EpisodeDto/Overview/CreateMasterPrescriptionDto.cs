@@ -10,6 +10,7 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
     public class CreateMasterPrescriptionDto
     {
         public long IVFPrescriptionMasterId { get; set; }
+        public long MedicationId { get; set; }
         public long OverviewId { get; set; }
         public long DrugId { get; set; }
         public long AppId { get; set; }
