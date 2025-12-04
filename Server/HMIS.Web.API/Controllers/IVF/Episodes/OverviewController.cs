@@ -62,10 +62,21 @@ namespace HMIS.Web.Controllers.IVF.Episodes
             return Ok(result.message);
         }
 
-        [HttpDelete("prescription-master-delete/{prescriptionId}")]
-        public async Task<IActionResult> DeleteMasterPrescription(long prescriptionId)
+        [HttpDelete("prescription-delete/{prescriptionId}")]
+        public async Task<IActionResult> DeletePrescription(long prescriptionId)
         {
             var result = await _prescriptionMasterService.DeletePrescription(prescriptionId);
+
+            if (!result.isSuccess)
+                return BadRequest(result.message);
+
+            return Ok(result.message);
+        }
+
+        [HttpDelete("prescription-master-delete")]
+        public async Task<IActionResult> DeleteMasterPrescription([FromBody] DeleteMasterPrescriptionDto dto)
+        {
+            var result = await _prescriptionMasterService.DeleteMasterPrescription(dto);
 
             if (!result.isSuccess)
                 return BadRequest(result.message);
