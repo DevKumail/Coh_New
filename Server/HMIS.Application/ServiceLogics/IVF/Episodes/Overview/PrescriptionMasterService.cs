@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 using Dapper;
 using HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview;
 using HMIS.Application.DTOs.SpLocalModel;
@@ -20,6 +15,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
         Task<(bool isSuccess, string message)> SaveMasterPrescription(CreateMasterPrescriptionDto dto);
         Task<(bool isSuccess, string message)> DeletePrescription(long prescriptionId);
         Task<List<GetDrugDetailsDto>> GetAllDrugs(string? keyword, PaginationInfo dto);
+        Task<(bool isSuccess, string message)> DeleteMasterPrescription(DeleteMasterPrescriptionDto dto);
     }
     public class PrescriptionMasterService : IPrescriptionMasterService
     {
@@ -189,26 +185,50 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
             }
         }
 
-        public async Task<(bool isSuccess, string message)> DeletePrescription(long prescriptionId)
+        public async Task<(bool isSuccess, string message)> DeletePrescription(long medicationId)
         {
             try
             {
-                var entity = await _context.IvfprescriptionMaster
-                    .FirstOrDefaultAsync(x => x.IvfprescriptionMasterId == prescriptionId);
+                var entity = await _context.Medications
+                    .FirstOrDefaultAsync(x => x.MedicationId == medicationId);
 
                 if (entity == null)
-                    return (false, "Prescription not found.");
+                    return (false, "Medication not found.");
 
                 entity.IsDeleted = true;
 
                 await _context.SaveChangesAsync();
 
-                return (true, "Prescription deleted successfully.");
+                return (true, "Medication deleted successfully.");
             }
             catch (Exception ex)
             {
                 return (false, $"An error occurred: {ex.Message}");
             }
+        }
+
+
+        public async Task<(bool isSuccess, string message)> DeleteMasterPrescription(DeleteMasterPrescriptionDto dto)
+        {
+            var masterPrescriptions = await _context.IvfprescriptionMaster
+                .Where(pm => pm.Overview.IvfdashboardTreatmentCycleId == dto.ivfTreatmentCycleId)
+                .Include(pm => pm.Medication)
+                .ToListAsync();
+
+            if (!masterPrescriptions.Any())
+                return (false, "Overview not found for the given Treatment Cycle");
+
+            foreach (var pm in masterPrescriptions)
+            {
+                if (pm.Medication.DrugId == dto.DrugId) 
+                {
+                    pm.IsDeleted = true;
+                    pm.Medication.IsDeleted = true;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return (true, "Master prescription deleted successfully.");
         }
 
     }
