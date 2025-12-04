@@ -19,79 +19,71 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
         {
             _dapper = dapper;
             _context = context;
-        } 
+        }
 
         public async Task<GetAllOverviewDetailDto> GetOverviewByTreatmentCycleAsync(long treatmentCycleId)
         {
             using var connection = _dapper.CreateConnection();
 
-            var parameters = new DynamicParameters();
-            parameters.Add("@IVFDashboardTreatmentCycleId", treatmentCycleId, DbType.Int64);
-
             var lookup = new Dictionary<long, GetAllOverviewDetailDto>();
 
-            var result = await connection.QueryAsync<GetAllOverviewDetailDto, GetEventDetailDto, GetMedicationDto, GetAllOverviewDetailDto>(
-                "IVF_GetOverviewByTreatmentCycle",
-                (overview, ev, med) =>
+            var result = await connection.QueryAsync<
+                GetAllOverviewDetailDto,
+                GetEventDetailDto,
+                GetMedicationDto,
+                string,
+                TimeSpan?,
+                GetAllOverviewDetailDto
+            >(
+                "[dbo].[IVF_GetOverviewByTreatmentCycle]", // Stored Procedure Name
+                (overview, evt, med, appDomain, time) =>
                 {
-                    if (!lookup.TryGetValue(overview.OverviewId, out var ov))
+                    if (!lookup.TryGetValue(overview.OverviewId, out var o))
                     {
-                        ov = overview;
-                        ov.Calender = new List<GetCalenderDto>
-                                    {
-                                       new GetCalenderDto
-                                       {
-                                           Events = new List<GetEventDetailDto>(),
-                                           Medications = new List<GetMedicationDto>()
-                                       }
-                                    };
-                        ov.Resources = new List<GetResourcesDetailDto>
+                        o = overview;
+                        o.Calender = new List<GetCalenderDto>
                         {
-                            new GetResourcesDetailDto
-                            {
-                                AllMedications = new List<GetSidebarMedicationDto>()
-                            }
+                    new GetCalenderDto
+                    {
+                        Events = new List<GetEventDetailDto>(),
+                        Medications = new List<GetMedicationDto>()
+                    }
                         };
-                        lookup.Add(ov.OverviewId, ov);
+                        lookup.Add(o.OverviewId, o);
                     }
 
-                    var cal = ov.Calender.First();
+                    var calendar = o.Calender[0];
 
-                    if (ev?.EventId != null)
-                    {
-                        if (!cal.Events.Any(x => x.EventId == ev.EventId))
-                            cal.Events.Add(ev);
-                    }
+                    // Event Grouping
+                    if (evt?.EventId != null)
+                        calendar.Events.Add(evt);
 
-                    if (med?.MedicationId > 0)
+                    // Medication Grouping
+                    if (med != null)
                     {
-                        var existingMed = cal.Medications.FirstOrDefault(x => x.DrugId == med.DrugId);
+                        var existingMed = calendar.Medications
+                            .FirstOrDefault(x => x.MedicationId == med.MedicationId);
+
                         if (existingMed == null)
                         {
-                            cal.Medications.Add(med);
-
-                            var res = ov.Resources.First();
-                            if (!res.AllMedications.Any(x => x.DrugId == med.DrugId))
-                                res.AllMedications.Add(new GetSidebarMedicationDto
-                                {
-                                    DrugId = med.DrugId,
-                                    DrugName = med.DrugName
-                                });
-
                             existingMed = med;
+                            calendar.Medications.Add(existingMed);
                         }
 
-                        if (!string.IsNullOrEmpty(med.ApplicationDomainName?.FirstOrDefault()))
-                            existingMed.ApplicationDomainName.AddRange(med.ApplicationDomainName);
+                        if (!string.IsNullOrEmpty(appDomain) &&
+                            !existingMed.ApplicationDomainName.Contains(appDomain))
+                        {
+                            existingMed.ApplicationDomainName.Add(appDomain);
+                        }
 
-                        if (med.Time?.Any() == true)
-                            existingMed.Time.AddRange(med.Time);
+                        if (time.HasValue)
+                            existingMed.Time.Add(time.Value);
                     }
 
-                    return ov;
+                    return o;
                 },
                 new { IVFDashboardTreatmentCycleId = treatmentCycleId },
-                splitOn: "EventId,MedicationId",
+                splitOn: "EventId,MedicationId,ApplicationDomainName,Time",
                 commandType: CommandType.StoredProcedure
             );
 
