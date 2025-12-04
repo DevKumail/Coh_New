@@ -287,30 +287,20 @@ export class CycleOverviewComponent {
           const doseTitle = String(m?.dose || '0').trim() || '0';
           const start = m?.startDate ? String(m.startDate) : '';
           const stop = m?.stopDate ? String(m.stopDate) : start;
-          const times: string[] = Array.isArray(m?.time) ? m.time.filter((t: any) => !!t) : [];
-          const dates = start ? eachDate(start, stop) : [];
-          for (const d of dates) {
-            if (times.length === 0) {
-              // Add as all-day label if no specific times
-              eventsToAdd.push({
-                resourceId: rid,
-                title: doseTitle,
-                start: d,
-                backgroundColor: '#5bc0de',
-                extendedProps: { type: 'medication-dose', medicationName: medName, dose: doseTitle, date: d }
-              } as any);
-            } else {
-              for (const t of times) {
-                const dt = `${d}T${String(t).slice(0,8)}`; // ensure HH:mm:ss
-                eventsToAdd.push({
-                  resourceId: rid,
-                  title: doseTitle,
-                  start: dt,
-                  backgroundColor: '#5bc0de',
-                  extendedProps: { type: 'medication-dose', medicationName: medName, dose: doseTitle, date: d }
-                } as any);
-              }
-            }
+          const bgColor = this.drugColor(m) || '#5bc0de';
+          // Render as one continuous bar: startDate .. stopDate (inclusive)
+          const startDay = start ? String(start).slice(0, 10) : '';
+          const stopDay = stop ? String(stop).slice(0, 10) : startDay;
+          if (startDay) {
+            const endExclusive = this.addOneDayISO(stopDay); // inclusive stop -> exclusive end
+            eventsToAdd.push({
+              resourceId: rid,
+              title: doseTitle,
+              start: startDay,
+              end: endExclusive,
+              backgroundColor: bgColor,
+              extendedProps: { type: 'medication-dose', medicationName: medName, dose: doseTitle, date: startDay }
+            } as any);
           }
         }
       }
@@ -476,7 +466,8 @@ export class CycleOverviewComponent {
     if (props.description) {
       info.el.title = props.description;
     } else if (props.type === 'medication-dose') {
-      info.el.title = `${props.medicationName} - ${props.dose}${props.notes ? `\n${props.notes}` : ''}`;
+      const doseOnly = String(props.dose || '').trim();
+      info.el.title = doseOnly;
     } else if (props.type === 'hormone-level') {
       info.el.title = `${props.hormoneName}: ${props.value}${props.status ? `\nStatus: ${props.status}` : ''}${props.notes ? `\n${props.notes}` : ''}`;
     } else if (props.type === 'lab-order') {
@@ -497,7 +488,7 @@ export class CycleOverviewComponent {
     } else if (props.type === 'ultrasound') {
       this.openUltrasoundModal(props);
     } else if (props.type === 'medication-dose') {
-      this.openMedicationDoseModal(props);
+      this.openMedicationDoseModal({ ...props, start: event.startStr, end: event.endStr });
     } else if (props.type === 'hormone-level') {
       this.openHormoneLevelModal(props);
     }
@@ -540,6 +531,25 @@ export class CycleOverviewComponent {
       this.medicationModalRef = null;
     }
     this.medicationDetail = null;
+  }
+
+  // Edit action from Medication Dose modal -> open Add Medication Resource Modal prefilled
+  editMedicationFromDose() {
+    const detail = this.medicationDetail || {};
+    this.closeMedicationModal();
+    // Ensure form exists and open modal
+    this.buildMedForm();
+    this.openAddMedModal();
+    // Prefill start/stop dates from the selected medication bar
+    const start = (detail?.start || '').slice(0, 10);
+    const stop = (detail?.end || '').slice(0, 10);
+    setTimeout(() => {
+      try {
+        const patch: any = { startDate: start || this.selectedDate || new Date().toISOString().slice(0,10) };
+        if (stop) patch.stopDate = stop;
+        this.medFG.patchValue(patch);
+      } catch { }
+    }, 0);
   }
 
   openHormoneLevelModal(data: any) {
@@ -826,7 +836,13 @@ export class CycleOverviewComponent {
       this.addForm.subtype = this.hormoneSubtypes[0] || '';
     }
 
-    this.openAddModal();
+    // Open appropriate modal
+    if (category === 'medication') {
+      // Open Add Medication Resource Modal
+      this.openAddMedModal();
+    } else {
+      this.openAddModal();
+    }
   }
 
   private setSelectedDate(dateStr: string) {
@@ -1285,19 +1301,18 @@ export class CycleOverviewComponent {
 
     this.api.savePrescriptionMasterFull(body).subscribe({
       next: () => {
-        const d = this.drugs.find(x => Number(x.drugId) === Number(this.selectedDrugId));
-        const dose = d && (d.dose || '').trim();
-        const label = d ? `${d.drugName}${dose ? ' | ' + dose : ''}` : '';
-        if (label) this.addMedicationRow(label, Number(this.selectedDrugId));
+        // Refresh calendar/resources from backend to reflect new medication
+        if (this.overviewId) {
+          this.fetchOverviewData(this.overviewId);
+        }
         this.closeAddMedModal();
         Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription saved successfully.', timer: 1200, showConfirmButton: false });
       },
       error: (err: any) => {
         if (err && Number(err.status) === 200) {
-          const d = this.drugs.find(x => Number(x.drugId) === Number(this.selectedDrugId));
-          const dose = d && (d.dose || '').trim();
-          const label = d ? `${d.drugName}${dose ? ' | ' + dose : ''}` : '';
-          if (label) this.addMedicationRow(label, Number(this.selectedDrugId));
+          if (this.overviewId) {
+            this.fetchOverviewData(this.overviewId);
+          }
           this.closeAddMedModal();
           Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription saved successfully.', timer: 1200, showConfirmButton: false });
           return;
