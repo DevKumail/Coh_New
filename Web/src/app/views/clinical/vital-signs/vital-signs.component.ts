@@ -63,6 +63,7 @@ declare var flatpickr: any;
 
 export class VitalSignsComponent implements OnInit {
   @Input() clinicalnote: boolean = false;
+  selectAll: boolean = false;
   vitalSignsForm!: FormGroup;
   SearchPatientData: any;
   patientDataSubscription!: Subscription;
@@ -505,5 +506,20 @@ PageInfo: any = {
         bmiCtrl?.setValue(null, { emitEvent: false });
       }
     }
+  }
+
+  toggleSelectAll(): void {
+    this.vitalSignsPagedData.forEach((vital: any) => {
+      vital.selected = this.selectAll;
+    });
+  }
+
+  onCheckboxChange(): void {
+    this.selectAll = this.vitalSignsPagedData.length > 0 &&
+                     this.vitalSignsPagedData.every((vital: any) => vital.selected);
+  }
+
+  getSelectedVitals(): any[] {
+    return this.vitalSignsPagedData.filter((vital: any) => vital.selected);
   }
 }

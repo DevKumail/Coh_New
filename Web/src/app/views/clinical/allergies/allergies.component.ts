@@ -38,6 +38,8 @@ declare var flatpickr: any;
 export class AllergiesComponent implements OnInit, AfterViewInit {
   @Input() clinicalnote: boolean = false;
   @ViewChild('allergyModal') allergyModal!: TemplateRef<any>;
+  selectAll: boolean = false;
+
   private focusFirstInvalidControl(): void {
     try {
       setTimeout(() => {
@@ -758,6 +760,21 @@ async onallergiePageChanged(page: number) {
     } catch {
       return false;
     }
+  }
+
+  toggleSelectAll(): void {
+    this.MyAllergiesData.forEach(allergy => {
+      allergy.selected = this.selectAll;
+    });
+  }
+
+  onCheckboxChange(): void {
+    this.selectAll = this.MyAllergiesData.length > 0 &&
+                     this.MyAllergiesData.every(allergy => allergy.selected);
+  }
+
+  getSelectedAllergies(): any[] {
+    return this.MyAllergiesData.filter(allergy => allergy.selected);
   }
 
 }

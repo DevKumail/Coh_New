@@ -326,6 +326,14 @@
             <table class="table table-bordered table-striped table-sm">
                 <thead>
                     <tr class="text-center">
+                        <th *ngIf="clinicalnote">
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                [(ngModel)]="selectAll"
+                                [ngModelOptions]="{standalone: true}"
+                                (change)="toggleSelectAll()" />
+                        </th>
                         <th>Provider Name</th>
                         <th>Type</th>
                         <th>Dose</th>
@@ -339,6 +347,14 @@
                 </thead>
                 <tbody class="table-group-divider text-center">
                     <tr *ngFor="let data of ImmunizationData">
+                        <td *ngIf="clinicalnote">
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                [(ngModel)]="data.selected"
+                                [ngModelOptions]="{standalone: true}"
+                                (change)="onCheckboxChange()" />
+                        </td>
                         @if(data.fullName){
                         <td>{{ data.fullName || "-" }}</td>
                         } @else{
@@ -402,7 +418,7 @@
                             !ImmunizationData || ImmunizationData.length === 0
                         "
                     >
-                        <td colspan="9" class="text-center">
+                        <td [attr.colspan]="clinicalnote ? 10 : 9" class="text-center">
                             {{ "NO_DATA_FOUND" | translate }}
                         </td>
                     </tr>

@@ -42,6 +42,14 @@
                     <table class="table table-bordered table-striped table-sm">
                         <thead>
                             <tr class="text-center">
+                                <th *ngIf="clinicalnote">
+                                    <input
+                                        type="checkbox"
+                                        class="form-check-input"
+                                        [(ngModel)]="selectAll"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleSelectAll()" />
+                                </th>
                                 <th>{{ "MRNO" | translate }}</th>
                                 <th>{{ "PROVIDER" | translate }}</th>
                                 <th>{{ "PROCEDURE" | translate }}</th>
@@ -54,6 +62,14 @@
                         </thead>
                         <tbody class="table-group-divider text-center">
                             <tr *ngFor="let record of procedureHistoryData">
+                                <td *ngIf="clinicalnote">
+                                    <input
+                                        type="checkbox"
+                                        class="form-check-input"
+                                        [(ngModel)]="record.selected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="onCheckboxChange()" />
+                                </td>
                                 <td class="text-center">
                                     {{ record.mrNo || "-" }}
                                 </td>
@@ -116,7 +132,7 @@
                                 </td>
                             </tr>
                             <tr *ngIf="procedureTotalItems === 0">
-                                <td colspan="9">
+                                <td [attr.colspan]="clinicalnote ? 9 : 8">
                                     {{ "NO_DATA_FOUND" | translate }}
                                 </td>
                             </tr>

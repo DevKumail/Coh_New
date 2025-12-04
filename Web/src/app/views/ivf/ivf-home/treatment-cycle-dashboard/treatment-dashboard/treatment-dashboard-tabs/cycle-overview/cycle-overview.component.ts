@@ -2,6 +2,7 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray, FormControl } from '@angular/forms';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -20,7 +21,7 @@ import { AddLabOrderComponent } from '@/app/views/ivf/ivf-patient-summary/male-s
 
 @Component({
   selector: 'app-cycle-overview',
-  imports: [CommonModule, FormsModule, FullCalendarModule, HttpClientModule, NgbDropdownModule, AddLabOrderComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, FullCalendarModule, HttpClientModule, NgbDropdownModule, AddLabOrderComponent],
   templateUrl: './cycle-overview.component.html',
   styleUrls: ['./cycle-overview.component.scss']
 })
@@ -32,7 +33,12 @@ export class CycleOverviewComponent {
     private sharedservice: SharedService,
     private patientBanner: PatientBannerService,
     private clinicalApiService: ClinicalApiService,
-    private route: ActivatedRoute) { }
+    private route: ActivatedRoute,
+    private fb: FormBuilder) { }
+
+
+  // Patient context
+  mrNo: string | null = null;
 
   // Mock data for UI display
   AllDropdownValues: any = [];
@@ -94,6 +100,30 @@ export class CycleOverviewComponent {
         this.fetchOverviewData(id);
       }
     });
+
+    // Load MRN from patient banner (table2[0].mrNo pattern used elsewhere)
+    try {
+      const pdata = this.patientBanner.getPatientData();
+      this.mrNo = pdata?.table2?.[0]?.mrNo || null;
+    } catch {
+      this.mrNo = null;
+    }
+  }
+
+ 
+
+  private parseIds(val: any): number[] {
+    try {
+      if (Array.isArray(val)) {
+        return val.map((x: any) => Number(x)).filter((n: any) => Number.isFinite(n));
+      }
+      const s = String(val || '').trim();
+      if (!s) return [];
+      return s
+        .split(/[,\s]+/)
+        .map((x: string) => Number(x))
+        .filter((n: number) => Number.isFinite(n));
+    } catch { return []; }
   }
 
   // Store payload from service for dynamic labels/options
@@ -103,6 +133,8 @@ export class CycleOverviewComponent {
 
   getfrequency: any = []
   GetRoute: any = []
+  roles: Array<{ roleId: number; roleName: string }> = []
+  receivers: Array<{ employeeId: number; fullName: string }> = []
 
 
   getAlldropdown() {
@@ -117,6 +149,18 @@ export class CycleOverviewComponent {
 
     this.clinicalApiService.GetFrequency().then((res: any) => {
       this.getfrequency = res.result
+    })
+
+    this.clinicalApiService.GetEMRRoute().then((res: any) => {
+      this.GetRoute = res.result
+    })
+
+    // Load Roles for Receiver section
+    this.api.getAllRoles().subscribe({
+      next: (res: any) => {
+        this.roles = Array.isArray(res?.roles) ? res.roles : (Array.isArray(res) ? res : []);
+      },
+      error: () => { this.roles = []; }
     })
 
   }
@@ -476,17 +520,92 @@ export class CycleOverviewComponent {
       note: ''
     };
 
+  medFG: FormGroup = new FormGroup({});
+
+  private buildMedForm() {
+    if (!this.medFG || Object.keys(this.medFG.controls || {}).length === 0) {
+      this.medFG = this.fb.group({
+        drugCode: [''],
+        packaging: [''],
+        applicationDomain: [''],
+        applicationDomainCategoryId: [null],
+        startDate: [''],
+        stopDate: [''],
+        duration: [null],
+        strength: [''],
+        route: [''],
+        frequency: [''],
+        doseTimes: this.fb.array([]),
+        quantity: [''],
+        refills: [''],
+        samples: [''],
+        substitution: [''],
+        instructions: [''],
+        indication: [''],
+        roleName: [null],
+        receiverName: [null],
+        internalOrder: [false],
+        additionalInfo: [''],
+        note: [''],
+        presentationForm: [''],
+        time: [''],
+        xDays: [null],
+        dailyDosage: [''],
+        dosageFrequency: ['']
+      });
+      // React to frequency changes
+      this.medFG.get('frequency')?.valueChanges.subscribe(v => this.adjustDoseTimes(String(v || '')));
+      // React to role changes to load receivers
+      this.medFG.get('roleName')?.valueChanges.subscribe((roleId) => {
+        const id = Number(roleId || 0);
+        this.receivers = [];
+        this.medFG.get('receiverName')?.reset(null);
+        if (Number.isFinite(id) && id > 0) {
+          this.api.getHREmployeesByRole(id).subscribe({
+            next: (res: any) => {
+              this.receivers = Array.isArray(res) ? res : (Array.isArray(res?.result) ? res.result : []);
+            },
+            error: () => { this.receivers = []; }
+          });
+        }
+      });
+    }
+  }
+
+  get doseTimesFA(): FormArray {
+    return this.medFG.get('doseTimes') as FormArray;
+  }
+
+  private adjustDoseTimes(freq: string) {
+    const s = (freq || '').toString().toLowerCase();
+    let count = 0;
+    if (s.includes('4 hourly')) count = 6;
+    else if (s.includes('6 hourly')) count = 4;
+    else if (s.includes('8 hourly')) count = 3;
+    else if (s.includes('12 hourly')) count = 2;
+    else if (s.includes('once daily') || s === 'daily' || s.includes('at night')) count = 1;
+
+    // Resize form array
+    while (this.doseTimesFA.length < count) this.doseTimesFA.push(new FormControl(''));
+    while (this.doseTimesFA.length > count) this.doseTimesFA.removeAt(this.doseTimesFA.length - 1);
+  }
+
   pickDrug(d: any) {
     try {
       this.selectedDrugId = Number(d?.drugId) || null;
-      this.medForm.presentationForm = String(d?.form || d?.dosageForm || d?.dosageFormPackage || '').trim();
-      this.medForm.packaging = String(d?.packageName || d?.packageSize || '').trim();
-      this.medForm.drugCode = String(d?.code || d?.drugCode || d?.greenRainCode || d?.GreenRainCode || d?.OldGreenRainCode || '').trim();
+      const presentationForm = String(d?.form || d?.dosageForm || d?.dosageFormPackage || '').trim();
+      const packaging = String(d?.packageName || d?.packageSize || '').trim();
+      const drugCode = String(d?.code || d?.drugCode || d?.greenRainCode || d?.GreenRainCode || d?.OldGreenRainCode || '').trim();
+      const strength = String(d?.dose || d?.strength || '').trim();
       const generic = String(d?.genericName || d?.DHA_GenericName || '').trim();
+      this.medFG.patchValue({ presentationForm, packaging, drugCode, strength, additionalInfo: generic || this.medFG.get('additionalInfo')?.value });
+      this.medForm.presentationForm = presentationForm;
+      this.medForm.packaging = packaging;
+      this.medForm.drugCode = drugCode;
       if (generic) this.medForm.additionalInfo = generic;
     } catch { }
   }
-
+ 
   saveAndDuplicate() {
     if (this.selectedDrugId) {
       const ovId = Number(this.overviewId || 0);
@@ -600,6 +719,9 @@ export class CycleOverviewComponent {
     const prev = this.selectedDate;
     this.selectedDate = dateStr;
     this.updateHighlightBg();
+
+    // Ensure Reactive form exists
+    this.buildMedForm();
   }
 
   handleDayHeaderDidMount(arg: any) {
@@ -686,8 +808,67 @@ export class CycleOverviewComponent {
   }
 
   onLabOrderCreateSave(evt: { tests: any[]; details: any; header?: any }) {
-    // TODO: integrate with backend to persist IVF lab order
-    this.closeLabOrderCreateModal();
+    if (!evt || !Array.isArray(evt.tests) || evt.tests.length === 0) {
+      Swal.fire({ icon: 'warning', title: 'No tests selected', text: 'Please select at least one test.', timer: 1200, showConfirmButton: false });
+      return;
+    }
+
+    const mrNoNum = Number(this.mrNo || 0);
+    if (!mrNoNum) {
+      Swal.fire({ icon: 'error', title: 'MRN not found', text: 'Patient MRN is missing. Please load patient in banner.', timer: 1500, showConfirmButton: false });
+      return;
+    }
+
+    const visitId = this.getAppId();
+    if (!visitId) {
+      Swal.fire({ icon: 'error', title: 'Visit not found', text: 'Appointment/visit is not loaded.', timer: 1500, showConfirmButton: false });
+      return;
+    }
+
+    const now = new Date().toISOString();
+
+    // Derive provider from per-test refPhysicianId (same pattern as other IVF forms)
+    const providerFromPhysician = Number(
+      (evt.tests || [])
+        .find(t => (t?.details?.refPhysicianId ?? null) !== null && (t?.details?.refPhysicianId ?? undefined) !== undefined)
+        ?.details?.refPhysicianId ?? 0
+    );
+    const providerId = Number.isFinite(providerFromPhysician) && providerFromPhysician > 0
+      ? providerFromPhysician
+      : 0;
+
+    const header = {
+      mrNo: mrNoNum,
+      providerId,
+      orderDate: now,
+      visitAccountNo: Number(visitId),
+      createdBy: providerId || 0,
+      createdDate: now,
+      orderControlCode: 'NW',
+      orderStatus: 'NEW',
+      isHL7MsgCreated: false,
+      isHL7MessageGeneratedForPhilips: false,
+      isSigned: false
+    } as any;
+
+    const details = evt.tests.map((t: any) => ({
+      labTestId: Number(t.id),
+      cptCode: t.cpt || '',
+      orderQuantity: 1,
+      investigationTypeId: 5,
+      billOnOrder: 1,
+      pComments: (evt.details && evt.details.comments) || ''
+    }));
+
+    this.api.createLabOrder({ header, details } as any).subscribe({
+      next: () => {
+        Swal.fire({ icon: 'success', title: 'Lab order saved', text: 'Lab order has been created.', timer: 1200, showConfirmButton: false });
+        this.closeLabOrderCreateModal();
+      },
+      error: () => {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create lab order.', timer: 1500, showConfirmButton: false });
+      }
+    });
   }
 
   openAddModal() {
@@ -842,11 +1023,23 @@ export class CycleOverviewComponent {
     this.medSearch = '' as any;
     this.medForm = {} as any;
     this.loadDrugs(true);
+    // Make sure form exists before template is instantiated
+    this.buildMedForm();
     this.addMedModalRef = this.modalService.open(this.addMedModal, { size: 'lg', centered: true });
     // Preload an extra page to ensure scroll appears
     setTimeout(() => this.loadDrugs(false), 250);
     // default dates
-    try { this.medForm.startDate = this.selectedDate || new Date().toISOString().slice(0, 10); } catch { this.medForm.startDate = ''; }
+    try {
+      const sd = this.selectedDate || new Date().toISOString().slice(0, 10);
+      this.medFG.reset({
+        drugCode: '', packaging: '', applicationDomain: '', applicationDomainCategoryId: null, startDate: sd, stopDate: '', duration: null, strength: '', route: '',
+        frequency: '', doseTimes: [], quantity: '', refills: '', samples: '', substitution: '', instructions: '', indication: '', roleName: '',
+        receiverName: '', internalOrder: false, additionalInfo: '', note: '', presentationForm: '', time: '', xDays: null,
+        dailyDosage: '', dosageFrequency: ''
+      });
+      this.adjustDoseTimes('');
+      this.medForm.startDate = sd as any;
+    } catch { this.medForm.startDate = '' as any; }
   }
 
   private loadDrugs(reset: boolean = false) {
@@ -926,44 +1119,76 @@ export class CycleOverviewComponent {
   }
 
   confirmAddMed() {
-    // If a drug is selected, save to prescription master first
-    if (this.selectedDrugId) {
-      const ovId = Number(this.overviewId || 0);
-      if (!ovId) {
-        Swal.fire({ icon: 'error', title: 'Error', text: 'Overview Id is not loaded. Go back to dashboard and reopen episode.', timer: 1000, showConfirmButton: false });
-        return;
-      }
-      this.api.savePrescriptionMaster({ ivfPrescriptionMasterId: 0, overviewId: ovId, drugId: Number(this.selectedDrugId) })
-        .subscribe({
-          next: () => {
-            const d = this.drugs.find(x => Number(x.drugId) === Number(this.selectedDrugId));
-            const dose = d && (d.dose || '').trim();
-            const label = d ? `${d.drugName}${dose ? ' | ' + dose : ''}` : '';
-            if (label) this.addMedicationRow(label, Number(this.selectedDrugId));
-            this.closeAddMedModal();
-            Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription master saved successfully.', timer: 1000, showConfirmButton: false });
-          },
-          error: (err: any) => {
-            // Some APIs return 200 with plain text, causing JSON parse error routed to error handler
-            if (err && Number(err.status) === 200) {
-              const d = this.drugs.find(x => Number(x.drugId) === Number(this.selectedDrugId));
-              const dose = d && (d.dose || '').trim();
-              const label = d ? `${d.drugName}${dose ? ' | ' + dose : ''}` : '';
-              if (label) this.addMedicationRow(label, Number(this.selectedDrugId));
-              this.closeAddMedModal();
-              Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription master saved successfully.', timer: 1000, showConfirmButton: false });
-              return;
-            }
-            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save prescription. Please try again.', timer: 1000, showConfirmButton: false });
-          }
-        });
+    // Build payload from reactive form and selected drug
+    const ovId = Number(this.overviewId || 0);
+    const appId = Number(this.getAppId() || 0);
+    const drugId = Number(this.selectedDrugId || 0);
+    if (!drugId) {
+      Swal.fire({ icon: 'warning', title: 'Select drug', text: 'Please select a medication from the dropdown.', timer: 1200, showConfirmButton: false });
       return;
     }
-    // Fallback: manual text add (no API)
-    const label = (this.addMedName || '').trim();
-    if (label) {
-      this.addMedicationRow(label);
-      this.closeAddMedModal();
+    if (!ovId) {
+      Swal.fire({ icon: 'error', title: 'Overview missing', text: 'Overview Id not loaded. Open the episode again.', timer: 1200, showConfirmButton: false });
+      return;
     }
+
+    const f = this.medFG?.getRawValue() || {};
+    const toNullIfEmpty = (v: any) => {
+      if (v === undefined || v === null) return null;
+      if (typeof v === 'string' && v.trim() === '') return null;
+      return v;
+    };
+    const toNullIfInvalidId = (v: any) => {
+      const n = Number(v);
+      return Number.isFinite(n) && n > 0 ? n : null;
+    };
+    const timesRaw: string[] = Array.isArray(f?.doseTimes) ? f.doseTimes.filter((x: any) => !!x) : [];
+    const times = timesRaw.length ? timesRaw : null;
+    const startISO = f?.startDate ? new Date(f.startDate).toISOString() : new Date().toISOString();
+    const appDomIds = toNullIfInvalidId(f?.applicationDomainCategoryId) ? [Number(f.applicationDomainCategoryId)] : null;
+
+    const body: any = {
+      ivfPrescriptionMasterId: 0,
+      overviewId: ovId,
+      drugId: drugId,
+      appId: appId,
+      applicationDomainCategoryId: toNullIfEmpty(appDomIds),
+      startDate: startISO,
+      xDays: toNullIfInvalidId(f?.duration),
+      time: times,
+      dosageFrequency: toNullIfEmpty(f?.frequency),
+      dailyDosage: toNullIfEmpty(f?.dailyDosage || f?.strength),
+      routeCategoryId: toNullIfEmpty(f?.route),
+      quantity: toNullIfEmpty(f?.quantity),
+      additionalRefills: toNullIfEmpty(f?.refills),
+      samples: toNullIfEmpty(f?.samples),
+      instructions: toNullIfEmpty(f?.instructions),
+      indications: toNullIfEmpty(f?.indication),
+      substitution: toNullIfEmpty(f?.substitution),
+      internalOrder: !!f?.internalOrder
+    };
+
+    this.api.savePrescriptionMasterFull(body).subscribe({
+      next: () => {
+        const d = this.drugs.find(x => Number(x.drugId) === Number(this.selectedDrugId));
+        const dose = d && (d.dose || '').trim();
+        const label = d ? `${d.drugName}${dose ? ' | ' + dose : ''}` : '';
+        if (label) this.addMedicationRow(label, Number(this.selectedDrugId));
+        this.closeAddMedModal();
+        Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription saved successfully.', timer: 1200, showConfirmButton: false });
+      },
+      error: (err: any) => {
+        if (err && Number(err.status) === 200) {
+          const d = this.drugs.find(x => Number(x.drugId) === Number(this.selectedDrugId));
+          const dose = d && (d.dose || '').trim();
+          const label = d ? `${d.drugName}${dose ? ' | ' + dose : ''}` : '';
+          if (label) this.addMedicationRow(label, Number(this.selectedDrugId));
+          this.closeAddMedModal();
+          Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription saved successfully.', timer: 1200, showConfirmButton: false });
+          return;
+        }
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save prescription.', timer: 1200, showConfirmButton: false });
+      }
+    });
   }
 }

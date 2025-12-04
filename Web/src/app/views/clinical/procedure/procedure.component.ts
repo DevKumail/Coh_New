@@ -49,6 +49,8 @@ import { ClinicalActivityService } from '@/app/shared/Services/clinical-activity
     styleUrl: './procedure.component.scss',
 })
 export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
+    @Input() clinicalnote: boolean = false;
+    selectAll: boolean = false;
     @ViewChild('procedureModal') procedureModal!: TemplateRef<any>;
     datePipe = new DatePipe('en-US');
     procedureForm!: FormGroup;
@@ -901,5 +903,20 @@ export class ProcedureComponent implements OnInit, OnChanges, OnDestroy {
     onStatusChange() {
         this.MHPaginationInfo.Page = 1;
         this.GetPatientProcedureData();
+    }
+
+    toggleSelectAll(): void {
+        this.procedureHistoryData.forEach((procedure: any) => {
+            procedure.selected = this.selectAll;
+        });
+    }
+
+    onCheckboxChange(): void {
+        this.selectAll = this.procedureHistoryData.length > 0 &&
+                         this.procedureHistoryData.every((procedure: any) => procedure.selected);
+    }
+
+    getSelectedProcedures(): any[] {
+        return this.procedureHistoryData.filter((procedure: any) => procedure.selected);
     }
 }

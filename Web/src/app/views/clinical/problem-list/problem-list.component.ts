@@ -44,6 +44,7 @@ import { LucideAlertTriangle } from 'lucide-angular';
 })
 export class ProblemListComponent implements OnInit, OnChanges, OnDestroy {
   @Input() clinicalnote: boolean = false;
+  selectAll: boolean = false;
   datePipe = new DatePipe('en-US');
   medicalForm!: FormGroup;
   submitted: boolean = false;
@@ -950,6 +951,21 @@ minDateValidator(otherControlName: string) {
     })
 
     this.loader.hide();
+    }
+
+    toggleSelectAll(): void {
+      this.medicalHistoryData.forEach((problem: any) => {
+        problem.selected = this.selectAll;
+      });
+    }
+
+    onCheckboxChange(): void {
+      this.selectAll = this.medicalHistoryData.length > 0 &&
+                       this.medicalHistoryData.every((problem: any) => problem.selected);
+    }
+
+    getSelectedProblems(): any[] {
+      return this.medicalHistoryData.filter((problem: any) => problem.selected);
     }
 
 }

@@ -1,6 +1,6 @@
 import { Component, TemplateRef, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { GenericPaginationComponent } from '@/app/shared/generic-pagination/generic-pagination.component';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import Swal from 'sweetalert2';
@@ -18,6 +18,7 @@ import { distinctUntilChanged, filter, Subscription } from 'rxjs';
     imports: [
         CommonModule,
         ReactiveFormsModule,
+        FormsModule,
         GenericPaginationComponent,
         TranslatePipe,
         NgIconComponent,
@@ -29,6 +30,8 @@ import { distinctUntilChanged, filter, Subscription } from 'rxjs';
 })
 export class MedicationComponent {
     @Input() clinicalnote: boolean = false;
+    selectAllCurrent: boolean = false;
+    selectAllPast: boolean = false;
     @ViewChild('medicationModal') medicationModal!: TemplateRef<any>;
     MedicationForm!: FormGroup;
     DrugFilterForm!: FormGroup;
@@ -522,6 +525,34 @@ export class MedicationComponent {
 
     }
 
+    toggleSelectAllCurrent(): void {
+        this.currentMedicationData.forEach((medication: any) => {
+            medication.selected = this.selectAllCurrent;
+        });
+    }
 
+    onCheckboxChangeCurrent(): void {
+        this.selectAllCurrent = this.currentMedicationData.length > 0 &&
+                                this.currentMedicationData.every((medication: any) => medication.selected);
+    }
+
+    getSelectedCurrentMedications(): any[] {
+        return this.currentMedicationData.filter((medication: any) => medication.selected);
+    }
+
+    toggleSelectAllPast(): void {
+        this.PastMedicationData.forEach((medication: any) => {
+            medication.selected = this.selectAllPast;
+        });
+    }
+
+    onCheckboxChangePast(): void {
+        this.selectAllPast = this.PastMedicationData.length > 0 &&
+                             this.PastMedicationData.every((medication: any) => medication.selected);
+    }
+
+    getSelectedPastMedications(): any[] {
+        return this.PastMedicationData.filter((medication: any) => medication.selected);
+    }
 
 }

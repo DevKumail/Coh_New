@@ -226,6 +226,20 @@ export class IVFApiService {
     return this.api.post('Overview/prescription-master-save', body);
   }
 
+  // Save full prescription master with schedule and details
+  savePrescriptionMasterFull(body: any): Observable<any> {
+    return this.api.post('Overview/prescription-master-save', body);
+  }
+
+  // Roles and Receivers
+  getAllRoles(): Observable<any> {
+    return this.api.get('Role/GetAllRoles');
+  }
+
+  getHREmployeesByRole(roleId: number): Observable<any> {
+    return this.api.get('Overview/get-hremployee', { employeeId: roleId });
+  }
+
   // Save prescription with dates and appointment
   savePrescription(body: {
     ivfPrescriptionMasterId: number;

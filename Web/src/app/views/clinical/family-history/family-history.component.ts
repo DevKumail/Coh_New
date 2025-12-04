@@ -30,6 +30,7 @@ import { tablerArrowWaveLeftDown } from '@ng-icons/tabler-icons';
 })
 export class FamilyHistoryComponent {
   @Input() clinicalnote: boolean = false;
+  selectAll: boolean = false;
   FamilyForm!: FormGroup;
   pagegination: any = {
     currentPage: 1,
@@ -232,5 +233,20 @@ export class FamilyHistoryComponent {
       Problem: data.fhItem,
       Relationship: data.relationShipId,
     })
+  }
+
+  toggleSelectAll(): void {
+    this.FamilyHistoryList.forEach((history: any) => {
+      history.selected = this.selectAll;
+    });
+  }
+
+  onCheckboxChange(): void {
+    this.selectAll = this.FamilyHistoryList.length > 0 &&
+                     this.FamilyHistoryList.every((history: any) => history.selected);
+  }
+
+  getSelectedFamilyHistories(): any[] {
+    return this.FamilyHistoryList.filter((history: any) => history.selected);
   }
 }

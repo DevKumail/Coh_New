@@ -1,6 +1,6 @@
 import { ClinicalApiService } from './../clinical.api.service';
 import { Component, OnInit, TemplateRef, ViewChild, Input } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { PageTitleComponent} from '@app/components/page-title.component';
@@ -24,6 +24,7 @@ import { distinctUntilChanged, filter, Subscription } from 'rxjs';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     NgIconComponent,
     NgbNavModule,
   GenericPaginationComponent,
@@ -34,6 +35,7 @@ import { distinctUntilChanged, filter, Subscription } from 'rxjs';
 })
 export class ProblemComponent implements OnInit {
     @Input() clinicalnote: boolean = false;
+    selectAll: boolean = false;
     private patientDataSubscription!: Subscription;
   datePipe = new DatePipe('en-US');
   favoritesForm!: FormGroup;
@@ -739,4 +741,19 @@ async onFAVClear(){
   await this.onFAVSearch();
 }
 // // // // FAV WORK END // // // //
+
+toggleSelectAll(): void {
+  this.medicalHistoryData.forEach((problem: any) => {
+    problem.selected = this.selectAll;
+  });
+}
+
+onCheckboxChange(): void {
+  this.selectAll = this.medicalHistoryData.length > 0 &&
+                   this.medicalHistoryData.every((problem: any) => problem.selected);
+}
+
+getSelectedProblems(): any[] {
+  return this.medicalHistoryData.filter((problem: any) => problem.selected);
+}
 }

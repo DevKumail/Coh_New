@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
@@ -17,6 +17,7 @@ import Swal from 'sweetalert2';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     TranslatePipe,
     GenericPaginationComponent,
     NgIconComponent,
@@ -27,6 +28,7 @@ import Swal from 'sweetalert2';
 })
 export class ImmunizationsComponent implements OnInit {
   @Input() clinicalnote: boolean = false;
+  selectAll: boolean = false;
   @ViewChild('immunizationModal') immunizationModal!: TemplateRef<any>;
   buttonText = 'Save';
   ImmunizationForm!: FormGroup;
@@ -461,5 +463,20 @@ onEdit(data: any) {
   onStatusChange() {
     this.paginationInfo.PageNumber = 1;
     this.GetPatientImmunizationData();
+  }
+
+  toggleSelectAll(): void {
+    this.ImmunizationData.forEach((immunization: any) => {
+      immunization.selected = this.selectAll;
+    });
+  }
+
+  onCheckboxChange(): void {
+    this.selectAll = this.ImmunizationData.length > 0 &&
+                     this.ImmunizationData.every((immunization: any) => immunization.selected);
+  }
+
+  getSelectedImmunizations(): any[] {
+    return this.ImmunizationData.filter((immunization: any) => immunization.selected);
   }
 }

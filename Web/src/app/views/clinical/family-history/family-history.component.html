@@ -123,6 +123,14 @@
                 <table class="table table-bordered table-striped table-sm">
                     <thead class="align-middle thead-sm text-center">
                         <tr>
+                            <th *ngIf="clinicalnote">
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    [(ngModel)]="selectAll"
+                                    [ngModelOptions]="{standalone: true}"
+                                    (change)="toggleSelectAll()" />
+                            </th>
                             <th>{{ "RELATIONSHIP" | translate }}</th>
                             <th>{{ "PROBLEM" | translate }}</th>
                             <th>{{ "STATUS" | translate }}</th>
@@ -138,6 +146,14 @@
                                 let i = index
                             "
                         >
+                            <td *ngIf="clinicalnote">
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    [(ngModel)]="data.selected"
+                                    [ngModelOptions]="{standalone: true}"
+                                    (change)="onCheckboxChange()" />
+                            </td>
                             <td>{{ data.relationship || "-" }}</td>
                             <td>{{ data.fhName || "-" }}</td>
                             <td>{{ data.active ? "Active" : "Inactive" }}</td>
@@ -162,7 +178,7 @@
                             </td>
                         </tr>
                         <tr *ngIf="FamilyHistoryTotalItems === 0">
-                            <td colspan="9" class="text-center">
+                            <td [attr.colspan]="clinicalnote ? 5 : 4" class="text-center">
                                 {{ "NO_DATA_FOUND" | translate }}
                             </td>
                         </tr>
