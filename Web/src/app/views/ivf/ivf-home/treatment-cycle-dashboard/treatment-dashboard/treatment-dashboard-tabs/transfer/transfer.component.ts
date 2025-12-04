@@ -107,7 +107,8 @@ export class TransferComponent implements OnInit {
     const embryosForm = this.embryoCmp?.form?.getRawValue?.();
     const furtherForm = this.furtherCmp?.form?.getRawValue?.();
 
-    const embryosInTransfer = (this.embryoCmp?.embryos || []).map((emb, idx) => {
+    const embryosInTransfer =
+     (this.embryoCmp?.embryos || []).map((emb, idx) => {
       const rowFg = this.embryoCmp?.embryosFA?.at(idx);
       const row = rowFg?.getRawValue ? rowFg.getRawValue() : {} as any;
       return {
@@ -175,7 +176,7 @@ export class TransferComponent implements OnInit {
         electiveSingleEmbryoTransfer: !!top.electiveSingleEmbryoTransfer,
         embryologistId: top.embryologistId ? Number(top.embryologistId) : null,
       },
-      embryosInTransfer,
+      // embryosInTransfer,
       furtherInformation,
     };
 
