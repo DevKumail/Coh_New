@@ -107,8 +107,19 @@ namespace HMIS.Web.Controllers.IVF.Episodes
         [HttpGet("get-all-Overview/{treatmentCycleId}")]
         public async Task<IActionResult> GetAllOverviewDetail(long treatmentCycleId)
         {
-            var result = await _overviewService.GetOverviewByTreatmentCycleAsync(treatmentCycleId);
-            return Ok(result);
+            try
+            {
+                var result = await _overviewService.GetOverviewByTreatmentCycleAsync(treatmentCycleId);
+
+                if (result == null)
+                    return NotFound(new { Message = "No overview found for the given Treatment Cycle ID." });
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while fetching overview details.", Details = ex.Message });
+            }
         }
 
         //----------------- Overview end -----------------

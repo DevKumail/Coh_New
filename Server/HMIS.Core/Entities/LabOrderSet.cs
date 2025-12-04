@@ -9,7 +9,7 @@ namespace HMIS.Core.Entities;
 public partial class LabOrderSet
 {
     [Key]
-    public int LabOrderSetId { get; set; }
+    public long LabOrderSetId { get; set; }
 
     [Column("MRNo")]
     public long? Mrno { get; set; }

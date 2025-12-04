@@ -218,6 +218,8 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<IvffemaleFhprevIllness> IvffemaleFhprevIllness { get; set; }
 
+    public virtual DbSet<IvflabOrderSet> IvflabOrderSet { get; set; }
+
     public virtual DbSet<Ivfmain> Ivfmain { get; set; }
 
     public virtual DbSet<IvfmaleCryoContracts> IvfmaleCryoContracts { get; set; }
@@ -291,6 +293,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<IvftreatmentEpisodeAspirationStage> IvftreatmentEpisodeAspirationStage { get; set; }
 
     public virtual DbSet<IvftreatmentEpisodeOverviewStage> IvftreatmentEpisodeOverviewStage { get; set; }
+
+    public virtual DbSet<IvftreatmentEpisodePregnancyStage> IvftreatmentEpisodePregnancyStage { get; set; }
 
     public virtual DbSet<IvftreatmentEpisodeTransferStage> IvftreatmentEpisodeTransferStage { get; set; }
 
@@ -1428,6 +1432,20 @@ public partial class HMISDbContext : DbContext
                 .HasConstraintName("FK_IVFFemaleFHPrevIllness_BLMasterICD9CM");
         });
 
+        modelBuilder.Entity<IvflabOrderSet>(entity =>
+        {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.OrderSetDetail).WithMany(p => p.IvflabOrderSet)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFLabOrderSet_LabOrderSetDetail");
+
+            entity.HasOne(d => d.Overview).WithMany(p => p.IvflabOrderSet)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFLabOrderSet_IVFTreatmentEpisodeOverviewStage");
+        });
+
         modelBuilder.Entity<Ivfmain>(entity =>
         {
             entity.HasKey(e => e.IvfmainId).HasName("PK__IVFMain__3F8F07820127E48F");
@@ -1812,7 +1830,6 @@ public partial class HMISDbContext : DbContext
         {
             entity.HasKey(e => e.IvfmedicationDropDownId).HasName("PK_IVFMedicationDropDown");
 
-            entity.Property(e => e.IvfmedicationDropDownId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
@@ -1928,6 +1945,16 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
             entity.HasOne(d => d.IvfdashboardTreatmentCycle).WithMany(p => p.IvftreatmentEpisodeOverviewStage).HasConstraintName("FK_IVFTreatmentEpisodeOverviewStage_IVFDashboardTreatmentEpisode");
+        });
+
+        modelBuilder.Entity<IvftreatmentEpisodePregnancyStage>(entity =>
+        {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.IvfdashboardTreatmentCycle).WithOne(p => p.IvftreatmentEpisodePregnancyStage)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFTreatmentEpisodePregnancyStage_IVFDashboardTreatmentCycle");
         });
 
         modelBuilder.Entity<IvftreatmentEpisodeTransferStage>(entity =>

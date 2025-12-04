@@ -37,6 +37,9 @@ public partial class IvftreatmentEpisodeOverviewStage
     public virtual ICollection<IvfepisodeOverviewEvents> IvfepisodeOverviewEvents { get; set; } = new List<IvfepisodeOverviewEvents>();
 
     [InverseProperty("Overview")]
+    public virtual ICollection<IvflabOrderSet> IvflabOrderSet { get; set; } = new List<IvflabOrderSet>();
+
+    [InverseProperty("Overview")]
     public virtual ICollection<IvfoverviewEpisodeAppointments> IvfoverviewEpisodeAppointments { get; set; } = new List<IvfoverviewEpisodeAppointments>();
 
     [InverseProperty("Overview")]
