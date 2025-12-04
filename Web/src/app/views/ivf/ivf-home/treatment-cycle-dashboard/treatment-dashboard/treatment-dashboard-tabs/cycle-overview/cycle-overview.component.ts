@@ -133,6 +133,8 @@ export class CycleOverviewComponent {
 
   getfrequency: any = []
   GetRoute: any = []
+  roles: Array<{ roleId: number; roleName: string }> = []
+  receivers: Array<{ employeeId: number; fullName: string }> = []
 
 
   getAlldropdown() {
@@ -151,6 +153,14 @@ export class CycleOverviewComponent {
 
     this.clinicalApiService.GetEMRRoute().then((res: any) => {
       this.GetRoute = res.result
+    })
+
+    // Load Roles for Receiver section
+    this.api.getAllRoles().subscribe({
+      next: (res: any) => {
+        this.roles = Array.isArray(res?.roles) ? res.roles : (Array.isArray(res) ? res : []);
+      },
+      error: () => { this.roles = []; }
     })
 
   }
@@ -532,8 +542,8 @@ export class CycleOverviewComponent {
         substitution: [''],
         instructions: [''],
         indication: [''],
-        roleName: [''],
-        receiverName: [''],
+        roleName: [null],
+        receiverName: [null],
         internalOrder: [false],
         additionalInfo: [''],
         note: [''],
@@ -545,6 +555,20 @@ export class CycleOverviewComponent {
       });
       // React to frequency changes
       this.medFG.get('frequency')?.valueChanges.subscribe(v => this.adjustDoseTimes(String(v || '')));
+      // React to role changes to load receivers
+      this.medFG.get('roleName')?.valueChanges.subscribe((roleId) => {
+        const id = Number(roleId || 0);
+        this.receivers = [];
+        this.medFG.get('receiverName')?.reset(null);
+        if (Number.isFinite(id) && id > 0) {
+          this.api.getHREmployeesByRole(id).subscribe({
+            next: (res: any) => {
+              this.receivers = Array.isArray(res) ? res : (Array.isArray(res?.result) ? res.result : []);
+            },
+            error: () => { this.receivers = []; }
+          });
+        }
+      });
     }
   }
 
@@ -572,8 +596,9 @@ export class CycleOverviewComponent {
       const presentationForm = String(d?.form || d?.dosageForm || d?.dosageFormPackage || '').trim();
       const packaging = String(d?.packageName || d?.packageSize || '').trim();
       const drugCode = String(d?.code || d?.drugCode || d?.greenRainCode || d?.GreenRainCode || d?.OldGreenRainCode || '').trim();
+      const strength = String(d?.dose || d?.strength || '').trim();
       const generic = String(d?.genericName || d?.DHA_GenericName || '').trim();
-      this.medFG.patchValue({ presentationForm, packaging, drugCode, additionalInfo: generic || this.medFG.get('additionalInfo')?.value });
+      this.medFG.patchValue({ presentationForm, packaging, drugCode, strength, additionalInfo: generic || this.medFG.get('additionalInfo')?.value });
       this.medForm.presentationForm = presentationForm;
       this.medForm.packaging = packaging;
       this.medForm.drugCode = drugCode;
@@ -1107,31 +1132,39 @@ export class CycleOverviewComponent {
       return;
     }
 
-    const f = this.medFG?.value || {};
-    const times: string[] = Array.isArray(f?.doseTimes) ? f.doseTimes.filter((x: any) => !!x) : [];
+    const f = this.medFG?.getRawValue() || {};
+    const toNullIfEmpty = (v: any) => {
+      if (v === undefined || v === null) return null;
+      if (typeof v === 'string' && v.trim() === '') return null;
+      return v;
+    };
+    const toNullIfInvalidId = (v: any) => {
+      const n = Number(v);
+      return Number.isFinite(n) && n > 0 ? n : null;
+    };
+    const timesRaw: string[] = Array.isArray(f?.doseTimes) ? f.doseTimes.filter((x: any) => !!x) : [];
+    const times = timesRaw.length ? timesRaw : null;
     const startISO = f?.startDate ? new Date(f.startDate).toISOString() : new Date().toISOString();
-    const appDomIds: number[] = Number.isFinite(Number(f?.applicationDomainCategoryId)) && Number(f.applicationDomainCategoryId) > 0
-      ? [Number(f.applicationDomainCategoryId)]
-      : [];
+    const appDomIds = toNullIfInvalidId(f?.applicationDomainCategoryId) ? [Number(f.applicationDomainCategoryId)] : null;
 
     const body: any = {
       ivfPrescriptionMasterId: 0,
       overviewId: ovId,
       drugId: drugId,
       appId: appId,
-      applicationDomainCategoryId: appDomIds,
+      applicationDomainCategoryId: toNullIfEmpty(appDomIds),
       startDate: startISO,
-      xDays: Number(f?.duration || 0),
+      xDays: toNullIfInvalidId(f?.duration),
       time: times,
-      dosageFrequency: f?.frequency || '',
-      dailyDosage: f?.dailyDosage || f?.strength || '',
-      routeCategoryId: f?.route || '',
-      quantity: f?.quantity || '',
-      additionalRefills: f?.refills || '',
-      samples: f?.samples || '',
-      instructions: f?.instructions || '',
-      indications: f?.indication || '',
-      substitution: f?.substitution || '',
+      dosageFrequency: toNullIfEmpty(f?.frequency),
+      dailyDosage: toNullIfEmpty(f?.dailyDosage || f?.strength),
+      routeCategoryId: toNullIfEmpty(f?.route),
+      quantity: toNullIfEmpty(f?.quantity),
+      additionalRefills: toNullIfEmpty(f?.refills),
+      samples: toNullIfEmpty(f?.samples),
+      instructions: toNullIfEmpty(f?.instructions),
+      indications: toNullIfEmpty(f?.indication),
+      substitution: toNullIfEmpty(f?.substitution),
       internalOrder: !!f?.internalOrder
     };
 
