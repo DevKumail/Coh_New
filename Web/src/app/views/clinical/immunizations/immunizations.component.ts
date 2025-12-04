@@ -413,7 +413,7 @@ onEdit(data: any) {
 
   paginationInfo: any = {
     PageNumber: 1,
-    PageSize: 3,
+    PageSize: 10,
   }
   totalimmunizationCount: any = 0;
   GetPatientImmunizationData() {

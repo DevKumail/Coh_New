@@ -318,7 +318,7 @@ onSubmit() {
 
 PageInfo: any = {
   CurrentPage: 1,
-  PageSize: 5,
+  PageSize: 10,
 }
 
   vitalSign(){
