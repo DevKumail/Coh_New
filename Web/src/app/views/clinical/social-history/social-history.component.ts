@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, TemplateRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@/app/shared/i18n/translate.pipe';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -31,9 +31,19 @@ export class SocialHistoryComponent {
     @ViewChild('socialHistoryModal') socialHistoryModal!: TemplateRef<any>;
 
     @Input() clinicalnote: boolean = false;
+    @Input() set preSelectedIds(ids: number[]) {
+        if (ids && ids.length > 0) {
+            console.log('📥 [SocialHistory] Received preSelectedIds:', ids);
+            this.selectedSocialHistories = new Set(ids);
+            this.updateSelectAllState();
+        }
+    }
+    @Output() selectionChanged = new EventEmitter<any[]>();
 
     SocialForm!: FormGroup;
     todayStr: string = '';
+    selectedSocialHistories: Set<number> = new Set<number>();
+    isAllSelected: boolean = false;
     SocialHistoryData: any[] = [];
     SocialHistoryList: any[] = [];
     pagegination: any = {
@@ -54,6 +64,7 @@ export class SocialHistoryComponent {
     ) { }
 
     ngOnInit(): void {
+        console.log('🎬 [SocialHistory] Component initialized, clinicalnote:', this.clinicalnote);
         this.todayStr = new Date().toISOString().split('T')[0];
         this.SocialForm = this.fb.group({
             socialHistory: [null, Validators.required],
@@ -94,9 +105,18 @@ export class SocialHistoryComponent {
     getSocialHistoryData() {
         this.SocialHistoryTotalItems = 0;
         const mrno = this.SearchPatientData?.table2?.[0]?.mrNo;
+        console.log('🔄 [SocialHistory] Loading data, current selections:', Array.from(this.selectedSocialHistories));
         this.ClinicalApiService.GetAllSocialHistory(mrno, this.pagegination.currentPage, this.pagegination.pageSize).then((res: any) => {
             this.SocialHistoryList = res?.table1 || [];
             this.SocialHistoryTotalItems = res?.table2[0]?.totalRecords || 0;
+            console.log('📋 [SocialHistory] Loaded data:', this.SocialHistoryList);
+            if (this.SocialHistoryList.length > 0) {
+                console.log('📋 [SocialHistory] First item structure:', this.SocialHistoryList[0]);
+                console.log('📋 [SocialHistory] shid property:', this.SocialHistoryList[0]?.shid);
+            }
+            // Keep existing selections when data refreshes
+            console.log('🔄 [SocialHistory] After load, selections:', Array.from(this.selectedSocialHistories));
+            this.updateSelectAllState();
         })
     }
 
@@ -220,5 +240,102 @@ export class SocialHistoryComponent {
                 })
             }
         })
+    }
+
+    toggleSelection(shid: any) {
+        // Ensure shid is a number
+        const numericShid = Number(shid);
+        console.log('🎯 [SocialHistory] toggleSelection called with shid:', shid, '-> numeric:', numericShid);
+        console.log('🎯 [SocialHistory] Type of shid:', typeof numericShid);
+        console.log('🎯 [SocialHistory] Current selectedSocialHistories:', Array.from(this.selectedSocialHistories));
+
+        if (this.selectedSocialHistories.has(numericShid)) {
+            this.selectedSocialHistories.delete(numericShid);
+            console.log('🔲 Unchecked:', numericShid);
+        } else {
+            this.selectedSocialHistories.add(numericShid);
+            console.log('✅ Checked:', numericShid);
+        }
+        console.log('📊 Total selected:', this.selectedSocialHistories.size, Array.from(this.selectedSocialHistories));
+        this.updateSelectAllState();
+        this.emitSelectionChange();
+    }
+
+    toggleSelectAll() {
+        if (this.isAllSelected) {
+            this.selectedSocialHistories.clear();
+        } else {
+            this.SocialHistoryList.forEach(item => {
+                this.selectedSocialHistories.add(item.shid);
+            });
+        }
+        this.isAllSelected = !this.isAllSelected;
+        this.emitSelectionChange();
+    }
+
+    updateSelectAllState() {
+        this.isAllSelected = this.SocialHistoryList.length > 0 &&
+            this.SocialHistoryList.every(item => this.selectedSocialHistories.has(item.shid));
+    }
+
+    isSelected(shid: any): boolean {
+        return this.selectedSocialHistories.has(Number(shid));
+    }
+
+    getSelectedSocialHistories(): any[] {
+        return this.SocialHistoryList.filter(item =>
+            this.selectedSocialHistories.has(item.shid)
+        );
+    }
+
+    getSelectedSocialHistoriesForNote(): any {
+        console.log('🔍 [SocialHistory] Getting selections...');
+        console.log('🔍 [SocialHistory] selectedSocialHistories:', Array.from(this.selectedSocialHistories));
+        console.log('🔍 [SocialHistory] SocialHistoryList count:', this.SocialHistoryList.length);
+
+        const selected = this.getSelectedSocialHistories();
+        console.log('🔍 [SocialHistory] Filtered selected items:', selected);
+
+        if (selected.length === 0) {
+            console.log('❌ [SocialHistory] No items selected, returning null');
+            return null;
+        }
+
+        const result = {
+            sectionTitle: 'Social History',
+            type: 'SocialHistory',
+            data: selected.map(item => ({
+                shid: item.shid,
+                socialHistory: item.shName,
+                startDate: item.startDate,
+                endDate: item.endDate,
+                active: item.active
+            }))
+        };
+
+        console.log('✅ [SocialHistory] Returning data:', result);
+        return result;
+    }
+
+    clearSelection() {
+        this.selectedSocialHistories.clear();
+        this.isAllSelected = false;
+        this.emitSelectionChange();
+    }
+
+    private emitSelectionChange(): void {
+        console.log('🔔 [SocialHistory] emitSelectionChange called');
+        console.log('🔔 [SocialHistory] selectedSocialHistories Set:', Array.from(this.selectedSocialHistories));
+        const selected = this.getSelectedSocialHistories();
+        console.log('🔔 [SocialHistory] Filtered selected items:', selected);
+        const formattedData = selected.map(item => ({
+            shid: item.shid,
+            socialHistory: item.shName,
+            startDate: item.startDate,
+            endDate: item.endDate,
+            active: item.active
+        }));
+        console.log('🔔 [SocialHistory] Emitting formattedData:', formattedData);
+        this.selectionChanged.emit(formattedData);
     }
 }

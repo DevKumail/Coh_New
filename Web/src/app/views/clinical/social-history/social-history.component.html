@@ -80,6 +80,14 @@
 
           <thead class="align-middle thead-sm text-center">
             <tr>
+              <th *ngIf="clinicalnote" style="width: 50px;">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [checked]="isAllSelected"
+                  (change)="toggleSelectAll()"
+                  [disabled]="SocialHistoryList.length === 0">
+              </th>
               <th>{{ 'SOCIAL_HISTORY' | translate }}</th>
               <th>{{ 'START_DATE' | translate }}</th>
               <th>{{ 'END_DATE' | translate }}</th>
@@ -89,6 +97,13 @@
           </thead>
           <tbody class="table-group-divider text-center">
             <tr *ngFor="let data of SocialHistoryList; let i = index">
+              <td *ngIf="clinicalnote" style="width: 50px;">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [checked]="isSelected(data.shid)"
+                  (click)="toggleSelection(data.shid); $event.stopPropagation()">
+              </td>
               <td>{{ data.shName || '-' }} </td>
             <td>{{ data.startDate ? (data.startDate | date:'dd/MM/yyyy') : '-' }}</td>
             <td>{{ data.endDate ? (data.endDate | date:'dd/MM/yyyy') : '-' }}</td>
@@ -104,7 +119,7 @@
               </td>
             </tr>
             <tr *ngIf="SocialHistoryTotalItems === 0">
-              <td colspan="9" class="text-center">{{ 'NO_DATA_FOUND' | translate }}</td>
+              <td [attr.colspan]="clinicalnote ? 6 : 5" class="text-center">{{ 'NO_DATA_FOUND' | translate }}</td>
             </tr>
           </tbody>
         </table>
