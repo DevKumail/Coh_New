@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
 import { ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
+import { finalize } from 'rxjs/operators';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import { Page } from '@/app/shared/enum/dropdown.enum';
@@ -49,6 +50,9 @@ export class CycleAspirationComponent {
   private aspirationId: number = 0;
   private oocyteRetrievalId: number = 0;
   private furtherDetailsId: number = 0;
+  isLoading = false;
+  isSaving = false;
+  get actionLabel() { return this.aspirationId > 0 ? 'Update' : 'Save'; }
 
   constructor(
     private sharedservice: SharedService,
@@ -164,7 +168,12 @@ export class CycleAspirationComponent {
 
 
   private loadAspiration() {
-    this.ivfApi.getEpisodeAspirationByCycleId(this.cycleId).subscribe({
+      if (!this.cycleId || this.cycleId === 0 || this.cycleId === null || this.cycleId === undefined)  {
+      Swal.fire('Treatment cycle id is required please go to dashboard and select cycle', '', 'error');
+      return;
+    }
+    this.isLoading = true;
+    this.ivfApi.getEpisodeAspirationByCycleId(this.cycleId).pipe(finalize(() => { this.isLoading = false; })).subscribe({
       next: (res: any) => {
         const a = res?.aspiration;
         if (!a) { return; }
@@ -237,6 +246,11 @@ export class CycleAspirationComponent {
   }
 
   submit() {
+    if (!this.cycleId || this.cycleId === 0 || this.cycleId === null || this.cycleId === undefined)  {
+      Swal.fire('Treatment cycle id is required please go to dashboard and select cycle', '', 'error');
+      return;
+    }
+    this.isSaving = true;
     const v = this.form.value as any;
     const retrievalDateISO = v.date ? new Date(v.date).toISOString() : new Date().toISOString();
     const poorResponse = v.poorDrugResponse === 'yes' ? true : v.poorDrugResponse === 'no' ? false : false;
@@ -291,18 +305,15 @@ export class CycleAspirationComponent {
       }
     };
 
-    this.ivfApi.saveEpisodeAspiration(body).subscribe({
+    this.ivfApi.saveEpisodeAspiration(body).pipe(finalize(() => { this.isSaving = false; })).subscribe({
       next: () => {
-        Swal.fire({ icon: 'success', title: 'Saved', text: 'Aspiration saved successfully.', timer: 1000, showConfirmButton: false, timerProgressBar: true });
+        const msg = this.aspirationId > 0 ? 'Aspiration updated successfully' : 'Aspiration saved successfully';
+        Swal.fire({ icon: 'success', title: msg, timer: 1000, showConfirmButton: false, timerProgressBar: true });
         this.loadAspiration();
       },
-      error: (err: any) => {
-        if (err && Number(err.status) === 200) {
-          Swal.fire({ icon: 'success', title: 'Saved', text: 'Aspiration saved successfully.', timer: 1000, showConfirmButton: false, timerProgressBar: true });
-          this.loadAspiration();
-          return;
-        }
-        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save aspiration. Please try again.' });
+      error: () => {
+        const msg = this.aspirationId > 0 ? 'Aspiration update failed' : 'Aspiration save failed';
+        Swal.fire({ icon: 'error', title: msg });
       }
     });
   }

@@ -177,6 +177,10 @@ export class IVFApiService {
     return this.api.post('IVFEpisodeTransfer/CreateUpdateEpisodeTransfer', payload);
   }
 
+  getEpisodeTransferByCycleId(ivfDashboardTreatmentCycleId: number): Observable<any> {
+    return this.api.get('IVFEpisodeTransfer/GetEpisodeTransferById', { ivfDashboardTreatmentCycleId });
+  }
+
   getOverviewByEpisodeId(episodeId: number): Observable<any> {
     return this.api.get(`Overview/get-all-Overview/${episodeId}`);
   }

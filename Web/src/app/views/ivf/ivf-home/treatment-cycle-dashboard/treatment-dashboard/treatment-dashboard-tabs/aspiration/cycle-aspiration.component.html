@@ -1,16 +1,17 @@
 <form [formGroup]="form" class="py-2">
-    <div class="row g-3">
-        <div class="col-12">
-            <ul class="nav nav-tabs small">
-                <li class="nav-item">
-                    <button type="button" class="nav-link" [class.active]="activeTab==='oocyte'"
-                        (click)="activeTab='oocyte'">Oocyte retrieval</button>
-                </li>
-                <li class="nav-item">
-                    <button type="button" class="nav-link" [class.active]="activeTab==='further'"
-                        (click)="activeTab='further'">Further details</button>
-                </li>
-            </ul>
+    <ng-container *ngIf="!isLoading; else skeleton">
+        <div class="row g-3">
+            <div class="col-12">
+                <ul class="nav nav-tabs small">
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" [class.active]="activeTab==='oocyte'"
+                            (click)="activeTab='oocyte'">Oocyte retrieval</button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" [class.active]="activeTab==='further'"
+                            (click)="activeTab='further'">Further details</button>
+                    </li>
+                </ul>
         </div>
 
         <!-- tab oocyte retrieval start -->
@@ -346,6 +347,42 @@
         <!-- tab further details end -->
     </div>
     <div class="d-flex justify-content-end mt-3">
-        <button type="button" class="btn btn-primary" (click)="submit()">Save</button>
+        <button type="button" class="btn btn-primary" [disabled]="isSaving" (click)="submit()">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span>{{ actionLabel }}
+        </button>
     </div>
+    </ng-container>
+    <ng-template #skeleton>
+        <div class="row g-3">
+            <!-- <div class="col-12">
+                <ul class="nav nav-tabs small">
+                    <li class="nav-item"><span class="nav-link active placeholder col-3"></span></li>
+                    <li class="nav-item"><span class="nav-link placeholder col-3"></span></li>
+                </ul>
+            </div> -->
+            <div class="col-12 col-lg-4">
+                <div class="card border border-2 h-100">
+                    <div class="card-body">
+                        <div class="placeholder-glow">
+                            <span class="placeholder col-6"></span>
+                            <span class="placeholder col-12 mt-2"></span>
+                            <span class="placeholder col-12 mt-2"></span>
+                            <span class="placeholder col-12 mt-2"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-8">
+                <div class="card border border-2 h-100">
+                    <div class="card-body">
+                        <div class="placeholder-glow">
+                            <span class="placeholder col-12 mb-2"></span>
+                            <span class="placeholder col-12 mb-2"></span>
+                            <span class="placeholder col-12"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
 </form>
