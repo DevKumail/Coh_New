@@ -55,7 +55,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     var calendar = o.Calender[0];
 
                     // Event Grouping
-                    if (evt?.EventId != null)
+                    if (evt?.EventId != null && !calendar.Events.Any(e => e.EventId == evt.EventId))
                         calendar.Events.Add(evt);
 
                     // Medication Grouping
