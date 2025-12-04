@@ -62,13 +62,6 @@ namespace HMIS.Web.Controllers.IVF.Episodes
             return Ok(result.message);
         }
 
-        [HttpGet("get-hremployee-type")]
-        public async Task<IActionResult> GetHREmployeeType()
-        {
-            var result = await _prescriptionMasterService.GetHREmployeeType();
-            return Ok(result);
-        }
-
         [HttpGet("get-hremployee")]
         public async Task<IActionResult> GetHREmployeeType(long employeeId)
         {

@@ -16,7 +16,6 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
         Task<(bool isSuccess, string message)> DeletePrescription(long prescriptionId);
         Task<List<GetDrugDetailsDto>> GetAllDrugs(string? keyword, PaginationInfo dto);
         Task<(bool isSuccess, string message)> DeleteMasterPrescription(DeleteMasterPrescriptionDto dto);
-        Task<List<HREmployeeTypeDto>> GetHREmployeeType();
         Task<List<HREmployeeDto>> GetHREmployeeByIdAsync(long employeeId);
     }
     public class PrescriptionMasterService : IPrescriptionMasterService
@@ -84,7 +83,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     medication.DrugId = dto.DrugId;
                     medication.Route = dto.RouteCategoryId;
                     medication.AdditionalRefills = dto.AdditionalRefills;
-                    medication.IsRefill = string.IsNullOrEmpty(dto.AdditionalRefills) ? false : true;
+                    medication.IsRefill = !string.IsNullOrWhiteSpace(dto.AdditionalRefills);
                     medication.Quantity = dto.Quantity;
                     medication.Samples = dto.Samples;
                     medication.Comments = dto.Substitution;
@@ -136,7 +135,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     Frequency = dto.DosageFrequency,
                     Route = dto.RouteCategoryId,
                     AdditionalRefills = dto.AdditionalRefills,
-                    IsRefill = dto.AdditionalRefills.IsNullOrEmpty() ? false : true,
+                    IsRefill = !string.IsNullOrWhiteSpace(dto.AdditionalRefills),
                     Quantity = dto.Quantity,
                     Samples = dto.Samples,
                     Comments = dto.Substitution,
@@ -231,16 +230,6 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
 
             await _context.SaveChangesAsync();
             return (true, "Master prescription deleted successfully.");
-        }
-
-        public async Task<List<HREmployeeTypeDto>> GetHREmployeeType()
-        {
-            using var connection = _dapper.CreateConnection();
-            var result = await connection.QueryAsync<HREmployeeTypeDto>(
-                "select TypeID, TypeDescription from HREmployeeType",
-                commandType: CommandType.Text
-            );
-            return result.ToList();
         }
 
         public async Task<List<HREmployeeDto>> GetHREmployeeByIdAsync(long employeeId) 
