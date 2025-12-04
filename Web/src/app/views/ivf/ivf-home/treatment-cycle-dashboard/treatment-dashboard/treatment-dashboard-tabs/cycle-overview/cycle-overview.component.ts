@@ -16,10 +16,11 @@ import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import { Page } from '@/app/shared/enum/dropdown.enum';
 import Swal from 'sweetalert2';
 import { ClinicalApiService } from '@/app/views/clinical/clinical.api.service';
+import { AddLabOrderComponent } from '@/app/views/ivf/ivf-patient-summary/male-sections/lab-diagnostics/add-lab-order.component';
 
 @Component({
   selector: 'app-cycle-overview',
-  imports: [CommonModule, FormsModule, FullCalendarModule, HttpClientModule, NgbDropdownModule],
+  imports: [CommonModule, FormsModule, FullCalendarModule, HttpClientModule, NgbDropdownModule, AddLabOrderComponent],
   templateUrl: './cycle-overview.component.html',
   styleUrls: ['./cycle-overview.component.scss']
 })
@@ -416,6 +417,7 @@ export class CycleOverviewComponent {
   @ViewChild('addMedModal') addMedModal!: TemplateRef<any>;
   @ViewChild('ultrasoundModal') ultrasoundModal!: TemplateRef<any>;
   @ViewChild('labOrderModal') labOrderModal!: TemplateRef<any>;
+  @ViewChild('labOrderCreateModal') labOrderCreateModal!: TemplateRef<any>;
   @ViewChild('medicationModal') medicationModal!: TemplateRef<any>;
   @ViewChild('hormoneModal') hormoneModal!: TemplateRef<any>;
   addModalRef: any;
@@ -424,6 +426,7 @@ export class CycleOverviewComponent {
   ultrasoundDetail: any = null;
   labOrderModalRef: any;
   labOrderDetail: any = null;
+  labOrderCreateModalRef: any;
   medicationModalRef: any;
   medicationDetail: any = null;
   hormoneModalRef: any;
@@ -555,6 +558,12 @@ export class CycleOverviewComponent {
     const clickedDate: string = arg?.dateStr || '';
     this.setSelectedDate(clickedDate);
 
+    // If Examination row is clicked, open Lab Order modal instead of generic add modal
+    if (resId === 'orders') {
+      this.openLabOrderCreateModal(clickedDate);
+      return;
+    }
+
     // Determine category by resource id
     let category: 'events' | 'medication' | 'hormone' = 'events';
     const medIds = new Set(this.medsResources.map(r => r.id));
@@ -661,6 +670,24 @@ export class CycleOverviewComponent {
     const d = new Date(dateStr + 'T00:00:00');
     d.setDate(d.getDate() + 1);
     return d.toISOString().slice(0, 10);
+  }
+
+  openLabOrderCreateModal(date: string) {
+    try {
+      this.labOrderCreateModalRef = this.modalService.open(this.labOrderCreateModal, { size: 'xl', centered: true });
+    } catch { }
+  }
+
+  closeLabOrderCreateModal() {
+    if (this.labOrderCreateModalRef) {
+      try { this.labOrderCreateModalRef.dismiss(); } catch { }
+      this.labOrderCreateModalRef = null;
+    }
+  }
+
+  onLabOrderCreateSave(evt: { tests: any[]; details: any; header?: any }) {
+    // TODO: integrate with backend to persist IVF lab order
+    this.closeLabOrderCreateModal();
   }
 
   openAddModal() {
