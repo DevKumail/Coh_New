@@ -225,6 +225,11 @@ namespace HMIS.Service.ServiceLogics
                    UpdateEmrNote(existingNote, emrNote);
                     await _context.SaveChangesAsync();
 
+                    if (note.FileId > 0)
+                    {
+                        note.Id = emrNote.NoteId;
+                        await InsertSpeechWithTranscription(note);
+                    }
                     _logger.LogInformation("Successfully updated note ID: {NoteId}", existingNote.NoteId);
                 }
                 else
