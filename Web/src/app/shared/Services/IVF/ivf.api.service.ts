@@ -226,6 +226,11 @@ export class IVFApiService {
     return this.api.post('Overview/prescription-master-save', body);
   }
 
+  // Save full prescription master with schedule and details
+  savePrescriptionMasterFull(body: any): Observable<any> {
+    return this.api.post('Overview/prescription-master-save', body);
+  }
+
   // Save prescription with dates and appointment
   savePrescription(body: {
     ivfPrescriptionMasterId: number;

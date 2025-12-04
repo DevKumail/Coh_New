@@ -123,7 +123,7 @@
       <h6 class="modal-title">Add Medication Row</h6>
       <button type="button" class="btn-close" aria-label="Close" (click)="closeAddMedModal()"></button>
     </div>
-    <form class="p-3 pt-2" (ngSubmit)="confirmAddMed()">
+    <form class="p-3 pt-2" (ngSubmit)="confirmAddMed()" [formGroup]="medFG">
       <div class="row g-2 align-items-end mb-2">
         <div class="col-8">
           <label class="form-label mb-1">Medication</label>
@@ -186,69 +186,134 @@
         </div>
         <div class="col-4">
           <label class="form-label mb-1">Drug code</label>
-          <input type="text" class="form-control form-control-sm" [(ngModel)]="medForm.drugCode" name="drugCode" [disabled]="true">
+          <input type="text" class="form-control form-control-sm" formControlName="drugCode" [disabled]="true">
         </div>
-      </div>
-      <div class="mb-2">
-        <label class="form-label mb-1">Packaging</label>
-        <input type="text" class="form-control form-control-sm" [(ngModel)]="medForm.packaging" name="packaging" [disabled]="true">
       </div>
 
       <div class="mb-2">
-        <label class="form-label mb-1">Application domain</label>
-        <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="medForm.applicationDomain" name="applicationDomain"></textarea>
+        <label class="form-label mb-1 d-block">Application domain</label>
+        <div class="border rounded p-2">
+          <div class="row g-2">
+            <div class="col-6" *ngFor="let o of options('ApplicationDomain')">
+              <div class="form-check">
+                <input class="form-check-input" type="radio"
+                       [value]="o.valueId" formControlName="applicationDomainCategoryId"
+                       [id]="'appDom_'+o.valueId">
+                <label class="form-check-label" [for]="'appDom_'+o.valueId">{{ o.name }}</label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="row g-2 mb-2">
         <div class="col-4">
-          <label class="form-label mb-1">Start</label>
-          <input type="date" class="form-control form-control-sm" [(ngModel)]="medForm.startDate" name="startDate">
+          <label class="form-label mb-1">Start Date</label>
+          <input type="date" class="form-control form-control-sm" formControlName="startDate">
+        </div>
+           <div class="col-4">
+          <label class="form-label mb-1">Duration</label>
+          <div class="input-group input-group-sm">
+            <input type="number" min="0" class="form-control form-control-sm" formControlName="duration">
+            <span class="input-group-text">day(s)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-2 mb-2">
+        <div class="col-4">
+          <label class="form-label mb-1">Strength</label>
+          <input type="text" class="form-control form-control-sm" formControlName="strength">
         </div>
         <div class="col-4">
-          <label class="form-label mb-1">Time</label>
-          <input type="time" class="form-control form-control-sm" [(ngModel)]="medForm.time" name="time">
+          <label class="form-label mb-1">Route</label>
+          <select class="form-select form-select-sm" formControlName="route">
+            <option [ngValue]="''">-- Select route --</option>
+             <option *ngFor="let r of GetRoute" [ngValue]="r?.name || r?.frequencyName || r">
+              {{ r?.name || r?.frequencyName || r }}
+            </option>
+          </select>
         </div>
+
         <div class="col-4">
-          <label class="form-label mb-1">x days</label>
-          <input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="medForm.xDays" name="xDays">
-        </div>
-        <div class="col-4">
-          <label class="form-label mb-1">Daily dosage</label>
-          <input type="text" class="form-control form-control-sm" [(ngModel)]="medForm.dailyDosage" name="dailyDosage">
-        </div>
-        <div class="col-4">
-          <label class="form-label mb-1">Dosage frequency</label>
-          <select class="form-select form-select-sm" [(ngModel)]="medForm.dosageFrequency" name="dosageFrequency">
+          <label class="form-label mb-1">Frequency</label>
+          <select class="form-select form-select-sm" formControlName="frequency">
             <option [ngValue]="''">-- Select frequency --</option>
             <option *ngFor="let f of getfrequency" [ngValue]="f?.name || f?.frequencyName || f">
               {{ f?.name || f?.frequencyName || f }}
             </option>
           </select>
         </div>
-      <!-- </div>
-
-      <div class="row g-2 mb-2"> -->
         <div class="col-4">
-          <label class="form-label mb-1">Presentation form</label>
-          <input type="text" class="form-control form-control-sm" [(ngModel)]="medForm.presentationForm" name="presentationForm" [disabled]="true">
+          <label class="form-label mb-1">Quantity</label>
+          <input type="text" class="form-control form-control-sm" formControlName="quantity">
         </div>
-        <!-- <div class="col-4">
-          <label class="form-label mb-1">Application</label>
-          <input type="text" class="form-control form-control-sm" [(ngModel)]="medForm.application" name="application">
-        </div> -->
+        <div class="col-4">
+          <label class="form-label mb-1">Refill(s)</label>
+          <input type="text" class="form-control form-control-sm" formControlName="refills">
+        </div>
+
+        <div class="col-4">
+          <label class="form-label mb-1">Sample(s)</label>
+          <input type="text" class="form-control form-control-sm" formControlName="samples">
+        </div>
+        <div class="col-4">
+          <label class="form-label mb-1">Substitution</label>
+          <select class="form-select form-select-sm" formControlName="substitution">
+            <option [ngValue]="''">-- Select substitution --</option>
+            <option *ngFor="let o of options('Substitution')" [ngValue]="o.name">{{ o.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-4">
+        <label class="form-label mb-1">Indication</label>
+        <select class="form-select form-select-sm" formControlName="indication">
+          <option [ngValue]="''">-- Select indication --</option>
+          <option *ngFor="let o of options('Indication')" [ngValue]="o.name">{{ o.name }}</option>
+        </select>
+      </div>
+
+           <div class="col-4">
+          <label class="form-label mb-1">Role Name</label>
+          <select class="form-select form-select-sm" formControlName="roleName">
+            <option [ngValue]="''">-- None --</option>
+          </select>
+        </div>
+
+         
+        <div class="col-4">
+          <label class="form-label mb-1">Receiver Name</label>
+            <select class="form-select form-select-sm flex-grow-1" formControlName="receiverName">
+              <option [ngValue]="''">-- None --</option>
+            </select>
+        </div>
+
+          <div class="form-check mb-0 col-4">
+              <input class="form-check-input" type="checkbox" formControlName="internalOrder" id="internalOrder">
+              <label class="form-check-label" for="internalOrder" style="font-size: 0.875rem;">
+                Internal Order
+              </label>
+          </div>
+      </div>
+
+      <!-- Dynamic dose time inputs based on Frequency -->
+      <div class="row g-2 mb-2" *ngIf="doseTimesFA?.length" formArrayName="doseTimes">
+        <div class="col-12">
+          <label class="form-label mb-1">Times</label>
+          <div class="row g-2">
+            <div class="col-3" *ngFor="let c of doseTimesFA.controls; index as i">
+              <input type="time" class="form-control form-control-sm" [formControlName]="i">
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="mb-2">
-        <label class="form-label mb-1">Additional information</label>
-        <input type="text" class="form-control form-control-sm" [(ngModel)]="medForm.additionalInfo" name="additionalInfo">
+        <label class="form-label mb-1">Instructions</label>
+        <textarea class="form-control form-control-sm" rows="3" formControlName="instructions"></textarea>
       </div>
 
 
-
-      <div class="mb-2">
-        <label class="form-label mb-1">Note</label>
-        <textarea class="form-control form-control-sm" rows="3" [(ngModel)]="medForm.note" name="note"></textarea>
-      </div>
 
       <div class="d-flex justify-content-end gap-2 mt-3">
         <button type="button" class="btn btn-sm btn-outline-secondary" (click)="closeAddMedModal()">Cancel</button>
