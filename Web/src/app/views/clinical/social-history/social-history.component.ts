@@ -38,7 +38,7 @@ export class SocialHistoryComponent {
     SocialHistoryList: any[] = [];
     pagegination: any = {
         currentPage: 1,
-        pageSize: 5,
+        pageSize: 10,
     }
     SocialHistoryTotalItems: number = 0;
     isSubmitting: boolean = false;

@@ -17,10 +17,11 @@ import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import { Page } from '@/app/shared/enum/dropdown.enum';
 import Swal from 'sweetalert2';
 import { ClinicalApiService } from '@/app/views/clinical/clinical.api.service';
+import { AddLabOrderComponent } from '@/app/views/ivf/ivf-patient-summary/male-sections/lab-diagnostics/add-lab-order.component';
 
 @Component({
   selector: 'app-cycle-overview',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, FullCalendarModule, HttpClientModule, NgbDropdownModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, FullCalendarModule, HttpClientModule, NgbDropdownModule, AddLabOrderComponent],
   templateUrl: './cycle-overview.component.html',
   styleUrls: ['./cycle-overview.component.scss']
 })
@@ -34,6 +35,10 @@ export class CycleOverviewComponent {
     private clinicalApiService: ClinicalApiService,
     private route: ActivatedRoute,
     private fb: FormBuilder) { }
+
+
+  // Patient context
+  mrNo: string | null = null;
 
   // Mock data for UI display
   AllDropdownValues: any = [];
@@ -95,7 +100,17 @@ export class CycleOverviewComponent {
         this.fetchOverviewData(id);
       }
     });
+
+    // Load MRN from patient banner (table2[0].mrNo pattern used elsewhere)
+    try {
+      const pdata = this.patientBanner.getPatientData();
+      this.mrNo = pdata?.table2?.[0]?.mrNo || null;
+    } catch {
+      this.mrNo = null;
+    }
   }
+
+ 
 
   private parseIds(val: any): number[] {
     try {
@@ -436,6 +451,7 @@ export class CycleOverviewComponent {
   @ViewChild('addMedModal') addMedModal!: TemplateRef<any>;
   @ViewChild('ultrasoundModal') ultrasoundModal!: TemplateRef<any>;
   @ViewChild('labOrderModal') labOrderModal!: TemplateRef<any>;
+  @ViewChild('labOrderCreateModal') labOrderCreateModal!: TemplateRef<any>;
   @ViewChild('medicationModal') medicationModal!: TemplateRef<any>;
   @ViewChild('hormoneModal') hormoneModal!: TemplateRef<any>;
   addModalRef: any;
@@ -444,6 +460,7 @@ export class CycleOverviewComponent {
   ultrasoundDetail: any = null;
   labOrderModalRef: any;
   labOrderDetail: any = null;
+  labOrderCreateModalRef: any;
   medicationModalRef: any;
   medicationDetail: any = null;
   hormoneModalRef: any;
@@ -635,6 +652,12 @@ export class CycleOverviewComponent {
     const clickedDate: string = arg?.dateStr || '';
     this.setSelectedDate(clickedDate);
 
+    // If Examination row is clicked, open Lab Order modal instead of generic add modal
+    if (resId === 'orders') {
+      this.openLabOrderCreateModal(clickedDate);
+      return;
+    }
+
     // Determine category by resource id
     let category: 'events' | 'medication' | 'hormone' = 'events';
     const medIds = new Set(this.medsResources.map(r => r.id));
@@ -744,6 +767,83 @@ export class CycleOverviewComponent {
     const d = new Date(dateStr + 'T00:00:00');
     d.setDate(d.getDate() + 1);
     return d.toISOString().slice(0, 10);
+  }
+
+  openLabOrderCreateModal(date: string) {
+    try {
+      this.labOrderCreateModalRef = this.modalService.open(this.labOrderCreateModal, { size: 'xl', centered: true });
+    } catch { }
+  }
+
+  closeLabOrderCreateModal() {
+    if (this.labOrderCreateModalRef) {
+      try { this.labOrderCreateModalRef.dismiss(); } catch { }
+      this.labOrderCreateModalRef = null;
+    }
+  }
+
+  onLabOrderCreateSave(evt: { tests: any[]; details: any; header?: any }) {
+    if (!evt || !Array.isArray(evt.tests) || evt.tests.length === 0) {
+      Swal.fire({ icon: 'warning', title: 'No tests selected', text: 'Please select at least one test.', timer: 1200, showConfirmButton: false });
+      return;
+    }
+
+    const mrNoNum = Number(this.mrNo || 0);
+    if (!mrNoNum) {
+      Swal.fire({ icon: 'error', title: 'MRN not found', text: 'Patient MRN is missing. Please load patient in banner.', timer: 1500, showConfirmButton: false });
+      return;
+    }
+
+    const visitId = this.getAppId();
+    if (!visitId) {
+      Swal.fire({ icon: 'error', title: 'Visit not found', text: 'Appointment/visit is not loaded.', timer: 1500, showConfirmButton: false });
+      return;
+    }
+
+    const now = new Date().toISOString();
+
+    // Derive provider from per-test refPhysicianId (same pattern as other IVF forms)
+    const providerFromPhysician = Number(
+      (evt.tests || [])
+        .find(t => (t?.details?.refPhysicianId ?? null) !== null && (t?.details?.refPhysicianId ?? undefined) !== undefined)
+        ?.details?.refPhysicianId ?? 0
+    );
+    const providerId = Number.isFinite(providerFromPhysician) && providerFromPhysician > 0
+      ? providerFromPhysician
+      : 0;
+
+    const header = {
+      mrNo: mrNoNum,
+      providerId,
+      orderDate: now,
+      visitAccountNo: Number(visitId),
+      createdBy: providerId || 0,
+      createdDate: now,
+      orderControlCode: 'NW',
+      orderStatus: 'NEW',
+      isHL7MsgCreated: false,
+      isHL7MessageGeneratedForPhilips: false,
+      isSigned: false
+    } as any;
+
+    const details = evt.tests.map((t: any) => ({
+      labTestId: Number(t.id),
+      cptCode: t.cpt || '',
+      orderQuantity: 1,
+      investigationTypeId: 5,
+      billOnOrder: 1,
+      pComments: (evt.details && evt.details.comments) || ''
+    }));
+
+    this.api.createLabOrder({ header, details } as any).subscribe({
+      next: () => {
+        Swal.fire({ icon: 'success', title: 'Lab order saved', text: 'Lab order has been created.', timer: 1200, showConfirmButton: false });
+        this.closeLabOrderCreateModal();
+      },
+      error: () => {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create lab order.', timer: 1500, showConfirmButton: false });
+      }
+    });
   }
 
   openAddModal() {

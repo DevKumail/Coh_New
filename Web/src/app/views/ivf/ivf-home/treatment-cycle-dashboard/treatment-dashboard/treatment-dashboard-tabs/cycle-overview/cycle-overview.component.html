@@ -350,6 +350,23 @@
     </div>
   </ng-template>
 
+  <!-- Lab Order Create/Edit Modal using AddLabOrderComponent -->
+  <ng-template #labOrderCreateModal let-modal>
+    <div class="modal-header py-2">
+      <h6 class="modal-title">Lab Order</h6>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeLabOrderCreateModal()"></button>
+    </div>
+    <div class="p-0">
+      <app-add-lab-order
+        [mrNo]="mrNo"
+        [mode]="'create'"
+        [investigationTypeId]="5"
+        (cancel)="closeLabOrderCreateModal()"
+        (save)="onLabOrderCreateSave($event)">
+      </app-add-lab-order>
+    </div>
+  </ng-template>
+
   <!-- Lab Order Modal -->
   <ng-template #labOrderModal let-modal>
     <div class="modal-header py-2">

@@ -1,13 +1,5 @@
 <form *ngIf="medicalForm " [formGroup]="medicalForm">
-  <div class="d-flex justify-content-center align-items-center mb-3 position-relative">
-    <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-      <i class="bi bi-heart-pulse fs-4"></i>
-      <span>{{ 'MEDICAL_HISTORY' | translate }}</span>
-    </h5>
-    <button type="button" class="btn btn-primary position-absolute end-0" (click)="openMedicalHistoryModal()">
-      <i class="bi bi-plus-circle"></i> {{ 'ADD' | translate }}
-    </button>
-  </div>
+
 
   <!-- Modal -->
   <ng-template #medicalHistoryModal let-modal>
@@ -171,6 +163,15 @@
 <!-- TABLE SECTION -->
 <div class="card shadow-sm">
   <div class="card-body">
+    <div class="d-flex justify-content-left align-items-left mb-3 position-relative">
+    <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
+      <i ></i>
+      <span>{{ 'MEDICAL_HISTORY' | translate }}</span>
+    </h5>
+    <button type="button" class="btn btn-primary position-absolute end-0" (click)="openMedicalHistoryModal()">
+      <i ></i> {{ 'ADD' | translate }}
+    </button>
+  </div>
     <div class="table-responsive">
       <div class="">
         <div class="table-responsive">

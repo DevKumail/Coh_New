@@ -101,6 +101,8 @@ export class ClinicalNoteCreateComponent implements OnInit {
   }
 
   SelectedVisit: any;
+  // Edit mode support
+  private noteId: number = 0;
   ngOnInit(): void {
     debugger
     this.patientDataSubscription = this.PatientData.patientData$
@@ -125,7 +127,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
 
     this.FillCache();
 
-    // Read query params and pre-populate form
+    // Read query params and pre-populate form / edit existing note
     this.route.queryParams.subscribe(params => {
       if (params['provider']) {
         this.preSelectedProvider = Number(params['provider']);
@@ -139,7 +141,14 @@ export class ClinicalNoteCreateComponent implements OnInit {
         this.selectedNotes = templateId;
         // Load template immediately
         this.GetNotesTemplate(templateId);
-        // Load notes to get template name
+      }
+
+      // Edit existing note (structured with voice)
+      if (params['noteId']) {
+        const id = Number(params['noteId']);
+        if (id) {
+          this.loadExistingNote(id);
+        }
       }
     });
 
@@ -411,6 +420,80 @@ export class ClinicalNoteCreateComponent implements OnInit {
     req.onsuccess = () => console.log('Note saved offline');
     req.onerror = (event: any) => console.error('Error saving note offline:', event);
   }
+
+  private loadExistingNote(noteId: number) {
+    if (!noteId) {
+      return;
+    }
+
+    this.dataquestion = [];
+    this.viewquestion = false;
+    this.nodeData = [];
+
+    this.loader.show();
+    this.clinicalApiService.GetEMRNoteByNoteId(noteId)
+      .then((res: any) => {
+        const note = res?.data;
+        if (!note) {
+          Swal.fire('Error', 'Unable to load note for editing.', 'error');
+          return;
+        }
+
+        // Normalize answeredNotesTemplate so it matches the same shape as GetNotesTemplate
+        let answeredTemplate: any = note.answeredNotesTemplate;
+
+        if (typeof answeredTemplate === 'string') {
+          try {
+            answeredTemplate = JSON.parse(answeredTemplate);
+          } catch (e) {
+            console.error('Failed to parse answeredNotesTemplate JSON', e);
+          }
+        }
+
+        if (answeredTemplate && !answeredTemplate.node && (answeredTemplate.questions || Array.isArray(answeredTemplate))) {
+          const questions = answeredTemplate[0].questions || answeredTemplate;
+          const titleFromTemplate = answeredTemplate[0].noteTitle || '';
+
+          answeredTemplate = {
+            node: {
+              noteTitle: titleFromTemplate || note.notesTitle || note.noteTitle || '',
+              questions: questions
+            }
+          };
+        }
+
+        this.dataquestion = answeredTemplate;
+        this.viewquestion = true;
+        this.nodeData = answeredTemplate;
+        // Store id for update payload
+        this.noteId = note.noteId || note.id || 0;
+
+        // Update MRN and visit if available
+        this.mrNo = note.mrno || this.mrNo;
+        if (note.visitAcNo && (!this.SelectedVisit || !this.SelectedVisit.appointmentId)) {
+          this.SelectedVisit = { ...(this.SelectedVisit || {}), appointmentId: note.visitAcNo };
+        }
+
+        // Provider and title
+        const providerCode = note.signedBy || note.providerId || null;
+        this.preSelectedProvider = providerCode || this.preSelectedProvider;
+        this.selectedProviders = this.preSelectedProvider || 0;
+
+        this.clinicalForm.patchValue({
+          noteTitle: note.notesTitle || note.noteTitle || '',
+          provider: providerCode
+        });
+
+        this.cdr.markForCheck();
+      })
+      .catch((error: any) => {
+        console.error('Error loading EMR note by id:', error);
+        Swal.fire('Error', 'Failed to load note for editing.', 'error');
+      })
+      .finally(() => {
+        this.loader.hide();
+      });
+  }
   // collect filled answers from structured note tree
   public collectFilledValues(): any {
     if (!this.dataquestion?.node) return null;
@@ -654,8 +737,8 @@ export class ClinicalNoteCreateComponent implements OnInit {
         createdBy,
         updatedBy: createdBy,
         signedBy: providerId || 0,
-        Id: 0,
-        isEdit: false,
+        Id: this.noteId || 0,
+        isEdit: this.noteId > 0,
         noteType: 'Structured',
         createdOn: new Date(),
         templateId: noteId,
@@ -696,6 +779,7 @@ export class ClinicalNoteCreateComponent implements OnInit {
                 this.voiceBlob = null;
                 this.clinicalForm.patchValue({ description: '', voicetext: '' });
                 Swal.fire('Success', 'Note uploaded successfully.', 'success');
+                this.router.navigate(['/patient-summary'], { queryParams: { id: 2 } });
                 this.loader.hide();
               })
               .catch((error: any) => {

@@ -123,7 +123,7 @@ problemTotalItems: any;
 problemCurrentPage: number = 1;
 MHPaginationInfo: any = {
   Page: 1,
-  RowsPerPage: 5
+  RowsPerPage: 10
 };
   problemData: any[] = [];   // Full list of problems
   pagedProblems: any[] = [];
@@ -133,11 +133,11 @@ MHPaginationInfo: any = {
   searchTotalItems: number = 0;
   PaginationInfo: any = {
     Page: 1,
-    RowsPerPage: 5
+    RowsPerPage: 10
   };
   favPaginationInfo: any = {
     Page: 1,
-    RowsPerPage: 5
+    RowsPerPage: 10
   };
   favoritesTabActive: boolean = false;
 

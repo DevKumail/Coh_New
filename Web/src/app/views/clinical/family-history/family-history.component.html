@@ -1,105 +1,182 @@
 <form *ngIf="FamilyForm" [formGroup]="FamilyForm">
-  <!-- Add button visible ly when clinicalnote is true -->
-  <div class="d-flex justify-content-center align-items-center mb-2 position-relative">
-    <h5 class="mb-0 fw-bold d-inline-flex align-items-center gap-2">
-      <i class="bi bi-heart-pulse fs-4"></i>
-      <span>{{ 'FAMILY_HISTORY' | translate }}</span>
-    </h5>
-    <button type="button" class="btn btn-primary position-absolute end-0" (click)="openAddModal(addFamilyHistoryModal)">
-      <i class="bi bi-plus-lg"></i> {{ 'ADD' | translate }}
-    </button>
-  </div>
-
-  <!-- Modal template that reuses the existing form UI -->
-  <ng-template #addFamilyHistoryModal let-modal>
-    <div class="modal-header py-2">
-      <h5 class="modal-title">{{ 'FAMILY_HISTORY' | translate }}</h5>
-      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('cross')"></button>
-    </div>
-    <div class="modal-body py-3">
-      <div class="row g-2">
-
-        <div class="col-md-6">
-          <label class="form-label fw-semibold">{{ 'RELATIONSHIP' | translate }} <span class="text-danger">*</span></label>
-          <select class="form-select" formControlName="Relationship">
-            <option [ngValue]="null" disabled>{{ 'SELECT_RELATIONSHIP' | translate }}</option>
-            <option *ngFor="let R of RelationshipData" [value]="R.code">{{ R.name }}</option>
-          </select>
-          <div class="text-danger small"
-            *ngIf="FamilyForm.get('Relationship')?.touched && FamilyForm.get('Relationship')?.invalid">
-            {{ 'RELATIONSHIP_IS_REQUIRED' | translate }}</div>
+    <!-- Add button visible ly when clinicalnote is true -->
+    <!-- Modal template that reuses the existing form UI -->
+    <ng-template #addFamilyHistoryModal let-modal>
+        <div class="modal-header py-2">
+            <h5 class="modal-title">{{ "FAMILY_HISTORY" | translate }}</h5>
+            <button
+                type="button"
+                class="btn-close"
+                aria-label="Close"
+                (click)="modal.dismiss('cross')"
+            ></button>
         </div>
-
-        <div class="col-md-6">
-          <label class="form-label fw-semibold">{{ 'PROBLEM' | translate }} <span class="text-danger">*</span></label>
-          <select class="form-select" formControlName="Problem">
-            <option [ngValue]="null" disabled>{{ 'SELECT_PROBLEM' | translate }}</option>
-            <option *ngFor="let FH of GetFamilyHistory" [value]="FH.id">{{ FH.name }}</option>
-          </select>
-          <div class="text-danger small"
-            *ngIf="FamilyForm.get('Problem')?.touched && FamilyForm.get('Problem')?.invalid">
-            {{ 'PROBLEM_IS_REQUIRED' | translate }}</div>
-        </div>
-
-        <div class="col-12">
-          <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-secondary" (click)="resetForm()">
-              <i class="bi bi-arrow-counterclockwise"></i> {{ 'CLEAR' | translate }}
-            </button>
-
-            <button type="button" class="btn btn-success" [disabled]="isSubmitting" (click)="submit(); modal.close('save')">
-              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              {{ isSubmitting ? ('SUBMITTING' | translate) : ('SAVE' | translate) }}
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </ng-template>
-
-
-  <div class="card mt-3">
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-bordered table-striped table-sm">
-
-          <thead class="align-middle thead-sm text-center">
-            <tr>
-              <th>{{ 'RELATIONSHIP' | translate }}</th>
-              <th>{{ 'PROBLEM' | translate }}</th>
-              <th>{{'STATUS' | translate}}</th>
-              <th class="text-center">{{ 'ACTION' | translate }}</th>
-            </tr>
-          </thead>
-          <tbody class="table-group-divider text-center">
-            <tr *ngFor="let data of FamilyHistoryList; let i = index">
-              <td>{{ data.relationship || '-' }}</td>
-              <td>{{ data.fhName || '-' }} </td>
-            <td>{{ data.active  ? 'Active' : 'Inactive' }}</td>
-              <td class="text-center" style="text-align: center;">
-
-                <div ngbDropdownMenu class="dropdown-menu-end d-flex gap-2 px-2 py-1">
-                  <ng-icon name="tablerEdit" class="me-1" (click)="editFamilyHistory(data)">
-                  </ng-icon>
-                  <ng-icon name="tablerTrash" class="text-danger me-1" (click)="deleteSocialHistory(data.fhid) ">
-                  </ng-icon>
+        <div class="modal-body py-3">
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold"
+                        >{{ "RELATIONSHIP" | translate }}
+                        <span class="text-danger">*</span></label
+                    >
+                    <select class="form-select" formControlName="Relationship">
+                        <option [ngValue]="null" disabled>
+                            {{ "SELECT_RELATIONSHIP" | translate }}
+                        </option>
+                        <option
+                            *ngFor="let R of RelationshipData"
+                            [value]="R.code"
+                        >
+                            {{ R.name }}
+                        </option>
+                    </select>
+                    <div
+                        class="text-danger small"
+                        *ngIf="
+                            FamilyForm.get('Relationship')?.touched &&
+                            FamilyForm.get('Relationship')?.invalid
+                        "
+                    >
+                        {{ "RELATIONSHIP_IS_REQUIRED" | translate }}
+                    </div>
                 </div>
-              </td>
-            </tr>
-            <tr *ngIf="FamilyHistoryTotalItems === 0">
-              <td colspan="9" class="text-center">{{ 'NO_DATA_FOUND' | translate }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
 
-      <app-generic-pagination
-      [totalItems]="FamilyHistoryTotalItems"
-      [pageSize]="pagegination.pageSize"
-      [currentPage]="pagegination.currentPage"
-      (pageChanged)="onFamilyHistoryPageChanged($event)">
-      </app-generic-pagination>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold"
+                        >{{ "PROBLEM" | translate }}
+                        <span class="text-danger">*</span></label
+                    >
+                    <select class="form-select" formControlName="Problem">
+                        <option [ngValue]="null" disabled>
+                            {{ "SELECT_PROBLEM" | translate }}
+                        </option>
+                        <option
+                            *ngFor="let FH of GetFamilyHistory"
+                            [value]="FH.id"
+                        >
+                            {{ FH.name }}
+                        </option>
+                    </select>
+                    <div
+                        class="text-danger small"
+                        *ngIf="
+                            FamilyForm.get('Problem')?.touched &&
+                            FamilyForm.get('Problem')?.invalid
+                        "
+                    >
+                        {{ "PROBLEM_IS_REQUIRED" | translate }}
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            (click)="resetForm()"
+                        >
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            {{ "CLEAR" | translate }}
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-success"
+                            [disabled]="isSubmitting"
+                            (click)="submit(); modal.close('save')"
+                        >
+                            <span
+                                *ngIf="isSubmitting"
+                                class="spinner-border spinner-border-sm"
+                                role="status"
+                                aria-hidden="true"
+                            ></span>
+                            {{
+                                isSubmitting
+                                    ? ("SUBMITTING" | translate)
+                                    : ("SAVE" | translate)
+                            }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <div
+                class="d-flex justify-content-left align-items-left mb-2 position-relative"
+            >
+                <h5 class="mb-0 fw-bold d-inline-flex align-items-left gap-2">
+                    <i></i>
+                    <span>{{ "FAMILY_HISTORY" | translate }}</span>
+                </h5>
+                <button
+                    type="button"
+                    class="btn btn-primary position-absolute end-0"
+                    (click)="openAddModal(addFamilyHistoryModal)"
+                >
+                    <i></i> {{ "ADD" | translate }}
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-sm">
+                    <thead class="align-middle thead-sm text-center">
+                        <tr>
+                            <th>{{ "RELATIONSHIP" | translate }}</th>
+                            <th>{{ "PROBLEM" | translate }}</th>
+                            <th>{{ "STATUS" | translate }}</th>
+                            <th class="text-center">
+                                {{ "ACTION" | translate }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider text-center">
+                        <tr
+                            *ngFor="
+                                let data of FamilyHistoryList;
+                                let i = index
+                            "
+                        >
+                            <td>{{ data.relationship || "-" }}</td>
+                            <td>{{ data.fhName || "-" }}</td>
+                            <td>{{ data.active ? "Active" : "Inactive" }}</td>
+                            <td class="text-center" style="text-align: center">
+                                <div
+                                    ngbDropdownMenu
+                                    class="dropdown-menu-end d-flex gap-2 px-2 py-1"
+                                >
+                                    <ng-icon
+                                        name="tablerEdit"
+                                        class="me-1"
+                                        (click)="editFamilyHistory(data)"
+                                    >
+                                    </ng-icon>
+                                    <ng-icon
+                                        name="tablerTrash"
+                                        class="text-danger me-1"
+                                        (click)="deleteSocialHistory(data.fhid)"
+                                    >
+                                    </ng-icon>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="FamilyHistoryTotalItems === 0">
+                            <td colspan="9" class="text-center">
+                                {{ "NO_DATA_FOUND" | translate }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <app-generic-pagination
+                [totalItems]="FamilyHistoryTotalItems"
+                [pageSize]="pagegination.pageSize"
+                [currentPage]="pagegination.currentPage"
+                (pageChanged)="onFamilyHistoryPageChanged($event)"
+            >
+            </app-generic-pagination>
+        </div>
     </div>
-  </div>
 </form>
