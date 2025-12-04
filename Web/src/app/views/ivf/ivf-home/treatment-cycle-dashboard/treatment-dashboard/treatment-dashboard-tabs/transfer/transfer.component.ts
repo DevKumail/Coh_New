@@ -7,6 +7,8 @@ import { FurtherInformationComponent } from './forms/further-information/further
 import { Page } from '@/app/shared/enum/dropdown.enum';
 import { SharedService } from '@/app/shared/Services/Common/shared-service';
 import { ActivatedRoute } from '@angular/router';
+import Swal from 'sweetalert2';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-transfer',
@@ -47,7 +49,7 @@ export class TransferComponent implements OnInit {
       const id = Number(idStr);
       this.cycleId = Number.isFinite(id) && id > 0 ? id : 0;
       if (this.cycleId > 0) {
-        // this.loadTreatment();
+        this.loadEpisodeTransfer(this.cycleId);
       }
     });
 
@@ -57,13 +59,84 @@ export class TransferComponent implements OnInit {
   dropdowns: any = [];
   cacheItems: string[] = ['Provider'];
   hrEmployees: any = [];
+  // hold ids for update
+  currentTransferId: number | null = null;
+  currentTransferInnerId: number | null = null;
+  currentEmbryosIds: Array<{ index: number; embryoInTransferId: number; transferId: number }> = [];
+  isLoading = false;
+  isSaving = false;
+  get actionLabel() { return this.currentTransferId ? 'Update' : 'Save'; }
 
   ngOnInit() {
     this.getAlldropdown();
     this.FillCache();
   }
 
-    FillCache() {
+  private loadEpisodeTransfer(cycleId: number) {
+    this.isLoading = true;
+    this.ivf.getEpisodeTransferByCycleId(cycleId).pipe(finalize(() => { this.isLoading = false; })).subscribe((res: any) => {
+      // Expecting shape { transfer: { ...same as sample... } }
+      const data = (res && res.transfer) ? res.transfer : res;
+      if (!data) return;
+
+      // store ids for update
+      this.currentTransferId = data.transferId ?? null;
+      this.currentTransferInnerId = data.transfer?.id ?? null;
+
+      // top form
+      const t = data.transfer || {};
+      this.form.patchValue({
+        dateOfTransfer: t.dateOfTransfer ? t.dateOfTransfer.substring(0, 10) : '',
+        timeOfTransfer: t.timeOfTransfer || '',
+        durationMin: t.transferDurationPerMin ?? 0,
+        operatingClinician: t.providerId ?? null,
+        nurse: t.nurseId ?? null,
+        dateOfSecTransfer: t.dateOfSecTransfer ? t.dateOfSecTransfer.substring(0, 10) : '',
+        electiveSingleEmbryoTransfer: !!t.electiveSingleEmbryoTransfer,
+        embryologistId: t.embryologistId ?? null,
+      });
+
+      // embryos
+      const embryos = Array.isArray(data.embryosInTransfer) ? data.embryosInTransfer : [];
+      this.currentEmbryosIds = embryos.map((e: any, i: number) => ({ index: i, embryoInTransferId: e.embryoInTransferId, transferId: e.transferId }));
+      this.embryosList = embryos.map((e: any, i: number) => ({
+        number: i + 1,
+        id: e.embryoId,
+        title: e.cellInformation,
+        morpho: e.ideal ? 'ideal' : 'not_ideal',
+        score: e.scoreCategoryId ?? null,
+        image1: null,
+        image2: null,
+      }));
+      // EmbryoTransferComponent will rebuild its form via ngOnChanges when embryosList changes
+
+      // further information
+      const fi = data.furtherInformation || {};
+      if (this.furtherCmp?.form) {
+        this.furtherCmp.form.patchValue({
+          cultureDuration: fi.cultureDays ?? 0,
+          catheterUsed: fi.catheterCategoryId ?? '',
+          catheterAddition: fi.catheterAddition ?? '',
+          mainComplication: fi.mainCompilationCategoryId ?? '',
+          furtherComplications: fi.furtherComplicationCategoryId ?? '',
+          severalAttempts: !!fi.severalAttempts,
+          attempts: fi.noOfAttempts ?? 0,
+          embryoGlue: !!fi.embryoGlue,
+          difficultCatheter: !!fi.difficultCatheterInsertion,
+          catheterChange: !!fi.catheterChange,
+          mucusInCatheter: !!fi.mucusInCatheter,
+          bloodInCatheter: !!fi.bloodInCatheter,
+          dilation: !!fi.dilation,
+          ultrasoundCheck: !!fi.ultrasoundCheck,
+          vulsellum: !!fi.vulsellum,
+          probe: !!fi.probe,
+          editorContent: fi.note ?? '',
+        });
+      }
+    });
+  }
+
+  FillCache() {
     this.sharedservice.getCacheItem({ entities: this.cacheItems }).subscribe((response: any) => {
       if (response?.cache) {
         this.FillDropDown(response);
@@ -81,57 +154,63 @@ export class TransferComponent implements OnInit {
           providerId: item.EmployeeId,
         }));
       }
-    } catch {}
+    } catch { }
   }
 
-    // Store payload from service for dynamic labels/options
-    getAllDropdown(payload: { [key: string]: Array<{ valueId: number; name: string }> }) {
-      this.dropdowns = payload || {};
-    }
-  
-    getAlldropdown() {
-      this.sharedservice.getDropDownValuesByName(Page.IVFTransferEpisode).subscribe((res: any) => {
-        this.AllDropdownValues = res;
-        this.getAllDropdown(res);
-      })
-    }
-  
-    // Helper to read dropdown options by key
-    options(key: string) {
-      return (this.dropdowns && this.dropdowns[`IVFTransferEpisode:${key}`]) || [];
-    }
+  // Store payload from service for dynamic labels/options
+  getAllDropdown(payload: { [key: string]: Array<{ valueId: number; name: string }> }) {
+    this.dropdowns = payload || {};
+  }
+
+  getAlldropdown() {
+    this.sharedservice.getDropDownValuesByName(Page.IVFTransferEpisode).subscribe((res: any) => {
+      this.AllDropdownValues = res;
+      this.getAllDropdown(res);
+    })
+  }
+
+  // Helper to read dropdown options by key
+  options(key: string) {
+    return (this.dropdowns && this.dropdowns[`IVFTransferEpisode:${key}`]) || [];
+  }
 
 
   onSave() {
+    if (!this.cycleId || this.cycleId === 0 || this.cycleId === null || this.cycleId === undefined) {
+      Swal.fire('Treatment cycle id is required please go to dashboard and selact cycle', '', 'error');
+      return;
+    }
+
+    this.isSaving = true;
     const top = this.form.getRawValue();
     const embryosForm = this.embryoCmp?.form?.getRawValue?.();
     const furtherForm = this.furtherCmp?.form?.getRawValue?.();
 
     const embryosInTransfer =
-     (this.embryoCmp?.embryos || []).map((emb, idx) => {
-      const rowFg = this.embryoCmp?.embryosFA?.at(idx);
-      const row = rowFg?.getRawValue ? rowFg.getRawValue() : {} as any;
-      return {
-        embryoInTransferId: 0,
-        transferId: 0,
-        sequenceId: idx + 1,
-        embryoId: emb.id ?? 0,
-        cellInformation: emb.title ?? 'string',
-        ideal: (row?.morpho ?? emb.morpho) === 'ideal',
-        scoreCategoryId: row?.score ? Number(row.score) : null,
-      };
-    });
+      (this.embryoCmp?.embryos || []).map((emb, idx) => {
+        const rowFg = this.embryoCmp?.embryosFA?.at(idx);
+        const row = rowFg?.getRawValue ? rowFg.getRawValue() : {} as any;
+        return {
+          embryoInTransferId: 0,
+          transferId: 0,
+          sequenceId: idx + 1,
+          embryoId: emb.id ?? 0,
+          cellInformation: emb.title ?? 'string',
+          ideal: (row?.morpho ?? emb.morpho) === 'ideal',
+          scoreCategoryId: row?.score ? Number(row.score) : null,
+        };
+      });
 
     const furtherInformation = furtherForm ? {
       cultureDays: Number(furtherForm.cultureDuration) || 0,
       catheterCategoryId: furtherForm.catheterUsed ? Number(furtherForm.catheterUsed) : null,
-      cathererAddition: furtherForm.catheterAddition ?? 'string',
+      catheterAddition: furtherForm.catheterAddition ?? null,
       mainCompilationCategoryId: furtherForm.mainComplication ? Number(furtherForm.mainComplication) : null,
       furtherComplicationCategoryId: furtherForm.furtherComplications ? Number(furtherForm.furtherComplications) : null,
       severalAttempts: !!furtherForm.severalAttempts,
       noOfAttempts: Number(furtherForm.attempts) || 0,
       embryoGlue: !!furtherForm.embryoGlue,
-      difficultCathererInsertion: !!furtherForm.difficultCatheter,
+      difficultCatheterInsertion: !!furtherForm.difficultCatheter ? true : null,
       catheterChange: !!furtherForm.catheterChange,
       mucusInCatheter: !!furtherForm.mucusInCatheter,
       bloodInCatheter: !!furtherForm.bloodInCatheter,
@@ -139,17 +218,17 @@ export class TransferComponent implements OnInit {
       ultrasoundCheck: !!furtherForm.ultrasoundCheck,
       vulsellum: !!furtherForm.vulsellum,
       probe: !!furtherForm.probe,
-      note: furtherForm.editorContent ?? furtherForm.note ?? 'string',
+      note: furtherForm.editorContent ?? null,
     } : {
       cultureDays: 0,
-      cathererCategoryId: 0,
-      cathererAddition: 'string',
+      catheterCategoryId: 0,
+      catheterAddition: null,
       mainCompilationCategoryId: 0,
       furtherComplicationCategoryId: 0,
       severalAttempts: false,
       noOfAttempts: 0,
       embryoGlue: false,
-      difficultCathererInsertion: false,
+      difficultCatheterInsertion: null,
       catheterChange: false,
       mucusInCatheter: false,
       bloodInCatheter: false,
@@ -157,16 +236,17 @@ export class TransferComponent implements OnInit {
       ultrasoundCheck: false,
       vulsellum: false,
       probe: false,
-      note: 'string',
+      note: null,
     };
 
+
     const payload = {
-      transferId: 0,
+      transferId: this.currentTransferId ?? 0,
       ivfDashboardTreatmentCycleId: this.cycleId,
       statusId: 0,
       transfer: {
-        id: 0,
-        transferId: 0,
+        id: this.currentTransferInnerId ?? 0,
+        transferId: this.currentTransferId ?? 0,
         dateOfTransfer: top.dateOfTransfer || new Date().toISOString(),
         timeOfTransfer: top.timeOfTransfer || 'string',
         transferDurationPerMin: Number(top.durationMin) || 0,
@@ -176,14 +256,22 @@ export class TransferComponent implements OnInit {
         electiveSingleEmbryoTransfer: !!top.electiveSingleEmbryoTransfer,
         embryologistId: top.embryologistId ? Number(top.embryologistId) : null,
       },
-      // embryosInTransfer,
+      embryosInTransfer,
       furtherInformation,
     };
 
-    console.log('Transfer save payload:', payload);
-    this.ivf.saveEpisodeTransfer(payload).subscribe({
-      next: (res) => console.log('Transfer saved OK', res),
-      error: (err) => console.error('Transfer save failed', err),
+    this.ivf.saveEpisodeTransfer(payload).pipe(finalize(() => { this.isSaving = false; })).subscribe({
+      next: () => {
+        const msg = this.currentTransferId ? 'Transfer updated successfully' : 'Transfer saved successfully';
+        Swal.fire(msg, '', 'success');
+        if (!this.currentTransferId && this.cycleId) {
+          this.loadEpisodeTransfer(this.cycleId);
+        }
+      },
+      error: () => {
+        const msg = this.currentTransferId ? 'Transfer update failed' : 'Transfer save failed';
+        Swal.fire(msg, '', 'error');
+      },
     });
   }
 }
