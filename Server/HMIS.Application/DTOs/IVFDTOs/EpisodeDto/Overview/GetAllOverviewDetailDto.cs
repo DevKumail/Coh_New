@@ -43,6 +43,7 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public long MedicationId { get; set; }
         public long DrugId { get; set; }
         public string DrugName { get; set; }
+        public string Code { get; set; }
         public List<string> ApplicationDomainName { get; set; } = new();
         public DateTime? StartDate { get; set; }
         public DateTime? StopDate { get; set; }
