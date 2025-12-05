@@ -646,7 +646,7 @@ AND (
                 {
                     var ivfLabOrder = new IvflabOrderSet
                     {
-                        OrderSetDetailId = orderSetDetailIds[0], 
+                        OrderSetDetailId = orderSetId, 
                         OverviewId = payload.Header.OverviewId ?? 0
                     };
                     _db.IvflabOrderSet.Add(ivfLabOrder);

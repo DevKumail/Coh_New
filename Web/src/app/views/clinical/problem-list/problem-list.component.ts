@@ -2,7 +2,7 @@ import { Patient } from './../../Scheduling/appointment-dashboard/appointment-da
 import { ClinicalApiService } from './../clinical.api.service';
 // import Swal from 'sweetalert2';
 
-import { Component, OnInit, OnChanges, SimpleChanges, TemplateRef, ViewChild, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, TemplateRef, ViewChild, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -44,6 +44,14 @@ import { LucideAlertTriangle } from 'lucide-angular';
 })
 export class ProblemListComponent implements OnInit, OnChanges, OnDestroy {
   @Input() clinicalnote: boolean = false;
+  @Output() selectionChanged = new EventEmitter<any[]>();
+  @Input() set preSelectedIds(ids: number[]) {
+    this.pendingSelections = ids || [];
+    if (this.medicalHistoryData?.length > 0) {
+      this.applyPendingSelections();
+    }
+  }
+  private pendingSelections: number[] = [];
   selectAll: boolean = false;
   datePipe = new DatePipe('en-US');
   medicalForm!: FormGroup;
@@ -472,6 +480,11 @@ minDateValidator(otherControlName: string) {
     this.filteredProblemData = this.medicalHistoryData || [];
 
     console.log('this.medicalHistoryData', this.medicalHistoryData);
+
+    // Apply pending selections after data loads
+    if (this.pendingSelections.length > 0) {
+      this.applyPendingSelections();
+    }
   });
 
   this.loader.hide();
@@ -957,15 +970,55 @@ minDateValidator(otherControlName: string) {
       this.medicalHistoryData.forEach((problem: any) => {
         problem.selected = this.selectAll;
       });
+      this.emitSelectionChange();
     }
 
     onCheckboxChange(): void {
       this.selectAll = this.medicalHistoryData.length > 0 &&
                        this.medicalHistoryData.every((problem: any) => problem.selected);
+      this.emitSelectionChange();
     }
 
     getSelectedProblems(): any[] {
       return this.medicalHistoryData.filter((problem: any) => problem.selected);
+    }
+
+    emitSelectionChange(): void {
+      const selectedItems = this.getSelectedProblemsForNote();
+      this.selectionChanged.emit(selectedItems);
+    }
+
+    getSelectedProblemsForNote(): any[] {
+      return this.medicalHistoryData
+        .filter((problem: any) => problem.selected)
+        .map((problem: any) => ({
+          problemId: problem.id,
+          providerName: problem.providerName,
+          problem: problem.icD9Description,
+          comments: problem.comments,
+          confidential: problem.confidential,
+          status: problem.status,
+          startDate: problem.startDate,
+          endDate: problem.endDate,
+          icdCode: problem.icD9Code
+        }));
+    }
+
+    clearSelection(): void {
+      this.medicalHistoryData.forEach((problem: any) => {
+        problem.selected = false;
+      });
+      this.selectAll = false;
+      this.emitSelectionChange();
+    }
+
+    private applyPendingSelections(): void {
+      if (this.pendingSelections.length > 0 && this.medicalHistoryData?.length > 0) {
+        this.medicalHistoryData.forEach((problem: any) => {
+          problem.selected = this.pendingSelections.includes(problem.id);
+        });
+        this.selectAll = this.medicalHistoryData.every((problem: any) => problem.selected);
+      }
     }
 
 }

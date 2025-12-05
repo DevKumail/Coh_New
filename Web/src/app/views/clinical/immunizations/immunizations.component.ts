@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, TemplateRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { ClinicalApiService } from '@/app/shared/Services/Clinical/clinical.api.service';
@@ -28,6 +28,16 @@ import Swal from 'sweetalert2';
 })
 export class ImmunizationsComponent implements OnInit {
   @Input() clinicalnote: boolean = false;
+  @Output() selectionChanged = new EventEmitter<any[]>();
+  @Input() set preSelectedIds(ids: number[]) {
+    if (ids && ids.length > 0) {
+      this.pendingSelections = [...ids];
+      if (this.ImmunizationData.length > 0) {
+        this.applyPendingSelections();
+      }
+    }
+  }
+  private pendingSelections: number[] = [];
   selectAll: boolean = false;
   @ViewChild('immunizationModal') immunizationModal!: TemplateRef<any>;
   buttonText = 'Save';
@@ -423,6 +433,11 @@ onEdit(data: any) {
     this.clinical.GetPatientImmunizationData(this.Mrno, this.paginationInfo.PageNumber, this.paginationInfo.PageSize, status).then((res: any) => {
       this.ImmunizationData = res.patient?.table1 || [];
       this.totalimmunizationCount = res.patient?.table2?.[0]?.totalRecords || 0;
+      
+      // Apply pending selections after data loads
+      if (this.pendingSelections.length > 0) {
+        this.applyPendingSelections();
+      }
     });
   }
 
@@ -469,14 +484,60 @@ onEdit(data: any) {
     this.ImmunizationData.forEach((immunization: any) => {
       immunization.selected = this.selectAll;
     });
+    this.emitSelectionChange();
   }
 
   onCheckboxChange(): void {
     this.selectAll = this.ImmunizationData.length > 0 &&
                      this.ImmunizationData.every((immunization: any) => immunization.selected);
+    this.emitSelectionChange();
   }
 
   getSelectedImmunizations(): any[] {
     return this.ImmunizationData.filter((immunization: any) => immunization.selected);
+  }
+
+  emitSelectionChange(): void {
+    const selectedItems = this.getSelectedImmunizationsForNote();
+    this.selectionChanged.emit(selectedItems);
+  }
+
+  getSelectedImmunizationsForNote(): any[] {
+    return this.ImmunizationData
+      .filter((immunization: any) => immunization.selected)
+      .map((immunization: any) => ({
+        immunizationId: immunization.id,
+        providerName: immunization.fullName || immunization.providerName,
+        isOutsideClinic: !immunization.fullName,
+        immTypeName: immunization.immTypeName,
+        dose: immunization.dose,
+        routeName: immunization.routeName,
+        startDate: immunization.startDate,
+        nextInjectionDate: immunization.nextInjectionDate,
+        siteName: immunization.siteName,
+        status: immunization.status
+      }));
+  }
+
+  clearSelection(): void {
+    this.selectAll = false;
+    this.ImmunizationData.forEach((immunization: any) => {
+      immunization.selected = false;
+    });
+    this.emitSelectionChange();
+  }
+
+  private applyPendingSelections(): void {
+    if (this.pendingSelections.length > 0) {
+      this.ImmunizationData.forEach((immunization: any) => {
+        if (this.pendingSelections.includes(immunization.id)) {
+          immunization.selected = true;
+        }
+      });
+      this.selectAll = this.ImmunizationData.length > 0 &&
+                       this.ImmunizationData.every((immunization: any) => immunization.selected);
+      this.pendingSelections = [];
+      this.emitSelectionChange();
+    }
   }
 }
