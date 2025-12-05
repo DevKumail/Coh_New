@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChild, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -37,8 +37,16 @@ declare var flatpickr: any;
 
 export class AllergiesComponent implements OnInit, AfterViewInit {
   @Input() clinicalnote: boolean = false;
+  @Input() set preSelectedIds(ids: number[]) {
+    if (ids && ids.length > 0) {
+      console.log('📥 [Allergies] Received preSelectedIds:', ids);
+      this.pendingSelections = ids;
+    }
+  }
+  @Output() selectionChanged = new EventEmitter<any[]>();
   @ViewChild('allergyModal') allergyModal!: TemplateRef<any>;
   selectAll: boolean = false;
+  private pendingSelections: number[] = [];
 
   private focusFirstInvalidControl(): void {
     try {
@@ -396,6 +404,18 @@ export class AllergiesComponent implements OnInit, AfterViewInit {
       // this.loader.hide();
       this.MyAllergiesData = res.allergys?.table1 || [];
       this.allergieTotalItems = res.allergys?.table2[0]?.totalCount || 0;
+
+      // Apply pending selections if any
+      if (this.pendingSelections.length > 0) {
+        this.MyAllergiesData.forEach((item: any) => {
+          if (this.pendingSelections.includes(item.allergyId)) {
+            item.selected = true;
+          }
+        });
+        this.selectAll = this.MyAllergiesData.length > 0 &&
+                         this.MyAllergiesData.every(item => item.selected);
+        this.pendingSelections = [];
+      }
     })
     // this.loader.hide();
 
@@ -766,15 +786,74 @@ async onallergiePageChanged(page: number) {
     this.MyAllergiesData.forEach(allergy => {
       allergy.selected = this.selectAll;
     });
+    this.emitSelectionChange();
   }
 
   onCheckboxChange(): void {
     this.selectAll = this.MyAllergiesData.length > 0 &&
                      this.MyAllergiesData.every(allergy => allergy.selected);
+    this.emitSelectionChange();
   }
 
   getSelectedAllergies(): any[] {
     return this.MyAllergiesData.filter(allergy => allergy.selected);
+  }
+
+  getSelectedAllergiesForNote(): any {
+    console.log('🔍 [Allergies] Getting selections for note...');
+    const selected = this.getSelectedAllergies();
+    console.log('🔍 [Allergies] Selected items:', selected);
+
+    if (selected.length === 0) {
+      console.log('❌ [Allergies] No items selected, returning null');
+      return null;
+    }
+
+    const result = {
+      sectionTitle: 'Allergies',
+      type: 'Allergies',
+      data: selected.map(item => ({
+        allergyId: item.allergyId,
+        allergen: item.allergen,
+        allergyType: item.alergyName,
+        severity: item.severityName,
+        reaction: item.reaction,
+        startDate: item.startDate,
+        endDate: item.endDate,
+        status: item.status
+      }))
+    };
+
+    console.log('✅ [Allergies] Returning data:', result);
+    return result;
+  }
+
+  private emitSelectionChange(): void {
+    console.log('🔔 [Allergies] emitSelectionChange called');
+    const selected = this.getSelectedAllergies();
+    console.log('🔔 [Allergies] Selected items:', selected);
+
+    const formattedData = selected.map(item => ({
+      allergyId: item.allergyId,
+      allergen: item.allergen,
+      allergyType: item.alergyName,
+      severity: item.severityName,
+      reaction: item.reaction,
+      startDate: item.startDate,
+      endDate: item.endDate,
+      status: item.status
+    }));
+
+    console.log('🔔 [Allergies] Emitting formattedData:', formattedData);
+    this.selectionChanged.emit(formattedData);
+  }
+
+  clearSelection(): void {
+    this.MyAllergiesData.forEach(allergy => {
+      allergy.selected = false;
+    });
+    this.selectAll = false;
+    this.emitSelectionChange();
   }
 
 }

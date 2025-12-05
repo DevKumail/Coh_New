@@ -21,13 +21,49 @@
     <!-- Dynamically render component based on section -->
     <ng-container [ngSwitch]="getComponentSelector()">
       <!-- Medical History renders ProblemListComponent -->
-      <app-problem-list [clinicalnote]="clinicalnote" *ngSwitchCase="'app-medical-history'"></app-problem-list>
+      <app-problem-list
+        #problemListRef
+        [clinicalnote]="clinicalnote"
+        [preSelectedIds]="selectedMedicalHistoryIds"
+        (selectionChanged)="handleMedicalHistorySelection($event)"
+        *ngSwitchCase="'app-medical-history'">
+      </app-problem-list>
       <app-medication [clinicalnote]="clinicalnote" *ngSwitchCase="'app-medication'"></app-medication>
-      <app-family-history [clinicalnote]="clinicalnote" *ngSwitchCase="'app-family-history'"></app-family-history>
-      <app-social-history [clinicalnote]="clinicalnote" *ngSwitchCase="'app-social-history'"></app-social-history>
-      <app-allergies [clinicalnote]="clinicalnote" *ngSwitchCase="'app-allergies'"></app-allergies>
-      <app-vital-signs [clinicalnote]="clinicalnote" *ngSwitchCase="'app-vital-signs'"></app-vital-signs>
-      <app-immunizations [clinicalnote]="clinicalnote" *ngSwitchCase="'app-immunizations'"></app-immunizations>
+      <app-family-history
+        #familyHistoryRef
+        [clinicalnote]="clinicalnote"
+        [preSelectedIds]="selectedFamilyHistoryIds"
+        (selectionChanged)="handleFamilyHistorySelection($event)"
+        *ngSwitchCase="'app-family-history'">
+      </app-family-history>
+      <app-social-history
+        #socialHistoryRef
+        [clinicalnote]="clinicalnote"
+        [preSelectedIds]="selectedSocialHistoryIds"
+        (selectionChanged)="handleSocialHistorySelection($event)"
+        *ngSwitchCase="'app-social-history'">
+      </app-social-history>
+      <app-allergies
+        #allergiesRef
+        [clinicalnote]="clinicalnote"
+        [preSelectedIds]="selectedAllergiesIds"
+        (selectionChanged)="handleAllergiesSelection($event)"
+        *ngSwitchCase="'app-allergies'">
+      </app-allergies>
+      <app-vital-signs
+        #vitalSignsRef
+        [clinicalnote]="clinicalnote"
+        [preSelectedIds]="selectedVitalSignsIds"
+        (selectionChanged)="handleVitalSignsSelection($event)"
+        *ngSwitchCase="'app-vital-signs'">
+      </app-vital-signs>
+      <app-immunizations
+        #immunizationsRef
+        [clinicalnote]="clinicalnote"
+        [preSelectedIds]="selectedImmunizationsIds"
+        (selectionChanged)="handleImmunizationsSelection($event)"
+        *ngSwitchCase="'app-immunizations'">
+      </app-immunizations>
       <!-- Problem section renders ProblemComponent -->
       <app-problem [clinicalnote]="clinicalnote" *ngSwitchCase="'app-problem'"></app-problem>
     </ng-container>
@@ -35,7 +71,7 @@
 
   <!-- Default Children (for sections WITH children) -->
   <div
-    *ngIf="shouldRenderDefaultChildren()"
+    *ngIf="shouldRenderDefaultChildren() && !isSocialHistorySection() && !isFamilyHistorySection() && !isAllergiesSection() && !isMedicalHistorySection() && !isVitalSignsSection() && !isImmunizationsSection()"
     class="children-container"
     style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-left: 15px; padding-left: 10px; border-left: 2px solid #0ACF97; margin-top: 10px;">
     <app-question-view
