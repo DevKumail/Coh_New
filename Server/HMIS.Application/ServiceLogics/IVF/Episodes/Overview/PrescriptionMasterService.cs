@@ -61,6 +61,8 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                 if (!overviewExists)
                     return (false, "Overview not found.");
 
+                int xdays = dto.XDays ?? 0;
+
                 if (dto.MedicationId > 0)
                 {
                     var medication = await _context.IvfprescriptionMaster
@@ -71,7 +73,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                         return (false, "Medication record missing.");
 
                     medication.StartDate = dto.StartDate;
-                    medication.StopDate = dto.StartDate.AddDays(dto.XDays);
+                    medication.StopDate = dto.StartDate.AddDays(xdays);
                     medication.Dose = dto.DailyDosage;
                     medication.Frequency = dto.DosageFrequency;
                     medication.DrugId = dto.DrugId;
@@ -118,7 +120,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     return (true, "Prescription updated successfully.");
                 }
 
-                var endDate = dto.StartDate.AddDays(dto.XDays);
+                var endDate = dto.StartDate.AddDays(xdays);
 
                 var medicationEntity = new Medications
                 {

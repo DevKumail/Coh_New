@@ -16,7 +16,7 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public long AppId { get; set; }
         public List<long> ApplicationDomainCategoryId { get; set; }    
         public DateTime StartDate { get; set; }
-        public int XDays { get; set; }
+        public int? XDays { get; set; }
         public List<TimeSpan> Time { get; set; }
         public string DosageFrequency { get; set; }
         public string DailyDosage { get; set; }
