@@ -113,7 +113,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     return ov;
                 },
                 new { IVFDashboardTreatmentCycleId = treatmentCycleId },
-                splitOn: "EventId,MedicationId,domainId,timeId,IVFLabOrderSetId",
+                splitOn: "EventId,MedicationId,ApplicationDomainId,timeId,IVFLabOrderSetId",
                 commandType: CommandType.StoredProcedure
             );
 

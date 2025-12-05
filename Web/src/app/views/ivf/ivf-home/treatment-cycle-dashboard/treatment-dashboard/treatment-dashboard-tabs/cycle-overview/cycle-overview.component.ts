@@ -303,6 +303,38 @@ export class CycleOverviewComponent {
             } as any);
           }
         }
+
+        // Ultrasound icons (placed on Examination row by createdDate)
+        const usArr = Array.isArray((block as any)?.ultraSound) ? (block as any).ultraSound : [];
+        for (const u of usArr) {
+          const rawCreated = String((u as any)?.createdDate || '').trim();
+          if (!rawCreated) continue;
+          // Expecting format like '12/05/2025 09:17:58' -> treat as MM/DD/YYYY so ultrasound falls in the visible month
+          const [datePart] = rawCreated.split(' ');
+          const pieces = (datePart || '').split('/');
+          if (pieces.length !== 3) continue;
+          const mNum = Number(pieces[0]);
+          const dNum = Number(pieces[1]);
+          const yNum = Number(pieces[2]);
+          if (!Number.isFinite(dNum) || !Number.isFinite(mNum) || !Number.isFinite(yNum)) continue;
+          const created = new Date(yNum, mNum - 1, dNum);
+          if (isNaN(created.getTime())) continue;
+          const startDay = created.toISOString().slice(0, 10);
+          const endExclusive = this.addOneDayISO(startDay);
+          eventsToAdd.push({
+            resourceId: 'orders',
+            title: 'US',
+            start: startDay,
+            end: endExclusive,
+            backgroundColor: '#6c757d',
+            extendedProps: {
+              type: 'ultrasound',
+              reportId: (u as any)?.ivfLabOrderSetId,
+              orderSetDetailId: (u as any)?.orderSetDetailId,
+              createdDate: rawCreated
+            }
+          } as any);
+        }
       }
 
       // Apply to calendar/resources
@@ -436,10 +468,23 @@ export class CycleOverviewComponent {
     const props = event.extendedProps || {};
     const resId = (event as any).getResources ? (event as any).getResources()[0]?.id : (event as any)?._def?.resourceIds?.[0];
 
-    // Icons for lab/ultrasound
-    if (props.type === 'lab-order' || props.type === 'ultrasound') {
+    // Icons for lab
+    if (props.type === 'lab-order') {
       return {
         html: `<div class="event-icon" style="font-size: 20px; cursor: pointer; text-align: center;">${event.title}</div>`
+      };
+    }
+
+    // Ultrasound: show image from assets/images/ultra.png
+    if (props.type === 'ultrasound') {
+      return {
+        html: `
+          <div class="event-icon" style="cursor:pointer; text-align:center; display:flex; align-items:center; justify-content:center;">
+            <img src="assets/images/ultra.png"
+                 alt="Ultrasound"
+                 style="width:24px;height:24px;object-fit:contain;display:inline-block;" />
+          </div>
+        `
       };
     }
 
