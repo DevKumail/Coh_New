@@ -188,5 +188,52 @@
       </div>
       <button type="button" class="btn btn-primary btn-sm" (click)="addObservation()">Add Row</button>
     </div>
+
+    <!-- Attachments / Notes tabs -->
+    <div class="mt-3">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'attachments'"
+            type="button"
+            (click)="activeTab = 'attachments'">
+            Attachments
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'notes'"
+            type="button"
+            (click)="activeTab = 'notes'">
+            Notes
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content border border-top-0 w-100" style="background-color: var(--bs-body-bg);">
+        <!-- Attachments tab: reuse global generic document upload component -->
+        <div class="tab-pane fade show" [class.active]="activeTab === 'attachments'">
+          <app-generic-document-upload></app-generic-document-upload>
+        </div>
+
+        <!-- Notes tab: rich text note using Quill editor -->
+        <div class="tab-pane fade show w-100" [class.active]="activeTab === 'notes'">
+          <div class="w-100">
+            <!-- <label class="form-label fw-semibold">Note</label> -->
+            <quill-editor
+              [(ngModel)]="noteText"
+              name="ivfOrderNote"
+              [modules]="quillModules"
+              format="html"
+              placeholder="Enter medical opinion or notes..."
+              class="w-100"
+              [styles]="{height: '120px', width: '100%'}">
+            </quill-editor>
+          </div>
+        </div>
+      </div>
+    </div>
   </form>
 </div>

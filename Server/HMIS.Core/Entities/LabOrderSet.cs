@@ -67,4 +67,7 @@ public partial class LabOrderSet
     [ForeignKey("AppId")]
     [InverseProperty("LabOrderSet")]
     public virtual SchAppointment? App { get; set; }
+
+    [InverseProperty("OrderSet")]
+    public virtual ICollection<IvflabOrderSet> IvflabOrderSet { get; set; } = new List<IvflabOrderSet>();
 }

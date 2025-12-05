@@ -33,4 +33,7 @@ public partial class IvftreatmentEpisodePregnancyStage
     [ForeignKey("IvfdashboardTreatmentCycleId")]
     [InverseProperty("IvftreatmentEpisodePregnancyStage")]
     public virtual IvfdashboardTreatmentCycle IvfdashboardTreatmentCycle { get; set; } = null!;
+
+    [InverseProperty("Pregnancy")]
+    public virtual IvfepisodePregnancy? IvfepisodePregnancy { get; set; }
 }

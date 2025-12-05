@@ -5,6 +5,8 @@ import { NgbDateStruct, NgbDatepickerModule, NgbTimepickerModule } from '@ng-boo
 import { forkJoin, Observable } from 'rxjs';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import Swal from 'sweetalert2';
+import { GenericDocumentUploadComponent } from '@/app/shared/generic-document-upload/generic-document-upload.component';
+import { QuillModule } from 'ngx-quill';
 
 export interface LabResultObservation {
   valueType: string;
@@ -31,7 +33,9 @@ export interface LabResultObservation {
     ReactiveFormsModule,
     FormsModule,
     NgbDatepickerModule,
-    NgbTimepickerModule
+    NgbTimepickerModule,
+    GenericDocumentUploadComponent,
+    QuillModule
   ],
   templateUrl: './ivf-order-completion.component.html',
   styles: [`
@@ -64,6 +68,7 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
   @Input() order: any;
   @Input() tests: Array<any> = [];
   @Input() showObservations: boolean = false;
+  @Input() orderSetId: number | string | null = null;
   @Output() cancel = new EventEmitter<void>();
   @Output() completed = new EventEmitter<any>();
 
@@ -74,6 +79,22 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
     day: new Date().getDate()
   };
   currentTime = { hour: new Date().getHours(), minute: new Date().getMinutes() };
+
+  // Simple tab state for Attachments / Notes section
+  activeTab: 'attachments' | 'notes' = 'attachments';
+  noteText: string = '';
+
+  quillModules = {
+    toolbar: [
+      [{ font: [] }],
+      [{ size: ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ color: [] }, { background: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ align: [] }],
+      ['clean']
+    ]
+  };
 
   isDisabled = (date: NgbDateStruct, current?: { year: number; month: number }) => {
     if (!date) return false;
@@ -100,6 +121,7 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
       entryDate: this.currentDate
     });
     this.addObservation();
+    this.loadTestsIfNeeded();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -107,6 +129,39 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
       const current = changes['tests'].currentValue ?? [];
       this.tests = Array.isArray(current) ? [...current] : [];
     }
+
+    if (changes['orderSetId'] && !changes['orderSetId'].firstChange) {
+      this.loadTestsIfNeeded();
+    }
+  }
+
+  private loadTestsIfNeeded() {
+    const rawId = this.orderSetId ?? (this.order && this.order.orderSetId);
+    const idNum = Number(rawId);
+    if (!Number.isFinite(idNum) || idNum <= 0) {
+      return;
+    }
+
+    if (Array.isArray(this.tests) && this.tests.length > 0) {
+      return;
+    }
+
+    this.ivfApi.getOrderCollectionDetails(idNum).subscribe({
+      next: (res: any) => {
+        const details = Array.isArray(res) ? res : (Array.isArray(res?.details) ? res.details : []);
+        this.tests = details.map((d: any) => ({
+          id: d.labTestId ?? d.testId,
+          orderSetDetailId: d.orderSetDetailId ?? d.id ?? d.labOrderSetDetailId,
+          cpt: d.cptCode ?? d.cpt,
+          name: d.testName ?? d.name ?? d.cptCode,
+          sampleTypeName: d.materialName ?? d.material ?? d.sampleTypeName ?? d.sampleType,
+          status: d.status
+        }));
+      },
+      error: () => {
+        // keep tests as-is on error
+      }
+    });
   }
 
   private initializeForm() {

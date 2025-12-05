@@ -117,7 +117,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public string? ReviewedBy { get; set; }
         public DateTime? ReviewedDate { get; set; }
         public int? PerformAtLabId { get; set; }
-        public List<LabResultObservationDTO> Observations { get; set; } = new();
+        public List<LabResultObservationDTO>? Observations { get; set; } = new();
     }
 
     public class OrderCollectionDetailsDTO

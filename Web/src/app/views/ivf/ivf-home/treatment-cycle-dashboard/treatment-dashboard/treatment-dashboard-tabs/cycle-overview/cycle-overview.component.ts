@@ -348,6 +348,7 @@ export class CycleOverviewComponent {
             extendedProps: {
               type: 'ultrasound',
               reportId: (u as any)?.ivfLabOrderSetId,
+              orderSetId: (u as any)?.orderSetId,
               orderSetDetailId: (u as any)?.orderSetDetailId,
               createdDate: rawCreated
             }
@@ -591,7 +592,7 @@ export class CycleOverviewComponent {
 
   // Open shared IVF order completion screen (Tests Observations) for an ultrasound report
   private openUltrasoundCompletion(props: any) {
-    const reportId = props?.reportId || props?.ivfLabOrderSetId || props?.orderSetId;
+    const reportId = props?.orderSetId || props?.ivfLabOrderSetId || props?.reportId;
     if (!reportId) {
       return;
     }
@@ -619,7 +620,7 @@ export class CycleOverviewComponent {
         };
 
         const modalRef = this.modalService.open(IvfOrderCompletionComponent, {
-          size: 'xl',
+          size: 'lg',
           backdrop: 'static',
           keyboard: false,
           centered: true
@@ -627,7 +628,8 @@ export class CycleOverviewComponent {
 
         const cmp: any = modalRef.componentInstance;
         cmp.order = order;
-        cmp.tests = tests;
+        cmp.orderSetId = orderSetId;
+        cmp.tests = tests; // pass mapped tests so UI can bind immediately
 
         if (cmp.cancel && cmp.cancel.subscribe) {
           cmp.cancel.subscribe(() => {

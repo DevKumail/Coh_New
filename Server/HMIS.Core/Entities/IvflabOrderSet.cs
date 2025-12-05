@@ -15,7 +15,7 @@ public partial class IvflabOrderSet
 
     public long OverviewId { get; set; }
 
-    public long OrderSetDetailId { get; set; }
+    public long OrderSetId { get; set; }
 
     public int? CreatedBy { get; set; }
 
@@ -29,9 +29,9 @@ public partial class IvflabOrderSet
 
     public bool IsDeleted { get; set; }
 
-    [ForeignKey("OrderSetDetailId")]
+    [ForeignKey("OrderSetId")]
     [InverseProperty("IvflabOrderSet")]
-    public virtual LabOrderSetDetail OrderSetDetail { get; set; } = null!;
+    public virtual LabOrderSet OrderSet { get; set; } = null!;
 
     [ForeignKey("OverviewId")]
     [InverseProperty("IvflabOrderSet")]
