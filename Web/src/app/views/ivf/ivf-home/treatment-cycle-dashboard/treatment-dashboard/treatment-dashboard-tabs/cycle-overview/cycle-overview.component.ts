@@ -299,7 +299,24 @@ export class CycleOverviewComponent {
               start: startDay,
               end: endExclusive,
               backgroundColor: bgColor,
-              extendedProps: { type: 'medication-dose', medicationName: medName, dose: doseTitle, date: startDay }
+              extendedProps: {
+                type: 'medication-dose',
+                medicationName: medName,
+                dose: doseTitle,
+                date: startDay,
+                start: startDay,
+                end: stopDay,
+                route: m?.routeName || '',
+                frequency: m?.frequency || '',
+                quantity: m?.quantity || '',
+                refills: m?.additionalRefills || '',
+                samples: m?.samples || '',
+                substitution: m?.substitution || '',
+                instructions: m?.instructions || '',
+                indications: m?.indications || '',
+                medicationId: m?.medicationId || null,
+                color: m?.color || ''
+              }
             } as any);
           }
         }
@@ -387,6 +404,7 @@ export class CycleOverviewComponent {
   addMedName: string = '';
   private selectedDate: string | null = null;
   private bgEvents: EventInput[] = [];
+  private skipMedResetOnce: boolean = false;
 
   private rebindEvents() {
     this.calendarOptions = { ...this.calendarOptions, events: [...this.calendarData, ...this.bgEvents] };
@@ -537,19 +555,61 @@ export class CycleOverviewComponent {
   editMedicationFromDose() {
     const detail = this.medicationDetail || {};
     this.closeMedicationModal();
-    // Ensure form exists and open modal
+    // Open Add Medication Resource Modal with prefilled values
     this.buildMedForm();
+    const medName = String(detail?.medicationName || '').trim();
+    const dose = String(detail?.dose || '').trim();
+    const route = String(detail?.route || '').trim();
+    const frequency = String(detail?.frequency || '').trim();
+    const quantity = String(detail?.quantity || '').trim();
+    const refills = String(detail?.refills || detail?.additionalRefills || '').trim();
+    const samples = String(detail?.samples || '').trim();
+    const substitution = String(detail?.substitution || '').trim();
+    const instructions = String(detail?.instructions || '').trim();
+    const indications = String(detail?.indications || '').trim();
+    const start = (detail?.start || '').slice(0, 10) || (this.selectedDate || new Date().toISOString().slice(0,10));
+    const stop = (detail?.end || '').slice(0, 10) || start;
+    // compute duration (inclusive days)
+    let duration: number | null = null;
+    try {
+      const sd = new Date(start + 'T00:00:00');
+      const ed = new Date(stop + 'T00:00:00');
+      const diff = Math.round((ed.getTime() - sd.getTime()) / (1000*60*60*24));
+      duration = (isFinite(diff) ? Math.max(0, diff) : 0) + 0; // duration field is number of days; keep as difference
+    } catch { duration = null; }
+
+    // Prefill key fields
+    const patch: any = {
+      startDate: start,
+      stopDate: stop,
+      duration: duration,
+      strength: dose || this.medFG.get('strength')?.value,
+      route: route || this.medFG.get('route')?.value,
+      frequency: frequency || this.medFG.get('frequency')?.value,
+      quantity: quantity || this.medFG.get('quantity')?.value,
+      refills: refills || this.medFG.get('refills')?.value,
+      samples: samples || this.medFG.get('samples')?.value,
+      substitution: substitution || this.medFG.get('substitution')?.value,
+      instructions: instructions || this.medFG.get('instructions')?.value,
+      indication: indications || this.medFG.get('indication')?.value,
+    };
+    this.medFG.patchValue(patch);
+    // help search: put med name into the search box
+    this.medSearch = medName;
+    // open modal
+    this.skipMedResetOnce = true;
     this.openAddMedModal();
-    // Prefill start/stop dates from the selected medication bar
-    const start = (detail?.start || '').slice(0, 10);
-    const stop = (detail?.end || '').slice(0, 10);
+    // re-apply patch after modal open in case any reset occurred
+    setTimeout(() => {
+      try { this.medFG.patchValue(patch); } catch { }
+    }, 0);
+    // try auto-select the medication after the list loads
     setTimeout(() => {
       try {
-        const patch: any = { startDate: start || this.selectedDate || new Date().toISOString().slice(0,10) };
-        if (stop) patch.stopDate = stop;
-        this.medFG.patchValue(patch);
+        const match = this.drugs.find(x => String(x?.drugName || '').trim().toLowerCase() === medName.toLowerCase());
+        if (match) this.pickDrug(match);
       } catch { }
-    }, 0);
+    }, 600);
   }
 
   openHormoneLevelModal(data: any) {
@@ -678,6 +738,9 @@ export class CycleOverviewComponent {
         dailyDosage: [''],
         dosageFrequency: ['']
       });
+      // Ensure read-only fields are disabled at form level as well
+      this.medFG.get('drugCode')?.disable({ emitEvent: false });
+      this.medFG.get('strength')?.disable({ emitEvent: false });
       // React to frequency changes
       this.medFG.get('frequency')?.valueChanges.subscribe(v => this.adjustDoseTimes(String(v || '')));
       // React to role changes to load receivers
@@ -1151,7 +1214,6 @@ export class CycleOverviewComponent {
     // reset form and selections
     this.addMedName = '';
     this.selectedDrugId = null;
-    this.medSearch = '' as any;
     this.medForm = {} as any;
     this.loadDrugs(true);
     // Make sure form exists before template is instantiated
@@ -1161,15 +1223,18 @@ export class CycleOverviewComponent {
     setTimeout(() => this.loadDrugs(false), 250);
     // default dates
     try {
-      const sd = this.selectedDate || new Date().toISOString().slice(0, 10);
-      this.medFG.reset({
-        drugCode: '', packaging: '', applicationDomain: '', applicationDomainCategoryId: null, startDate: sd, stopDate: '', duration: null, strength: '', route: '',
-        frequency: '', doseTimes: [], quantity: '', refills: '', samples: '', substitution: '', instructions: '', indication: '', roleName: '',
-        receiverName: '', internalOrder: false, additionalInfo: '', note: '', presentationForm: '', time: '', xDays: null,
-        dailyDosage: '', dosageFrequency: ''
-      });
-      this.adjustDoseTimes('');
-      this.medForm.startDate = sd as any;
+      if (!this.skipMedResetOnce) {
+        const sd = this.selectedDate || new Date().toISOString().slice(0, 10);
+        this.medFG.reset({
+          drugCode: '', packaging: '', applicationDomain: '', applicationDomainCategoryId: null, startDate: sd, stopDate: '', duration: null, strength: '', route: '',
+          frequency: '', doseTimes: [], quantity: '', refills: '', samples: '', substitution: '', instructions: '', indication: '', roleName: '',
+          receiverName: '', internalOrder: false, additionalInfo: '', note: '', presentationForm: '', time: '', xDays: null,
+          dailyDosage: '', dosageFrequency: ''
+        });
+        this.adjustDoseTimes('');
+        this.medForm.startDate = sd as any;
+      }
+      this.skipMedResetOnce = false;
     } catch { this.medForm.startDate = '' as any; }
   }
 
