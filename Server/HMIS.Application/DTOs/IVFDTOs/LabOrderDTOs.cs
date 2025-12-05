@@ -35,6 +35,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public long? OrderNumber { get; set; }
         public int? SampleTypeId { get; set; }
         public string? SampleTypeName { get; set; }
+        public long? OverviewId { get; set; }
     }
 
     public class LabOrderSetDetailDTO

@@ -1019,9 +1019,15 @@ export class CycleOverviewComponent {
       return;
     }
 
+    const ovId = Number(this.overviewId || 0);
+    if (!ovId) {
+      Swal.fire({ icon: 'error', title: 'Overview not loaded', text: 'Overview Id is not loaded. Go back to dashboard and reopen episode.', timer: 1500, showConfirmButton: false });
+      return;
+    }
+
     const now = new Date().toISOString();
 
-    // Derive provider from per-test refPhysicianId (same pattern as other IVF forms)
+    // Derive provider from per-test refPhysicianId
     const providerFromPhysician = Number(
       (evt.tests || [])
         .find(t => (t?.details?.refPhysicianId ?? null) !== null && (t?.details?.refPhysicianId ?? undefined) !== undefined)
@@ -1042,16 +1048,17 @@ export class CycleOverviewComponent {
       orderStatus: 'NEW',
       isHL7MsgCreated: false,
       isHL7MessageGeneratedForPhilips: false,
-      isSigned: false
+      isSigned: false,
+      overviewId: ovId,
     } as any;
 
-    const details = evt.tests.map((t: any) => ({
+    const details = (evt.tests || []).map((t: any) => ({
       labTestId: Number(t.id),
       cptCode: t.cpt || '',
       orderQuantity: 1,
       investigationTypeId: 5,
       billOnOrder: 1,
-      pComments: (evt.details && evt.details.comments) || ''
+      pComments: (evt.details && evt.details.comments) || '',
     }));
 
     this.api.createLabOrder({ header, details } as any).subscribe({
@@ -1061,13 +1068,12 @@ export class CycleOverviewComponent {
       },
       error: () => {
         Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create lab order.', timer: 1500, showConfirmButton: false });
-      }
+      },
     });
   }
 
   openAddModal() {
-    // Open a specific modal based on the computed addForm.category
-    let tpl: TemplateRef<any> | null = null;
+    let tpl: any;
     if (this.addForm.category === 'events') {
       tpl = this.addEventModal;
     } else if (this.addForm.category === 'medication') {

@@ -28,6 +28,7 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
     {
         public List<GetEventDetailDto> Events { get; set; }
         public List<GetMedicationDto> Medications { get; set; }
+        public List<GetUltraSound> UltraSound { get; set; }
     }
 
     public class GetEventDetailDto
@@ -51,12 +52,14 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public List<GetTimeDetailsDto> TimeDetails { get; set; } = new();
         public string Frequency { get; set; }
         public string Dose { get; set; }
+        public string RouteId { get; set; }
         public string RouteName { get; set; }
         public string Quantity { get; set; }
         public string AdditionalRefills { get; set; }
         public string Samples { get; set; }
         public string Substitution { get; set; }
         public string Instructions { get; set; }
+        public string IndicationsId { get; set; }
         public string Indications { get; set; }
     }
 
@@ -70,5 +73,12 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
     {
         public long ApplicationDomainId { get; set; }
         public string ApplicationDomainName { get; set; }
+    }
+
+    public class GetUltraSound
+    {
+        public long IVFLabOrderSetId { get; set; }
+        public long OrderSetDetailId { get; set; }
+        public string CreatedDate { get; set; }
     }
 }

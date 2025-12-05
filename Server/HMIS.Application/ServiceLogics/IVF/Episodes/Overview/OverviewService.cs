@@ -22,13 +22,13 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
         public async Task<GetAllOverviewDetailDto> GetOverviewByTreatmentCycleAsync(long treatmentCycleId)
         {
             using var connection = _dapper.CreateConnection();
-
             var lookup = new Dictionary<long, GetAllOverviewDetailDto>();
             var medicationLookup = new Dictionary<long, GetMedicationDto>();
+            var ultraSoundLookup = new HashSet<long>();
 
-            var result = await connection.QueryAsync<GetAllOverviewDetailDto, GetEventDetailDto, GetMedicationDto, GetApplicationDomainDto, GetTimeDetailsDto, GetAllOverviewDetailDto>(
+            var result = await connection.QueryAsync<GetAllOverviewDetailDto, GetEventDetailDto, GetMedicationDto, GetApplicationDomainDto, GetTimeDetailsDto, GetUltraSound, GetAllOverviewDetailDto>(
                 "IVF_GetOverviewByTreatmentCycle",
-                (overview, ev, med, domain, time) =>
+                (overview, ev, med, domain, time, ultraSound) =>
                 {
                     // Get or create overview
                     if (!lookup.TryGetValue(overview.OverviewId, out var ov))
@@ -39,7 +39,8 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     new GetCalenderDto
                     {
                         Events = new List<GetEventDetailDto>(),
-                        Medications = new List<GetMedicationDto>()
+                        Medications = new List<GetMedicationDto>(),
+                        UltraSound = new List<GetUltraSound>()
                     }
                         };
                         ov.Resources = new List<GetResourcesDetailDto>
@@ -55,20 +56,20 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     var calender = ov.Calender.First();
                     var resource = ov.Resources.First();
 
+                    // Handle Events
                     if (ev?.EventId != null && !calender.Events.Any(x => x.EventId == ev.EventId))
                     {
                         calender.Events.Add(ev);
                     }
 
+                    // Handle Medications
                     if (med != null && med.MedicationId > 0)
                     {
                         GetMedicationDto existingMed;
-
                         if (!medicationLookup.TryGetValue(med.MedicationId, out existingMed))
                         {
                             med.ApplicationDomainName = new List<GetApplicationDomainDto>();
                             med.TimeDetails = new List<GetTimeDetailsDto>();
-
                             calender.Medications.Add(med);
                             medicationLookup.Add(med.MedicationId, med);
                             existingMed = med;
@@ -100,10 +101,19 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                         }
                     }
 
+                    if (ultraSound != null && ultraSound.IVFLabOrderSetId > 0)
+                    {
+                        if (!ultraSoundLookup.Contains(ultraSound.IVFLabOrderSetId))
+                        {
+                            calender.UltraSound.Add(ultraSound);
+                            ultraSoundLookup.Add(ultraSound.IVFLabOrderSetId);
+                        }
+                    }
+
                     return ov;
                 },
                 new { IVFDashboardTreatmentCycleId = treatmentCycleId },
-                splitOn: "EventId,MedicationId,domainId,timeId",
+                splitOn: "EventId,MedicationId,ApplicationDomainId,timeId,IVFLabOrderSetId",
                 commandType: CommandType.StoredProcedure
             );
 

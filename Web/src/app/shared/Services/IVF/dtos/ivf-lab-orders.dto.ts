@@ -18,6 +18,7 @@ export interface IvfLabOrderHeaderDto {
   updatedDate?: string; // ISO string
   oldMRNo?: string | null;
   hL7MessageId?: number | null;
+  overviewId?: number;
 }
 
 export interface IvfLabOrderDetailDto {

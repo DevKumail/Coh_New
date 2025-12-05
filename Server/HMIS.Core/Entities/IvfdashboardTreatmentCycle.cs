@@ -102,6 +102,9 @@ public partial class IvfdashboardTreatmentCycle
     public virtual IvftreatmentEpisodeAspirationStage? IvftreatmentEpisodeAspirationStage { get; set; }
 
     [InverseProperty("IvfdashboardTreatmentCycle")]
+    public virtual IvftreatmentEpisodeBirthStage? IvftreatmentEpisodeBirthStage { get; set; }
+
+    [InverseProperty("IvfdashboardTreatmentCycle")]
     public virtual ICollection<IvftreatmentEpisodeOverviewStage> IvftreatmentEpisodeOverviewStage { get; set; } = new List<IvftreatmentEpisodeOverviewStage>();
 
     [InverseProperty("IvfdashboardTreatmentCycle")]
