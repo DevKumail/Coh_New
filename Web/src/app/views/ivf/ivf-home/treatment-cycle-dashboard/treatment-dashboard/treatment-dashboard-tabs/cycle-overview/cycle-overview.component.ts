@@ -18,10 +18,11 @@ import { Page } from '@/app/shared/enum/dropdown.enum';
 import Swal from 'sweetalert2';
 import { ClinicalApiService } from '@/app/views/clinical/clinical.api.service';
 import { AddLabOrderComponent } from '@/app/views/ivf/ivf-patient-summary/male-sections/lab-diagnostics/add-lab-order.component';
+import { IvfOrderCompletionComponent } from '@/app/shared/components/ivf-order-completion/ivf-order-completion.component';
 
 @Component({
   selector: 'app-cycle-overview',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, FullCalendarModule, HttpClientModule, NgbDropdownModule, AddLabOrderComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, FullCalendarModule, HttpClientModule, NgbDropdownModule, AddLabOrderComponent, IvfOrderCompletionComponent],
   templateUrl: './cycle-overview.component.html',
   styleUrls: ['./cycle-overview.component.scss']
 })
@@ -615,7 +616,7 @@ export class CycleOverviewComponent {
     if (props.type === 'lab-order') {
       this.openLabOrderModal(props);
     } else if (props.type === 'ultrasound') {
-      this.openUltrasoundModal(props);
+      this.openUltrasoundCompletion(props);
     } else if (props.type === 'medication-dose') {
       this.openMedicationDoseModal({ ...props, start: event.startStr, end: event.endStr });
     } else if (props.type === 'hormone-level') {
@@ -647,6 +648,63 @@ export class CycleOverviewComponent {
       this.ultrasoundModalRef = null;
     }
     this.ultrasoundDetail = null;
+  }
+
+  // Open shared IVF order completion screen (Tests Observations) for an ultrasound report
+  private openUltrasoundCompletion(props: any) {
+    const reportId = props?.reportId || props?.ivfLabOrderSetId || props?.orderSetId;
+    if (!reportId) {
+      return;
+    }
+
+    const orderSetId = Number(reportId);
+    if (!Number.isFinite(orderSetId) || orderSetId <= 0) {
+      return;
+    }
+
+    this.api.getOrderCollectionDetails(orderSetId).subscribe({
+      next: (res: any) => {
+        const details = Array.isArray(res) ? res : (Array.isArray(res?.details) ? res.details : []);
+        const tests = details.map((d: any) => ({
+          id: d.labTestId ?? d.testId,
+          orderSetDetailId: d.orderSetDetailId ?? d.id ?? d.labOrderSetDetailId,
+          cpt: d.cptCode ?? d.cpt,
+          name: d.testName ?? d.name ?? d.cptCode,
+          sampleTypeName: d.materialName ?? d.material ?? d.sampleTypeName ?? d.sampleType,
+          status: d.status
+        }));
+
+        const order: any = {
+          orderSetId: orderSetId,
+          orderNumber: props?.orderNumber || orderSetId,
+        };
+
+        const modalRef = this.modalService.open(IvfOrderCompletionComponent, {
+          size: 'xl',
+          backdrop: 'static',
+          keyboard: false,
+          centered: true
+        });
+
+        const cmp: any = modalRef.componentInstance;
+        cmp.order = order;
+        cmp.tests = tests;
+
+        if (cmp.cancel && cmp.cancel.subscribe) {
+          cmp.cancel.subscribe(() => {
+            try { modalRef.close(); } catch { }
+          });
+        }
+        if (cmp.completed && cmp.completed.subscribe) {
+          cmp.completed.subscribe(() => {
+            try { modalRef.close(); } catch { }
+          });
+        }
+      },
+      error: () => {
+        // Silent fail; keep calendar responsive even if completion data cannot be loaded
+      }
+    });
   }
 
   openMedicationDoseModal(data: any) {

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -30,7 +30,17 @@ import { tablerArrowWaveLeftDown } from '@ng-icons/tabler-icons';
 })
 export class FamilyHistoryComponent {
   @Input() clinicalnote: boolean = false;
+  @Input() set preSelectedIds(ids: number[]) {
+    if (ids && ids.length > 0) {
+      console.log('📥 [FamilyHistory] Received preSelectedIds:', ids);
+      // Will be applied after data loads
+      this.pendingSelections = ids;
+    }
+  }
+  @Output() selectionChanged = new EventEmitter<any[]>();
+
   selectAll: boolean = false;
+  private pendingSelections: number[] = [];
   FamilyForm!: FormGroup;
   pagegination: any = {
     currentPage: 1,
@@ -184,6 +194,17 @@ export class FamilyHistoryComponent {
     this.ClinicalApiService.GetAllFamilyHistory(this.SearchPatientData?.table2?.[0]?.mrNo, this.pagegination.currentPage, this.pagegination.pageSize).then((res: any) => {
       this.FamilyHistoryList = res?.table1 || [];
       this.FamilyHistoryTotalItems = res?.table2?.[0]?.totalRecords || 0;
+
+      // Apply pending selections if any
+      if (this.pendingSelections.length > 0) {
+        this.FamilyHistoryList.forEach((item: any) => {
+          if (this.pendingSelections.includes(item.fhid)) {
+            item.selected = true;
+          }
+        });
+        this.updateSelectAllState();
+        this.pendingSelections = [];
+      }
     })
   }
 
@@ -239,14 +260,69 @@ export class FamilyHistoryComponent {
     this.FamilyHistoryList.forEach((history: any) => {
       history.selected = this.selectAll;
     });
+    this.emitSelectionChange();
   }
 
   onCheckboxChange(): void {
+    this.updateSelectAllState();
+    this.emitSelectionChange();
+  }
+
+  private updateSelectAllState(): void {
     this.selectAll = this.FamilyHistoryList.length > 0 &&
                      this.FamilyHistoryList.every((history: any) => history.selected);
   }
 
   getSelectedFamilyHistories(): any[] {
     return this.FamilyHistoryList.filter((history: any) => history.selected);
+  }
+
+  getSelectedFamilyHistoriesForNote(): any {
+    console.log('🔍 [FamilyHistory] Getting selections for note...');
+    const selected = this.getSelectedFamilyHistories();
+    console.log('🔍 [FamilyHistory] Selected items:', selected);
+
+    if (selected.length === 0) {
+      console.log('❌ [FamilyHistory] No items selected, returning null');
+      return null;
+    }
+
+    const result = {
+      sectionTitle: 'Family History',
+      type: 'FamilyHistory',
+      data: selected.map(item => ({
+        fhid: item.fhid,
+        relationship: item.relationship,
+        problem: item.fhName,
+        active: item.active
+      }))
+    };
+
+    console.log('✅ [FamilyHistory] Returning data:', result);
+    return result;
+  }
+
+  private emitSelectionChange(): void {
+    console.log('🔔 [FamilyHistory] emitSelectionChange called');
+    const selected = this.getSelectedFamilyHistories();
+    console.log('🔔 [FamilyHistory] Selected items:', selected);
+
+    const formattedData = selected.map(item => ({
+      fhid: item.fhid,
+      relationship: item.relationship,
+      problem: item.fhName,
+      active: item.active
+    }));
+
+    console.log('🔔 [FamilyHistory] Emitting formattedData:', formattedData);
+    this.selectionChanged.emit(formattedData);
+  }
+
+  clearSelection(): void {
+    this.FamilyHistoryList.forEach((history: any) => {
+      history.selected = false;
+    });
+    this.selectAll = false;
+    this.emitSelectionChange();
   }
 }

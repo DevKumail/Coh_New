@@ -1,6 +1,6 @@
 import { routes } from './../../../app.routes';
 import { EmailItemType } from '@/app/views/apps/email/types';
-import { Component, AfterViewInit, Input, ViewChild, TemplateRef } from '@angular/core';
+import { Component, AfterViewInit, Input, Output, EventEmitter, ViewChild, TemplateRef } from '@angular/core';
 import {
     FormBuilder,
     FormGroup,
@@ -63,6 +63,14 @@ declare var flatpickr: any;
 
 export class VitalSignsComponent implements OnInit {
   @Input() clinicalnote: boolean = false;
+  @Output() selectionChanged = new EventEmitter<any[]>();
+  @Input() set preSelectedIds(ids: number[]) {
+    this.pendingSelections = ids || [];
+    if (this.vitalSignsPagedData?.length > 0) {
+      this.applyPendingSelections();
+    }
+  }
+  private pendingSelections: number[] = [];
   selectAll: boolean = false;
   vitalSignsForm!: FormGroup;
   SearchPatientData: any;
@@ -333,8 +341,16 @@ PageInfo: any = {
     const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo || '';
     this.ClinicalApiService.SummarySheet(mrNo,this.PageInfo.CurrentPage,this.PageInfo.PageSize).then((res:any)=>{
     console.log('vital Sign RESULT: ',res);
-    this.vitalSignsPagedData = res?.vitalSigns.table1 || []
+    this.vitalSignsPagedData = (res?.vitalSigns.table1 || []).map((vital: any) => ({
+      ...vital,
+      selected: false // Initialize all items as unselected
+    }));
     this.vitalTotalItems = res?.vitalSigns.table2?.[0]?.totalRecords || 0;
+    
+    // Apply pending selections after data loads
+    if (this.pendingSelections.length > 0) {
+      this.applyPendingSelections();
+    }
     })
   }
 
@@ -512,14 +528,57 @@ PageInfo: any = {
     this.vitalSignsPagedData.forEach((vital: any) => {
       vital.selected = this.selectAll;
     });
+    this.emitSelectionChange();
   }
 
   onCheckboxChange(): void {
     this.selectAll = this.vitalSignsPagedData.length > 0 &&
                      this.vitalSignsPagedData.every((vital: any) => vital.selected);
+    this.emitSelectionChange();
   }
 
   getSelectedVitals(): any[] {
     return this.vitalSignsPagedData.filter((vital: any) => vital.selected);
+  }
+
+  emitSelectionChange(): void {
+    const selectedItems = this.getSelectedVitalsForNote();
+    this.selectionChanged.emit(selectedItems);
+  }
+
+  getSelectedVitalsForNote(): any[] {
+    return this.vitalSignsPagedData
+      .filter((vital: any) => vital.selected)
+      .map((vital: any) => ({
+        vitalId: vital.vitalId,
+        entryDate: vital.entryDate,
+        temperature: vital.temperature,
+        pulseRate: vital.pulseRate,
+        respirationRate: vital.respirationRate,
+        bpSystolic: vital.bpSystolic,
+        bpDiastolic: vital.bpDiastolic,
+        spO2: vital.spO2,
+        height: vital.height,
+        weight: vital.weight,
+        bmi: vital.bmi
+      }));
+  }
+
+  clearSelection(): void {
+    this.vitalSignsPagedData.forEach((vital: any) => {
+      vital.selected = false;
+    });
+    this.selectAll = false;
+    this.emitSelectionChange();
+  }
+
+  private applyPendingSelections(): void {
+    if (this.pendingSelections.length > 0 && this.vitalSignsPagedData?.length > 0) {
+      this.vitalSignsPagedData.forEach((vital: any) => {
+        vital.selected = this.pendingSelections.includes(vital.vitalId);
+      });
+      this.selectAll = this.vitalSignsPagedData.every((vital: any) => vital.selected);
+      this.pendingSelections = []; // Clear after applying
+    }
   }
 }
