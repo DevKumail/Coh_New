@@ -53,6 +53,14 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
   medicalHistoryQuestionId: number = 0; // Track the medical history section quest_Id
   vitalSignsQuestionId: number = 0; // Track the vital signs section quest_Id
   immunizationsQuestionId: number = 0; // Track the immunizations section quest_Id
+  
+  // Properties to store IDs only during restoration phase
+  restoredSocialHistoryIds: number[] = [];
+  restoredFamilyHistoryIds: number[] = [];
+  restoredAllergiesIds: number[] = [];
+  restoredMedicalHistoryIds: number[] = [];
+  restoredVitalSignsIds: number[] = [];
+  restoredImmunizationsIds: number[] = [];
 
   cacheItems: string[] = ['Provider'];
   private subscriptions: Subscription[] = [];
@@ -1167,27 +1175,27 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
   }
 
   getSelectedSocialHistoryIds(): number[] {
-    return this.selectedSocialHistoryItems.map(item => item.shid);
+    return this.restoredSocialHistoryIds;
   }
 
   getSelectedFamilyHistoryIds(): number[] {
-    return this.selectedFamilyHistoryItems.map(item => item.fhid);
+    return this.restoredFamilyHistoryIds;
   }
 
   getSelectedAllergiesIds(): number[] {
-    return this.selectedAllergiesItems.map(item => item.allergyId);
+    return this.restoredAllergiesIds;
   }
 
   getSelectedMedicalHistoryIds(): number[] {
-    return this.selectedMedicalHistoryItems.map(item => item.problemId);
+    return this.restoredMedicalHistoryIds;
   }
 
   getSelectedVitalSignsIds(): number[] {
-    return this.selectedVitalSignsItems.map(item => item.vitalId);
+    return this.restoredVitalSignsIds;
   }
 
   getSelectedImmunizationsIds(): number[] {
-    return this.selectedImmunizationsItems.map(item => item.immunizationId);
+    return this.restoredImmunizationsIds;
   }
 
   // Update the model when a child emits an answer change (string or boolean for checkboxes)
@@ -1202,6 +1210,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
   onSocialHistorySelectionChanged(selectedItems: any[]): void {
     console.log('📥 [ClinicalNote] Received social history selections:', selectedItems);
 
+    // Clear restored IDs on user interaction to prevent feedback loop
+    this.restoredSocialHistoryIds = [];
+    
     // Store selected items to prevent loss during re-renders
     this.selectedSocialHistoryItems = selectedItems;
 
@@ -1264,6 +1275,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
   onFamilyHistorySelectionChanged(selectedItems: any[]): void {
     console.log('📥 [ClinicalNote] Received family history selections:', selectedItems);
 
+    // Clear restored IDs on user interaction to prevent feedback loop
+    this.restoredFamilyHistoryIds = [];
+    
     // Store selected items to prevent loss during re-renders
     this.selectedFamilyHistoryItems = selectedItems;
 
@@ -1333,6 +1347,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
   onAllergiesSelectionChanged(selectedItems: any[]): void {
     console.log('📥 [ClinicalNote] Received allergies selections:', selectedItems);
 
+    // Clear restored IDs on user interaction to prevent feedback loop
+    this.restoredAllergiesIds = [];
+    
     // Store selected items to prevent loss during re-renders
     this.selectedAllergiesItems = selectedItems;
 
@@ -1406,6 +1423,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
   onMedicalHistorySelectionChanged(selectedItems: any[]): void {
     console.log('📥 [ClinicalNote] Received medical history selections:', selectedItems);
 
+    // Clear restored IDs on user interaction to prevent feedback loop
+    this.restoredMedicalHistoryIds = [];
+    
     // Store selected items to prevent loss during re-renders
     this.selectedMedicalHistoryItems = selectedItems;
 
@@ -1480,6 +1500,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
   onVitalSignsSelectionChanged(selectedItems: any[]): void {
     console.log('📥 [ClinicalNote] Received vital signs selections:', selectedItems);
 
+    // Clear restored IDs on user interaction to prevent feedback loop
+    this.restoredVitalSignsIds = [];
+    
     // Store selected items to prevent loss during re-renders
     this.selectedVitalSignsItems = selectedItems;
 
@@ -1556,6 +1579,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
   onImmunizationsSelectionChanged(selectedItems: any[]): void {
     console.log('📥 [ClinicalNote] Received immunizations selections:', selectedItems);
 
+    // Clear restored IDs on user interaction to prevent feedback loop
+    this.restoredImmunizationsIds = [];
+    
     // Store selected items to prevent loss during re-renders
     this.selectedImmunizationsItems = selectedItems;
 
@@ -1656,9 +1682,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (socialHistoryItems.length > 0) {
         console.log('✅ Extracted social history items for restoration:', socialHistoryItems);
         this.selectedSocialHistoryItems = socialHistoryItems;
-
-        // The social history component will receive these via @Input preSelectedIds
-        // in the question-view template binding
+        
+        // Populate the restored IDs array for preSelectedIds binding
+        this.restoredSocialHistoryIds = socialHistoryItems.map((item: any) => item.shid);
       }
     }
   }
@@ -1687,9 +1713,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (familyHistoryItems.length > 0) {
         console.log('✅ Extracted family history items for restoration:', familyHistoryItems);
         this.selectedFamilyHistoryItems = familyHistoryItems;
-
-        // The family history component will receive these via @Input preSelectedIds
-        // in the question-view template binding
+        
+        // Populate the restored IDs array for preSelectedIds binding
+        this.restoredFamilyHistoryIds = familyHistoryItems.map((item: any) => item.fhid);
       }
     }
   }
@@ -1722,9 +1748,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (allergiesItems.length > 0) {
         console.log('✅ Extracted allergies items for restoration:', allergiesItems);
         this.selectedAllergiesItems = allergiesItems;
-
-        // The allergies component will receive these via @Input preSelectedIds
-        // in the question-view template binding
+        
+        // Populate the restored IDs array for preSelectedIds binding
+        this.restoredAllergiesIds = allergiesItems.map((item: any) => item.allergyId);
       }
     }
   }
@@ -1755,9 +1781,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (medicalHistoryItems.length > 0) {
         console.log('✅ Extracted medical history items for restoration:', medicalHistoryItems);
         this.selectedMedicalHistoryItems = medicalHistoryItems;
-
-        // The problem-list component will receive these via @Input preSelectedIds
-        // in the question-view template binding
+        
+        // Populate the restored IDs array for preSelectedIds binding
+        this.restoredMedicalHistoryIds = medicalHistoryItems.map((item: any) => item.problemId);
       }
     }
   }
@@ -1790,9 +1816,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (vitalSignsItems.length > 0) {
         console.log('✅ Extracted vital signs items for restoration:', vitalSignsItems);
         this.selectedVitalSignsItems = vitalSignsItems;
-
-        // The vital-signs component will receive these via @Input preSelectedIds
-        // in the question-view template binding
+        
+        // Populate the restored IDs array for preSelectedIds binding
+        this.restoredVitalSignsIds = vitalSignsItems.map((item: any) => item.vitalId);
       }
     }
   }
@@ -1824,9 +1850,9 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (immunizationsItems.length > 0) {
         console.log('✅ Extracted immunizations items for restoration:', immunizationsItems);
         this.selectedImmunizationsItems = immunizationsItems;
-
-        // The immunizations component will receive these via @Input preSelectedIds
-        // in the question-view template binding
+        
+        // Populate the restored IDs array for preSelectedIds binding
+        this.restoredImmunizationsIds = immunizationsItems.map((item: any) => item.immunizationId);
       }
     }
   }

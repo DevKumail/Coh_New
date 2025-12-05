@@ -341,7 +341,10 @@ PageInfo: any = {
     const mrNo = this.SearchPatientData?.table2?.[0]?.mrNo || '';
     this.ClinicalApiService.SummarySheet(mrNo,this.PageInfo.CurrentPage,this.PageInfo.PageSize).then((res:any)=>{
     console.log('vital Sign RESULT: ',res);
-    this.vitalSignsPagedData = res?.vitalSigns.table1 || []
+    this.vitalSignsPagedData = (res?.vitalSigns.table1 || []).map((vital: any) => ({
+      ...vital,
+      selected: false // Initialize all items as unselected
+    }));
     this.vitalTotalItems = res?.vitalSigns.table2?.[0]?.totalRecords || 0;
     
     // Apply pending selections after data loads
@@ -575,6 +578,7 @@ PageInfo: any = {
         vital.selected = this.pendingSelections.includes(vital.vitalId);
       });
       this.selectAll = this.vitalSignsPagedData.every((vital: any) => vital.selected);
+      this.pendingSelections = []; // Clear after applying
     }
   }
 }
