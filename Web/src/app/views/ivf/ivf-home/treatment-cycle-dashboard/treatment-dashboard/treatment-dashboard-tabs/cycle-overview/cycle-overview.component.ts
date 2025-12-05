@@ -9,7 +9,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
@@ -34,12 +34,13 @@ export class CycleOverviewComponent {
     private patientBanner: PatientBannerService,
     private clinicalApiService: ClinicalApiService,
     private route: ActivatedRoute,
-    private fb: FormBuilder) { }
+    private fb: FormBuilder,
+    private http: HttpClient) { }
 
 
   // Patient context
   mrNo: string | null = null;
-
+  cycleId: any;
   // Mock data for UI display
   AllDropdownValues: any = [];
   dropdowns: any = [];
@@ -98,6 +99,7 @@ export class CycleOverviewComponent {
       const id = Number(idStr);
       if (Number.isFinite(id) && id > 0) {
         this.fetchOverviewData(id);
+        this.cycleId = id 
       }
     });
 
@@ -223,6 +225,23 @@ export class CycleOverviewComponent {
       const cal = Array.isArray(payload?.calender) ? payload.calender : [];
       // Clear existing before binding
       this.resetCalendarBinding();
+      // Pre-populate Medication resource rows from payload.resources[0].allMedications
+      try {
+        const resArr = Array.isArray(payload?.resources) ? payload.resources : [];
+        const allMeds = Array.isArray(resArr?.[0]?.allMedications) ? resArr[0].allMedications : [];
+        let ord = 3;
+        for (const m of allMeds) {
+          const name = String(m?.drugName || '').trim();
+          const idNum = Number(m?.drugId || 0);
+          if (!name) continue;
+          const slug = 'med-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+          if (!this.medsResources.some(r => r.id === slug)) {
+            this.medsResources.push({ id: slug, title: name, eventColor: '#5bc0de', order: ord++ });
+            if (Number.isFinite(idNum) && idNum > 0) this.medResourceDrugMap[slug] = idNum;
+          }
+        }
+        this.medicationSubtypes = this.medsResources.map(r => r.title);
+      } catch { }
       const eventsToAdd: EventInput[] = [];
 
       // Helper: add event row entries
@@ -355,8 +374,9 @@ export class CycleOverviewComponent {
       }
 
       // Apply to calendar/resources
-      this.rebuildResources();
+      // Important: set events first so resource filtering can see them
       this.calendarData = eventsToAdd;
+      this.rebuildResources();
       this.rebindEvents();
     } catch { }
   }
@@ -396,6 +416,47 @@ export class CycleOverviewComponent {
           this.openAddMedModal();
         });
         el.appendChild(btn);
+      }
+    }
+    // Inject delete icon into each Medication resource row
+    if (id && this.medsResources.some(r => r.id === id)) {
+      const el: HTMLElement = arg.el as HTMLElement;
+      el.style.position = 'relative';
+      // Ensure long medication names truncate with ellipsis and show full in tooltip
+      try {
+        const res = this.medsResources.find(r => r.id === id);
+        if (res) {
+          el.style.whiteSpace = 'nowrap';
+          el.style.overflow = 'hidden';
+          el.style.textOverflow = 'ellipsis';
+          el.title = res.title;
+        }
+      } catch { }
+      // avoid duplicates
+      if (!el.querySelector('.med-del-btn')) {
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'btn btn-sm btn-link med-del-btn';
+        del.title = 'Delete medication row';
+        del.style.position = 'absolute';
+        del.style.right = '0px';
+        del.style.top = '-1px';
+        del.style.padding = '0';
+        del.style.lineHeight = '1';
+        del.style.height = '20px';
+        del.style.width = '20px';
+        del.style.display = 'flex';
+        del.style.alignItems = 'center';
+        del.style.justifyContent = 'center';
+        del.style.fontSize = 'xx-large';
+        del.style.color = '#dc3545';
+        // show a cross like the + add medication button
+        del.textContent = '×';
+        del.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.deleteMedicationResource(String(id));
+        });
+        el.appendChild(del);
       }
     }
   }
@@ -505,7 +566,7 @@ export class CycleOverviewComponent {
           <div class="event-icon" style="cursor:pointer; text-align:center; display:flex; align-items:center; justify-content:center;">
             <img src="assets/images/ultra.png"
                  alt="Ultrasound"
-                 style="width:24px;height:24px;object-fit:contain;display:inline-block;" />
+                 style="width:32px;height:32px;object-fit:contain;display:inline-block;" />
           </div>
         `
       };
@@ -1054,6 +1115,56 @@ export class CycleOverviewComponent {
     return d.toISOString().slice(0, 10);
   }
 
+  private deleteMedicationResource(resourceId: string) {
+    try {
+      const drugId = this.medResourceDrugMap[resourceId];
+      const ovId = Number(this.overviewId || 0);
+ 
+      if (!this.cycleId) {
+        Swal.fire({ icon: 'error', title: 'Cycle not loaded', text: 'Cycle Id is not loaded.', showConfirmButton: true });
+        return;
+      }
+      Swal.fire({
+        icon: 'warning',
+        title: 'Remove medication row?',
+        text: 'This will remove all schedules for this drug from the cycle.',
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel'
+      }).then((res) => {
+        if (!res.isConfirmed) return;
+        this.api.deletePrescriptionMaster(this.cycleId, Number(drugId)).subscribe({
+          next: () => {
+            // Remove resource and its events locally
+            this.medsResources = this.medsResources.filter(r => r.id !== resourceId);
+            delete this.medResourceDrugMap[resourceId];
+            this.calendarData = this.calendarData.filter(ev => (ev as any).resourceId !== resourceId);
+            this.rebuildResources();
+            this.rebindEvents();
+            this.fetchOverviewData(this.cycleId);
+            Swal.fire({ icon: 'success', title: 'Deleted', text: 'Medication removed.', timer: 1000, showConfirmButton: false });
+          },
+          error: (err: any) => {
+            // Some servers may return 200 in error channel
+            if (err && Number(err.status) === 200) {
+              this.medsResources = this.medsResources.filter(r => r.id !== resourceId);
+              delete this.medResourceDrugMap[resourceId];
+              this.calendarData = this.calendarData.filter(ev => (ev as any).resourceId !== resourceId);
+              this.rebuildResources();
+              this.rebindEvents();
+              this.fetchOverviewData(this.cycleId);
+              Swal.fire({ icon: 'success', title: 'Deleted', text: 'Medication removed.', timer: 1000, showConfirmButton: false });
+              return;
+            }
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete medication.', timer: 1200, showConfirmButton: false });
+          }
+        });
+      });
+    } catch {
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete medication.', timer: 1200, showConfirmButton: false });
+    }
+  }
+
   private toDay(v: any): string | null {
     if (!v) return null;
     if (typeof v === 'string' && v.length >= 10) return v.slice(0, 10);
@@ -1064,35 +1175,9 @@ export class CycleOverviewComponent {
     } catch { return null; }
   }
 
-  // Return only those medication resources that have at least one event overlapping the visible range
+  // Always show all medication resources without filtering by visible date range
   private filterMedsByVisibleRange() {
-    // If no visible range yet, return all meds
-    if (!this.visibleStart || !this.visibleEnd) return this.medsResources;
-    const vs = this.visibleStart;
-    const ve = this.visibleEnd; // end-exclusive from FullCalendar
-
-    // helper overlap: [aStart, aEnd) overlaps [bStart, bEnd)
-    const overlaps = (aStart: string | null, aEnd?: string | null) => {
-      if (!aStart) return false;
-      const s = aStart;
-      const e = aEnd && aEnd > s ? aEnd : this.addOneDayISO(s);
-      return s < ve && e > vs;
-    };
-
-    const medsWithEvents = new Set<string>();
-    for (const ev of this.calendarData) {
-      const rid: string | undefined = (ev as any).resourceId;
-      if (!rid) continue;
-      // consider only meds rows (they start with 'med-' as constructed) or any rid in medsResources
-      if (!this.medsResources.some(r => r.id === rid)) continue;
-      const es = this.toDay((ev as any)?.start);
-      const ee = this.toDay((ev as any)?.end);
-      if (!es) continue;
-      if (overlaps(es, ee)) medsWithEvents.add(rid);
-    }
-
-    // Keep only meds that have overlapping events
-    return this.medsResources.filter(r => medsWithEvents.has(r.id));
+    return this.medsResources;
   }
 
   openLabOrderCreateModal(date: string) {
@@ -1328,6 +1413,7 @@ export class CycleOverviewComponent {
     this.addMedName = '';
     this.selectedDrugId = null;
     this.medForm = {} as any;
+    this.medSearch = '';
     this.loadDrugs(true);
     // Make sure form exists before template is instantiated
     this.buildMedForm();
@@ -1480,17 +1566,13 @@ export class CycleOverviewComponent {
     this.api.savePrescriptionMasterFull(body).subscribe({
       next: () => {
         // Refresh calendar/resources from backend to reflect new medication
-        if (this.overviewId) {
-          this.fetchOverviewData(this.overviewId);
-        }
         this.closeAddMedModal();
         Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription saved successfully.', timer: 1200, showConfirmButton: false });
+        this.fetchOverviewData(this.cycleId);
       },
       error: (err: any) => {
         if (err && Number(err.status) === 200) {
-          if (this.overviewId) {
-            this.fetchOverviewData(this.overviewId);
-          }
+          this.fetchOverviewData(this.cycleId);
           this.closeAddMedModal();
           Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription saved successfully.', timer: 1200, showConfirmButton: false });
           return;

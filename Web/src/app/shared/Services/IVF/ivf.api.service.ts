@@ -231,6 +231,12 @@ export class IVFApiService {
     return this.api.post('Overview/prescription-master-save', body);
   }
 
+
+// Delete all schedules of a drug for a treatment cycle
+deletePrescriptionMaster(ivfTreatmentCycleId: number, drugId: number): Observable<any> {
+  return this.api.deleteWithBody('Overview/prescription-master-delete', { ivfTreatmentCycleId, drugId });
+}
+
   // Roles and Receivers
   getAllRoles(): Observable<any> {
     return this.api.get('Role/GetAllRoles');
