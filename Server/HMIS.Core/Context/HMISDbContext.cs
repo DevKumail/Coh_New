@@ -208,6 +208,8 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<IvfepisodeOverviewLabTestOrder> IvfepisodeOverviewLabTestOrder { get; set; }
 
+    public virtual DbSet<IvfepisodePregnancy> IvfepisodePregnancy { get; set; }
+
     public virtual DbSet<IvfepisodeTransfer> IvfepisodeTransfer { get; set; }
 
     public virtual DbSet<IvfepisodeTransferEmbryoInTransfer> IvfepisodeTransferEmbryoInTransfer { get; set; }
@@ -291,6 +293,8 @@ public partial class HMISDbContext : DbContext
     public virtual DbSet<IvfstrawColors> IvfstrawColors { get; set; }
 
     public virtual DbSet<IvftreatmentEpisodeAspirationStage> IvftreatmentEpisodeAspirationStage { get; set; }
+
+    public virtual DbSet<IvftreatmentEpisodeBirthStage> IvftreatmentEpisodeBirthStage { get; set; }
 
     public virtual DbSet<IvftreatmentEpisodeOverviewStage> IvftreatmentEpisodeOverviewStage { get; set; }
 
@@ -1935,6 +1939,17 @@ public partial class HMISDbContext : DbContext
                 .HasConstraintName("FK_IVFTreatmentEpisodeAspirationStage_IVFEpisodeAspirationOocyteRetrieval");
 
             entity.HasOne(d => d.IvfdashboardTreatmentCycle).WithOne(p => p.IvftreatmentEpisodeAspirationStage).HasConstraintName("FK_IVFTreatmentEpisodeAspirationStage_IVFDashboardTreatmentCycle");
+        });
+
+        modelBuilder.Entity<IvftreatmentEpisodeBirthStage>(entity =>
+        {
+            entity.Property(e => e.BirthId).ValueGeneratedNever();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.IvfdashboardTreatmentCycle).WithOne(p => p.IvftreatmentEpisodeBirthStage)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFTreatmentEpisodeBirthStage_IVFDashboardTreatmentCycle");
         });
 
         modelBuilder.Entity<IvftreatmentEpisodeOverviewStage>(entity =>
