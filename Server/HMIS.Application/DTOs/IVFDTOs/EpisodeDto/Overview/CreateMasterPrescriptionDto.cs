@@ -28,6 +28,8 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public string Indications { get; set; }
         public string Substitution { get; set; }
         public bool InternalOrder { get; set; }
+        public long RoleId { get; set; }
+        public long ReceiverId { get; set; }
     }
 
 }
