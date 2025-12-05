@@ -9,7 +9,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import { PatientBannerService } from '@/app/shared/Services/patient-banner.service';
@@ -35,12 +35,13 @@ export class CycleOverviewComponent {
     private patientBanner: PatientBannerService,
     private clinicalApiService: ClinicalApiService,
     private route: ActivatedRoute,
-    private fb: FormBuilder) { }
+    private fb: FormBuilder,
+    private http: HttpClient) { }
 
 
   // Patient context
   mrNo: string | null = null;
-
+  cycleId: any;
   // Mock data for UI display
   AllDropdownValues: any = [];
   dropdowns: any = [];
@@ -99,6 +100,7 @@ export class CycleOverviewComponent {
       const id = Number(idStr);
       if (Number.isFinite(id) && id > 0) {
         this.fetchOverviewData(id);
+        this.cycleId = id 
       }
     });
 
@@ -224,7 +226,39 @@ export class CycleOverviewComponent {
       const cal = Array.isArray(payload?.calender) ? payload.calender : [];
       // Clear existing before binding
       this.resetCalendarBinding();
+      // Pre-populate Medication resource rows from payload.resources[0].allMedications
+      try {
+        const resArr = Array.isArray(payload?.resources) ? payload.resources : [];
+        const allMeds = Array.isArray(resArr?.[0]?.allMedications) ? resArr[0].allMedications : [];
+        let ord = 3;
+        for (const m of allMeds) {
+          const name = String(m?.drugName || '').trim();
+          const idNum = Number(m?.drugId || 0);
+          if (!name) continue;
+          const slug = 'med-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+          if (!this.medsResources.some(r => r.id === slug)) {
+            this.medsResources.push({ id: slug, title: name, eventColor: '#5bc0de', order: ord++ });
+            if (Number.isFinite(idNum) && idNum > 0) this.medResourceDrugMap[slug] = idNum;
+          }
+        }
+        this.medicationSubtypes = this.medsResources.map(r => r.title);
+      } catch { }
       const eventsToAdd: EventInput[] = [];
+
+      // Add LMP event from dateOfLmp if present
+      try {
+        const lmpDate = payload?.dateOfLmp;
+        if (lmpDate) {
+          const lmpISO = new Date(lmpDate).toISOString();
+          eventsToAdd.push({
+            resourceId: 'events',
+            title: 'LMP',
+            start: lmpISO,
+            backgroundColor: '#FF6B6B',
+            extendedProps: { description: 'LMP (Last Menstrual Period)' }
+          } as any);
+        }
+      } catch { }
 
       // Helper: add event row entries
       const pushEventMarker = (title: string, startISO: string, endISO?: string) => {
@@ -307,7 +341,7 @@ export class CycleOverviewComponent {
                 date: startDay,
                 start: startDay,
                 end: stopDay,
-                route: m?.routeName || '',
+                route: m?.routeName || m?.routeId || '',
                 frequency: m?.frequency || '',
                 quantity: m?.quantity || '',
                 refills: m?.additionalRefills || '',
@@ -316,7 +350,9 @@ export class CycleOverviewComponent {
                 instructions: m?.instructions || '',
                 indications: m?.indications || '',
                 medicationId: m?.medicationId || null,
-                color: m?.color || ''
+                color: m?.color || '',
+                applicationDomainName: m?.applicationDomainName || [],
+                timeDetails: m?.timeDetails || []
               }
             } as any);
           }
@@ -357,8 +393,9 @@ export class CycleOverviewComponent {
       }
 
       // Apply to calendar/resources
-      this.rebuildResources();
+      // Important: set events first so resource filtering can see them
       this.calendarData = eventsToAdd;
+      this.rebuildResources();
       this.rebindEvents();
     } catch { }
   }
@@ -398,6 +435,47 @@ export class CycleOverviewComponent {
           this.openAddMedModal();
         });
         el.appendChild(btn);
+      }
+    }
+    // Inject delete icon into each Medication resource row
+    if (id && this.medsResources.some(r => r.id === id)) {
+      const el: HTMLElement = arg.el as HTMLElement;
+      el.style.position = 'relative';
+      // Ensure long medication names truncate with ellipsis and show full in tooltip
+      try {
+        const res = this.medsResources.find(r => r.id === id);
+        if (res) {
+          el.style.whiteSpace = 'nowrap';
+          el.style.overflow = 'hidden';
+          el.style.textOverflow = 'ellipsis';
+          el.title = res.title;
+        }
+      } catch { }
+      // avoid duplicates
+      if (!el.querySelector('.med-del-btn')) {
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'btn btn-sm btn-link med-del-btn';
+        del.title = 'Delete medication row';
+        del.style.position = 'absolute';
+        del.style.right = '0px';
+        del.style.top = '-1px';
+        del.style.padding = '0';
+        del.style.lineHeight = '1';
+        del.style.height = '20px';
+        del.style.width = '20px';
+        del.style.display = 'flex';
+        del.style.alignItems = 'center';
+        del.style.justifyContent = 'center';
+        del.style.fontSize = 'xx-large';
+        del.style.color = '#dc3545';
+        // show a cross like the + add medication button
+        del.textContent = '×';
+        del.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.deleteMedicationResource(String(id));
+        });
+        el.appendChild(del);
       }
     }
   }
@@ -442,6 +520,7 @@ export class CycleOverviewComponent {
   private selectedDate: string | null = null;
   private bgEvents: EventInput[] = [];
   private skipMedResetOnce: boolean = false;
+  private editingMedicationId: number | null = null;
 
   private rebindEvents() {
     this.calendarOptions = { ...this.calendarOptions, events: [...this.calendarData, ...this.bgEvents] };
@@ -507,7 +586,7 @@ export class CycleOverviewComponent {
           <div class="event-icon" style="cursor:pointer; text-align:center; display:flex; align-items:center; justify-content:center;">
             <img src="assets/images/ultra.png"
                  alt="Ultrasound"
-                 style="width:24px;height:24px;object-fit:contain;display:inline-block;" />
+                 style="width:32px;height:32px;object-fit:contain;display:inline-block;" />
           </div>
         `
       };
@@ -679,13 +758,34 @@ export class CycleOverviewComponent {
     const indications = String(detail?.indications || '').trim();
     const start = (detail?.start || '').slice(0, 10) || (this.selectedDate || new Date().toISOString().slice(0,10));
     const stop = (detail?.end || '').slice(0, 10) || start;
+    const medicationId = detail?.medicationId || null;
+    const color = detail?.color || '';
+    
+    // Extract application domain from applicationDomainName array
+    let applicationDomainCategoryId: number | null = null;
+    let applicationDomainName = '';
+    try {
+      const appDomainArr = detail?.applicationDomainName;
+      if (Array.isArray(appDomainArr) && appDomainArr.length > 0) {
+        const domainId = appDomainArr[0]?.applicationDomainId;
+        applicationDomainCategoryId = Number.isFinite(Number(domainId)) ? Number(domainId) : null;
+        applicationDomainName = appDomainArr[0]?.applicationDomainName || '';
+        console.log('Application Domain extracted:', { applicationDomainCategoryId, applicationDomainName });
+      }
+    } catch (e) { 
+      console.error('Error extracting application domain:', e);
+    }
+    
+    // Extract time details from timeDetails array
+    const timeDetailsArr = Array.isArray(detail?.timeDetails) ? detail.timeDetails : [];
+    
     // compute duration (inclusive days)
     let duration: number | null = null;
     try {
       const sd = new Date(start + 'T00:00:00');
       const ed = new Date(stop + 'T00:00:00');
       const diff = Math.round((ed.getTime() - sd.getTime()) / (1000*60*60*24));
-      duration = (isFinite(diff) ? Math.max(0, diff) : 0) + 0; // duration field is number of days; keep as difference
+      duration = (isFinite(diff) ? Math.max(0, diff) : 0) + 1; // +1 for inclusive duration
     } catch { duration = null; }
 
     // Prefill key fields
@@ -702,8 +802,32 @@ export class CycleOverviewComponent {
       substitution: substitution || this.medFG.get('substitution')?.value,
       instructions: instructions || this.medFG.get('instructions')?.value,
       indication: indications || this.medFG.get('indication')?.value,
+      applicationDomainCategoryId: applicationDomainCategoryId,
+      applicationDomain: applicationDomainName
     };
+    
+    // Store medicationId for update operation
+    this.editingMedicationId = medicationId;
+    
     this.medFG.patchValue(patch);
+    
+    // Populate time fields from timeDetails
+    this.adjustDoseTimes(frequency);
+    if (timeDetailsArr.length > 0) {
+      const doseTimesFA = this.doseTimesFA;
+      timeDetailsArr.forEach((td: any, idx: number) => {
+        if (idx < doseTimesFA.length) {
+          const timeStr = String(td?.time || '').trim();
+          if (timeStr) {
+            // Convert "HH:mm:ss" to "HH:mm" for time input
+            const timeParts = timeStr.split(':');
+            const formattedTime = timeParts.length >= 2 ? `${timeParts[0]}:${timeParts[1]}` : timeStr;
+            doseTimesFA.at(idx)?.setValue(formattedTime);
+          }
+        }
+      });
+    }
+    
     // help search: put med name into the search box
     this.medSearch = medName;
     // open modal
@@ -711,15 +835,44 @@ export class CycleOverviewComponent {
     this.openAddMedModal();
     // re-apply patch after modal open in case any reset occurred
     setTimeout(() => {
-      try { this.medFG.patchValue(patch); } catch { }
-    }, 0);
+      try { 
+        this.medFG.patchValue(patch);
+        console.log('Patch applied:', patch);
+        // Explicitly set application domain again
+        if (applicationDomainCategoryId) {
+          this.medFG.get('applicationDomainCategoryId')?.setValue(applicationDomainCategoryId);
+          console.log('Application Domain set to:', applicationDomainCategoryId);
+          console.log('Form value after setting:', this.medFG.get('applicationDomainCategoryId')?.value);
+        }
+        // Re-populate time fields after modal opens
+        if (timeDetailsArr.length > 0) {
+          const doseTimesFA = this.doseTimesFA;
+          timeDetailsArr.forEach((td: any, idx: number) => {
+            if (idx < doseTimesFA.length) {
+              const timeStr = String(td?.time || '').trim();
+              if (timeStr) {
+                const timeParts = timeStr.split(':');
+                const formattedTime = timeParts.length >= 2 ? `${timeParts[0]}:${timeParts[1]}` : timeStr;
+                doseTimesFA.at(idx)?.setValue(formattedTime);
+              }
+            }
+          });
+        }
+      } catch (e) { 
+        console.error('Error in setTimeout patch:', e);
+      }
+    }, 100);
     // try auto-select the medication after the list loads
     setTimeout(() => {
       try {
         const match = this.drugs.find(x => String(x?.drugName || '').trim().toLowerCase() === medName.toLowerCase());
         if (match) this.pickDrug(match);
+        // Re-apply application domain after drug is picked
+        if (applicationDomainCategoryId) {
+          this.medFG.get('applicationDomainCategoryId')?.setValue(applicationDomainCategoryId);
+        }
       } catch { }
-    }, 600);
+    }, 650);
   }
 
   openHormoneLevelModal(data: any) {
@@ -1114,6 +1267,56 @@ export class CycleOverviewComponent {
     return d.toISOString().slice(0, 10);
   }
 
+  private deleteMedicationResource(resourceId: string) {
+    try {
+      const drugId = this.medResourceDrugMap[resourceId];
+      const ovId = Number(this.overviewId || 0);
+ 
+      if (!this.cycleId) {
+        Swal.fire({ icon: 'error', title: 'Cycle not loaded', text: 'Cycle Id is not loaded.', showConfirmButton: true });
+        return;
+      }
+      Swal.fire({
+        icon: 'warning',
+        title: 'Remove medication row?',
+        text: 'This will remove all schedules for this drug from the cycle.',
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel'
+      }).then((res) => {
+        if (!res.isConfirmed) return;
+        this.api.deletePrescriptionMaster(this.cycleId, Number(drugId)).subscribe({
+          next: () => {
+            // Remove resource and its events locally
+            this.medsResources = this.medsResources.filter(r => r.id !== resourceId);
+            delete this.medResourceDrugMap[resourceId];
+            this.calendarData = this.calendarData.filter(ev => (ev as any).resourceId !== resourceId);
+            this.rebuildResources();
+            this.rebindEvents();
+            this.fetchOverviewData(this.cycleId);
+            Swal.fire({ icon: 'success', title: 'Deleted', text: 'Medication removed.', timer: 1000, showConfirmButton: false });
+          },
+          error: (err: any) => {
+            // Some servers may return 200 in error channel
+            if (err && Number(err.status) === 200) {
+              this.medsResources = this.medsResources.filter(r => r.id !== resourceId);
+              delete this.medResourceDrugMap[resourceId];
+              this.calendarData = this.calendarData.filter(ev => (ev as any).resourceId !== resourceId);
+              this.rebuildResources();
+              this.rebindEvents();
+              this.fetchOverviewData(this.cycleId);
+              Swal.fire({ icon: 'success', title: 'Deleted', text: 'Medication removed.', timer: 1000, showConfirmButton: false });
+              return;
+            }
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete medication.', timer: 1200, showConfirmButton: false });
+          }
+        });
+      });
+    } catch {
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete medication.', timer: 1200, showConfirmButton: false });
+    }
+  }
+
   private toDay(v: any): string | null {
     if (!v) return null;
     if (typeof v === 'string' && v.length >= 10) return v.slice(0, 10);
@@ -1124,35 +1327,9 @@ export class CycleOverviewComponent {
     } catch { return null; }
   }
 
-  // Return only those medication resources that have at least one event overlapping the visible range
+  // Always show all medication resources without filtering by visible date range
   private filterMedsByVisibleRange() {
-    // If no visible range yet, return all meds
-    if (!this.visibleStart || !this.visibleEnd) return this.medsResources;
-    const vs = this.visibleStart;
-    const ve = this.visibleEnd; // end-exclusive from FullCalendar
-
-    // helper overlap: [aStart, aEnd) overlaps [bStart, bEnd)
-    const overlaps = (aStart: string | null, aEnd?: string | null) => {
-      if (!aStart) return false;
-      const s = aStart;
-      const e = aEnd && aEnd > s ? aEnd : this.addOneDayISO(s);
-      return s < ve && e > vs;
-    };
-
-    const medsWithEvents = new Set<string>();
-    for (const ev of this.calendarData) {
-      const rid: string | undefined = (ev as any).resourceId;
-      if (!rid) continue;
-      // consider only meds rows (they start with 'med-' as constructed) or any rid in medsResources
-      if (!this.medsResources.some(r => r.id === rid)) continue;
-      const es = this.toDay((ev as any)?.start);
-      const ee = this.toDay((ev as any)?.end);
-      if (!es) continue;
-      if (overlaps(es, ee)) medsWithEvents.add(rid);
-    }
-
-    // Keep only meds that have overlapping events
-    return this.medsResources.filter(r => medsWithEvents.has(r.id));
+    return this.medsResources;
   }
 
   openLabOrderCreateModal(date: string) {
@@ -1388,6 +1565,7 @@ export class CycleOverviewComponent {
     this.addMedName = '';
     this.selectedDrugId = null;
     this.medForm = {} as any;
+    this.medSearch = '';
     this.loadDrugs(true);
     // Make sure form exists before template is instantiated
     this.buildMedForm();
@@ -1406,6 +1584,7 @@ export class CycleOverviewComponent {
         });
         this.adjustDoseTimes('');
         this.medForm.startDate = sd as any;
+        this.editingMedicationId = null;
       }
       this.skipMedResetOnce = false;
     } catch { this.medForm.startDate = '' as any; }
@@ -1515,14 +1694,25 @@ export class CycleOverviewComponent {
     const times = timesRaw.length ? timesRaw : null;
     const startISO = f?.startDate ? new Date(f.startDate).toISOString() : new Date().toISOString();
     const appDomIds = toNullIfInvalidId(f?.applicationDomainCategoryId) ? [Number(f.applicationDomainCategoryId)] : null;
+    
+    // Calculate stopDate from startDate + duration
+    let stopDateISO = startISO;
+    if (f?.duration && Number(f.duration) > 0) {
+      const stopDate = new Date(f.startDate);
+      stopDate.setDate(stopDate.getDate() + Number(f.duration) - 1); // -1 because duration is inclusive
+      stopDateISO = stopDate.toISOString();
+    } else if (f?.stopDate) {
+      stopDateISO = new Date(f.stopDate).toISOString();
+    }
 
     const body: any = {
-      ivfPrescriptionMasterId: 0,
+      ivfPrescriptionMasterId: this.editingMedicationId || 0,
       overviewId: ovId,
       drugId: drugId,
       appId: appId,
       applicationDomainCategoryId: toNullIfEmpty(appDomIds),
       startDate: startISO,
+      stopDate: stopDateISO,
       xDays: toNullIfInvalidId(f?.duration),
       time: times,
       dosageFrequency: toNullIfEmpty(f?.frequency),
@@ -1540,18 +1730,16 @@ export class CycleOverviewComponent {
     this.api.savePrescriptionMasterFull(body).subscribe({
       next: () => {
         // Refresh calendar/resources from backend to reflect new medication
-        if (this.overviewId) {
-          this.fetchOverviewData(this.overviewId);
-        }
         this.closeAddMedModal();
+        this.editingMedicationId = null;
         Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription saved successfully.', timer: 1200, showConfirmButton: false });
+        this.fetchOverviewData(this.cycleId);
       },
       error: (err: any) => {
         if (err && Number(err.status) === 200) {
-          if (this.overviewId) {
-            this.fetchOverviewData(this.overviewId);
-          }
+          this.fetchOverviewData(this.cycleId);
           this.closeAddMedModal();
+          this.editingMedicationId = null;
           Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription saved successfully.', timer: 1200, showConfirmButton: false });
           return;
         }

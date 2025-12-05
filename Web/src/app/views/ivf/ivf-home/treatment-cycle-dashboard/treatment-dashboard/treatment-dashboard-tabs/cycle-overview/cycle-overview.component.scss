@@ -133,3 +133,19 @@
     color: #333 !important;
   }
 }
+
+// Ensure the medication delete cross is readable and not overlapped by label text
+:host ::ng-deep .med-del-btn {
+  background-color: #fff !important;
+  border: 1px solid #e0e0e0 !important;
+  // border-radius: 50% !important;
+  width: 30px !important;
+  height: 35px !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 0 0 0px #fff !important; // extra ring to mask text beneath
+  z-index: 2 !important;
+}
