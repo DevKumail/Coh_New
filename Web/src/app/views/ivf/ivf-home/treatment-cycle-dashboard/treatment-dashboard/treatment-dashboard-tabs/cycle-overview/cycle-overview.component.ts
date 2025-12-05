@@ -373,6 +373,9 @@ export class CycleOverviewComponent {
   newMedName: string = '';
   // Map resourceId -> drugId for medication rows
   private medResourceDrugMap: Record<string, number> = {};
+  // Currently visible range in the calendar (ISO date strings, end exclusive)
+  private visibleStart: string | null = null;
+  private visibleEnd: string | null = null;
   drugs: Array<
     {
       drugId: number;
@@ -416,7 +419,9 @@ export class CycleOverviewComponent {
       { id: 'events', title: 'Events', eventColor: '#0066cc', order: 1 },
       { id: 'divider-meds', title: 'Medication', eventColor: '#eee', order: 2 },
     ];
-    const medsSorted = [...this.medsResources]
+    // Filter medication rows to only those with events in the visible range (if set)
+    const medsBase = this.filterMedsByVisibleRange();
+    const medsSorted = [...medsBase]
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
       .map((r, idx) => ({ id: r.id, title: r.title, eventColor: r.eventColor, order: 3 + idx }));
     const staticBottom = [
@@ -939,11 +944,27 @@ export class CycleOverviewComponent {
   handleViewDidMount() {
     // Bind clicks on the timeline header slots (resourceTimeline header)
     this.bindHeaderClicks();
+    // Ensure resources reflect current visible range after first render
+    this.rebuildResources();
   }
 
-  handleDatesSet() {
+  handleDatesSet(arg: any) {
+    // Capture visible range and rebind header clicks
+    try {
+      const s = arg?.startStr || arg?.start;
+      const e = arg?.endStr || arg?.end;
+      const sDay = typeof s === 'string' ? s.slice(0,10) : (s ? new Date(s).toISOString().slice(0,10) : null);
+      const eDay = typeof e === 'string' ? e.slice(0,10) : (e ? new Date(e).toISOString().slice(0,10) : null);
+      this.visibleStart = sDay;
+      this.visibleEnd = eDay;
+    } catch {
+      this.visibleStart = null;
+      this.visibleEnd = null;
+    }
     // Rebind after navigation (prev/next/today)
     this.bindHeaderClicks();
+    // Rebuild resources to reflect visible range
+    this.rebuildResources();
   }
 
   private bindHeaderClicks() {
@@ -986,6 +1007,47 @@ export class CycleOverviewComponent {
     const d = new Date(dateStr + 'T00:00:00');
     d.setDate(d.getDate() + 1);
     return d.toISOString().slice(0, 10);
+  }
+
+  private toDay(v: any): string | null {
+    if (!v) return null;
+    if (typeof v === 'string' && v.length >= 10) return v.slice(0, 10);
+    try {
+      const d = new Date(v);
+      if (isNaN(d.getTime())) return null;
+      return d.toISOString().slice(0, 10);
+    } catch { return null; }
+  }
+
+  // Return only those medication resources that have at least one event overlapping the visible range
+  private filterMedsByVisibleRange() {
+    // If no visible range yet, return all meds
+    if (!this.visibleStart || !this.visibleEnd) return this.medsResources;
+    const vs = this.visibleStart;
+    const ve = this.visibleEnd; // end-exclusive from FullCalendar
+
+    // helper overlap: [aStart, aEnd) overlaps [bStart, bEnd)
+    const overlaps = (aStart: string | null, aEnd?: string | null) => {
+      if (!aStart) return false;
+      const s = aStart;
+      const e = aEnd && aEnd > s ? aEnd : this.addOneDayISO(s);
+      return s < ve && e > vs;
+    };
+
+    const medsWithEvents = new Set<string>();
+    for (const ev of this.calendarData) {
+      const rid: string | undefined = (ev as any).resourceId;
+      if (!rid) continue;
+      // consider only meds rows (they start with 'med-' as constructed) or any rid in medsResources
+      if (!this.medsResources.some(r => r.id === rid)) continue;
+      const es = this.toDay((ev as any)?.start);
+      const ee = this.toDay((ev as any)?.end);
+      if (!es) continue;
+      if (overlaps(es, ee)) medsWithEvents.add(rid);
+    }
+
+    // Keep only meds that have overlapping events
+    return this.medsResources.filter(r => medsWithEvents.has(r.id));
   }
 
   openLabOrderCreateModal(date: string) {
