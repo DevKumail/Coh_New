@@ -245,6 +245,21 @@ export class CycleOverviewComponent {
       } catch { }
       const eventsToAdd: EventInput[] = [];
 
+      // Add LMP event from dateOfLmp if present
+      try {
+        const lmpDate = payload?.dateOfLmp;
+        if (lmpDate) {
+          const lmpISO = new Date(lmpDate).toISOString();
+          eventsToAdd.push({
+            resourceId: 'events',
+            title: 'LMP',
+            start: lmpISO,
+            backgroundColor: '#FF6B6B',
+            extendedProps: { description: 'LMP (Last Menstrual Period)' }
+          } as any);
+        }
+      } catch { }
+
       // Helper: add event row entries
       const pushEventMarker = (title: string, startISO: string, endISO?: string) => {
         if (!title || !startISO) return;
@@ -326,7 +341,7 @@ export class CycleOverviewComponent {
                 date: startDay,
                 start: startDay,
                 end: stopDay,
-                route: m?.routeName || '',
+                route: m?.routeName || m?.routeId || '',
                 frequency: m?.frequency || '',
                 quantity: m?.quantity || '',
                 refills: m?.additionalRefills || '',
@@ -335,7 +350,9 @@ export class CycleOverviewComponent {
                 instructions: m?.instructions || '',
                 indications: m?.indications || '',
                 medicationId: m?.medicationId || null,
-                color: m?.color || ''
+                color: m?.color || '',
+                applicationDomainName: m?.applicationDomainName || [],
+                timeDetails: m?.timeDetails || []
               }
             } as any);
           }
@@ -502,6 +519,7 @@ export class CycleOverviewComponent {
   private selectedDate: string | null = null;
   private bgEvents: EventInput[] = [];
   private skipMedResetOnce: boolean = false;
+  private editingMedicationId: number | null = null;
 
   private rebindEvents() {
     this.calendarOptions = { ...this.calendarOptions, events: [...this.calendarData, ...this.bgEvents] };
@@ -738,13 +756,34 @@ export class CycleOverviewComponent {
     const indications = String(detail?.indications || '').trim();
     const start = (detail?.start || '').slice(0, 10) || (this.selectedDate || new Date().toISOString().slice(0,10));
     const stop = (detail?.end || '').slice(0, 10) || start;
+    const medicationId = detail?.medicationId || null;
+    const color = detail?.color || '';
+    
+    // Extract application domain from applicationDomainName array
+    let applicationDomainCategoryId: number | null = null;
+    let applicationDomainName = '';
+    try {
+      const appDomainArr = detail?.applicationDomainName;
+      if (Array.isArray(appDomainArr) && appDomainArr.length > 0) {
+        const domainId = appDomainArr[0]?.applicationDomainId;
+        applicationDomainCategoryId = Number.isFinite(Number(domainId)) ? Number(domainId) : null;
+        applicationDomainName = appDomainArr[0]?.applicationDomainName || '';
+        console.log('Application Domain extracted:', { applicationDomainCategoryId, applicationDomainName });
+      }
+    } catch (e) { 
+      console.error('Error extracting application domain:', e);
+    }
+    
+    // Extract time details from timeDetails array
+    const timeDetailsArr = Array.isArray(detail?.timeDetails) ? detail.timeDetails : [];
+    
     // compute duration (inclusive days)
     let duration: number | null = null;
     try {
       const sd = new Date(start + 'T00:00:00');
       const ed = new Date(stop + 'T00:00:00');
       const diff = Math.round((ed.getTime() - sd.getTime()) / (1000*60*60*24));
-      duration = (isFinite(diff) ? Math.max(0, diff) : 0) + 0; // duration field is number of days; keep as difference
+      duration = (isFinite(diff) ? Math.max(0, diff) : 0) + 1; // +1 for inclusive duration
     } catch { duration = null; }
 
     // Prefill key fields
@@ -761,8 +800,32 @@ export class CycleOverviewComponent {
       substitution: substitution || this.medFG.get('substitution')?.value,
       instructions: instructions || this.medFG.get('instructions')?.value,
       indication: indications || this.medFG.get('indication')?.value,
+      applicationDomainCategoryId: applicationDomainCategoryId,
+      applicationDomain: applicationDomainName
     };
+    
+    // Store medicationId for update operation
+    this.editingMedicationId = medicationId;
+    
     this.medFG.patchValue(patch);
+    
+    // Populate time fields from timeDetails
+    this.adjustDoseTimes(frequency);
+    if (timeDetailsArr.length > 0) {
+      const doseTimesFA = this.doseTimesFA;
+      timeDetailsArr.forEach((td: any, idx: number) => {
+        if (idx < doseTimesFA.length) {
+          const timeStr = String(td?.time || '').trim();
+          if (timeStr) {
+            // Convert "HH:mm:ss" to "HH:mm" for time input
+            const timeParts = timeStr.split(':');
+            const formattedTime = timeParts.length >= 2 ? `${timeParts[0]}:${timeParts[1]}` : timeStr;
+            doseTimesFA.at(idx)?.setValue(formattedTime);
+          }
+        }
+      });
+    }
+    
     // help search: put med name into the search box
     this.medSearch = medName;
     // open modal
@@ -770,15 +833,44 @@ export class CycleOverviewComponent {
     this.openAddMedModal();
     // re-apply patch after modal open in case any reset occurred
     setTimeout(() => {
-      try { this.medFG.patchValue(patch); } catch { }
-    }, 0);
+      try { 
+        this.medFG.patchValue(patch);
+        console.log('Patch applied:', patch);
+        // Explicitly set application domain again
+        if (applicationDomainCategoryId) {
+          this.medFG.get('applicationDomainCategoryId')?.setValue(applicationDomainCategoryId);
+          console.log('Application Domain set to:', applicationDomainCategoryId);
+          console.log('Form value after setting:', this.medFG.get('applicationDomainCategoryId')?.value);
+        }
+        // Re-populate time fields after modal opens
+        if (timeDetailsArr.length > 0) {
+          const doseTimesFA = this.doseTimesFA;
+          timeDetailsArr.forEach((td: any, idx: number) => {
+            if (idx < doseTimesFA.length) {
+              const timeStr = String(td?.time || '').trim();
+              if (timeStr) {
+                const timeParts = timeStr.split(':');
+                const formattedTime = timeParts.length >= 2 ? `${timeParts[0]}:${timeParts[1]}` : timeStr;
+                doseTimesFA.at(idx)?.setValue(formattedTime);
+              }
+            }
+          });
+        }
+      } catch (e) { 
+        console.error('Error in setTimeout patch:', e);
+      }
+    }, 100);
     // try auto-select the medication after the list loads
     setTimeout(() => {
       try {
         const match = this.drugs.find(x => String(x?.drugName || '').trim().toLowerCase() === medName.toLowerCase());
         if (match) this.pickDrug(match);
+        // Re-apply application domain after drug is picked
+        if (applicationDomainCategoryId) {
+          this.medFG.get('applicationDomainCategoryId')?.setValue(applicationDomainCategoryId);
+        }
       } catch { }
-    }, 600);
+    }, 650);
   }
 
   openHormoneLevelModal(data: any) {
@@ -1490,6 +1582,7 @@ export class CycleOverviewComponent {
         });
         this.adjustDoseTimes('');
         this.medForm.startDate = sd as any;
+        this.editingMedicationId = null;
       }
       this.skipMedResetOnce = false;
     } catch { this.medForm.startDate = '' as any; }
@@ -1599,14 +1692,25 @@ export class CycleOverviewComponent {
     const times = timesRaw.length ? timesRaw : null;
     const startISO = f?.startDate ? new Date(f.startDate).toISOString() : new Date().toISOString();
     const appDomIds = toNullIfInvalidId(f?.applicationDomainCategoryId) ? [Number(f.applicationDomainCategoryId)] : null;
+    
+    // Calculate stopDate from startDate + duration
+    let stopDateISO = startISO;
+    if (f?.duration && Number(f.duration) > 0) {
+      const stopDate = new Date(f.startDate);
+      stopDate.setDate(stopDate.getDate() + Number(f.duration) - 1); // -1 because duration is inclusive
+      stopDateISO = stopDate.toISOString();
+    } else if (f?.stopDate) {
+      stopDateISO = new Date(f.stopDate).toISOString();
+    }
 
     const body: any = {
-      ivfPrescriptionMasterId: 0,
+      ivfPrescriptionMasterId: this.editingMedicationId || 0,
       overviewId: ovId,
       drugId: drugId,
       appId: appId,
       applicationDomainCategoryId: toNullIfEmpty(appDomIds),
       startDate: startISO,
+      stopDate: stopDateISO,
       xDays: toNullIfInvalidId(f?.duration),
       time: times,
       dosageFrequency: toNullIfEmpty(f?.frequency),
@@ -1625,6 +1729,7 @@ export class CycleOverviewComponent {
       next: () => {
         // Refresh calendar/resources from backend to reflect new medication
         this.closeAddMedModal();
+        this.editingMedicationId = null;
         Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription saved successfully.', timer: 1200, showConfirmButton: false });
         this.fetchOverviewData(this.cycleId);
       },
@@ -1632,6 +1737,7 @@ export class CycleOverviewComponent {
         if (err && Number(err.status) === 200) {
           this.fetchOverviewData(this.cycleId);
           this.closeAddMedModal();
+          this.editingMedicationId = null;
           Swal.fire({ icon: 'success', title: 'Saved', text: 'Prescription saved successfully.', timer: 1200, showConfirmButton: false });
           return;
         }
