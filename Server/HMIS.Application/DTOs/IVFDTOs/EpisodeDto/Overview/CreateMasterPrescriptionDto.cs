@@ -14,6 +14,7 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public long OverviewId { get; set; }
         public long DrugId { get; set; }
         public long AppId { get; set; }
+        public string MrNo { get; set; }
         public List<long> ApplicationDomainCategoryId { get; set; }    
         public DateTime StartDate { get; set; }
         public int? XDays { get; set; }

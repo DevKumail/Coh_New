@@ -87,6 +87,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     medication.Instructions = dto.Instructions;
                     medication.IsInternal = dto.InternalOrder;
                     medication.AppointmentId = dto.AppId;
+                    medication.Mrno = dto.MrNo;
 
                     var oldDomain = _context.IvfoverviewMedicationApplicationDomain
                         .Where(x => x.MedicationId == medication.MedicationId);
@@ -138,7 +139,8 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                     Indications = dto.Indications,
                     Instructions = dto.Instructions,
                     IsInternal = dto.InternalOrder,
-                    AppointmentId = dto.AppId
+                    AppointmentId = dto.AppId,
+                    Mrno = dto.MrNo
                 };
 
                 await _context.Medications.AddAsync(medicationEntity);
