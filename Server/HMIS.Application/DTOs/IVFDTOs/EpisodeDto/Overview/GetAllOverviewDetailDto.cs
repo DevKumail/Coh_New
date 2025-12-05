@@ -9,6 +9,7 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
     public class GetAllOverviewDetailDto
     {
         public long OverviewId { get; set; }
+        public DateTime DateOfLmp { get; set; }
         public List<GetCalenderDto> Calender { get; set; }
         public List<GetResourcesDetailDto> Resources { get; set; }
     }
@@ -78,7 +79,7 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
     public class GetUltraSound
     {
         public long IVFLabOrderSetId { get; set; }
-        public long OrderSetDetailId { get; set; }
+        public long OrderSetId { get; set; }
         public string CreatedDate { get; set; }
     }
 }
