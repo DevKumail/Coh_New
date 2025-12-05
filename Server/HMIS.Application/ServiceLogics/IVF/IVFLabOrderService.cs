@@ -571,14 +571,12 @@ AND (
                 var resolvedCreate = ResolveStatus(h.OrderStatusEnum, h.OrderStatus);
                 var details = payload.Details ?? new List<LabOrderSetDetailDTO>();
 
-                // Generate order number ONCE per order set
                 long? orderNumber = h.OrderNumber;
                 if (!orderNumber.HasValue || orderNumber.Value == 0)
                 {
                     orderNumber = await GetNextOrderNumberAsync();
                 }
 
-                // Always create a single header
                 var hdr = new LabOrderSet
                 {
                     Mrno = h.MRNo,
@@ -597,8 +595,8 @@ AND (
                 await _db.SaveChangesAsync();
 
                 var orderSetId = (long)hdr.LabOrderSetId;
+                var orderSetDetailIds = new List<long>();
 
-                // Add all tests under the same header
                 foreach (var d in details)
                 {
                     long? visitOrderNo = d.VisitOrderNo;
@@ -635,23 +633,37 @@ AND (
                     };
 
                     _db.LabOrderSetDetail.Add(ent);
+
+                    await _db.SaveChangesAsync();
+
+                    var orderSetDetailId = (long)ent.OrderSetDetailId;
+                    orderSetDetailIds.Add(orderSetDetailId);
+
+                    d.OrderSetDetailId = orderSetDetailId;
                 }
 
-                if (details.Count > 0)
+                if (payload.Header.OverviewId > 0 && orderSetDetailIds.Count > 0)
                 {
+                    var ivfLabOrder = new IvflabOrderSet
+                    {
+                        OrderSetDetailId = orderSetDetailIds[0], 
+                        OverviewId = payload.Header.OverviewId ?? 0
+                    };
+                    _db.IvflabOrderSet.Add(ivfLabOrder);
                     await _db.SaveChangesAsync();
                 }
 
                 await tx.CommitAsync();
+
+
                 return orderSetId;
             }
             catch (Exception ex)
             {
                 await tx.RollbackAsync();
-                throw ex;
+                throw;
             }
         }
-
         public async Task<bool> UpdateOrderSetAsync(long orderSetId, CreateUpdateLabOrderSetDTO payload)
         {
             await using var tx = await _db.Database.BeginTransactionAsync();
