@@ -72,7 +72,22 @@
           <div *ngIf="viewquestion" class="card p-3">
             <h2 class="fw-bold text-decoration-underline">{{ dataquestion?.node?.noteTitle }}</h2>
             <div *ngFor="let q of dataquestion?.node?.questions" class="mt-2">
-              <app-question-view [question]="q" (answerChange)="onAnswerChange($event, q)"></app-question-view>
+              <app-question-view
+                [question]="q"
+                [selectedSocialHistoryIds]="getSelectedSocialHistoryIds()"
+                [selectedFamilyHistoryIds]="getSelectedFamilyHistoryIds()"
+                [selectedAllergiesIds]="getSelectedAllergiesIds()"
+                [selectedMedicalHistoryIds]="getSelectedMedicalHistoryIds()"
+                [selectedVitalSignsIds]="getSelectedVitalSignsIds()"
+                [selectedImmunizationsIds]="getSelectedImmunizationsIds()"
+                (answerChange)="onAnswerChange($event, q)"
+                (socialHistorySelectionChanged)="onSocialHistorySelectionChanged($event)"
+                (familyHistorySelectionChanged)="onFamilyHistorySelectionChanged($event)"
+                (allergiesSelectionChanged)="onAllergiesSelectionChanged($event)"
+                (medicalHistorySelectionChanged)="onMedicalHistorySelectionChanged($event)"
+                (vitalSignsSelectionChanged)="onVitalSignsSelectionChanged($event)"
+                (immunizationsSelectionChanged)="onImmunizationsSelectionChanged($event)">
+              </app-question-view>
             </div>
           </div>
         </div>
