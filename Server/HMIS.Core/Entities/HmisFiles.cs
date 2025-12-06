@@ -50,5 +50,8 @@ public partial class HmisFiles
     public virtual ICollection<IvftreatmentEpisodesAttachments> IvftreatmentEpisodesAttachments { get; set; } = new List<IvftreatmentEpisodesAttachments>();
 
     [InverseProperty("File")]
+    public virtual ICollection<LabResultsScannedImages> LabResultsScannedImages { get; set; } = new List<LabResultsScannedImages>();
+
+    [InverseProperty("File")]
     public virtual ICollection<SpeechToText> SpeechToText { get; set; } = new List<SpeechToText>();
 }

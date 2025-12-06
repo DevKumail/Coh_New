@@ -215,7 +215,7 @@
       <div class="tab-content border border-top-0 w-100" style="background-color: var(--bs-body-bg);">
         <!-- Attachments tab: reuse global generic document upload component -->
         <div class="tab-pane fade show" [class.active]="activeTab === 'attachments'">
-          <app-generic-document-upload></app-generic-document-upload>
+          <app-generic-document-upload #uploader></app-generic-document-upload>
         </div>
 
         <!-- Notes tab: rich text note using Quill editor -->

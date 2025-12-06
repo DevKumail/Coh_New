@@ -320,6 +320,8 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<LabResultsObservation> LabResultsObservation { get; set; }
 
+    public virtual DbSet<LabResultsScannedImages> LabResultsScannedImages { get; set; }
+
     public virtual DbSet<LabSampleTypes> LabSampleTypes { get; set; }
 
     public virtual DbSet<LabTests> LabTests { get; set; }
@@ -2072,6 +2074,17 @@ public partial class HMISDbContext : DbContext
         modelBuilder.Entity<LabResultsObservation>(entity =>
         {
             entity.Property(e => e.LabObservationId).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<LabResultsScannedImages>(entity =>
+        {
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.File).WithMany(p => p.LabResultsScannedImages).HasConstraintName("FK_LabResultsScannedImages_HMISFiles");
+
+            entity.HasOne(d => d.LabResult).WithMany(p => p.LabResultsScannedImages)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_LabResultsScannedImages_LabResultsMain");
         });
 
         modelBuilder.Entity<LabSampleTypes>(entity =>

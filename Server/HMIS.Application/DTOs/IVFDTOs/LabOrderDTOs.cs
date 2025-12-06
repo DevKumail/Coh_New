@@ -117,7 +117,10 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public string? ReviewedBy { get; set; }
         public DateTime? ReviewedDate { get; set; }
         public int? PerformAtLabId { get; set; }
+        public string? Note { get; set; }
         public List<LabResultObservationDTO>? Observations { get; set; } = new();
+        public List<AttachmentDTO>? Attachments { get; set; } = new();
+
     }
 
     public class OrderCollectionDetailsDTO
@@ -160,5 +163,9 @@ namespace HMIS.Application.DTOs.IVFDTOs
     {
         public long UserId { get; set; }
         public DateTime CancelDate { get; set; }
+    }
+    public class AttachmentDTO
+    {
+        public long FileId { get; set; }
     }
 }

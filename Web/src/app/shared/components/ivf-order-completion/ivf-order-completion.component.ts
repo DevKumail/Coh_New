@@ -1,12 +1,14 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgbDateStruct, NgbDatepickerModule, NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
 import Swal from 'sweetalert2';
 import { GenericDocumentUploadComponent } from '@/app/shared/generic-document-upload/generic-document-upload.component';
 import { QuillModule } from 'ngx-quill';
+import { SharedService } from '@/app/shared/Services/Common/shared-service';
 
 export interface LabResultObservation {
   valueType: string;
@@ -72,6 +74,8 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
   @Output() cancel = new EventEmitter<void>();
   @Output() completed = new EventEmitter<any>();
 
+  @ViewChild(GenericDocumentUploadComponent) uploader?: GenericDocumentUploadComponent;
+
   completionForm!: FormGroup;
   currentDate: NgbDateStruct = {
     year: new Date().getFullYear(),
@@ -110,7 +114,8 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
 
   constructor(
     private fb: FormBuilder,
-    private ivfApi: IVFApiService
+    private ivfApi: IVFApiService,
+    private shared: SharedService
   ) {
     this.initializeForm();
   }
@@ -291,40 +296,79 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
       });
     });
 
-    if (observationsByTest.size === 0) {
-      return;
+    const testObservationPairs: Array<{ testId: string; observations: any[] }> = [];
+    if (Array.isArray(this.tests) && this.tests.length > 0) {
+      this.tests.forEach((t: any) => {
+        const rawId = t.orderSetDetailId ?? t.id;
+        const key = String(rawId ?? '').trim();
+        if (!key) {
+          return;
+        }
+        const obs = observationsByTest.get(key) || [];
+        testObservationPairs.push({ testId: key, observations: obs });
+      });
+    } else {
+      observationsByTest.forEach((observations, testId) => {
+        testObservationPairs.push({ testId: String(testId), observations });
+      });
     }
 
-    const apiCalls: Observable<any>[] = [];
-
-    observationsByTest.forEach((observations, testId) => {
-      const payload = {
-        performDate: performDate,
-        entryDate: new Date().toISOString(),
-        userId: 0,
-        isDefault: formValue.isDefault ?? true,
-        principalResultInterpreter: formValue.principalResultInterpreter || 0,
-        action: formValue.action || 'Final',
-        reviewedBy: formValue.reviewedBy || 'System User',
-        reviewedDate: formValue.reviewedDate ? new Date(formValue.reviewedDate).toISOString() : null,
-        performAtLabId: formValue.performAtLabId || 0,
-        observations: observations
-      };
-
-      apiCalls.push(this.ivfApi.addLabOrderObservations(testId, payload));
-    });
-
-    if (apiCalls.length === 0) {
+    if (!testObservationPairs.length) {
       return;
     }
+    const newFiles = this.uploader?.getFiles() || [];
+    const existingFileIds = this.uploader?.getExistingIds() || [];
 
-    forkJoin(apiCalls).subscribe({
-      next: () => {
-        this.completed.emit({ success: true });
-      },
-      error: (err) => {
-        console.error('Failed to add observations', err);
-      }
-    });
+    const upload$ = newFiles.length > 0
+      ? this.shared.uploadDocumentsWithModule('LABORDER', newFiles)
+      : of([]);
+
+    upload$
+      .pipe(
+        switchMap((uploadRes: any) => {
+          const uploadedIds: number[] = Array.isArray(uploadRes)
+            ? uploadRes
+              .map((x: any) => Number(x?.fileId ?? x?.id))
+              .filter((x: any) => Number.isFinite(x) && x > 0)
+            : [];
+
+          const allFileIds = [...existingFileIds, ...uploadedIds];
+          const attachments = allFileIds.map(id => ({ fileId: id }));
+
+          const apiCalls: Observable<any>[] = [];
+
+          testObservationPairs.forEach(pair => {
+            const observations = pair.observations || [];
+            const testId = pair.testId;
+            const payload = {
+              performDate: performDate,
+              entryDate: new Date().toISOString(),
+              userId: 0,
+              accessionNumber: null,
+              isDefault: formValue.isDefault ?? true,
+              principalResultInterpreter: formValue.principalResultInterpreter || 0,
+              action: formValue.action || 'Final',
+              reviewedBy: formValue.reviewedBy || 'System User',
+              reviewedDate: formValue.reviewedDate ? new Date(formValue.reviewedDate).toISOString() : null,
+              performAtLabId: formValue.performAtLabId || 0,
+              Note: this.noteText || null,
+              observations: observations,
+              attachments: attachments
+            };
+
+            apiCalls.push(this.ivfApi.completeLabOrder(testId, payload));
+          });
+
+          return apiCalls.length ? forkJoin(apiCalls) : of([]);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.completed.emit({ success: true });
+        },
+        error: (err) => {
+          console.error('Failed to complete lab order with attachments', err);
+        }
+      });
   }
 }

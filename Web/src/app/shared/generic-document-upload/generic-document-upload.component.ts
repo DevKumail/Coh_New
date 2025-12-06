@@ -9,7 +9,7 @@ import { SharedService } from '@/app/shared/Services/Common/shared-service';
   styleUrls: ['./generic-document-upload.component.scss']
 })
 export class GenericDocumentUploadComponent {
-  selected: Array<{ id: number; name: string; size: number; ext: string; isExisting?: boolean; fileId?: number }> = [];
+  selected: Array<{ id: number; name: string; size: number; ext: string; isExisting?: boolean; fileId?: number; previewUrl?: string | null }> = [];
   private idCounter = 1;
   isLoading: boolean = false;
   private files: File[] = [];
@@ -20,11 +20,13 @@ export class GenericDocumentUploadComponent {
     const input = evt.target as HTMLInputElement;
     const files = input.files;
     if (!files || files.length === 0) return;
-    const toAdd: Array<{ id: number; name: string; size: number; ext: string; isExisting?: boolean; fileId?: number }> = [];
+    const toAdd: Array<{ id: number; name: string; size: number; ext: string; isExisting?: boolean; fileId?: number; previewUrl?: string | null }> = [];
     for (let i = 0; i < files.length; i++) {
       const f = files.item(i)!;
       if (!this.existsInList(f)) {
-        toAdd.push({ id: this.idCounter++, name: f.name, size: f.size, ext: this.getExt(f.name) });
+        const ext = this.getExt(f.name);
+        const previewUrl = this.isImageExt(ext) ? URL.createObjectURL(f) : null;
+        toAdd.push({ id: this.idCounter++, name: f.name, size: f.size, ext, previewUrl });
         this.files.push(f);
       }
     }
@@ -43,6 +45,9 @@ export class GenericDocumentUploadComponent {
     if (item.isExisting) {
       this.deleteExisting(id);
       return;
+    }
+    if (item.previewUrl) {
+      URL.revokeObjectURL(item.previewUrl);
     }
     this.selected = this.selected.filter(d => d.id !== id);
     this.files = this.files.filter(f => !(f.name === item.name && f.size === item.size));
@@ -63,21 +68,20 @@ export class GenericDocumentUploadComponent {
     return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(e);
   }
 
-  getPreview(meta: { name: string; size: number; ext: string }): string | null {
+  getPreview(meta: { name: string; size: number; ext: string; previewUrl?: string | null }): string | null {
     if (!this.isImageExt(meta?.ext)) return null;
-    const f = this.files.find(x => x.name === meta.name && x.size === meta.size);
-    return f ? URL.createObjectURL(f) : null;
+    return meta.previewUrl ?? null;
   }
 
   // Bind existing attachments (from server) by their file metadata
   setExisting(docs: Array<{ fileId: number; fileName: string; fileSize: number }>) {
     if (!Array.isArray(docs) || !docs.length) return;
-    const toAdd: Array<{ id: number; name: string; size: number; ext: string; isExisting?: boolean; fileId?: number }> = [];
+    const toAdd: Array<{ id: number; name: string; size: number; ext: string; isExisting?: boolean; fileId?: number; previewUrl?: string | null }> = [];
     for (const d of docs) {
       const name = d.fileName;
       const size = Number(d.fileSize) || 0;
       if (this.selected.some(s => s.name === name && s.size === size)) continue;
-      toAdd.push({ id: this.idCounter++, name, size, ext: this.getExt(name), isExisting: true, fileId: Number(d.fileId) });
+      toAdd.push({ id: this.idCounter++, name, size, ext: this.getExt(name), isExisting: true, fileId: Number(d.fileId), previewUrl: null });
       this.existingIds.push(Number(d.fileId));
     }
     if (toAdd.length) this.selected = [...this.selected, ...toAdd];

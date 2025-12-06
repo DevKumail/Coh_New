@@ -307,7 +307,8 @@ AND (
                 Action = payload.Action,
                 OldMrno = header.OldMrno,
                 SequenceNo = null,
-                PerformAtLabId = payload.PerformAtLabId
+                PerformAtLabId = payload.PerformAtLabId,
+                Note = payload.Note
             };
             _db.Add(main);
             await _db.SaveChangesAsync();
@@ -352,6 +353,19 @@ AND (
                 header.OrderStatus = resolved;
               //  header.UpdatedBy = payload.UserId.ToString();
                // header.UpdatedDate = FormatDate(DateTime.UtcNow);
+            }
+
+            if(payload.Attachments != null && payload.Attachments.Count > 0)
+            {
+                foreach (var att in payload.Attachments)
+                {
+                    var attachment = new LabResultsScannedImages
+                    {
+                        LabResultId = labResultId,
+                        FileId = att.FileId
+                    };
+                    _db.Add(attachment);
+                }
             }
             await _db.SaveChangesAsync();
             return labResultId;

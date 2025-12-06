@@ -202,6 +202,10 @@ export class IVFApiService {
     return this.api.post(`IVFLabOrders/${orderSetDetailId}/observations`, body);
   }
 
+  completeLabOrder(orderSetDetailId: number | string, body: any): Observable<any> {
+    return this.api.post(`IVFLabOrders/${orderSetDetailId}/observations`, body);
+  }
+
   getPathologyResults(mrno: string | number, search?: string): Observable<any> {
     const params: any = {};
     if (search && search.trim()) {

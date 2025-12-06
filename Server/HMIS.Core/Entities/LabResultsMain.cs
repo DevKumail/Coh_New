@@ -83,4 +83,9 @@ public partial class LabResultsMain
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    public string? Note { get; set; }
+
+    [InverseProperty("LabResult")]
+    public virtual ICollection<LabResultsScannedImages> LabResultsScannedImages { get; set; } = new List<LabResultsScannedImages>();
 }
