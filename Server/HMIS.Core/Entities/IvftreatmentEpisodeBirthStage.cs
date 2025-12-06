@@ -33,4 +33,7 @@ public partial class IvftreatmentEpisodeBirthStage
     [ForeignKey("IvfdashboardTreatmentCycleId")]
     [InverseProperty("IvftreatmentEpisodeBirthStage")]
     public virtual IvfdashboardTreatmentCycle IvfdashboardTreatmentCycle { get; set; } = null!;
+
+    [InverseProperty("Birth")]
+    public virtual ICollection<IvfepisodeBirth> IvfepisodeBirth { get; set; } = new List<IvfepisodeBirth>();
 }

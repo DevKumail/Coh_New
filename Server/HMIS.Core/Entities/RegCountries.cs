@@ -36,6 +36,9 @@ public partial class RegCountries
     [InverseProperty("Country")]
     public virtual ICollection<InsuredSubscriber> InsuredSubscriber { get; set; } = new List<InsuredSubscriber>();
 
+    [InverseProperty("Country")]
+    public virtual ICollection<IvfepisodeBirth> IvfepisodeBirth { get; set; } = new List<IvfepisodeBirth>();
+
     [InverseProperty("Nokcountry")]
     public virtual ICollection<RegPatientTemp> RegPatientTempNokcountry { get; set; } = new List<RegPatientTemp>();
 

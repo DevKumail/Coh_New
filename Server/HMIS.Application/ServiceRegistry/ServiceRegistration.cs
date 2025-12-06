@@ -9,6 +9,7 @@ using HMIS.Application.ServiceLogics.IVF.Episode.Overview;
 using HMIS.Application.ServiceLogics.IVF.Episodes.Aspiration;
 using HMIS.Application.ServiceLogics.IVF.Episodes.Overview;
 using HMIS.Application.ServiceLogics.IVF.Episodes.Transfer;
+using HMIS.Application.ServiceLogics.IVF.Episodes.Birth;
 using HMIS.Application.ServiceLogics.IVF.Episodes.Pregnancy;
 using HMIS.Application.ServiceLogics.IVF.Female;
 using HMIS.Application.ServiceLogics.IVF.Male;
@@ -57,6 +58,7 @@ namespace HMIS.Application
             services.AddScoped<IDashboardService, IVFDashboardService>();
             services.AddScoped<IIVFEpisodeAspirationService, IVFEpisodeAspirationService>();
             services.AddScoped<IIVFEpisodePregnancyService, IVFEpisodePregnancyService>();
+            services.AddScoped<IIVFEpisodeBirthService, IVFEpisodeBirthService>();
             services.AddScoped<ICryoManagementService, CryoManagementService>();
             services.AddScoped<IDropDownLookUpService, DropDownLookUpService>();
             services.AddScoped<IIVFLabService, IVFLabService>();
