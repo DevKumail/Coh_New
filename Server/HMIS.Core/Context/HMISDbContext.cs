@@ -290,7 +290,9 @@ public partial class HMISDbContext : DbContext
 
     public virtual DbSet<IvfpolarBodiesIndications> IvfpolarBodiesIndications { get; set; }
 
-    public virtual DbSet<IvfpregnancyComplicationBefore20th> IvfpregnancyComplicationBefore20th { get; set; }
+    public virtual DbSet<IvfpregnancyComplicationAfter20th> IvfpregnancyComplicationAfter20th { get; set; }
+
+    public virtual DbSet<IvfpregnancyComplicationUntil20th> IvfpregnancyComplicationUntil20th { get; set; }
 
     public virtual DbSet<IvfprescriptionMaster> IvfprescriptionMaster { get; set; }
 
@@ -1363,6 +1365,8 @@ public partial class HMISDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
+            entity.HasOne(d => d.FetalPathologyComplicationCategory).WithMany(p => p.IvfepisodePregnancy).HasConstraintName("FK_IVFEpisodePregnancy_DropdownConfiguration");
+
             entity.HasOne(d => d.Pregnancy).WithOne(p => p.IvfepisodePregnancy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFEpisodePregnancy_IVFTreatmentEpisodePregnancyStage");
@@ -1370,7 +1374,7 @@ public partial class HMISDbContext : DbContext
 
         modelBuilder.Entity<IvfepisodePregnancyEmbryo>(entity =>
         {
-            entity.Property(e => e.EmbyroId).ValueGeneratedNever();
+            entity.Property(e => e.EmbryoId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
 
@@ -1931,10 +1935,28 @@ public partial class HMISDbContext : DbContext
             entity.HasOne(d => d.PidpolarBodiesIndicationCategory).WithMany(p => p.IvfpolarBodiesIndications).HasConstraintName("FK_IVFPolarBodiesIndications_DropdownConfiguration");
         });
 
-        modelBuilder.Entity<IvfpregnancyComplicationBefore20th>(entity =>
+        modelBuilder.Entity<IvfpregnancyComplicationAfter20th>(entity =>
         {
+            entity.Property(e => e.ComplicationAfter20thId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.Pregnancy).WithMany(p => p.IvfpregnancyComplicationAfter20th)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFPregnancyComplicationAfter20th_IVFTreatmentEpisodePregnancyStage");
+        });
+
+        modelBuilder.Entity<IvfpregnancyComplicationUntil20th>(entity =>
+        {
+            entity.Property(e => e.ComplicationUntil20thId).ValueGeneratedNever();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.Pregnancy).WithMany(p => p.IvfpregnancyComplicationUntil20th)
+                .HasPrincipalKey(p => p.PregnancyId)
+                .HasForeignKey(d => d.PregnancyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IVFPregnancyComplicationUntil20th_IVFEpisodePregnancy");
         });
 
         modelBuilder.Entity<IvfprescriptionMaster>(entity =>

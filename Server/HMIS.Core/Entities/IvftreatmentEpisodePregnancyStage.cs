@@ -36,4 +36,7 @@ public partial class IvftreatmentEpisodePregnancyStage
 
     [InverseProperty("Pregnancy")]
     public virtual IvfepisodePregnancy? IvfepisodePregnancy { get; set; }
+
+    [InverseProperty("Pregnancy")]
+    public virtual ICollection<IvfpregnancyComplicationAfter20th> IvfpregnancyComplicationAfter20th { get; set; } = new List<IvfpregnancyComplicationAfter20th>();
 }
