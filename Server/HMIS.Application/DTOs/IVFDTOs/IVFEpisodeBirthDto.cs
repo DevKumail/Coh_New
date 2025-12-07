@@ -8,7 +8,8 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public long? BirthId { get; set; }
         public int? IVFDashboardTreatmentCycleId { get; set; }
         public int? StatusId { get; set; }
-
+        
+        public int? ChildrenCount {get;set;}
         public List<IVFEpisodeBirthChildDto>? Children { get; set; }
     }
 
