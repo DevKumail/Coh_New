@@ -14,7 +14,8 @@ public partial class IvfepisodeBirthChromosomeAnomaly
 
     public long BirthId { get; set; }
 
-    public long? ChromosomeAnomalyCategoryId { get; set; }
+    [StringLength(11)]
+    public string? ChromosomeAnomalyCategoryId { get; set; }
 
     public int? CreatedBy { get; set; }
 
@@ -34,5 +35,5 @@ public partial class IvfepisodeBirthChromosomeAnomaly
 
     [ForeignKey("ChromosomeAnomalyCategoryId")]
     [InverseProperty("IvfepisodeBirthChromosomeAnomaly")]
-    public virtual DropdownConfiguration? ChromosomeAnomalyCategory { get; set; }
+    public virtual BlmasterIcd9cm? ChromosomeAnomalyCategory { get; set; }
 }

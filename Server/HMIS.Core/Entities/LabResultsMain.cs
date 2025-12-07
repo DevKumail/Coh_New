@@ -32,14 +32,6 @@ public partial class LabResultsMain
     [StringLength(22)]
     public string? Cptcode { get; set; }
 
-    [StringLength(14)]
-    [Unicode(false)]
-    public string PerformDate { get; set; } = null!;
-
-    [StringLength(14)]
-    [Unicode(false)]
-    public string EntryDate { get; set; } = null!;
-
     public int? CreatedBy { get; set; }
 
     [StringLength(14)]
@@ -85,6 +77,12 @@ public partial class LabResultsMain
     public DateTime? UpdatedAt { get; set; }
 
     public string? Note { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? PerformDate { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? EntryDate { get; set; }
 
     [InverseProperty("LabResult")]
     public virtual ICollection<LabResultsScannedImages> LabResultsScannedImages { get; set; } = new List<LabResultsScannedImages>();

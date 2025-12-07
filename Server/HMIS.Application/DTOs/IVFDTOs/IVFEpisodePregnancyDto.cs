@@ -49,7 +49,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public long? EmbryoId { get; set; }
         public long? PregnancyId { get; set; }
 
-        public long? PGProgressUntil4thWeekCategoryId { get; set; }
+        public long? PGProgressUntil24thWeekCategoryId { get; set; }
         public string? Note { get; set; }
         public long? ImageId { get; set; }
     }

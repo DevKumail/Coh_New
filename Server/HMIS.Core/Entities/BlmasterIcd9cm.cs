@@ -68,6 +68,12 @@ public partial class BlmasterIcd9cm
     [InverseProperty("Icd9codeNavigation")]
     public virtual ICollection<BlsuperBillDiagnosis> BlsuperBillDiagnosis { get; set; } = new List<BlsuperBillDiagnosis>();
 
+    [InverseProperty("ChromosomeAnomalyCategory")]
+    public virtual ICollection<IvfepisodeBirthChromosomeAnomaly> IvfepisodeBirthChromosomeAnomaly { get; set; } = new List<IvfepisodeBirthChromosomeAnomaly>();
+
+    [InverseProperty("CongenitalMalformationCategory")]
+    public virtual ICollection<IvfepisodeBirthCongenitalMalformation> IvfepisodeBirthCongenitalMalformation { get; set; } = new List<IvfepisodeBirthCongenitalMalformation>();
+
     [InverseProperty("ImpairmentFactorNavigation")]
     public virtual ICollection<IvffemaleFhimpairmentFactor> IvffemaleFhimpairmentFactor { get; set; } = new List<IvffemaleFhimpairmentFactor>();
 

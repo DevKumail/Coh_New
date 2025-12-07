@@ -1369,7 +1369,7 @@ public partial class HMISDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFEpisodeBirthChromosomeAnomaly_IVFEpisodeBirth");
 
-            entity.HasOne(d => d.ChromosomeAnomalyCategory).WithMany(p => p.IvfepisodeBirthChromosomeAnomaly).HasConstraintName("FK_IVFEpisodeBirthChromosomeAnomaly_DropdownConfiguration");
+            entity.HasOne(d => d.ChromosomeAnomalyCategory).WithMany(p => p.IvfepisodeBirthChromosomeAnomaly).HasConstraintName("FK_IVFEpisodeBirthChromosomeAnomaly_BLMasterICD9CM");
         });
 
         modelBuilder.Entity<IvfepisodeBirthCongenitalMalformation>(entity =>
@@ -1381,7 +1381,7 @@ public partial class HMISDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IVFEpisodeBirthCongenitalMalformation_IVFEpisodeBirthCongenitalMalformation");
 
-            entity.HasOne(d => d.CongenitalMalformationCategory).WithMany(p => p.IvfepisodeBirthCongenitalMalformation).HasConstraintName("FK_IVFEpisodeBirthCongenitalMalformation_DropdownConfiguration");
+            entity.HasOne(d => d.CongenitalMalformationCategory).WithMany(p => p.IvfepisodeBirthCongenitalMalformation).HasConstraintName("FK_IVFEpisodeBirthCongenitalMalformation_BLMasterICD9CM");
         });
 
         modelBuilder.Entity<IvfepisodeOverviewEvents>(entity =>
