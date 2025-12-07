@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { QuillModule, QuillEditorComponent } from 'ngx-quill';
 
@@ -15,13 +15,10 @@ import { QuillModule, QuillEditorComponent } from 'ngx-quill';
   templateUrl: './progress.component.html',
   styleUrl: './progress.component.scss'
 })
-export class ProgressComponent {
-  embryosData = [
-    { key: 1, label: 'HB Embryo 1' },
-    { key: 2, label: 'HB Embryo 2' },
-    { key: 3, label: 'HB Embryo 3' },
-    { key: 4, label: 'HB Embryo 4' },
-  ];
+export class ProgressComponent implements OnInit {
+  embryosData: Array<{ key: number; label: string }> = [];
+  embryoCountOptions = [1, 2, 3, 4];
+  selectedEmbryoCount = 0;
   quillModules = {
     toolbar: [
       [{ font: [] }],
@@ -50,17 +47,11 @@ export class ProgressComponent {
       // editor
       editorContent: [''],
 
-      // embryos array
-      embryos: this.fb.array(
-        this.embryosData.map((_, i) =>
-          this.fb.group({
-            checked: [i === 0],
-            progress1: ['Ongoing'],
-            progress2: ['Ongoing'],
-            note: [''],
-          })
-        )
-      ),
+      // embryo count dropdown
+      embryoCount: [0],
+
+      // embryos array (initially empty)
+      embryos: this.fb.array([]),
 
       // complications until 20th week
       compUntil20: this.fb.group({
@@ -84,6 +75,39 @@ export class ProgressComponent {
 
       fetalPathology: ['—'],
     });
+  }
+
+  ngOnInit() {
+    // Listen to embryo count changes
+    this.form.get('embryoCount')?.valueChanges.subscribe((count: number) => {
+      this.selectedEmbryoCount = count;
+      this.updateEmbryosArray(count);
+    });
+  }
+
+  updateEmbryosArray(count: number) {
+    const embryosArray = this.embryosFA;
+    
+    // Clear existing array
+    while (embryosArray.length > 0) {
+      embryosArray.removeAt(0);
+    }
+    
+    // Generate new embryos data
+    this.embryosData = [];
+    for (let i = 1; i <= count; i++) {
+      this.embryosData.push({ key: i, label: `HB Embryo ${i}` });
+      
+      // Add form group for each embryo
+      embryosArray.push(
+        this.fb.group({
+          checked: [true],
+          progress1: ['Ongoing'],
+          progress2: ['Ongoing'],
+          note: [''],
+        })
+      );
+    }
   }
 
   get embryosFA(): FormArray<FormGroup> {

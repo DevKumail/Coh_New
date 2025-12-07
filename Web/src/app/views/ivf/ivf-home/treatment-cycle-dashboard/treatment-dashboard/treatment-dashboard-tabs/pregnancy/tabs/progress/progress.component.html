@@ -12,11 +12,10 @@
             <input type="date" class="form-control form-control-sm" disabled />
         </div>
         <div class="col-md-3">
-            <label class="form-label mb-0">Amniotic cavities</label>
-            <select class="form-select form-select-sm">
-                <option>No. intrauterine</option>
-                <option>1</option>
-                <option>2</option>
+            <label class="form-label mb-0">Amniotic cavities: No. intrauterine</label>
+            <select class="form-select form-select-sm" formControlName="embryoCount">
+                <option [value]="0">Select</option>
+                <option *ngFor="let count of embryoCountOptions" [value]="count">{{ count }}</option>
             </select>
         </div>
         <div class="col-md-3">
@@ -34,13 +33,6 @@
     <div class="row g-2">
         <div class="col-md-9">
             <div formArrayName="embryos">
-                <div class="d-flex align-items-center flex-wrap gap-3">
-                    <div class="form-check" *ngFor="let d of embryosData; let i = index" [formGroupName]="i">
-                        <input class="form-check-input" type="checkbox" [id]="'hb'+d.key" formControlName="checked">
-                        <label class="form-check-label" [for]="'hb'+d.key">{{ d.label }}</label>
-                    </div>
-                </div>
-
                 <div class="row g-2 mt-2">
                     <ng-container *ngFor="let d of embryosData; let i = index">
                         <div class="col-12 col-sm-6 col-lg-3" [hidden]="!embryosFA.at(i).get('checked')?.value">
