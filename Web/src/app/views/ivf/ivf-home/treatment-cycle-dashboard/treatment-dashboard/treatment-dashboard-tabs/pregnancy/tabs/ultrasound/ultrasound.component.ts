@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,6 +9,8 @@ import { CommonModule } from '@angular/common';
   styleUrl: './ultrasound.component.scss'
 })
 export class UltrasoundComponent {
+  @Input() dropdowns: any = {};
+  
   carouselId = 'ultrasoundCarousel';
   images: { src: string; alt: string; name: string }[] = [
     { src: 'assets/images/placeholder-image.png', alt: 'Ultrasound 1', name: 'US_2025_001.png' },

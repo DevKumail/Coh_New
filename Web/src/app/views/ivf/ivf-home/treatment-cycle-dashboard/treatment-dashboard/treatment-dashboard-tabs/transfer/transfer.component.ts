@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { IVFApiService } from '@/app/shared/Services/IVF/ivf.api.service';
@@ -17,12 +17,9 @@ import { finalize } from 'rxjs/operators';
   templateUrl: './transfer.component.html',
   styleUrl: './transfer.component.scss'
 })
-export class TransferComponent implements OnInit {
+export class TransferComponent implements OnInit, AfterViewInit {
   form: FormGroup;
-  embryosList: EmbryoTransferComponent['embryos'] = [
-    { number: 1, id: 12673, title: 'Hatching blastocyst', morpho: 'ideal' as 'ideal', score: '5AA', image1: null, image2: null },
-    { number: 2, id: 12675, title: 'Hatching blastocyst', morpho: null, score: null, image1: null, image2: null }
-  ];
+  embryosList: EmbryoTransferComponent['embryos'] = [];
 
   @ViewChild(EmbryoTransferComponent) embryoCmp?: EmbryoTransferComponent;
   @ViewChild(FurtherInformationComponent) furtherCmp?: FurtherInformationComponent;
@@ -43,16 +40,6 @@ export class TransferComponent implements OnInit {
       electiveSingleEmbryoTransfer: [false],
       embryologistId: [0],
     });
-
-        this.route.queryParamMap.subscribe((qp) => {
-      const idStr = qp.get('cycleId');
-      const id = Number(idStr);
-      this.cycleId = Number.isFinite(id) && id > 0 ? id : 0;
-      if (this.cycleId > 0) {
-        this.loadEpisodeTransfer(this.cycleId);
-      }
-    });
-
   }
   cycleId: any;
   AllDropdownValues: any = [];
@@ -65,11 +52,42 @@ export class TransferComponent implements OnInit {
   currentEmbryosIds: Array<{ index: number; embryoInTransferId: number; transferId: number }> = [];
   isLoading = false;
   isSaving = false;
+  // Store further information data temporarily until component is ready
+  private pendingFurtherInfo: any = null;
   get actionLabel() { return this.currentTransferId ? 'Update' : 'Save'; }
 
   ngOnInit() {
     this.getAlldropdown();
     this.FillCache();
+    
+    // Load data after initialization
+    this.route.queryParamMap.subscribe((qp) => {
+      const idStr = qp.get('cycleId');
+      const id = Number(idStr);
+      this.cycleId = Number.isFinite(id) && id > 0 ? id : 0;
+      if (this.cycleId > 0) {
+        this.loadEpisodeTransfer(this.cycleId);
+      }
+    });
+  }
+  
+  ngAfterViewInit() {
+    // If we have pending further info data, apply it now that the component is ready
+    // Use setTimeout to ensure the child component's form is fully initialized
+    setTimeout(() => {
+      if (this.pendingFurtherInfo && this.furtherCmp?.form) {
+        console.log('Binding further info in ngAfterViewInit:', this.pendingFurtherInfo);
+        // Enable disabled fields before patching
+        this.furtherCmp.form.get('cultureDuration')?.enable();
+        this.furtherCmp.form.get('attempts')?.enable();
+        this.furtherCmp.form.patchValue(this.pendingFurtherInfo);
+        // Disable attempts if severalAttempts is false
+        if (!this.pendingFurtherInfo.severalAttempts) {
+          this.furtherCmp.form.get('attempts')?.disable();
+        }
+        this.pendingFurtherInfo = null;
+      }
+    }, 200);
   }
 
   private loadEpisodeTransfer(cycleId: number) {
@@ -112,27 +130,47 @@ export class TransferComponent implements OnInit {
 
       // further information
       const fi = data.furtherInformation || {};
-      if (this.furtherCmp?.form) {
-        this.furtherCmp.form.patchValue({
-          cultureDuration: fi.cultureDays ?? 0,
-          catheterUsed: fi.catheterCategoryId ?? '',
-          catheterAddition: fi.catheterAddition ?? '',
-          mainComplication: fi.mainCompilationCategoryId ?? '',
-          furtherComplications: fi.furtherComplicationCategoryId ?? '',
-          severalAttempts: !!fi.severalAttempts,
-          attempts: fi.noOfAttempts ?? 0,
-          embryoGlue: !!fi.embryoGlue,
-          difficultCatheter: !!fi.difficultCatheterInsertion,
-          catheterChange: !!fi.catheterChange,
-          mucusInCatheter: !!fi.mucusInCatheter,
-          bloodInCatheter: !!fi.bloodInCatheter,
-          dilation: !!fi.dilation,
-          ultrasoundCheck: !!fi.ultrasoundCheck,
-          vulsellum: !!fi.vulsellum,
-          probe: !!fi.probe,
-          editorContent: fi.note ?? '',
-        });
-      }
+      const furtherInfoData = {
+        cultureDuration: fi.cultureDays ?? 0,
+        catheterUsed: fi.catheterCategoryId ? fi.catheterCategoryId : '',
+        catheterAddition: fi.catheterAddition ?? '',
+        mainComplication: fi.mainCompilationCategoryId ? fi.mainCompilationCategoryId : '',
+        furtherComplications: fi.furtherComplicationCategoryId ? fi.furtherComplicationCategoryId : '',
+        severalAttempts: fi.severalAttempts === true,
+        attempts: fi.noOfAttempts ?? 0,
+        embryoGlue: fi.embryoGlue === true,
+        difficultCatheter: fi.difficultCatheterInsertion === true,
+        catheterChange: fi.catheterChange === true,
+        mucusInCatheter: fi.mucusInCatheter === true,
+        bloodInCatheter: fi.bloodInCatheter === true,
+        dilation: fi.dilation === true,
+        ultrasoundCheck: fi.ultrasoundCheck === true,
+        vulsellum: fi.vulsellum === true,
+        probe: fi.probe === true,
+        editorContent: fi.note ?? '',
+      };
+      
+      // Store for later binding in ngAfterViewInit
+      this.pendingFurtherInfo = furtherInfoData;
+      
+      // Try to bind immediately if component is ready
+      console.log('Further info data to bind:', furtherInfoData);
+      setTimeout(() => {
+        if (this.furtherCmp?.form) {
+          console.log('Binding further info immediately');
+          // Enable disabled fields before patching
+          this.furtherCmp.form.get('cultureDuration')?.enable();
+          this.furtherCmp.form.get('attempts')?.enable();
+          this.furtherCmp.form.patchValue(furtherInfoData);
+          // Disable attempts if severalAttempts is false
+          if (!furtherInfoData.severalAttempts) {
+            this.furtherCmp.form.get('attempts')?.disable();
+          }
+          this.pendingFurtherInfo = null;
+        } else {
+          console.log('Further component not ready, will bind in ngAfterViewInit');
+        }
+      }, 100);
     });
   }
 

@@ -4,24 +4,26 @@
         <div class="col-md-3">
             <label class="form-label mb-0">Clinical pregnancy determined on</label>
             <div class="d-flex gap-2">
-                <input type="date" class="form-control form-control-sm" />
+                <input type="date" class="form-control form-control-sm" formControlName="clinicalPregnancyDate" />
             </div>
         </div>
         <div class="col-md-3">
             <label class="form-label mb-0">Calculated birth date (CBD)</label>
-            <input type="date" class="form-control form-control-sm" disabled />
+            <input type="date" class="form-control form-control-sm" formControlName="cbd" readonly />
         </div>
         <div class="col-md-3">
-            <label class="form-label mb-0">Amniotic cavities</label>
-            <select class="form-select form-select-sm">
-                <option>No. intrauterine</option>
-                <option>1</option>
-                <option>2</option>
+            <label class="form-label mb-0">Amniotic cavities: No. intrauterine</label>
+            <select class="form-select form-select-sm" formControlName="embryoCount">
+                <option [value]="null">Select</option>
+                <option *ngFor="let opt of options('IntrauterineCount')" [value]="opt.valueId">{{ opt.name }}</option>
             </select>
         </div>
         <div class="col-md-3">
             <label class="form-label mb-0">No. extrauterine</label>
-            <input type="number" class="form-control form-control-sm" min="0" />
+            <select class="form-select form-select-sm" formControlName="amnioticExtrauterine">
+                <option [value]="null">Select</option>
+                <option *ngFor="let opt of options('ExtrauterineCount')" [value]="opt.valueId">{{ opt.name }}</option>
+            </select>
         </div>
         <div class="col-12">
             <div class="small text-muted text-center">No. of pregnancy weeks and days until today: <strong>[24+1]</strong></div>
@@ -32,149 +34,146 @@
 
     <!-- HB embryos bar + note -->
     <div class="row g-2">
-        <div class="col-md-9">
-            <div formArrayName="embryos">
-                <div class="d-flex align-items-center flex-wrap gap-3">
-                    <div class="form-check" *ngFor="let d of embryosData; let i = index" [formGroupName]="i">
-                        <input class="form-check-input" type="checkbox" [id]="'hb'+d.key" formControlName="checked">
-                        <label class="form-check-label" [for]="'hb'+d.key">{{ d.label }}</label>
-                    </div>
-                </div>
-
-                <div class="row g-2 mt-2">
-                    <ng-container *ngFor="let d of embryosData; let i = index">
-                        <div class="col-12 col-sm-6 col-lg-3" [hidden]="!embryosFA.at(i).get('checked')?.value">
-                            <div class="card embryo-card shadow-sm" [formGroupName]="i">
-                                <div class="embryo-card__header d-flex align-items-center gap-2 p-1">
-                                    <input class="form-check-input m-0" type="checkbox" formControlName="checked" />
-                                    <strong>Embryo {{ d.key }}</strong>
+        <!-- Embryos section wrapper - dynamic width -->
+        <div [ngClass]="{
+            'd-none': embryosData.length === 0,
+            'col-lg-3': embryosData.length === 1,
+            'col-lg-6': embryosData.length === 2,
+            'col-lg-9': embryosData.length === 3 || embryosData.length === 4
+        }">
+            <div class="row g-2" formArrayName="embryos">
+                <ng-container *ngFor="let d of embryosData; let i = index">
+                    <div [ngClass]="{
+                        'col-12': embryosData.length === 1,
+                        'col-6': embryosData.length === 2,
+                        'col-4': embryosData.length === 3,
+                        'col-3': embryosData.length === 4
+                    }" [hidden]="!embryosFA.at(i).get('checked')?.value">
+                        <div class="card embryo-card shadow-sm" [formGroupName]="i">
+                            <div class="embryo-card__header d-flex align-items-center gap-2 p-1">
+                                <input class="form-check-input m-0" type="checkbox" formControlName="checked" />
+                                <strong>Embryo {{ d.key }}</strong>
+                            </div>
+                            <div class="embryo-card__body">
+                                <div class="row g-1 align-items-end p-1">
+                                    <div class="col-12">
+                                        <label class="form-label form-label-sm mb-0">PG progress until 24th week</label>
+                                        <select class="form-select form-select-sm" formControlName="progress1">
+                                            <option [value]="null">Select...</option>
+                                            <option *ngFor="let p of progressOptions" [value]="p.valueId">{{ p.name }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label form-label-sm mb-0">Note</label>
+                                        <input type="text" class="form-control form-control-sm" formControlName="note" />
+                                    </div>
                                 </div>
-                                <div class="embryo-card__body">
-                                    <div class="row g-1 align-items-end p-1">
-                                        <div class="col-12">
-                                            <label class="form-label form-label-sm mb-0">PG progress until 24th
-                                                week</label>
-                                            <select class="form-select form-select-sm" formControlName="progress1">
-                                                <option *ngFor="let p of progressOptions" [ngValue]="p">{{ p }}</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-12">
-                                            <label class="form-label form-label-sm mb-0">Note</label>
-                                            <input type="text" class="form-control form-control-sm"
-                                                formControlName="note" />
-                                        </div>
-                                    </div>
-                                    <div class="mt-2">
-                                        <img [src]="embryoImageSrc" alt="embryo"
-                                            class="rounded border bg-light embryo-card__image" />
-                                    </div>
+                                <div class="mt-2">
+                                    <img [src]="embryoImageSrc" alt="embryo"
+                                        class="rounded border bg-light embryo-card__image" />
                                 </div>
                             </div>
                         </div>
-                    </ng-container>
-                </div>
+                    </div>
+                </ng-container>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <!-- <div class="card px-3 py-2"> -->
-                <!-- <label class="fw-bold mb-2">Note</label> -->
-                <quill-editor formControlName="editorContent" [modules]="quillModules" format="html"
-                    placeholder="Enter notes..." [styles]="{height: '208px'}">
-                </quill-editor>
-            <!-- </div> -->
+        <!-- Notes editor - dynamic width based on embryo count -->
+        <div [ngClass]="{
+            'col-12': embryosData.length === 0,
+            'col-lg-9': embryosData.length === 1,
+            'col-lg-6': embryosData.length === 2,
+            'col-lg-3': embryosData.length === 3 || embryosData.length === 4
+        }">
+            <quill-editor formControlName="editorContent" [modules]="quillModules" format="html"
+                placeholder="Enter notes..." [styles]="{height: '308px'}">
+            </quill-editor>
         </div>
     </div>
-
-    <!-- <hr /> -->
 
     <!-- Complications -->
     <div class="card complications-card">
         <div class="card-header py-2 bg-light"><strong>Complications</strong></div>
         <div class="card-body">
             <div class="row g-2 complications-row h-100">
-                <div class="col-lg-6 h-100">
-                    <label class="form-label mb-1">Complications until 20th week (max. 4)</label>
-                    <div class="border rounded p-2 comp-box h-100">
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="cNone">
-                                    <label class="form-check-label" for="cNone">None</label>
+                <div class="col-lg-4 h-100">
+                    <label class="form-label mb-1 fw-bold">Complications until 20th week</label>
+                    <div class="dropdown w-100">
+                        <button class="form-control form-control-sm text-start d-flex justify-content-between align-items-center"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="background-color: white; cursor: pointer;">
+                            <span class="text-truncate">
+                                <span *ngIf="selectedComplications.length === 0" class="text-muted">Select complications...</span>
+                                <span *ngIf="selectedComplications.length > 0">{{ selectedComplicationsDisplay }}</span>
+                            </span>
+                            <i class="bi bi-chevron-down ms-2"></i>
+                        </button>
+                        <ul class="dropdown-menu w-100" data-bs-auto-close="outside">
+                            <li class="px-2 py-1 sticky-top bg-white" style="z-index: 10;">
+                                <input type="text" class="form-control form-control-sm" placeholder="Search..."
+                                    [ngModel]="searchComplication" (ngModelChange)="searchComplication = $event"
+                                    [ngModelOptions]="{standalone: true}">
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider m-0">
+                            </li>
+                            <li>
+                                <div style="max-height: 260px; overflow: auto;">
+                                    <div *ngFor="let opt of filteredComplicationsOptions" class="px-2 py-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" [checked]="isComplicationSelected(opt.valueId)"
+                                                (click)="$event.stopPropagation()" (change)="toggleComplication(opt.valueId)">
+                                            <label class="form-check-label"
+                                                (click)="$event.preventDefault(); $event.stopPropagation(); toggleComplication(opt.valueId)">{{ opt.name }}</label>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="cBleeding">
-                                    <label class="form-check-label" for="cBleeding">Bleeding</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="cFluid">
-                                    <label class="form-check-label" for="cFluid">Passing of amniotic fluid</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="cInfection">
-                                    <label class="form-check-label" for="cInfection">Vaginal infection</label>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="cAmnionInf">
-                                    <label class="form-check-label" for="cAmnionInf">Amnion-infection-syndrome</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="cFever">
-                                    <label class="form-check-label" for="cFever">Fever</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="cOther1">
-                                    <label class="form-check-label" for="cOther1">Other</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="cUnknown">
-                                    <label class="form-check-label" for="cUnknown">Unknown</label>
-                                </div>
-                            </div>
-                        </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <div class="col-lg-6 h-100">
-                    <label class="form-label mb-1">Complications after 20th week (by relevance)</label>
-                    <div class="border rounded p-2 comp-box h-100">
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <div class="mb-2">
-                                    <label class="form-label form-label-sm mb-1">Complication 1</label>
-                                    <select class="form-select form-select-sm">
-                                        <option>Complication 1</option>
-                                    </select>
+                <div class="col-lg-4 h-100">
+                    <label class="form-label mb-1 fw-bold">Complications after 20th week (by relevance)</label>
+                    <div class="dropdown w-100">
+                        <button class="form-control form-control-sm text-start d-flex justify-content-between align-items-center"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="background-color: white; cursor: pointer;">
+                            <span class="text-truncate">
+                                <span *ngIf="selectedComplicationsAfter20.length === 0" class="text-muted">Select complications...</span>
+                                <span *ngIf="selectedComplicationsAfter20.length > 0">{{ selectedComplicationsAfter20Display }}</span>
+                            </span>
+                            <i class="bi bi-chevron-down ms-2"></i>
+                        </button>
+                        <ul class="dropdown-menu w-100" data-bs-auto-close="outside">
+                            <li class="px-2 py-1 sticky-top bg-white" style="z-index: 10;">
+                                <input type="text" class="form-control form-control-sm" placeholder="Search..."
+                                    [ngModel]="searchComplicationAfter20" (ngModelChange)="searchComplicationAfter20 = $event"
+                                    [ngModelOptions]="{standalone: true}">
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider m-0">
+                            </li>
+                            <li>
+                                <div style="max-height: 260px; overflow: auto;">
+                                    <div *ngFor="let opt of filteredComplicationsAfter20Options" class="px-2 py-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" [checked]="isComplicationAfter20Selected(opt.valueId)"
+                                                (click)="$event.stopPropagation()" (change)="toggleComplicationAfter20(opt.valueId)">
+                                            <label class="form-check-label"
+                                                (click)="$event.preventDefault(); $event.stopPropagation(); toggleComplicationAfter20(opt.valueId)">{{ opt.name }}</label>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="form-label form-label-sm mb-1">Complication 2</label>
-                                    <select class="form-select form-select-sm">
-                                        <option>Complication 2</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="mb-2">
-                                    <label class="form-label form-label-sm mb-1">Complication 3</label>
-                                    <select class="form-select form-select-sm">
-                                        <option>Complication 3</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="form-label form-label-sm mb-1">Complication 4</label>
-                                    <select class="form-select form-select-sm">
-                                        <option>Complication 4</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <div class="col-12">
-                    <label class="form-label mb-0">Fetal pathology and complications</label>
-                    <select class="form-select form-select-sm">
-                        <option>—</option>
+                <div class="col-4">
+                    <label class="form-label mb-1">Fetal pathology and complications</label>
+                    <select class="form-select form-select-sm" formControlName="fetalPathology">
+                        <option [value]="null">Select...</option>
+                        <option *ngFor="let opt of options('FetalPathologyComplication')" [value]="opt.valueId">{{ opt.name }}</option>
                     </select>
                 </div>
             </div>
