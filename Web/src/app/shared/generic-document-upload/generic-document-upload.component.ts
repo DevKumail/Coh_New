@@ -12,6 +12,8 @@ export class GenericDocumentUploadComponent {
   selected: Array<{ id: number; name: string; size: number; ext: string; isExisting?: boolean; fileId?: number; previewUrl?: string | null }> = [];
   private idCounter = 1;
   isLoading: boolean = false;
+  // For image preview modal
+  imagePreviewUrl: string | null = null;
   private files: File[] = [];
   private existingIds: number[] = [];
   constructor(private shared: SharedService) {}
@@ -73,18 +75,43 @@ export class GenericDocumentUploadComponent {
     return meta.previewUrl ?? null;
   }
 
+  // Open image in a simple viewer (used by template when clicking image thumbnails)
+  openImagePreview(meta: { name: string; size: number; ext: string; previewUrl?: string | null }) {
+    const url = this.getPreview(meta);
+    if (!url) return;
+    this.imagePreviewUrl = url;
+  }
+
+  closeImagePreview() {
+    this.imagePreviewUrl = null;
+  }
+
   // Bind existing attachments (from server) by their file metadata
-  setExisting(docs: Array<{ fileId: number; fileName: string; fileSize: number }>) {
+  setExisting(docs: Array<{ fileId: number; fileName: string; fileSize: number; previewUrl?: string | null }>) {
     if (!Array.isArray(docs) || !docs.length) return;
-    const toAdd: Array<{ id: number; name: string; size: number; ext: string; isExisting?: boolean; fileId?: number; previewUrl?: string | null }> = [];
     for (const d of docs) {
       const name = d.fileName;
       const size = Number(d.fileSize) || 0;
       if (this.selected.some(s => s.name === name && s.size === size)) continue;
-      toAdd.push({ id: this.idCounter++, name, size, ext: this.getExt(name), isExisting: true, fileId: Number(d.fileId), previewUrl: null });
-      this.existingIds.push(Number(d.fileId));
+      const fileId = Number(d.fileId);
+      const ext = this.getExt(name);
+      const base: { id: number; name: string; size: number; ext: string; isExisting?: boolean; fileId?: number; previewUrl?: string | null } = {
+        id: this.idCounter++,
+        name,
+        size,
+        ext,
+        isExisting: true,
+        fileId,
+        // If caller provided a previewUrl (e.g. data:image/*;base64,...) for images, use it.
+        // Otherwise, for images, fall back to direct download URL as preview.
+        previewUrl: this.isImageExt(ext) && Number.isFinite(fileId) && fileId > 0
+          ? (d.previewUrl ?? `/api/RsUpload/download/?fileId=${fileId}`)
+          : null
+      };
+
+      this.selected = [...this.selected, base];
+      this.existingIds.push(fileId);
     }
-    if (toAdd.length) this.selected = [...this.selected, ...toAdd];
   }
 
   getExistingIds(): number[] { return Array.from(new Set(this.existingIds)); }
@@ -97,6 +124,9 @@ export class GenericDocumentUploadComponent {
     this.shared.deleteDocument(item.fileId).subscribe({
       next: () => {
         this.isLoading = false;
+        if (item.previewUrl) {
+          try { URL.revokeObjectURL(item.previewUrl); } catch {}
+        }
         this.selected = this.selected.filter(d => d.id !== rowId);
         this.existingIds = this.existingIds.filter(x => x !== item.fileId);
       },

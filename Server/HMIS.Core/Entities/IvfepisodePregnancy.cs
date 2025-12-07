@@ -31,6 +31,10 @@ public partial class IvfepisodePregnancy
 
     public string? Notes { get; set; }
 
+    public long? FetalPathologyComplicationCategoryId { get; set; }
+
+    public long? UltrasoundId { get; set; }
+
     public int? CreatedBy { get; set; }
 
     public DateTime? CreatedAt { get; set; }
@@ -43,8 +47,15 @@ public partial class IvfepisodePregnancy
 
     public bool IsDeleted { get; set; }
 
+    [ForeignKey("FetalPathologyComplicationCategoryId")]
+    [InverseProperty("IvfepisodePregnancy")]
+    public virtual DropdownConfiguration? FetalPathologyComplicationCategory { get; set; }
+
     [InverseProperty("Pregnancy")]
     public virtual ICollection<IvfepisodePregnancyEmbryo> IvfepisodePregnancyEmbryo { get; set; } = new List<IvfepisodePregnancyEmbryo>();
+
+    [InverseProperty("Pregnancy")]
+    public virtual ICollection<IvfpregnancyComplicationUntil20th> IvfpregnancyComplicationUntil20th { get; set; } = new List<IvfpregnancyComplicationUntil20th>();
 
     [ForeignKey("PregnancyId")]
     [InverseProperty("IvfepisodePregnancy")]

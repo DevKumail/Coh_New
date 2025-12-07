@@ -6,20 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMIS.Core.Entities;
 
-[Table("IVFEpisodePregnancyEmbryo")]
-public partial class IvfepisodePregnancyEmbryo
+[Table("IVFPregnancyComplicationAfter20th")]
+public partial class IvfpregnancyComplicationAfter20th
 {
     [Key]
-    public long EmbryoId { get; set; }
+    public long ComplicationAfter20thId { get; set; }
 
     public long PregnancyId { get; set; }
 
-    [Column("PGProgressUntil24thWeekCategoryId")]
-    public long? PgprogressUntil24thWeekCategoryId { get; set; }
-
-    public string? Note { get; set; }
-
-    public long? ImageId { get; set; }
+    public long? ComplicationAfter20thWeekCategoryId { get; set; }
 
     public int? CreatedBy { get; set; }
 
@@ -34,6 +29,6 @@ public partial class IvfepisodePregnancyEmbryo
     public bool IsDeleted { get; set; }
 
     [ForeignKey("PregnancyId")]
-    [InverseProperty("IvfepisodePregnancyEmbryo")]
-    public virtual IvfepisodePregnancy Pregnancy { get; set; } = null!;
+    [InverseProperty("IvfpregnancyComplicationAfter20th")]
+    public virtual IvftreatmentEpisodePregnancyStage Pregnancy { get; set; } = null!;
 }

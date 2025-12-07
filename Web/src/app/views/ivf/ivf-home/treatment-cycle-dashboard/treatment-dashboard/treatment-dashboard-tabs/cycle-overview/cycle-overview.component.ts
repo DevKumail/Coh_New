@@ -386,6 +386,7 @@ export class CycleOverviewComponent {
               reportId: (u as any)?.ivfLabOrderSetId,
               orderSetId: (u as any)?.orderSetId,
               orderSetDetailId: (u as any)?.orderSetDetailId,
+              labResultId: (u as any)?.labResultId ?? (u as any)?.labTestId,
               createdDate: rawCreated
             }
           } as any);
@@ -681,6 +682,43 @@ export class CycleOverviewComponent {
       return;
     }
 
+    const labResultId = Number(props?.labResultId ?? props?.labTestId ?? 0);
+
+    // If we have a labResultId, let IvfOrderCompletionComponent load
+    // everything via getCollectionDetailsWithResults(labResultId)
+    if (Number.isFinite(labResultId) && labResultId > 0) {
+      const order: any = {
+        orderSetId: orderSetId,
+        orderNumber: props?.orderNumber || orderSetId,
+      };
+
+      const modalRef = this.modalService.open(IvfOrderCompletionComponent, {
+        size: 'lg',
+        backdrop: 'static',
+        keyboard: false,
+        centered: true
+      });
+
+      const cmp: any = modalRef.componentInstance;
+      cmp.order = order;
+      cmp.orderSetId = orderSetId;
+      cmp.labResultId = labResultId;
+
+      if (cmp.cancel && cmp.cancel.subscribe) {
+        cmp.cancel.subscribe(() => {
+          try { modalRef.close(); } catch { }
+        });
+      }
+      if (cmp.completed && cmp.completed.subscribe) {
+        cmp.completed.subscribe(() => {
+          try { modalRef.close(); } catch { }
+        });
+      }
+
+      return;
+    }
+
+    // Fallback: no labResultId, so load tests via collection-details
     this.api.getOrderCollectionDetails(orderSetId).subscribe({
       next: (res: any) => {
         const details = Array.isArray(res) ? res : (Array.isArray(res?.details) ? res.details : []);
@@ -709,6 +747,7 @@ export class CycleOverviewComponent {
         cmp.order = order;
         cmp.orderSetId = orderSetId;
         cmp.tests = tests; // pass mapped tests so UI can bind immediately
+        cmp.labResultId = null;
 
         if (cmp.cancel && cmp.cancel.subscribe) {
           cmp.cancel.subscribe(() => {

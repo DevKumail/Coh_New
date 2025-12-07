@@ -25,6 +25,10 @@ public partial class LabResultsScannedImages
     [Column(TypeName = "datetime")]
     public DateTime? UpdatedAt { get; set; }
 
+    public int? DeletedBy { get; set; }
+
+    public bool IsDeleted { get; set; }
+
     [ForeignKey("FileId")]
     [InverseProperty("LabResultsScannedImages")]
     public virtual HmisFiles? File { get; set; }

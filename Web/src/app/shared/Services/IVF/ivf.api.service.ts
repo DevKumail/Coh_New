@@ -206,6 +206,11 @@ export class IVFApiService {
     return this.api.post(`IVFLabOrders/${orderSetDetailId}/observations`, body);
   }
 
+  // Get collection details together with previously completed header/attachments by lab result id
+  getCollectionDetailsWithResults(labResultId: number | string): Observable<any> {
+    return this.api.get('IVFLabOrders', { LabResultId: labResultId });
+  }
+
   getPathologyResults(mrno: string | number, search?: string): Observable<any> {
     const params: any = {};
     if (search && search.trim()) {

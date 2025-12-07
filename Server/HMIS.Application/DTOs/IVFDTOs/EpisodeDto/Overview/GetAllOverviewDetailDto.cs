@@ -81,5 +81,7 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public long IVFLabOrderSetId { get; set; }
         public long OrderSetId { get; set; }
         public string CreatedDate { get; set; }
+        public long LabResultId { get; set; }
+
     }
 }
