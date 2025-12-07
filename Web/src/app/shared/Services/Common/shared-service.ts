@@ -39,14 +39,18 @@ export class SharedService {
     return this.api.delete(`RsUpload/delete/${id}`);
   }
 
-  downloadDocument(id: number): Observable<Blob> {
-    // GET https://localhost:44320/api/RsUpload/download/{id}
-    return this.api.get(`RsUpload/download/?fileId=${id}`, 
-      { responseType: 'blob' as any });
-  }
-
   getDocumentInfo(id: number): Observable<any> {
     // GET https://localhost:44320/api/RsUpload/info/{id}
     return this.api.get(`RsUpload/info/${id}`);
+  }
+
+  // Get multiple attachment files by their ids
+  getAttachmentFiles(fileIds: number[]): Observable<any> {
+    // Backend: [HttpGet("GetAttachmentFiles")] on RsUpload controller
+    // GET https://localhost:44320/api/RsUpload/GetAttachmentFiles?fileIds=1&fileIds=2
+    if (!Array.isArray(fileIds) || !fileIds.length) {
+      return this.api.get('RsUpload/GetAttachmentFiles', { fileIds: [] });
+    }
+    return this.api.get('RsUpload/GetAttachmentFiles', { fileIds });
   }
 }

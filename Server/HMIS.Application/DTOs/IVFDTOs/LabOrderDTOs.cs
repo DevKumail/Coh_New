@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 
@@ -132,6 +133,27 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public string Status { get; set; }
     }
 
+    public class LabOrderCompleteResultDto
+    {
+        public long? OrderSetDetailId { get; set; }
+        public long LabTestId { get; set; }
+        public string TestName { get; set; }
+        public string Material { get; set; }
+        public string Status { get; set; }
+        public DateTime? PerformDate { get; set; }
+        public DateTime? EntryDate { get; set; }
+        public int UserId { get; set; }
+        public string? AccessionNumber { get; set; }
+        public bool? IsDefault { get; set; }
+        public long? PrincipalResultInterpreter { get; set; }
+        public string? Action { get; set; }
+        public string? ReviewedBy { get; set; }
+        public DateTime? ReviewedDate { get; set; }
+        public int? PerformAtLabId { get; set; }
+        public string? Note { get; set; }
+        public List<AttachmentDTO>? Attachments { get; set; } = new();
+    }
+
     public class PathologyObservationDTO
     {
         public int? SequenceNo { get; set; }
@@ -167,5 +189,8 @@ namespace HMIS.Application.DTOs.IVFDTOs
     public class AttachmentDTO
     {
         public long FileId { get; set; }
+        public string? FilePath { get; set; }
+        public IFormFile? FormFile { get; set; } 
+
     }
 }

@@ -71,6 +71,7 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
   @Input() tests: Array<any> = [];
   @Input() showObservations: boolean = false;
   @Input() orderSetId: number | string | null = null;
+  @Input() labResultId: number | string | null = null;
   @Output() cancel = new EventEmitter<void>();
   @Output() completed = new EventEmitter<any>();
 
@@ -127,6 +128,7 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
     });
     this.addObservation();
     this.loadTestsIfNeeded();
+    this.loadExistingIfNeeded();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -137,6 +139,10 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
 
     if (changes['orderSetId'] && !changes['orderSetId'].firstChange) {
       this.loadTestsIfNeeded();
+    }
+
+    if (changes['labResultId'] && !changes['labResultId'].firstChange) {
+      this.loadExistingIfNeeded();
     }
   }
 
@@ -181,6 +187,177 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
       performAtLabId: [0],
       observations: this.fb.array([])
     });
+  }
+
+  private loadExistingIfNeeded() {
+    const rawId = this.labResultId;
+    const idNum = Number(rawId);
+    if (!Number.isFinite(idNum) || idNum <= 0) {
+      return;
+    }
+
+    this.ivfApi.getCollectionDetailsWithResults(idNum).subscribe({
+      next: (res: any) => {
+        const rows = Array.isArray(res) ? res : (Array.isArray(res?.details) ? res.details : (res ? [res] : []));
+        if (!rows.length) {
+          return;
+        }
+
+        const first = rows[0];
+
+        // Map tests from response (if provided)
+        try {
+          this.tests = rows.map((d: any) => ({
+            id: d.labTestId ?? d.labTestID ?? d.testId,
+            orderSetDetailId: d.orderSetDetailId ?? d.orderSetDetailID ?? d.labOrderSetDetailId,
+            cpt: d.cptCode ?? d.cpt,
+            name: d.testName ?? d.name ?? d.testName ?? '',
+            sampleTypeName: d.material ?? d.materialName ?? d.sampleTypeName ?? d.sampleType,
+            status: d.status
+          }));
+        } catch {
+          // keep existing tests if mapping fails
+        }
+
+        // Patch header fields where available
+        const patch: any = {};
+        if (first.action) patch.action = first.action;
+        if (first.reviewedBy) patch.reviewedBy = first.reviewedBy;
+        if (first.reviewedDate) patch.reviewedDate = new Date(first.reviewedDate).toISOString().slice(0, 10);
+        if (first.performAtLabId != null) patch.performAtLabId = first.performAtLabId;
+        if (first.isDefault != null) patch.isDefault = first.isDefault;
+        if (first.principalResultInterpreter != null) patch.principalResultInterpreter = first.principalResultInterpreter;
+
+        if (Object.keys(patch).length) {
+          this.completionForm.patchValue(patch);
+        }
+
+        // Existing rich-text note
+        this.noteText = first.note || first.Note || this.noteText;
+
+        // Existing attachments -> bind into GenericDocumentUploadComponent
+        const rawAttachments = first.attachments || first.Attachments;
+        if (this.uploader && Array.isArray(rawAttachments) && rawAttachments.length) {
+          const ids = rawAttachments
+            .map((a: any) => Number(a.fileId ?? a.FileId))
+            .filter((id: number) => Number.isFinite(id) && id > 0);
+
+          if (ids.length) {
+            // Prefer backend GetAttachmentFiles API to get accurate file metadata + base64 content
+            this.shared.getAttachmentFiles(ids).subscribe({
+              next: (resp: any) => {
+                let rows: any[] = [];
+                if (Array.isArray(resp)) {
+                  rows = resp;
+                } else if (Array.isArray(resp?.data)) {
+                  rows = resp.data;
+                } else if (resp && typeof resp === 'object') {
+                  const firstArray = Object.values(resp).find((v: any) => Array.isArray(v));
+                  if (Array.isArray(firstArray)) {
+                    rows = firstArray as any[];
+                  }
+                }
+                const docsFromApi = rows
+                  .map((r: any, idx: number) => {
+                    const fileId = Number(r.fileId ?? r.FileId);
+                    if (!Number.isFinite(fileId) || fileId <= 0) return null;
+
+                    const file = r.file || r.File || {};
+                    const nameFromApi =
+                      r.fileName ?? r.FileName ??
+                      file.fileName ?? file.FileName;
+                    const lenFromApi = Number(
+                      r.length ?? r.Length ??
+                      file.length ?? file.Length
+                    );
+                    const contentType =
+                      r.contentType ?? r.ContentType ??
+                      file.contentType ?? file.ContentType;
+                    const base64 = r.content ?? r.Content;
+
+                    const fallbackPath = (rawAttachments.find((a: any) => Number(a.fileId ?? a.FileId) === fileId)?.filePath
+                      ?? rawAttachments.find((a: any) => Number(a.fileId ?? a.FileId) === fileId)?.FilePath
+                      ?? '');
+                    const fileName = String(nameFromApi || this.deriveAttachmentFileName(fallbackPath, idx + 1));
+                    const fileSize = Number.isFinite(lenFromApi) && lenFromApi > 0 ? lenFromApi : 0;
+
+                    const isImage = typeof contentType === 'string' && contentType.startsWith('image/');
+                    const previewUrl = isImage && typeof base64 === 'string' && base64.length
+                      ? `data:${contentType};base64,${base64}`
+                      : null;
+
+                    return { fileId, fileName, fileSize, previewUrl };
+                  })
+                  .filter((x: any) => !!x);
+
+                if (docsFromApi.length) {
+                  this.uploader!.setExisting(docsFromApi as Array<{ fileId: number; fileName: string; fileSize: number; previewUrl?: string | null }>);
+                  return;
+                }
+
+                // Fallback to local mapping if API returned no usable rows
+                const fallbackDocs = rawAttachments
+                  .map((a: any, idx: number) => {
+                    const fileId = Number(a.fileId ?? a.FileId);
+                    if (!Number.isFinite(fileId) || fileId <= 0) return null;
+                    const filePath = a.filePath ?? a.FilePath ?? '';
+                    const fileName = this.deriveAttachmentFileName(filePath, idx + 1);
+                    const fileSize = Number(a.fileSize ?? a.FileSize);
+                    return {
+                      fileId,
+                      fileName,
+                      fileSize: Number.isFinite(fileSize) && fileSize > 0 ? fileSize : 0,
+                      previewUrl: null
+                    };
+                  })
+                  .filter((x: any) => !!x);
+
+                if (fallbackDocs.length) {
+                  this.uploader!.setExisting(fallbackDocs as Array<{ fileId: number; fileName: string; fileSize: number; previewUrl?: string | null }>);
+                }
+              },
+              error: () => {
+                // On error, fall back to basic mapping from Attachments DTO
+                const fallbackDocs = rawAttachments
+                  .map((a: any, idx: number) => {
+                    const fileId = Number(a.fileId ?? a.FileId);
+                    if (!Number.isFinite(fileId) || fileId <= 0) return null;
+                    const filePath = a.filePath ?? a.FilePath ?? '';
+                    const fileName = this.deriveAttachmentFileName(filePath, idx + 1);
+                    const fileSize = Number(a.fileSize ?? a.FileSize);
+                    return {
+                      fileId,
+                      fileName,
+                      fileSize: Number.isFinite(fileSize) && fileSize > 0 ? fileSize : 0,
+                      previewUrl: null
+                    };
+                  })
+                  .filter((x: any) => !!x);
+
+                if (fallbackDocs.length) {
+                  this.uploader!.setExisting(fallbackDocs as Array<{ fileId: number; fileName: string; fileSize: number; previewUrl?: string | null }>);
+                }
+              }
+            });
+          }
+        }
+      },
+      error: () => {
+        // ignore and keep create-mode defaults
+      }
+    });
+  }
+
+  private deriveAttachmentFileName(filePath: string, index: number): string {
+    const trimmed = String(filePath || '').trim();
+    if (trimmed) {
+      const parts = trimmed.split(/[\\/]/);
+      const last = parts[parts.length - 1];
+      if (last) {
+        return last;
+      }
+    }
+    return `Attachment-${index}.pdf`;
   }
 
   get observations(): FormArray {
@@ -272,6 +449,8 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
   }
 
   onComplete() {
+    console.log('noteText before submit:', this.noteText);
+
     const formValue = this.completionForm.getRawValue();
     const performDate = this.formatDateForSubmission(formValue.performDate);
 
