@@ -304,7 +304,16 @@ deletePrescriptionMaster(ivfTreatmentCycleId: number, drugId: number): Observabl
     return this.api.post('IVFEpisodePregnancy/CreateUpdateEpisodePregnancy', payload);
   }
 
-  getEpisodePregnancyByCycleId(ivfDashboardTreatmentCycleId: number): Observable<any> {
-    return this.api.get(`IVFEpisodePregnancy/GetEpisodePregnancyByCycleId?ivfDashboardTreatmentCycleId=${ivfDashboardTreatmentCycleId}`);
+  getEpisodePregnancyByCycleId(cycleId: number): Observable<any> {
+    return this.api.get(`IVFEpisodePregnancy/GetEpisodePregnancyByCycleId?ivfDashboardTreatmentCycleId=${cycleId}`);
+  }
+
+  // Birth Episode APIs
+  getEpisodeBirthByCycleId(cycleId: number): Observable<any> {
+    return this.api.get(`IVFEpisodeBirth/GetEpisodeBirthByCycleId?ivfDashboardTreatmentCycleId=${cycleId}`);
+  }
+
+  saveEpisodeBirth(payload: any): Observable<any> {
+    return this.api.post('IVFEpisodeBirth/CreateUpdateEpisodeBirth', payload);
   }
 }
