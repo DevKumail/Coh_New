@@ -323,7 +323,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Pregnancy
                 var entity = new IvfepisodePregnancyEmbryo
                 {
                     PregnancyId = stage.PregnancyId,
-                    PgprogressUntil4thWeekCategoryId = dto.PGProgressUntil4thWeekCategoryId,
+                    PgprogressUntil24thWeekCategoryId = dto.PGProgressUntil24thWeekCategoryId,
                     Note = dto.Note,
                     ImageId = dto.ImageId,
                     IsDeleted = false

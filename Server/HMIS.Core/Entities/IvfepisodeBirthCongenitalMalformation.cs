@@ -14,7 +14,8 @@ public partial class IvfepisodeBirthCongenitalMalformation
 
     public long BirthId { get; set; }
 
-    public long? CongenitalMalformationCategoryId { get; set; }
+    [StringLength(11)]
+    public string? CongenitalMalformationCategoryId { get; set; }
 
     public int? CreatedBy { get; set; }
 
@@ -34,5 +35,5 @@ public partial class IvfepisodeBirthCongenitalMalformation
 
     [ForeignKey("CongenitalMalformationCategoryId")]
     [InverseProperty("IvfepisodeBirthCongenitalMalformation")]
-    public virtual DropdownConfiguration? CongenitalMalformationCategory { get; set; }
+    public virtual BlmasterIcd9cm? CongenitalMalformationCategory { get; set; }
 }

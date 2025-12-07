@@ -14,8 +14,8 @@ public partial class IvfepisodePregnancyEmbryo
 
     public long PregnancyId { get; set; }
 
-    [Column("PGProgressUntil4thWeekCategoryId")]
-    public long? PgprogressUntil4thWeekCategoryId { get; set; }
+    [Column("PGProgressUntil24thWeekCategoryId")]
+    public long? PgprogressUntil24thWeekCategoryId { get; set; }
 
     public string? Note { get; set; }
 

@@ -33,8 +33,8 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public int? CountryId { get; set; }
         public string? Note { get; set; }
 
-        public List<long>? ChromosomeAnomalyCategoryIds { get; set; }
-        public List<long>? CongenitalMalformationCategoryIds { get; set; }
+        public List<string>? ChromosomeAnomalyCategoryIds { get; set; }
+        public List<string>? CongenitalMalformationCategoryIds { get; set; }
     }
 
     public class IVFEpisodeBirthListItemDto
