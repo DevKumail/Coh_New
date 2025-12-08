@@ -1,4 +1,18 @@
 <div class="p-0">
+  <!-- Header Section with Labels, Buttons and Table -->
+  <div class="card mb-3">
+    <div class="card-body p-1">
+      <div class="row g-1 align-items-start">
+        <!-- left Side: Buttons -->
+        <div class="col-md-4 d-flex ">
+          <button class="btn btn-sm btn-primary w-100 mb-2 mt-2">Button 1</button>
+          <button class="btn btn-sm btn-secondary w-100 w-100 mb-2 mt-2 me-2 ms-2">Button 2</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Section -->
   <ul ngbNav #nav="ngbNav" class="nav nav-tabs small">
     <li [ngbNavItem]="1">
       <button ngbNavLink class="nav-link">Table representation</button>
@@ -9,7 +23,7 @@
     <li [ngbNavItem]="2">
       <button ngbNavLink class="nav-link">Graphical representation</button>
       <ng-template ngbNavContent>
-        <div class="p-3 text-muted">Graphical representation (coming soon)</div>
+        <app-graphical-representation></app-graphical-representation>
       </ng-template>
     </li>
     <li [ngbNavItem]="3">

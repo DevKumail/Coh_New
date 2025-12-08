@@ -1,1 +1,558 @@
-<p>graphical-representation works!</p>
+<div class="graphical-representation-container p-3">
+  <!-- Oocyte Culture Table -->
+  <div class="table-responsive" (scroll)="onTableScroll($event)">
+    <table class="culture-table table table-bordered table-sm">
+      <thead>
+        <tr class="header-row">
+          <th class="ooc-no-col" rowspan="2">
+            <div class="d-flex flex-column align-items-center">
+              <span>Ooc. no</span>
+              <i class="bi bi-arrow-down-up small"></i>
+            </div>
+          </th>
+          <th class="ooc-id-col" rowspan="2">Ooc. ID</th>
+          <th class="status-col" rowspan="2">
+            <i class="bi bi-asterisk text-danger" title="Status"></i>
+          </th>
+          <th class="sp-col" rowspan="2">SP</th>
+          <th *ngFor="let day of days; let i = index" class="day-col">
+            Day {{ i }}
+          </th>
+        </tr>
+        <tr class="date-row">
+          <th *ngFor="let day of days" class="date-col">
+            {{ day | date: 'dd/MM/yyyy' }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let oocyte of oocytes; let rowIndex = index" 
+            [class.selected-row]="selectedOocyte === oocyte">
+          <!-- Oocyte Number -->
+          <td class="text-center fw-bold">{{ oocyte.number }}</td>
+          
+          <!-- Oocyte ID -->
+          <td class="text-center">{{ oocyte.id }}</td>
+          
+          <!-- Status Icon -->
+          <td class="text-center status-icon-cell">
+            <i *ngIf="oocyte.status === 'normal'" class="bi bi-snow text-primary" title="Normal"></i>
+            <i *ngIf="oocyte.status === 'discarded'" class="bi bi-x-lg text-danger" title="Discarded"></i>
+            <i *ngIf="oocyte.status === 'cryo'" class="bi bi-snow text-info" title="Cryo Storage"></i>
+            <i *ngIf="oocyte.status === 'transfer'" class="bi bi-arrow-right-circle text-success" title="Transfer"></i>
+          </td>
+          
+          <!-- SP Column -->
+          <td class="text-center sp-cell" (dblclick)="openSemenModal(oocyte)" style="cursor: pointer;">
+            <span class="badge bg-light text-dark border">SP {{ oocyte.spType }}</span>
+          </td>
+          
+          <!-- Day Cells -->
+          <td *ngFor="let day of days; let dayIndex = index" 
+              class="day-cell position-relative"
+              [class.cell-disabled]="!isCellEnabled(oocyte, dayIndex)"
+              [class.cell-selected]="selectedCell?.oocyteId === oocyte.id && selectedCell?.dayIndex === dayIndex"
+              (contextmenu)="onRightClick($event, oocyte, dayIndex)"
+              (dblclick)="onDoubleClick(oocyte, dayIndex)">
+            
+            <div class="cell-content d-flex align-items-center justify-content-center gap-1 flex-wrap">
+              <!-- Render icons based on cell data -->
+              <ng-container *ngIf="getCellData(oocyte.id, dayIndex) as cellData">
+                
+                <!-- Sperm Icon -->
+                <div *ngIf="cellData.spermIcon" class="icon-wrapper" [title]="cellData.spermTooltip">
+                  <svg width="32" height="32" viewBox="0 0 32 32">
+                    <path d="M8 16 Q12 8, 16 8 Q20 8, 24 16" stroke="#4a90e2" stroke-width="2" fill="none"/>
+                    <circle cx="16" cy="8" r="4" fill="#4a90e2"/>
+                    <line x1="16" y1="12" x2="16" y2="20" stroke="#4a90e2" stroke-width="1.5"/>
+                  </svg>
+                </div>
+                
+                <!-- Green Dot (1 micron, 1 PN observed) -->
+                <span *ngIf="cellData.greenDot" class="status-dot bg-success" title="1 micron / 1 PN observed"></span>
+                
+                <!-- Oocyte/Embryo Stage Icons -->
+                <div *ngIf="cellData.stageIcon" class="stage-icon-wrapper" [title]="cellData.stageTooltip">
+                  <!-- Circle with optional red X -->
+                  <svg width="32" height="32" viewBox="0 0 32 32">
+                    <circle cx="16" cy="16" r="10" [attr.stroke]="cellData.stageColor || '#666'" 
+                            stroke-width="2" fill="none"/>
+                    <circle *ngIf="cellData.innerDots" cx="16" cy="16" r="3" fill="#999"/>
+                    <path *ngIf="cellData.redX" d="M12 12 L20 20 M20 12 L12 20" 
+                          stroke="red" stroke-width="2"/>
+                  </svg>
+                </div>
+                
+                <!-- Embryo Development Stage (2-cell, 4-cell, 8-cell, Morula, Blastocyst) -->
+                <div *ngIf="cellData.embryoStage" class="embryo-stage-wrapper" [title]="cellData.embryoTooltip">
+                  <svg width="36" height="36" viewBox="0 0 36 36">
+                    <!-- Different patterns for different stages -->
+                    <circle cx="18" cy="18" r="14" stroke="#666" stroke-width="2" fill="none"/>
+                    
+                    <!-- 2-cell stage -->
+                    <g *ngIf="cellData.embryoStage === '2-cell'">
+                      <circle cx="13" cy="18" r="5" fill="#ddd" stroke="#666"/>
+                      <circle cx="23" cy="18" r="5" fill="#ddd" stroke="#666"/>
+                    </g>
+                    
+                    <!-- 4-cell stage -->
+                    <g *ngIf="cellData.embryoStage === '4-cell'">
+                      <circle cx="13" cy="13" r="4" fill="#ddd" stroke="#666"/>
+                      <circle cx="23" cy="13" r="4" fill="#ddd" stroke="#666"/>
+                      <circle cx="13" cy="23" r="4" fill="#ddd" stroke="#666"/>
+                      <circle cx="23" cy="23" r="4" fill="#ddd" stroke="#666"/>
+                    </g>
+                    
+                    <!-- 8-cell stage -->
+                    <g *ngIf="cellData.embryoStage === '8-cell'">
+                      <circle *ngFor="let pos of get8CellPositions()" 
+                              [attr.cx]="pos.x" [attr.cy]="pos.y" r="3" fill="#ccc" stroke="#666"/>
+                    </g>
+                    
+                    <!-- Morula -->
+                    <g *ngIf="cellData.embryoStage === 'morula'">
+                      <circle *ngFor="let pos of getMorulaPositions()" 
+                              [attr.cx]="pos.x" [attr.cy]="pos.y" r="2.5" fill="#bbb" stroke="#555"/>
+                    </g>
+                    
+                    <!-- Blastocyst -->
+                    <g *ngIf="cellData.embryoStage === 'blastocyst'">
+                      <circle cx="18" cy="18" r="12" fill="#e8e8e8" stroke="#666" stroke-width="2"/>
+                      <ellipse cx="22" cy="18" rx="6" ry="8" fill="#999" opacity="0.6"/>
+                    </g>
+                  </svg>
+                </div>
+                
+                <!-- Stage Number/Label -->
+                <span *ngIf="cellData.stageLabel" class="stage-label">{{ cellData.stageLabel }}</span>
+                
+                <!-- Cryo Icon (Snowflake) -->
+                <i *ngIf="cellData.cryoIcon" class="bi bi-snow text-primary fs-5" title="Cryopreservation"></i>
+                
+                <!-- Degenerated/Discarded Icon -->
+                <i *ngIf="cellData.degeneratedIcon" class="bi bi-x-circle text-danger" title="Degenerated"></i>
+                
+                <!-- Transfer Arrow -->
+                <i *ngIf="cellData.transferIcon" class="bi bi-arrow-right-circle text-success" title="Transfer"></i>
+                
+                <!-- Cell Image Overlay (for hover/tooltip) -->
+                <div *ngIf="cellData.hasImage" class="cell-image-indicator">
+                  <i class="bi bi-image text-muted" title="Has image"></i>
+                </div>
+                
+              </ng-container>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div #contextMenu class="context-menu" 
+     [style.display]="showContextMenu ? 'block' : 'none'"
+     [style.left.px]="contextMenuX"
+     [style.top.px]="contextMenuY"
+     (click)="$event.stopPropagation()">
+  <ul class="list-unstyled mb-0">
+    <li class="menu-item" [class.has-submenu]="activeSubmenu === 'ooc-treatment'" (click)="selectMenuItem('ooc-treatment'); $event.stopPropagation()">
+      <span>Ooc. treatment</span>
+      <i [class]="activeSubmenu === 'ooc-treatment' ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+    </li>
+    <!-- Submenu -->
+    <ul class="submenu list-unstyled" *ngIf="activeSubmenu === 'ooc-treatment'" (click)="$event.stopPropagation()">
+      <li (click)="selectTreatment('None'); $event.stopPropagation()">
+        <i class="bi bi-dash-circle"></i> None
+      </li>
+      <li (click)="selectTreatment('IVF'); $event.stopPropagation()">
+        <i class="bi bi-droplet"></i> IVF
+      </li>
+      <li (click)="selectTreatment('ICSI'); $event.stopPropagation()">
+        <i class="bi bi-check text-success"></i> ICSI
+      </li>
+      <li (click)="selectTreatment('IMSI'); $event.stopPropagation()">
+        <i class="bi bi-eye"></i> IMSI
+      </li>
+      <li (click)="selectTreatment('PICSI'); $event.stopPropagation()">
+        <i class="bi bi-bullseye"></i> PICSI
+      </li>
+    </ul>
+    
+    <li class="menu-item" [class.has-submenu]="activeSubmenu === 'stage'" (click)="selectMenuItem('stage'); $event.stopPropagation()">
+      <span>Stage</span>
+      <i [class]="activeSubmenu === 'stage' ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+    </li>
+    <!-- Submenu -->
+    <ul class="submenu list-unstyled" *ngIf="activeSubmenu === 'stage'" (click)="$event.stopPropagation()">
+      <li (click)="selectStage('Unknown'); $event.stopPropagation()">
+        <i class="bi bi-question-circle text-muted"></i> Unknown
+      </li>
+      <li (click)="selectStage('GV'); $event.stopPropagation()">
+        <i class="bi bi-circle text-secondary"></i> GV (Germinal Vesicle)
+      </li>
+      <li (click)="selectStage('MI'); $event.stopPropagation()">
+        <i class="bi bi-circle text-warning"></i> MI (Metaphase I)
+      </li>
+      <li (click)="selectStage('MII'); $event.stopPropagation()">
+        <i class="bi bi-circle text-success"></i> MII (Metaphase II)
+      </li>
+      <li class="submenu-parent" [class.has-nested]="activeNestedSubmenu === 'pn'" (click)="selectNestedSubmenu('pn'); $event.stopPropagation()">
+        <span>PN</span>
+        <i [class]="activeNestedSubmenu === 'pn' ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+      </li>
+      <!-- PN Nested Submenu -->
+      <ul class="nested-submenu list-unstyled" *ngIf="activeNestedSubmenu === 'pn'" (click)="$event.stopPropagation()">
+        <li (click)="selectStage('0PN'); $event.stopPropagation()">
+          <i class="bi bi-circle"></i> 0
+        </li>
+        <li (click)="selectStage('1PN'); $event.stopPropagation()">
+          <i class="bi bi-record-circle"></i> 1
+        </li>
+        <li (click)="selectStage('2PN'); $event.stopPropagation()">
+          <i class="bi bi-record-circle text-success"></i> 2
+        </li>
+        <li (click)="selectStage('3PN'); $event.stopPropagation()">
+          <i class="bi bi-record-circle text-danger"></i> 3
+        </li>
+        <li (click)="selectStage('4PN'); $event.stopPropagation()">
+          <i class="bi bi-record-circle text-danger"></i> 4
+        </li>
+      </ul>
+      
+      <li class="submenu-parent" [class.has-nested]="activeNestedSubmenu === 'x-cells'" (click)="selectNestedSubmenu('x-cells'); $event.stopPropagation()">
+        <span>x-cells</span>
+        <i [class]="activeNestedSubmenu === 'x-cells' ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+      </li>
+      <!-- x-cells Nested Submenu -->
+      <ul class="nested-submenu list-unstyled" *ngIf="activeNestedSubmenu === 'x-cells'" (click)="$event.stopPropagation()">
+        <li (click)="selectStage('1-cell'); $event.stopPropagation()">
+          <i class="bi bi-circle-fill"></i> 1
+        </li>
+        <li (click)="selectStage('2-cell'); $event.stopPropagation()">
+          <i class="bi bi-grid-1x2"></i> 2
+        </li>
+        <li (click)="selectStage('3-cell'); $event.stopPropagation()">
+          <i class="bi bi-grid"></i> 3
+        </li>
+        <li (click)="selectStage('4-cell'); $event.stopPropagation()">
+          <i class="bi bi-grid"></i> 4
+        </li>
+        <li (click)="selectStage('5-cell'); $event.stopPropagation()">
+          <i class="bi bi-grid-3x2"></i> 5
+        </li>
+        <li (click)="selectStage('6-cell'); $event.stopPropagation()">
+          <i class="bi bi-grid-3x2"></i> 6
+        </li>
+        <li (click)="selectStage('7-cell'); $event.stopPropagation()">
+          <i class="bi bi-grid-3x2"></i> 7
+        </li>
+        <li (click)="selectStage('8-cell'); $event.stopPropagation()">
+          <i class="bi bi-grid-3x3"></i> 8
+        </li>
+        <li (click)="selectStage('9-16-cell'); $event.stopPropagation()">
+          <i class="bi bi-grid-3x3-gap"></i> 9-16
+        </li>
+      </ul>
+      <li (click)="selectStage('Early morula'); $event.stopPropagation()">
+        <i class="bi bi-circle-fill text-info"></i> Early morula
+      </li>
+      <li (click)="selectStage('Morula'); $event.stopPropagation()">
+        <i class="bi bi-circle-fill text-primary"></i> Morula
+      </li>
+      <li (click)="selectStage('Compacting'); $event.stopPropagation()">
+        <i class="bi bi-circle-half"></i> Compacting
+      </li>
+      <li (click)="selectStage('Start of cavitation'); $event.stopPropagation()">
+        <i class="bi bi-circle"></i> Start of cavitation
+      </li>
+      <li (click)="selectStage('Early blastocyst'); $event.stopPropagation()">
+        <i class="bi bi-egg"></i> Early blastocyst
+      </li>
+      <li (click)="selectStage('Blastocyst'); $event.stopPropagation()">
+        <i class="bi bi-egg-fill text-success"></i> Blastocyst
+      </li>
+      <li (click)="selectStage('Expanded blastocyst'); $event.stopPropagation()">
+        <i class="bi bi-egg-fried"></i> Expanded blastocyst
+      </li>
+      <li (click)="selectStage('Hatching blastocyst'); $event.stopPropagation()">
+        <i class="bi bi-egg-fried text-warning"></i> Hatching blastocyst
+      </li>
+      <li (click)="selectStage('Hatched blastocyst'); $event.stopPropagation()">
+        <i class="bi bi-star-fill text-success"></i> Hatched blastocyst
+      </li>
+      <li (click)="selectStage('Degenerated'); $event.stopPropagation()">
+        <i class="bi bi-x-circle-fill text-danger"></i> Degenerated
+      </li>
+      <li (click)="selectStage('Arrested'); $event.stopPropagation()">
+        <i class="bi bi-pause-circle text-warning"></i> Arrested
+      </li>
+      <li (click)="selectStage('None'); $event.stopPropagation()">
+        <i class="bi bi-dash"></i> None
+      </li>
+    </ul>
+    
+    <li class="menu-item" [class.has-submenu]="activeSubmenu === 'quality'" (click)="selectMenuItem('quality'); $event.stopPropagation()">
+      <span>Quality / Grade</span>
+      <i [class]="activeSubmenu === 'quality' ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+    </li>
+    <!-- Submenu -->
+    <ul class="submenu list-unstyled" *ngIf="activeSubmenu === 'quality'" (click)="$event.stopPropagation()">
+      <li (click)="selectQuality('Excellent'); $event.stopPropagation()">
+        <i class="bi bi-star-fill text-success"></i> Excellent (Grade A)
+      </li>
+      <li (click)="selectQuality('Good'); $event.stopPropagation()">
+        <i class="bi bi-star-fill text-primary"></i> Good (Grade B)
+      </li>
+      <li (click)="selectQuality('Fair'); $event.stopPropagation()">
+        <i class="bi bi-star-half text-warning"></i> Fair (Grade C)
+      </li>
+      <li (click)="selectQuality('Poor'); $event.stopPropagation()">
+        <i class="bi bi-star text-danger"></i> Poor (Grade D)
+      </li>
+      <li (click)="selectQuality('5AA'); $event.stopPropagation()">
+        <i class="bi bi-trophy-fill text-warning"></i> 5AA (Top Quality)
+      </li>
+      <li (click)="selectQuality('5AB'); $event.stopPropagation()">
+        <i class="bi bi-trophy text-success"></i> 5AB
+      </li>
+      <li (click)="selectQuality('5BA'); $event.stopPropagation()">
+        <i class="bi bi-trophy text-success"></i> 5BA
+      </li>
+      <li (click)="selectQuality('5BB'); $event.stopPropagation()">
+        <i class="bi bi-trophy text-primary"></i> 5BB
+      </li>
+      <li (click)="selectQuality('4AA'); $event.stopPropagation()">
+        <i class="bi bi-award-fill text-success"></i> 4AA
+      </li>
+      <li (click)="selectQuality('4AB'); $event.stopPropagation()">
+        <i class="bi bi-award text-primary"></i> 4AB
+      </li>
+      <li (click)="selectQuality('3AA'); $event.stopPropagation()">
+        <i class="bi bi-award text-info"></i> 3AA
+      </li>
+    </ul>
+    
+    <li class="menu-item" (click)="selectMenuItem('discarded')">
+      <i class="bi bi-x-circle text-danger"></i>
+      <span>Discarded</span>
+    </li>
+    
+    <li class="menu-item" (click)="selectMenuItem('arrested')">
+      <i class="bi bi-pause-circle text-warning"></i>
+      <span>In arrest</span>
+    </li>
+    
+    <li class="menu-item" (click)="selectMenuItem('cultivation')">
+      <i class="bi bi-check-circle text-success"></i>
+      <span>For embryo cultivation selected</span>
+    </li>
+    
+    <li class="menu-item" (click)="selectMenuItem('transfer')">
+      <span>Transfer</span>
+      <i class="bi bi-chevron-right"></i>
+    </li>
+    
+    <li class="menu-item" (click)="selectMenuItem('cryopreservation')">
+      <span>Cryopreservation</span>
+    </li>
+    
+    <li class="menu-item" [class.has-submenu]="activeSubmenu === 'ooc-groups'" (click)="selectMenuItem('ooc-groups'); $event.stopPropagation()">
+      <span>Ooc. groups</span>
+      <i [class]="activeSubmenu === 'ooc-groups' ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+    </li>
+    <!-- Submenu -->
+    <ul class="submenu list-unstyled" *ngIf="activeSubmenu === 'ooc-groups'" (click)="$event.stopPropagation()">
+      <li (click)="selectOocGroup('new'); $event.stopPropagation()"><i class="bi bi-plus-circle text-success"></i> New ooc./emb. group</li>
+      <li (click)="selectOocGroup('none'); $event.stopPropagation()"><i class="bi bi-dash-circle text-danger"></i> No ooc./emb. group</li>
+    </ul>
+    
+    <li class="menu-item" (click)="selectMenuItem('incubator')">
+      <span>Incubator</span>
+      <i class="bi bi-chevron-right"></i>
+    </li>
+    
+    <li class="menu-item" (click)="selectMenuItem('details')">
+      <i class="bi bi-info-circle text-primary"></i>
+      <span>Oocyte / embryo details</span>
+    </li>
+    
+    <li class="menu-item" (click)="selectMenuItem('cell-tracking')">
+      <i class="bi bi-camera-video text-success"></i>
+      <span>Cell tracking</span>
+    </li>
+  </ul>
+</div>
+
+<!-- Double Click Modal -->
+<ng-template #cellDetailsModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Cell Details - Oocyte #{{ selectedCellDetails?.oocyteNumber }} - Day {{ selectedCellDetails?.day }}</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row g-3">
+      <!-- Left Side: Image -->
+      <div class="col-md-6">
+        <div class="cell-image-container border rounded p-2 text-center">
+          <img *ngIf="selectedCellDetails?.imageUrl" 
+               [src]="selectedCellDetails.imageUrl" 
+               alt="Cell Image" 
+               class="img-fluid rounded"
+               style="max-height: 300px;">
+          <div *ngIf="!selectedCellDetails?.imageUrl" class="text-muted p-5">
+            <i class="bi bi-image fs-1"></i>
+            <p>No image available</p>
+          </div>
+        </div>
+        
+        <div class="mt-3">
+          <label class="form-label">Upload Image</label>
+          <input type="file" class="form-control form-control-sm" accept="image/*" (change)="onImageUpload($event)">
+        </div>
+      </div>
+      
+      <!-- Right Side: Details Form -->
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Stage</label>
+          <select class="form-select form-select-sm">
+            <option>Unknown</option>
+            <option>GV</option>
+            <option>MI</option>
+            <option selected>MII</option>
+            <option>2-cell</option>
+            <option>4-cell</option>
+            <option>8-cell</option>
+            <option>Morula</option>
+            <option>Blastocyst</option>
+          </select>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Quality Grade</label>
+          <select class="form-select form-select-sm">
+            <option>Excellent</option>
+            <option selected>Good</option>
+            <option>Fair</option>
+            <option>Poor</option>
+          </select>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Fragmentation %</label>
+          <input type="number" class="form-control form-control-sm" value="10" min="0" max="100">
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Symmetry</label>
+          <select class="form-select form-select-sm">
+            <option selected>Symmetric</option>
+            <option>Slightly asymmetric</option>
+            <option>Asymmetric</option>
+          </select>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Notes</label>
+          <textarea class="form-control form-control-sm" rows="3" placeholder="Enter notes...">{{ selectedCellDetails?.notes }}</textarea>
+        </div>
+        
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="cryoCheck">
+          <label class="form-check-label" for="cryoCheck">
+            Cryopreserved
+          </label>
+        </div>
+        
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="transferCheck">
+          <label class="form-check-label" for="transferCheck">
+            Selected for transfer
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-sm btn-primary" (click)="saveCellDetails(modal)">Save Changes</button>
+  </div>
+</ng-template>
+
+<!-- Semen Analysis Modal -->
+<ng-template #semenModal let-modal>
+  <div class="modal-header bg-primary text-white">
+    <h5 class="modal-title">
+      <i class="bi bi-droplet-fill me-2"></i>
+      Semen Analysis - Oocyte #{{ selectedOocyteForSemen?.number }} (ID: {{ selectedOocyteForSemen?.id }})
+    </h5>
+    <button type="button" class="btn-close btn-close-white" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0">Available Semen Samples</h6>
+        <button class="btn btn-sm btn-success">
+          <i class="bi bi-plus-circle me-1"></i> Add New Sample
+        </button>
+      </div>
+    </div>
+    
+    <!-- Semen Samples List -->
+    <div class="list-group">
+      <div *ngFor="let sample of semenSamples; let i = index" 
+           class="list-group-item list-group-item-action"
+           [class.active]="selectedSemenSample?.id === sample.id"
+           (click)="selectSemenSample(sample)"
+           style="cursor: pointer;">
+        <div class="d-flex w-100 justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center mb-1">
+              <i class="bi bi-droplet-fill text-primary me-2"></i>
+              <h6 class="mb-0">{{ sample.sampleId }}</h6>
+              <span class="badge bg-info ms-2">{{ sample.type }}</span>
+            </div>
+            <p class="mb-1 small">
+              <strong>Collection Date:</strong> {{ sample.collectionDate | date: 'dd/MM/yyyy HH:mm' }}
+            </p>
+            <div class="row g-2 small">
+              <div class="col-6">
+                <span class="text-muted">Volume:</span> <strong>{{ sample.volume }} ml</strong>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Concentration:</span> <strong>{{ sample.concentration }} M/ml</strong>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Motility:</span> <strong>{{ sample.motility }}%</strong>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Morphology:</span> <strong>{{ sample.morphology }}%</strong>
+              </div>
+            </div>
+          </div>
+          <div class="ms-3">
+            <i *ngIf="selectedSemenSample?.id === sample.id" class="bi bi-check-circle-fill text-success fs-4"></i>
+          </div>
+        </div>
+        <div *ngIf="sample.notes" class="mt-2 pt-2 border-top">
+          <small class="text-muted">
+            <i class="bi bi-chat-left-text me-1"></i>{{ sample.notes }}
+          </small>
+        </div>
+      </div>
+      
+      <!-- Empty State -->
+      <div *ngIf="semenSamples.length === 0" class="text-center py-4 text-muted">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+        <p>No semen samples available</p>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="assignSemenSample(modal)" [disabled]="!selectedSemenSample">
+      <i class="bi bi-check-circle me-1"></i> Assign Sample
+    </button>
+  </div>
+</ng-template>
