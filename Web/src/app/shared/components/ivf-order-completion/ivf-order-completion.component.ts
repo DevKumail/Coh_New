@@ -41,28 +41,119 @@ export interface LabResultObservation {
   ],
   templateUrl: './ivf-order-completion.component.html',
   styles: [`
+    /* Modal scroll container */
+    .modal-scroll-container {
+      max-height: 85vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .modal-scroll-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    .modal-scroll-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    .modal-scroll-container::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    .modal-scroll-container::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
     .form-label {
       font-weight: 500;
-      margin-bottom: 0.25rem;
       color: var(--bs-body-color);
     }
-    .form-section {
-      background-color: var(--bs-secondary-bg);
-      border-radius: 4px;
-      padding: 1rem;
-      margin-bottom: 1rem;
+    .form-label.small {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    h6.fw-semibold {
+      font-size: 1rem;
+      font-weight: 600;
       color: var(--bs-body-color);
     }
-    .observation-row {
-      background-color: var(--bs-secondary-bg);
-      border-radius: 4px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border: 1px solid var(--bs-border-color);
-      color: var(--bs-body-color);
+    .card-body {
+      padding: 1.25rem;
+    }
+    .table th {
+      background-color: var(--bs-light);
+      font-weight: 600;
+      font-size: 0.875rem;
     }
     .btn-add-observation {
-      margin-top: 1rem;
+      margin-top: 0.5rem;
+    }
+    /* Custom tab styling */
+    .custom-tabs .nav-link {
+      color: #6c757d;
+      border: 1px solid transparent;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+    }
+    .custom-tabs .nav-link:hover {
+      border-color: transparent;
+      color: #20c997;
+    }
+    .custom-tabs .nav-link.active {
+      color: #20c997;
+      background-color: transparent;
+      border-color: transparent transparent #20c997 transparent;
+      border-bottom-width: 3px;
+    }
+    .tab-content {
+      min-height: 200px;
+    }
+    /* Custom button styling */
+    .btn-complete {
+      background-color: #20c997;
+      border-color: #20c997;
+      color: white;
+    }
+    .btn-complete:hover {
+      background-color: #1ab386;
+      border-color: #1ab386;
+      color: white;
+    }
+    .btn-complete:disabled {
+      background-color: #20c997;
+      border-color: #20c997;
+      opacity: 0.65;
+    }
+    .card-footer {
+      border-top: 1px solid #dee2e6;
+    }
+    /* Close button styling */
+    .btn-close {
+      padding: 0.5rem;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .btn-close:hover {
+      opacity: 1;
+    }
+    .card-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: white;
+    }
+    /* Skeleton loader styling */
+    .placeholder {
+      background-color: #e9ecef;
+      border-radius: 0.25rem;
+      display: inline-block;
+    }
+    .placeholder-glow .placeholder {
+      animation: placeholder-glow 2s ease-in-out infinite;
+    }
+    @keyframes placeholder-glow {
+      50% {
+        opacity: 0.5;
+      }
     }
   `]
 })
@@ -88,6 +179,10 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
   // Simple tab state for Attachments / Notes section
   activeTab: 'attachments' | 'notes' = 'attachments';
   noteText: string = '';
+  
+  // Loading states
+  isLoading: boolean = true;
+  isSaving: boolean = false;
 
   quillModules = {
     toolbar: [
@@ -122,13 +217,17 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.completionForm.patchValue({
-      performDate: this.currentDate,
-      entryDate: this.currentDate
-    });
-    this.addObservation();
-    this.loadTestsIfNeeded();
-    this.loadExistingIfNeeded();
+    // Simulate loading
+    setTimeout(() => {
+      this.completionForm.patchValue({
+        performDate: this.currentDate,
+        entryDate: this.currentDate
+      });
+      this.addObservation();
+      this.loadTestsIfNeeded();
+      this.loadExistingIfNeeded();
+      this.isLoading = false;
+    }, 500);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -444,21 +543,47 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
 
   private convertDateToISO(dateString: string): string {
     if (!dateString) return new Date().toISOString();
-    const date = new Date(dateString);
-    return date.toISOString();
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return new Date().toISOString();
+      }
+      return date.toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
   }
 
   onComplete() {
-    console.log('noteText before submit:', this.noteText);
+    if (!this.completionForm.valid) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Validation Error',
+        text: 'Please fill all required fields',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      return;
+    }
 
-    const formValue = this.completionForm.getRawValue();
-    const performDate = this.formatDateForSubmission(formValue.performDate);
+    // Directly save without confirmation
+    this.saveLabOrder();
+  }
+
+  private saveLabOrder() {
+    this.isSaving = true;
+
+    const formValue = this.completionForm.value;
+    const performDate = this.convertDateToISO(formValue.performDate);
 
     const observationsByTest = new Map<string, any[]>();
 
-    formValue.observations.forEach((obs: any) => {
-      const selectedTestId = obs.selectedTest;
-      if (!selectedTestId || selectedTestId === '') {
+    const obsArray = this.completionForm.get('observations') as FormArray;
+    obsArray.controls.forEach((ctrl: any) => {
+      const obs = ctrl.value;
+      const selectedTestId = String(obs.selectedTest ?? '').trim();
+      if (!selectedTestId) {
         return;
       }
 
@@ -493,6 +618,7 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
     }
 
     if (!testObservationPairs.length) {
+      this.isSaving = false;
       return;
     }
     const newFiles = this.uploader?.getFiles() || [];
@@ -543,10 +669,26 @@ export class IvfOrderCompletionComponent implements OnInit, OnChanges {
       )
       .subscribe({
         next: () => {
+          this.isSaving = false;
+          Swal.fire({
+            icon: 'success',
+            title: 'Saved!',
+            text: 'Lab order completed successfully',
+            timer: 2000,
+            showConfirmButton: false
+          });
           this.completed.emit({ success: true });
         },
         error: (err) => {
+          this.isSaving = false;
           console.error('Failed to complete lab order with attachments', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to save lab order. Please try again.',
+            timer: 3000,
+            showConfirmButton: false
+          });
         }
       });
   }

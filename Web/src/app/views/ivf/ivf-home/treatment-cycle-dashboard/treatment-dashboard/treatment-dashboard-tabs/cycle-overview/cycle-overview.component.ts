@@ -363,7 +363,7 @@ export class CycleOverviewComponent {
         for (const u of usArr) {
           const rawCreated = String((u as any)?.createdDate || '').trim();
           if (!rawCreated) continue;
-          // Expecting format like '12/05/2025 09:17:58' -> treat as MM/DD/YYYY so ultrasound falls in the visible month
+          // Expecting format like '12/05/2025 09:17:58' -> treat as MM/DD/YYYY
           const [datePart] = rawCreated.split(' ');
           const pieces = (datePart || '').split('/');
           if (pieces.length !== 3) continue;
@@ -371,9 +371,9 @@ export class CycleOverviewComponent {
           const dNum = Number(pieces[1]);
           const yNum = Number(pieces[2]);
           if (!Number.isFinite(dNum) || !Number.isFinite(mNum) || !Number.isFinite(yNum)) continue;
-          const created = new Date(yNum, mNum - 1, dNum);
-          if (isNaN(created.getTime())) continue;
-          const startDay = created.toISOString().slice(0, 10);
+          
+          // Format as YYYY-MM-DD directly without timezone conversion
+          const startDay = `${yNum}-${String(mNum).padStart(2, '0')}-${String(dNum).padStart(2, '0')}`;
           const endExclusive = this.addOneDayISO(startDay);
           eventsToAdd.push({
             resourceId: 'orders',

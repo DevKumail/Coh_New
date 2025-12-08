@@ -1,33 +1,86 @@
+<div class="modal-scroll-container">
 <div class="card shadow">
   <div class="card-header d-flex justify-content-between align-items-center">
     <div>
       <div class="fw-bold">Tests Observations</div>
       <div class="small text-muted">Order #: {{ order?.orderNumber || order?.orderSetId || '-' }}</div>
     </div>
-    <div class="d-flex gap-2">
-      <button class="btn btn-secondary btn-sm" (click)="cancel.emit()">Back</button>
-      <button class="btn btn-success btn-sm" (click)="onComplete()">
-        <i class="fas fa-check me-1"></i> Complete
-      </button>
-    </div>
+    <button type="button" class="btn-close" aria-label="Close" (click)="cancel.emit()"></button>
   </div>   
 
   <form class="card-body" [formGroup]="completionForm">
+    <!-- Skeleton Loader -->
+    <ng-container *ngIf="isLoading">
+      <div class="mb-2">
+        <h6 class="mb-2 fw-semibold">Lab Result</h6>
+        <div class="row g-1">
+          <div class="col-md-3" *ngFor="let i of [1,2,3,4]">
+            <div class="placeholder-glow">
+              <span class="placeholder col-6 mb-1" style="height: 14px;"></span>
+              <span class="placeholder col-12" style="height: 31px;"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-1">
+        <h6 class="mb-1 fw-semibold">Test Details</h6>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped table-sm">
+            <thead>
+              <tr>
+                <th>Test Name</th>
+                <th>Material</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let i of [1,2]">
+                <td><span class="placeholder col-8"></span></td>
+                <td><span class="placeholder col-5"></span></td>
+                <td><span class="placeholder col-4"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-1">
+        <ul class="nav nav-tabs custom-tabs">
+          <li class="nav-item">
+            <button class="nav-link active" type="button">Attachments</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" type="button">Notes</button>
+          </li>
+        </ul>
+        <div class="tab-content border border-top-0 p-3 bg-white">
+          <div class="placeholder-glow">
+            <span class="placeholder col-12 mb-2" style="height: 40px;"></span>
+            <span class="placeholder col-12 mb-2" style="height: 40px;"></span>
+            <span class="placeholder col-8" style="height: 40px;"></span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Actual Content -->
+    <ng-container *ngIf="!isLoading">
     <!-- Test Information -->
-    <div class="form-section">
-      <h6 class="mb-3">Lab Result</h6>
-      <div class="row g-3">
+    <div class="mb-2">
+      <h6 class="mb-2 fw-semibold">Lab Result</h6>
+      <div class="row g-1">
         <div class="col-md-3">
-          <label class="form-label">Perform Date</label>
-          <div class="input-group">
-            <input class="form-control form-control-sm"
+          <label class="form-label mb-1 small">Perform Date</label>
+          <div class="input-group input-group-sm">
+            <input class="form-control"
                   placeholder="yyyy-mm-dd"
                   [minDate]="minDate"
                   [markDisabled]="isDisabled"
                   ngbDatepicker
                   #d="ngbDatepicker"
                   [formControl]="performDateControl">
-            <button class="btn btn-outline-secondary btn-sm" 
+            <button class="btn btn-outline-secondary" 
                    (click)="openDatePicker(d)" 
                    type="button">
               <i class="far fa-calendar-alt"></i>
@@ -35,7 +88,7 @@
           </div>
         </div>
         <div class="col-md-3">
-          <label class="form-label">Action</label>
+          <label class="form-label mb-1 small">Action</label>
           <select class="form-select form-select-sm" formControlName="action">
             <option value="">Select Action</option>
             <option value="Reported">Reported</option>
@@ -45,21 +98,21 @@
           </select>
         </div>
         <div class="col-md-3">
-          <label class="form-label">Reviewed By</label>
+          <label class="form-label mb-1 small">Reviewed By</label>
           <input type="text" class="form-control form-control-sm" formControlName="reviewedBy">
         </div>
         <div class="col-md-3">
-          <label class="form-label">Reviewed Date</label>
+          <label class="form-label mb-1 small">Reviewed Date</label>
           <input type="date" class="form-control form-control-sm" formControlName="reviewedDate">
         </div>
       </div>
     </div>
 
     <!-- Test Details -->
-    <div class="form-section">
-      <h6 class="mb-3">Test Details</h6>
+    <div class="mb-1">
+      <h6 class="mb-1 fw-semibold">Test Details</h6>
       <div class="table-responsive">
-        <table class="table table-sm table-bordered">
+        <table class="table table-bordered table-striped table-sm">
           <thead>
             <tr>
               <th>Test Name</th>
@@ -67,7 +120,7 @@
               <th>Status</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="table-group-divider">
             <tr *ngFor="let test of tests">
               <td>{{ test.name || test.testName || test.cpt }}</td>
               <td>{{ test.material || test.materialName || test.sampleTypeName || '-' }}</td>
@@ -82,8 +135,8 @@
     </div>
 
     <!-- Observations (hidden by default; controlled by showObservations input) -->
-    <div class="form-section" formArrayName="observations" *ngIf="showObservations">
-      <h6 class="mb-3">Observations</h6>
+    <div class="mb-1" formArrayName="observations" *ngIf="showObservations">
+      <h6 class="mb-2 fw-semibold">Observations</h6>
       <div class="table-responsive">
         <table class="table table-sm table-bordered mb-2">
           <thead>
@@ -190,8 +243,8 @@
     </div>
 
     <!-- Attachments / Notes tabs -->
-    <div class="mt-3">
-      <ul class="nav nav-tabs">
+    <div class="mt-1">
+      <ul class="nav nav-tabs custom-tabs">
         <li class="nav-item">
           <button
             class="nav-link"
@@ -212,29 +265,38 @@
         </li>
       </ul>
 
-      <div class="tab-content border border-top-0 w-100" style="background-color: var(--bs-body-bg);">
+      <div class="tab-content border border-top-0 p-3 bg-white">
         <!-- Attachments tab: reuse global generic document upload component -->
-        <div class="tab-pane fade show" [class.active]="activeTab === 'attachments'">
+        <div class="tab-pane fade" [class.show]="activeTab === 'attachments'" [class.active]="activeTab === 'attachments'">
           <app-generic-document-upload #uploader></app-generic-document-upload>
         </div>
 
         <!-- Notes tab: rich text note using Quill editor -->
-        <div class="tab-pane fade show w-100" [class.active]="activeTab === 'notes'">
-          <div class="w-100">
-            <!-- <label class="form-label fw-semibold">Note</label> -->
-            <quill-editor
-              [(ngModel)]="noteText"
-              [ngModelOptions]="{ standalone: true }"
-              name="ivfOrderNote"
-              [modules]="quillModules"
-              format="html"
-              placeholder="Enter medical opinion or notes..."
-              class="w-100"
-              [styles]="{height: '120px', width: '100%'}">
-            </quill-editor>
-          </div>
+        <div class="tab-pane fade" [class.show]="activeTab === 'notes'" [class.active]="activeTab === 'notes'">
+          <quill-editor
+            [(ngModel)]="noteText"
+            [ngModelOptions]="{ standalone: true }"
+            name="ivfOrderNote"
+            [modules]="quillModules"
+            format="html"
+            placeholder="Enter medical opinion or notes..."
+            [styles]="{height: '200px'}">
+          </quill-editor>
         </div>
       </div>
     </div>
+    </ng-container>
   </form>
+
+  <!-- Footer with Action Buttons -->
+  <div class="card-footer d-flex justify-content-end gap-2 bg-white">
+    <button class="btn btn-secondary btn-sm" (click)="cancel.emit()" [disabled]="isSaving || isLoading">
+      Cancel
+    </button>
+    <button class="btn btn-complete btn-sm" (click)="onComplete()" [disabled]="isSaving || isLoading">
+      <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+      {{ isSaving ? 'Saving...' : 'Complete' }}
+    </button>
+  </div>
+</div>
 </div>
