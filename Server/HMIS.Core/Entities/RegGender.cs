@@ -28,5 +28,8 @@ public partial class RegGender
     public int? UpdatedBy { get; set; }
 
     [InverseProperty("Gender")]
+    public virtual ICollection<IvfepisodeBirth> IvfepisodeBirth { get; set; } = new List<IvfepisodeBirth>();
+
+    [InverseProperty("Gender")]
     public virtual ICollection<RegPatientDetails> RegPatientDetails { get; set; } = new List<RegPatientDetails>();
 }

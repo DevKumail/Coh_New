@@ -6,6 +6,7 @@ using HMIS.Application.DTOs.IVFDTOs;
 using HMIS.Core.Context;
 using HMIS.Core.Entities;
 using HMIS.Infrastructure.ORM;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Task = System.Threading.Tasks.Task;
 
@@ -26,8 +27,12 @@ namespace HMIS.Application.ServiceLogics.IVF
         Task<bool> MarkCompleteOrderAsync(long orderSetDetailId);
         Task<int> CompleteOrderAsync(long orderSetDetailId, CompleteLabOrderDTO payload);
         Task<IEnumerable<OrderCollectionDetailsDTO>> GetOrderCollectionDetailsAsync(long orderSetId);
+        Task<IEnumerable<LabOrderCompleteResultDto>> GetOrderCollectionDetailsWithResultsAsync(long LabResultId);
+
         Task<IEnumerable<PathologyResultDTO>> GetPathologyResultsAsync(long mrno, string? search);
         Task<int> CancelOrderAsync(long orderSetId, CancelOrderDTO payload);
+        Task<bool> DeleteScannedImageAsync(long fileId);
+
     }
 
     public class IVFLabOrderService : IIVFLabOrderService
@@ -61,6 +66,56 @@ namespace HMIS.Application.ServiceLogics.IVF
 
             return await q.ToListAsync();
         }
+
+        public async Task<IEnumerable<LabOrderCompleteResultDto>> GetOrderCollectionDetailsWithResultsAsync(long LabResultId)
+        {
+            var q = from d in _db.LabResultsMain
+                    where d.LabResultId == LabResultId
+                    join orderDetail in _db.LabOrderSetDetail on d.OrderSetDetailId equals orderDetail.OrderSetDetailId into odLeft
+                    from orderDetail in odLeft.DefaultIfEmpty()
+                    join labTest in _db.LabTests on (orderDetail != null ? orderDetail.LabTestId : orderDetail.LabTestId) equals labTest.LabTestId into ltLeft
+                    from labTest in ltLeft.DefaultIfEmpty()
+                    join st in _db.LabSampleTypes on (labTest != null ? labTest.SampleTypeId : null) equals st.SampleTypeId into sleft
+                    from st in sleft.DefaultIfEmpty()
+                    join orderSet in _db.LabOrderSet on (orderDetail != null ? orderDetail.OrderSetId : 0) equals orderSet.LabOrderSetId into oleft
+                    from orderSet in oleft.DefaultIfEmpty()
+                    select new LabOrderCompleteResultDto
+                    {
+                        OrderSetDetailId = d.OrderSetDetailId,
+                        LabTestId = orderDetail.LabTestId,
+                        TestName = labTest != null ? labTest.LabName : (d.TestName ?? string.Empty),
+                        Material = st != null ? st.SampleName : string.Empty,
+                        Status = (orderSet != null && (orderSet.IsSigned ?? false)) ? "✔" : (orderSet.OrderStatus ?? "—"),
+                        PerformDate = d.PerformDate,
+                        EntryDate = d.EntryDate,
+                        UserId = d.CreatedBy ?? 0,
+                        AccessionNumber = d.AccessionNumber,
+                        IsDefault = d.IsDefault,
+                        PrincipalResultInterpreter = d.PrincipalResultInterpreter,
+                        Action = d.Action,
+                        ReviewedBy = d.ReviewedBy,
+                        ReviewedDate = d.ReviewedDate,
+                        PerformAtLabId = d.PerformAtLabId,
+                        Note = d.Note,
+                        Attachments = (
+                            from li in _db.LabResultsScannedImages
+                            where li.LabResultId == d.LabResultId 
+                            join f in _db.HmisFiles on li.FileId equals f.Id
+                            where f.IsDeleted != true
+                            select new AttachmentDTO
+                            {
+                                FileId = f.Id,
+                                FilePath = f.FilePath
+                            }
+                        ).ToList()
+                    };
+
+            return await q.ToListAsync();
+
+
+        }
+
+
 
         public async Task<IEnumerable<PathologyResultDTO>> GetPathologyResultsAsync(long mrno, string? search)
         {
@@ -276,7 +331,8 @@ AND (
 
         public async Task<int> CompleteOrderAsync(long orderSetDetailId, CompleteLabOrderDTO payload)
         {
-            // Load detail + header + test
+            int labResultId = 0;  
+
             var detail = await _db.LabOrderSetDetail.FirstOrDefaultAsync(d => d.OrderSetDetailId == orderSetDetailId);
             if (detail == null) return 0;
             var header = await _db.LabOrderSet.FirstOrDefaultAsync(h => h.LabOrderSetId == detail.OrderSetId);
@@ -284,78 +340,135 @@ AND (
 
             var test = await _db.LabTests.FirstOrDefaultAsync(t => t.LabTestId == detail.LabTestId);
 
-            // Create main result record
-            var main = new LabResultsMain
-            {
-                OrderSetDetailId = detail.OrderSetDetailId,
-                Mrno = (header.Mrno ?? 0).ToString(),
-                ProviderId = header.ProviderId,
-                TestName = test?.LabName ?? string.Empty,
-                TestNameAbbreviation = test?.LabAbreviation ?? (test?.LabName ?? string.Empty),
-                Cptcode = detail.Cptcode,
-                PerformDate = FormatY14(payload.PerformDate),
-                EntryDate = FormatY14(payload.EntryDate),
-                CreatedBy = Convert.ToInt32(payload.UserId),
-                CreatedDate = FormatY14(DateTime.UtcNow),
-                UpdatedBy = payload.UserId.ToString(),
-                UpdatedDate = FormatY14(DateTime.UtcNow),
-                ReviewedBy = payload.ReviewedBy,
-                ReviewedDate = payload.ReviewedDate,
-                AccessionNumber = payload.AccessionNumber,
-                IsDefault = payload.IsDefault,
-                PrincipalResultInterpreter = payload.PrincipalResultInterpreter,
-                Action = payload.Action,
-                OldMrno = header.OldMrno,
-                SequenceNo = null,
-                PerformAtLabId = payload.PerformAtLabId
-            };
-            _db.Add(main);
-            await _db.SaveChangesAsync();
+            var labRecord = await _db.LabResultsMain.FirstOrDefaultAsync(x => x.OrderSetDetailId == orderSetDetailId);
 
-            var labResultId = main.LabResultId;
-
-            // Insert observations using raw SQL because entity is keyless
-            if (payload.Observations != null && payload.Observations.Count > 0)
+            if (labRecord == null)
             {
-                foreach (var obs in payload.Observations)
+                var main = new LabResultsMain
                 {
-                    await _db.Database.ExecuteSqlRawAsync(
-                        "INSERT INTO LabResultsObservation (ValueType, ObservationIdentifierFullName, ObservationIdentifierShortName, ObservationValue, Units, ReferenceRangeMin, ReferenceRangeMax, AbnormalFlag, ResultStatus, ObservationDateTime, AnalysisDateTime, CreatedBy, CreatedDate, UpdatedBy, UpdatedDate, Remarks, WeqayaScreening, SequenceNo, LabResultId) VALUES ({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18})",
-                        obs.ValueType,
-                        obs.ObservationIdentifierFullName,
-                        obs.ObservationIdentifierShortName,
-                        obs.ObservationValue,
-                        obs.Units,
-                        obs.ReferenceRangeMin,
-                        obs.ReferenceRangeMax,
-                        obs.AbnormalFlag,
-                        obs.ResultStatus,
-                        obs.ObservationDateTime.HasValue ? obs.ObservationDateTime.Value.ToString("yyyyMMddHHmmss") : null,
-                        obs.AnalysisDateTime.HasValue ? obs.AnalysisDateTime.Value.ToString("yyyyMMddHHmmss") : null,
-                        payload.UserId.ToString(),
-                        DateTime.UtcNow.ToString("yyyyMMddHHmmss"),
-                        payload.UserId.ToString(),
-                        DateTime.UtcNow.ToString("yyyyMMddHHmmss"),
-                        obs.Remarks,
-                        obs.WeqayaScreening,
-                        obs.SequenceNo,
-                        labResultId
-                    );
+                    OrderSetDetailId = detail.OrderSetDetailId,
+                    Mrno = (header.Mrno ?? 0).ToString(),
+                    ProviderId = header.ProviderId,
+                    TestName = test?.LabName ?? string.Empty,
+                    TestNameAbbreviation = test?.LabAbreviation ?? (test?.LabName ?? string.Empty),
+                    Cptcode = detail.Cptcode,
+                    PerformDate = payload.PerformDate,
+                    EntryDate = payload.EntryDate,
+                    CreatedBy = Convert.ToInt32(payload.UserId),
+                    CreatedDate = FormatY14(DateTime.UtcNow),
+                    UpdatedDate = FormatY14(DateTime.UtcNow),
+                    ReviewedBy = payload.ReviewedBy,
+                    ReviewedDate = payload.ReviewedDate,
+                    AccessionNumber = payload.AccessionNumber,
+                    IsDefault = payload.IsDefault,
+                    PrincipalResultInterpreter = payload.PrincipalResultInterpreter,
+                    Action = payload.Action,
+                    OldMrno = header.OldMrno,
+                    SequenceNo = null,
+                    PerformAtLabId = payload.PerformAtLabId,
+                    Note = payload.Note
+                };
+                _db.Add(main);
+                await _db.SaveChangesAsync();
+
+                labResultId = main.LabResultId;
+
+                if (payload.Observations != null && payload.Observations.Count > 0)
+                {
+                    foreach (var obs in payload.Observations)
+                    {
+                        await _db.Database.ExecuteSqlRawAsync(
+                            "INSERT INTO LabResultsObservation (ValueType, ObservationIdentifierFullName, ObservationIdentifierShortName, ObservationValue, Units, ReferenceRangeMin, ReferenceRangeMax, AbnormalFlag, ResultStatus, ObservationDateTime, AnalysisDateTime, CreatedBy, CreatedDate, UpdatedBy, UpdatedDate, Remarks, WeqayaScreening, SequenceNo, LabResultId) VALUES ({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18})",
+                            obs.ValueType,
+                            obs.ObservationIdentifierFullName,
+                            obs.ObservationIdentifierShortName,
+                            obs.ObservationValue,
+                            obs.Units,
+                            obs.ReferenceRangeMin,
+                            obs.ReferenceRangeMax,
+                            obs.AbnormalFlag,
+                            obs.ResultStatus,
+                            obs.ObservationDateTime.HasValue ? obs.ObservationDateTime.Value.ToString("yyyyMMddHHmmss") : null,
+                            obs.AnalysisDateTime.HasValue ? obs.AnalysisDateTime.Value.ToString("yyyyMMddHHmmss") : null,
+                            payload.UserId.ToString(),
+                            DateTime.UtcNow.ToString("yyyyMMddHHmmss"),
+                            payload.UserId.ToString(),
+                            DateTime.UtcNow.ToString("yyyyMMddHHmmss"),
+                            obs.Remarks,
+                            obs.WeqayaScreening,
+                            obs.SequenceNo,
+                            labResultId
+                        );
+                    }
                 }
+
+                detail.PerformDate = payload.PerformDate;
+                if (header != null)
+                {
+                    var resolved = ResolveStatus(LabOrderStatus.Completed, header.OrderStatus);
+                    header.OrderStatus = resolved;
+                }
+
+                if (payload.Attachments != null && payload.Attachments.Count > 0)
+                {
+                    foreach (var att in payload.Attachments)
+                    {
+                        var attachment = new LabResultsScannedImages
+                        {
+                            LabResultId = labResultId,
+                            FileId = att.FileId
+                        };
+                        _db.Add(attachment);
+                    }
+                }
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                labRecord.PerformDate = payload.PerformDate;
+                labRecord.EntryDate = payload.EntryDate;
+                labRecord.UpdatedDate = FormatY14(DateTime.UtcNow);
+                labRecord.ReviewedBy = payload.ReviewedBy;
+                labRecord.ReviewedDate = payload.ReviewedDate;
+                labRecord.AccessionNumber = payload.AccessionNumber;
+                labRecord.IsDefault = payload.IsDefault;
+                labRecord.PrincipalResultInterpreter = payload.PrincipalResultInterpreter;
+                labRecord.Action = payload.Action;
+                labRecord.PerformAtLabId = payload.PerformAtLabId;
+                labRecord.Note = payload.Note;
+
+                detail.PerformDate = payload.PerformDate;
+                if (header != null)
+                {
+                    var resolved = ResolveStatus(LabOrderStatus.Completed, header.OrderStatus);
+                    header.OrderStatus = resolved;
+                }
+
+                if (payload.Attachments != null && payload.Attachments.Count > 0)
+                {
+                    foreach (var att in payload.Attachments)
+                    {
+                        var getAttachment = _db.LabResultsScannedImages
+                            .FirstOrDefault(x => x.LabResultId == labRecord.LabResultId && x.FileId == att.FileId);
+                        if (getAttachment == null)
+                        {
+                            var attachment = new LabResultsScannedImages
+                            {
+                                LabResultId = labRecord.LabResultId,
+                                FileId = att.FileId
+                            };
+                            _db.Add(attachment);
+                        }
+                    }
+                }
+                await _db.SaveChangesAsync();
+
+                labResultId = labRecord.LabResultId; 
             }
 
-            // Update detail and header statuses (Completed via enum mapping)
-            detail.PerformDate = payload.PerformDate;
-            if (header != null)
-            {
-                var resolved = ResolveStatus(LabOrderStatus.Completed, header.OrderStatus);
-                header.OrderStatus = resolved;
-              //  header.UpdatedBy = payload.UserId.ToString();
-               // header.UpdatedDate = FormatDate(DateTime.UtcNow);
-            }
-            await _db.SaveChangesAsync();
             return labResultId;
         }
+
         public async Task<IEnumerable<OptionDTO>> GetRefPhysiciansAsync(int? employeeTypeId)
         {
             // Filter by EmployeeTypeId when provided (e.g., 1=Doctor, 7=Nurse), otherwise return all active/non-deleted
@@ -646,7 +759,7 @@ AND (
                 {
                     var ivfLabOrder = new IvflabOrderSet
                     {
-                        OrderSetDetailId = orderSetId, 
+                        OrderSetId = orderSetId, 
                         OverviewId = payload.Header.OverviewId ?? 0
                     };
                     _db.IvflabOrderSet.Add(ivfLabOrder);
@@ -1001,6 +1114,29 @@ AND (
                     return LabOrderStatus.Cancel;
                 default:
                     return (isSigned ?? false) ? LabOrderStatus.Completed : LabOrderStatus.New;
+            }
+        }
+        public async Task<bool> DeleteScannedImageAsync(long fileId)
+        {
+            await using var tx = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                var scannedImage = await _db.LabResultsScannedImages
+                    .FirstOrDefaultAsync(x => x.FileId == fileId);
+
+                if (scannedImage == null) return false;
+
+                scannedImage.IsDeleted = true;
+                _db.LabResultsScannedImages.Update(scannedImage);
+                await _db.SaveChangesAsync();
+                await tx.CommitAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await tx.RollbackAsync();
+                throw;
             }
         }
     }

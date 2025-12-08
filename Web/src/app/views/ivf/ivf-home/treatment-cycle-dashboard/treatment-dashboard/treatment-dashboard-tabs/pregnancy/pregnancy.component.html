@@ -4,60 +4,120 @@
       <strong>Pregnancy</strong>
     </div>
     <div class="card-body py-2">
-      <!-- Top status row -->
-      <div class="row g-1 align-items-end">
-        <div class="col-md-5 d-flex align-items-center gap-2 flex-wrap">
-          <div class="fw-semibold">Cycle outcome:</div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="outcomeUnknown" formControlName="outcomeUnknown">
-            <label class="form-check-label" for="outcomeUnknown">Unknown</label>
+      <ng-container *ngIf="!isLoading; else skeleton">
+        <!-- Top status row -->
+        <div class="row g-1 align-items-end">
+          <div class="col-md-3">
+            <div class="d-flex align-items-center gap-2">
+              <label class="form-label mb-0 text-nowrap">Cycle outcome:</label>
+              <select class="form-select form-select-sm" formControlName="cycleOutcome">
+                <option [value]="null">Select...</option>
+                <option *ngFor="let opt of options('CycleOutcome')" [value]="opt.valueId">{{ opt.name }}</option>
+              </select>
+            </div>
           </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="outcomeClinical" formControlName="outcomeClinical">
-            <label class="form-check-label" for="outcomeClinical">Clinical PG</label>
+          <div class="col-md-3">
+            <div class="d-flex align-items-center flex-nowrap gap-2">
+              <label class="form-label mb-0 small text-nowrap">Positive PG test</label>
+              <select class="form-select form-select-sm w-auto" formControlName="positivePgTest">
+                <option [value]="null">Select...</option>
+                <option *ngFor="let opt of options('PositivePgtest')" [value]="opt.valueId">{{ opt.name }}</option>
+              </select>
+            </div>
           </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="outcomeNoPreg" formControlName="outcomeNoPreg">
-            <label class="form-check-label" for="outcomeNoPreg">No pregnancy</label>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="d-flex align-items-center flex-nowrap gap-2">
-            <label class="form-label mb-0 small text-nowrap">Positive PG test</label>
-            <select class="form-select form-select-sm w-auto" formControlName="positivePgTest">
-              <option>Yes</option>
-              <option>No</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="d-flex align-items-center flex-nowrap gap-2">
-            <label class="form-label mb-0 small text-nowrap">Last hCG</label>
-            <input type="date" class="form-control form-control-sm w-auto" formControlName="lastHcg" [disabled]="true" />
+          <div class="col-md-3">
+            <div class="d-flex align-items-center flex-nowrap gap-2">
+              <label class="form-label mb-0 small text-nowrap">Last hCG</label>
+              <input type="date" class="form-control form-control-sm w-auto" formControlName="lastHcg" />
+            </div>
           </div>
         </div>
-      </div>
-      <hr>
-      <!-- Tabs -->
-      <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#preg-progress" type="button" role="tab">Progress</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#preg-ultrasound" type="button" role="tab">Ultrasound</button>
-        </li>
-      </ul>
-      <div class="tab-content border-start border-end border-bottom p-2">
-        <div class="tab-pane fade show active" id="preg-progress" role="tabpanel">
-          <app-progress></app-progress>
+        <hr>
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#preg-progress" type="button" role="tab">Progress</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#preg-ultrasound" type="button" role="tab">Ultrasound</button>
+          </li>
+        </ul>
+        <div class="tab-content border-start border-end border-bottom p-2">
+          <div class="tab-pane fade show active" id="preg-progress" role="tabpanel">
+            <app-progress [dropdowns]="dropdowns"></app-progress>
+          </div>
+          <div class="tab-pane fade" id="preg-ultrasound" role="tabpanel">
+            <app-ultrasound [dropdowns]="dropdowns"></app-ultrasound>
+          </div>
         </div>
-        <div class="tab-pane fade" id="preg-ultrasound" role="tabpanel">
-          <app-ultrasound></app-ultrasound>
+        <div class="text-end mt-2">
+          <button type="button" class="btn btn-sm btn-primary" (click)="onSave()" [disabled]="isSaving">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+            {{ isSaving ? 'Saving...' : 'Save' }}
+          </button>
         </div>
-      </div>
-      <div class="text-end mt-2">
-        <button type="button" class="btn btn-sm btn-primary" (click)="onSave()">Save</button>
-      </div>
+      </ng-container>
+
+      <!-- Skeleton Template -->
+      <ng-template #skeleton>
+        <div class="row g-1 mb-3">
+          <div class="col-md-3">
+            <div class="placeholder-glow">
+              <span class="placeholder col-5 mb-1"></span>
+              <span class="placeholder col-12"></span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="placeholder-glow">
+              <span class="placeholder col-6 mb-1"></span>
+              <span class="placeholder col-12"></span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="placeholder-glow">
+              <span class="placeholder col-4 mb-1"></span>
+              <span class="placeholder col-12"></span>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="placeholder-glow">
+          <span class="placeholder col-2 mb-2" style="height: 38px;"></span>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="row g-2 mb-3">
+              <div class="col-md-3">
+                <div class="placeholder-glow">
+                  <span class="placeholder col-10 mb-1"></span>
+                  <span class="placeholder col-12"></span>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="placeholder-glow">
+                  <span class="placeholder col-8 mb-1"></span>
+                  <span class="placeholder col-12"></span>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="placeholder-glow">
+                  <span class="placeholder col-9 mb-1"></span>
+                  <span class="placeholder col-12"></span>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="placeholder-glow">
+                  <span class="placeholder col-7 mb-1"></span>
+                  <span class="placeholder col-12"></span>
+                </div>
+              </div>
+            </div>
+            <div class="placeholder-glow">
+              <span class="placeholder col-12" style="height: 200px;"></span>
+            </div>
+          </div>
+        </div>
+      </ng-template>
     </div>
   </div>
 </div>

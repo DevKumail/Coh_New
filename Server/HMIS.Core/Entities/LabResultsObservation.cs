@@ -60,9 +60,7 @@ public partial class LabResultsObservation
     [Unicode(false)]
     public string CreatedDate { get; set; } = null!;
 
-    [StringLength(25)]
-    [Unicode(false)]
-    public string UpdatedBy { get; set; } = null!;
+    public int? UpdatedBy { get; set; }
 
     [StringLength(14)]
     [Unicode(false)]

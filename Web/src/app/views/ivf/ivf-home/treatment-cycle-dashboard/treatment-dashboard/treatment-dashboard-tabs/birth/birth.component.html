@@ -11,14 +11,17 @@
     </ul>
     <div class="tab-content border-start border-end border-bottom p-2">
       <div class="tab-pane fade show active" id="birth-tab" role="tabpanel">
-       <app-birth-tab></app-birth-tab>
+       <app-birth-tab [dropdowns]="dropdowns"></app-birth-tab>
       </div>
       <div class="tab-pane fade" id="followup-tab" role="tabpanel">
         <app-follow-up></app-follow-up>
       </div>
     </div>
     <div class="text-end mt-2">
-      <button type="button" class="btn btn-sm btn-primary" (click)="onSave()">Save</button>
+      <button type="button" class="btn btn-sm btn-primary" (click)="onSave()" [disabled]="isSaving">
+        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+        {{ isSaving ? 'Saving...' : 'Save' }}
+      </button>
     </div>
   </div>
 </div>

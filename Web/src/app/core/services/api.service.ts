@@ -52,4 +52,9 @@ export class ApiService {
   delete<T>(endpoint: string): Observable<T> {
     return this.http.delete<T>(`${this.baseUrl}/${endpoint}`);
   }
+
+  // Some backends expect a DELETE request with a body payload
+  deleteWithBody<T>(endpoint: string, body: any): Observable<T> {
+    return this.http.request<T>('DELETE', `${this.baseUrl}/${endpoint}`, { body });
+  }
 }

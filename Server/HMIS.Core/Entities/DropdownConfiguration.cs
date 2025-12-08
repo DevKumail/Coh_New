@@ -86,8 +86,14 @@ public partial class DropdownConfiguration
     [InverseProperty("RetrievalTechniqueCategory")]
     public virtual ICollection<IvfepisodeAspirationOocyteRetrieval> IvfepisodeAspirationOocyteRetrievalRetrievalTechniqueCategory { get; set; } = new List<IvfepisodeAspirationOocyteRetrieval>();
 
+    [InverseProperty("DeliveryMethodCategory")]
+    public virtual ICollection<IvfepisodeBirth> IvfepisodeBirth { get; set; } = new List<IvfepisodeBirth>();
+
     [InverseProperty("EventTypeCategory")]
     public virtual ICollection<IvfepisodeOverviewEvents> IvfepisodeOverviewEvents { get; set; } = new List<IvfepisodeOverviewEvents>();
+
+    [InverseProperty("FetalPathologyComplicationCategory")]
+    public virtual ICollection<IvfepisodePregnancy> IvfepisodePregnancy { get; set; } = new List<IvfepisodePregnancy>();
 
     [InverseProperty("CatheterCategory")]
     public virtual ICollection<IvfepisodeTransfer> IvfepisodeTransferCatheterCategory { get; set; } = new List<IvfepisodeTransfer>();

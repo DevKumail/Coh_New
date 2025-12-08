@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { QuillModule, QuillEditorComponent } from 'ngx-quill';
@@ -10,7 +10,7 @@ import { QuillModule, QuillEditorComponent } from 'ngx-quill';
   templateUrl: './further-information.component.html',
   styleUrl: './further-information.component.scss'
 })
-export class FurtherInformationComponent {
+export class FurtherInformationComponent implements OnInit {
   @Input() catheterOptions: Array<{ valueId: number; name: string }> = [];
   @Input() mainOptions: Array<{ valueId: number; name: string }> = [];
   @Input() furtherOptions: Array<{ valueId: number; name: string }> = [];
@@ -50,6 +50,19 @@ export class FurtherInformationComponent {
       ultrasoundCheck: [false],
       vulsellum: [false],
       probe: [false],
+    });
+  }
+
+  ngOnInit() {
+    // Listen to severalAttempts checkbox changes
+    this.form.get('severalAttempts')?.valueChanges.subscribe((checked: boolean) => {
+      const attemptsControl = this.form.get('attempts');
+      if (checked) {
+        attemptsControl?.enable();
+      } else {
+        attemptsControl?.setValue(null);
+        attemptsControl?.disable();
+      }
     });
   }
 

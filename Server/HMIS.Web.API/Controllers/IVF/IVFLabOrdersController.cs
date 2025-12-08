@@ -98,6 +98,14 @@ namespace HMIS.Web.Controllers.IVF
             return Ok(rows);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetCollectionDetailsWithResults(long LabResultId)
+        {
+            var rows = await _service.GetOrderCollectionDetailsWithResultsAsync(LabResultId);
+            if (rows == null) return NotFound();
+            return Ok(rows);
+        }
+
         // Sample collection - Collect samples for all tests in the order
         [HttpPost("{OrderSetDetailId:long}/collect")]
         public async Task<IActionResult> CollectSample(long OrderSetDetailId, [FromBody] CollectSampleDTO payload)
@@ -136,6 +144,13 @@ namespace HMIS.Web.Controllers.IVF
                 return BadRequest("Marked complete order cannot be canceled.");
             
             return Ok(new { message = "Order cancelled successfully", orderSetId });
+        }
+
+        [HttpDelete("scanned-images/{fileId:long}")]
+        public async Task<IActionResult> DeleteScannedImage(long fileId)
+        {
+            var success = await _service.DeleteScannedImageAsync(fileId);
+            return success ? NoContent() : NotFound();
         }
     }
 }

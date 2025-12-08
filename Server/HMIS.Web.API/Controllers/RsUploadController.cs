@@ -178,5 +178,50 @@ namespace HMIS.Web.Controllers
                 return StatusCode(500, "Error getting file information");
             }
         }
+
+        [HttpGet("GetAttachmentFiles")]
+        public async Task<ActionResult<List<GetFileResponse>>> GetAttachmentIFormFiles([FromQuery] List<long> fileIds)
+        {
+            try
+            {
+                if (fileIds == null || fileIds.Count == 0)
+                    return BadRequest("No file IDs provided");
+
+                var responses = new List<GetFileResponse>();
+
+                foreach (var fileId in fileIds)
+                {
+                    var fileEntity = await _fileRepository.GetAsync(fileId);
+                    if (fileEntity == null || fileEntity.IsDeleted == true)
+                        continue;
+
+                    var filePath = await _fileRepository.GetFilePathAsync(fileId);
+                    if (!_fileHelper.FileExists(filePath))
+                        continue;
+
+                    var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                    responses.Add(new GetFileResponse
+                    {
+                        FileId = fileId,
+                        FileName = fileEntity.FileName,
+                        ContentType = fileEntity.DocumentType ?? "application/octet-stream",
+                        Content = fileBytes 
+                    });
+                }
+
+                if (responses.Count == 0)
+                    return NotFound("No valid files found");
+
+                return Ok(responses);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error downloading files as bytes");
+                return StatusCode(500, "Error downloading files");
+            }
+        }
+
+
     }
 }

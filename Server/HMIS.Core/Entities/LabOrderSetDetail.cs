@@ -95,9 +95,6 @@ public partial class LabOrderSetDetail
     [Column(TypeName = "datetime")]
     public DateTime? UpdatedAt { get; set; }
 
-    [InverseProperty("OrderSetDetail")]
-    public virtual ICollection<IvflabOrderSet> IvflabOrderSet { get; set; } = new List<IvflabOrderSet>();
-
     [ForeignKey("SampleTypeId")]
     [InverseProperty("LabOrderSetDetail")]
     public virtual LabSampleTypes? SampleType { get; set; }

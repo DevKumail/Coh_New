@@ -202,6 +202,15 @@ export class IVFApiService {
     return this.api.post(`IVFLabOrders/${orderSetDetailId}/observations`, body);
   }
 
+  completeLabOrder(orderSetDetailId: number | string, body: any): Observable<any> {
+    return this.api.post(`IVFLabOrders/${orderSetDetailId}/observations`, body);
+  }
+
+  // Get collection details together with previously completed header/attachments by lab result id
+  getCollectionDetailsWithResults(labResultId: number | string): Observable<any> {
+    return this.api.get('IVFLabOrders', { LabResultId: labResultId });
+  }
+
   getPathologyResults(mrno: string | number, search?: string): Observable<any> {
     const params: any = {};
     if (search && search.trim()) {
@@ -230,6 +239,12 @@ export class IVFApiService {
   savePrescriptionMasterFull(body: any): Observable<any> {
     return this.api.post('Overview/prescription-master-save', body);
   }
+
+
+// Delete all schedules of a drug for a treatment cycle
+deletePrescriptionMaster(ivfTreatmentCycleId: number, drugId: number): Observable<any> {
+  return this.api.deleteWithBody('Overview/prescription-master-delete', { ivfTreatmentCycleId, drugId });
+}
 
   // Roles and Receivers
   getAllRoles(): Observable<any> {
@@ -287,5 +302,23 @@ export class IVFApiService {
   // Cancel a lab order
   cancelLabOrder(orderSetId: number | string): Observable<any> {
     return this.api.post(`IVFLabOrders/${orderSetId}/cancel`, {});
+  }
+
+  // Episode Pregnancy (Pregnancy tab)
+  saveEpisodePregnancy(payload: any): Observable<any> {
+    return this.api.post('IVFEpisodePregnancy/CreateUpdateEpisodePregnancy', payload);
+  }
+
+  getEpisodePregnancyByCycleId(cycleId: number): Observable<any> {
+    return this.api.get(`IVFEpisodePregnancy/GetEpisodePregnancyByCycleId?ivfDashboardTreatmentCycleId=${cycleId}`);
+  }
+
+  // Birth Episode APIs
+  getEpisodeBirthByCycleId(cycleId: number): Observable<any> {
+    return this.api.get(`IVFEpisodeBirth/GetEpisodeBirthByCycleId?ivfDashboardTreatmentCycleId=${cycleId}`);
+  }
+
+  saveEpisodeBirth(payload: any): Observable<any> {
+    return this.api.post('IVFEpisodeBirth/CreateUpdateEpisodeBirth', payload);
   }
 }
