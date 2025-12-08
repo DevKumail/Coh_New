@@ -117,8 +117,12 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Birth
                             BirthId = stage.BirthId,
                             DateOfBirth = childDto.DateOfBirth,
                             Week = childDto.Week,
-                            GenderId = childDto.GenderId,
-                            DeliveryMethodCategoryId = childDto.DeliveryMethodCategoryId,
+                            GenderId = childDto.GenderId.HasValue && childDto.GenderId.Value > 0
+                                ? childDto.GenderId.Value
+                                : null,
+                            DeliveryMethodCategoryId = childDto.DeliveryMethodCategoryId.HasValue && childDto.DeliveryMethodCategoryId.Value > 0
+                                ? childDto.DeliveryMethodCategoryId.Value
+                                : null,
                             Weight = childDto.Weight,
                             Length = childDto.Length,
                             HeadCircumference = childDto.HeadCircumference,
@@ -129,7 +133,9 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Birth
                             FirstName = childDto.FirstName,
                             Surname = childDto.Surname,
                             PlaceOfBirth = childDto.PlaceOfBirth,
-                            CountryId = childDto.CountryId,
+                            CountryId = childDto.CountryId.HasValue && childDto.CountryId.Value > 0
+                                ? childDto.CountryId.Value
+                                : null,
                             Note = childDto.Note,
                             IsDeleted = false
                         };
@@ -141,6 +147,9 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Birth
                         {
                             foreach (var catId in childDto.ChromosomeAnomalyCategoryIds)
                             {
+                                if (string.IsNullOrWhiteSpace(catId))
+                                    continue;
+
                                 var anomaly = new IvfepisodeBirthChromosomeAnomaly
                                 {
                                     BirthId = childEntity.Id,
@@ -155,6 +164,9 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Birth
                         {
                             foreach (var catId in childDto.CongenitalMalformationCategoryIds)
                             {
+                                if (string.IsNullOrWhiteSpace(catId))
+                                    continue;
+
                                 var malformation = new IvfepisodeBirthCongenitalMalformation
                                 {
                                     BirthId = childEntity.Id,
@@ -176,7 +188,10 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Birth
             catch (Exception ex)
             {
                 await tx.RollbackAsync();
-                return Result<long>.Failure(ex.Message);
+                var detailedMessage = ex.InnerException != null
+                    ? $"{ex.Message} | InnerException: {ex.InnerException.Message}"
+                    : ex.Message;
+                return Result<long>.Failure(detailedMessage);
             }
         }
 
@@ -288,7 +303,10 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Birth
             catch (Exception ex)
             {
                 await tx.RollbackAsync();
-                return (false, ex.Message);
+                var detailedMessage = ex.InnerException != null
+                    ? $"{ex.Message} | InnerException: {ex.InnerException.Message}"
+                    : ex.Message;
+                return (false, detailedMessage);
             }
         }
     }
