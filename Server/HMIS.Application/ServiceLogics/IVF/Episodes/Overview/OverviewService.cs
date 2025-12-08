@@ -36,19 +36,19 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                         ov = overview;
                         ov.Calender = new List<GetCalenderDto>
                         {
-                    new GetCalenderDto
-                    {
-                        Events = new List<GetEventDetailDto>(),
-                        Medications = new List<GetMedicationDto>(),
-                        UltraSound = new List<GetUltraSound>()
-                    }
+                            new GetCalenderDto
+                            {
+                                Events = new List<GetEventDetailDto>(),
+                                Medications = new List<GetMedicationDto>(),
+                                UltraSound = new List<GetUltraSound>()
+                            }
                         };
                         ov.Resources = new List<GetResourcesDetailDto>
                         {
-                    new GetResourcesDetailDto
-                    {
-                        AllMedications = new List<GetSidebarMedicationDto>()
-                    }
+                            new GetResourcesDetailDto
+                            {
+                                AllMedications = new List<GetSidebarMedicationDto>()
+                            }
                         };
                         lookup.Add(ov.OverviewId, ov);
                     }
