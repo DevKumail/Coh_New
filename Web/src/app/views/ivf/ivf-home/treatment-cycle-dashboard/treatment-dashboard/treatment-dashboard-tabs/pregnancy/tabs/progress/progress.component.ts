@@ -275,4 +275,71 @@ export class ProgressComponent implements OnInit {
     if (q.length === 0) return this.complicationsAfter20Options;
     return this.complicationsAfter20Options.filter((o: any) => o.name.toLowerCase().includes(q));
   }
+
+  // Clear all form fields
+  clearForm() {
+    console.log('Clearing progress form');
+    this.form.reset({
+      clinicalPregnancyDate: null,
+      cbd: null,
+      embryoCount: null,
+      amnioticExtrauterine: null,
+      editorContent: '',
+      fetalPathology: null,
+      compUntil20: [],
+      compAfter20: []
+    });
+    
+    // Clear embryos array
+    const embryosArray = this.form.get('embryos') as FormArray;
+    embryosArray.clear();
+    this.embryosData = [];
+    this.selectedEmbryoCount = 0;
+  }
+
+  // Bind progress data (restore from saved data)
+  bindProgressData(data: any) {
+    console.log('Binding progress data:', data);
+    
+    // Helper to format date
+    const formatDate = (dateStr: string | null) => {
+      if (!dateStr) return null;
+      const d = new Date(dateStr);
+      return d.toISOString().split('T')[0];
+    };
+    
+    // Patch form values
+    this.form.patchValue({
+      clinicalPregnancyDate: data.pregnancyDeterminedOnDate ? formatDate(data.pregnancyDeterminedOnDate) : null,
+      embryoCount: data.intrauterineCategoryId || null,
+      amnioticExtrauterine: data.extrauterineCategoryId || null,
+      editorContent: data.notes || '',
+      fetalPathology: data.fetalPathologyComplicationCategoryId || null,
+      compUntil20: this.extractComplicationIds(data.complicationsUntil20th),
+      compAfter20: this.extractComplicationIds(data.complicationsAfter20th)
+    });
+    
+    // Restore embryos
+    if (data.embryos && data.embryos.length > 0) {
+      const embryosArray = this.form.get('embryos') as FormArray;
+      embryosArray.clear();
+      this.embryosData = [];
+      
+      data.embryos.forEach((embryo: any, index: number) => {
+        this.embryosData.push({ key: index + 1, label: `Embryo ${index + 1}` });
+        embryosArray.push(this.fb.group({
+          progress1: [embryo.pgProgressUntil24thWeekCategoryId || null],
+          note: [embryo.note || null]
+        }));
+      });
+      
+      this.selectedEmbryoCount = data.embryos.length;
+    }
+  }
+  
+  // Helper to extract complication IDs
+  private extractComplicationIds(complications: any[]): number[] {
+    if (!complications || complications.length === 0) return [];
+    return complications.map((c: any) => c.complicationUntil20thWeekCategoryId || c.complicationAfter20thWeekCategoryId).filter((id: any) => id != null);
+  }
 }

@@ -32,6 +32,8 @@ export class PregnancyComponent implements OnInit {
   AllDropdownValues: any = [];
   isLoading: boolean = false;
   isSaving: boolean = false;
+  isNoPregnancy: boolean = false;
+  savedProgressData: any = null; // Store fetched progress data
   @ViewChild(ProgressComponent) progress?: ProgressComponent;
   @ViewChild(UltrasoundComponent) ultrasound?: UltrasoundComponent;
 
@@ -46,11 +48,18 @@ export class PregnancyComponent implements OnInit {
       cycleOutcome: [null],
       positivePgTest: [null],
       lastHcg: [null],
+      withdrawalBleeding: [null],
+      withdrawalBleedingDate: [null]
     });
   }
 
   ngOnInit(): void {
     this.getAlldropdown();
+
+    // Listen to cycle outcome changes to detect "No pregnancy"
+    this.form.get('cycleOutcome')?.valueChanges.subscribe((value) => {
+      this.checkNoPregnancyStatus(value);
+    });
 
     this.route.queryParamMap.subscribe((qp) => {
       const idStr = qp.get('cycleId');
@@ -58,6 +67,12 @@ export class PregnancyComponent implements OnInit {
       this.cycleId = Number.isFinite(id) && id > 0 ? id : 0;
       if (this.cycleId > 0) {
         this.loadPregnancyData();
+      } else {
+        // Check initial form value if no API call
+        const currentValue = this.form.get('cycleOutcome')?.value;
+        if (currentValue) {
+          this.checkNoPregnancyStatus(currentValue);
+        }
       }
     });
   }
@@ -78,6 +93,54 @@ export class PregnancyComponent implements OnInit {
     // Helper to read dropdown options by key
     options(key: string) {
       return (this.dropdowns && this.dropdowns[`IVFPregnancyEpisode:${key}`]) || [];
+    }
+
+    // OnChange event handler for Cycle outcome dropdown
+    onCycleOutcomeChange(event: any) {
+      const selectedValue = event.target.value;
+      console.log('Cycle outcome changed:', selectedValue);
+      
+      // Convert to number if it's a string
+      const valueId = selectedValue && selectedValue !== 'null' ? Number(selectedValue) : null;
+      
+      // Check No pregnancy status
+      this.checkNoPregnancyStatus(valueId);
+      
+      // Handle progress form data based on selection
+      this.handleProgressFormData();
+    }
+
+    // Check if "No pregnancy" is selected
+    checkNoPregnancyStatus(cycleOutcomeId: number | null) {
+      if (!cycleOutcomeId) {
+        this.isNoPregnancy = false;
+        console.log('No pregnancy status: false (no selection)');
+        return;
+      }
+      
+      const selectedOption = this.options('CycleOutcome').find((opt: any) => opt.valueId === cycleOutcomeId);
+      // Check if the selected option name is "No pregnancy" (case-insensitive)
+      this.isNoPregnancy = selectedOption?.name?.toLowerCase().includes('no pregnancy') || false;
+      console.log('No pregnancy status:', this.isNoPregnancy, 'Selected option:', selectedOption?.name);
+    }
+
+    // Handle progress form data based on No pregnancy selection
+    handleProgressFormData() {
+      setTimeout(() => {
+        if (this.isNoPregnancy) {
+          // Clear progress form when No pregnancy is selected
+          console.log('Clearing progress form (No pregnancy selected)');
+          if (this.progress) {
+            this.progress.clearForm();
+          }
+        } else {
+          // Restore saved progress data when other option is selected
+          console.log('Restoring progress form data');
+          if (this.progress && this.savedProgressData) {
+            this.progress.bindProgressData(this.savedProgressData);
+          }
+        }
+      }, 100);
     }
 
   loadPregnancyData() {
@@ -107,8 +170,13 @@ export class PregnancyComponent implements OnInit {
     this.form.patchValue({
       cycleOutcome: data.statusId || null,
       positivePgTest: data.progress?.positivePgtestCategoryId || null,
-      lastHcg: data.progress?.lastbhCGDate ? this.formatDateForInput(data.progress.lastbhCGDate) : null
+      lastHcg: data.progress?.lastbhCGDate ? this.formatDateForInput(data.progress.lastbhCGDate) : null,
+      withdrawalBleeding: data.withdrawalBleedingCategoryId || null,
+      withdrawalBleedingDate: data.withdrawalBleedingDate ? this.formatDateForInput(data.withdrawalBleedingDate) : null
     });
+
+    // Check if No pregnancy is selected
+    this.checkNoPregnancyStatus(data.statusId);
 
     console.log('Top form patched');
 
@@ -118,6 +186,9 @@ export class PregnancyComponent implements OnInit {
       if (this.progress && data.progress?.pregnancy) {
         console.log('Progress component found, binding data');
         const pregnancyData = data.progress.pregnancy;
+        
+        // Save progress data for later restoration
+        this.savedProgressData = pregnancyData;
         
         // Patch basic fields
         this.progress.form.patchValue({
@@ -196,15 +267,20 @@ export class PregnancyComponent implements OnInit {
 
   onSave() {
     const topData = this.form.getRawValue();
-    const progressData = this.progress ? this.progress.form.getRawValue() : null;
     
-    if (!progressData) {
+    // If No pregnancy is selected, send null for progress data
+    let progressData = null;
+    if (!this.isNoPregnancy && this.progress) {
+      progressData = this.progress.form.getRawValue();
+    }
+    
+    // Only require progress data if NOT "No pregnancy"
+    if (!this.isNoPregnancy && !progressData) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
         text: 'Progress data is required',
       });
-
       return;
     }
 
@@ -256,7 +332,31 @@ export class PregnancyComponent implements OnInit {
     });
   }
 
+  // Helper to convert empty/invalid values to null
+  private toNullIfEmpty(value: any): any {
+    if (value === null || value === undefined || value === '' || value === 'null') {
+      return null;
+    }
+    // Convert string numbers to actual numbers for IDs
+    if (typeof value === 'string' && !isNaN(Number(value))) {
+      return Number(value);
+    }
+    return value;
+  }
+
   private buildPayload(topData: any, progressData: any) {
+    // If No pregnancy is selected, send minimal payload with null progress
+    if (this.isNoPregnancy || !progressData) {
+      return {
+        pregnancyId: this.pregnancyId,
+        ivfDashboardTreatmentCycleId: this.cycleId,
+        statusId: this.toNullIfEmpty(topData.cycleOutcome),
+        withdrawalBleedingCategoryId: this.toNullIfEmpty(topData.withdrawalBleeding),
+        withdrawalBleedingDate: this.toNullIfEmpty(topData.withdrawalBleedingDate),
+        progress: null
+      };
+    }
+    
     // Map embryos
     const embryos = (progressData.embryos || []).map((embryo: any, index: number) => ({
       embryoId: 0,
@@ -287,22 +387,24 @@ export class PregnancyComponent implements OnInit {
     return {
       pregnancyId: this.pregnancyId,
       ivfDashboardTreatmentCycleId: this.cycleId,
-      statusId: topData.cycleOutcome || null,
+      statusId: this.toNullIfEmpty(topData.cycleOutcome),
+      withdrawalBleedingCategoryId: this.toNullIfEmpty(topData.withdrawalBleeding),
+      withdrawalBleedingDate: this.toNullIfEmpty(topData.withdrawalBleedingDate),
       progress: {
         id: 0,
         pregnancyId: this.pregnancyId,
-        cycleOutcomeCategoryId: topData.cycleOutcome || null,
-        positivePgtestCategoryId: topData.positivePgTest || null,
-        lastbhCGDate: topData.lastHcg || null,
+        cycleOutcomeCategoryId: this.toNullIfEmpty(topData.cycleOutcome),
+        positivePgtestCategoryId: this.toNullIfEmpty(topData.positivePgTest),
+        lastbhCGDate: this.toNullIfEmpty(topData.lastHcg),
         ultrasound: {
           ultrasoundId: 0
         },
         pregnancy: {
-          pregnancyDeterminedOnDate: progressData.clinicalPregnancyDate || null,
-          intrauterineCategoryId: progressData.embryoCount || null,
-          extrauterineCategoryId: progressData.amnioticExtrauterine || null,
-          notes: progressData.editorContent || null,
-          fetalPathologyComplicationCategoryId: progressData.fetalPathology || null,
+          pregnancyDeterminedOnDate: this.toNullIfEmpty(progressData.clinicalPregnancyDate),
+          intrauterineCategoryId: this.toNullIfEmpty(progressData.embryoCount),
+          extrauterineCategoryId: this.toNullIfEmpty(progressData.amnioticExtrauterine),
+          notes: this.toNullIfEmpty(progressData.editorContent),
+          fetalPathologyComplicationCategoryId: this.toNullIfEmpty(progressData.fetalPathology),
           embryos: embryos,
           complicationsUntil20th: complicationsUntil20th,
           complicationsAfter20th: complicationsAfter20th

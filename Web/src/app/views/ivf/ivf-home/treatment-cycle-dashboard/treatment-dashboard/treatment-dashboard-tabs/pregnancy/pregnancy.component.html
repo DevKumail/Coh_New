@@ -10,46 +10,63 @@
           <div class="col-md-3">
             <div class="d-flex align-items-center gap-2">
               <label class="form-label mb-0 text-nowrap">Cycle outcome:</label>
-              <select class="form-select form-select-sm" formControlName="cycleOutcome">
+              <select class="form-select form-select-sm" formControlName="cycleOutcome" (change)="onCycleOutcomeChange($event)">
                 <option [value]="null">Select...</option>
                 <option *ngFor="let opt of options('CycleOutcome')" [value]="opt.valueId">{{ opt.name }}</option>
               </select>
             </div>
           </div>
-          <div class="col-md-3">
-            <div class="d-flex align-items-center flex-nowrap gap-2">
-              <label class="form-label mb-0 small text-nowrap">Positive PG test</label>
-              <select class="form-select form-select-sm w-auto" formControlName="positivePgTest">
-                <option [value]="null">Select...</option>
-                <option *ngFor="let opt of options('PositivePgtest')" [value]="opt.valueId">{{ opt.name }}</option>
-              </select>
+          
+          <!-- Show these fields when No pregnancy is NOT selected -->
+          <ng-container>
+            <div class="col-md-3" *ngIf="isNoPregnancy">
+              <div class="d-flex align-items-center flex-nowrap gap-2">
+                <label class="form-label mb-0 small text-nowrap">Withdrawal bleeding</label>
+                <select class="form-select form-select-sm w-auto" formControlName="withdrawalBleeding">
+                  <option [value]="null">Select...</option>
+                  <option *ngFor="let opt of options('WithdrawalBleeding')" [value]="opt.valueId">{{ opt.name }}</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="d-flex align-items-center flex-nowrap gap-2">
+                <label class="form-label mb-0 small text-nowrap">Positive PG test</label>
+                <select class="form-select form-select-sm w-auto" formControlName="positivePgTest">
+                  <option [value]="null">Select...</option>
+                  <option *ngFor="let opt of options('PositivePgtest')" [value]="opt.valueId">{{ opt.name }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="d-flex align-items-center flex-nowrap gap-2">
+                <label class="form-label mb-0 small text-nowrap">Last hCG</label>
+                <input type="date" class="form-control form-control-sm w-auto" formControlName="lastHcg" />
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <!-- Show tabs only when No pregnancy is NOT selected -->
+        <ng-container >
+          <hr>
+          <!-- Tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#preg-progress" type="button" role="tab">Progress</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#preg-ultrasound" type="button" role="tab">Ultrasound</button>
+            </li>
+          </ul>
+          <div class="tab-content border-start border-end border-bottom p-2">
+            <div class="tab-pane fade show active" id="preg-progress" role="tabpanel" *ngIf="!isNoPregnancy">
+              <app-progress [dropdowns]="dropdowns"></app-progress>
+            </div>
+            <div class="tab-pane fade" id="preg-ultrasound" role="tabpanel">
+              <app-ultrasound [dropdowns]="dropdowns"></app-ultrasound>
             </div>
           </div>
-          <div class="col-md-3">
-            <div class="d-flex align-items-center flex-nowrap gap-2">
-              <label class="form-label mb-0 small text-nowrap">Last hCG</label>
-              <input type="date" class="form-control form-control-sm w-auto" formControlName="lastHcg" />
-            </div>
-          </div>
-        </div>
-        <hr>
-        <!-- Tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#preg-progress" type="button" role="tab">Progress</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#preg-ultrasound" type="button" role="tab">Ultrasound</button>
-          </li>
-        </ul>
-        <div class="tab-content border-start border-end border-bottom p-2">
-          <div class="tab-pane fade show active" id="preg-progress" role="tabpanel">
-            <app-progress [dropdowns]="dropdowns"></app-progress>
-          </div>
-          <div class="tab-pane fade" id="preg-ultrasound" role="tabpanel">
-            <app-ultrasound [dropdowns]="dropdowns"></app-ultrasound>
-          </div>
-        </div>
+        </ng-container>
         <div class="text-end mt-2">
           <button type="button" class="btn btn-sm btn-primary" (click)="onSave()" [disabled]="isSaving">
             <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span>
