@@ -194,6 +194,7 @@ export class CycleOverviewComponent {
 
   private overviewData: any = null;
   overviewId: number | null = null;
+  labInvestigationTypeId: number = 5;
 
   private fetchOverviewData(id: number) {
     this.api.getOverviewByEpisodeId(id).subscribe({
@@ -434,6 +435,33 @@ export class CycleOverviewComponent {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           this.openAddMedModal();
+        });
+        el.appendChild(btn);
+      }
+    }
+    // Inject [+] button into Hormones divider to open Lab Order UI (type 25)
+    if (id === 'divider-hormones') {
+      const el: HTMLElement = arg.el;
+      el.style.position = 'relative';
+      if (!el.querySelector('.hormone-add-btn')) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-sm btn-link hormone-add-btn';
+        btn.title = 'Add hormone lab order';
+        btn.style.position = 'absolute';
+        btn.style.right = '6px';
+        btn.style.top = '8px';
+        btn.style.padding = '0 6px';
+        btn.style.lineHeight = '1';
+        btn.textContent = '+';
+        btn.style.height = '20px';
+        btn.style.width = '20px';
+        btn.style.fontSize = 'xx-large';
+        btn.style.color = '#333';
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.labInvestigationTypeId = 25;
+          this.openLabOrderCreateModal(this.selectedDate || new Date().toISOString().slice(0, 10));
         });
         el.appendChild(btn);
       }
@@ -1169,6 +1197,7 @@ export class CycleOverviewComponent {
 
     // If Examination row is clicked, open Lab Order modal instead of generic add modal
     if (resId === 'orders') {
+      this.labInvestigationTypeId = 5;
       this.openLabOrderCreateModal(clickedDate);
       return;
     }
@@ -1180,6 +1209,7 @@ export class CycleOverviewComponent {
       category = 'medication';
     } else if (['fsh', 'hcg-ng', 'lh', 'progesterone-ng'].includes(resId)) {
       category = 'hormone';
+      this.labInvestigationTypeId = 25;
     }
 
     this.addForm = {
@@ -1205,6 +1235,9 @@ export class CycleOverviewComponent {
     if (category === 'medication') {
       // Open Add Medication Resource Modal
       this.openAddMedModal();
+    } else if (category === 'hormone') {
+      // For hormone rows, open Lab Order UI using investigation type 25
+      this.openLabOrderCreateModal(clickedDate);
     } else {
       this.openAddModal();
     }
@@ -1439,7 +1472,7 @@ export class CycleOverviewComponent {
       labTestId: Number(t.id),
       cptCode: t.cpt || '',
       orderQuantity: 1,
-      investigationTypeId: 5,
+      investigationTypeId: this.labInvestigationTypeId || 5,
       billOnOrder: 1,
       pComments: (evt.details && evt.details.comments) || '',
     }));
