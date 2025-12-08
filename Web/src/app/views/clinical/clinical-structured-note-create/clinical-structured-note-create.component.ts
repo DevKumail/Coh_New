@@ -53,7 +53,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
   medicalHistoryQuestionId: number = 0; // Track the medical history section quest_Id
   vitalSignsQuestionId: number = 0; // Track the vital signs section quest_Id
   immunizationsQuestionId: number = 0; // Track the immunizations section quest_Id
-  
+
   // Properties to store IDs only during restoration phase
   restoredSocialHistoryIds: number[] = [];
   restoredFamilyHistoryIds: number[] = [];
@@ -514,12 +514,21 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       this.clinicalApiService.InsertNote(payload)
         .then((response: any) => {
           if (response != null && response != "") {
-            this.dataquestion = response;
+            // Store the note ID if it's a new note (preserve data, don't reset template)
+            if (response.id || response.noteId) {
+              this.noteId = response.id || response.noteId;
+            }
+
+            // Keep the current data intact - don't replace dataquestion with response
+            // this.dataquestion = response;  // Commented out to retain data
             this.nodeData = response.node || response;
             this.viewquestion = true;
             this.viewNoteResponse = true;
+
+            // Only clear description field
             this.clinicalForm.patchValue({ description: '' });
-            Swal.fire('Success', 'Note created successfully.', 'success');
+
+            Swal.fire('Success', 'Note saved successfully.', 'success');
           } else {
             throw new Error('Creation failed');
           }
@@ -651,7 +660,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
         if (question.children && question.children.length > 0) {
           // Check if this section contains VitalSignsItem children - render as table
           const hasVitalSigns = question.children.some((child: any) => child.type === 'VitalSignsItem');
-          
+
           if (hasVitalSigns) {
             // Render vital signs as a table
             html += `<div style="margin-left: 20px; margin-top: 10px;">`;
@@ -923,7 +932,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
         if (filledChildren.length > 0) {
           // Check if this section contains VitalSignsItem children - render as table
           const hasVitalSigns = filledChildren.some((child: any) => child.type === 'VitalSignsItem');
-          
+
           if (hasVitalSigns) {
             // Render vital signs as a table in Note tab
             html += `<div style="margin-left: ${marginLeft + 20}px; margin-top: 10px;">`;
@@ -1212,7 +1221,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
 
     // Clear restored IDs on user interaction to prevent feedback loop
     this.restoredSocialHistoryIds = [];
-    
+
     // Store selected items to prevent loss during re-renders
     this.selectedSocialHistoryItems = selectedItems;
 
@@ -1277,7 +1286,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
 
     // Clear restored IDs on user interaction to prevent feedback loop
     this.restoredFamilyHistoryIds = [];
-    
+
     // Store selected items to prevent loss during re-renders
     this.selectedFamilyHistoryItems = selectedItems;
 
@@ -1349,7 +1358,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
 
     // Clear restored IDs on user interaction to prevent feedback loop
     this.restoredAllergiesIds = [];
-    
+
     // Store selected items to prevent loss during re-renders
     this.selectedAllergiesItems = selectedItems;
 
@@ -1425,7 +1434,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
 
     // Clear restored IDs on user interaction to prevent feedback loop
     this.restoredMedicalHistoryIds = [];
-    
+
     // Store selected items to prevent loss during re-renders
     this.selectedMedicalHistoryItems = selectedItems;
 
@@ -1502,7 +1511,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
 
     // Clear restored IDs on user interaction to prevent feedback loop
     this.restoredVitalSignsIds = [];
-    
+
     // Store selected items to prevent loss during re-renders
     this.selectedVitalSignsItems = selectedItems;
 
@@ -1581,7 +1590,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
 
     // Clear restored IDs on user interaction to prevent feedback loop
     this.restoredImmunizationsIds = [];
-    
+
     // Store selected items to prevent loss during re-renders
     this.selectedImmunizationsItems = selectedItems;
 
@@ -1602,7 +1611,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       selectedItems.forEach((item, index) => {
         const providerText = item.isOutsideClinic ? `${item.providerName} (Outside Clinic)` : item.providerName;
         const dateText = item.startDate ? new Date(item.startDate).toLocaleDateString() : 'N/A';
-        
+
         const childQuestion = {
           quest_Id: Number(item.immunizationId) || (60000000 + index), // Use immunizationId as unique ID
           quest_Title: `${item.immTypeName} - ${dateText}`,
@@ -1682,7 +1691,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (socialHistoryItems.length > 0) {
         console.log('✅ Extracted social history items for restoration:', socialHistoryItems);
         this.selectedSocialHistoryItems = socialHistoryItems;
-        
+
         // Populate the restored IDs array for preSelectedIds binding
         this.restoredSocialHistoryIds = socialHistoryItems.map((item: any) => item.shid);
       }
@@ -1713,7 +1722,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (familyHistoryItems.length > 0) {
         console.log('✅ Extracted family history items for restoration:', familyHistoryItems);
         this.selectedFamilyHistoryItems = familyHistoryItems;
-        
+
         // Populate the restored IDs array for preSelectedIds binding
         this.restoredFamilyHistoryIds = familyHistoryItems.map((item: any) => item.fhid);
       }
@@ -1748,7 +1757,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (allergiesItems.length > 0) {
         console.log('✅ Extracted allergies items for restoration:', allergiesItems);
         this.selectedAllergiesItems = allergiesItems;
-        
+
         // Populate the restored IDs array for preSelectedIds binding
         this.restoredAllergiesIds = allergiesItems.map((item: any) => item.allergyId);
       }
@@ -1781,7 +1790,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (medicalHistoryItems.length > 0) {
         console.log('✅ Extracted medical history items for restoration:', medicalHistoryItems);
         this.selectedMedicalHistoryItems = medicalHistoryItems;
-        
+
         // Populate the restored IDs array for preSelectedIds binding
         this.restoredMedicalHistoryIds = medicalHistoryItems.map((item: any) => item.problemId);
       }
@@ -1816,7 +1825,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (vitalSignsItems.length > 0) {
         console.log('✅ Extracted vital signs items for restoration:', vitalSignsItems);
         this.selectedVitalSignsItems = vitalSignsItems;
-        
+
         // Populate the restored IDs array for preSelectedIds binding
         this.restoredVitalSignsIds = vitalSignsItems.map((item: any) => item.vitalId);
       }
@@ -1850,7 +1859,7 @@ export class ClinicalStructuredNoteCreateComponent implements OnInit, AfterViewI
       if (immunizationsItems.length > 0) {
         console.log('✅ Extracted immunizations items for restoration:', immunizationsItems);
         this.selectedImmunizationsItems = immunizationsItems;
-        
+
         // Populate the restored IDs array for preSelectedIds binding
         this.restoredImmunizationsIds = immunizationsItems.map((item: any) => item.immunizationId);
       }
