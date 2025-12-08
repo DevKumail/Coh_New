@@ -23,6 +23,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public int? GenderId { get; set; }
         public long? DeliveryMethodCategoryId { get; set; }
         public int? Weight { get; set; }
+        public int? Length { get; set; }
         public int? HeadCircumference { get; set; }
         public int? Apgar1 { get; set; }
         public int? Apgar5 { get; set; }

@@ -120,6 +120,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Birth
                             GenderId = childDto.GenderId,
                             DeliveryMethodCategoryId = childDto.DeliveryMethodCategoryId,
                             Weight = childDto.Weight,
+                            Length = childDto.Length,
                             HeadCircumference = childDto.HeadCircumference,
                             Apgar1 = childDto.Apgar1,
                             Apgar5 = childDto.Apgar5,
