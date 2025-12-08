@@ -122,6 +122,24 @@ namespace HMIS.Web.Controllers.IVF.Episodes
             }
         }
 
-        //----------------- Overview end -----------------
+        [HttpGet("get-medication/{medicationId}")]
+        public async Task<IActionResult> GetMedicationById(long medicationId)
+        {
+            try
+            {
+                var result = await _overviewService.GetMedicationByIdAsync(medicationId);
+
+                if (result == null)
+                    return NotFound(new { Message = "No Medication found for the given Medication ID." });
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while fetching medication details.", Details = ex.Message });
+            }
+        }
+
+            //----------------- Overview end -----------------
     }
 }
