@@ -1195,6 +1195,11 @@ export class CycleOverviewComponent {
     const clickedDate: string = arg?.dateStr || '';
     this.setSelectedDate(clickedDate);
 
+    // Prevent modal from opening when clicking on divider rows
+    if (resId === 'divider-meds' || resId === 'divider-hormones' || resId === 'divider-ultrasound') {
+      return;
+    }
+
     // If Examination row is clicked, open Lab Order modal instead of generic add modal
     if (resId === 'orders') {
       this.labInvestigationTypeId = 5;
