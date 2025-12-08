@@ -2,6 +2,7 @@
 using HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview;
 using HMIS.Core.Context;
 using HMIS.Infrastructure.ORM;
+using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
@@ -9,6 +10,7 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
     public interface IOverviewService
     {
         Task<GetAllOverviewDetailDto> GetOverviewByTreatmentCycleAsync(long treatmentCycleId);
+        Task<GetMedicationDto> GetMedicationByIdAsync(long medicationId);
     }
     public class OverviewService : IOverviewService
     {
@@ -36,19 +38,19 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
                         ov = overview;
                         ov.Calender = new List<GetCalenderDto>
                         {
-                    new GetCalenderDto
-                    {
-                        Events = new List<GetEventDetailDto>(),
-                        Medications = new List<GetMedicationDto>(),
-                        UltraSound = new List<GetUltraSound>()
-                    }
+                            new GetCalenderDto
+                            {
+                                Events = new List<GetEventDetailDto>(),
+                                Medications = new List<GetMedicationDto>(),
+                                UltraSound = new List<GetUltraSound>()
+                            }
                         };
                         ov.Resources = new List<GetResourcesDetailDto>
                         {
-                    new GetResourcesDetailDto
-                    {
-                        AllMedications = new List<GetSidebarMedicationDto>()
-                    }
+                            new GetResourcesDetailDto
+                            {
+                                AllMedications = new List<GetSidebarMedicationDto>()
+                            }
                         };
                         lookup.Add(ov.OverviewId, ov);
                     }
@@ -118,6 +120,47 @@ namespace HMIS.Application.ServiceLogics.IVF.Episodes.Overview
             );
 
             return lookup.Values.FirstOrDefault();
+        }
+
+        public async Task<GetMedicationDto> GetMedicationByIdAsync(long medicationId)
+        {
+            using var connection = _dapper.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@MedicationId", medicationId);
+
+            var medicationDict = new Dictionary<long, GetMedicationDto>();
+
+            var result = await connection.QueryAsync<GetMedicationDto, GetApplicationDomainDto, GetTimeDetailsDto, GetMedicationDto>(
+                "IVF_GetMedicationById",
+                (medication, appDomain, time) =>
+                {
+                    if (!medicationDict.TryGetValue(medication.MedicationId, out var medicationEntry))
+                    {
+                        medicationEntry = medication;
+                        medicationDict.Add(medication.MedicationId, medicationEntry);
+                    }
+
+                    if (appDomain?.ApplicationDomainId != null &&
+                        !medicationEntry.ApplicationDomainName.Any(ad => ad.ApplicationDomainId == appDomain.ApplicationDomainId))
+                    {
+                        medicationEntry.ApplicationDomainName.Add(appDomain);
+                    }
+
+                    if (time?.TimeId != null &&
+                        !medicationEntry.TimeDetails.Any(t => t.TimeId == time.TimeId))
+                    {
+                        medicationEntry.TimeDetails.Add(time);
+                    }
+
+                    return medicationEntry;
+                },
+                splitOn: "ApplicationDomainId,TimeId",
+                param: parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return medicationDict.Values.FirstOrDefault();
         }
     }
 }

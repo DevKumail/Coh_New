@@ -9,6 +9,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public int? IVFDashboardTreatmentCycleId { get; set; }
         public int? StatusId { get; set; }
         
+        public DateTime? PregnancyDeterminedOnDate {get;set;}
         public int? ChildrenCount {get;set;}
         public List<IVFEpisodeBirthChildDto>? Children { get; set; }
     }
@@ -23,6 +24,7 @@ namespace HMIS.Application.DTOs.IVFDTOs
         public int? GenderId { get; set; }
         public long? DeliveryMethodCategoryId { get; set; }
         public int? Weight { get; set; }
+        public int? Length { get; set; }
         public int? HeadCircumference { get; set; }
         public int? Apgar1 { get; set; }
         public int? Apgar5 { get; set; }

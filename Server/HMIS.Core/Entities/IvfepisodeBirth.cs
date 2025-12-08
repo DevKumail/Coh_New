@@ -24,6 +24,8 @@ public partial class IvfepisodeBirth
 
     public int? Weight { get; set; }
 
+    public int? Length { get; set; }
+
     public int? HeadCircumference { get; set; }
 
     [Column("APGAR1")]
