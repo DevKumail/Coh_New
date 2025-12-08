@@ -54,14 +54,12 @@ namespace HMIS.Application.DTOs.IVFDTOs.EpisodeDto.Overview
         public string Frequency { get; set; }
         public string Dose { get; set; }
         public string RouteId { get; set; }
-        public string RouteName { get; set; }
         public string Quantity { get; set; }
         public string AdditionalRefills { get; set; }
         public string Samples { get; set; }
         public string Substitution { get; set; }
         public string Instructions { get; set; }
         public string IndicationsId { get; set; }
-        public string Indications { get; set; }
     }
 
     public class GetTimeDetailsDto
