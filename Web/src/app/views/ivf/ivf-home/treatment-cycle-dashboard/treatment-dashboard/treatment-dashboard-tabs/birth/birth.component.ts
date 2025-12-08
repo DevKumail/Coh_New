@@ -23,6 +23,7 @@ export class BirthComponent implements OnInit, AfterViewInit {
   cycleId: number = 0;
   birthId: number | null = null;
   childrenCount: number = 0;
+  pregnancyDeterminedOnDate: string | null = null;
   isLoading: boolean = false;
   isSaving: boolean = false;
   private pendingChildrenCount: number = 0;
@@ -133,14 +134,17 @@ export class BirthComponent implements OnInit, AfterViewInit {
         if (response?.birth) {
           this.birthId = response.birth.birthId;
           this.childrenCount = response.birth.childrenCount || 0;
+          this.pregnancyDeterminedOnDate = response.birth.pregnancyDeterminedOnDate || null;
 
           console.log('Children count:', this.childrenCount);
+          console.log('Pregnancy Determined On Date:', this.pregnancyDeterminedOnDate);
           console.log('Birth tab component:', this.birthTab);
 
           // Pass data to child component
           if (this.birthTab) {
             console.log('Birth tab available, setting children count immediately');
             this.birthTab.isLoading = true;
+            this.birthTab.pregnancyDeterminedOnDate = this.pregnancyDeterminedOnDate;
 
             // Small delay to show skeleton
             setTimeout(() => {
@@ -174,36 +178,34 @@ export class BirthComponent implements OnInit, AfterViewInit {
 
     const formData = this.birthTab.form.getRawValue();
 
-    // Build payload
+    // Build payload matching API structure
     const payload = {
       birthId: this.birthId || 0,
       ivfDashboardTreatmentCycleId: this.cycleId,
       statusId: 0,
+      pregnancyDeterminedOnDate: new Date().toISOString(),
       childrenCount: this.childrenCount,
       children: formData.children.map((child: any) => ({
         id: 0,
         birthId: this.birthId || 0,
-        dateOfBirth: child.dateOfBirth || null,
-        week: (child.week !== null && child.week !== undefined && child.week !== '') ? Number(child.week) : null,
-        genderId: (child.gender && child.gender !== '' && child.gender !== '—') ? child.gender : null,
-        deliveryMethodCategoryId: (child.deliveryMethod && child.deliveryMethod !== '' && child.deliveryMethod !== '—') ? child.deliveryMethod : null,
+        dateOfBirth: child.dateOfBirth ? new Date(child.dateOfBirth).toISOString() : new Date().toISOString(),
+        week: (child.week !== null && child.week !== undefined && child.week !== '') ? Number(child.week) : 0,
+        genderId: (child.gender && child.gender !== '' && child.gender !== '—') ? Number(child.gender) : 0,
+        deliveryMethodCategoryId: (child.deliveryMethod && child.deliveryMethod !== '' && child.deliveryMethod !== '—') ? Number(child.deliveryMethod) : 0,
         weight: child.weight ? Number(child.weight) : 0,
         length: child.length ? Number(child.length) : 0,
         headCircumference: child.headCircumference ? Number(child.headCircumference) : 0,
-        apgar1: (child.apgar1 !== null && child.apgar1 !== undefined && child.apgar1 !== '') ? Number(child.apgar1) : null,
-        apgar5: (child.apgar5 !== null && child.apgar5 !== undefined && child.apgar5 !== '') ? Number(child.apgar5) : null,
-        conditionCategoryId: (child.condition && child.condition !== '' && child.condition !== '—') ? child.condition : null,
-        infantFeedingCategoryId: (child.infantFeeding && child.infantFeeding !== '' && child.infantFeeding !== '—') ? child.infantFeeding : null,
-        deathPostPartumOn: child.deathPostPartumOn || null,
-        diedPerinatallyOn: child.diedPerinatallyOn || null,
-        identityNumber: child.identityNumber || null,
-        firstName: child.firstName || null,
-        surname: child.surname || null,
-        placeOfBirth: child.placeOfBirth || null,
-        countryId: (child.countryOfBirth && child.countryOfBirth !== '' && child.countryOfBirth !== '—') ? child.countryOfBirth : null,
-        note: child.note || null,
-        chromosomeAnomalyCategoryIds: (child.icd10Codes || []).filter((c: string) => c && c.trim() !== ''),
-        congenitalMalformationCategoryIds: (child.malfCodes || []).filter((c: string) => c && c.trim() !== '')
+        apgar1: (child.apgar1 !== null && child.apgar1 !== undefined && child.apgar1 !== '') ? Number(child.apgar1) : 0,
+        apgar5: (child.apgar5 !== null && child.apgar5 !== undefined && child.apgar5 !== '') ? Number(child.apgar5) : 0,
+        deathPostPartumOn: child.deathPostPartumOn ? new Date(child.deathPostPartumOn).toISOString() : new Date().toISOString(),
+        diedPerinatallyOn: child.diedPerinatallyOn ? new Date(child.diedPerinatallyOn).toISOString() : new Date().toISOString(),
+        firstName: child.firstName || 'string',
+        surname: child.surname || 'string',
+        placeOfBirth: child.placeOfBirth || 'string',
+        countryId: (child.countryOfBirth && child.countryOfBirth !== '' && child.countryOfBirth !== '—') ? Number(child.countryOfBirth) : 0,
+        note: child.note || 'string',
+        chromosomeAnomalyCategoryIds: (child.icd10Codes || []).filter((c: string) => c && c.trim() !== '').map((c: string) => c.toString()),
+        congenitalMalformationCategoryIds: (child.malfCodes || []).filter((c: string) => c && c.trim() !== '').map((c: string) => c.toString())
       }))
     };
 
