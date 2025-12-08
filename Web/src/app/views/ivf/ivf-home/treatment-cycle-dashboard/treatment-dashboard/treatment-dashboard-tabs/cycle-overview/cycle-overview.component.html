@@ -361,7 +361,7 @@
       <button type="button" class="btn-close" aria-label="Close" (click)="closeLabOrderCreateModal()"></button>
     </div>
     <div class="p-0">
-      <app-add-lab-order [mrNo]="mrNo" [mode]="'create'" [investigationTypeId]="5" (cancel)="closeLabOrderCreateModal()"
+      <app-add-lab-order [mrNo]="mrNo" [mode]="'create'" [investigationTypeId]="labInvestigationTypeId" (cancel)="closeLabOrderCreateModal()"
         (save)="onLabOrderCreateSave($event)">
       </app-add-lab-order>
     </div>
