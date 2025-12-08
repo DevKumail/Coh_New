@@ -16,6 +16,7 @@ export class BirthComponent {
   @Input() dropdowns: any = {};
   @Input() genders: any[] = [];
   @Input() countries: any[] = [];
+  @Input() pregnancyDeterminedOnDate: string | null = null;
   
   form: FormGroup;
   childrenCount: number = 0;
@@ -119,9 +120,30 @@ export class BirthComponent {
           return date.toISOString().split('T')[0]; // YYYY-MM-DD format
         };
 
+        // Calculate CDB (Calculated Date of Birth) based on pregnancyDeterminedOnDate + 280 days (40 weeks)
+        // Same calculation as in progress component
+        let calculatedCDB = null;
+        if (this.pregnancyDeterminedOnDate) {
+          const pregnancyDate = new Date(this.pregnancyDeterminedOnDate);
+          // Add 280 days (40 weeks) to get calculated birth date
+          pregnancyDate.setDate(pregnancyDate.getDate() + 280);
+          
+          // Format to YYYY-MM-DD (same format as progress component)
+          const year = pregnancyDate.getFullYear();
+          const month = String(pregnancyDate.getMonth() + 1).padStart(2, '0');
+          const day = String(pregnancyDate.getDate()).padStart(2, '0');
+          calculatedCDB = `${year}-${month}-${day}`;
+          
+          console.log('CDB Calculation:', {
+            pregnancyDeterminedOnDate: this.pregnancyDeterminedOnDate,
+            calculatedCDB: calculatedCDB
+          });
+        }
+
         // Map API fields to form fields
         formGroup.patchValue({
           dateOfBirth: formatDate(child.dateOfBirth),
+          cdb: calculatedCDB,
           week: child.week !== null && child.week !== undefined ? child.week : null,
           gender: child.genderId,
           deliveryMethod: child.deliveryMethodCategoryId,
