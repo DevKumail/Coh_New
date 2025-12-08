@@ -51,7 +51,6 @@
                     }" [hidden]="!embryosFA.at(i).get('checked')?.value">
                         <div class="card embryo-card shadow-sm" [formGroupName]="i">
                             <div class="embryo-card__header d-flex align-items-center gap-2 p-1">
-                                <input class="form-check-input m-0" type="checkbox" formControlName="checked" />
                                 <strong>Embryo {{ d.key }}</strong>
                             </div>
                             <div class="embryo-card__body">

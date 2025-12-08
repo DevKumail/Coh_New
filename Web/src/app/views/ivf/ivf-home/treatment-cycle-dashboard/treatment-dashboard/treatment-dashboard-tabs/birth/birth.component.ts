@@ -12,7 +12,7 @@ import { Page } from '@/app/shared/enum/dropdown.enum';
 @Component({
   selector: 'app-birth',
   standalone: true,
-  imports: [CommonModule, BirthTabComponent, FollowUpComponent,FilledOnValueDirective],
+  imports: [CommonModule, BirthTabComponent, FollowUpComponent, FilledOnValueDirective],
   templateUrl: './birth.component.html',
   styleUrl: './birth.component.scss'
 })
@@ -28,14 +28,17 @@ export class BirthComponent implements OnInit, AfterViewInit {
   private pendingChildrenCount: number = 0;
   dropdowns: any = [];
   AllDropdownValues: any = [];
+  Country: any = [];
+  genders: any = [];
   constructor(
     private route: ActivatedRoute,
     private ivfApi: IVFApiService,
     private sharedservice: SharedService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.getAlldropdown()
+    this.getAlldropdown();
+    this.FillCache();
     this.route.queryParamMap.subscribe((qp) => {
       const idStr = qp.get('cycleId');
       const id = Number(idStr);
@@ -44,26 +47,75 @@ export class BirthComponent implements OnInit, AfterViewInit {
         this.loadBirthData();
       }
     });
-
-
   }
 
-      // Store payload from service for dynamic labels/options
-      getAllDropdown(payload: { [key: string]: Array<{ valueId: number; name: string }> }) {
-        this.dropdowns = payload || {};
-      }
-    
-      getAlldropdown() {
-        this.sharedservice.getDropDownValuesByName(Page.IVFBirthEpisode).subscribe((res: any) => {
-          this.AllDropdownValues = res;
-          this.getAllDropdown(res);
-        })
-      }
-    
-      // Helper to read dropdown options by key
-      options(key: string) {
-        return (this.dropdowns && this.dropdowns[`IVFBirthEpisode:${key}`]) || [];
-      }
+
+
+  FillCache() {
+    this.sharedservice.getCacheItem({
+      entities: [
+        'RegGender',
+        'RegCountries',
+      ],
+    })
+      .subscribe((response: any) => {
+        if (response.cache) {
+          this.FillDropDown(
+            JSON.parse(JSON.stringify(response)).cache
+          );
+        }
+      })
+  }
+
+  FillDropDown(jParse: any) {
+    const json = JSON.parse(jParse);
+
+    let regcountries = JSON.parse(jParse).RegCountries;
+    let reggender = JSON.parse(jParse).RegGender;
+
+    if (regcountries) {
+      regcountries = regcountries.map(
+        (item: { CountryId: any; Name: any }) => {
+          return {
+            name: item.Name,
+            code: item.CountryId,
+          };
+        }
+      );
+
+      this.Country = regcountries;
+    }
+    if (reggender) {
+      reggender = reggender.map(
+        (item: { GenderId: any; Gender: any }) => {
+          return {
+            name: item.Gender,
+            code: item.GenderId,
+          };
+        }
+      );
+
+      this.genders = reggender;
+    }
+  }
+
+
+  // Store payload from service for dynamic labels/options
+  getAllDropdown(payload: { [key: string]: Array<{ valueId: number; name: string }> }) {
+    this.dropdowns = payload || {};
+  }
+
+  getAlldropdown() {
+    this.sharedservice.getDropDownValuesByName(Page.IVFBirthEpisode).subscribe((res: any) => {
+      this.AllDropdownValues = res;
+      this.getAllDropdown(res);
+    })
+  }
+
+  // Helper to read dropdown options by key
+  options(key: string) {
+    return (this.dropdowns && this.dropdowns[`IVFBirthEpisode:${key}`]) || [];
+  }
   ngAfterViewInit(): void {
     // If data was loaded before ViewChild was ready, apply it now
     if (this.pendingChildrenCount > 0 && this.birthTab) {
@@ -81,15 +133,15 @@ export class BirthComponent implements OnInit, AfterViewInit {
         if (response?.birth) {
           this.birthId = response.birth.birthId;
           this.childrenCount = response.birth.childrenCount || 0;
-          
+
           console.log('Children count:', this.childrenCount);
           console.log('Birth tab component:', this.birthTab);
-          
+
           // Pass data to child component
           if (this.birthTab) {
             console.log('Birth tab available, setting children count immediately');
             this.birthTab.isLoading = true;
-            
+
             // Small delay to show skeleton
             setTimeout(() => {
               if (this.birthTab) {
@@ -121,7 +173,7 @@ export class BirthComponent implements OnInit, AfterViewInit {
     }
 
     const formData = this.birthTab.form.getRawValue();
-    
+
     // Build payload
     const payload = {
       birthId: this.birthId || 0,
@@ -150,21 +202,21 @@ export class BirthComponent implements OnInit, AfterViewInit {
         placeOfBirth: child.placeOfBirth || null,
         countryId: (child.countryOfBirth && child.countryOfBirth !== '' && child.countryOfBirth !== '—') ? child.countryOfBirth : null,
         note: child.note || null,
-        chromosomeAnomalyCategoryIds: child.chromAnom ? child.icd10Codes.filter((c: string) => c) : [],
-        congenitalMalformationCategoryIds: child.malfEnable ? child.malfCodes.filter((c: string) => c) : []
+        chromosomeAnomalyCategoryIds: (child.icd10Codes || []).filter((c: string) => c && c.trim() !== ''),
+        congenitalMalformationCategoryIds: (child.malfCodes || []).filter((c: string) => c && c.trim() !== '')
       }))
     };
 
     console.log('Birth save payload:', payload);
 
     const isUpdate = this.birthId && this.birthId > 0;
-    
+
     this.isSaving = true;
     this.ivfApi.saveEpisodeBirth(payload).subscribe({
       next: (response: any) => {
         console.log('Birth saved successfully:', response);
         this.isSaving = false;
-        
+
         Swal.fire({
           icon: 'success',
           title: isUpdate ? 'Updated!' : 'Saved!',
@@ -181,7 +233,7 @@ export class BirthComponent implements OnInit, AfterViewInit {
       error: (error: any) => {
         console.error('Birth save error:', error);
         this.isSaving = false;
-        
+
         let errorMessage = 'Failed to save birth data';
         if (error?.error?.errors) {
           const errors = Object.values(error.error.errors).flat();

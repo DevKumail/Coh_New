@@ -50,8 +50,9 @@
                             </div>
                             <div class="col-6">
                                 <label class="form-label mb-0">Gender</label>
-                                <select class="form-select form-select-sm" formControlName="gender">
-                                    <option value="" disabled selected>Select Gender</option>
+                                <select class="form-select form-select-sm" formControlName="gender" filledOnValue>
+                                    <option value="">Select Gender</option>
+                                    <option *ngFor="let gender of genders" [value]="gender.code">{{ gender.name }}</option>
                                 </select>
                             </div>
                             <div class="col-6">
@@ -81,14 +82,10 @@
                                 <label class="form-label mb-0">APGAR 5</label>
                                 <input type="number" class="form-control form-control-sm" formControlName="apgar5" />
                             </div>
-                            <div class="col-6">
+                            <!-- <div class="col-6">
                                 <label class="form-label mb-0">Condition</label>
                                 <input class="form-control form-control-sm" formControlName="condition" />
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label mb-0">Infant feeding</label>
-                                <input class="form-control form-control-sm" formControlName="infantFeeding" />
-                            </div>
+                            </div> -->
                             <div class="col-6">
                                 <label class="form-label mb-0">Death post-partum on</label>
                                 <input type="date" class="form-control form-control-sm" formControlName="deathPostPartumOn" />
@@ -97,10 +94,10 @@
                                 <label class="form-label mb-0">Died perinatally on</label>
                                 <input type="date" class="form-control form-control-sm" formControlName="diedPerinatallyOn" />
                             </div>
-                            <div class="col-6">
+                            <!-- <div class="col-6">
                                 <label class="form-label mb-0">Identity number</label>
                                 <input class="form-control form-control-sm" formControlName="identityNumber" />
-                            </div>
+                            </div> -->
                             <div class="col-6">
                                 <label class="form-label mb-0">First name</label>
                                 <input class="form-control form-control-sm" formControlName="firstName" />
@@ -115,8 +112,9 @@
                             </div>
                             <div class="col-6">
                                 <label class="form-label mb-0">Country of birth</label>
-                                <select class="form-select form-select-sm" formControlName="countryOfBirth">
-                                    <option value="" disabled selected>—</option>
+                                <select class="form-select form-select-sm" formControlName="countryOfBirth" filledOnValue>
+                                    <option value="">Select Country</option>
+                                    <option *ngFor="let country of countries" [value]="country.code">{{ country.name }}</option>
                                 </select>
                             </div>
                             <div class="col-12">
@@ -128,17 +126,42 @@
                             <div class="col-12">
                                 <div class="border rounded">
                                     <div class="d-flex align-items-center gap-2 px-2 py-1 border-bottom bg-light">
-                                        <label class="form-label mb-0 fw-semibold small">ICD 10</label>
+                                        <label class="form-label mb-0 fw-semibold small">Chromosome anomaly (ICD-10)</label>
                                     </div>
                                     <div class="p-2">
-                                        <div class="form-check mb-2">
-                                            <input class="form-check-input" type="checkbox" [id]="'chromAnom_' + i" formControlName="chromAnom">
-                                            <label class="form-check-label" [for]="'chromAnom_' + i">Chromosome anomaly</label>
-                                        </div>
-                                        <div class="row g-2" formArrayName="icd10Codes">
-                                            <div class="col-2" *ngFor="let c of getIcd10CodesFA(i).controls; let j = index">
-                                                <input class="form-control form-control-sm" [formControlName]="j" [disabled]="true" />
-                                            </div>
+                                        <div class="dropdown w-100">
+                                            <button class="btn btn-sm border w-100 text-start d-flex justify-content-between align-items-center"
+                                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="text-truncate">
+                                                    <span *ngIf="getSelectedChromosomes(i).length === 0" class="text-muted">Select chromosome anomaly...</span>
+                                                    <span *ngIf="getSelectedChromosomes(i).length > 0">{{ getSelectedChromosomes(i).join(', ') }}</span>
+                                                </span>
+                                                <i class="bi bi-chevron-down ms-2"></i>
+                                            </button>
+                                            <ul class="dropdown-menu w-100" data-bs-auto-close="outside">
+                                                <li class="px-2 py-1 sticky-top bg-white" style="z-index: 10;">
+                                                    <input type="text" class="form-control form-control-sm" placeholder="Search..."
+                                                        [ngModel]="searchChromosome" (ngModelChange)="onChromosomeSearchChange($event, i)"
+                                                        [ngModelOptions]="{standalone: true}">
+                                                </li>
+                                                <li><hr class="dropdown-divider m-0"></li>
+                                                <li>
+                                                    <div style="max-height: 260px; overflow: auto;" (scroll)="onChromosomeScroll($event, i)">
+                                                        <div *ngFor="let opt of filteredChromosomeOptions" class="px-2 py-1">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" 
+                                                                    [checked]="isChromosomeSelected(opt, i)"
+                                                                    (click)="$event.stopPropagation()" 
+                                                                    (change)="toggleChromosome(opt, i)">
+                                                                <label class="form-check-label"
+                                                                    (click)="$event.preventDefault(); $event.stopPropagation(); toggleChromosome(opt, i)">
+                                                                    {{ opt }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -148,26 +171,42 @@
                             <div class="col-12">
                                 <div class="border rounded">
                                     <div class="d-flex align-items-center gap-2 px-2 py-1 border-bottom bg-light">
-                                        <div class="form-check m-0">
-                                            <input class="form-check-input" type="checkbox" [id]="'malfEnable_' + i" formControlName="malfEnable">
-                                        </div>
-                                        <label class="form-label mb-0 fw-semibold small" [for]="'malfEnable_' + i">Congenital malformation</label>
+                                        <label class="form-label mb-0 fw-semibold small">Congenital malformation (ICD-10)</label>
                                     </div>
                                     <div class="p-2">
-                                        <div class="d-flex align-items-center gap-4 mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" [id]="'malfMajor_' + i" value="major" formControlName="malfType">
-                                                <label class="form-check-label fw-semibold" [for]="'malfMajor_' + i">Major</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" [id]="'malfMinor_' + i" value="minor" formControlName="malfType">
-                                                <label class="form-check-label fw-semibold" [for]="'malfMinor_' + i">Minor</label>
-                                            </div>
-                                        </div>
-                                        <div class="row g-2" formArrayName="malfCodes">
-                                            <div class="col-2" *ngFor="let c of getMalfCodesFA(i).controls; let j = index">
-                                                <input class="form-control form-control-sm" [formControlName]="j" [disabled]="true" />
-                                            </div>
+                                        <div class="dropdown w-100">
+                                            <button class="btn btn-sm border w-100 text-start d-flex justify-content-between align-items-center"
+                                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="text-truncate">
+                                                    <span *ngIf="getSelectedMalformations(i).length === 0" class="text-muted">Select congenital malformation...</span>
+                                                    <span *ngIf="getSelectedMalformations(i).length > 0">{{ getSelectedMalformations(i).join(', ') }}</span>
+                                                </span>
+                                                <i class="bi bi-chevron-down ms-2"></i>
+                                            </button>
+                                            <ul class="dropdown-menu w-100" data-bs-auto-close="outside">
+                                                <li class="px-2 py-1 sticky-top bg-white" style="z-index: 10;">
+                                                    <input type="text" class="form-control form-control-sm" placeholder="Search..."
+                                                        [ngModel]="searchMalformation" (ngModelChange)="onMalformationSearchChange($event, i)"
+                                                        [ngModelOptions]="{standalone: true}">
+                                                </li>
+                                                <li><hr class="dropdown-divider m-0"></li>
+                                                <li>
+                                                    <div style="max-height: 260px; overflow: auto;" (scroll)="onMalformationScroll($event, i)">
+                                                        <div *ngFor="let opt of filteredMalformationOptions" class="px-2 py-1">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" 
+                                                                    [checked]="isMalformationSelected(opt, i)"
+                                                                    (click)="$event.stopPropagation()" 
+                                                                    (change)="toggleMalformation(opt, i)">
+                                                                <label class="form-check-label"
+                                                                    (click)="$event.preventDefault(); $event.stopPropagation(); toggleMalformation(opt, i)">
+                                                                    {{ opt }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
